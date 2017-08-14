@@ -494,7 +494,9 @@ module.exports = function (app) {
       .exec()
     .then(results => {   
        if(results){
-          var resultArray = results.filter(item => {        
+         console.log(results[0])
+          var resultArray = results.filter(item => {    
+            if(!item.requestId) return false;    
             return item.requestId.sessionId == req.params.sessionId && item.requestId.institutionId._id == req.params.institutionId;
           }) 
           res.status(200).json(resultArray);

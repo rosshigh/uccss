@@ -32,6 +32,18 @@ export class Systems{
         }
     }
 
+    async getSystem(index){
+        if(index){
+            let id = this.systemsArray[index]._id;
+            let serverResponse = await this.data.get(this.SYSTEMS_SERVICE + "/" + id);
+            if(!serverResponse.error){
+                this.selectedSystem = serverResponse;
+                this.systemsArray[index] = this.utils.copyObject(this.selectedSystem);
+            }
+            return serverResponse;
+        }
+    }
+
     selectSystem(index){
         if(!index && index != 0) {
             this.selectedSystem = this.emptySystem();
@@ -121,15 +133,14 @@ export class Systems{
         return response;
     }
 
-    isDirty(){
+    isDirty(obj, skip){
         if(this.selectedSystem){
-            if(this.selectedSystem._id){
-                var obj = this.systemsArray[this.editIndex];
-            } else {
-                var obj = this.emptySystem();
+            if(!obj){
+                var obj = this.emptyRequest();
             }
-            return this.utils.objectsEqual(this.selectedSystem, obj);
+            return this.utils.objectsEqual(this.selectedSystem, obj, skip);
         }
+        return new Array();
     }
 
     async deleteAllClients(){

@@ -985,7 +985,7 @@ export class Assignments {
     }
 
 	back() {
-        if(this.assignmentDetails && this.assignmentDetails.length > 0){
+        if(this.assignmentDetails && this.assignmentDetails.length > 0 && this.selectedRequestDetail.requestStatus != this.config.ASSIGNED_REQUEST_CODE){
              return this.dialog.showMessage(
                     "There is an unsaved assignment. Are you sure you want to leave this page?",
                     "Confirm Back",

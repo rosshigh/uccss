@@ -25,24 +25,24 @@ module.exports = function (app) {
     })
   });
 
-  router.get('/api/systems/clients', requireAuth, function(req, res, next){
-    logger.log('Get systems with clients',"verbose");
-    Model.find({})
-      .sort(req.query.order)
-      .populate('clients')
-      .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
-  });
+  // router.get('/api/systems/clients', requireAuth, function(req, res, next){
+  //   logger.log('Get systems with clients',"verbose");
+  //   Model.find({})
+  //     .sort(req.query.order)
+  //     .populate({path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName'})
+  //     .exec(function(err, object){
+  //       if (err) {
+  //         return next(err);
+  //       } else {
+  //         res.status(200).json(object);
+  //       }
+  //     });
+  // });
 
   router.get('/api/systems/:id', requireAuth, function(req, res, next){
     logger.log('Get system ' + req.params.id,"verbose");
     Model.findById(req.params.id)
-      .populate('clients')
+     .populate({path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName'})
       .exec(function(err, object){
       if (err) {
         return next(err);

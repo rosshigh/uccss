@@ -66,9 +66,15 @@ export class EditSystem {
         this.newSystem = true;
     }
 
-    edit(index, el) {
+    async edit(index, el) {
         this.editIndex = this.dataTable.getOriginalIndex(index);
-        this.systems.selectSystem(this.editIndex);
+        let response = await this.systems.getSystem(this.editIndex)
+        // this.systems.selectSystem(this.editIndex);
+        if(response.error){
+            this.utils.showNotification('There was an error retrieving the system');
+            return;
+        }
+        this.originalSystem = this.utils.copyObject(this.systems.selectedSystem);
         this.editSystem = true;
         this.systemSelected = true;
         this.newSystem = false;
@@ -433,7 +439,7 @@ export class EditSystem {
     }
 
     back() {
-        if (this.systems.isDirty().length) {
+        if (this.systems.isDirty(this.originalSystem).length) {
             return this.dialog.showMessage(
                 "The system has been changed. Do you want to save your changes?", 
                 "Save Changes", 

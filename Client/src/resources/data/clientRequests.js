@@ -281,6 +281,7 @@ export class ClientRequests {
           if(!obj){
               var obj = this.emptyRequest();
           }
+            if(!skip) skip = new Array();
             skip.push('audit');
             return this.utils.objectsEqual(this.selectedRequest, obj, skip);
         }

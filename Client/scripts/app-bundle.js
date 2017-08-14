@@ -7061,6 +7061,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                 if (!obj) {
                     var obj = this.emptyRequest();
                 }
+                if (!skip) skip = new Array();
                 skip.push('audit');
                 return this.utils.objectsEqual(this.selectedRequest, obj, skip);
             }
@@ -14443,6 +14444,46 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
             return getSystemsArray;
         }();
 
+        Systems.prototype.getSystem = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(index) {
+                var id, serverResponse;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!index) {
+                                    _context2.next = 7;
+                                    break;
+                                }
+
+                                id = this.systemsArray[index]._id;
+                                _context2.next = 4;
+                                return this.data.get(this.SYSTEMS_SERVICE + "/" + id);
+
+                            case 4:
+                                serverResponse = _context2.sent;
+
+                                if (!serverResponse.error) {
+                                    this.selectedSystem = serverResponse;
+                                    this.systemsArray[index] = this.utils.copyObject(this.selectedSystem);
+                                }
+                                return _context2.abrupt('return', serverResponse);
+
+                            case 7:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getSystem(_x3) {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getSystem;
+        }();
+
         Systems.prototype.selectSystem = function selectSystem(index) {
             if (!index && index != 0) {
                 this.selectedSystem = this.emptySystem();
@@ -14491,45 +14532,45 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
         };
 
         Systems.prototype.saveSystem = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
                 var _serverResponse, serverResponse;
 
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
-                        switch (_context2.prev = _context2.next) {
+                        switch (_context3.prev = _context3.next) {
                             case 0:
                                 if (this.selectedSystem) {
-                                    _context2.next = 2;
+                                    _context3.next = 2;
                                     break;
                                 }
 
-                                return _context2.abrupt('return');
+                                return _context3.abrupt('return');
 
                             case 2:
                                 if (this.selectedSystem._id) {
-                                    _context2.next = 10;
+                                    _context3.next = 10;
                                     break;
                                 }
 
-                                _context2.next = 5;
+                                _context3.next = 5;
                                 return this.data.saveObject(this.selectedSystem, this.SYSTEMS_SERVICE, "post");
 
                             case 5:
-                                _serverResponse = _context2.sent;
+                                _serverResponse = _context3.sent;
 
                                 if (!_serverResponse.error) {
                                     this.systemsArray.push(_serverResponse);
                                 } else {
                                     this.data.processError(_serverResponse, "Error updating the system.<br>");
                                 }
-                                return _context2.abrupt('return', _serverResponse);
+                                return _context3.abrupt('return', _serverResponse);
 
                             case 10:
-                                _context2.next = 12;
+                                _context3.next = 12;
                                 return this.data.saveObject(this.selectedSystem, this.SYSTEMS_SERVICE, "put");
 
                             case 12:
-                                serverResponse = _context2.sent;
+                                serverResponse = _context3.sent;
 
                                 if (!serverResponse.error) {
                                     this.selectedSystem = serverResponse;
@@ -14537,45 +14578,9 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
                                 } else {
                                     this.data.processError(serverResponse, "Error updating the system.<br>");
                                 }
-                                return _context2.abrupt('return', serverResponse);
-
-                            case 15:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function saveSystem() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return saveSystem;
-        }();
-
-        Systems.prototype.deleteSystem = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                _context3.next = 2;
-                                return this.data.deleteObject(this.SYSTEMS_SERVICE + '/' + this.selectedSystem._id);
-
-                            case 2:
-                                serverResponse = _context3.sent;
-
-                                if (!serverResponse.error) {
-                                    this.systemsArray.splice(this.editIndex, 1);
-                                    this.editIndex = -1;
-                                } else {
-                                    this.data.processError(serverResponse, "Error deleting the system.<br>");
-                                }
                                 return _context3.abrupt('return', serverResponse);
 
-                            case 5:
+                            case 15:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -14583,28 +14588,35 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
                 }, _callee3, this);
             }));
 
-            function deleteSystem() {
+            function saveSystem() {
                 return _ref3.apply(this, arguments);
             }
 
-            return deleteSystem;
+            return saveSystem;
         }();
 
-        Systems.prototype.saveProductChanges = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(obj) {
-                var response;
+        Systems.prototype.deleteSystem = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                var serverResponse;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
                                 _context4.next = 2;
-                                return this.data.saveObject(obj, this.SYSTEMS_SERVICE + '/product/', "put");
+                                return this.data.deleteObject(this.SYSTEMS_SERVICE + '/' + this.selectedSystem._id);
 
                             case 2:
-                                response = _context4.sent;
-                                return _context4.abrupt('return', response);
+                                serverResponse = _context4.sent;
 
-                            case 4:
+                                if (!serverResponse.error) {
+                                    this.systemsArray.splice(this.editIndex, 1);
+                                    this.editIndex = -1;
+                                } else {
+                                    this.data.processError(serverResponse, "Error deleting the system.<br>");
+                                }
+                                return _context4.abrupt('return', serverResponse);
+
+                            case 5:
                             case 'end':
                                 return _context4.stop();
                         }
@@ -14612,35 +14624,28 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
                 }, _callee4, this);
             }));
 
-            function saveProductChanges(_x3) {
+            function deleteSystem() {
                 return _ref4.apply(this, arguments);
             }
 
-            return saveProductChanges;
+            return deleteSystem;
         }();
 
-        Systems.prototype.isDirty = function isDirty() {
-            if (this.selectedSystem) {
-                if (this.selectedSystem._id) {
-                    var obj = this.systemsArray[this.editIndex];
-                } else {
-                    var obj = this.emptySystem();
-                }
-                return this.utils.objectsEqual(this.selectedSystem, obj);
-            }
-        };
-
-        Systems.prototype.deleteAllClients = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+        Systems.prototype.saveProductChanges = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(obj) {
+                var response;
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
                         switch (_context5.prev = _context5.next) {
                             case 0:
-                                if (this.selectedSystem._id) {
-                                    this.selectedSystem.clients = new Array();
-                                }
+                                _context5.next = 2;
+                                return this.data.saveObject(obj, this.SYSTEMS_SERVICE + '/product/', "put");
 
-                            case 1:
+                            case 2:
+                                response = _context5.sent;
+                                return _context5.abrupt('return', response);
+
+                            case 4:
                             case 'end':
                                 return _context5.stop();
                         }
@@ -14648,8 +14653,43 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
                 }, _callee5, this);
             }));
 
-            function deleteAllClients() {
+            function saveProductChanges(_x4) {
                 return _ref5.apply(this, arguments);
+            }
+
+            return saveProductChanges;
+        }();
+
+        Systems.prototype.isDirty = function isDirty(obj, skip) {
+            if (this.selectedSystem) {
+                if (!obj) {
+                    var obj = this.emptyRequest();
+                }
+                return this.utils.objectsEqual(this.selectedSystem, obj, skip);
+            }
+            return new Array();
+        };
+
+        Systems.prototype.deleteAllClients = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                if (this.selectedSystem._id) {
+                                    this.selectedSystem.clients = new Array();
+                                }
+
+                            case 1:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function deleteAllClients() {
+                return _ref6.apply(this, arguments);
             }
 
             return deleteAllClients;
@@ -26539,44 +26579,79 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
             this.newSystem = true;
         };
 
-        EditSystem.prototype.edit = function edit(index, el) {
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.systems.selectSystem(this.editIndex);
-            this.editSystem = true;
-            this.systemSelected = true;
-            this.newSystem = false;
-            $("#editSid").focus();
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = $(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-            this.showTable = false;
-            setTimeout(function () {
-                $('[data-toggle="tooltip"]').tooltip();
-            }, 500);
-        };
-
-        EditSystem.prototype.save = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var _this = this;
-
-                var serverResponse;
+        EditSystem.prototype.edit = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(index, el) {
+                var response;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
-                                if (!this.validation.validate(1)) {
+                                this.editIndex = this.dataTable.getOriginalIndex(index);
+                                _context3.next = 3;
+                                return this.systems.getSystem(this.editIndex);
+
+                            case 3:
+                                response = _context3.sent;
+
+                                if (!response.error) {
                                     _context3.next = 7;
+                                    break;
+                                }
+
+                                this.utils.showNotification('There was an error retrieving the system');
+                                return _context3.abrupt('return');
+
+                            case 7:
+                                this.originalSystem = this.utils.copyObject(this.systems.selectedSystem);
+                                this.editSystem = true;
+                                this.systemSelected = true;
+                                this.newSystem = false;
+                                $("#editSid").focus();
+
+                                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                                this.selectedRow = $(el.target).closest('tr');
+                                this.selectedRow.children().addClass('info');
+                                this.showTable = false;
+                                setTimeout(function () {
+                                    $('[data-toggle="tooltip"]').tooltip();
+                                }, 500);
+
+                            case 17:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function edit(_x, _x2) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return edit;
+        }();
+
+        EditSystem.prototype.save = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                var _this = this;
+
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                if (!this.validation.validate(1)) {
+                                    _context4.next = 7;
                                     break;
                                 }
 
                                 this.systems.selectedSystem.sid = this.systems.selectedSystem.sid.toUpperCase();
                                 this.systems.selectedSystem.server = this.systems.selectedSystem.server.toUpperCase();
-                                _context3.next = 5;
+                                _context4.next = 5;
                                 return this.systems.saveSystem();
 
                             case 5:
-                                serverResponse = _context3.sent;
+                                serverResponse = _context4.sent;
 
                                 if (!serverResponse.error) {
                                     if (this.saveProduct) this.products.saveProduct();
@@ -26594,32 +26669,32 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
 
                             case 7:
                             case 'end':
-                                return _context3.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee3, this);
+                }, _callee4, this);
             }));
 
             function save() {
-                return _ref3.apply(this, arguments);
+                return _ref4.apply(this, arguments);
             }
 
             return save;
         }();
 
         EditSystem.prototype.saveBackups = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(system) {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(system) {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
-                        switch (_context4.prev = _context4.next) {
+                        switch (_context5.prev = _context5.next) {
                             case 0:
                                 this.systems.setSelectedSystem(system);
-                                _context4.next = 3;
+                                _context5.next = 3;
                                 return this.systems.saveSystem();
 
                             case 3:
-                                serverResponse = _context4.sent;
+                                serverResponse = _context5.sent;
 
                                 if (!serverResponse.error) {
                                     this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
@@ -26627,14 +26702,14 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
 
                             case 5:
                             case 'end':
-                                return _context4.stop();
+                                return _context5.stop();
                         }
                     }
-                }, _callee4, this);
+                }, _callee5, this);
             }));
 
-            function saveBackups(_x) {
-                return _ref4.apply(this, arguments);
+            function saveBackups(_x3) {
+                return _ref5.apply(this, arguments);
             }
 
             return saveBackups;
@@ -26727,18 +26802,18 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
         };
 
         EditSystem.prototype.deleteSystem = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
                 var name, serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context6.prev = _context6.next) {
                             case 0:
                                 name = this.systems.selectedSystem.sid;
-                                _context5.next = 3;
+                                _context6.next = 3;
                                 return this.systems.deleteSystem();
 
                             case 3:
-                                serverResponse = _context5.sent;
+                                serverResponse = _context6.sent;
 
                                 if (!serverResponse.error) {
                                     this.dataTable.updateArray(this.systems.systemsArray);
@@ -26749,14 +26824,14 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
 
                             case 7:
                             case 'end':
-                                return _context5.stop();
+                                return _context6.stop();
                         }
                     }
-                }, _callee5, this);
+                }, _callee6, this);
             }));
 
             function deleteSystem() {
-                return _ref5.apply(this, arguments);
+                return _ref6.apply(this, arguments);
             }
 
             return deleteSystem;
@@ -26921,24 +26996,24 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
         };
 
         EditSystem.prototype.deleteC = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
                                 this.systems.deleteClient();
                                 this.utils.showNotification("The client was deleted but you must save the system to complete the deltion");
 
                             case 2:
                             case 'end':
-                                return _context6.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee6, this);
+                }, _callee7, this);
             }));
 
             function deleteC() {
-                return _ref6.apply(this, arguments);
+                return _ref7.apply(this, arguments);
             }
 
             return deleteC;
@@ -26979,7 +27054,7 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
         EditSystem.prototype.back = function back() {
             var _this11 = this;
 
-            if (this.systems.isDirty().length) {
+            if (this.systems.isDirty(this.originalSystem).length) {
                 return this.dialog.showMessage("The system has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
                     if (!response.wasCancelled) {
                         _this11.save();
@@ -28527,7 +28602,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         Assignments.prototype.back = function back() {
             var _this7 = this;
 
-            if (this.assignmentDetails && this.assignmentDetails.length > 0) {
+            if (this.assignmentDetails && this.assignmentDetails.length > 0 && this.selectedRequestDetail.requestStatus != this.config.ASSIGNED_REQUEST_CODE) {
                 return this.dialog.showMessage("There is an unsaved assignment. Are you sure you want to leave this page?", "Confirm Back", ['Yes', 'No']).whenClosed(function (response) {
                     if (response.wasCancelled) {
                         return;
