@@ -331,7 +331,7 @@ export class Assignments {
 	
 	findAssignedClients(){
         this.assignmentDetails.forEach(item => {
-            this.systems.selectClientFromID(item.systemId, item.client);
+            this.systems.selectClientFromIDNoSystem(item.systemId, item.client);
             this.proposedClient.push(this.systems.selectedClient);
         })
 	}

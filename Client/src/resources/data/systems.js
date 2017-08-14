@@ -199,6 +199,21 @@ export class Systems{
             this.clientIndex = index;
         }
     }
+
+    selectClientFromIDNoSystem(systemId, clientId){
+      this.selectedClient = null;
+      for(var i = 0, x = this.systemsArray.length; i < x; i++){
+        if(this.systemsArray[i]._id === systemId){
+            for(var j = 0; j < this.systemsArray[i].clients.length; j++){
+                if(this.systemsArray[i].clients[j].client == clientId){
+                    this.selectedClient = this.utils.copyObject(this.systemsArray[i].clients[j]);
+                    this.clientIndex = j;
+                    break;
+                }
+            }  
+        }
+      }
+    }
     
     selectClientFromID(systemId, clientId){
       this.selectedClient = null;

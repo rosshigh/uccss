@@ -4,11 +4,12 @@ import Flatpickr from 'flatpickr';
 
 @inject(Element)
 export class FlatPickerCustomElement {
-
+    backgroundColor = 'white';
     @bindable config = {};
     @bindable startdate;
     @bindable enddate
     @bindable controlid;
+    @bindable disabled;
     @bindable({defaultBindingMode: bindingMode.twoWay}) value;
 
     constructor(element) {
@@ -74,7 +75,19 @@ export class FlatPickerCustomElement {
 		if(this.flatpickr){
 			this.flatpickr.set("maxDate", newValue);
 		}
-	}
+    }
+    
+    disabledChanged(newValue, oldValue){
+        if(newValue){
+            this.flatpickr._input.setAttribute("disabled", "disabled");
+            // $("input.flat-input").css("background-color", "#eeeeee");
+            $("input.flat-input").removeClass('enable').addClass('disable');
+        } else {
+            this.flatpickr._input.setAttribute("disabled", "enabled");
+            $("input.flat-input").removeClass('disable').addClass('enable');
+            // $("input.flat-input").css("background-color", "white");
+        }
+    }
 
     onChange(selectedDates, dateStr, instance) {
         if (!this._datesAreSynced(this.value, selectedDates)) {
