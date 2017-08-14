@@ -31,8 +31,11 @@
             <span if.bind="request.delete" class="label label-warning">Delete this product</span>
           </td>
           <td> 
-            <div class="form-group col-md-8">
+            <div show.bind="!existingRequest" class="form-group col-md-8">
                <flat-picker if.bind="!request.delete" controlid="requiredDate-${$index}" config.bind="configDate" value.bind="request.requiredDate" startdate.bind="minRequiredDate" enddate.bind="maxRequiredDate"></flat-picker>
+            </div>
+            <div show.bind="existingRequest" class="col-sm-8">
+              <h5><b>${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>
             </div>
           </td>
         </tr>
