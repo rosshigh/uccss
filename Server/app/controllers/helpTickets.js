@@ -9,7 +9,8 @@ var express = require('express'),
     passport = require('passport'),
     HelpTicketLock = mongoose.model('HelpTicketLock'),
     HelpTicketTypes = mongoose.model('HelpTicketTypes'),
-    writeLog = require('../../config/logger');
+    writeLog = require('../../config/logger'),
+    fs = require('fs');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
@@ -342,7 +343,7 @@ module.exports = function (app, config) {
   var storage = multer.diskStorage({
     destination: function (req, file, cb) {
 
-      var path = config.uploads + '/helpTickets/' + req.params.container;
+      var path = config.uploads + '/helpTickets/' + req.params.container;    
      
       mkdirp(path, function(err) {
         if(err){
@@ -353,7 +354,17 @@ module.exports = function (app, config) {
       });
     },
     filename: function (req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now() + file.originalname.substring(file.originalname.indexOf('.')));
+      var path = config.uploads + '/helpTickets/' + req.params.container;    
+      var fileParts = file.originalname.split(".");
+      var version = 1;
+      while(fs.existsSync(path + "/" + file.originalname)){
+        file.originalname = fileParts[0] + "(" + version + ")." + fileParts[1]; 
+        version += 1;
+        console.log(file.originalname)
+      }
+     
+     console.log(file.originalname)
+      cb(null, file.originalname);
     }
   });
 

@@ -191,7 +191,6 @@ export class ViewHelpTickets {
   async selectHelpTicket(el, index) { 
     //Make the selected help ticket the selected help ticket
     this.editIndex = this.dataTable.getOriginalIndex(index);
-    // this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
     this.helpTickets.selectHelpTicket(this.editIndex);
     this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
     this.openHelpTicket();
@@ -468,6 +467,8 @@ export class ViewHelpTickets {
     this.filesSelected = "";
     this._unLock();
     this.helpTicketSelected = false;
+    $('input[type=file]').wrap('<form></form>').parent().trigger('reset').children().unwrap('<form></form>');
+    // $("#fileControlLabel").html(' Browse for files <input  type="file" style="display: none;" change.delegate="changeFiles()" files.bind="files" multiple>')
   }
 
   flag(){

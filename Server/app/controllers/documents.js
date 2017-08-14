@@ -179,10 +179,8 @@ module.exports = function (app, config) {
         }
       });
     },
-    filename: function (req, file, cb) {
-console.log(file)      
-      let fileName = file.originalname.split('.');
-console.log(fileName)      
+    filename: function (req, file, cb) {    
+      let fileName = file.originalname.split('.');   
       cb(null, fileName[0] + " (" + req.params.version + ")." + fileName[fileName.length - 1]);
     }
   });

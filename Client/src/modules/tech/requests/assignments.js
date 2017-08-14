@@ -215,6 +215,7 @@ export class Assignments {
         // //Retrieve relevant data
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.selectedRequestDetail = this.utils.copyObject(request);
+        this.originalRequestDetail = this.utils.copyObject(request);
 		this.productId = this.selectedRequestDetail.productId._id;
         this.products.selectedProductFromId(this.productId);
 
@@ -861,11 +862,12 @@ export class Assignments {
 
      _buildEmailObject(){
         let mailObject = {};
+        if(!this.sendEmail) return mailObject;
         var date = new Date(this.selectedRequestDetail.requiredDate);
         var day = date.getDate();
         var month = date.getMonth() + 1;
         var year = date.getFullYear(); 
-        if(this.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE && this.sendEmail){
+        if(this.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE ){
             mailObject.reason = 2;
             mailObject.numStudents = parseInt(this.selectedRequestDetail.requestId.undergradIds) + parseInt(this.selectedRequestDetail.requestId.graduateIds);
             mailObject.fullName = this.selectedRequestDetail.requestId.personId.fullName; 
@@ -987,8 +989,11 @@ export class Assignments {
         return true;
     }
 
-	back() {
-        if(this.assignmentDetails && this.assignmentDetails.length > 0 && this.selectedRequestDetail.requestStatus != this.config.ASSIGNED_REQUEST_CODE){
+	back() { 
+        this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
+        let changes = this.clientRequests.isRequestDetailDirty(this.originalRequestDetail,['requestId','productId','techComments']);
+
+        if(changes.length > 0 || (this.assignmentDetails && this.assignmentDetails.length > 0) ){
              return this.dialog.showMessage(
                     "There is an unsaved assignment. Are you sure you want to leave this page?",
                     "Confirm Back",
@@ -1265,6 +1270,13 @@ export class Assignments {
     }
 		
 	filterInAssigned() {
+        this.requiredDateFilterValue = "";
+        this.createdDateFilterValue = "";
+        this.requestStatusFilter = "";
+        this.productFilterValue = "";
+        this.courseFilterValue = "";
+        this.helpTicketTypeFilterValue = "";
+        this.institutionFilterValue = "";
         if(this.isCheckedAssigned){
             this.dataTable.filterList(this.config.ASSIGNED_REQUEST_CODE, { type: 'custom',  filter: this.statusCustomFilter, compare:'custom'} )
         } else {
@@ -1287,11 +1299,11 @@ export class Assignments {
     }
 
     institutionCustomFilter(value, item, context){
-        return item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+        return item.requestId && item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
     courseCustomFilter(value, item, context){
-        return item.requestId.courseId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+        return item.requestId && item.requestId.courseId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
     customProductNameFilter(value, item, context){
