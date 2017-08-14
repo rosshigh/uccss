@@ -1007,7 +1007,18 @@ export class Assignments {
                 });
         }
         this._cleanUp();
-	}
+    }
+    
+    viewAssignment(index, request){
+        this.editIndex = index;
+        this.selectedRequestDetail = this.utils.copyObject(request);
+        this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
+        this.requestSelected = 'view';
+    }
+
+    backView(){
+        this.requestSelected = 'table';
+    }
 	
 	systemSelected(){
         this.systems.selectedSystemFromId(this.selectedSystemId);

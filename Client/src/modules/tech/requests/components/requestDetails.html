@@ -1,76 +1,46 @@
 <template>
-     <div class="row">
-        <div class="col-lg-12">
-          <div  class="panel panel-default topMargin">
-            <div class="panel-body leftJustify">
-              <div class="bottomMargin">
-                <button class="btn btn-primary btn-fill btn-wd" click.delegate="save()">Save</button>
-                <button class="btn btn-primary btn-fill btn-wd" click.delegate="cancel()">Cancel</button>
-              </div>
-              <div class="form-group" show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID">
-                <div class="row">
-                  <div class="col-lg-6">
-                      <h5>Undergraduates: ${requests.selectedRequest.undergradIds}</h5>
-                  </div>
-                  <div class="col-lg-6">
-                      <h5>Graduates: ${requests.selectedRequest.graduateIds}</h5>
-                  </div>
-                </div>
-                 
-                  <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="editAddUnder" class="control-label">Add Undergraduates</label>
-                            <input value.bind="requests.selectedRequest.addUndergraduates" id="editAddUnder" class="form-control input-sm" placeholder="Addiiontal undergraduates" type="number" />
-                        </div>
-                    </div>
-                              
-                    <div class="col-lg-4 col-lg-offset-2">
-                        <div class="form-group">
-                            <label for="editAddGrad" class="control-label">Add Graduate</label>
-                             <input value.bind="requests.selectedRequest.addGraduates" type="number" id="editAddGrad" class="form-control input-sm" placeholder="Addiiontal Graduates"/>
-                        </div>
-                    </div>
-                  </div>
-                
-                
-                 <label show.bind="request.addUndergraduates > 0">Additional Undergraduates: ${requests.selectedRequest.addUndergraduates}</label>
-                 <label show.bind="request.addGraduates > 0">Additional Graduates: ${requests.selectedRequest.addGraduates}</label>
-              </div>
-              <div class="leftJustify">
-                <div class="row">
-                  <div class="col-lg-6">
-                    <div class="form-group topMargin">
-                      <div class="input-group">
-                        <div>
-                          <label for="beginDate" class="leftJustify">Date the course begins</label>
-                          <input change.trigger="changeBeginDate()" type="date" value.bind="requests.selectedRequest.startDate"
-                                class="form-control" id="beginDate">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="form-group topMargin">
-                      <div class="input-group">
-                        <div>
-                          <label for="endDate" class="leftJustify">Date the course ends</label>
-                          <input change.trigger="changeEndDate()" type="date" value.bind="requests.selectedRequest.endDate"
-                                class="form-control" id="endDate">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-              </div>
-               <textarea  placeholder="Additional Comments" class="topMargin col-lg-12" id="comments"
-                value.bind="requests.selectedRequest.comments" class="form-control" rows="10"></textarea>
-              
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+   <div class="row">
+		<div class="col-lg-12">
+			<h4 class="topMargin"><strong>Request Details</strong></h4>
+			<div class="panel panel-default topMargin">
+				<div class="panel-body leftJustify">
+					<div  class="form-horizontal topMargin">
+						<h4>Product: ${selectedRequestDetail.productId.name}</h4>
+						<h5>Course: ${selectedRequestDetail.requestId.courseId.name}</h5>
+						<div class="topMargin" show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID">
+							<div class="row">
+								<div class="col-lg-5 leftMargin">
+									<h5>Undergrads: <b>${selectedRequestDetail.requestId.undergradIds}</b></h5>
+								</div>
+								<div class="col-lg-5">
+									<h5>Graduate: <b>${selectedRequestDetail.requestId.graduateIds}</b></h5>
+								</div>
+							</div> 
+						</div>
+						<div class="row">
+							<div class="col-lg-5 leftMargin">
+								<h5>Start Date:  <b>${selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>
+							</div>
+							<div class="col-lg-5">
+								<h5>End Date: <b>${selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>
+							</div>
+						</div>
+						<div show.bind="selectedRequestDetail.requestId.customerMessage && selectedRequestDetail.requestId.customerMessage.length > 0">
+							<label class="topMargin">Requests from the UCC</label>
+							<div class="well" innerhtml.bind="selectedRequestDetail.requestId.customerMessage"></div>
+						</div>
+						<div show.bind="selectedRequestDetail.requestId.comments && selectedRequestDetail.requestId.comments.length > 0">
+							<label class="topMargin">Comments</label>
+							<div innerhtml.bind="selectedRequestDetail.requestId.comments"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div show.bind="products.selectedProduct.productDescription">
+		<h4>Product Information</h4>
+		<div innerhtml.bind="products.selectedProduct.productDescription"></div>
+	</div>
 </template>
     

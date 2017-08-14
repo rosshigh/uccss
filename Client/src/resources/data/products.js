@@ -27,6 +27,18 @@ export class Products {
         }
     }
 
+    async getProduct(index){
+        if(index){
+            let id = this.productsArray[index]._id;
+            let serverResponse = await this.data.get(this.PRODUCTS_SERVICE + "/" + id);
+            if(!serverResponse.error){
+                this.selectedProduct = serverResponse;
+                this.productsArray[index] = this.utils.copyObject(this.selectedProduct);
+            }
+            return serverResponse;
+        }
+    }
+
     selectProduct(index) {
         if (index === undefined) {
             this.selectedProduct = this.emptyProduct();
