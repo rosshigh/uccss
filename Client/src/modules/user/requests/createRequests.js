@@ -30,6 +30,7 @@ export class ViewHelpTickets {
   sessionId = -1;
   courseId = -1;
   requestType = -1;
+  requestReceived = false;
 
   tempRequests = new Array();
   productInfo = new Array();
@@ -113,6 +114,7 @@ export class ViewHelpTickets {
 
   async getRequests(){
     await this._unLock();
+    this.requestReceived = false;
     if( this.sessionId != -1 &&  this.courseId != -1  ){
         this.ILockedIt = false;
         this.existingRequest = false;
@@ -131,12 +133,14 @@ export class ViewHelpTickets {
             } else {
               $("#existingRequestInfo").empty().hide();
             }
+            this.requestReceived = true;
         } else{
            $("#existingRequestInfo").empty().hide();
             this.setDates(true);
             this.existingRequest = false;
             this.requests.selectRequest();
             this.requests.selectedRequest.sessionId = this.sessionId;
+             this.requestReceived = true;
         }
         
     } else {
