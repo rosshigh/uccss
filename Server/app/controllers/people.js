@@ -71,12 +71,15 @@ module.exports = function (app, config) {
   router.get('/api/people/checkEmail',  function(req, res, next){
     logger.log('Get person for email =' + req.params.email,'verbose');
     var value = req.query.email;
-    Model.find({ email : value})
+  
+    var query = Model.findOne({email: {$regex: new RegExp('^' + value.toLowerCase(), 'i')}});
+    // Model.find({ email : value})
+    query
       .exec(function(err, object){
         if (err) {
           return next(err);
         } else {
-          if(object.length){
+          if(object){
             res.status(409).json({status: 'exists'});
           } else {
             res.status(200).json({status: 'available'});
