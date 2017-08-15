@@ -52,13 +52,15 @@
                       <p>&nbsp;</p>
 
                       <div class="row">
-                        <div class="col-lg-6">
-                          <div class="col-lg-3">
-                              <label id="fileControlLabel" class="btn btn-primary">
-                                  Browse for files <input  type="file" style="display: none;" change.delegate="changeFiles()" files.bind="files" multiple>
-                              </label>
+                    
+                          <div class="col-lg-6">
+                            <div class="col-lg-3">
+                                <label id="fileControlLabel" class="btn btn-primary">
+                                    Browse for files <input  type="file" style="display: none;" change.delegate="changeFiles()" files.bind="files" multiple>
+                                </label>
+                            </div>
                           </div>
-                        </div>
+                        
                         <div class="col-lg-6">
                           <button click.delegate="insertDocument()" class="btn btn-primary">Insert Document</button>
                         </div>

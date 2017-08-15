@@ -177,8 +177,8 @@ export class ViewHelpTickets {
   *****************************************************************************************/
   async refresh() {
     this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-    this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
-      this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+    await this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
+    this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
     this.spinnerHTML = "";
     this._cleanUpFilters()
   }
@@ -362,11 +362,15 @@ export class ViewHelpTickets {
             "Save Changes",
             ['Yes', 'No']
         ).whenClosed(response => {
-            if (response.wasCancelled) {
-               return;
+            if (!response.wasCancelled) {
+               this.saveIt(status);
             }
         });
     }
+  
+  }
+
+  async saveIt(status){
     this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
     this._createResponse();
     var email = new Object();
@@ -380,8 +384,8 @@ export class ViewHelpTickets {
     }
     let serverResponse = await this.helpTickets.saveHelpTicketResponse(email);
     if (!serverResponse.error) {
-      if(status = this.config.CLOSED_HELPTICKET_STATUS) await this.refresh();
-      this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+      if(status == this.config.CLOSED_HELPTICKET_STATUS) await this.refresh();
+      // this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
       this.utils.showNotification("The help ticket was updated");
       if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
     }
@@ -467,8 +471,7 @@ export class ViewHelpTickets {
     this.filesSelected = "";
     this._unLock();
     this.helpTicketSelected = false;
-    $('input[type=file]').wrap('<form></form>').parent().trigger('reset').children().unwrap('<form></form>');
-    // $("#fileControlLabel").html(' Browse for files <input  type="file" style="display: none;" change.delegate="changeFiles()" files.bind="files" multiple>')
+    $('input[type=file]').wrap('<form></form>').parent().trigger('reset').children().unwrap();
   }
 
   flag(){
