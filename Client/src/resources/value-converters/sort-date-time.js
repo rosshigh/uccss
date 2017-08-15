@@ -3,8 +3,8 @@ import moment from 'moment';
 export class SortDateTimeValueConverter {
   toView(array, propertyName, sortProp, tech, trim) {
     if(array === undefined) return;
-
-    var sortOrder = sortProp === "ASC" ? true : false;
+    
+    var sortOrder = sortProp === "ASC" ? 1 : -1;
 
     var sortArray = [];
     var firstItem;
@@ -18,7 +18,8 @@ export class SortDateTimeValueConverter {
     })
 
     sortArray.sort((a,b) => {
-        return sortOrder ? moment(a[propertyName]).isAfter(b[propertyName]) : !moment(a[propertyName]).isAfter(b[propertyName]);
+        var sort = moment(a[propertyName]).isAfter(b[propertyName]) ? 1 : -1;
+        return sort * sortOrder; 
     });
 
     if(!trim) sortArray.unshift(firstItem);
