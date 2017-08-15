@@ -251,7 +251,7 @@ export class ViewHelpTickets {
           } else {
              if(response[0].personId !== this.userObj._id){
               this.lockObject = response[0];
-              this.lockMessage = "Help Ticket is currently locked by " + this.getName();
+              this.lockMessage = "Help Ticket is currently locked";
               this.showLockMessage = true;
              }
           }
