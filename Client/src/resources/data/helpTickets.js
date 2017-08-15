@@ -209,7 +209,7 @@ export class HelpTickets {
         if(!this.selectedHelpTicket._id){
             var response = await this.data.saveObject(this.selectedHelpTicket, url, "post");
             if (!response.error) {
-                if(email.email){
+                if(email && email.email){
                     email.helpTicketNo = response.helpTicketNo;
                     this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                 }
@@ -222,11 +222,11 @@ export class HelpTickets {
         } else {
             var response = await this.data.saveObject(this.selectedHelpTicket, url, "put");
             if (!response.error) {
-                if(email.email){
+                if(email && email.email){
                     this.selectedHelpTicket = this.utils.copyObject(response);
+                    this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                 }
                 this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
-                this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
             } else {
                  this.data.processError(response, "There was an error updating the help ticket.");
                 }

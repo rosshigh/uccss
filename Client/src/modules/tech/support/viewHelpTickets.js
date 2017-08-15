@@ -400,20 +400,8 @@ export class ViewHelpTickets {
     }
     if(this.helpTickets.selectedHelpTicket.owner[0].personId === null || this.helpTickets.selectedHelpTicket.owner[0].personId._id != this.userObj._id){
       if(!this.showLockMessage){
-          var email = new Object();
-          email.personId = this.userObj._id;
-          email.status = this.config.REVIEW_HELPTICKET_STATUS;
-          if(this.sendEmail){    
-              email.reason = 2;
-              email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; 
-              email.personId = this.userObj._id;
-              email.status = this.config.REVIEW_HELPTICKET_STATUS;
-              // email.email = this.helpTickets.selectedHelpTicket.personId.email; 
-              email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
-              email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
-              email.message = this.userObj.fullName + " has taken ownership of the help ticket.";
-          }
-          let serverResponse = await this.helpTickets.updateOwner(email, this.userObj);
+          var obj = new Object();
+          let serverResponse = await this.helpTickets.updateOwner(obj, this.userObj);
           if (!serverResponse.error) {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
             this.utils.showNotification("The help ticket was updated");
@@ -438,17 +426,8 @@ export class ViewHelpTickets {
             date: new Date
           }
           this.helpTickets.selectedHelpTicket.audit.push(obj);
-          var email = new Object();
-          if(this.sendEmail){
-              email.reason = status;
-              email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; 
-              // email.email = this.helpTickets.selectedHelpTicket.personId.email; 
-              email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
-              email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
-              email.message = "The status was changed to " + description;
-          }
           this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
-          let serverResponse = await this.helpTickets.saveHelpTicket(email);
+          let serverResponse = await this.helpTickets.saveHelpTicket();
           if (!serverResponse.error) {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
             this.utils.showNotification("The help ticket was updated");

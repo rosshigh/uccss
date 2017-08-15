@@ -10269,7 +10269,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 response = _context8.sent;
 
                                 if (!response.error) {
-                                    if (email.email) {
+                                    if (email && email.email) {
                                         email.helpTicketNo = response.helpTicketNo;
                                         this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                                     }
@@ -10288,11 +10288,11 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 response = _context8.sent;
 
                                 if (!response.error) {
-                                    if (email.email) {
+                                    if (email && email.email) {
                                         this.selectedHelpTicket = this.utils.copyObject(response);
+                                        this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                                     }
                                     this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
-                                    this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
@@ -31610,7 +31610,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.ownHelpTicket = function () {
       var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(helpTicket) {
-        var email, serverResponse;
+        var obj, serverResponse;
         return regeneratorRuntime.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
@@ -31620,33 +31620,20 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 }
 
                 if (!(this.helpTickets.selectedHelpTicket.owner[0].personId === null || this.helpTickets.selectedHelpTicket.owner[0].personId._id != this.userObj._id)) {
-                  _context10.next = 12;
+                  _context10.next = 9;
                   break;
                 }
 
                 if (this.showLockMessage) {
-                  _context10.next = 12;
+                  _context10.next = 9;
                   break;
                 }
 
-                email = new Object();
+                obj = new Object();
+                _context10.next = 6;
+                return this.helpTickets.updateOwner(obj, this.userObj);
 
-                email.personId = this.userObj._id;
-                email.status = this.config.REVIEW_HELPTICKET_STATUS;
-                if (this.sendEmail) {
-                  email.reason = 2;
-                  email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName;
-                  email.personId = this.userObj._id;
-                  email.status = this.config.REVIEW_HELPTICKET_STATUS;
-
-                  email.helpTicketNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
-                  email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
-                  email.message = this.userObj.fullName + " has taken ownership of the help ticket.";
-                }
-                _context10.next = 9;
-                return this.helpTickets.updateOwner(email, this.userObj);
-
-              case 9:
+              case 6:
                 serverResponse = _context10.sent;
 
                 if (!serverResponse.error) {
@@ -31657,7 +31644,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   this._cleanUp();
                 }
 
-              case 12:
+              case 9:
               case 'end':
                 return _context10.stop();
             }
@@ -31674,7 +31661,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.changeStatus = function () {
       var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(helpTicket, status, description) {
-        var response, obj, email, serverResponse;
+        var response, obj, serverResponse;
         return regeneratorRuntime.wrap(function _callee11$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
@@ -31687,12 +31674,12 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 response = _context11.sent;
 
                 if (response.error) {
-                  _context11.next = 16;
+                  _context11.next = 14;
                   break;
                 }
 
                 if (!(response.helpTicketId === 0)) {
-                  _context11.next = 16;
+                  _context11.next = 14;
                   break;
                 }
 
@@ -31705,21 +31692,11 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 };
 
                 this.helpTickets.selectedHelpTicket.audit.push(obj);
-                email = new Object();
-
-                if (this.sendEmail) {
-                  email.reason = status;
-                  email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName;
-
-                  email.helpTicketNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
-                  email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
-                  email.message = "The status was changed to " + description;
-                }
                 this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
-                _context11.next = 13;
-                return this.helpTickets.saveHelpTicket(email);
+                _context11.next = 11;
+                return this.helpTickets.saveHelpTicket();
 
-              case 13:
+              case 11:
                 serverResponse = _context11.sent;
 
                 if (!serverResponse.error) {
@@ -31728,7 +31705,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 }
                 this._cleanUp();
 
-              case 16:
+              case 14:
               case 'end':
                 return _context11.stop();
             }
