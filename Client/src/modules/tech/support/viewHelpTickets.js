@@ -458,6 +458,10 @@ export class ViewHelpTickets {
     }
   }
 
+  unlockIt(){
+    this._unLock();
+  }
+
   _unLock() {
     if (!this.showLockMessage) {
       if (this.helpTickets.selectedHelpTicket && this.helpTickets.selectedHelpTicket._id) {
