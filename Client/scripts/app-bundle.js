@@ -31530,6 +31530,8 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                       _this4.saveIt(status);
                     }
                   });
+                } else {
+                  this.saveIt(status);
                 }
 
               case 1:

@@ -366,6 +366,8 @@ export class ViewHelpTickets {
                this.saveIt(status);
             }
         });
+    } else {
+      this.saveIt(status);
     }
   
   }
