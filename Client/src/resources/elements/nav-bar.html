@@ -1,7 +1,7 @@
 <template>
     <style>
         .navbar-default {
-            color: ${config.MENU_COLOR};
+            color: ${config.MENU_COLOR}; 
             background-color:${config.MENU_BACKGROUND}
         }
         .navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:hover, .navbar-inverse .navbar-nav>.active>a:focus {
@@ -54,18 +54,18 @@
                             <li><a href="#/customers">Customers</a></li>
                             <li><a href="#/site">Site</a></li>
                             <li><a href="#/documents">Documents</a></li>
-                             <li><a href="#/inventory">Inventory</a></li>
+                            <li><a href="#/inventory">Inventory</a></li>
                         </ul>
                     </li>
-                     <li class="dropdown">
+                     <li class="dropdown hidden-sm hidden-md">
                         <a if.bind="userObj.userRole >= config.UCC_TECH_ROLE" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Technical <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="#/techRq">Product Requests</a></li>
                             <li><a href="#/techHt">Help Tickets</a></li>
                         </ul>
                     </li>
-                    <li if.bind="isAuthenticated"><a href="#/social">Social</a></li>
-                    <li if.bind="userObj.userRole >= config.USER_ROLE"><a href="#/facco">Faculty Coordinator</a></li>
+                    <li class="hidden-sm hidden-md" if.bind="isAuthenticated"><a href="#/social">Social</a></li>
+                    <li class="hidden-sm hidden-md" if.bind="userObj.userRole >= config.USER_ROLE"><a href="#/facco">Faculty Coordinator</a></li>
                     <li if.bind="isAuthenticated"><a href="#/support">Support</a></li>
                     <li if.bind="isAuthenticated"><a href="#/clientRequests">Product Requests</a></li>
                     <li if.bind="isAuthenticated && userObj.userRole >= config.UA_ROLE"><a href="#/analytics">Analytics</a></li>
@@ -81,8 +81,18 @@
                     </li>  
                    
                     <li if.bind="!isAuthenticated"><a href="#/register">Register</a></li>
-                    <li if.bind="isAuthenticated"><a href="#/profile">Profile</a></li>
-                    <li><a href="#/about">About the UCC</a></li>
+                    <li class="hidden-sm hidden-md" if.bind="isAuthenticated"><a href="#/profile">Profile</a></li>
+                    <li class="hidden-sm hidden-md" ><a href="#/about">About the UCC</a></li>
+
+                    <li class="dropdown hidden-xs">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">More <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li class="hidden-lg" if.bind="isAuthenticated"><a href="#/social">Social</a></li>
+                            <li class="hidden-lg" if.bind="userObj.userRole >= config.USER_ROLE"><a href="#/facco">Faculty Coordinator</a></li>
+                            <li class="hidden-lg" if.bind="isAuthenticated"><a href="#/profile">Profile</a></li>
+                            <li class="hidden-lg" ><a href="#/about">About the UCC</a></li>
+                        </ul>
+                    </li>
                     <li if.bind="isAuthenticated" click.trigger="logout()"><a href="#">Logout</a></li>
                 </ul>
             </div>
