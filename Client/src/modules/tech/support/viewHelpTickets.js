@@ -70,7 +70,7 @@ export class ViewHelpTickets {
     this.systems.getSystemsArray();
     this.documents.getDocumentsCategoriesArray();
 
-    this.peopleArray = this.people.peopleArray;
+    // this.peopleArray = this.people.peopleArray;
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
     this.sendEmail = this.config.SEND_EMAILS;
     this._setUpValidation();

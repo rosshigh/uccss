@@ -1314,7 +1314,7 @@ export class Assignments {
     }
 
     statusCustomFilter(value, item, context){
-        if(item.requestStatus == value) return false;
+        if(item.requestStatus == this.config.ASSIGNED_REQUEST_CODE || item.requestStatus == this.config.CANCELLED_REQUEST_CODE) return false;
         return true;
     }
 

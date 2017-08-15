@@ -29108,7 +29108,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.statusCustomFilter = function statusCustomFilter(value, item, context) {
-            if (item.requestStatus == value) return false;
+            if (item.requestStatus == this.config.ASSIGNED_REQUEST_CODE || item.requestStatus == this.config.CANCELLED_REQUEST_CODE) return false;
             return true;
         };
 
@@ -31077,7 +31077,6 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 this.systems.getSystemsArray();
                 this.documents.getDocumentsCategoriesArray();
 
-                this.peopleArray = this.people.peopleArray;
                 this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
                 this.sendEmail = this.config.SEND_EMAILS;
                 this._setUpValidation();
@@ -31094,7 +31093,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
                 this.removeHTStatus = [this.config.NEW_HELPTICKET_STATUS, this.config.REPLIED_HELPTICKET_STATUS];
 
-              case 15:
+              case 14:
               case 'end':
                 return _context.stop();
             }
