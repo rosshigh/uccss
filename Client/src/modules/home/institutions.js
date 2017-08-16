@@ -37,6 +37,7 @@ export class ViewInstitutions {
 		this.dataTable.numRowsShown = "50";
         this.dataTable.updateTake();
         var inst = this.people.institutionsArray[0]
+        this.institutionName = inst.name;
         this.institutionAddress = inst.address1 + "," + inst.city + ", " + inst.region + ", " + inst.postalCode;
 
         this.geocoder = new google.maps.Geocoder();  
@@ -57,6 +58,7 @@ export class ViewInstitutions {
     }
 
     getAddress(inst, el){
+        this.institutionName = inst.name;
         this.institutionAddress = inst.address1 + "," + inst.city + ", " + inst.region + ", " + inst.postalCode;
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
         this.selectedRow = $(el.target).closest('tr');
