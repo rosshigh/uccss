@@ -84,8 +84,8 @@
                     <li class="hidden-sm hidden-md" if.bind="isAuthenticated"><a href="#/profile">Profile</a></li>
                     <li class="hidden-sm hidden-md" ><a href="#/about">About the UCC</a></li>
 
-                    <li class="dropdown hidden-xs">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">More <b class="caret"></b></a>
+                    <li class="dropdown hidden-md">
+                        <a href="#" class="dropdown-toggle hidden-lg" data-toggle="dropdown">More <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li class="hidden-lg" if.bind="isAuthenticated"><a href="#/social">Social</a></li>
                             <li class="hidden-lg" if.bind="userObj.userRole >= config.USER_ROLE"><a href="#/facco">Faculty Coordinator</a></li>

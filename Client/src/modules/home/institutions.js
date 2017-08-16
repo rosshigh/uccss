@@ -18,10 +18,18 @@ export class ViewInstitutions {
 
     async activate() {
         let responses = await Promise.all([
-            this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name'),
+            this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name', true),
 			this.is4ua.loadIs4ua()
         ]);
 
+        this.people.institutionsArray.forEach((item, index) => {
+            if(item.name == 'HEC Montréal'){
+                this.people.institutionsArray.splice(index, 1);
+            }
+            if(item.name == '-- UA Staff --'){
+                this.people.institutionsArray.splice(index, 1);
+            }
+        });
         this.dataTable.updateArray(this.people.institutionsArray);
 		this.dataTable.numRowsShown = "50";
         this.dataTable.updateTake();
