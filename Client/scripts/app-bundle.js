@@ -31335,20 +31335,21 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   if (response.helpTicketId === 0) {
                     this.helpTickets.lockHelpTicket({
                       helpTicketId: this.helpTickets.selectedHelpTicket._id,
-                      personId: this.userObj._id
+                      personId: this.userObj._id,
+                      name: this.userObj.fullName
                     });
                     this.lockMessage = "";
                     this.showLockMessage = false;
-                    this.lockObject = { personId: this.userObj._id };
+                    this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
                   } else {
                     if (response[0].personId === this.userObj._id) {
                       this.showLockMessage = false;
                       this.lockMessage = "";
-                      this.lockObject = { personId: this.userObj._id };
+                      this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
                     } else {
                       if (response[0].personId !== this.userObj._id) {
                         this.lockObject = response[0];
-                        this.lockMessage = "Help Ticket is currently locked";
+                        this.lockMessage = "Help Ticket is currently locked by " + this.getName();
                         this.showLockMessage = true;
                       }
                     }
@@ -31410,10 +31411,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     }();
 
     ViewHelpTickets.prototype.getName = function getName() {
-      for (var i = 0; i < this.people.uccPeople.length; i++) {
-        if (this.people.uccPeople[i]._id == this.lockObject.personId) return this.people.uccPeople[i].fullName;
-      }
-      return "someone";
+      return this.lockObject.name ? this.lockObject.name : 'someone';
     };
 
     ViewHelpTickets.prototype.save = function () {

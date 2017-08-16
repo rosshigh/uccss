@@ -6,7 +6,8 @@ var Mongoose = require('mongoose'),
 var helpTicketLockSchema = new Schema({
   helpTicketId: { type: Schema.Types.ObjectId },
   personId: { type: Schema.Types.ObjectId },
-  createdAt: { type: Date, expires: '900s', default: Date.now }
+  name: { type: String },
+  createdAt: { type: Date, expires: '600s', default: Date.now }
 });
 
 module.exports = Mongoose.model('HelpTicketLock', helpTicketLockSchema);
