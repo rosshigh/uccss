@@ -3438,6 +3438,9 @@ define('modules/home/institutions',['exports', 'aurelia-framework', '../../resou
                                     if (item.name == '-- UA Staff --') {
                                         _this.people.institutionsArray.splice(index, 1);
                                     }
+                                    if (item.memberType == '04') {
+                                        _this.people.institutionsArray.splice(index, 1);
+                                    }
                                 });
                                 this.dataTable.updateArray(this.people.institutionsArray);
                                 this.dataTable.numRowsShown = "50";

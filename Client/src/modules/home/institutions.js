@@ -29,6 +29,9 @@ export class ViewInstitutions {
             if(item.name == '-- UA Staff --'){
                 this.people.institutionsArray.splice(index, 1);
             }
+            if(item.memberType == '04'){
+                this.people.institutionsArray.splice(index, 1);
+            }
         });
         this.dataTable.updateArray(this.people.institutionsArray);
 		this.dataTable.numRowsShown = "50";
