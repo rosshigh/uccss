@@ -1,10 +1,11 @@
 <template>
   <div class="container">
-      <div class='bottomMargin'>
-        <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
-        <div id="no-more-tables">
-          <table class="table table-striped table-hover cf">
+      <div id='no-more-tables'>
+        <table class="table table-striped table-hover cf marginRight">
             <thead class="cf">
+              <tr colspan="7">
+                <compose view="../../../../resources/elements/table-navigation-bar.html"></compose> 
+              </tr>
               <tr>
                 <td colspan='7'>
                     <div class="checkbox">
@@ -25,7 +26,7 @@
                 <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketNo'})">Number </span><i class="fa fa-sort"></i></th>
                 <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketType'})">Type </span><i class="fa fa-sort"></i></th>
                  <th>Owner</th>
-                <th></th>
+                <th  class="hidden-xs hidden-sm"></th>
                 <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})">Status </span><i class="fa fa-sort"></i></th>
                 <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'createdDate'})">Date Created </span><i class="fa fa-sort"></i></th>
                 <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'modifiedDate'})">Date Modified </span><i class="fa fa-sort"></i></th>
@@ -36,7 +37,7 @@
                   <input value.bind="helpTicketTypeFilterValue" input.delegate="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )"  class="form-control" />
                 </th>
                 <th></th>
-                <th></th>
+                <th class="hidden-xs hidden-sm"></th>
                 <th> 
                   <select value.bind="helpTicketStatusFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )" class="form-control">
                         <option value=""></option>
@@ -53,10 +54,10 @@
             </thead>
             <tbody>
               <tr repeat.for="helpTicket of dataTable.displayArray">
-                <td click.delegate="selectHelpTicket($event, $index)" data-title="Reference">${helpTicket.helpTicketNo}</td>
+                <td click.delegate="selectHelpTicket($event, $index)" data-title="Number">${helpTicket.helpTicketNo}</td>
                 <td click.delegate="selectHelpTicket($event, $index)" data-title="Type">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>
-                <td style="width:12rem;">${helpTicket.owner[0].personId | lookupValue:people:"_id":'fullName'}</td> 
-                <td style="width:2rem;" data-title="Update">
+                <td style="width:12rem;" data-tile="Owner">${helpTicket.owner[0].personId | lookupValue:people:"_id":'fullName'}</td> 
+                <td style="width:2rem;"  class="hidden-xs hidden-sm" data-title="Close">
                   <span click.trigger="closeHelpTicket(helpTicket)" show.bind="helpTicket.helpTicketStatus != config.CLOSED_HELPTICKET_STATUS" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Close Help Ticket"><i class="fa fa-window-close-o fa-lg" aria-hidden="true"></i></span>
                 </td>  
                 <td click.delegate="selectHelpTicket($event, $index)" data-title="Status">${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:"code":"description"}</td>             
@@ -67,6 +68,5 @@
           </table>
         </div>
       </div>
-    </div>
   </div>
 </template>

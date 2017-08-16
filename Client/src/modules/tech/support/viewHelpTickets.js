@@ -23,7 +23,9 @@ export class ViewHelpTickets {
   notesHistory = false;
   lockMessage = "";
 
-  colSpan = 10;
+  toolbar;
+
+  colSpan = 10; 
 
   // navControl = "supportNavButtons";
   spinnerHTML = "";
@@ -86,6 +88,10 @@ export class ViewHelpTickets {
     })
 
     this.removeHTStatus = [this.config.NEW_HELPTICKET_STATUS, this.config.REPLIED_HELPTICKET_STATUS];
+
+    if(this.utils.isMobile()){
+      this.toolbar = [['style', ['style', 'bold', 'clear']]];
+    }
   }
 
   attached() {

@@ -29,7 +29,6 @@
                     <a if.bind="(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && isAuthenticated" class="navbar-brand" href="#/user"><i class="fa fa-home"></i> UCCSS</a>
                     <a if.bind="(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && !isAuthenticated" class="navbar-brand" href="#/home"><i class="fa fa-home"></i> UCCSS</a>
                 </span>
-              
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -57,7 +56,7 @@
                             <li><a href="#/inventory">Inventory</a></li>
                         </ul>
                     </li>
-                     <li class="dropdown hidden-sm hidden-md">
+                     <li class="dropdown">
                         <a if.bind="userObj.userRole >= config.UCC_TECH_ROLE" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Technical <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="#/techRq">Product Requests</a></li>
@@ -68,11 +67,11 @@
                     <li class="hidden-sm hidden-md" if.bind="userObj.userRole >= config.USER_ROLE"><a href="#/facco">Faculty Coordinator</a></li>
                     <li if.bind="isAuthenticated"><a href="#/support">Support</a></li>
                     <li if.bind="isAuthenticated"><a href="#/clientRequests">Product Requests</a></li>
-                    <li if.bind="isAuthenticated && userObj.userRole >= config.UA_ROLE"><a href="#/analytics">Analytics</a></li>
+                    <li class="hidden-sm hidden-md" if.bind="isAuthenticated && userObj.userRole >= config.UA_ROLE"><a href="#/analytics">Analytics</a></li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                     <li class="dropdown">
+                    <li class="dropdown">
                         <a if.bind="userObj.userRole >= config.UCC_ROLE" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Notes<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a click.trigger="enterNote()" href="#">Enter Note</a></li>
@@ -89,12 +88,14 @@
                         <ul class="dropdown-menu">
                             <li class="hidden-lg" if.bind="isAuthenticated"><a href="#/social">Social</a></li>
                             <li class="hidden-lg" if.bind="userObj.userRole >= config.USER_ROLE"><a href="#/facco">Faculty Coordinator</a></li>
+                            <li class="hidden-lg" if.bind="isAuthenticated && userObj.userRole >= config.UA_ROLE"><a href="#/analytics">Analytics</a></li>
                             <li class="hidden-lg" if.bind="isAuthenticated"><a href="#/profile">Profile</a></li>
                             <li class="hidden-lg" ><a href="#/about">About the UCC</a></li>
                         </ul>
                     </li>
                     <li if.bind="isAuthenticated" click.trigger="logout()"><a href="#">Logout</a></li>
                 </ul>
+                
             </div>
         </div>
     </nav>

@@ -21,6 +21,7 @@ export class ViewHelpTickets {
   responseMessage = "";
   isChecked = true;
   nohelpTickets = true;
+  toolbar;
 
   spinnerHTML = "";
   filterValues = new Array();
@@ -102,6 +103,10 @@ export class ViewHelpTickets {
     })
 
     this._setUpValidation();
+
+     if(this.utils.isMobile()){
+      this.toolbar = [['style', ['style', 'bold', 'clear']]];
+    }
   }
 
   async refresh() {

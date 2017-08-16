@@ -25,7 +25,10 @@ export class Home {
            this.sessions.getSessionsArray('?order=startDate', true ),
            this.siteinfo.getInfoArray(true, options)
          ]);
-        if(this.isMobile()) console.log('Mobile');
+        if(this.isMobile()) {
+            console.log('Mobile');
+            this.config.isMobile = true;
+        }
     }
 
     async attached(){

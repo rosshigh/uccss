@@ -30,10 +30,10 @@
             </div>
 
             <div class="row leftMargin rightMargin">
-              <editor value.bind="helpTickets.selectedHelpTicketContent.content.comments" height="250"></editor>
+              <editor toolbar.bind="toolbar" value.bind="helpTickets.selectedHelpTicketContent.content.comments" height="250"></editor>
       
               <p>&nbsp;</p>
-              <div class="row">
+              <div class="row hidden-xs hidden-sm">
                 <h4>Upload screenshots or other files that will help us solve you problem</h4>
                   <div class="col-lg-2">
                       <label class="btn btn-primary">
