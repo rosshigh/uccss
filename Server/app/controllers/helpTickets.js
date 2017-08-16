@@ -156,8 +156,10 @@ module.exports = function (app, config) {
 
   router.put('/api/helpTickets/owner/:id', requireAuth, function(req, res, next){
     writeLog.log('Update HelpTicket owner', 'verbose');
+
     Model.findById(req.params.id).exec()
-    .then(result => {   
+    .then(result => {  
+     
         if(req.body.personId != result.owner[0].personId){
           result.owner.unshift({
             personId: req.body.personId,

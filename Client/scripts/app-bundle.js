@@ -10111,7 +10111,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.updateOwner = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(email, userObj) {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(obj) {
                 var response;
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
@@ -10126,7 +10126,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
 
                             case 2:
                                 _context5.next = 4;
-                                return this.data.saveObject(email, this.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
+                                return this.data.saveObject(obj, this.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
 
                             case 4:
                                 response = _context5.sent;
@@ -10147,7 +10147,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee5, this);
             }));
 
-            function updateOwner(_x7, _x8) {
+            function updateOwner(_x7) {
                 return _ref5.apply(this, arguments);
             }
 
@@ -10190,7 +10190,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee6, this);
             }));
 
-            function updateStatus(_x9) {
+            function updateStatus(_x8) {
                 return _ref6.apply(this, arguments);
             }
 
@@ -10306,7 +10306,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee8, this);
             }));
 
-            function saveHelpTicket(_x10) {
+            function saveHelpTicket(_x9) {
                 return _ref8.apply(this, arguments);
             }
 
@@ -10349,7 +10349,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee9, this);
             }));
 
-            function saveHelpTicketResponse(_x11) {
+            function saveHelpTicketResponse(_x10) {
                 return _ref9.apply(this, arguments);
             }
 
@@ -10394,7 +10394,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee10, this);
             }));
 
-            function uploadFile(_x12, _x13) {
+            function uploadFile(_x11, _x12) {
                 return _ref10.apply(this, arguments);
             }
 
@@ -10443,7 +10443,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee11, this, [[3, 10]]);
             }));
 
-            function getHelpTicketTypes(_x14, _x15) {
+            function getHelpTicketTypes(_x13, _x14) {
                 return _ref11.apply(this, arguments);
             }
 
@@ -10796,7 +10796,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee13, this);
             }));
 
-            function getHelpTicketLock(_x16) {
+            function getHelpTicketLock(_x15) {
                 return _ref13.apply(this, arguments);
             }
 
@@ -31629,9 +31629,9 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   break;
                 }
 
-                obj = new Object();
+                obj = { status: this.config.REVIEW_HELPTICKET_STATUS, personId: this.userObj._id };
                 _context10.next = 6;
-                return this.helpTickets.updateOwner(obj, this.userObj);
+                return this.helpTickets.updateOwner(obj);
 
               case 6:
                 serverResponse = _context10.sent;

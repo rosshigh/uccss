@@ -400,8 +400,8 @@ export class ViewHelpTickets {
     }
     if(this.helpTickets.selectedHelpTicket.owner[0].personId === null || this.helpTickets.selectedHelpTicket.owner[0].personId._id != this.userObj._id){
       if(!this.showLockMessage){
-          var obj = new Object();
-          let serverResponse = await this.helpTickets.updateOwner(obj, this.userObj);
+          var obj = {status: this.config.REVIEW_HELPTICKET_STATUS, personId: this.userObj._id}
+          let serverResponse = await this.helpTickets.updateOwner(obj);
           if (!serverResponse.error) {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
             this.utils.showNotification("The help ticket was updated");

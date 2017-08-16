@@ -158,12 +158,12 @@ export class HelpTickets {
 
     }
 
-    async updateOwner(email, userObj){
+    async updateOwner(obj){
          if(!this.selectedHelpTicket){
             return;
         }
 
-        var response = await this.data.saveObject(email, this.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
+        var response = await this.data.saveObject(obj, this.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
         if (!response.error) {
             this.selectedHelpTicket = response;
             this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
