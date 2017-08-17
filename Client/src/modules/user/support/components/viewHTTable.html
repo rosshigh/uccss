@@ -54,7 +54,7 @@
             </thead>
             <tbody>
               <tr repeat.for="helpTicket of dataTable.displayArray">
-                <td click.delegate="selectHelpTicket($event, $index)" data-title="Number">${helpTicket.helpTicketNo}</td>
+                <td click.trigger="selectHelpTicket($event, $index)" data-title="Number">${helpTicket.helpTicketNo}</td>
                 <td click.delegate="selectHelpTicket($event, $index)" data-title="Type">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>
                 <td style="width:12rem;" data-tile="Owner">${helpTicket.owner[0].personId | lookupValue:people:"_id":'fullName'}</td> 
                 <td style="width:2rem;"  class="hidden-xs hidden-sm" data-title="Close">

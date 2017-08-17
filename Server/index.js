@@ -1,3 +1,5 @@
+require('look').start();
+
 var express = require('express'),
     config = require('./config/config'),
     http = require('http'),
@@ -13,7 +15,6 @@ var express = require('express'),
     var optionsget = {
         host : 'api.openweathermap.org', 
         path : '/data/2.5/weather?q=' + config.UCC_HOME + '&APPID=' + config.weatherAPI,
-        //0f85bb931f8faad7e35b6f685aa4e931', 
         method : 'GET'
     };
     logger.log(optionsget.path);
