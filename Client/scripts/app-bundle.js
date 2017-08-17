@@ -34814,7 +34814,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.attached = function attached() {
-      this.toolTips();
+      if (!this.mobile) this.toolTips();
     };
 
     ViewHelpTickets.prototype.deactivate = function deactivate() {
@@ -34865,6 +34865,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 this._setUpValidation();
 
                 if (this.utils.isMobile()) {
+                  this.mobile = true;
                   this.toolbar = [['style', ['style', 'bold', 'clear']]];
                 }
 

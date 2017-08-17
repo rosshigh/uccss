@@ -60,7 +60,7 @@ export class ViewHelpTickets {
   }   
 
   attached() {
-    this.toolTips();
+    if(!this.mobile) this.toolTips();
   }
 
   deactivate(){
@@ -105,6 +105,7 @@ export class ViewHelpTickets {
     this._setUpValidation();
 
      if(this.utils.isMobile()){
+      this.mobile = true;
       this.toolbar = [['style', ['style', 'bold', 'clear']]];
     }
   }
