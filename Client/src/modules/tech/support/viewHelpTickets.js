@@ -99,6 +99,10 @@ export class ViewHelpTickets {
     if(!this.mobile) this.toolTips();
   }
 
+  toolTips(){
+    $('[data-toggle="tooltip"]').tooltip();
+  }
+  
   detached() {
     this._unLock();
   }

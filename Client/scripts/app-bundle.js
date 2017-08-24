@@ -31225,6 +31225,10 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       if (!this.mobile) this.toolTips();
     };
 
+    ViewHelpTickets.prototype.toolTips = function toolTips() {
+      $('[data-toggle="tooltip"]').tooltip();
+    };
+
     ViewHelpTickets.prototype.detached = function detached() {
       this._unLock();
     };
