@@ -99,7 +99,7 @@ export class BulkEmails {
             recipients.push({name: item.fullName, email: item.email});
         });
 
-        var email = {email: this.email, recipients: recipients};
+        var email = {email: this.config.UCC_EMAIL, recipients: recipients}; 
         this.people.sendBuikEmail(email);
     }
 

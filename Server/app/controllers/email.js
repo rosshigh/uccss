@@ -259,6 +259,20 @@ if(env === 'development'){
       sendGrid(mailObject)
   }
 
+  sendBulkEmails = function(mailObject){
+    mailObject.recipients.forEach(item => { 
+      var mail = {
+        from: emailConfig.emailAddress,
+        to: item.email,
+        subject: mailObject.email.subject,
+        template: "generic",
+        context: { name: item.name, message: mailObject.email.emailMessage}
+      }
+     console.log(mail)
+    })  
+
+  }
+
 } else {
    var  nodemailer = require('nodemailer'),
         handlebars = require('express-handlebars'),

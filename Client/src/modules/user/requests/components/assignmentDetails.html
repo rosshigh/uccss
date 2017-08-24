@@ -5,8 +5,8 @@
         <div class="panel-body">  
           <ul style="padding-left:10px;">
 						<li class="list-group-item" repeat.for="assign of requests.selectedRequestDetail.assignments">
-             <compose if.bind="systems.selectedSystem.type === 'ERP' || !systems.selectedSystem.type" view="./erp.html"></compose>
-             <compose if.bind="systems.selectedSystem.type === 'HANA'" view="./hana.html"></compose>
+              <compose if.bind="systems.selectedSystem.type === 'ERP' || !systems.selectedSystem.type" view="./erp.html"></compose>
+              <compose if.bind="systems.selectedSystem.type === 'HANA'" view="./hana.html"></compose>
               <compose if.bind="systems.selectedSystem.type === 'BO'" view="./bo.html"></compose>
 						</li>
           </ul>

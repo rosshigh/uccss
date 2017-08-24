@@ -90,12 +90,13 @@ export class ViewHelpTickets {
     this.removeHTStatus = [this.config.NEW_HELPTICKET_STATUS, this.config.REPLIED_HELPTICKET_STATUS];
 
     if(this.utils.isMobile()){
+      this.mobile = true;
       this.toolbar = [['style', ['style', 'bold', 'clear']]];
     }
   }
 
   attached() {
-    $('[data-toggle="tooltip"]').tooltip();
+    if(!this.mobile) this.toolTips();
   }
 
   detached() {

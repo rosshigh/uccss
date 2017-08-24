@@ -1277,6 +1277,47 @@ export class Assignments {
             }
   }
 
+  bulkEmail(){
+      this.email = {emailMessage: "", subject: ""} ;
+      this.emailArray = new Array();
+      this.dataTable.displayArray.forEach(item => {
+        let keep = true;  
+        for(let i = 0; i < this.emailArray.length; i++ ){
+            if(item.requestId.personId.email === this.emailArray[i].email) keep = false;
+        }
+        if(keep){
+            this.emailArray.push({
+                fullName: item.requestId.personId.fullName,
+                email: item.requestId.personId.email,
+                institution: item.requestId.institutionId.name
+            })
+        }
+      })
+      this.requestSelected = 'email';
+  }
+
+  backBulkEmail(){
+      this.requestSelected = 'table';
+  }
+
+  sendBulkEmail(){
+    if(this.email.emailMessage === "" || this.email.subject === ""){
+        this.showNotification("Enter a subject and messsage");
+        return;
+    }
+    if(this.emailArray.length === 0){
+        this.showNotification("You must include some recipients");
+        return;
+    }
+    var recipients = new Array();
+    this.emailArray.forEach(item => {
+        recipients.push({name: item.fullName, email: item.email});
+    });
+
+    var email = {email: this.email, recipients: recipients}; 
+    this.people.sendBuikEmail(email);
+  }
+
     clearFilters(){
         this.requiredDateFilterValue = "";
         this.createdDateFilterValue = "";

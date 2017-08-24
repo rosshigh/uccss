@@ -33,7 +33,7 @@ export class Systems{
     }
 
     async getSystem(index){
-        if(index){
+        if(index >= 0){
             let id = this.systemsArray[index]._id;
             let serverResponse = await this.data.get(this.SYSTEMS_SERVICE + "/" + id);
             if(!serverResponse.error){
