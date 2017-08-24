@@ -29603,6 +29603,12 @@ define('modules/tech/requests/createRequest',['exports', 'aurelia-framework', 'a
 		CreateRequestTech.prototype.changeInstitution = function changeInstitution(el) {
 			console.log(this.selectedInstitution);
 			this.institutionSelected = true;
+			this.courseSelected = false;
+			this.personSelected = false;
+			this.regularClient = false;
+			this.selectedPerson = "";
+			this.requestType = "";
+			$("#existingRequestInfo").empty().hide();
 			this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.selectedInstitution + '&order=lastName', true);
 		};
 

@@ -238,6 +238,12 @@ export class CreateRequestTech {
 	changeInstitution(el) {
 		console.log(this.selectedInstitution)
 		this.institutionSelected = true;
+		this.courseSelected = false;
+		this.personSelected = false;
+		this.regularClient = false;
+		this.selectedPerson = "";
+		this.requestType = "";
+		 $("#existingRequestInfo").empty().hide();
 		this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.selectedInstitution + '&order=lastName', true);
 	}
 
