@@ -268,7 +268,7 @@ if(env === 'development'){
         template: "generic",
         context: { name: item.name, message: mailObject.email.emailMessage}
       }
-     console.log(mail)
+     console.log(mail);
     })  
 
   }
@@ -519,7 +519,7 @@ if(env === 'development'){
         to: item.email,
         subject: mailObject.email.subject,
         template: "generic",
-        context: { name: item.name, message: mailObject.email.emailMessage}
+        context: { name: item.name, message: mailObject.email.emailMessage, UCC_PHONE: emailConfig.UCC_PHONE, UCC_EMAIL: emailConfig.UCC_EMAIL}
       }
       nodeMailerSendMail(mail); 
     })  
