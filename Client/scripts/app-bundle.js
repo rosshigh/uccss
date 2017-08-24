@@ -29127,7 +29127,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
             this.email = { emailMessage: "", subject: "" };
             this.emailArray = new Array();
-            this.dataTable.displayArray.forEach(function (item) {
+            this.dataTable.baseArray.forEach(function (item) {
                 var keep = true;
                 for (var i = 0; i < _this11.emailArray.length; i++) {
                     if (item.requestId.personId.email === _this11.emailArray[i].email) keep = false;

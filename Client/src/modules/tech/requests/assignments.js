@@ -1284,7 +1284,7 @@ export class Assignments {
   bulkEmail(){
       this.email = {emailMessage: "", subject: ""} ;
       this.emailArray = new Array();
-      this.dataTable.displayArray.forEach(item => {
+      this.dataTable.baseArray.forEach(item => {
         let keep = true;  
         for(let i = 0; i < this.emailArray.length; i++ ){
             if(item.requestId.personId.email === this.emailArray[i].email) keep = false;
