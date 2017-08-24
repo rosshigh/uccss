@@ -1221,7 +1221,7 @@ export class Assignments {
         localStorage.setItem('unassignedOnly', this.unassignedOnly);
     }
 		
-	 _setUpValidation(){
+    _setUpValidation(){
         this.validation.addRule(1,"errorRange",[{"rule":"custom","message":"Invalid ID range",
             "valFunction":function(context){
                 var valid = true;
@@ -1388,12 +1388,7 @@ export class Assignments {
     }
 
     customProductNameFilter(value, item, context){
-        for(let i = 0; i < context.products.productsArray.length; i++){
-            if(item.productId._id == context.products.productsArray[i]._id) {
-                return context.products.productsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-            }
-        }
-        return false;
+        return item.productId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
     customCourseSorter(sortProperty, sortDirection, sortArray, context){ 

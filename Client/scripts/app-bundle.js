@@ -29228,12 +29228,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.customProductNameFilter = function customProductNameFilter(value, item, context) {
-            for (var i = 0; i < context.products.productsArray.length; i++) {
-                if (item.productId._id == context.products.productsArray[i]._id) {
-                    return context.products.productsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-                }
-            }
-            return false;
+            return item.productId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
         };
 
         Assignments.prototype.customCourseSorter = function customCourseSorter(sortProperty, sortDirection, sortArray, context) {
