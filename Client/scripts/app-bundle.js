@@ -27143,7 +27143,20 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
         };
 
         EditSystem.prototype.saveClient = function saveClient() {
+            var _this11 = this;
+
             this.systems.selectedSystem.clients[this.selectedClientIndex] = this.selectedClient;
+            this.products.selectedProductFromId(this.selectedClient.productId);
+            if (this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
+                this.products.selectedProduct.systems.forEach(function (item) {
+                    if (item.sid === _this11.systems.selectedSystem.sid) _this11.saveProduct = false;
+                });
+            } else {
+                this.saveProduct = true;
+            }
+            if (this.saveProduct) {
+                this.products.selectedProduct.systems.push({ systemId: this.systems.selectedSystem._id, sid: this.systems.selectedSystem.sid });
+            }
             this.clientSelected = false;
             this.utils.showNotification("You must save the system for any changes to take effect.");
         };
@@ -27165,14 +27178,14 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
         };
 
         EditSystem.prototype.back = function back() {
-            var _this11 = this;
+            var _this12 = this;
 
             if (this.systems.isDirty(this.originalSystem).length) {
                 return this.dialog.showMessage("The system has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
                     if (!response.wasCancelled) {
-                        _this11.save();
+                        _this12.save();
                     } else {
-                        _this11._cleanUp();
+                        _this12._cleanUp();
                     }
                 });
             } else {
@@ -29430,9 +29443,9 @@ define('modules/tech/requests/createRequest',['exports', 'aurelia-framework', 'a
 					if (el.target.id === this.requests.selectedRequest.requestDetails[i].productId) {
 						if (this.requests.selectedRequest.requestDetails[i]._id) {
 							if (this.requests.selectedRequest.requestDetails[i].requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
-								return this.dialog.showMessage("That request has already been assigned and cannot be deleted?", "Cannot Delete Request", ['Ok']).then(function (response) {});
+								return this.dialog.showMessage("That request has already been assigned and cannot be deleted?", "Cannot Delete Request", ['Ok']).whenClosed(function (response) {});
 							} else {
-								return this.dialog.showMessage("Are you sure you want to delete that request?", "Delete Request", ['Yes', 'No']).then(function (response) {
+								return this.dialog.showMessage("Are you sure you want to delete that request?", "Delete Request", ['Yes', 'No']).whenClosed(function (response) {
 									if (!response.wasCancelled) {
 										_this.requests.selectedRequest.requestDetails[i].delete = true;
 									}

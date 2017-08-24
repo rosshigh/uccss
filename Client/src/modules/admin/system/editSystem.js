@@ -67,7 +67,7 @@ export class EditSystem {
     }
 
     async edit(index, el) {
-        this.editIndex = this.dataTable.getOriginalIndex(index);
+        this.editIndex = this.dataTable.getOriginalIndex(index); 
         let response = await this.systems.getSystem(this.editIndex)
         // this.systems.selectSystem(this.editIndex);
         if(response.error){
@@ -418,6 +418,18 @@ export class EditSystem {
 
     saveClient(){
         this.systems.selectedSystem.clients[this.selectedClientIndex] = this.selectedClient;
+        this.products.selectedProductFromId(this.selectedClient.productId);
+        if(this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
+            this.products.selectedProduct.systems.forEach(item => {
+                if(item.sid === this.systems.selectedSystem.sid) this.saveProduct = false;
+            })
+        } else {
+            this.saveProduct = true
+        }
+        if(this.saveProduct){
+            this.products.selectedProduct.systems.push({systemId: this.systems.selectedSystem._id, sid: this.systems.selectedSystem.sid} );
+            
+        }
         this.clientSelected = false;
         this.utils.showNotification("You must save the system for any changes to take effect.");
     }

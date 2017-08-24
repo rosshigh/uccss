@@ -113,7 +113,7 @@ export class CreateRequestTech {
 					"That request has already been assigned and cannot be deleted?",
 					"Cannot Delete Request",
 					['Ok']
-					).then(response => {
+					).whenClosed(response => {
 					});
 
 				} else {
@@ -121,7 +121,7 @@ export class CreateRequestTech {
 					"Are you sure you want to delete that request?",
 					"Delete Request",
 					['Yes','No']
-					).then(response => {
+					).whenClosed(response => {
 					if (!response.wasCancelled) {
 						this.requests.selectedRequest.requestDetails[i].delete = true;
 						// this.requests.selectedRequest.requestDetails.splice(i,1);
