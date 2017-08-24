@@ -1324,7 +1324,6 @@ export class Assignments {
             this.sendTheBulkEmail();
         }
     });
-   
   }
 
   sendTheBulkEmail(){
@@ -1335,6 +1334,8 @@ export class Assignments {
 
     var email = {email: this.email, recipients: recipients}; 
     this.people.sendBuikEmail(email);
+    this.utils.showNotification("Message sent");
+    this.requestSelected = 'table';
   }
 
     clearFilters(){

@@ -3,8 +3,8 @@
       <span class="col-lg-4">
         <h5 class="leftMargin">System: <span class="bold">${assign.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</span></h5>
         <h5 class="leftMargin">Client: <span class="bold"> ${assign.client} </span></h5>
-        <h5 class="leftMargin">Server: <span class="bold"> ${systems.selectedSystem.server} </span></h5>
-        <h5 class="leftMargin">System Number: <span class="bold"> ${systems.selectedSystem.instance} </span></h5>
+        <h5 class="leftMargin">Server: <span class="bold"> ${assign.systemId | lookupValue:systems.systemsArray:"_id":"system"} </span></h5>
+        <h5 class="leftMargin">System Number: <span class="bold"> ${assign.systemId | lookupValue:systems.systemsArray:"_id":"instance"} </span></h5>
       </span>
       <span class="col-lg-6">
         <h5>Student IDs: <span class="bold"> ${assign.studentUserIds ? assign.studentUserIds : 'N/A'}</span></h5>
