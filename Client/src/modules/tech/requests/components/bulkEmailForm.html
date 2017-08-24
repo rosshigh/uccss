@@ -1,7 +1,7 @@
 <template>
 	 <div class="bottomMargin list-group-item leftMargin rightMargin">
 		<span click.delegate="backBulkEmail()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
-		<span click.delegate="sendBulkEmail()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+		<span click.delegate="sendBulkEmail()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Send"><i class="fa fa-paper-plane fa-lg fa-border" aria-hidden="true"></i></span>
 	</div>
 
 	 <div class="col-md-4 topMargin">
@@ -9,9 +9,13 @@
         <div class="well well2 overFlow" style="height:800px;">
           <ul>
 			<li class="list-group-item" repeat.for="person of emailArray">
-				<h5>${person.fullName}</h5>
-				<h6>${person.email}</h6>
-				<h6>${person.institution}</h6>
+				<span class="col-lg-10" style="padding-left:0px;"><h5>${person.fullName}</h5></span>
+				<span class="col-lg-1">
+				<span class="col-lg-2 icon glyphicon glyphicon-trash pull-right smallMarginRight" click.delegate="deleteRecipient($index)"></span>
+				</span>
+					<h6>${person.email}</h6>
+					<h6>${person.institution}</h6>
+				
 			</li>
           </ul>
         </div>

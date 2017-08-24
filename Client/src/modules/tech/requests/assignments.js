@@ -1277,6 +1277,10 @@ export class Assignments {
             }
   }
 
+  deleteRecipient(index){
+    this.emailArray.splice(index,1);
+  }
+
   bulkEmail(){
       this.email = {emailMessage: "", subject: ""} ;
       this.emailArray = new Array();
@@ -1302,14 +1306,29 @@ export class Assignments {
 
   sendBulkEmail(){
     if(this.email.emailMessage === "" || this.email.subject === ""){
-        this.showNotification("Enter a subject and messsage");
+        this.utils.showNotification("Enter a subject and messsage");
         return;
     }
     if(this.emailArray.length === 0){
-        this.showNotification("You must include some recipients");
+        this.utils.showNotification("You must include some recipients");
         return;
     }
-    var recipients = new Array();
+    return this.dialog.showMessage(
+        "Are you sure you want to send the email to these recipients?",
+        "Confirm Send",
+        ['Yes', 'No']
+    ).whenClosed(response => {                      
+        if (response.wasCancelled) {
+            okToProcess = false;
+        } else {
+            this.sendTheBulkEmail();
+        }
+    });
+   
+  }
+
+  sendTheBulkEmail(){
+     var recipients = new Array();
     this.emailArray.forEach(item => {
         recipients.push({name: item.fullName, email: item.email});
     });
