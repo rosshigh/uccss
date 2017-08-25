@@ -1071,7 +1071,7 @@ export class Assignments {
         this.productsSelected = new Array();
             
         let subject = "Question about product request " +  this.selectedRequestNo;
-        let email = {emailBody: "", emailSubject: subject, emailId: this.email, products: this.products, productsSelected: this.productsSelected};
+        let email = {emailBody: "", emailSubject: subject, emailId: this.email, products: this.clientRequests.selectedRequest.requestDetails, productsSelected: this.productsSelected};
         return this.dialog.showEmail(
                 "Enter Email",
                 email,

@@ -27,7 +27,6 @@ export class ViewHelpTickets {
 
   colSpan = 10; 
 
-  // navControl = "supportNavButtons";
   spinnerHTML = "";
   filterValues = new Array();
   commentShown = "";
@@ -67,7 +66,7 @@ export class ViewHelpTickets {
       this.config.getConfig()
     ]);
 
-    this.sessions.getSessionsArray('?order=startDate');
+    this.sessions.getSessionsArray('?order=startDate:DSC');
     this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name');
     this.systems.getSystemsArray();
     this.documents.getDocumentsCategoriesArray();

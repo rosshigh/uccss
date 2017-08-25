@@ -58,7 +58,7 @@ export class ViewRequests {
     $("#infoBox").fadeOut();
     $("#existingRequestInfo").fadeOut(); 
     let responses =  await Promise.all([
-      this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate',true ),
+      this.sessions.getSessionsArray('?order=startDate:DSC',true ),
       this.people.getCoursesArray(true, "?filter=personId|eq|" + this.userObj._id),
       this.products.getProductsArray('?filter=active|eq|true&order=Category'),
       this.systems.getSystemsArray(),

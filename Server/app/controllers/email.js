@@ -513,35 +513,24 @@ if(env === 'development'){
   }
 
   sendBulkEmails = function(mailObject){
-    var toEmails = "";
     mailObject.recipients.forEach(item => { 
-      toEmails = toEmails + item.email + ";";
-      // var mail = {
-      //   from: emailConfig.emailAddress,
-      //   to: item.email,
-      //   subject: mailObject.email.subject,
-      //   template: "generic",
-      //   context: { name: item.name, message: mailObject.email.emailMessage, UCC_PHONE: emailConfig.UCC_PHONE, UCC_EMAIL: emailConfig.UCC_EMAIL}
-      // }
-      // nodeMailerSendMail(mail); 
-    });
-    //  var mail = {
-    //     from: emailConfig.emailAddress,
-    //     to: emailConfig.emailAddress,
-    //     subject: mailObject.email.subject,
-    //     template: "generic",
-    //     context: { name: "UCC", message: mailObject.email.emailMessage, UCC_PHONE: emailConfig.UCC_PHONE, UCC_EMAIL: emailConfig.UCC_EMAIL}
-    //   }
-    //   nodeMailerSendMail(mail);  
-     var mail = {
+      var mail = {
         from: emailConfig.emailAddress,
-        to: toEmails,
+        to: item.email,
         subject: mailObject.email.subject,
         template: "generic",
         context: { name: item.name, message: mailObject.email.emailMessage, UCC_PHONE: emailConfig.UCC_PHONE, UCC_EMAIL: emailConfig.UCC_EMAIL}
       }
-console.log(mail);      
-      nodeMailerSendMail(mail);
+      nodeMailerSendMail(mail); 
+    });
+     var mail = {
+        from: emailConfig.emailAddress,
+        to: emailConfig.emailAddress,
+        subject: mailObject.email.subject,
+        template: "generic",
+        context: { name: "UCC", message: mailObject.email.emailMessage, UCC_PHONE: emailConfig.UCC_PHONE, UCC_EMAIL: emailConfig.UCC_EMAIL}
+      }
+      nodeMailerSendMail(mail);  
   }
 
   test = function(mailObj){
