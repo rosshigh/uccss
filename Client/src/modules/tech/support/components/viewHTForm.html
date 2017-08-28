@@ -122,6 +122,11 @@
                 </div>
                 <div class="col-md-3">
                   <div class="form-group">
+                    <h5 class="col-md-offset-1">Phone: ${helpTickets.selectedHelpTicket.personId.phone | phoneNumber} Mobile: ${helpTickets.selectedHelpTicket.personId.mobile | phoneNumber}</h5>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
                     <h5 class="col-md-offset-1">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId.fullName}</h5>
                   </div>
                 </div>
