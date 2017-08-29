@@ -71,7 +71,7 @@ export class CreateRequestTech {
 	}
 
 	selectProduct(el){
-    	if(this.requests.selectedRequest.requestDetails.length < this.config.REQUEST_LIMIT && !this.showLockMessage){
+    	if(!this.showLockMessage){
 			if(this.alreadyOnList(el.target.id)){
 				this.utils.showNotification("You can't add the same product more than once")
 			} else {
