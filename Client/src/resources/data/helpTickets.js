@@ -468,6 +468,17 @@ export class HelpTickets {
         })
     }
 
+    async archiveSearch(searchObj){
+        if(searchObj){
+            var resultArray = new Array();
+            let response = await this.data.saveObject(searchObj, this.HELP_TICKET_SERVICES + "/archive", "post");
+            if(!response.error){
+                resultArray = response;
+                return resultArray;
+            }
+        }
+    }
+
     advancedSearch(searchObj){
 
          var resultArray = this.utils.copyArray(this.helpTicketsArray);

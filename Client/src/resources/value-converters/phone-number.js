@@ -2,7 +2,7 @@ export class PhoneNumberValueConverter {
   toView(value) {
 		var mask = "___-___-____";
 	  if(value){
-			
+			value = value.replace(/ /g, );
 			value = value.replace(/-/g, '');
 			if(value.length > 10) value = value.substr(0,10);
 			if(value.length === 0){

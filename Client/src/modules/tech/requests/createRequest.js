@@ -20,6 +20,7 @@ import moment from 'moment';
 export class CreateRequestTech {
 	sessionSelected = false;
 	spinnerHTML = "";
+	configDate = {};
 
 	constructor(router, config, validation, people, dialog, datatable, utils, sessions, products, requests, siteInfo, ea) {
 		this.router = router;

@@ -68,19 +68,30 @@ export class ArchiveHelpTickets {
   buildSearchCriteria(){
     this.searchObj = new Object();
 
-    this.searchObj.helpTicketNo = this.helpTicketNo;
+    if(this.helpTicketNo){
+      this.searchObj.helpTicketNo = this.helpTicketNo;
+    }
+    
+    if(this.dateFrom || this.dateTo){
+      this.searchObj.dateRange = {
+        dateFrom: this.dateFrom,
+        dateTo: this.dateTo
+      };
+    }
+    
 
-    this.searchObj.dateRange = {
-      dateFrom: this.dateFrom,
-      dateTo: this.dateTo
-    };
+    if(this.selectedStatus){
+      this.searchObj.status = this.selectedStatus;
+    }
 
-    this.searchObj.status = this.selectedStatus;
-
-    this.searchObj.keyWords = this.keyWords;
-
-    this.searchObj.content = this.content;
-
+    if(this.keyWords){
+      this.searchObj.keyWords = this.keyWords;
+    }
+    
+    if(this.content){
+      this.searchObj.content = this.content;
+    }
+    
     this.searchObj.type = this.selectedType;
 
     this.searchObj.productIds = this.selectedProducts;
@@ -91,9 +102,10 @@ export class ArchiveHelpTickets {
 
   }
 
-  search(){
+  async search(){
     this.buildSearchCriteria();
-    this.resultArray = this.helpTickets.advancedSearch(this.searchObj);
+    this.resultArray = await this.helpTickets.archiveSearch(this.searchObj);
+    // this.resultArray = this.helpTickets.advancedSearch(this.searchObj);
     this.helpTicketSelected = true;
     this.dataTable.updateArray(this.resultArray);
   }

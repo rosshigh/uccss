@@ -103,6 +103,54 @@ module.exports = function (app, config) {
       })
   });
 
+  router.post('/api/helpTickets/archive', requireAuth, function(req, res, next){
+    writeLog.log('Archive search', 'verbose');
+console.log(req.body)    
+    var query = Model.find();
+    if(req.body.helpTicketNo){   
+      query.where('helpTicketNo').equals(req.body.helpTicketNo);
+    } else {
+      if(req.body.dateRange){
+        query.where('createdDate').gt(req.body.dateRange.dateFrom).lt(req.body.dateRange.dateTo);
+      }
+      if(req.body.selectedStatus){
+        query.where('helpTicketStatus').equals(req.body.selectedStatus);
+      }
+      if(req.body.keyWords){
+        let term = new RegExp(req.body.keyWords, "i")       
+        query.regex('keyWords', term);
+      }
+      // if(req.body.content){
+      //   let term = new RegExp(req.body.keyWords, "i")       
+      //   query.regex('keyWords', term);
+      // }
+    }
+    query.exec()
+      .then(response => {
+        if(response && response.length > 0){
+          if(req.body.content){
+            let searchTerm = req.body.content.toUpperCase();
+console.log(searchTerm)            
+            response = response.filter(item => {           
+              for(let i = 0; i < item.content.length; i++){
+console.log(item.content[i].content.comments.toUpperCase())                
+                if(item.content[i].content.comments.toUpperCase().indexOf(searchTerm) > -1){
+                  return true;
+                }
+              }
+              return false;
+            });
+          }
+          res.status(200).json(response);
+        } else {
+          res.status(204).json({message: "No documents found"});
+        }
+      })
+      .catch(err => {
+        return next(err);
+      })
+  });
+
   router.get('/api/helpTickets/:id', requireAuth, function(req, res, next){
     writeLog.log('Get help ticket '+ req.params.id, 'verbose');
     Model.findOne({_id: req.params.id})
