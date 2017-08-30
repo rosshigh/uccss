@@ -31,6 +31,7 @@ export class ClientRequestAnalytics {
     selectedTab = "institution";
     institutionTableSelected = true;
     productTableSelected = true;
+    showExportPanel = false;
 
     constructor(router, config, dialog, people, datatable, utils, sessions, products, systems, requests) {
         this.router = router;
@@ -429,6 +430,50 @@ export class ClientRequestAnalytics {
 
     hideProfile(){
         $(".hoverProfile").css("display", "none");
+    }
+
+    downloadExcel(){
+			var exportArray = this.utils.copyArray(this.dataTable.baseArray);
+			var htmlContent = "<table><tr><th>Product</th>";
+			var numFields = this.config.REQUEST_STATUS.length;
+			
+			this.config.REQUEST_STATUS.forEach(item => {
+				htmlContent += "<th>" + item.description + "</th>";
+			})
+			htmlContent += "</tr>";
+
+			exportArray.forEach(item => {
+				var line = "<tr><td>" + item.productId.name + "</td>";
+				this.config.REQUEST_STATUS.forEach((field, index) => {
+					line += "<td>" + item[field.code] + "</td>"; 
+				})
+				line += "</tr>";
+				htmlContent += line;
+			});
+			htmlContent += "</table>";
+			window.open('data:application/vnd.ms-excel,' + htmlContent);
+    }
+        
+    downloadInstExcel(){
+        var exportArray = this.utils.copyArray(this.dataTable.baseArray);
+        var htmlContent = "<table><tr><th>Product</th>";
+        var numFields = this.config.REQUEST_STATUS.length;
+        
+        this.config.REQUEST_STATUS.forEach(item => {
+            htmlContent += "<th>" + item.description + "</th>";
+        })
+        htmlContent += "</tr>";
+
+        exportArray.forEach(item => {
+            var line = "<tr><td>" + item.name + "</td>";
+            this.config.REQUEST_STATUS.forEach((field, index) => {
+                line += "<td>" + item[field.code] + "</td>"; 
+            })
+            line += "</tr>";
+            htmlContent += line;
+        });
+        htmlContent += "</table>";
+        window.open('data:application/vnd.ms-excel,' + htmlContent);
     }
 
     customProductSorter(sortProperty, sortDirection, sortArray, context){  
