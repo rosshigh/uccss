@@ -297,7 +297,14 @@ export class DataTable{
    * sortProperty - property showing in table on which sort is actually performed
    * sortDirectionParam - direction of sort
    */
-  sortArray(el, options){ //propertyName, type, surrogateArray, surrogateProperty, sortProperty, sortDirectionParam){
+  sortArray(el, options, reSort){ //propertyName, type, surrogateArray, surrogateProperty, sortProperty, sortDirectionParam){
+    if(reSort){
+      el = this.lastEl;
+      options = this.lastOption;
+    } else {
+      this.lastEl = el;
+      this.lastOption = options;
+    }
     if(options.sortDirectionParam) this.sortDirection = sortDirectionParam;
     this.sortProperty=options.propertyName;
     if(options.propertyName === this.sortProperty){

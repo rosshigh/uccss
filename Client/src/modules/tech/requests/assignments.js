@@ -19,6 +19,8 @@ export class Assignments {
 	spinnerHTML = "";
     isCheckedAssigned = true; 
     noRequests = true;
+    sortProperty = '';
+    sortDirection;
 
     constructor( config, validation, dialog, datatable, utils, sessions, products, systems, people, requests) {
         this.config = config;
@@ -111,6 +113,7 @@ export class Assignments {
         if (!serverResponse.error) {
             this.utils.showNotification("The request was updated");
             this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
+            this.reSort();
             this.dataTable.applyFilters();
             this.filterInAssigned();
             this._cleanUp();
@@ -776,6 +779,7 @@ export class Assignments {
         this.systems. selectedSystemFromId(this.proposedClient[index].systemId);
         this.assignment = this.assignmentDetails[index];
         this.assignmentDetails.splice(index, 1);
+        this.proposedClient.splice(index, 1);
         if(this.assignmentDetails.length == 0) this.selectedRequestDetail.requestStatus = this.config.UNASSIGNED_REQUEST_CODE
         
         //Construct the object to submit to the server
@@ -791,6 +795,7 @@ export class Assignments {
         let serverResponse = await this.clientRequests.deleteAssignment(this.editIndex);  
         if (!serverResponse.status) {
             this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
+            this.reSort();
             this.filterInAssigned();
             this.utils.showNotification("The assignment was deleted");
             await this.systems.saveSystem();
@@ -843,18 +848,21 @@ export class Assignments {
      * Save the request 
      ****************************************************************************************************/
     async save() {
-        if (this.validation.validate(1)) {
-            if(this._buildRequest()){
-                this.clientRequests.setSelectedRequest(this.requestToSave);
-                var email = this._buildEmailObject();
-                let serverResponse = await this.clientRequests.assignRequest(email, this.editIndex);
-                if (!serverResponse.status) {
-                  
-                    this.utils.showNotification("The request was updated");
-                    this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
-                    this.filterInAssigned();
-                    await this.systems.saveSystem();
-                    this._cleanUp();
+        if( this.assignmentDetails &&  this.assignmentDetails.length > 0){
+            if (this.validation.validate(1)) {
+                if(this._buildRequest()){
+                    this.clientRequests.setSelectedRequest(this.requestToSave);
+                    var email = this._buildEmailObject();
+                    let serverResponse = await this.clientRequests.assignRequest(email, this.editIndex);
+                    if (!serverResponse.status) {
+                    
+                        this.utils.showNotification("The request was updated");
+                        this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
+                        this.reSort();
+                        this.filterInAssigned();
+                        await this.systems.saveSystem();
+                        this._cleanUp();
+                    }
                 }
             }
         }
@@ -998,11 +1006,11 @@ export class Assignments {
         var newAssignment = false;
         if(this.assignmentDetails) {
             this.assignmentDetails.forEach(item => {
-                if(!item.assignedDate) newAssignment = truel
+                if(!item.assignedDate) newAssignment = true;
             })
         }
 
-        if(changes.length > 0 || newAssignment ){
+        if(this.assignmentDetails.length > 0 && (changes.length > 0 || newAssignment) ){
              return this.dialog.showMessage(
                     "There is an unsaved assignment. Are you sure you want to leave this page?",
                     "Confirm Back",
@@ -1050,16 +1058,6 @@ export class Assignments {
             this.hideProfile();
          } else {
             await this.clientRequests.getRequest(this.selectedRequestDetail.requestId._id);
-            // this.model = 'detail';
-            // this.requestId =  this.selectedRequestDetail.requestId._id;
-            // // this.productName = this.selectedRequestDetail.productId.name;
-            // this.selectedRequestNo = this.selectedRequestDetail.requestId.clientRequestNo;
-            // this.course = this.selectedRequestDetail.requestId.courseId.name;
-            // this.email = this.selectedRequestDetail.requestId.personId.email;
-            // this.personId = this.selectedRequestDetail.requestId.personId._id;
-            // this.products = this.selectedRequestDetail;
-            // this.products.requestId = this.products.requestId._id;
-            // this.productsSelected = new Array();
          }  
         
         this.selectedRequestNo = this.clientRequests.selectedRequest.clientRequestNo;
@@ -1231,7 +1229,7 @@ export class Assignments {
                     }
                 }
                 return valid;
-            }}]);
+            }}]);  
 	}
 
 	_cleanUp() {
@@ -1392,8 +1390,10 @@ export class Assignments {
     }
 
     customCourseSorter(sortProperty, sortDirection, sortArray, context){ 
+        this.sortProperty = 'course';
+        this.sortDirection = sortDirection;
         return sortArray.sort((a, b) => {
-            if(a['requestId']['courseId']['name'] && b['requestId']['courseId']['name']) {
+            if(a['requestId'] !== null &&  b['requestId'] !== null && a['requestId']['courseId']['name'] && b['requestId']['courseId']['name']) {
                 var result = (a['requestId']['courseId']['name'] < b['requestId']['courseId']['name']) ? -1 : (a['requestId']['courseId']['name'] > b['requestId']['courseId']['name']) ? 1 : 0;
             } else {
                 var result = -1;
@@ -1403,8 +1403,10 @@ export class Assignments {
     }
 
     customInstitutionsSorter(sortProperty, sortDirection, sortArray, context){ 
+        this.sortProperty = 'institution';
+        this.sortDirection = sortDirection;
         return sortArray.sort((a, b) => {
-            if(a['requestId']['institutionId']['name'] && b['requestId']['institutionId']['name']) {
+            if(a['requestId'] !== null &&  b['requestId'] !== null && a['requestId']['institutionId']['name'] && b['requestId']['institutionId']['name']) {
                 var result = (a['requestId']['institutionId']['name'] < b['requestId']['institutionId']['name']) ? -1 : (a['requestId']['institutionId']['name'] > b['requestId']['institutionId']['name']) ? 1 : 0;
             } else {
                  var result = -1;
@@ -1414,8 +1416,10 @@ export class Assignments {
     }
 
     customPersonSorter(sortProperty, sortDirection, sortArray, context){ 
+        this.sortProperty = 'person';
+        this.sortDirection = sortDirection;
         return sortArray.sort((a, b) => {
-            if(a['requestId']['personId']['lastName'] && b['requestId']['personId']['lastName']){
+            if(a['requestId'] !== null &&  b['requestId'] !== null && a['requestId']['personId']['lastName'] && b['requestId']['personId']['lastName']){
                 var result = (a['requestId']['personId']['lastName'] < b['requestId']['personId']['lastName']) ? -1 : (a['requestId']['personId']['lastName'] > b['requestId']['personId']['lastName']) ? 1 : 0;
             } else {
                 var result = -1;
@@ -1425,10 +1429,16 @@ export class Assignments {
     }
 
     customRequestStatusSorter(sortProperty, sortDirection, sortArray, context){ 
+        this.sortProperty = 'status';
+        this.sortDirection = sortDirection;
         return sortArray.sort((a, b) => {
 			var result = (a[sortProperty] < b[sortProperty]) ? -1 : (a[sortProperty] > b[sortProperty]) ? 1 : 0;
 			return result * sortDirection;
 		});
+    }
+
+    reSort(){
+       this.dataTable.sortArray({}, {}, true);
     }
 
 }
