@@ -67,6 +67,14 @@ export class HelpTickets {
         }
     }
 
+    setHelpTicket(helpTicket){
+        if(!helpTicket){
+            this.emptyHelpTicket();
+        } else {
+            this.selectedHelpTicket = this.utils.copyObject(helpTicket);
+        }
+    }
+
     async getCurrentCount(options){
         var url = this.HELP_TICKET_SERVICES +'/current/count';
         url += options ? "/" + options : "";
@@ -475,6 +483,8 @@ export class HelpTickets {
             if(!response.error){
                 resultArray = response;
                 return resultArray;
+            } else {
+                return new Array();
             }
         }
     }

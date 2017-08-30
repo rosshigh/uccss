@@ -16,6 +16,10 @@ import moment from 'moment';
 export class ArchiveHelpTickets {
   searchResults = false;
   helpTicketSelected = false;
+  showPanel = false;
+  showCustomer = false;
+  showInstituion = false;
+   colSpan = 10; 
 
   navControl = "supportNavButtons";
   spinnerHTML = "";
@@ -46,7 +50,6 @@ export class ArchiveHelpTickets {
   async activate() {
     let responses = await Promise.all([
       this.helpTickets.getHelpTicketTypes('?order=category'),
-      this.helpTickets.getHelpTicketArray("",true),
       this.sessions.getSessionsArray('?order=startDate', true),
       this.products.getProductsArray('?order=name'),
       this.people.getInstitutionsArray('?order=name'),
@@ -79,7 +82,6 @@ export class ArchiveHelpTickets {
       };
     }
     
-
     if(this.selectedStatus){
       this.searchObj.status = this.selectedStatus;
     }
@@ -92,14 +94,22 @@ export class ArchiveHelpTickets {
       this.searchObj.content = this.content;
     }
     
-    this.searchObj.type = this.selectedType;
+    if(this.selectedType != -1){
+      this.searchObj.helpTicketType = this.selectedType;
+    }
+    
+    if(this.selectedProducts && this.selectedProducts.length){
+       this.searchObj.productIds = this.selectedProducts;
+    }
 
-    this.searchObj.productIds = this.selectedProducts;
-
-    this.searchObj.peopleIds = this.selectedPeople;
-
-    this.searchObj.institutionIds = this.selectedInstitutions;
-
+    if(this.selectedPeople && this.selectedPeople.length){
+      this.searchObj.peopleIds = this.selectedPeople;
+    }
+    
+    if(this.selectedInstitutions && this.selectedInstitutions.length){
+      this.searchObj.institutionIds = this.selectedInstitutions;
+    }
+    
   }
 
   async search(){
@@ -245,8 +255,7 @@ export class ArchiveHelpTickets {
   *****************************************************************************************/
   async selectHelpTicket(helpTicket, el) {
     //Make the selected help ticket the selected help ticket
-     this.helpTickets.selectHelpTicketByID(helpTicket._id);
-    this.oroginalHelpTicket = this.utils.copyObject(this.helpTickets.selectedHelpTicket);
+     this.helpTickets.setHelpTicket(helpTicket);
     //If the help ticket has a systemId, retrieve the system from the server
     if (this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
       await this.systems.getSystem(this.helpTickets.content.content.systemId);
@@ -276,6 +285,54 @@ export class ArchiveHelpTickets {
     $("#type").val("");
     $("#status").val("");
     $("#personStatus").val("");
+  }
+
+  toggleProduct(){
+    this.showPanel = !this.showPanel;
+  }
+
+  toggleCustomer(){
+    this.showCustomer = !this.showCustomer;
+  }
+
+  toggleInstitution(){
+    this.showInstitution = !this.showInstitution;
+  }
+
+    customHelpTicketTypeFilter(value, item, context){
+    var foo = value.toUpperCase();
+    for(let i = 0; i < context.helpTickets.helpTicketTypesArray.length; i++){
+      for(let j = 0; j < context.helpTickets.helpTicketTypesArray[i].subtypes.length; j++){
+        if(context.helpTickets.helpTicketTypesArray[i].subtypes[j].type == item.helpTicketType) {
+          return  context.helpTickets.helpTicketTypesArray[i].subtypes[j].description.toUpperCase().indexOf(foo) > -1;
+        }
+      }
+    }
+    return false
+  }
+
+  customOwnerFilter(value, item, context){
+      if(item.owner[0].personId === null) return false;
+      return item.owner[0].personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
+  }
+
+  customNameFilter(value, item, context){
+      return item.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
+  }
+
+  institutionCustomFilter(value, item, context){
+      return item.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+  }
+
+  customOwnerSorter(sortProperty, sortDirection, sortArray, context){
+    context.sortDirection = context.sortDirection === null ? 1 : context.sortDirection === 1 ? -1 : 1;
+    return sortArray.sort((a,b) => {
+      if(a.owner[0].personId === null && b.owner[0].personId === null) return 0;
+      if(a.owner[0].personId === null && b.owner[0].personId !== null) return context.sortDirection * -1;
+      if(a.owner[0].personId !== null && b.owner[0].personId === null) return context.sortDirection;
+      var result = (a.owner[0].personId.lastName < b.owner[0].personId.lastName) ? -1 : (a.owner[0].personId.lastName > b.owner[0].personId.lastName) ? 1 : 0;
+      return result *context.sortDirection;
+    })
   }
 
 }

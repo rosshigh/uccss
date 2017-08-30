@@ -60,6 +60,7 @@ export class ClientRequestAnalytics {
         ]);
         this.selectedCategory = this.categories[0];
         this.selectedSession = this.sessions.sessionsArray[0]._id;
+        this.requests.requestsArray = new Array();
        
         this.getProductsRequests();
         this.getInstitutionRequests();
@@ -101,7 +102,7 @@ export class ClientRequestAnalytics {
         if (this.selectedSession) {
             this.numCols = this.config.REQUEST_STATUS.length + 1
             this.sessions.selectSessionById(this.selectedSession);
-            await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession);
+            await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession, true);
             if (this.requests.requestsDetailsArrayAnalytics && this.requests.requestsDetailsArrayAnalytics.length) {
                 await this.requests.groupRequestsByInstitution();
                 this.totalsInstitutionArray = new Array();

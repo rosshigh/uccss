@@ -105,7 +105,7 @@ module.exports = function (app, config) {
 
   router.post('/api/helpTickets/archive', requireAuth, function(req, res, next){
     writeLog.log('Archive search', 'verbose');
-console.log(req.body)    
+   
     var query = Model.find();
     if(req.body.helpTicketNo){   
       query.where('helpTicketNo').equals(req.body.helpTicketNo);
@@ -113,34 +113,47 @@ console.log(req.body)
       if(req.body.dateRange){
         query.where('createdDate').gt(req.body.dateRange.dateFrom).lt(req.body.dateRange.dateTo);
       }
-      if(req.body.selectedStatus){
-        query.where('helpTicketStatus').equals(req.body.selectedStatus);
+      if(req.body.status){
+        query.in('helpTicketStatus', req.body.status);
       }
       if(req.body.keyWords){
         let term = new RegExp(req.body.keyWords, "i")       
         query.regex('keyWords', term);
       }
-      // if(req.body.content){
-      //   let term = new RegExp(req.body.keyWords, "i")       
-      //   query.regex('keyWords', term);
-      // }
+      if(req.body.helpTicketType){
+        query.where('helpTicketType').equals(req.body.helpTicketType);
+      }
+      if(req.body.peopleIds && req.body.peopleIds.length){
+        console.log(req.body.peopleIds)
+        query.in('personId', req.body.peopleIds);
+      }
+      if(req.body.productIds && req.body.productIds.length){
+        query.in('productId', req.body.productIds);
+      }
+      if(req.body.institutionIds && req.body.institutionIds.length){
+        query.in('institutionId', req.body.institutionIds);
+      }
     }
+    query.populate('courseId', 'name number')
+    query.populate('requestId')
+    query.populate('personId','email firstName lastName phone mobile nickName file')
+    query.populate('content.personId','email firstName lastName phone mobile nickName')
+    query.populate('institutionId', 'name')
+    query.populate({path: 'owner.personId', model: 'Person', select: 'firstName lastName'})
     query.exec()
       .then(response => {
         if(response && response.length > 0){
           if(req.body.content){
             let searchTerm = req.body.content.toUpperCase();
-console.log(searchTerm)            
             response = response.filter(item => {           
-              for(let i = 0; i < item.content.length; i++){
-console.log(item.content[i].content.comments.toUpperCase())                
+              for(let i = 0; i < item.content.length; i++){         
                 if(item.content[i].content.comments.toUpperCase().indexOf(searchTerm) > -1){
                   return true;
                 }
               }
               return false;
             });
-          }
+          }      
           res.status(200).json(response);
         } else {
           res.status(204).json({message: "No documents found"});

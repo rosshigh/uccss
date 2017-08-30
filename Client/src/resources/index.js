@@ -2,6 +2,7 @@ export function configure(config) {
   config.globalResources([
     './editor/editor',
     './elements/calendar',
+    './elements/multiselect',
     './elements/tree-node',
     './elements/submenu',
     './elements/nav-bar',

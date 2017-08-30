@@ -255,6 +255,14 @@
               "attributes/chart-attribute.js"
             ],
             "deps": ["chart.js"]
+          },
+           {
+            "name": "bootstrap-select",
+            "path": "../node_modules/bootstrap-select/dist/",
+            "main": "js/bootstrap-select",
+            "resources": [
+              "css/bootstrap-select.css"
+            ]
           }
         ]
       }
