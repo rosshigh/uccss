@@ -1,350 +1,338 @@
 <template>
-  <div class="bottomMargin list-group-item leftMargin rightMargin">
-    <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
-    <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
-    <span click.delegate="customerActionDialog()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Customer Action"><i class="fa fa-paper-plane fa-lg fa-border" aria-hidden="true"></i></span>
-    <span click.delegate="openFacultyDetails()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Details"><i class="fa fa-user fa-lg fa-border" aria-hidden="true"></i></span>
-    <span click.delegate="openSettings()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Settings"><i class="fa fa-cog fa-lg fa-border" aria-hidden="true"></i></span>
-    <span click.delegate="openAudit()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Audit"><i class="fa fa-history fa-lg fa-border" aria-hidden="true"></i></span>
-    <span click.delegate="flag()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Flag"><i class="fa fa-flag fa-lg fa-border" aria-hidden="true"></i></span>
-    <span click.delegate="delete()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>
-  </div>
-  <div class="row leftMargin rightMargin">
-    <div show.bind="!facultyDetails" class="well col-lg-12">
-       <div class="col-lg-4">
-          <div class="col-lg-12">
-            <h5>Request No: ${selectedRequestDetail.requestNo}</h5>
-          </div>
-          <div class="col-lg-12">
-            <h5>Required Date: ${selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>
-          </div>
-          <div class="col-lg-12">
-              <h5>Product: ${selectedRequestDetail.productId.name}</h5>
-          </div>
-          <div class="col-lg-12">
-            <h5>Course: ${selectedRequestDetail.requestId.courseId.name}</h5>
-          </div>
-        </div>
-         <div class="col-lg-4">
-            <div class="col-lg-12">
-              <h5>Faculty: ${selectedRequestDetail.requestId.personId.fullName}</h5>
-            </div>
-            <div class="col-lg-12">
-              <h5>Email: ${selectedRequestDetail.requestId.personId.email}</h5>
-            </div>
-            <div class="col-lg-12">
-              <h5>Institution: ${selectedRequestDetail.requestId.institutionId.name}</h5>
-            </div>
-            <div class="col-lg-12">
-              <h5>Phone: ${selectedRequestDetail.requestId.personId.phone | phoneNumber} Mobile: ${selectedRequestDetail.requestId.personId.mobile | phoneNumber}</h5>
-            </div>
-        </div>
-        <div class="col-lg-4">
-          <div class="col-lg-12">
-              <h5><strong>IDs Required: ${idsRequired}</strong></h5>
-          </div>
-            <div class="col-lg-12">
-              <h5><strong>IDs Assigned: ${totalIdsAssigned}</strong></h5>
-          </div>
-            <div class="col-lg-12">
-              <h5><strong>IDs Remaining: ${idsRemaining}</strong></h5>
-          </div>
-        </div>
-    </div>
-    
-  </div>
-  <div show.bind="showAudit">
-    <table class="table table-striped table-hover">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Property</th>
-          <th>Old Value</th>
-          <th>New Value</th>
-          <th>Person</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr  repeat.for="item of selectedRequestDetail.requestId.audit">
-          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
-          <td>${item.property}</td>
-          <td>${item.oldValue}</td>
-          <td>${item.newValue}</td>
-          <td>${item.personId | lookupValue:people.uccPeople:"_id":"fullName"}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-    
-  <div show.bind="!showAudit" class="row">
-    <div show.bind="showSettings">
-      <div class="panel panel-default leftMargin rightMargin editPanel">
-        <div class="panel-body">
-          <div class="bottomMargin list-group-item leftMargin rightMargin">
-            <span click.delegate="saveSettings()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
-            <span click.delegate="restoreDefaults()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Restore Defaults"><i class="fa fa-refresh fa-lg fa-border" aria-hidden="true"></i></span>
-          </div>
-          <div class="row">
-            <div class="form-group col-lg-3">
-              <label>Regular ID Buffer</label>
-              <input  value.bind="idBuffer"  id="bufferIds"  class="form-control" type="number" />
-              <label>Added to the number of ids requested.  Default is ${config.REGULAR_ID_BUFFER}</label>
-            </div>
-            <div class="form-group col-lg-3">
-              <label>Number of Sandbox IDs</label>
-              <input  value.bind="sandBoxIDs"  id="sandBoxIDs"  class="form-control" type="number" />
-              <label>Number of sandbox IDs assigned.  Default is ${config.SANDBOX_ID_COUNT}</label>
-            </div>
-             <div class="form-group col-lg-3">
-              <label>Sandbox ID  Bufffer</label>
-              <input  value.bind="sandBoxIDs"  id="sandBoxIDs"  class="form-control" type="number" />
-              <label>Number of IDs between assignments assigned.  Default is ${config.SANDBOX_ID_BUFFER}</label>
-            </div>
+	<div class="bottomMargin list-group-item smallLeftMargin smallMarginRight">
+		<span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
+		<span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+		<span click.delegate="customerActionDialog()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Customer Action"><i class="fa fa-paper-plane fa-lg fa-border" aria-hidden="true"></i></span>
+		<span click.delegate="openFacultyDetails()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Details"><i class="fa fa-user fa-lg fa-border" aria-hidden="true"></i></span>
+		<span click.delegate="openSettings()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Settings"><i class="fa fa-cog fa-lg fa-border" aria-hidden="true"></i></span>
+		<span click.delegate="openAudit()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Audit"><i class="fa fa-history fa-lg fa-border" aria-hidden="true"></i></span>
+		<span click.delegate="flag()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Flag"><i class="fa fa-flag fa-lg fa-border" aria-hidden="true"></i></span>
+		<span click.delegate="delete()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>
+	</div>
+  	<div class="row">
+		<div class="col-lg-5">
+			<div show.bind="!facultyDetails" class="well smallLeftMargin">
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="col-lg-12">
+							<h5>Request No: ${selectedRequestDetail.requestNo}</h5>
+						</div>
+						<div class="col-lg-12">
+							<h5>${selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>
+						</div>
+						<div class="col-lg-12">
+							<h5>${selectedRequestDetail.productId.name}</h5>
+						</div>
+						<div class="col-lg-12">
+							<h5>${selectedRequestDetail.requestId.courseId.name}</h5>
+						</div>
+						
+					</div>
+					<div class="col-lg-6">
+						<div class="col-lg-12">
+							<h5>${selectedRequestDetail.requestId.personId.fullName}</h5>
+						</div>
+						<div class="col-lg-12">
+							<h5>${selectedRequestDetail.requestId.personId.email}</h5>
+						</div>
+						<div class="col-lg-12">
+							<h5>${selectedRequestDetail.requestId.institutionId.name}</h5>
+						</div>
+						<div class="col-lg-12">
+							<h5>${selectedRequestDetail.requestId.personId.phone | phoneNumber} Mobile: ${selectedRequestDetail.requestId.personId.mobile | phoneNumber}</h5>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div show.bind="showAudit" class="smallLeftMargin">
+				<table class="table table-striped table-hover">
+					<thead>
+						<tr>
+						<th>Date</th>
+						<th>Property</th>
+						<th>Old Value</th>
+						<th>New Value</th>
+						<th>Person</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr  repeat.for="item of selectedRequestDetail.requestId.audit">
+						<td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+						<td>${item.property}</td>
+						<td>${item.oldValue}</td>
+						<td>${item.newValue}</td>
+						<td>${item.personId | lookupValue:people.uccPeople:"_id":"fullName"}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div show.bind="!showAudit">
+				<div show.bind="showSettings" class="smallLeftMargin">
+					<div class="panel panel-default editPanel">
+						<div class="panel-body">
+							<div class="bottomMargin list-group-item leftMargin rightMargin">
+								<span click.delegate="saveSettings()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+								<span click.delegate="restoreDefaults()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Restore Defaults"><i class="fa fa-refresh fa-lg fa-border" aria-hidden="true"></i></span>
+							</div>
+							<div class="row">
+								<div class="form-group col-lg-12">
+									<label>Regular ID Buffer</label>
+									<input  value.bind="idBuffer"  id="bufferIds"  class="form-control" type="number" />
+									<label>Added to the number of ids requested.  Default is ${config.REGULAR_ID_BUFFER}</label>
+								</div>
+								<div class="form-group col-lg-12">
+									<label>Number of Sandbox IDs</label>
+									<input  value.bind="sandBoxIDs"  id="sandBoxIDs"  class="form-control" type="number" />
+									<label>Number of sandbox IDs assigned.  Default is ${config.SANDBOX_ID_COUNT}</label>
+								</div>
+								<div class="form-group col-lg-12">
+									<label>Sandbox ID  Bufffer</label>
+									<input  value.bind="sandBoxIDs"  id="sandBoxIDs"  class="form-control" type="number" />
+									<label>Number of IDs between assignments assigned.  Default is ${config.SANDBOX_ID_BUFFER}</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row leftMargin rightMargin">
-      <table id="assignmentTable" class="table table-striped table-hover">
-        <thead>
-          <tr>
-            <th class="col-sm-1">System</th>
-            <th class="col-sm-1">Client</th>
-            <th class="col-sm-1">Assigned IDs</th>
-            <th>Student IDs</th>
-            <th>Student Password</th>
-            <th>Faculty IDs</th>
-            <th>Faculty Password</th>
-            <th>Assigned Date</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="dropbtn" click.trigger="selectProposedClient($index, $event)" repeat.for="client of assignmentDetails" class="${client.notValid}">
-            <td>${client.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
-            <td>${client.client}</td>
-            <td>${client.idsAssigned}</td>
-            <td>${client.studentUserIds}</td>
-            <td>${client.studentPassword}</td>
-            <td>${client.facultyUserIds}</td>
-            <td>${client.facultyPassword}</td>
-            <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
-            <td>${client.notValid | overlap}
-            <td><span click.delegate="deleteProposedClient($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash-o" aria-hidden="true"></i></span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <span id="errorRange"></span>
-  <div show.bind="!showAudit" class="row leftMargin">
-    <div class="panel panel-default col-lg-5 leftMargin">
-      <div class="panel-body">
+				<div show.bind="!showAudit" class="row smallLeftMargin">
+					<div class="panel panel-default">
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+											<div class="checkbox">
+												<label class="pull-left">
+													<input checked.bind="provisionalAssignment" id="provisionalCheckBox" type="checkbox" data-toggle="checkbox"> Provisional
+												</label>
+												<label class="pull-left leftMargin">
+													<input checked.bind="sendEmail" id="sendEmailCheckBox" type="checkbox" data-toggle="checkbox"> Send Email
+												</label>
+												<label class="pull-left leftMargin">
+													<input disabled.bind="forceManual" checked.bind="manualMode" id="manualCheckBox" type="checkbox" change.trigger="changeManualMode()" data-toggle="checkbox"> Manual
+												</label>
+												<label class="pull-left leftMargin">
+													Student ID Template 
+													<span class="smallLeftMargin" click.delegate="openEditStudentTemplate()" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Edit Template"><i class="fa fa-pencil" aria-hidden="true"></i></span>
+													<span class="smallLeftMargin" click.delegate="openStudentTemplate()" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="View Templates"><i class="fa fa-eye" aria-hidden="true"></i></span>
+												</label>
+											</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-sm-12">
+									<select show.bind="showTemplates" id="studentIdTemplate" multiple value.bind="selectedStudentIDTemplate" class="form-control input-md topMargin">
+										<option repeat.for="template of studentIDTemplates" value.bind="$index">${template}</option>
+									</select>
+								</div>
+							</div>
+							<div class="row" show.bind="showAddStudentTemplate">
+								<div class="panel panel-default col-md-12 editPanel">
+									<div class="panel-body">
+										<div class="bottomMargin">
+											<span click.delegate="saveStudentTemplate()" class="smallLeftMargin" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save Template"><i class="fa fa-floppy-o fa-lg" aria-hidden="true"></i></span>
+											<span click.delegate="cancelEditStudentTemplate()" class="smallLeftMargin" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel"><i class="fa fa-ban fa-lg" aria-hidden="true"></i></span>
+										</div>
+										<div class="form-group">
+											<input id="number" value.bind="products.selectedProduct.defaultStudentIdPrefix" type="text" placeholder="Template" class="form-control"/>
+										</div>
+									</div>
+								</div>
+							</div>
 
-        <div class="row">
-          <div class="col-lg-6">
-                <div class="form-group">
-                  <div class="checkbox">
-                      <label class="pull-left">
-                          <input checked.bind="provisionalAssignment" id="provisionalCheckBox" type="checkbox" data-toggle="checkbox"> Provisional
-                      </label>
-                      <label class="pull-left leftMargin">
-                          <input checked.bind="sendEmail" id="sendEmailCheckBox" type="checkbox" data-toggle="checkbox"> Send Email
-                      </label>
-                  </div>
-                </div>
-            </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-sm-12">
-              <label for="studentIdTemplate" class="col-sm-6 form-control-label topMargin">
-                Student ID Template
-                <span class="smallLeftMargin" click.delegate="openEditStudentTemplate()" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Edit Template"><i class="fa fa-pencil" aria-hidden="true"></i></span>
-              </label>
-              <select id="studentIdTemplate" multiple value.bind="selectedStudentIDTemplate" class="form-control input-md topMargin">
-                  <option repeat.for="template of studentIDTemplates" value.bind="$index">${template}</option>
-              </select>
-            </div>
-        </div>
-
-            <div class="row" show.bind="showAddStudentTemplate">
-                <div class="panel panel-default col-md-12 editPanel">
-                    <div class="panel-body">
-                      <div class="bottomMargin">
-                        <span click.delegate="saveStudentTemplate()" class="smallLeftMargin" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save Template"><i class="fa fa-floppy-o fa-lg" aria-hidden="true"></i></span>
-                        <span click.delegate="cancelEditStudentTemplate()" class="smallLeftMargin" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel"><i class="fa fa-ban fa-lg" aria-hidden="true"></i></span>
-                      </div>
-                        <div class="form-group">
-                            <input id="number" value.bind="products.selectedProduct.defaultStudentIdPrefix" type="text" placeholder="Template" class="form-control"/>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-          <div class="row">
-            <div class="col-lg-6">
-                <div class="form-group">
-                    <div class="checkbox">
-                        <label class="pull-left">
-                            <input disabled.bind="forceManual" checked.bind="manualMode" id="manualCheckBox" type="checkbox" change.trigger="changeManualMode()" data-toggle="checkbox"> Manual
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-          </div>
-
-        <div class="row">
-          <div class="form-group col-lg-6">
-            <label>Student IDs</label>
-            <input disabled.bind="!manualMode" value.bind="assignmentDetails[assignmentDetailIndex].studentUserIds" id="proposedIDRange"  placeholder="Proposed IDs" class="form-control" type="text" ref="proposedIDRange"/>
-          </div>
-          <div show.bind="studentIDTemplateAvailable" class="form-group col-lg-2">
-            <label>First ID</label>
-            <input disabled.bind="manualMode" value.bind="firstID" change.trigger ="firstIDChanged()" style="width:75px;margin-right:10px;" id="firstID"  class="form-control input-sm"
-            type="number" />
-          </div>
-          <div show.bind="studentIDTemplateAvailable" class="form-group col-lg-2">
-            <label>Last ID</label>
-            <input  disabled.bind="manualMode" value.bind="lastID" change.trigger ="lastIDChanged()" style="width:75px;margin-right:10px;" id="lastID"  class="form-control input-sm"
-            type="number" />
-          </div>
-        </div>
-        <div class="row">
-         <fieldset class="form-group">
-            <div class="col-lg-6">
-              <input value.bind="assignmentDetails[assignmentDetailIndex].studentPassword" id="proposedStudentPassword"  placeholder="Proposed Password" class="form-control" type="text"/>
-            </div>
-        </fieldset>
-        </div>
-        <div class="row">
-          <div class="form-group col-lg-6">
-            <label>Faculty IDs</label>
-              <input  value.bind="assignmentDetails[assignmentDetailIndex].facultyUserIds" id="proposedFacultyIDRange"  placeholder="Proposed Faculty IDs" class="form-control" type="text" />
-          </div>
-          <div show.bind="facultyIDTemplateAvailable" class="form-group col-lg-2">
-            <label>First ID</label>
-            <input disabled.bind="manualMode" value.bind="firstNumericFacID" change.trigger ="firstFacIDChanged()" style="width:75px;margin-right:10px;" id="firstFacID"  class="form-control input-sm"
-            type="number" />
-          </div>
-          <div show.bind="facultyIDTemplateAvailable" class="form-group col-lg-2">
-            <label>Last ID</label>
-            <input  disabled.bind="manualMode" value.bind="lastNumericFacID" change.trigger ="lastFacIDChanged()" style="width:75px;margin-right:10px;" id="lastFacID"  class="form-control input-sm"
-            type="number" />
-          </div>
-        </div>
-        <div class="row">
-          <fieldset class="form-group">
-              <div class="col-lg-6">
-                <input value.bind="assignmentDetails[assignmentDetailIndex].facultyPassword" id="proposedFacultyPassword"  placeholder="Proposed Faculty Password" class="form-control" type="text"/>
-              </div>
-          </fieldset>
-        </div>
-         <div class="row">
-        <fieldset class="form-group">
-            <div class="col-lg-12">
-             <editor value.bind="selectedRequestDetail.techComments" height="250"></editor>
-            </div>
-        </fieldset>
-        </div>
-
-        <h3>Request Details</h3>
-          <h5 class="topMargin">Product: ${selectedRequestDetail.productId.name}</h5>
-          <h5 class="topMargin">Required Date: ${selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>
-          <h5 show.bind="selectedRequestDetail.requestId.courseId != config.SANDBOX_ID" class="topMargin">Undergraduates: ${selectedRequestDetail.requestId.undergradIds}</h5>
-          <h5 show.bind="selectedRequestDetail.requestId.courseId != config.SANDBOX_ID" class="topMargin">Graduates: ${selectedRequestDetail.requestId.graduateIds}</h5>
-          <h5 show.bind="selectedRequestDetail.requestId.courseId != config.SANDBOX_ID" class="topMargin">Add Undergraduates: ${selectedRequestDetail.requestId.addUndergraduates}</h5>
-          <h5 show.bind="selectedRequestDetail.requestId.courseId != config.SANDBOX_ID" class="topMargin">Add Graduates: ${selectedRequestDetail.requestId.addGraduates}</h5>
-          <h5 class="topMargin">Begin Date: ${selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>
-          <h5 class="topMargin">End Date: ${selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>
-          <div if.bind="selectedRequestDetail.requestId.comments.length > 0" class="row topMargin">
-            <div class="col-sm-12">
-              <div class="form-group">
-                <h5 >Comments:</h5>
-                <div class="topMargin"  innerhtml.bind="selectedRequestDetail.requestId.comments" ></div>
-              </div>
-            </div>
-          </div>
-      </div>
-    </div>
-
- 
-    <div  class="panel panel-default col-lg-6 rightMargin leftMargin">
-      <div class="panel-body">
-        <div class="row">
-          <div class="col-lg-6 pull-right">
-                <div class="col-lg-7" show.bind="!sandBoxOnly">
-                  <div class="checkbox">
-                      <label>
-                          <input checked.bind="unassignedOnly" id="unassignedCheckBox" type="checkbox" change.trigger="changeUnassignedOnly()" data-toggle="checkbox"> Unassigned only
-                      </label>
-                  </div>
-                </div>
-                <div class="col-lg-5 pull-right">
-                  <div class="checkbox">
-                      <label>
-                          <input checked.bind="sandBoxOnly" id="sandBoxOnlyCheckBox" type="checkbox"  data-toggle="checkbox"> Sandbox only
-                      </label>
-                  </div>
-                </div>
-            </div>
-        </div>
- 
-        <div class="form-group">
-            <label class="control-label col-sm-3 hideOnPhone">Systems</label>
-            <select change.delegate="systemSelected()" class="form-control" value.bind="selectedSystemId">
-                <option  repeat.for='sys of productSystems' model.bind="sys._id">${sys.sid}</option>
-            </select>
-        </div>
-
-        <div  class="topMargin">
-          <div show.bind="clientsConfigured">
-          
-              <table id="clientTable" class="table table-striped table-hover">
-                <thead>
-                  <tr>
-                    <th class="col-sm-1">Client</th>
-                    <th class="col-sm-1">Status</th>
-                    <th class="col-sm-1">IDs Available</th>
-                    <th>Product</th>
-                    <th class="col-sm-6">Assignments</th>
-                  </tr>
-                </thead>
-              </table>
-                <div  style="overflow:auto;height:800px;">
-                  <table id="clientTable2" class="table table-striped table-hover">
-                <tbody>
-                  <tr class="dropbtn" click.trigger="selectClient($index, client, $event)" repeat.for="client of systems.selectedSystem.clients | 
-                      filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:products.selectedProduct._id">
-                    <td>${client.client}</br><span class="smallLeftMargin" if.bind="client.manual"><i class="fa fa-hand-paper-o" aria-hidden="true"></i></span></td>
-                    <td>${client.clientStatus | lookupValue:config.CLIENT_STATUSES:"code":"description"}</td>
-                    <td>${client.idsAvailable}</td>
-                    <td>${products.selectedProduct.name}</td>
-                    <td>
-                      <table class="col-sm-12">
-                        <tr repeat.for="assignment of client.assignments">
-                          <td><div class="col-lg-12 list-group-item">
-                            <h5 class="list-group-item-heading">Request ${assignment.assignment | lookupValue:requests.requestsDetailsArray:"_id":"requestNo"}</h5>
-                          
-                            <p class="list-group-item-text"><strong>${assignment.studentIDRange}</strong> <br>
-                              ${assignment.facultyIDRange} <br> 
-                              <span if.bind="assignment.personId">${assignment.personId.fullName}</span></br>
-                              ${assignment.institutionId.name}</p>
-                            </div>
-                              </td>
-                        </tr>
-                      </table>
-                    </td>
-                </tbody>
-              </table>
-            </div>
-          </div>
+							<div class="row">
+								<div class="form-group col-lg-6">
+									<label>Student IDs</label>
+									<input disabled.bind="!manualMode" value.bind="assignmentDetails[assignmentDetailIndex].studentUserIds" id="proposedIDRange"  placeholder="Proposed IDs" class="form-control" type="text" ref="proposedIDRange"/>
+								</div>
+								<div show.bind="studentIDTemplateAvailable" class="form-group col-lg-2">
+									<label>First ID</label>
+									<input disabled.bind="manualMode" value.bind="firstID" change.trigger ="firstIDChanged()" style="width:75px;margin-right:10px;" id="firstID"  class="form-control input-sm"
+									type="number" />
+								</div>
+								<div show.bind="studentIDTemplateAvailable" class="form-group col-lg-2">
+									<label>Last ID</label>
+									<input  disabled.bind="manualMode" value.bind="lastID" change.trigger ="lastIDChanged()" style="width:75px;margin-right:10px;" id="lastID"  class="form-control input-sm"
+									type="number" />
+								</div>
+							</div>
+							<div class="row">
+								<fieldset class="form-group">
+									<div class="col-lg-6">
+										<input value.bind="assignmentDetails[assignmentDetailIndex].studentPassword" id="proposedStudentPassword"  placeholder="Proposed Password" class="form-control" type="text"/>
+									</div>
+								</fieldset>
+							</div>
+							<div class="row">
+								<div class="form-group col-lg-6">
+									<label>Faculty IDs</label>
+									<input  value.bind="assignmentDetails[assignmentDetailIndex].facultyUserIds" id="proposedFacultyIDRange"  placeholder="Proposed Faculty IDs" class="form-control" type="text" />
+								</div>
+								<div show.bind="facultyIDTemplateAvailable" class="form-group col-lg-2">
+									<label>First ID</label>
+									<input disabled.bind="manualMode" value.bind="firstNumericFacID" change.trigger ="firstFacIDChanged()" style="width:75px;margin-right:10px;" id="firstFacID"  class="form-control input-sm"
+									type="number" />
+								</div>
+								<div show.bind="facultyIDTemplateAvailable" class="form-group col-lg-2">
+									<label>Last ID</label>
+									<input  disabled.bind="manualMode" value.bind="lastNumericFacID" change.trigger ="lastFacIDChanged()" style="width:75px;margin-right:10px;" id="lastFacID"  class="form-control input-sm"
+									type="number" />
+								</div>
+							</div>
+							<div class="row">
+								<fieldset class="form-group">
+									<div class="col-lg-6">
+										<input value.bind="assignmentDetails[assignmentDetailIndex].facultyPassword" id="proposedFacultyPassword"  placeholder="Proposed Faculty Password" class="form-control" type="text"/>
+									</div>
+								</fieldset>
+							</div>
+							<div if.bind="selectedRequestDetail.requestId.comments.length > 0" class="row topMargin">
+								<div class="col-sm-12">
+									<div class="form-group">
+										<h5 >Comments:</h5>
+										<div class="topMargin"  innerhtml.bind="selectedRequestDetail.requestId.comments" ></div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<fieldset class="form-group">
+									<div class="col-lg-12">
+										<editor value.bind="selectedRequestDetail.techComments" height="250"></editor>
+									</div>
+								</fieldset>
+							</div>
+							<h3>Request Details</h3>
+							<div if.bind="selectedRequestDetail.requestId.comments.length > 0" class="row topMargin">
+								<div class="col-sm-12">
+									<div class="form-group">
+										<h5 >Comments:</h5>
+										<div class="topMargin"  innerhtml.bind="selectedRequestDetail.requestId.comments" ></div>
+									</div>
+								</div>
+							</div>
+							<h5 class="topMargin">Product: ${selectedRequestDetail.productId.name}</h5>
+							<h5 class="topMargin">Required Date: ${selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>
+							<h5 show.bind="selectedRequestDetail.requestId.courseId != config.SANDBOX_ID" class="topMargin">Undergraduates: ${selectedRequestDetail.requestId.undergradIds}</h5>
+							<h5 show.bind="selectedRequestDetail.requestId.courseId != config.SANDBOX_ID" class="topMargin">Graduates: ${selectedRequestDetail.requestId.graduateIds}</h5>
+							<h5 show.bind="selectedRequestDetail.requestId.courseId != config.SANDBOX_ID" class="topMargin">Add Undergraduates: ${selectedRequestDetail.requestId.addUndergraduates}</h5>
+							<h5 show.bind="selectedRequestDetail.requestId.courseId != config.SANDBOX_ID" class="topMargin">Add Graduates: ${selectedRequestDetail.requestId.addGraduates}</h5>
+							<h5 class="topMargin">Begin Date: ${selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>
+							<h5 class="topMargin">End Date: ${selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-7">
+			<div  class="panel panel-default smallLeftMargin">
+				<div class="panel-body">
+					<div class="row  well smallLeftMargin smallMarginRight">
+						<div class="col-lg-4 ">
+							<h5><strong>IDs Required: ${idsRequired}</strong></h5>
+						</div>
+						<div class="col-lg-4 ">
+							<h5><strong>IDs Remaining: ${idsRemaining}</strong></h5>
+						</div>
+						<div class="col-lg-4 ">
+							<h5><strong>IDs Assigned: ${totalIdsAssigned}</strong></h5>
+						</div> 
+					</div>
+					<div class="row smallLeftMargin topMargin">
+						<table id="assignmentTable" class="table table-striped table-hover">
+							<thead>
+								<tr>
+									<th style="width:20px;">System</th>
+									<th style="width:20px;">Client</th>
+									<th style="width:20px;">Assigned IDs</th>
+									<th style="width:175px;">Student IDs/<br>Password</th>
+									<th style="width:175px;">Faculty IDs/<br>Password</th>
+									<th style="width:30px;">Assigned Date</th>
+									<th style="width:20px;">Status</th>
+									<th style="width:20px;"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="dropbtn" click.trigger="selectProposedClient($index, $event)" repeat.for="client of assignmentDetails" class="${client.notValid}">
+									<td>${client.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
+									<td>${client.client}</td>
+									<td>${client.idsAssigned}</td>
+									<td>${client.studentUserIds}<br>${client.studentPassword}</td>
+									<td>${client.facultyUserIds}<br>${client.facultyPassword}</td>
+									<td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+									<td>${client.notValid | overlap}
+									<td><span click.delegate="deleteProposedClient($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash-o" aria-hidden="true"></i></span></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<span id="errorRange"></span>
+					<div class="row">
+						<div class="col-lg-6 pull-right">
+							<div class="col-lg-7" show.bind="!sandBoxOnly">
+								<div class="checkbox">
+									<label>
+										<input checked.bind="unassignedOnly" id="unassignedCheckBox" type="checkbox" change.trigger="changeUnassignedOnly()" data-toggle="checkbox"> Unassigned only
+									</label>
+								</div>
+							</div>
+							<div class="col-lg-5 pull-right">
+								<div class="checkbox">
+									<label>
+										<input checked.bind="sandBoxOnly" id="sandBoxOnlyCheckBox" type="checkbox"  data-toggle="checkbox"> Sandbox only
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-3 hideOnPhone">Systems</label>
+						<select change.delegate="systemSelected()" class="form-control" value.bind="selectedSystemId">
+							<option  repeat.for='sys of productSystems' model.bind="sys._id">${sys.sid}</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div  class="topMargin">
+          		<div show.bind="clientsConfigured">
+					<table id="clientTable" class="table table-striped table-hover">
+						<thead>
+						<tr>
+							<th class="col-sm-1">Client</th>
+							<th class="col-sm-1">Status</th>
+							<th class="col-sm-1">IDs Available</th>
+							<th>Product</th>
+							<th class="col-sm-6">Assignments</th>
+						</tr>
+						</thead>
+					</table>
+                	<div  style="overflow:auto;height:800px;">
+                  		<table id="clientTable2" class="table table-striped table-hover">
+							<tbody>
+							<tr class="dropbtn" click.trigger="selectClient($index, client, $event)" repeat.for="client of systems.selectedSystem.clients | 
+								filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:products.selectedProduct._id">
+								<td>${client.client}</br><span class="smallLeftMargin" if.bind="client.manual"><i class="fa fa-hand-paper-o" aria-hidden="true"></i></span></td>
+								<td>${client.clientStatus | lookupValue:config.CLIENT_STATUSES:"code":"description"}</td>
+								<td>${client.idsAvailable}</td>
+								<td>${products.selectedProduct.name}</td>
+								<td>
+								<table class="col-sm-12">
+									<tr repeat.for="assignment of client.assignments">
+									<td><div class="col-lg-12 list-group-item">
+										<p class="list-group-item-text"><strong>${assignment.studentIDRange} <span class="pull-right">${assignment.facultyIDRange}</span></strong> 
+										 <br style="margin-top:10px;"> 
+										<span if.bind="assignment.personId">${assignment.personId.fullName}</span>
+										<span class="pull-right">${assignment.institutionId.name}</span></br></p>
+										</div>
+										</td>
+									</tr>
+								</table>
+								</td>
+							</tbody>
+              			</table>
+            		</div>
+          		</div>
           <div show.bind="!clientsConfigured"><h5>There are no clients configured for this product in ${systems.selectedSystem.sid}</h5>
-        </div>
-      </div>
-    </div>
-  </div>
-  </div>
+		</div>
+	</div>
 </template>

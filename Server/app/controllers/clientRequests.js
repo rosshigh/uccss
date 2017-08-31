@@ -150,7 +150,7 @@ module.exports = function (app) {
   });
 
   router.post('/api/clientRequests/sendMail', requireAuth, function(req, res, next){
-    writeLog.log("Send email to " + req.body.email, 'verbose');
+    logger.log("Send email to " + req.body.email, 'verbose');
 
     if(req.body){
        switch(req.body.reason){
@@ -493,8 +493,11 @@ module.exports = function (app) {
     .then(results => {   
        if(results){
           var resultArray = results.filter(item => {    
-            if(!item.requestId || item.requestId === null) return false;    
-            return item.requestId.sessionId == req.params.sessionId && item.requestId.institutionId._id == req.params.institutionId;
+            if(!item.requestId || item.requestId === null || !item.requestId.institutionId) {
+              return false; 
+            } else {
+              return item.requestId.sessionId == req.params.sessionId && item.requestId.institutionId._id == req.params.institutionId;
+            } 
           }) 
           res.status(200).json(resultArray);
         } else {

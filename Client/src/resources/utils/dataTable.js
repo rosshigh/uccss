@@ -299,6 +299,7 @@ export class DataTable{
    */
   sortArray(el, options, reSort){ //propertyName, type, surrogateArray, surrogateProperty, sortProperty, sortDirectionParam){
     if(reSort){
+      if(!this.lastOption || !this.lastEl) return;
       el = this.lastEl;
       options = this.lastOption;
     } else {

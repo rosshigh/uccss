@@ -19,6 +19,7 @@ export class Assignments {
 	spinnerHTML = "";
     isCheckedAssigned = true; 
     noRequests = true;
+    // showTemplates = false;
     sortProperty = '';
     sortDirection;
 
@@ -59,6 +60,7 @@ export class Assignments {
         this.sendEmail = this.config.SEND_EMAILS;
         this.manualMode = localStorage.getItem('manualMode')  ? localStorage.getItem('manualMode') == "true" : false;
         this.unassignedOnly = localStorage.getItem('unassignedOnly')  ? localStorage.getItem('unassignedOnly') == "true" : false;
+        this.facultyDetails = localStorage.getItem("facultyDetails") ? localStorage.getItem("facultyDetails") == "true" : false;;
         this.numberOfFacIDs = this.config.DEFAULT_FACULTY_IDS;
         this.selectedSession = this.sessions.sessionsArray[0]._id;
         this.getRequests();
@@ -1171,7 +1173,11 @@ export class Assignments {
 	}
 
 	openEditStudentTemplate() {
-        this.showAddStudentTemplate = true;
+        this.showAddStudentTemplate = !this.showAddStudentTemplate;
+    }
+
+    openStudentTemplate(){
+        this.showTemplates = !this.showTemplates;
     }
 
     cancelEditStudentTemplate(){
@@ -1213,6 +1219,7 @@ export class Assignments {
 	
 	openFacultyDetails(){
         this.facultyDetails = !this.facultyDetails;
+        localStorage.setItem("facultyDetails", this.facultyDetails);
     }
 	
 	changeUnassignedOnly(){
