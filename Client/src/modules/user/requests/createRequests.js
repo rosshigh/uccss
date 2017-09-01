@@ -123,6 +123,7 @@ export class ViewHelpTickets {
         if(this.requests.requestsArray && this.requests.requestsArray.length > 0) {
             this.requests.selectRequest(0);
             this.originalRequest = this.utils.copyObject(this.requests.selectedRequest);
+            this.existingRequestLength = this.requests.selectedRequest.requestDetails.length;
             this.setDates(false);
             await this._lock();
             this.ILockedIt = true;
@@ -138,10 +139,11 @@ export class ViewHelpTickets {
         } else{
            $("#existingRequestInfo").empty().hide();
             this.setDates(true);
+            this.existingRequestLength = 0;
             this.existingRequest = false;
             this.requests.selectRequest();
             this.requests.selectedRequest.sessionId = this.sessionId;
-             this.requestReceived = true;
+            this.requestReceived = true;
         }
         
     } else {
@@ -224,9 +226,10 @@ export class ViewHelpTickets {
     this.minEndDate = this.sessions.selectedSession.startDate;
     this.maxEndDate = this.sessions.selectedSession.endDate;
 
-    var nowPlusLeeway = moment(new Date()).add(this.config.REQUEST_LEEWAY + 1,'days');
-    this.minRequiredDate = moment.max(nowPlusLeeway, moment(this.sessions.selectedSession.startDate));
-    this.minRequiredDate = moment(this.minRequiredDate).add(7, 'hours').format('YYYY-MM-DD');
+    this.minRequiredDate = this.minStartDate;
+    // var nowPlusLeeway = moment(new Date()).add(this.config.REQUEST_LEEWAY + 1,'days');
+    // this.minRequiredDate = moment.max(nowPlusLeeway, moment(this.sessions.selectedSession.startDate));
+    // this.minRequiredDate = moment(this.minRequiredDate).add(7, 'hours').format('YYYY-MM-DD');
     this.maxRequiredDate = this.sessions.selectedSession.endDate;
   }
 
@@ -308,7 +311,12 @@ export class ViewHelpTickets {
             this.requests.selectedRequest.requestDetails.push(newObj);
             this.products.selectedProductFromId(newObj.productId);
             this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = this.products.selectedProduct.name;
+            // this.requiredDates.push(false);
           }
+      } else {
+         if(this.requests.selectedRequest.requestDetails.length === this.config.REQUEST_LIMIT) {
+            this.utils.showNotification('Only ' + this.config.REQUEST_LIMIT + ' products per request are allowed.')
+         }
       }
     
     this.validation.makeValid( $("#productList"));
@@ -345,9 +353,10 @@ export class ViewHelpTickets {
                   }
                 });
             }
-            break;
+            break; 
           } else {
             this.requests.selectedRequest.requestDetails.splice(i,1);
+            // this.requiredDates.splice(i,1);
             for(var j=0; j<this.productInfo.length; j++){
               if(el.target.id == this.productInfo[j].productId) {
                 this.productInfo.splice(j,1);
@@ -424,14 +433,27 @@ export class ViewHelpTickets {
     this.validation.addRule(4,"productListTable",[{"rule":"custom","message":"Enter all required dates",
       "valFunction":function(context){
         for(var i = 0; i < context.requests.selectedRequest.requestDetails.length; i++ ){
-          if(!context.requests.selectedRequest.requestDetails[i].requiredDate || context.requests.selectedRequest.requestDetails[i].requiredDate === ""
-            || moment(context.requests.selectedRequest.requestDetails[i].requiredDate).isBefore(context.minStartDate) ){
+          if((!context.requests.selectedRequest.requestDetails[i].requiredDate || context.requests.selectedRequest.requestDetails[i].requiredDate === ""
+            || moment(context.requests.selectedRequest.requestDetails[i].requiredDate).isBefore(context.minStartDate))
+          ){
             return false;
           }
         }
         return true;
       }
-    }]);
+    },
+    {"rule":"custom","message":"Required date cannot be earlier than 5 days from today",
+        "valFunction":function(context){
+          var nowPlusLeeway = moment(new Date()).add(context.config.REQUEST_LEEWAY + 1, 'days');
+          var minRequiredDate = moment.max(nowPlusLeeway, moment(context.sessions.selectedSession.startDate));
+          for(var i = context.existingRequestLength; i < context.requests.selectedRequest.requestDetails.length; i++ ){
+            if(moment(context.requests.selectedRequest.requestDetails[i].requiredDate).isBefore(minRequiredDate)){
+              return false;
+            }
+          }
+          return true;
+        }
+      }]);
     this.validation.addRule(5,"number",[
       {"rule":"required","message":"Enter the course number", "value": "people.selectedCourse.number"},
       {"rule":"required","message":"Enter the course name", "value": "people.selectedCourse.name"}
@@ -472,6 +494,12 @@ export class ViewHelpTickets {
       this.requests.selectedRequest.audit[0].personId = this.userObj._id; 
     }
 
+    // this.requests.selectedRequest.requestDetails.forEach((item, index) => {
+    //   if(!item.requiredDate){
+    //      this.requests.selectedRequest.requestDetails[index].requiredDate = this.requiredDates[index];
+    //   }
+    // });
+
     this.requests.selectedRequest.institutionId = this.userObj.institutionId._id;
     this.requests.selectedRequest.sessionId = this.sessionId;
     this.requests.selectedRequest.courseId = this.courseId;
@@ -483,11 +511,29 @@ export class ViewHelpTickets {
     if(this.validation.validate(1)){
       this._buildRequest();
       let email = this._buildEmailObject();
-      let serverResponse = await this.requests.saveRequest(email);
-      if (!serverResponse.status) {
-          this.utils.showNotification("The product request was updated");
-          this.systemSelected = false;
-      }
+    //   var mailObject = new Object();
+    //   if(this.config.SEND_EMAILS) {
+    //     mailObject.products = new Array();
+    //     this.requests.selectedRequest.requestDetails.forEach((detail, index) => {
+    //       this.products.selectedProductFromId(detail.productId);
+    //       var date = new Date(detail.requiredDate);
+    //       var day = date.getDate();
+    //       var month = date.getMonth() + 1;
+    //       var year = date.getFullYear();
+    //       mailObject.products.push({id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: this.products.selectedProduct.name})    
+    //     });
+
+    //     mailObject.comments = this.requests.selectedRequest.comments;
+    //     mailObject.name = this.userObj.fullName;
+    //     mailObject.numStudents =  parseInt(this.requests.selectedRequest.undergradIds) + parseInt(this.requests.selectedRequest.graduateIds);
+    //     mailObject.email = this.userObj.email
+    //     mailObject.cc = this.config.REQUESTS_EMAIL_LIST ? this.config.REQUESTS_EMAIL_LIST : "";
+    // }
+    let serverResponse = await this.requests.saveRequest(email);
+    if (!serverResponse.status) {
+        this.utils.showNotification("The product request was updated");
+        this.systemSelected = false;
+    }
     }
     this._cleanUp();
   }
