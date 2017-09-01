@@ -31,6 +31,7 @@ export class ViewHelpTickets {
   courseId = -1;
   requestType = -1;
   requestReceived = false;
+  existingRequest = false;
 
   tempRequests = new Array();
   productInfo = new Array();
