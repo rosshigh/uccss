@@ -702,6 +702,20 @@ module.exports = function (app) {
 
   });
 
+  router.get('/api/serverAssignments/:id', function(req, res, next){
+    var serverId = req.params.id;
+    ClientRequestDetail.find()
+    .then(results => {
+      results = results.filter(item => {
+        var keep = false;
+        item.assignments.forEach(ass =>{
+          if(ass.serverId == serverId) keep = true;
+        });
+        return keepl
+      });
+    })
+  })
+
 };
 
   function updateRequest(clientRequest, req, res, next){
