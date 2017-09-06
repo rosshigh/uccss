@@ -107,15 +107,15 @@
 								<h4 click.trigger="toggleCustomer()" class="panel-title">Search by Customer</h4>
 							</div>
 							<div show.bind="showCustomer" class="panel-body">
-								<div class="col-md-12 topMargin">
-								<label id="productList">Available People</label>
-								<div class="well well2 overFlow" style="height:400px;">
-									<input class="form-control" value.bind="peopleFilter" input.trigger="filterPeopleList()" placeholder="Filter people" />
-									<ul class="list-group">
-										<button click.trigger="selectPerson($event)" type="button" repeat.for="person of filteredPersonArray" id="${person._id}"
-											class="list-group-item">${person.fullName}</button>
-									</ul>
-								</div>
+								<div class="col-md-5 topMargin">
+									<label id="productList">Available People</label>
+									<div class="well well2 overFlow" style="height:400px;">
+										<input class="form-control" value.bind="peopleFilter" input.trigger="filterPeopleList()" placeholder="Filter people" />
+										<ul class="list-group">
+											<button click.trigger="selectPerson($event, person)" type="button" repeat.for="person of filteredPersonArray" id="${person._id}"
+												class="list-group-item">${person.fullName}</button>
+										</ul>
+									</div>
 								</div>
 								<div class="col-md-5 col-md-offset-1 topMargin">
 									<label >Requested Person</label>

@@ -705,14 +705,20 @@ module.exports = function (app) {
   router.get('/api/serverAssignments/:id', function(req, res, next){
     var serverId = req.params.id;
     ClientRequestDetail.find()
-    .then(results => {
+    .select('requestId productId assignments')
+    .populate({path:  'requestId', model: 'ClientRequest', select: 'personId institutionId' })
+    .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName institutionId'}})
+    .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
+    .populate({ path: "productId", model: "Product", select: "name"})
+         .then(results => {
       results = results.filter(item => {
         var keep = false;
-        item.assignments.forEach(ass =>{
-          if(ass.serverId == serverId) keep = true;
+        item.assignments.forEach(ass =>{          
+          if(ass.systemId == serverId) keep = true;
         });
-        return keepl
+        return keep;
       });
+      res.status(200).json(results);
     })
   })
 

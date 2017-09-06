@@ -274,17 +274,27 @@ export class Systems{
     /*****************************************************************************************************
      * Find the client in a systems client list and update it, used by client request assignment
      ****************************************************************************************************/
-    updateClient(client){
-        for(var i = 0, x = this.systemsArray.length; i < x; i++){
-            if(this.systemsArray[i]._id === client.systemId){
-                for(var j = 0; j < this.systemsArray[i].clients.length; j++){
-                    if(this.systemsArray[i].clients[j].client == client.client){
-                        this.systemsArray[i].clients[j] = this.utils.copyObject(client);
-                        break;
-                    }
-                }  
-            }
-        };
+    updateClient(client, systemId){
+        if(!systemId){
+            for(var i = 0, x = this.systemsArray.length; i < x; i++){
+                if(this.systemsArray[i]._id === client.systemId){
+                    for(var j = 0; j < this.systemsArray[i].clients.length; j++){
+                        if(this.systemsArray[i].clients[j].client == client.client){
+                            this.systemsArray[i].clients[j] = this.utils.copyObject(client);
+                            break;
+                        }
+                    }  
+                }
+            };
+        } else {
+            for(var j = 0; j < this.systemsArray[i].clients.length; j++){
+                if(this.systemsArray[i].clients[j].client == client.client){
+                    this.systemsArray[i].clients[j] = this.utils.copyObject(client);
+                    break;
+                }
+            } 
+        }
+        
     }
 
 }

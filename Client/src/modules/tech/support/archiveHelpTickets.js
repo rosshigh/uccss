@@ -204,9 +204,9 @@ export class ArchiveHelpTickets {
     }
   }
 
-  selectPerson(el){
+  selectPerson(el, person){
       $("#requestProductsLabel").html("Requested Person");
-      this.selectedPeople.push(el.target.id);
+      this.selectedPeople.push(person._id);
   }
 
   removePerson(el){
