@@ -1032,6 +1032,7 @@ export class Assignments {
         this.editIndex = index;
         this.selectedRequestDetail = this.utils.copyObject(request);
         this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
+        if(this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
         this.requestSelected = 'view';
     }
 
