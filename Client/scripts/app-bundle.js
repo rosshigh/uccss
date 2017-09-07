@@ -27452,23 +27452,7 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
                     return true;
                 } }], true);
             this.validation.addRule(1, "editDesc", [{ "rule": "required", "message": "Description is required", "value": "systems.selectedSystem.description" }]);
-            this.validation.addRule(1, "editServer", [{ "rule": "required", "message": "Server is required", "value": "systems.selectedSystem.server" }, { "rule": "custom", "message": "A system with that server already exists",
-                "valFunction": function valFunction(context) {
-                    if (!context.systems.selectedSystem._id) {
-                        var found = false;
-                        for (var i = 0; i < context.systems.systemsArray.length; i++) {
-                            if (context.systems.systemsArray[i].server.toUpperCase() === context.systems.selectedSystem.server.toUpperCase()) {
-                                if (context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id) {
-                                    found = true;
-                                } else if (!context.systems.selectedSystem._id) {
-                                    found = true;
-                                }
-                            }
-                        }
-                        return !found;
-                    }
-                    return true;
-                } }]);
+
             this.validation.addRule(1, "editInst", [{ "rule": "required", "message": "Instance is required", "value": "systems.selectedSystem.instance" }]);
         };
 
