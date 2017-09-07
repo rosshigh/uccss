@@ -269,6 +269,7 @@ export class EditCurriculum {
         this.files = null;
         this.selectedFile = "";
         this.filesToUpload = new Array();
+        $("#progressBar").css('width', 0);
     }
 
     _setupValidation(){

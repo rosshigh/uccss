@@ -23551,6 +23551,7 @@ define('modules/admin/site/editCurriculum',['exports', 'aurelia-framework', '../
             this.files = null;
             this.selectedFile = "";
             this.filesToUpload = new Array();
+            $("#progressBar").css('width', 0);
         };
 
         EditCurriculum.prototype._setupValidation = function _setupValidation() {
