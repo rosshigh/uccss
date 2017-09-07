@@ -267,7 +267,7 @@ export class Admin {
 			msg,
 			"Confirm", 
 			['Yes', 'No']
-			).then(response => {
+			).whenClosed(response => {
 				if(!response.wasCancelled){
 					this.deleteTheFiles();
 				} 

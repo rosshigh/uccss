@@ -107,7 +107,6 @@ module.exports = function (app, config) {
 
   router.post('/api/helpTickets/archive', requireAuth, function(req, res, next){
     writeLog.log('Archive search', 'verbose');
-   
     var query = Model.find();
     if(req.body.helpTicketNo){   
       query.where('helpTicketNo').equals(req.body.helpTicketNo);
@@ -115,7 +114,7 @@ module.exports = function (app, config) {
       if(req.body.dateRange){
         query.where('createdDate').gt(req.body.dateRange.dateFrom).lt(req.body.dateRange.dateTo);
       }
-      if(req.body.status){
+      if(req.body.status && req.body.status.length > 0){        
         query.in('helpTicketStatus', req.body.status);
       }
       if(req.body.keyWords){
@@ -126,8 +125,7 @@ module.exports = function (app, config) {
         query.where('helpTicketType').equals(req.body.helpTicketType);
       }
       if(req.body.peopleIds && req.body.peopleIds.length){
-        console.log(req.body.peopleIds)
-        query.in('personId', req.body.peopleIds);
+        query.where('personId').in(req.body.peopleIds); 
       }
       if(req.body.productIds && req.body.productIds.length){
         query.in('productId', req.body.productIds);
@@ -141,10 +139,12 @@ module.exports = function (app, config) {
     query.populate('personId','email firstName lastName phone mobile nickName file')
     query.populate('content.personId','email firstName lastName phone mobile nickName')
     query.populate('institutionId', 'name')
-    query.populate({path: 'owner.personId', model: 'Person', select: 'firstName lastName'})
+    query.populate({path: 'owner.personId', model: 'Person', select: 'firstName lastName'}) 
     query.exec()
       .then(response => {
+        console.log(response)  
         if(response && response.length > 0){
+        
           if(req.body.content){
             let searchTerm = req.body.content.toUpperCase();
             response = response.filter(item => {           
