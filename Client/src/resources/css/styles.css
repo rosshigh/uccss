@@ -360,4 +360,8 @@ ux-dialog-header {
 	/*
 	Label the data
 	*/
-	#no-more-tables td:before { content: attr(data-title); }
+    #no-more-tables td:before { content: attr(data-title); }
+    
+    .hover_img a { position:relative; }
+.hover_img a span { position:absolute; display:none; z-index:99; }
+.hover_img a:hover span { display:block; }
