@@ -248,7 +248,7 @@ export class EditProducts {
         this.uploading = false;
         this.downloadSelected = false;
         this.selectedFiles = undefined;
-        this.files = null;
+        this.files = new Array();
         this.selectedFile = "";
         this.newDownload = false;
         this.filesToUpload = new Array();

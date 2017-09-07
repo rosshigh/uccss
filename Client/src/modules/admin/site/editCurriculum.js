@@ -211,7 +211,7 @@ export class EditCurriculum {
             this.editCategoryFlag = false;
         } else {
             this.curriculum.selectCurriculumCategoryByName(this.curriculum.selectedCurriculum.category);
-             this.categoryDescription = this.curriculum.selectedCurriculumCategory.description;
+            this.categoryDescription = this.curriculum.selectedCurriculumCategory.description;
             this.showCategoryForm = true;
             this.editCategoryFlag = true;
         }
@@ -266,10 +266,13 @@ export class EditCurriculum {
         this.showCategoryForm = false;
         this.curriculumItemSelected = false;
         this.selectedFiles = undefined;
-        this.files = null;
+        this.files = new Array();
         this.selectedFile = "";
         this.filesToUpload = new Array();
         $("#progressBar").css('width', 0);
+        this.uploading = false;
+        // var input = $("#uploadControl");
+        // input.replaceWith(input.val('').clone(true));
     }
 
     _setupValidation(){
