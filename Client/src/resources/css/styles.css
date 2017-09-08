@@ -1,6 +1,20 @@
 @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
+    .hover_img a { position:relative; }
+    .hover_img a span { position:absolute; display:none; z-index:99; }
+    .hover_img a:hover span { display:block; }
 
+    .hover {
+        position:absolute;
+        height: 200px;
+        width: 600px;
+        z-index:99;
+        display:none; 
+        box-shadow: 10px 10px 5px #888888;
+        overflow: hidden;
+        background-color: white;
+        padding: 10px;
+    }
 
 .bold {
     font-weight: bold;
@@ -362,18 +376,3 @@ ux-dialog-header {
 	*/
     #no-more-tables td:before { content: attr(data-title); }
     
-    .hover_img a { position:relative; }
-    .hover_img a span { position:absolute; display:none; z-index:99; }
-    .hover_img a:hover span { display:block; }
-
-    .hover {
-        position:absolute;
-        height: 200px;
-        width: 600px;
-        z-index:99;
-        display:none;
-        box-shadow: 10px 10px 5px #888888;
-        overflow: hidden;
-        background-color: white;
-        padding: 10px;
-    }
