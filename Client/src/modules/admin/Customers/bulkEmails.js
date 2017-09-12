@@ -93,24 +93,58 @@ export class BulkEmails {
         this.email.subject = "";
     }
 
-    send(){
+    sendBulkEmail(){
+        if(this.email.emailMessage === "" || this.email.subject === ""){
+            this.utils.showNotification("Enter a subject and messsage");
+            return;
+        }
+        if(this.dataTable.baseArray.length === 0){
+            this.utils.showNotification("You must include some recipients");
+            return;
+        }
+        return this.dialog.showMessage(
+            "Are you sure you want to send the email to these recipients?",
+            "Confirm Send",
+            ['Yes', 'No']
+        ).whenClosed(response => {                      
+            if (response.wasCancelled) {
+                okToProcess = false;
+            } else {
+                this.sendTheBulkEmail();
+            }
+        });
+    }
+
+    sendTheBulkEmail(){
         var recipients = new Array();
         this.dataTable.baseArray.forEach(item => {
             recipients.push({name: item.fullName, email: item.email});
         });
 
-        var email = {email: this.config.UCC_EMAIL, recipients: recipients}; 
+        var email = {email: this.email, recipients: recipients}; 
         this.people.sendBuikEmail(email);
+        this.utils.showNotification("Message sent");
     }
 
-    institutionCustomFilter(value, item, context){
-        for(let i = 0; i < context.people.institutionsArray.length; i++){
-            if(item.institutionId._id == context.people.institutionsArray[i]._id) {
-                return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-            }
-        }
-        return false;
-    }
+
+    // send(){
+    //     var recipients = new Array();
+    //     this.dataTable.baseArray.forEach(item => {
+    //         recipients.push({name: item.fullName, email: item.email});
+    //     });
+
+    //     var email = {email.email: this.config.UCC_EMAIL, recipients: recipients}; 
+    //     this.people.sendBuikEmail(email);
+    // }
+
+    // institutionCustomFilter(value, item, context){
+    //     for(let i = 0; i < context.people.institutionsArray.length; i++){
+    //         if(item.institutionId._id == context.people.institutionsArray[i]._id) {
+    //             return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    //         }
+    //     }
+    //     return false;
+    // }
 
     regionCustomFilter(value, item, context){
         for(let i = 0; i < context.people.institutionsArray.length; i++){
@@ -147,5 +181,14 @@ export class BulkEmails {
 			}
 		}
         return keep;
+    }
+
+
+    customerCustomFilter(value, item, context){
+        return item.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
+
+    institutionCustomFilter(value, item, context){
+        return item.institutionId && item.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 }
