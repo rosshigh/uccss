@@ -28,7 +28,7 @@
       <div class="panel-body">
 		<div class="col-lg-2">
 			<label class="control-label hideOnPhone">Customer</label>
-			<input value.bind="CustomerFilter" input.delegate="dataTable.filterList(CustomerFilter, { type: 'custom',  filter: customerCustomFilter, compare:'custom'} )"  class="form-control" />
+			<input value.bind="CustomerFilter" input.delegate="dataTable.filterList(CustomerFilter, { type: 'custom',  filter: customerCustomFilter, compare:'custom'} )"  class="form-control" ref="nameFilter"/>
 		</div>
 	  	<div class="col-lg-2">
 			<label class="control-labelhideOnPhone">Status</label>

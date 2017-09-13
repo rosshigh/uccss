@@ -16,6 +16,13 @@
         padding: 10px;
     }
 
+.fixed
+{
+    position: fixed;
+    top: 20px;
+    right: 40px;
+}
+
 .bold {
     font-weight: bold;
 }

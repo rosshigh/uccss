@@ -71,6 +71,7 @@ export class BulkEmails {
     }
 
 	_clearFilters(){
+        this.nameFilter = "";
 		this.institutionFilter = "";
         this.institutionTypeFilter = "";
         this.memberTypeFilter = "";

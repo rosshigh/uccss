@@ -90,6 +90,17 @@ export class Institutions {
             this.people.getInstitutionsArray('?order=name', true),
             this.is4ua.loadIs4ua()
 		]);
+		this.people.institutionsArray.forEach((item, index) => {
+            if(item.name == 'HEC Montréal'){
+                this.people.institutionsArray.splice(index, 1);
+            }
+            if(item.name == '-- UA Staff --'){
+                this.people.institutionsArray.splice(index, 1);
+            }
+            if(item.memberType == '04'){
+                this.people.institutionsArray.splice(index, 1);
+            }
+        });
 		
 		this.config.getConfig(true);
 		this.dataTable.updateArray(this.people.institutionsArray);
