@@ -32038,16 +32038,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 response = _context5.sent;
 
                 if (!response.error) {
-                  if (response.helpTicketId === 0) {
-                    this.helpTickets.lockHelpTicket({
-                      helpTicketId: this.helpTickets.selectedHelpTicket._id,
-                      personId: this.userObj._id,
-                      name: this.userObj.fullName
-                    });
-                    this.lockMessage = "";
-                    this.showLockMessage = false;
-                    this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
-                  } else {
+                  if (response.helpTicketId === 0) {} else {
                     if (response[0].personId === this.userObj._id) {
                       this.showLockMessage = false;
                       this.lockMessage = "";
@@ -32197,7 +32188,16 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.respond = function respond() {
       if (!this.showLockMessage && !this.enterResponse) {
+        this.helpTickets.lockHelpTicket({
+          helpTicketId: this.helpTickets.selectedHelpTicket._id,
+          personId: this.userObj._id,
+          name: this.userObj.fullName
+        });
+        this.lockMessage = "";
+        this.showLockMessage = false;
+        this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
         this.sendMailDisable = false;
+
         this.responseMessage = "";
         this.helpTickets.selectHelpTicketContent();
         this.enterResponse = true;
@@ -32209,6 +32209,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       this.response = new Object();
       this.isUnchanged = true;
       this.enterResponse = false;
+      this.unlockIt();
     };
 
     ViewHelpTickets.prototype._createResponse = function _createResponse() {
@@ -32296,8 +32297,9 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
               case 13:
                 this._cleanUp();
+                this.unlockIt();
 
-              case 14:
+              case 15:
               case 'end':
                 return _context9.stop();
             }
@@ -32425,7 +32427,9 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     }();
 
     ViewHelpTickets.prototype.unlockIt = function unlockIt() {
-      this._unLock();
+      if (this.helpTickets.selectedHelpTicket && this.helpTickets.selectedHelpTicket._id) {
+        this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      }
     };
 
     ViewHelpTickets.prototype._unLock = function _unLock() {

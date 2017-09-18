@@ -246,14 +246,14 @@ export class ViewHelpTickets {
       if (!response.error) {
         if (response.helpTicketId === 0) {
           //Lock help ticket
-          this.helpTickets.lockHelpTicket({
-            helpTicketId: this.helpTickets.selectedHelpTicket._id,
-            personId: this.userObj._id,
-            name: this.userObj.fullName
-          });
-          this.lockMessage = "";
-          this.showLockMessage = false;
-          this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
+          // this.helpTickets.lockHelpTicket({
+          //   helpTicketId: this.helpTickets.selectedHelpTicket._id,
+          //   personId: this.userObj._id,
+          //   name: this.userObj.fullName
+          // });
+          // this.lockMessage = "";
+          // this.showLockMessage = false;
+          // this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
         } else {
           if (response[0].personId === this.userObj._id) {
             this.showLockMessage = false;
@@ -291,10 +291,6 @@ export class ViewHelpTickets {
 
   getName(){
     return this.lockObject.name ? this.lockObject.name : 'someone';
-    // for(var i = 0; i < this.people.uccPeople.length; i++){
-    //   if(this.people.uccPeople[i]._id == this.lockObject.personId) return this.people.uccPeople[i].fullName;
-    // }
-    // return "someone";
   }
 
   async save(changes){
@@ -339,7 +335,16 @@ export class ViewHelpTickets {
   *****************************************************************************************/
   respond() {
     if (!this.showLockMessage && !this.enterResponse) {
+      this.helpTickets.lockHelpTicket({
+        helpTicketId: this.helpTickets.selectedHelpTicket._id,
+        personId: this.userObj._id,
+        name: this.userObj.fullName
+      });
+      this.lockMessage = "";
+      this.showLockMessage = false;
+      this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
       this.sendMailDisable = false;
+
       this.responseMessage = "";
       this.helpTickets.selectHelpTicketContent();
       this.enterResponse = true;
@@ -351,6 +356,7 @@ export class ViewHelpTickets {
     this.response = new Object();
     this.isUnchanged = true;
     this.enterResponse = false;
+    this.unlockIt();
   }
 
   /*****************************************************************************************
@@ -404,6 +410,7 @@ export class ViewHelpTickets {
       if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
     }
     this._cleanUp();
+    this.unlockIt();
   }
 
   async ownHelpTicket(helpTicket) {
@@ -450,7 +457,9 @@ export class ViewHelpTickets {
   }
 
   unlockIt(){
-    this._unLock();
+    if (this.helpTickets.selectedHelpTicket && this.helpTickets.selectedHelpTicket._id) {
+      this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+    }
   }
 
   _unLock() {
