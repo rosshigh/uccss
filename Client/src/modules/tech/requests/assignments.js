@@ -857,12 +857,17 @@ export class Assignments {
                     var email = this._buildEmailObject();
                     let serverResponse = await this.clientRequests.assignRequest(email, this.editIndex);
                     if (!serverResponse.status) {
-                    
                         this.utils.showNotification("The request was updated");
                         this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
                         this.reSort();
                         this.filterInAssigned();
-                        await this.systems.saveSystem();
+                        var that = this;
+                        if(this.systemQueue && this.systemQueue.length > 0){
+                            this.systemQueue.forEach(item => {
+                                this.systems.selectedSystemFromId(item)
+                                this.systems.saveSystem();
+                            }); 
+                        }
                         this._cleanUp();
                     }
                 }
@@ -896,6 +901,7 @@ export class Assignments {
      * Build the data objects to send to the server 
      ****************************************************************************************************/
     _buildRequest(){
+        this.systemQueue = new Array();
         //Check to see if this assignment already exists
         if(this.selectedRequestDetail.requestStatus == this.config.ASSIGNED_REQUEST_CODE){  
             for(var i = 0; i < this.assignmentDetails.length; i++){
@@ -921,6 +927,7 @@ export class Assignments {
                                         this.proposedClient[j].manual = this.manualMode;
                                         if(this.proposedClient[i].assignments.length > 1) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                                         this.systems.updateClient(this.proposedClient[j]);
+                                        this.systemQueue.push(this.proposedClient[j].systemId);
                                     }
                                 }
                             }
@@ -943,6 +950,7 @@ export class Assignments {
                             });
                             if(this.proposedClient[i].assignments.length > 1) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                             this.systems.updateClient(this.proposedClient[i]);
+                            this.systemQueue.push(this.proposedClient[i].systemId);
                         }
                     }
                 }
@@ -979,6 +987,7 @@ export class Assignments {
                 });
                 if(this.proposedClient[i].assignments.length > 1) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                 this.systems.updateClient(this.proposedClient[i]);
+                this.systemQueue.push(this.proposedClient[i].systemId);
             };
         }
         

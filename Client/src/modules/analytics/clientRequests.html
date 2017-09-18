@@ -6,7 +6,6 @@
         }
     </style>
     <div class="col-lg-2">
-		<h4>Categories</h4>
 		<div>
 			<ul class="list-group">
 				<button click.trigger="typeChanged(category, $event)" type="button"  repeat.for="category of categories"
@@ -34,6 +33,9 @@
             </div>
              <div show.bind="selectedCategory.code === 1">
                 <compose view="./components/requestsByProducts.html"></compose>
+            </div>
+            <div show.bind="selectedCategory.code === 2">
+                <compose view="./components/requestsBySAPProducts.html"></compose>
             </div>
         </div> 
       </div> 
