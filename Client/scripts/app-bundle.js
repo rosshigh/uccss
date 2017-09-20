@@ -152,8 +152,8 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
 
             this.HOST = location.origin;
             this.DOWNLOAD_URL = this.HOST + '/uploadedFiles';
-            this.BASE_URL = this.HOST + "/api/";
-            this.IMG_DOWNLOAD_URL = this.HOST + '/img/';
+            this.BASE_URL = "http://localhost:5000/api/";
+            this.IMG_DOWNLOAD_URL = "http://localhost:5000/img/";
             this.isMobile = false;
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
@@ -19148,6 +19148,8 @@ define('resources/value-converters/idsRequested',["exports"], function (exports)
 
     IdsRequestedValueConverter.prototype.toView = function toView(value) {
       if (value) {
+        value.graduateIds = value.graduateIds === null ? 0 : value.graduateIds;
+        value.undergradIds = value.undergradIds === null ? 0 : value.undergradIds;
         return parseInt(value.graduateIds) + parseInt(value.undergradIds);
       }
       return 0;
@@ -28477,6 +28479,8 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                 this.sandBoxOnly = false;
             } else {
                 this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
+                this.selectedRequestDetail.requestId.graduateIds = this.selectedRequestDetail.requestId.graduateIds === null ? 0 : this.selectedRequestDetail.requestId.graduateIds;
+                this.selectedRequestDetail.requestId.undergradIds = this.selectedRequestDetail.requestId.undergradIds === null ? 0 : this.selectedRequestDetail.requestId.undergradIds;
                 this.numberOfIds = parseInt(this.selectedRequestDetail.requestId.graduateIds) + parseInt(this.selectedRequestDetail.requestId.undergradIds);
                 this.sandBoxOnly = false;
             }
@@ -28795,7 +28799,16 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.validateIDRange = function validateIDRange(client, assignment, id) {
+            var _this5 = this;
+
             if (!client.assignments || client.assignments.length == 0) return true;
+            client.assignments.forEach(function (item) {
+                if (item.firstID === null || item.firstID == "" || item.lastID === null || item.lastID === "") {
+                    return _this5.dialog.showMessage("You must enter the ID range manually with this client.", "Manual Assignment", ['OK']).whenClosed(function (response) {
+                        return true;
+                    });
+                }
+            });
             var valid = true;
             var x1 = parseInt(assignment.firstID);
             var x2 = parseInt(assignment.lastID);
@@ -28839,7 +28852,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.deleteProposedClient = function () {
             var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(index) {
-                var _this5 = this;
+                var _this6 = this;
 
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
@@ -28852,7 +28865,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                                 return _context5.abrupt('return', this.dialog.showMessage("This will delete the assignment.  Are you sure you want to do that?", "Delete Assignment", ['Yes', 'No']).whenClosed(function (response) {
                                     if (!response.wasCancelled) {
-                                        _this5.deleteSaved(index);
+                                        _this6.deleteSaved(index);
                                     }
                                 }));
 
@@ -28971,7 +28984,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         }();
 
         Assignments.prototype.delete = function _delete() {
-            var _this6 = this;
+            var _this7 = this;
 
             if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) {
                 return this.dialog.showMessage("Please delete the assignments before deleting the request", "Delete Request", ['OK']).whenClosed(function (response) {
@@ -28982,7 +28995,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
             } else {
                 return this.dialog.showMessage("Are you sure you want to delete the request?", "Delete Request", ['Yes', 'No']).whenClosed(function (response) {
                     if (!response.wasCancelled) {
-                        _this6.deleteRequest();
+                        _this7.deleteRequest();
                     }
                 });
             }
@@ -29027,7 +29040,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.save = function () {
             var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-                var _this7 = this;
+                var _this8 = this;
 
                 var email, serverResponse, that;
                 return regeneratorRuntime.wrap(function _callee8$(_context8) {
@@ -29066,8 +29079,8 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                                     if (this.systemQueue && this.systemQueue.length > 0) {
                                         this.systemQueue.forEach(function (item) {
-                                            _this7.systems.selectedSystemFromId(item);
-                                            _this7.systems.saveSystem();
+                                            _this8.systems.selectedSystemFromId(item);
+                                            _this8.systems.saveSystem();
                                         });
                                     }
                                     this._cleanUp();
@@ -29210,7 +29223,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.back = function back() {
-            var _this8 = this;
+            var _this9 = this;
 
             this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
             var changes = this.clientRequests.isRequestDetailDirty(this.originalRequestDetail, ['requestId', 'productId', 'techComments']);
@@ -29227,7 +29240,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                     if (response.wasCancelled) {
                         return;
                     } else {
-                        _this8._cleanUp();
+                        _this9._cleanUp();
                     }
                 });
             }
@@ -29262,7 +29275,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.customerActionDialog = function () {
             var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
-                var _this9 = this;
+                var _this10 = this;
 
                 var subject, email;
                 return regeneratorRuntime.wrap(function _callee9$(_context9) {
@@ -29301,7 +29314,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 email = { emailBody: "", emailSubject: subject, emailId: this.email, products: this.clientRequests.selectedRequest.requestDetails, productsSelected: this.productsSelected };
                                 return _context9.abrupt('return', this.dialog.showEmail("Enter Email", email, ['Submit', 'Cancel']).whenClosed(function (response) {
                                     if (!response.wasCancelled) {
-                                        _this9.sendTheEmail(response.output);
+                                        _this10.sendTheEmail(response.output);
                                     } else {
                                         console.log("Cancelled");
                                     }
@@ -29324,7 +29337,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.sendTheEmail = function () {
             var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(email) {
-                var _this10 = this;
+                var _this11 = this;
 
                 var updateIds, date, day, month, year, response, serverResponse;
                 return regeneratorRuntime.wrap(function _callee10$(_context10) {
@@ -29340,14 +29353,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 updateIds = new Array();
 
                                 this.productsSelected.forEach(function (item) {
-                                    _this10.clientRequests.selectedRequest.requestDetails[item.index].audit.push({
+                                    _this11.clientRequests.selectedRequest.requestDetails[item.index].audit.push({
                                         property: 'Customer Action',
-                                        newValue: _this10.config.CUSTOMER_ACTION_REQUEST_CODE,
+                                        newValue: _this11.config.CUSTOMER_ACTION_REQUEST_CODE,
                                         oldValue: item.requestStatus,
                                         eventDate: new Date(),
-                                        personId: _this10.userObj._id
+                                        personId: _this11.userObj._id
                                     });
-                                    _this10.clientRequests.selectedRequest.requestDetails[item.index].requestStatus = _this10.config.CUSTOMER_ACTION_REQUEST_CODE;
+                                    _this11.clientRequests.selectedRequest.requestDetails[item.index].requestStatus = _this11.config.CUSTOMER_ACTION_REQUEST_CODE;
                                     updateIds.push(item._id);
                                 });
 
@@ -29550,12 +29563,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.flag = function flag() {
-            var _this11 = this;
+            var _this12 = this;
 
             var note = { noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0 };
             return this.dialog.showNote("Save Changes", note, ['Submit', 'Cancel']).whenClosed(function (response) {
                 if (!response.wasCancelled) {
-                    _this11.saveNote(response.output);
+                    _this12.saveNote(response.output);
                 } else {
                     console.log("Cancelled");
                 }
@@ -29606,17 +29619,17 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.bulkEmail = function bulkEmail() {
-            var _this12 = this;
+            var _this13 = this;
 
             this.email = { emailMessage: "", subject: "" };
             this.emailArray = new Array();
             this.dataTable.baseArray.forEach(function (item) {
                 var keep = true;
-                for (var i = 0; i < _this12.emailArray.length; i++) {
-                    if (item.requestId.personId.email === _this12.emailArray[i].email) keep = false;
+                for (var i = 0; i < _this13.emailArray.length; i++) {
+                    if (item.requestId.personId.email === _this13.emailArray[i].email) keep = false;
                 }
                 if (keep) {
-                    _this12.emailArray.push({
+                    _this13.emailArray.push({
                         fullName: item.requestId.personId.fullName,
                         email: item.requestId.personId.email,
                         institution: item.requestId.institutionId.name
@@ -29631,7 +29644,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.sendBulkEmail = function sendBulkEmail() {
-            var _this13 = this;
+            var _this14 = this;
 
             if (this.email.emailMessage === "" || this.email.subject === "") {
                 this.utils.showNotification("Enter a subject and messsage");
@@ -29645,7 +29658,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                 if (response.wasCancelled) {
                     okToProcess = false;
                 } else {
-                    _this13.sendTheBulkEmail();
+                    _this14.sendTheBulkEmail();
                 }
             });
         };

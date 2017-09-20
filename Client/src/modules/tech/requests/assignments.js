@@ -301,6 +301,8 @@ export class Assignments {
             this.sandBoxOnly = false;
         } else {
             this.idBuffer = localStorage.getItem('idBuffer')  ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
+            this.selectedRequestDetail.requestId.graduateIds = this.selectedRequestDetail.requestId.graduateIds === null ? 0 : this.selectedRequestDetail.requestId.graduateIds;
+            this.selectedRequestDetail.requestId.undergradIds = this.selectedRequestDetail.requestId.undergradIds === null ? 0 : this.selectedRequestDetail.requestId.undergradIds;
             this.numberOfIds = parseInt(this.selectedRequestDetail.requestId.graduateIds)
                 + parseInt(this.selectedRequestDetail.requestId.undergradIds);
             this.sandBoxOnly = false;
@@ -679,7 +681,19 @@ export class Assignments {
      * Check to see if an id range overlaps other assignments in the same client
      ****************************************************************************************************/
     validateIDRange(client, assignment, id){
+
         if(!client.assignments || client.assignments.length == 0) return true;
+        client.assignments.forEach(item => {
+            if(item.firstID === null || item.firstID == "" || item.lastID === null || item.lastID === ""){
+                return this.dialog.showMessage(
+                    "You must enter the ID range manually with this client.", 
+                    "Manual Assignment", 
+                    ['OK']
+                    ).whenClosed(response => {
+                       return true;
+                    }); 
+            }
+        })
         var valid = true;
         var x1 = parseInt(assignment.firstID);
         var x2 = parseInt(assignment.lastID);
@@ -1395,7 +1409,7 @@ export class Assignments {
     }
 
     institutionCustomFilter(value, item, context){
-        return item.requestId && item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+        return item.requestId && item.requestId.institutionId && item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
     courseCustomFilter(value, item, context){
@@ -1423,7 +1437,7 @@ export class Assignments {
         this.sortProperty = 'institution';
         this.sortDirection = sortDirection;
         return sortArray.sort((a, b) => {
-            if(a['requestId'] !== null &&  b['requestId'] !== null && a['requestId']['institutionId']['name'] && b['requestId']['institutionId']['name']) {
+            if(a['requestId'] !== null &&  b['requestId'] !== null && a['requestId']['institutionId'] && b['requestId']['institutionId']) {
                 var result = (a['requestId']['institutionId']['name'] < b['requestId']['institutionId']['name']) ? -1 : (a['requestId']['institutionId']['name'] > b['requestId']['institutionId']['name']) ? 1 : 0;
             } else {
                  var result = -1;
