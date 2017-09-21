@@ -297,4 +297,15 @@ export class Systems{
         
     }
 
+    async getAssignmentDetails(id){
+        var url = "/serverAssignments/" + id;
+        let serverResponse = await this.data.get(url);
+        if (!serverResponse.error) {
+            this.assignmentDetailsArray = serverResponse.sort((a,b) => {
+                return a.lastName < b.lastName;
+            });
+        }  else {
+            this.data.processError(serverResponse);
+        }
+    }
 }

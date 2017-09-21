@@ -453,7 +453,7 @@ export class ClientRequests {
         var that = this;
         sortedArray.forEach(function(item){
             if(item.requestId){
-                if(item.requestId.institutionId.name != instID){
+                if(item.requestId.institutionId && item.requestId.institutionId.name != instID){
                     instID = item.requestId.institutionId.name;
                     var obj = that.utils.copyObject(templateObj);
                     obj.name = item.requestId.institutionId.name;
@@ -495,7 +495,7 @@ export class ClientRequests {
                 obj.productId = item.productId;
                 this.analyticsProductsResultArray.push(obj);
             }
-             this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1]['total'] += 1;
+            this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1]['total'] += 1;
             this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1][item.requestStatus] += 1;
         })
     }

@@ -67,6 +67,7 @@ export class EditSystem {
     }
 
     async edit(index, el) {
+        this.systemDetails = true;
         this.editIndex = this.dataTable.getOriginalIndex(index); 
         let response = await this.systems.getSystem(this.editIndex)
         // this.systems.selectSystem(this.editIndex);
@@ -440,6 +441,7 @@ export class EditSystem {
         this.clientSelected = false;
         this.editClients = false;
         this.validation.makeAllValid(1);
+        this.systemDetails = true;
     }
 
     _cleanUpFilters(){
@@ -516,5 +518,29 @@ export class EditSystem {
     selectProduct(){
         this.products.selectedProductFromId(this.selectedProduct);
         if(this.products.selectedProduct) this.idsAvailable = this.products.selectedProduct.idsAvailable ? this.products.selectedProduct.idsAvailable : 0;
+    }
+
+    async assignmentDetails(){
+        await this.systems.getAssignmentDetails(this.systems.selectedSystem._id);
+        this.systemDetails = false;
+    }
+
+    backAssignmentDetails(){
+        this.systemDetails = true;
+    }
+
+    downloadExcel(){
+			var exportArray = this.systems.assignmentDetailsArray;
+			var htmlContent = "<table><tr><th>Faculty</th><th>Institution</th><th>Client</th><th>Student IDs</th><th>FacultyIDs</th></tr>";
+
+
+			exportArray.forEach(item => {
+				var line = "<tr><td>" + item.firstName + " " + item.lastName + "</td><td>" + item.institution + "</td><td>" + item.client + "</td><td>" + item.studentIds + "</td><td>" + item.facultyIds + "</td>";
+                
+				line += "</tr>";
+				htmlContent += line;
+			});
+			htmlContent += "</table>";
+			window.open('data:application/vnd.ms-excel,' + htmlContent);
     }
 }

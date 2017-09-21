@@ -718,7 +718,25 @@ module.exports = function (app) {
         });
         return keep;
       });
-      res.status(200).json(results);
+      var assignments = new Array();
+      results.forEach(item => {
+        item.assignments.forEach(assign => {
+          assignments.push({
+          product: item.productId.name,
+          institution: item.requestId.institutionId.name,
+          firstName:  item.requestId.personId.firstName,
+          lastName:  item.requestId.personId.lastName,
+          client: assign.client,
+          studentIds: assign.studentUserIds,
+          studentPassword: assign.studentPassword,
+          facultyIds: assign.facultyUserIds,
+          facultyPassword: assign.facultyPassword,
+          assignDate: assign.assignedDate
+        })
+      })
+
+      })
+      res.status(200).json(assignments);
     })
   })
 
