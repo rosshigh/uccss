@@ -529,6 +529,55 @@ export class EditSystem {
         this.systemDetails = true;
     }
 
+    sortOnFaculty(el){
+        this.facultySort = this.facultySort ? this.facultySort * -1 : 1;
+        this.systems.assignmentDetailsArray = this.systems.assignmentDetailsArray.sort((a,b) => {
+            return (a.lastName < b.lastName ? -1 : 1) *  this.facultySort;
+        });
+
+        $(".sortable").next().replaceWith('<i class="fa fa-sort"></i>');
+        if(this.facultySort < 0){
+            var icon = '<i class="fa fa-sort-amount-desc" aria-hidden="true"></i>';  
+        } else {
+            var icon = '<i class="fa fa-sort-amount-asc" aria-hidden="true"></i>';
+        }
+    
+        $(el.target).next().replaceWith(icon);
+    }
+
+    sortOnClient(el){
+        this.clientSort = this.clientSort ? this.clientSort * -1 : 1;
+        this.systems.assignmentDetailsArray = this.systems.assignmentDetailsArray.sort((a,b) => {
+            return (a.client < b.client ? -1 : 1) * this.clientSort;
+        });
+
+        $(".sortable").next().replaceWith('<i class="fa fa-sort"></i>');
+        if(this.clientSort < 0){
+            var icon = '<i class="fa fa-sort-amount-desc" aria-hidden="true"></i>';  
+        } else {
+            var icon = '<i class="fa fa-sort-amount-asc" aria-hidden="true"></i>';
+        }
+    
+        $(el.target).next().replaceWith(icon);
+    }
+
+    sortOnInst(el){
+        this.instSort = this.instSort ? this.instSort * -1 : 1;
+        this.systems.assignmentDetailsArray = this.systems.assignmentDetailsArray.sort((a,b) => {
+            return (a.institution < b.institution ? -1 : 1) * this.instSort;
+        });
+
+        $(".sortable").next().replaceWith('<i class="fa fa-sort"></i>');
+        if(this.instSort < 0){
+            var icon = '<i class="fa fa-sort-amount-desc" aria-hidden="true"></i>';  
+        } else {
+            var icon = '<i class="fa fa-sort-amount-asc" aria-hidden="true"></i>';
+        }
+    
+        $(el.target).next().replaceWith(icon);
+    }
+
+
     downloadExcel(){
 			var exportArray = this.systems.assignmentDetailsArray;
 			var htmlContent = "<table><tr><th>Faculty</th><th>Institution</th><th>Client</th><th>Student IDs</th><th>FacultyIDs</th></tr>";

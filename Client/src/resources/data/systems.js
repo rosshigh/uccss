@@ -302,7 +302,7 @@ export class Systems{
         let serverResponse = await this.data.get(url);
         if (!serverResponse.error) {
             this.assignmentDetailsArray = serverResponse.sort((a,b) => {
-                return a.lastName < b.lastName;
+                return a.lastName < b.lastName ? -1 : 1;
             });
         }  else {
             this.data.processError(serverResponse);
