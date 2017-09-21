@@ -184,14 +184,14 @@
                 <tr>
                     <th><span  class="sortable"  click.delegate="sortOnFaculty($event)">Faculty</span><span><i class="fa fa-sort"></i></span></th>
                     <th><span  class="sortable" click.delegate="sortOnInst($event)">Institution</span><span><i class="fa fa-sort"></i></span></th>
-					<th><span  class="sortable" click.delegate="sortOnClient($event)">Client </span><span><i class="fa fa-sort"></i></span></th>
+					<th class="col-sm-1"><span  class="sortable" click.delegate="sortOnClient($event)">Client </span><span><i class="fa fa-sort"></i></span></th>
 					<th>Student IDs</th>
 					<th>Faculty IDs</th>
                 </tr>
             </thead>
             <tbody>
                 <tr repeat.for="assign of systems.assignmentDetailsArray">
-                    <td data-title="Faculty">${asign.firstName} ${assign.lastName}</td>
+                    <td data-title="Faculty">${assign.firstName} ${assign.lastName}</td>
                     <td data-title="Institution">${assign.institution}</td>
 					<td data-title="Client">${assign.client}</td>
 					<td data-title="StudentIDs">${assign.studentIds}</td>
