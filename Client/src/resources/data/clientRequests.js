@@ -466,7 +466,10 @@ export class ClientRequests {
                 }
                 if(item.requestStatus != skip){
                     that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['total'] += 1;
-                    that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['studentIds'] += parseInt(item.requestId.graduateIds) + parseInt(item.requestId.undergradIds);
+                    var gradIds = item.requestId.graduateIds != null ? parseInt(item.requestId.graduateIds) : 0;
+                    var underIds = item.requestId.undergradIds != null ? parseInt(item.requestId.undergradIds) : 0;
+                    this.analyticsInstitutionResultArray[this.analyticsInstitutionResultArray.length-1]['studentIds'] += gradIds + underIds;
+                    // that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['studentIds'] += parseInt(item.requestId.graduateIds) + parseInt(item.requestId.undergradIds);
                 }
                 that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1][item.requestStatus] += 1;
             }
