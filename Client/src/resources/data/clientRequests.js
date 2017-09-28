@@ -507,8 +507,8 @@ export class ClientRequests {
                 this.analyticsProductsResultArray.push(obj);
             }
             if(item.requestStatus != skip){
-                that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['total'] += 1;
-                that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['studentIds'] += parseInt(item.requestId.graduateIds) + parseInt(item.requestId.undergradIds);
+                this.analyticsInstitutionResultArray[this.analyticsInstitutionResultArray.length-1]['total'] += 1;
+                this.analyticsInstitutionResultArray[this.analyticsInstitutionResultArray.length-1]['studentIds'] += parseInt(item.requestId.graduateIds) + parseInt(item.requestId.undergradIds);
             }            
             // this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1]['total'] += 1;
             this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1][item.requestStatus] += 1;

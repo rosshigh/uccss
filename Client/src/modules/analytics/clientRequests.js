@@ -133,6 +133,7 @@ export class ClientRequestAnalytics {
                     this.totalsInstitutionArray.push(0);
                 });
                 this.totalsInstitutionArray.push(0);
+                this.totalsInstitutionArray.push(0);
                 this.requests.analyticsInstitutionResultArray.forEach(item => {
                     this.totalsInstitutionArray[0] += item['total'];
                     this.totalsInstitutionArray[1] += item[1];
@@ -142,6 +143,7 @@ export class ClientRequestAnalytics {
                     this.totalsInstitutionArray[5] += item[5];
                     this.totalsInstitutionArray[6] += item[6];
                     this.totalsInstitutionArray[7] += item[7];
+                    this.totalsInstitutionArray[8] += item['studentIds'];
                     
                 });
                 // this.dataTable.updateArray(this.requests.analyticsInstitutionResultArray);

@@ -911,7 +911,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                         switch (_context4.prev = _context4.next) {
                             case 0:
                                 if (!this.selectedSession) {
-                                    _context4.next = 12;
+                                    _context4.next = 13;
                                     break;
                                 }
 
@@ -922,7 +922,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
 
                             case 5:
                                 if (!(this.requests.requestsDetailsArrayAnalytics && this.requests.requestsDetailsArrayAnalytics.length)) {
-                                    _context4.next = 12;
+                                    _context4.next = 13;
                                     break;
                                 }
 
@@ -935,6 +935,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                                     _this.totalsInstitutionArray.push(0);
                                 });
                                 this.totalsInstitutionArray.push(0);
+                                this.totalsInstitutionArray.push(0);
                                 this.requests.analyticsInstitutionResultArray.forEach(function (item) {
                                     _this.totalsInstitutionArray[0] += item['total'];
                                     _this.totalsInstitutionArray[1] += item[1];
@@ -944,9 +945,10 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                                     _this.totalsInstitutionArray[5] += item[5];
                                     _this.totalsInstitutionArray[6] += item[6];
                                     _this.totalsInstitutionArray[7] += item[7];
+                                    _this.totalsInstitutionArray[8] += item['studentIds'];
                                 });
 
-                            case 12:
+                            case 13:
                             case 'end':
                                 return _context4.stop();
                         }
@@ -7750,8 +7752,8 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                     _this4.analyticsProductsResultArray.push(obj);
                 }
                 if (item.requestStatus != skip) {
-                    that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length - 1]['total'] += 1;
-                    that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length - 1]['studentIds'] += parseInt(item.requestId.graduateIds) + parseInt(item.requestId.undergradIds);
+                    _this4.analyticsInstitutionResultArray[_this4.analyticsInstitutionResultArray.length - 1]['total'] += 1;
+                    _this4.analyticsInstitutionResultArray[_this4.analyticsInstitutionResultArray.length - 1]['studentIds'] += parseInt(item.requestId.graduateIds) + parseInt(item.requestId.undergradIds);
                 }
 
                 _this4.analyticsProductsResultArray[_this4.analyticsProductsResultArray.length - 1][item.requestStatus] += 1;
