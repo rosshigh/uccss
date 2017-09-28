@@ -447,8 +447,12 @@ export class ClientRequests {
         var numStatuses = this.config.REQUEST_STATUS.length;
         var templateObj = new Object();
          templateObj['total'] = 0;
+         templateObj['studentIds'] = 0;
         for(var i = 0; i < numStatuses; i++){
             templateObj[this.config.REQUEST_STATUS[i].code] = 0;
+            if(this.config.REQUEST_STATUS[i].description === "Cancelled") {
+                var skip = this.config.REQUEST_STATUS[i].code;
+            }
         }
         var that = this;
         sortedArray.forEach(function(item){
@@ -460,7 +464,10 @@ export class ClientRequests {
                     obj.institutionId = item.requestId.institutionId._id;
                     that.analyticsInstitutionResultArray.push(obj);
                 }
-                that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['total'] += 1;
+                if(item.requestStatus != skip){
+                    that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['total'] += 1;
+                    that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['studentIds'] += parseInt(item.requestId.graduateIds) + parseInt(item.requestId.undergradIds);
+                }
                 that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1][item.requestStatus] += 1;
             }
           
@@ -484,8 +491,12 @@ export class ClientRequests {
         var numStatuses = this.config.REQUEST_STATUS.length;
         var templateObj = new Object();
          templateObj['total'] = 0;
+        templateObj['studentIds'] = 0;
         for(var i = 0; i < numStatuses; i++){
             templateObj[this.config.REQUEST_STATUS[i].code] = 0;
+            if(this.config.REQUEST_STATUS[i].description === "Cancelled") {
+                var skip = this.config.REQUEST_STATUS[i].code;
+            }            
         }
 
         sortedArray.forEach(item => {
@@ -495,7 +506,11 @@ export class ClientRequests {
                 obj.productId = item.productId;
                 this.analyticsProductsResultArray.push(obj);
             }
-            this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1]['total'] += 1;
+            if(item.requestStatus != skip){
+                that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['total'] += 1;
+                that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['studentIds'] += parseInt(item.requestId.graduateIds) + parseInt(item.requestId.undergradIds);
+            }            
+            // this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1]['total'] += 1;
             this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1][item.requestStatus] += 1;
         })
     }

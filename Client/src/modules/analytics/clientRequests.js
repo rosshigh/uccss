@@ -26,10 +26,10 @@ export class ClientRequestAnalytics {
             code: 1,
             description: 'Requests by Product'
         },
-        {
-            code: 2,
-            description: 'Requests by SAP Product'
-        }
+        // {
+        //     code: 2,
+        //     description: 'Requests by SAP Product'
+        // }
     ]
     backgroundColors =['#cc3300','#99e600','#0099cc','#ff0066','#6666ff','#1a8cff','#000080','#66ff99','#1aff66','#808000','#ffff66','#4d4d00','#ccffff','#006666','#339933','#b3ffff','#000099','#66ff33','#269900','#ffff00','#ffff66','#9999ff','#6600cc','#009933','','#0000b3','#ff0000','#00004d','#0000cc','#ff0000','#ff0000','#ffb3b3','#ffb3b3','#e63900','#ffb3b3','#330d00','#ffb3b3','#3333ff','#0000cc'];
     selectedTab = "institution";
