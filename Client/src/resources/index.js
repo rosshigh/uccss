@@ -14,6 +14,7 @@ export function configure(config) {
     './value-converters/info-filter',
     './value-converters/request-status-class',
     './value-converters/course-name',
+    './value-converters/format-number',
     './value-converters/session-name',
     './value-converters/session-type',
     './value-converters/date-format',
