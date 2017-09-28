@@ -500,7 +500,7 @@ export class ClientRequests {
         }
 
         sortedArray.forEach(item => {
-            if(item.productId.name != prodID){
+            if(item.productId.name != prodID){ 
                 prodID = item.productId.name;
                 var obj = this.utils.copyObject(templateObj);
                 obj.productId = item.productId;
