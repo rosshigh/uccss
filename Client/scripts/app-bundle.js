@@ -7754,12 +7754,11 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                     _this4.analyticsProductsResultArray.push(obj);
                 }
                 if (item.requestStatus != skip) {
-                    _this4.analyticsInstitutionResultArray[_this4.analyticsInstitutionResultArray.length - 1]['total'] += 1;
+                    _this4.analyticsProductsResultArray[_this4.analyticsProductsResultArray.length - 1]['total'] += 1;
                     var gradIds = item.requestId.graduateIds != null ? parseInt(item.requestId.graduateIds) : 0;
                     var underIds = item.requestId.undergradIds != null ? parseInt(item.requestId.undergradIds) : 0;
-                    _this4.analyticsInstitutionResultArray[_this4.analyticsInstitutionResultArray.length - 1]['studentIds'] += gradIds + underIds;
+                    _this4.analyticsProductsResultArray[_this4.analyticsProductsResultArray.length - 1]['studentIds'] += gradIds + underIds;
                 }
-
                 _this4.analyticsProductsResultArray[_this4.analyticsProductsResultArray.length - 1][item.requestStatus] += 1;
             });
         };
