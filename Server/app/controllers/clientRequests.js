@@ -444,13 +444,22 @@ module.exports = function (app) {
     logger.log('Get clientRequests', 'verbose');
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
+    .select('')
     .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
     .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
     .populate({ path: 'productId', model: 'Product', select: 'name'})
     query.exec()
       .then(object => {
         if(object){
-          res.status(200).json(object);
+          var result = [];
+          object.forEach(item => {
+            result.push({
+              requestId: {personId: {fullName: item.requestId.personId.fullName}, institutionId: item.requestId.institutionId, undergradIds: item.requestId.undergradIds, undergradIds: item.requestId.undergradIds},
+              requestStatus: item.requestStatus,
+              productId: item.productId
+            });
+          });
+          res.status(200).json(result);
         } else {
           res.status(404).json({message: "No requests were found"});
         }

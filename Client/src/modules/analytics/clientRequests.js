@@ -470,7 +470,7 @@ export class ClientRequestAnalytics {
             this.dataTable.updateArray(this.requests.requestsDetailsArray);
             this.selectedProductDetails = product.productId.name;
         } else {
-            this.getProductsRequests();
+            this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
         }
     }
 
@@ -478,11 +478,10 @@ export class ClientRequestAnalytics {
         this.summerInstTable = !this.summerInstTable;
         if(!this.summerInstTable){
             let response = await this.requests.getClientRequestsDetailFaccoArray(this.selectedSession,  product.institutionId);
-            // let response = await this.requests.getClientRequestsDetailsArray('?filter=[and]institutionId|eq|' + product.institution._id + ':sessionId|eq|' + this.selectedSession, true);
             this.dataTable.updateArray(this.requests.requestsDetailsArray);
             this.selectedInstitutionDetail = product.requestId.institutionId.name;
         } else {
-            this.getInstitutionRequests();
+            this.dataTable.updateArray(this.requests.analyticsInstitutionResultArray);
         }
     }
 
