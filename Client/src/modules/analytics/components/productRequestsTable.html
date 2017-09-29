@@ -41,7 +41,7 @@
                     <td data-title="Product">${stat.productId.name}</td>
                     <td data-title="Institution">${stat.total | formatNumber}</td>
                     <td data-title="${config.REQUEST_STATUS[$index].description}" repeat.for="status of config.REQUEST_STATUS">${stat | statValue:config.REQUEST_STATUS:$index}</td>
-                    <td>${stat.studentIds}</td>
+                    <td>${stat.studentIds | formatNumber}</td>
                 </tr>
             </tbody>
         </table>
