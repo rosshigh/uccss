@@ -14,6 +14,7 @@ export class Editor {
 		['style', ['style', 'bold', 'clear']],
 		['color', ['color']],
 		['font', ['strikethrough', 'superscript', 'subscript']],
+		['fontsize', ['fontsize']],
 		['layout', ['ul', 'ol', 'paragraph']],
 		['insert', ['picture', 'link', 'table', 'hello']],
 		['misc', ['undo', 'redo', 'fullscreen']]

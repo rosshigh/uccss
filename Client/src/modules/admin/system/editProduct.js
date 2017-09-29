@@ -26,7 +26,8 @@ export class EditProducts {
     toolbar = [
 		['style', ['style', 'bold', 'italic', 'underline','clear']],
 		['color', ['color']],
-		['font', ['strikethrough', 'superscript', 'subscript']],
+        ['font', ['strikethrough', 'superscript', 'subscript']],
+        ['fontsize', ['fontsize']],
 		['layout', ['ul', 'ol', 'paragraph']],
 		['insert', [ 'link', 'table', 'hello']],
 		['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
