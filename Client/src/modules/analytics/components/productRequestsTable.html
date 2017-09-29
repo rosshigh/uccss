@@ -18,7 +18,7 @@
                     <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: '5'})">${config.REQUEST_STATUS[4].description}  </span><span><i class="fa fa-sort"></i></span></th>
                     <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: '6'})">${config.REQUEST_STATUS[5].description}  </span><span><i class="fa fa-sort"></i></span></th>
                     <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: '7'})">${config.REQUEST_STATUS[6].description}  </span><span><i class="fa fa-sort"></i></span></th>
-                    <th>Student IDs</th>
+                    <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'studentIds'})">Student IDs  </span><span><i class="fa fa-sort"></i></span></th>
                 </tr>
                  <tr>
                     <th>
@@ -39,7 +39,7 @@
             <tbody>
                 <tr click.delegate="showProductDetail(stat)" repeat.for="stat of dataTable.displayArray">
                     <td data-title="Product">${stat.productId.name}</td>
-                    <td data-title="Institution">${stat.total}</td>
+                    <td data-title="Institution">${stat.total | formatNumber}</td>
                     <td data-title="${config.REQUEST_STATUS[$index].description}" repeat.for="status of config.REQUEST_STATUS">${stat | statValue:config.REQUEST_STATUS:$index}</td>
                     <td>${stat.studentIds}</td>
                 </tr>
