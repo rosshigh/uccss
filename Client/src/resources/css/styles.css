@@ -28,7 +28,8 @@
 }
 
 .redText {
-    color: red;
+    color: purple;
+    font-weight: bolder;
 }
 
 .banner {
