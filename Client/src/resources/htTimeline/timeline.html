@@ -30,7 +30,7 @@
                           <tr repeat.for="assign of helpTickets.selectedHelpTicket.requestId.assignments">
                             <td class="${assign.client == helpTickets.selectedHelpTicket.client ? 'col-lg-1 redText' : 'col-lg-1'}"><h4>${assign.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</h4></td>
                             <td class="${assign.client == helpTickets.selectedHelpTicket.client ? 'col-lg-1 redText' : 'col-lg-1'}"><h4>${assign.client}</h4></td>
-                            <td innerhtml="${assign.client | arrow:helpTickets.selectedHelpTicket.client}"></td>
+                            <td innerhtml="${assign.client | arrow:helpTickets.selectedHelpTicket.client:helpTickets.selectedHelpTicket.severId:assign.serverId}"></td>
                           </tr>
                       
                         </table>
