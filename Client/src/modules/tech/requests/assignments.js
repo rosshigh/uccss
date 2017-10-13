@@ -949,7 +949,12 @@ export class Assignments {
                             //It's a new assignment
                             this.assignmentDetails[i].assignedDate = new Date();
                             this.selectedRequestDetail.assignedDate = new Date();
-                            if(this.selectedRequestDetail.requestId.courseId._id != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                            if(this.selectedRequestDetail.requestId.courseId._id != this.config.SANDBOX_ID) {
+                                this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                            } else {
+                                this.proposedClient[i].clientStatus = this.config.SANDBOX_CLIENT_CODE;
+                            }
+
                             var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
                             this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - parseInt(totalIdsAssigned);
                             this.proposedClient[i].manual = this.manualMode;
@@ -983,7 +988,11 @@ export class Assignments {
             for(var i = 0; i < this.proposedClient.length; i++){
                 this.assignmentDetails[i].assignedDate = new Date();
                 this.assignmentDetails[i].modifiedDate = new Date();
-                if(this.selectedRequestDetail.requestId.courseId._id != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                if(this.selectedRequestDetail.requestId.courseId._id != this.config.SANDBOX_ID) {
+                    this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                } else {
+                    this.proposedClient[i].clientStatus = this.config.SANDBOX_CLIENT_CODE;
+                }
                 if(this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                 var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
                 this.proposedClient[i].idsAvailable = this.proposedClient[i].idsAvailable ? parseInt(this.proposedClient[i].idsAvailable) : parseInt(this.products.selectedProduct.idsAvailable);

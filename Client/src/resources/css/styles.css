@@ -27,6 +27,10 @@
     font-weight: bold;
 }
 
+.redText {
+    color: red;
+}
+
 .banner {
     height: 50px;
     width: 100%;

@@ -30,6 +30,7 @@ export class AppConfig {
     INACTIVE_PERSON = "02";
 
     ROLES = [{ role: 'USER', label: 'User', UCConly: false, authLevel: 2 },
+            { role: 'FACU', label: 'Faculty', UCConly: false, authLevel: 3 },
             { role: 'PROV', label: "Provisional", UCConly: false, authLevel: 1 },
             { role: 'LEGL', label: 'Legal', UCConly: false, authLevel: 2 },
             { role: 'BUSI', label: 'Billing', UCConly: false, authLevel: 2 },

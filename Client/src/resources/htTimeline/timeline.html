@@ -20,17 +20,21 @@
                       <h4 show.bind="showCourse" class="col-sm-11 col-sm-offset-1 topMargin">Course: ${course}</h4>
                       <div show.bind="showRequestDetails">
                         <h4  class="col-sm-11 col-sm-offset-1 topMargin">Request: ${helpTickets.selectedHelpTicket.requestId.requestNo}</h4>
-                        <h4  class="col-sm-11 col-sm-offset-1">Assignments</h4>
+                        <h4  class="col-sm-11 col-sm-offset-1">Product: ${helpTickets.selectedHelpTicket.productId | lookupValue:products.productsArray:"_id":"name"}</h4>
+                                                  
                         <table class="col-sm-11 col-sm-offset-1">
                           <tr>
                             <th class="col-lg-1">System</th>
                             <th class="col-lg-1">Client</th>
                           </tr>
                           <tr repeat.for="assign of helpTickets.selectedHelpTicket.requestId.assignments">
-                            <td class="col-lg-1"><h4>${assign.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</h4></td>
-                            <td class="col-lg-1"><h4>${assign.client}</h4></td>
+                            <td class="${assign.client == helpTickets.selectedHelpTicket.client ? 'col-lg-1 redText' : 'col-lg-1'}"><h4>${assign.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</h4></td>
+                            <td class="${assign.client == helpTickets.selectedHelpTicket.client ? 'col-lg-1 redText' : 'col-lg-1'}"><h4>${assign.client}</h4></td>
+                            <td innerhtml="${assign.client | arrow:helpTickets.selectedHelpTicket.client}"></td>
                           </tr>
+                      
                         </table>
+                          
                           <!--
                         <h4  class="col-sm-11 col-sm-offset-1 topMargin">System: ${systems.selectedSystem.sid}</h4>
                         <h4  class="col-sm-11 col-sm-offset-1 ">Client: ${helpTickets.selectedHelpTicket.client}</h4>

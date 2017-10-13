@@ -77,6 +77,7 @@ export class ViewHelpTickets {
       this.helpTickets.getHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true),
       this.people.getUCCStaff(uccRoles),
       this.helpTickets.getHelpTicketTypes('?order=category'),
+      this.products.getProductsArray('',true),
       this.sessions.getSessionsArray('?order=startDate', true),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
       this.systems.getSystemsArray(),
