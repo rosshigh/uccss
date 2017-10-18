@@ -453,11 +453,13 @@ module.exports = function (app) {
         if(object){
           var result = [];
           object.forEach(item => {
-            result.push({
-              requestId: {personId: {fullName: item.requestId.personId.fullName}, institutionId: item.requestId.institutionId, undergradIds: item.requestId.undergradIds, undergradIds: item.requestId.undergradIds},
-              requestStatus: item.requestStatus,
-              productId: item.productId
-            });
+            if(item.requestId){
+              result.push({
+                requestId: {personId: {fullName: item.requestId.personId.fullName}, institutionId: item.requestId.institutionId, undergradIds: item.requestId.undergradIds, undergradIds: item.requestId.undergradIds},
+                requestStatus: item.requestStatus,
+                productId: item.productId
+              });
+            }
           });
           res.status(200).json(result);
         } else {
