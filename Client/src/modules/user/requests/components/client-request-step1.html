@@ -5,7 +5,7 @@
       <div class="form-group leftJustify">
         <select value.bind="sessionId" class="form-control" change.trigger="changeSession($event)" id="session">
           <option value="-1">Select a session</option>
-          <option repeat.for="session of sessions.sessionsArray | filterSessions:config.ACTIVE_REQUEST_OVERLAP:'Requests'"
+          <option repeat.for="session of sessions.sessionsArray | filterSessions:config.ACTIVE_REQUEST_OVERLAP:'Requests':config.SESSION_SORT_ORDER"
                   value.bind="session._id">Session ${session.session} - ${session.year}</option>
         </select>
       </div>

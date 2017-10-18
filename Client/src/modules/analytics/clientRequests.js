@@ -580,7 +580,7 @@ export class ClientRequestAnalytics {
     }
 
     downloadExcel(){
-			var exportArray = this.utils.copyArray(this.dataTable.baseArray);
+			var exportArray = this.utils.copyArray(this.requests.analyticsProductsResultArray);
 			var htmlContent = "<table><tr><th>Product</th>";
 			var numFields = this.config.REQUEST_STATUS.length;
 			
@@ -602,7 +602,7 @@ export class ClientRequestAnalytics {
     }
         
     downloadInstExcel(){
-        var exportArray = this.utils.copyArray(this.dataTable.baseArray);
+        var exportArray = this.utils.copyArray(this.requests.analyticsInstitutionResultArray);
         var htmlContent = "<table><tr><th>Product</th>";
         var numFields = this.config.REQUEST_STATUS.length;
         

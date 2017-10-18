@@ -52,6 +52,19 @@ var express = require('express'),
     // This will schedule the next call.
 }, 3600000).run();
 
+// AsyncPolling(function (end) {
+//     let newFile = new Date().toString() + ".log";
+//     let file = "/forever-log/forever.log";
+//     fs.rename(file, newFile, function(err) {
+//         if ( err ) console.log('ERROR: ' + err);
+//     });
+//     fs.writeFile("./forever-log/forever.log", "", (err) => {
+//         if (err) throw err;
+//         console.log("The file was succesfully saved!");
+//     }); 
+//     end();
+// },  3000).run();
+// 86400000
 var app = express();
 
 require('./config/express')(app, config);

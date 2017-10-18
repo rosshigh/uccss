@@ -1,0 +1,7 @@
+{
+	"script": "index.js",
+	"watch": true,
+	"logFile": "forever-log/forever.log", 
+    "outFile": "forever-log/out.log", 
+    "errFile": "forever-log/error.log" 
+}
