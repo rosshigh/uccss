@@ -244,7 +244,7 @@ export class ViewHelpTickets {
       await this.getDetails();
       var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       if (!response.error) {
-        if (response.helpTicketId === 0) {
+        // if (response.helpTicketId === 0) {
           //Lock help ticket
           // this.helpTickets.lockHelpTicket({
           //   helpTicketId: this.helpTickets.selectedHelpTicket._id,
@@ -254,7 +254,8 @@ export class ViewHelpTickets {
           // this.lockMessage = "";
           // this.showLockMessage = false;
           // this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
-        } else {
+        // } else {
+        if (response.helpTicketId !== 0) {
           if (response[0].personId === this.userObj._id) {
             this.showLockMessage = false;
             this.lockMessage = "";
