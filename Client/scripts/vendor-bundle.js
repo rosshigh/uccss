@@ -11581,718 +11581,6 @@ define('aurelia-bootstrapper',['exports', 'aurelia-pal', 'aurelia-pal-browser', 
 
   run();
 });
-define('aurelia-event-aggregator',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.EventAggregator = undefined;
-  exports.includeEventsIn = includeEventsIn;
-  exports.configure = configure;
-
-  var LogManager = _interopRequireWildcard(_aureliaLogging);
-
-  function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-        }
-      }
-
-      newObj.default = obj;
-      return newObj;
-    }
-  }
-
-  
-
-  var logger = LogManager.getLogger('event-aggregator');
-
-  var Handler = function () {
-    function Handler(messageType, callback) {
-      
-
-      this.messageType = messageType;
-      this.callback = callback;
-    }
-
-    Handler.prototype.handle = function handle(message) {
-      if (message instanceof this.messageType) {
-        this.callback.call(null, message);
-      }
-    };
-
-    return Handler;
-  }();
-
-  function invokeCallback(callback, data, event) {
-    try {
-      callback(data, event);
-    } catch (e) {
-      logger.error(e);
-    }
-  }
-
-  function invokeHandler(handler, data) {
-    try {
-      handler.handle(data);
-    } catch (e) {
-      logger.error(e);
-    }
-  }
-
-  var EventAggregator = exports.EventAggregator = function () {
-    function EventAggregator() {
-      
-
-      this.eventLookup = {};
-      this.messageHandlers = [];
-    }
-
-    EventAggregator.prototype.publish = function publish(event, data) {
-      var subscribers = void 0;
-      var i = void 0;
-
-      if (!event) {
-        throw new Error('Event was invalid.');
-      }
-
-      if (typeof event === 'string') {
-        subscribers = this.eventLookup[event];
-        if (subscribers) {
-          subscribers = subscribers.slice();
-          i = subscribers.length;
-
-          while (i--) {
-            invokeCallback(subscribers[i], data, event);
-          }
-        }
-      } else {
-        subscribers = this.messageHandlers.slice();
-        i = subscribers.length;
-
-        while (i--) {
-          invokeHandler(subscribers[i], event);
-        }
-      }
-    };
-
-    EventAggregator.prototype.subscribe = function subscribe(event, callback) {
-      var handler = void 0;
-      var subscribers = void 0;
-
-      if (!event) {
-        throw new Error('Event channel/type was invalid.');
-      }
-
-      if (typeof event === 'string') {
-        handler = callback;
-        subscribers = this.eventLookup[event] || (this.eventLookup[event] = []);
-      } else {
-        handler = new Handler(event, callback);
-        subscribers = this.messageHandlers;
-      }
-
-      subscribers.push(handler);
-
-      return {
-        dispose: function dispose() {
-          var idx = subscribers.indexOf(handler);
-          if (idx !== -1) {
-            subscribers.splice(idx, 1);
-          }
-        }
-      };
-    };
-
-    EventAggregator.prototype.subscribeOnce = function subscribeOnce(event, callback) {
-      var sub = this.subscribe(event, function (a, b) {
-        sub.dispose();
-        return callback(a, b);
-      });
-
-      return sub;
-    };
-
-    return EventAggregator;
-  }();
-
-  function includeEventsIn(obj) {
-    var ea = new EventAggregator();
-
-    obj.subscribeOnce = function (event, callback) {
-      return ea.subscribeOnce(event, callback);
-    };
-
-    obj.subscribe = function (event, callback) {
-      return ea.subscribe(event, callback);
-    };
-
-    obj.publish = function (event, data) {
-      ea.publish(event, data);
-    };
-
-    return ea;
-  }
-
-  function configure(config) {
-    config.instance(EventAggregator, includeEventsIn(config.aurelia));
-  }
-});
-define('aurelia-framework',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-metadata', 'aurelia-templating', 'aurelia-loader', 'aurelia-task-queue', 'aurelia-path', 'aurelia-pal', 'aurelia-logging'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaMetadata, _aureliaTemplating, _aureliaLoader, _aureliaTaskQueue, _aureliaPath, _aureliaPal, _aureliaLogging) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.LogManager = exports.FrameworkConfiguration = exports.Aurelia = undefined;
-  Object.keys(_aureliaDependencyInjection).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaDependencyInjection[key];
-      }
-    });
-  });
-  Object.keys(_aureliaBinding).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaBinding[key];
-      }
-    });
-  });
-  Object.keys(_aureliaMetadata).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaMetadata[key];
-      }
-    });
-  });
-  Object.keys(_aureliaTemplating).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaTemplating[key];
-      }
-    });
-  });
-  Object.keys(_aureliaLoader).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaLoader[key];
-      }
-    });
-  });
-  Object.keys(_aureliaTaskQueue).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaTaskQueue[key];
-      }
-    });
-  });
-  Object.keys(_aureliaPath).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaPath[key];
-      }
-    });
-  });
-  Object.keys(_aureliaPal).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaPal[key];
-      }
-    });
-  });
-
-  var TheLogManager = _interopRequireWildcard(_aureliaLogging);
-
-  function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-        }
-      }
-
-      newObj.default = obj;
-      return newObj;
-    }
-  }
-
-  
-
-  function preventActionlessFormSubmit() {
-    _aureliaPal.DOM.addEventListener('submit', function (evt) {
-      var target = evt.target;
-      var action = target.action;
-
-      if (target.tagName.toLowerCase() === 'form' && !action) {
-        evt.preventDefault();
-      }
-    });
-  }
-
-  var Aurelia = exports.Aurelia = function () {
-    function Aurelia(loader, container, resources) {
-      
-
-      this.loader = loader || new _aureliaPal.PLATFORM.Loader();
-      this.container = container || new _aureliaDependencyInjection.Container().makeGlobal();
-      this.resources = resources || new _aureliaTemplating.ViewResources();
-      this.use = new FrameworkConfiguration(this);
-      this.logger = TheLogManager.getLogger('aurelia');
-      this.hostConfigured = false;
-      this.host = null;
-
-      this.use.instance(Aurelia, this);
-      this.use.instance(_aureliaLoader.Loader, this.loader);
-      this.use.instance(_aureliaTemplating.ViewResources, this.resources);
-    }
-
-    Aurelia.prototype.start = function start() {
-      var _this = this;
-
-      if (this._started) {
-        return this._started;
-      }
-
-      this.logger.info('Aurelia Starting');
-      return this._started = this.use.apply().then(function () {
-        preventActionlessFormSubmit();
-
-        if (!_this.container.hasResolver(_aureliaTemplating.BindingLanguage)) {
-          var message = 'You must configure Aurelia with a BindingLanguage implementation.';
-          _this.logger.error(message);
-          throw new Error(message);
-        }
-
-        _this.logger.info('Aurelia Started');
-        var evt = _aureliaPal.DOM.createCustomEvent('aurelia-started', { bubbles: true, cancelable: true });
-        _aureliaPal.DOM.dispatchEvent(evt);
-        return _this;
-      });
-    };
-
-    Aurelia.prototype.enhance = function enhance() {
-      var _this2 = this;
-
-      var bindingContext = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-      var applicationHost = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-      this._configureHost(applicationHost || _aureliaPal.DOM.querySelectorAll('body')[0]);
-
-      return new Promise(function (resolve) {
-        var engine = _this2.container.get(_aureliaTemplating.TemplatingEngine);
-        _this2.root = engine.enhance({ container: _this2.container, element: _this2.host, resources: _this2.resources, bindingContext: bindingContext });
-        _this2.root.attached();
-        _this2._onAureliaComposed();
-        resolve(_this2);
-      });
-    };
-
-    Aurelia.prototype.setRoot = function setRoot() {
-      var _this3 = this;
-
-      var root = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
-      var applicationHost = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-      var instruction = {};
-
-      if (this.root && this.root.viewModel && this.root.viewModel.router) {
-        this.root.viewModel.router.deactivate();
-        this.root.viewModel.router.reset();
-      }
-
-      this._configureHost(applicationHost);
-
-      var engine = this.container.get(_aureliaTemplating.TemplatingEngine);
-      var transaction = this.container.get(_aureliaTemplating.CompositionTransaction);
-      delete transaction.initialComposition;
-
-      if (!root) {
-        if (this.configModuleId) {
-          root = (0, _aureliaPath.relativeToFile)('./app', this.configModuleId);
-        } else {
-          root = 'app';
-        }
-      }
-
-      instruction.viewModel = root;
-      instruction.container = instruction.childContainer = this.container;
-      instruction.viewSlot = this.hostSlot;
-      instruction.host = this.host;
-
-      return engine.compose(instruction).then(function (r) {
-        _this3.root = r;
-        instruction.viewSlot.attached();
-        _this3._onAureliaComposed();
-        return _this3;
-      });
-    };
-
-    Aurelia.prototype._configureHost = function _configureHost(applicationHost) {
-      if (this.hostConfigured) {
-        return;
-      }
-      applicationHost = applicationHost || this.host;
-
-      if (!applicationHost || typeof applicationHost === 'string') {
-        this.host = _aureliaPal.DOM.getElementById(applicationHost || 'applicationHost');
-      } else {
-        this.host = applicationHost;
-      }
-
-      if (!this.host) {
-        throw new Error('No applicationHost was specified.');
-      }
-
-      this.hostConfigured = true;
-      this.host.aurelia = this;
-      this.hostSlot = new _aureliaTemplating.ViewSlot(this.host, true);
-      this.hostSlot.transformChildNodesIntoView();
-      this.container.registerInstance(_aureliaPal.DOM.boundary, this.host);
-    };
-
-    Aurelia.prototype._onAureliaComposed = function _onAureliaComposed() {
-      var evt = _aureliaPal.DOM.createCustomEvent('aurelia-composed', { bubbles: true, cancelable: true });
-      setTimeout(function () {
-        return _aureliaPal.DOM.dispatchEvent(evt);
-      }, 1);
-    };
-
-    return Aurelia;
-  }();
-
-  var logger = TheLogManager.getLogger('aurelia');
-  var extPattern = /\.[^/.]+$/;
-
-  function runTasks(config, tasks) {
-    var current = void 0;
-    var next = function next() {
-      current = tasks.shift();
-      if (current) {
-        return Promise.resolve(current(config)).then(next);
-      }
-
-      return Promise.resolve();
-    };
-
-    return next();
-  }
-
-  function loadPlugin(config, loader, info) {
-    logger.debug('Loading plugin ' + info.moduleId + '.');
-    config.resourcesRelativeTo = info.resourcesRelativeTo;
-
-    var id = info.moduleId;
-
-    if (info.resourcesRelativeTo.length > 1) {
-      return loader.normalize(info.moduleId, info.resourcesRelativeTo[1]).then(function (normalizedId) {
-        return _loadPlugin(normalizedId);
-      });
-    }
-
-    return _loadPlugin(id);
-
-    function _loadPlugin(moduleId) {
-      return loader.loadModule(moduleId).then(function (m) {
-        if ('configure' in m) {
-          return Promise.resolve(m.configure(config, info.config || {})).then(function () {
-            config.resourcesRelativeTo = null;
-            logger.debug('Configured plugin ' + info.moduleId + '.');
-          });
-        }
-
-        config.resourcesRelativeTo = null;
-        logger.debug('Loaded plugin ' + info.moduleId + '.');
-      });
-    }
-  }
-
-  function loadResources(aurelia, resourcesToLoad, appResources) {
-    var viewEngine = aurelia.container.get(_aureliaTemplating.ViewEngine);
-
-    return Promise.all(Object.keys(resourcesToLoad).map(function (n) {
-      return _normalize(resourcesToLoad[n]);
-    })).then(function (loads) {
-      var names = [];
-      var importIds = [];
-
-      loads.forEach(function (l) {
-        names.push(undefined);
-        importIds.push(l.importId);
-      });
-
-      return viewEngine.importViewResources(importIds, names, appResources);
-    });
-
-    function _normalize(load) {
-      var moduleId = load.moduleId;
-      var ext = getExt(moduleId);
-
-      if (isOtherResource(moduleId)) {
-        moduleId = removeExt(moduleId);
-      }
-
-      return aurelia.loader.normalize(moduleId, load.relativeTo).then(function (normalized) {
-        return {
-          name: load.moduleId,
-          importId: isOtherResource(load.moduleId) ? addOriginalExt(normalized, ext) : normalized
-        };
-      });
-    }
-
-    function isOtherResource(name) {
-      var ext = getExt(name);
-      if (!ext) return false;
-      if (ext === '') return false;
-      if (ext === '.js' || ext === '.ts') return false;
-      return true;
-    }
-
-    function removeExt(name) {
-      return name.replace(extPattern, '');
-    }
-
-    function addOriginalExt(normalized, ext) {
-      return removeExt(normalized) + '.' + ext;
-    }
-  }
-
-  function getExt(name) {
-    var match = name.match(extPattern);
-    if (match && match.length > 0) {
-      return match[0].split('.')[1];
-    }
-  }
-
-  function assertProcessed(plugins) {
-    if (plugins.processed) {
-      throw new Error('This config instance has already been applied. To load more plugins or global resources, create a new FrameworkConfiguration instance.');
-    }
-  }
-
-  var FrameworkConfiguration = function () {
-    function FrameworkConfiguration(aurelia) {
-      var _this4 = this;
-
-      
-
-      this.aurelia = aurelia;
-      this.container = aurelia.container;
-      this.info = [];
-      this.processed = false;
-      this.preTasks = [];
-      this.postTasks = [];
-      this.resourcesToLoad = {};
-      this.preTask(function () {
-        return aurelia.loader.normalize('aurelia-bootstrapper').then(function (name) {
-          return _this4.bootstrapperName = name;
-        });
-      });
-      this.postTask(function () {
-        return loadResources(aurelia, _this4.resourcesToLoad, aurelia.resources);
-      });
-    }
-
-    FrameworkConfiguration.prototype.instance = function instance(type, _instance) {
-      this.container.registerInstance(type, _instance);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.singleton = function singleton(type, implementation) {
-      this.container.registerSingleton(type, implementation);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.transient = function transient(type, implementation) {
-      this.container.registerTransient(type, implementation);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.preTask = function preTask(task) {
-      assertProcessed(this);
-      this.preTasks.push(task);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.postTask = function postTask(task) {
-      assertProcessed(this);
-      this.postTasks.push(task);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.feature = function feature(plugin) {
-      var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-      var hasIndex = /\/index$/i.test(plugin);
-      var moduleId = hasIndex || getExt(plugin) ? plugin : plugin + '/index';
-      var root = hasIndex ? plugin.substr(0, plugin.length - 6) : plugin;
-      return this.plugin({ moduleId: moduleId, resourcesRelativeTo: [root, ''], config: config });
-    };
-
-    FrameworkConfiguration.prototype.globalResources = function globalResources(resources) {
-      assertProcessed(this);
-
-      var toAdd = Array.isArray(resources) ? resources : arguments;
-      var resource = void 0;
-      var resourcesRelativeTo = this.resourcesRelativeTo || ['', ''];
-
-      for (var i = 0, ii = toAdd.length; i < ii; ++i) {
-        resource = toAdd[i];
-        if (typeof resource !== 'string') {
-          throw new Error('Invalid resource path [' + resource + ']. Resources must be specified as relative module IDs.');
-        }
-
-        var parent = resourcesRelativeTo[0];
-        var grandParent = resourcesRelativeTo[1];
-        var name = resource;
-
-        if ((resource.startsWith('./') || resource.startsWith('../')) && parent !== '') {
-          name = (0, _aureliaPath.join)(parent, resource);
-        }
-
-        this.resourcesToLoad[name] = { moduleId: name, relativeTo: grandParent };
-      }
-
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.globalName = function globalName(resourcePath, newName) {
-      assertProcessed(this);
-      this.resourcesToLoad[resourcePath] = { moduleId: newName, relativeTo: '' };
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.plugin = function plugin(_plugin, config) {
-      assertProcessed(this);
-
-      if (typeof _plugin === 'string') {
-        return this.plugin({ moduleId: _plugin, resourcesRelativeTo: [_plugin, ''], config: config || {} });
-      }
-
-      this.info.push(_plugin);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype._addNormalizedPlugin = function _addNormalizedPlugin(name, config) {
-      var _this5 = this;
-
-      var plugin = { moduleId: name, resourcesRelativeTo: [name, ''], config: config || {} };
-      this.plugin(plugin);
-
-      this.preTask(function () {
-        var relativeTo = [name, _this5.bootstrapperName];
-        plugin.moduleId = name;
-        plugin.resourcesRelativeTo = relativeTo;
-        return Promise.resolve();
-      });
-
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.defaultBindingLanguage = function defaultBindingLanguage() {
-      return this._addNormalizedPlugin('aurelia-templating-binding');
-    };
-
-    FrameworkConfiguration.prototype.router = function router() {
-      return this._addNormalizedPlugin('aurelia-templating-router');
-    };
-
-    FrameworkConfiguration.prototype.history = function history() {
-      return this._addNormalizedPlugin('aurelia-history-browser');
-    };
-
-    FrameworkConfiguration.prototype.defaultResources = function defaultResources() {
-      return this._addNormalizedPlugin('aurelia-templating-resources');
-    };
-
-    FrameworkConfiguration.prototype.eventAggregator = function eventAggregator() {
-      return this._addNormalizedPlugin('aurelia-event-aggregator');
-    };
-
-    FrameworkConfiguration.prototype.basicConfiguration = function basicConfiguration() {
-      return this.defaultBindingLanguage().defaultResources().eventAggregator();
-    };
-
-    FrameworkConfiguration.prototype.standardConfiguration = function standardConfiguration() {
-      return this.basicConfiguration().history().router();
-    };
-
-    FrameworkConfiguration.prototype.developmentLogging = function developmentLogging() {
-      var _this6 = this;
-
-      this.preTask(function () {
-        return _this6.aurelia.loader.normalize('aurelia-logging-console', _this6.bootstrapperName).then(function (name) {
-          return _this6.aurelia.loader.loadModule(name).then(function (m) {
-            TheLogManager.addAppender(new m.ConsoleAppender());
-            TheLogManager.setLevel(TheLogManager.logLevel.debug);
-          });
-        });
-      });
-
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.apply = function apply() {
-      var _this7 = this;
-
-      if (this.processed) {
-        return Promise.resolve();
-      }
-
-      return runTasks(this, this.preTasks).then(function () {
-        var loader = _this7.aurelia.loader;
-        var info = _this7.info;
-        var current = void 0;
-
-        var next = function next() {
-          current = info.shift();
-          if (current) {
-            return loadPlugin(_this7, loader, current).then(next);
-          }
-
-          _this7.processed = true;
-          return Promise.resolve();
-        };
-
-        return next().then(function () {
-          return runTasks(_this7, _this7.postTasks);
-        });
-      });
-    };
-
-    return FrameworkConfiguration;
-  }();
-
-  exports.FrameworkConfiguration = FrameworkConfiguration;
-  var LogManager = exports.LogManager = TheLogManager;
-});
 define('aurelia-dependency-injection',['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aureliaMetadata, _aureliaPal) {
   'use strict';
 
@@ -13052,6 +12340,763 @@ define('aurelia-dependency-injection',['exports', 'aurelia-metadata', 'aurelia-p
     };
   }
 });
+define('aurelia-event-aggregator',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.EventAggregator = undefined;
+  exports.includeEventsIn = includeEventsIn;
+  exports.configure = configure;
+
+  var LogManager = _interopRequireWildcard(_aureliaLogging);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  
+
+  var logger = LogManager.getLogger('event-aggregator');
+
+  var Handler = function () {
+    function Handler(messageType, callback) {
+      
+
+      this.messageType = messageType;
+      this.callback = callback;
+    }
+
+    Handler.prototype.handle = function handle(message) {
+      if (message instanceof this.messageType) {
+        this.callback.call(null, message);
+      }
+    };
+
+    return Handler;
+  }();
+
+  function invokeCallback(callback, data, event) {
+    try {
+      callback(data, event);
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
+  function invokeHandler(handler, data) {
+    try {
+      handler.handle(data);
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
+  var EventAggregator = exports.EventAggregator = function () {
+    function EventAggregator() {
+      
+
+      this.eventLookup = {};
+      this.messageHandlers = [];
+    }
+
+    EventAggregator.prototype.publish = function publish(event, data) {
+      var subscribers = void 0;
+      var i = void 0;
+
+      if (!event) {
+        throw new Error('Event was invalid.');
+      }
+
+      if (typeof event === 'string') {
+        subscribers = this.eventLookup[event];
+        if (subscribers) {
+          subscribers = subscribers.slice();
+          i = subscribers.length;
+
+          while (i--) {
+            invokeCallback(subscribers[i], data, event);
+          }
+        }
+      } else {
+        subscribers = this.messageHandlers.slice();
+        i = subscribers.length;
+
+        while (i--) {
+          invokeHandler(subscribers[i], event);
+        }
+      }
+    };
+
+    EventAggregator.prototype.subscribe = function subscribe(event, callback) {
+      var handler = void 0;
+      var subscribers = void 0;
+
+      if (!event) {
+        throw new Error('Event channel/type was invalid.');
+      }
+
+      if (typeof event === 'string') {
+        handler = callback;
+        subscribers = this.eventLookup[event] || (this.eventLookup[event] = []);
+      } else {
+        handler = new Handler(event, callback);
+        subscribers = this.messageHandlers;
+      }
+
+      subscribers.push(handler);
+
+      return {
+        dispose: function dispose() {
+          var idx = subscribers.indexOf(handler);
+          if (idx !== -1) {
+            subscribers.splice(idx, 1);
+          }
+        }
+      };
+    };
+
+    EventAggregator.prototype.subscribeOnce = function subscribeOnce(event, callback) {
+      var sub = this.subscribe(event, function (a, b) {
+        sub.dispose();
+        return callback(a, b);
+      });
+
+      return sub;
+    };
+
+    return EventAggregator;
+  }();
+
+  function includeEventsIn(obj) {
+    var ea = new EventAggregator();
+
+    obj.subscribeOnce = function (event, callback) {
+      return ea.subscribeOnce(event, callback);
+    };
+
+    obj.subscribe = function (event, callback) {
+      return ea.subscribe(event, callback);
+    };
+
+    obj.publish = function (event, data) {
+      ea.publish(event, data);
+    };
+
+    return ea;
+  }
+
+  function configure(config) {
+    config.instance(EventAggregator, includeEventsIn(config.aurelia));
+  }
+});
+define('aurelia-framework',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-metadata', 'aurelia-templating', 'aurelia-loader', 'aurelia-task-queue', 'aurelia-path', 'aurelia-pal', 'aurelia-logging'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaMetadata, _aureliaTemplating, _aureliaLoader, _aureliaTaskQueue, _aureliaPath, _aureliaPal, _aureliaLogging) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.LogManager = exports.FrameworkConfiguration = exports.Aurelia = undefined;
+  Object.keys(_aureliaDependencyInjection).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaDependencyInjection[key];
+      }
+    });
+  });
+  Object.keys(_aureliaBinding).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaBinding[key];
+      }
+    });
+  });
+  Object.keys(_aureliaMetadata).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaMetadata[key];
+      }
+    });
+  });
+  Object.keys(_aureliaTemplating).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaTemplating[key];
+      }
+    });
+  });
+  Object.keys(_aureliaLoader).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaLoader[key];
+      }
+    });
+  });
+  Object.keys(_aureliaTaskQueue).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaTaskQueue[key];
+      }
+    });
+  });
+  Object.keys(_aureliaPath).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaPath[key];
+      }
+    });
+  });
+  Object.keys(_aureliaPal).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaPal[key];
+      }
+    });
+  });
+
+  var TheLogManager = _interopRequireWildcard(_aureliaLogging);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  
+
+  function preventActionlessFormSubmit() {
+    _aureliaPal.DOM.addEventListener('submit', function (evt) {
+      var target = evt.target;
+      var action = target.action;
+
+      if (target.tagName.toLowerCase() === 'form' && !action) {
+        evt.preventDefault();
+      }
+    });
+  }
+
+  var Aurelia = exports.Aurelia = function () {
+    function Aurelia(loader, container, resources) {
+      
+
+      this.loader = loader || new _aureliaPal.PLATFORM.Loader();
+      this.container = container || new _aureliaDependencyInjection.Container().makeGlobal();
+      this.resources = resources || new _aureliaTemplating.ViewResources();
+      this.use = new FrameworkConfiguration(this);
+      this.logger = TheLogManager.getLogger('aurelia');
+      this.hostConfigured = false;
+      this.host = null;
+
+      this.use.instance(Aurelia, this);
+      this.use.instance(_aureliaLoader.Loader, this.loader);
+      this.use.instance(_aureliaTemplating.ViewResources, this.resources);
+    }
+
+    Aurelia.prototype.start = function start() {
+      var _this = this;
+
+      if (this._started) {
+        return this._started;
+      }
+
+      this.logger.info('Aurelia Starting');
+      return this._started = this.use.apply().then(function () {
+        preventActionlessFormSubmit();
+
+        if (!_this.container.hasResolver(_aureliaTemplating.BindingLanguage)) {
+          var message = 'You must configure Aurelia with a BindingLanguage implementation.';
+          _this.logger.error(message);
+          throw new Error(message);
+        }
+
+        _this.logger.info('Aurelia Started');
+        var evt = _aureliaPal.DOM.createCustomEvent('aurelia-started', { bubbles: true, cancelable: true });
+        _aureliaPal.DOM.dispatchEvent(evt);
+        return _this;
+      });
+    };
+
+    Aurelia.prototype.enhance = function enhance() {
+      var _this2 = this;
+
+      var bindingContext = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+      var applicationHost = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+      this._configureHost(applicationHost || _aureliaPal.DOM.querySelectorAll('body')[0]);
+
+      return new Promise(function (resolve) {
+        var engine = _this2.container.get(_aureliaTemplating.TemplatingEngine);
+        _this2.root = engine.enhance({ container: _this2.container, element: _this2.host, resources: _this2.resources, bindingContext: bindingContext });
+        _this2.root.attached();
+        _this2._onAureliaComposed();
+        resolve(_this2);
+      });
+    };
+
+    Aurelia.prototype.setRoot = function setRoot() {
+      var _this3 = this;
+
+      var root = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var applicationHost = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+      var instruction = {};
+
+      if (this.root && this.root.viewModel && this.root.viewModel.router) {
+        this.root.viewModel.router.deactivate();
+        this.root.viewModel.router.reset();
+      }
+
+      this._configureHost(applicationHost);
+
+      var engine = this.container.get(_aureliaTemplating.TemplatingEngine);
+      var transaction = this.container.get(_aureliaTemplating.CompositionTransaction);
+      delete transaction.initialComposition;
+
+      if (!root) {
+        if (this.configModuleId) {
+          root = (0, _aureliaPath.relativeToFile)('./app', this.configModuleId);
+        } else {
+          root = 'app';
+        }
+      }
+
+      instruction.viewModel = root;
+      instruction.container = instruction.childContainer = this.container;
+      instruction.viewSlot = this.hostSlot;
+      instruction.host = this.host;
+
+      return engine.compose(instruction).then(function (r) {
+        _this3.root = r;
+        instruction.viewSlot.attached();
+        _this3._onAureliaComposed();
+        return _this3;
+      });
+    };
+
+    Aurelia.prototype._configureHost = function _configureHost(applicationHost) {
+      if (this.hostConfigured) {
+        return;
+      }
+      applicationHost = applicationHost || this.host;
+
+      if (!applicationHost || typeof applicationHost === 'string') {
+        this.host = _aureliaPal.DOM.getElementById(applicationHost || 'applicationHost');
+      } else {
+        this.host = applicationHost;
+      }
+
+      if (!this.host) {
+        throw new Error('No applicationHost was specified.');
+      }
+
+      this.hostConfigured = true;
+      this.host.aurelia = this;
+      this.hostSlot = new _aureliaTemplating.ViewSlot(this.host, true);
+      this.hostSlot.transformChildNodesIntoView();
+      this.container.registerInstance(_aureliaPal.DOM.boundary, this.host);
+    };
+
+    Aurelia.prototype._onAureliaComposed = function _onAureliaComposed() {
+      var evt = _aureliaPal.DOM.createCustomEvent('aurelia-composed', { bubbles: true, cancelable: true });
+      setTimeout(function () {
+        return _aureliaPal.DOM.dispatchEvent(evt);
+      }, 1);
+    };
+
+    return Aurelia;
+  }();
+
+  var logger = TheLogManager.getLogger('aurelia');
+  var extPattern = /\.[^/.]+$/;
+
+  function runTasks(config, tasks) {
+    var current = void 0;
+    var next = function next() {
+      current = tasks.shift();
+      if (current) {
+        return Promise.resolve(current(config)).then(next);
+      }
+
+      return Promise.resolve();
+    };
+
+    return next();
+  }
+
+  function loadPlugin(config, loader, info) {
+    logger.debug('Loading plugin ' + info.moduleId + '.');
+    config.resourcesRelativeTo = info.resourcesRelativeTo;
+
+    var id = info.moduleId;
+
+    if (info.resourcesRelativeTo.length > 1) {
+      return loader.normalize(info.moduleId, info.resourcesRelativeTo[1]).then(function (normalizedId) {
+        return _loadPlugin(normalizedId);
+      });
+    }
+
+    return _loadPlugin(id);
+
+    function _loadPlugin(moduleId) {
+      return loader.loadModule(moduleId).then(function (m) {
+        if ('configure' in m) {
+          return Promise.resolve(m.configure(config, info.config || {})).then(function () {
+            config.resourcesRelativeTo = null;
+            logger.debug('Configured plugin ' + info.moduleId + '.');
+          });
+        }
+
+        config.resourcesRelativeTo = null;
+        logger.debug('Loaded plugin ' + info.moduleId + '.');
+      });
+    }
+  }
+
+  function loadResources(aurelia, resourcesToLoad, appResources) {
+    var viewEngine = aurelia.container.get(_aureliaTemplating.ViewEngine);
+
+    return Promise.all(Object.keys(resourcesToLoad).map(function (n) {
+      return _normalize(resourcesToLoad[n]);
+    })).then(function (loads) {
+      var names = [];
+      var importIds = [];
+
+      loads.forEach(function (l) {
+        names.push(undefined);
+        importIds.push(l.importId);
+      });
+
+      return viewEngine.importViewResources(importIds, names, appResources);
+    });
+
+    function _normalize(load) {
+      var moduleId = load.moduleId;
+      var ext = getExt(moduleId);
+
+      if (isOtherResource(moduleId)) {
+        moduleId = removeExt(moduleId);
+      }
+
+      return aurelia.loader.normalize(moduleId, load.relativeTo).then(function (normalized) {
+        return {
+          name: load.moduleId,
+          importId: isOtherResource(load.moduleId) ? addOriginalExt(normalized, ext) : normalized
+        };
+      });
+    }
+
+    function isOtherResource(name) {
+      var ext = getExt(name);
+      if (!ext) return false;
+      if (ext === '') return false;
+      if (ext === '.js' || ext === '.ts') return false;
+      return true;
+    }
+
+    function removeExt(name) {
+      return name.replace(extPattern, '');
+    }
+
+    function addOriginalExt(normalized, ext) {
+      return removeExt(normalized) + '.' + ext;
+    }
+  }
+
+  function getExt(name) {
+    var match = name.match(extPattern);
+    if (match && match.length > 0) {
+      return match[0].split('.')[1];
+    }
+  }
+
+  function assertProcessed(plugins) {
+    if (plugins.processed) {
+      throw new Error('This config instance has already been applied. To load more plugins or global resources, create a new FrameworkConfiguration instance.');
+    }
+  }
+
+  var FrameworkConfiguration = function () {
+    function FrameworkConfiguration(aurelia) {
+      var _this4 = this;
+
+      
+
+      this.aurelia = aurelia;
+      this.container = aurelia.container;
+      this.info = [];
+      this.processed = false;
+      this.preTasks = [];
+      this.postTasks = [];
+      this.resourcesToLoad = {};
+      this.preTask(function () {
+        return aurelia.loader.normalize('aurelia-bootstrapper').then(function (name) {
+          return _this4.bootstrapperName = name;
+        });
+      });
+      this.postTask(function () {
+        return loadResources(aurelia, _this4.resourcesToLoad, aurelia.resources);
+      });
+    }
+
+    FrameworkConfiguration.prototype.instance = function instance(type, _instance) {
+      this.container.registerInstance(type, _instance);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.singleton = function singleton(type, implementation) {
+      this.container.registerSingleton(type, implementation);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.transient = function transient(type, implementation) {
+      this.container.registerTransient(type, implementation);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.preTask = function preTask(task) {
+      assertProcessed(this);
+      this.preTasks.push(task);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.postTask = function postTask(task) {
+      assertProcessed(this);
+      this.postTasks.push(task);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.feature = function feature(plugin) {
+      var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+      var hasIndex = /\/index$/i.test(plugin);
+      var moduleId = hasIndex || getExt(plugin) ? plugin : plugin + '/index';
+      var root = hasIndex ? plugin.substr(0, plugin.length - 6) : plugin;
+      return this.plugin({ moduleId: moduleId, resourcesRelativeTo: [root, ''], config: config });
+    };
+
+    FrameworkConfiguration.prototype.globalResources = function globalResources(resources) {
+      assertProcessed(this);
+
+      var toAdd = Array.isArray(resources) ? resources : arguments;
+      var resource = void 0;
+      var resourcesRelativeTo = this.resourcesRelativeTo || ['', ''];
+
+      for (var i = 0, ii = toAdd.length; i < ii; ++i) {
+        resource = toAdd[i];
+        if (typeof resource !== 'string') {
+          throw new Error('Invalid resource path [' + resource + ']. Resources must be specified as relative module IDs.');
+        }
+
+        var parent = resourcesRelativeTo[0];
+        var grandParent = resourcesRelativeTo[1];
+        var name = resource;
+
+        if ((resource.startsWith('./') || resource.startsWith('../')) && parent !== '') {
+          name = (0, _aureliaPath.join)(parent, resource);
+        }
+
+        this.resourcesToLoad[name] = { moduleId: name, relativeTo: grandParent };
+      }
+
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.globalName = function globalName(resourcePath, newName) {
+      assertProcessed(this);
+      this.resourcesToLoad[resourcePath] = { moduleId: newName, relativeTo: '' };
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.plugin = function plugin(_plugin, config) {
+      assertProcessed(this);
+
+      if (typeof _plugin === 'string') {
+        return this.plugin({ moduleId: _plugin, resourcesRelativeTo: [_plugin, ''], config: config || {} });
+      }
+
+      this.info.push(_plugin);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype._addNormalizedPlugin = function _addNormalizedPlugin(name, config) {
+      var _this5 = this;
+
+      var plugin = { moduleId: name, resourcesRelativeTo: [name, ''], config: config || {} };
+      this.plugin(plugin);
+
+      this.preTask(function () {
+        var relativeTo = [name, _this5.bootstrapperName];
+        plugin.moduleId = name;
+        plugin.resourcesRelativeTo = relativeTo;
+        return Promise.resolve();
+      });
+
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.defaultBindingLanguage = function defaultBindingLanguage() {
+      return this._addNormalizedPlugin('aurelia-templating-binding');
+    };
+
+    FrameworkConfiguration.prototype.router = function router() {
+      return this._addNormalizedPlugin('aurelia-templating-router');
+    };
+
+    FrameworkConfiguration.prototype.history = function history() {
+      return this._addNormalizedPlugin('aurelia-history-browser');
+    };
+
+    FrameworkConfiguration.prototype.defaultResources = function defaultResources() {
+      return this._addNormalizedPlugin('aurelia-templating-resources');
+    };
+
+    FrameworkConfiguration.prototype.eventAggregator = function eventAggregator() {
+      return this._addNormalizedPlugin('aurelia-event-aggregator');
+    };
+
+    FrameworkConfiguration.prototype.basicConfiguration = function basicConfiguration() {
+      return this.defaultBindingLanguage().defaultResources().eventAggregator();
+    };
+
+    FrameworkConfiguration.prototype.standardConfiguration = function standardConfiguration() {
+      return this.basicConfiguration().history().router();
+    };
+
+    FrameworkConfiguration.prototype.developmentLogging = function developmentLogging() {
+      var _this6 = this;
+
+      this.preTask(function () {
+        return _this6.aurelia.loader.normalize('aurelia-logging-console', _this6.bootstrapperName).then(function (name) {
+          return _this6.aurelia.loader.loadModule(name).then(function (m) {
+            TheLogManager.addAppender(new m.ConsoleAppender());
+            TheLogManager.setLevel(TheLogManager.logLevel.debug);
+          });
+        });
+      });
+
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.apply = function apply() {
+      var _this7 = this;
+
+      if (this.processed) {
+        return Promise.resolve();
+      }
+
+      return runTasks(this, this.preTasks).then(function () {
+        var loader = _this7.aurelia.loader;
+        var info = _this7.info;
+        var current = void 0;
+
+        var next = function next() {
+          current = info.shift();
+          if (current) {
+            return loadPlugin(_this7, loader, current).then(next);
+          }
+
+          _this7.processed = true;
+          return Promise.resolve();
+        };
+
+        return next().then(function () {
+          return runTasks(_this7, _this7.postTasks);
+        });
+      });
+    };
+
+    return FrameworkConfiguration;
+  }();
+
+  exports.FrameworkConfiguration = FrameworkConfiguration;
+  var LogManager = exports.LogManager = TheLogManager;
+});
+define('aurelia-history',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  function mi(name) {
+    throw new Error('History must implement ' + name + '().');
+  }
+
+  var History = exports.History = function () {
+    function History() {
+      
+    }
+
+    History.prototype.activate = function activate(options) {
+      mi('activate');
+    };
+
+    History.prototype.deactivate = function deactivate() {
+      mi('deactivate');
+    };
+
+    History.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
+      mi('getAbsoluteRoot');
+    };
+
+    History.prototype.navigate = function navigate(fragment, options) {
+      mi('navigate');
+    };
+
+    History.prototype.navigateBack = function navigateBack() {
+      mi('navigateBack');
+    };
+
+    History.prototype.setTitle = function setTitle(title) {
+      mi('setTitle');
+    };
+
+    return History;
+  }();
+});
 define('aurelia-history-browser',['exports', 'aurelia-pal', 'aurelia-history'], function (exports, _aureliaPal, _aureliaHistory) {
   'use strict';
 
@@ -13377,51 +13422,6 @@ define('aurelia-history-browser',['exports', 'aurelia-pal', 'aurelia-history'], 
   function createOrigin(protocol, hostname, port) {
     return protocol + '//' + hostname + (port ? ':' + port : '');
   }
-});
-define('aurelia-history',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  
-
-  function mi(name) {
-    throw new Error('History must implement ' + name + '().');
-  }
-
-  var History = exports.History = function () {
-    function History() {
-      
-    }
-
-    History.prototype.activate = function activate(options) {
-      mi('activate');
-    };
-
-    History.prototype.deactivate = function deactivate() {
-      mi('deactivate');
-    };
-
-    History.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
-      mi('getAbsoluteRoot');
-    };
-
-    History.prototype.navigate = function navigate(fragment, options) {
-      mi('navigate');
-    };
-
-    History.prototype.navigateBack = function navigateBack() {
-      mi('navigateBack');
-    };
-
-    History.prototype.setTitle = function setTitle(title) {
-      mi('setTitle');
-    };
-
-    return History;
-  }();
 });
 define('aurelia-loader',['exports', 'aurelia-path', 'aurelia-metadata'], function (exports, _aureliaPath, _aureliaMetadata) {
   'use strict';
@@ -14313,108 +14313,6 @@ define('aurelia-metadata',['exports', 'aurelia-pal'], function (exports, _aureli
     return result;
   };
 });
-define('aurelia-pal',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.AggregateError = AggregateError;
-  exports.initializePAL = initializePAL;
-  exports.reset = reset;
-  function AggregateError(message, innerError, skipIfAlreadyAggregate) {
-    if (innerError) {
-      if (innerError.innerError && skipIfAlreadyAggregate) {
-        return innerError;
-      }
-
-      var separator = '\n------------------------------------------------\n';
-
-      message += separator + 'Inner Error:\n';
-
-      if (typeof innerError === 'string') {
-        message += 'Message: ' + innerError;
-      } else {
-        if (innerError.message) {
-          message += 'Message: ' + innerError.message;
-        } else {
-          message += 'Unknown Inner Error Type. Displaying Inner Error as JSON:\n ' + JSON.stringify(innerError, null, '  ');
-        }
-
-        if (innerError.stack) {
-          message += '\nInner Error Stack:\n' + innerError.stack;
-          message += '\nEnd Inner Error Stack';
-        }
-      }
-
-      message += separator;
-    }
-
-    var e = new Error(message);
-    if (innerError) {
-      e.innerError = innerError;
-    }
-
-    return e;
-  }
-
-  var FEATURE = exports.FEATURE = {};
-
-  var PLATFORM = exports.PLATFORM = {
-    noop: function noop() {},
-    eachModule: function eachModule() {},
-    moduleName: function (_moduleName) {
-      function moduleName(_x) {
-        return _moduleName.apply(this, arguments);
-      }
-
-      moduleName.toString = function () {
-        return _moduleName.toString();
-      };
-
-      return moduleName;
-    }(function (moduleName) {
-      return moduleName;
-    })
-  };
-
-  PLATFORM.global = function () {
-    if (typeof self !== 'undefined') {
-      return self;
-    }
-
-    if (typeof global !== 'undefined') {
-      return global;
-    }
-
-    return new Function('return this')();
-  }();
-
-  var DOM = exports.DOM = {};
-  var isInitialized = exports.isInitialized = false;
-  function initializePAL(callback) {
-    if (isInitialized) {
-      return;
-    }
-    exports.isInitialized = isInitialized = true;
-    if (typeof Object.getPropertyDescriptor !== 'function') {
-      Object.getPropertyDescriptor = function (subject, name) {
-        var pd = Object.getOwnPropertyDescriptor(subject, name);
-        var proto = Object.getPrototypeOf(subject);
-        while (typeof pd === 'undefined' && proto !== null) {
-          pd = Object.getOwnPropertyDescriptor(proto, name);
-          proto = Object.getPrototypeOf(proto);
-        }
-        return pd;
-      };
-    }
-
-    callback(PLATFORM, FEATURE, DOM);
-  }
-  function reset() {
-    exports.isInitialized = isInitialized = false;
-  }
-});
 define('aurelia-pal-browser',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
   'use strict';
 
@@ -14897,6 +14795,108 @@ define('aurelia-pal-browser',['exports', 'aurelia-pal'], function (exports, _aur
     });
   }
 });
+define('aurelia-pal',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.AggregateError = AggregateError;
+  exports.initializePAL = initializePAL;
+  exports.reset = reset;
+  function AggregateError(message, innerError, skipIfAlreadyAggregate) {
+    if (innerError) {
+      if (innerError.innerError && skipIfAlreadyAggregate) {
+        return innerError;
+      }
+
+      var separator = '\n------------------------------------------------\n';
+
+      message += separator + 'Inner Error:\n';
+
+      if (typeof innerError === 'string') {
+        message += 'Message: ' + innerError;
+      } else {
+        if (innerError.message) {
+          message += 'Message: ' + innerError.message;
+        } else {
+          message += 'Unknown Inner Error Type. Displaying Inner Error as JSON:\n ' + JSON.stringify(innerError, null, '  ');
+        }
+
+        if (innerError.stack) {
+          message += '\nInner Error Stack:\n' + innerError.stack;
+          message += '\nEnd Inner Error Stack';
+        }
+      }
+
+      message += separator;
+    }
+
+    var e = new Error(message);
+    if (innerError) {
+      e.innerError = innerError;
+    }
+
+    return e;
+  }
+
+  var FEATURE = exports.FEATURE = {};
+
+  var PLATFORM = exports.PLATFORM = {
+    noop: function noop() {},
+    eachModule: function eachModule() {},
+    moduleName: function (_moduleName) {
+      function moduleName(_x) {
+        return _moduleName.apply(this, arguments);
+      }
+
+      moduleName.toString = function () {
+        return _moduleName.toString();
+      };
+
+      return moduleName;
+    }(function (moduleName) {
+      return moduleName;
+    })
+  };
+
+  PLATFORM.global = function () {
+    if (typeof self !== 'undefined') {
+      return self;
+    }
+
+    if (typeof global !== 'undefined') {
+      return global;
+    }
+
+    return new Function('return this')();
+  }();
+
+  var DOM = exports.DOM = {};
+  var isInitialized = exports.isInitialized = false;
+  function initializePAL(callback) {
+    if (isInitialized) {
+      return;
+    }
+    exports.isInitialized = isInitialized = true;
+    if (typeof Object.getPropertyDescriptor !== 'function') {
+      Object.getPropertyDescriptor = function (subject, name) {
+        var pd = Object.getOwnPropertyDescriptor(subject, name);
+        var proto = Object.getPrototypeOf(subject);
+        while (typeof pd === 'undefined' && proto !== null) {
+          pd = Object.getOwnPropertyDescriptor(proto, name);
+          proto = Object.getPrototypeOf(proto);
+        }
+        return pd;
+      };
+    }
+
+    callback(PLATFORM, FEATURE, DOM);
+  }
+  function reset() {
+    exports.isInitialized = isInitialized = false;
+  }
+});
 define('aurelia-path',['exports'], function (exports) {
   'use strict';
 
@@ -15110,1360 +15110,6 @@ define('aurelia-path',['exports'], function (exports) {
       }
     }
     return queryParams;
-  }
-});
-define('aurelia-route-recognizer',['exports', 'aurelia-path'], function (exports, _aureliaPath) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.RouteRecognizer = exports.EpsilonSegment = exports.StarSegment = exports.DynamicSegment = exports.StaticSegment = exports.State = undefined;
-
-  
-
-  var State = exports.State = function () {
-    function State(charSpec) {
-      
-
-      this.charSpec = charSpec;
-      this.nextStates = [];
-    }
-
-    State.prototype.get = function get(charSpec) {
-      for (var _iterator = this.nextStates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
-        }
-
-        var child = _ref;
-
-        var isEqual = child.charSpec.validChars === charSpec.validChars && child.charSpec.invalidChars === charSpec.invalidChars;
-
-        if (isEqual) {
-          return child;
-        }
-      }
-
-      return undefined;
-    };
-
-    State.prototype.put = function put(charSpec) {
-      var state = this.get(charSpec);
-
-      if (state) {
-        return state;
-      }
-
-      state = new State(charSpec);
-
-      this.nextStates.push(state);
-
-      if (charSpec.repeat) {
-        state.nextStates.push(state);
-      }
-
-      return state;
-    };
-
-    State.prototype.match = function match(ch) {
-      var nextStates = this.nextStates;
-      var results = [];
-
-      for (var i = 0, l = nextStates.length; i < l; i++) {
-        var child = nextStates[i];
-        var charSpec = child.charSpec;
-
-        if (charSpec.validChars !== undefined) {
-          if (charSpec.validChars.indexOf(ch) !== -1) {
-            results.push(child);
-          }
-        } else if (charSpec.invalidChars !== undefined) {
-          if (charSpec.invalidChars.indexOf(ch) === -1) {
-            results.push(child);
-          }
-        }
-      }
-
-      return results;
-    };
-
-    return State;
-  }();
-
-  var specials = ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'];
-
-  var escapeRegex = new RegExp('(\\' + specials.join('|\\') + ')', 'g');
-
-  var StaticSegment = exports.StaticSegment = function () {
-    function StaticSegment(string, caseSensitive) {
-      
-
-      this.string = string;
-      this.caseSensitive = caseSensitive;
-    }
-
-    StaticSegment.prototype.eachChar = function eachChar(callback) {
-      var s = this.string;
-      for (var i = 0, ii = s.length; i < ii; ++i) {
-        var ch = s[i];
-        callback({ validChars: this.caseSensitive ? ch : ch.toUpperCase() + ch.toLowerCase() });
-      }
-    };
-
-    StaticSegment.prototype.regex = function regex() {
-      return this.string.replace(escapeRegex, '\\$1');
-    };
-
-    StaticSegment.prototype.generate = function generate() {
-      return this.string;
-    };
-
-    return StaticSegment;
-  }();
-
-  var DynamicSegment = exports.DynamicSegment = function () {
-    function DynamicSegment(name, optional) {
-      
-
-      this.name = name;
-      this.optional = optional;
-    }
-
-    DynamicSegment.prototype.eachChar = function eachChar(callback) {
-      callback({ invalidChars: '/', repeat: true });
-    };
-
-    DynamicSegment.prototype.regex = function regex() {
-      return this.optional ? '([^/]+)?' : '([^/]+)';
-    };
-
-    DynamicSegment.prototype.generate = function generate(params, consumed) {
-      consumed[this.name] = true;
-      return params[this.name];
-    };
-
-    return DynamicSegment;
-  }();
-
-  var StarSegment = exports.StarSegment = function () {
-    function StarSegment(name) {
-      
-
-      this.name = name;
-    }
-
-    StarSegment.prototype.eachChar = function eachChar(callback) {
-      callback({ invalidChars: '', repeat: true });
-    };
-
-    StarSegment.prototype.regex = function regex() {
-      return '(.+)';
-    };
-
-    StarSegment.prototype.generate = function generate(params, consumed) {
-      consumed[this.name] = true;
-      return params[this.name];
-    };
-
-    return StarSegment;
-  }();
-
-  var EpsilonSegment = exports.EpsilonSegment = function () {
-    function EpsilonSegment() {
-      
-    }
-
-    EpsilonSegment.prototype.eachChar = function eachChar() {};
-
-    EpsilonSegment.prototype.regex = function regex() {
-      return '';
-    };
-
-    EpsilonSegment.prototype.generate = function generate() {
-      return '';
-    };
-
-    return EpsilonSegment;
-  }();
-
-  var RouteRecognizer = exports.RouteRecognizer = function () {
-    function RouteRecognizer() {
-      
-
-      this.rootState = new State();
-      this.names = {};
-    }
-
-    RouteRecognizer.prototype.add = function add(route) {
-      var _this = this;
-
-      if (Array.isArray(route)) {
-        route.forEach(function (r) {
-          return _this.add(r);
-        });
-        return undefined;
-      }
-
-      var currentState = this.rootState;
-      var regex = '^';
-      var types = { statics: 0, dynamics: 0, stars: 0 };
-      var names = [];
-      var routeName = route.handler.name;
-      var isEmpty = true;
-      var isAllOptional = true;
-      var segments = parse(route.path, names, types, route.caseSensitive);
-
-      for (var i = 0, ii = segments.length; i < ii; i++) {
-        var segment = segments[i];
-        if (segment instanceof EpsilonSegment) {
-          continue;
-        }
-
-        isEmpty = false;
-        isAllOptional = isAllOptional && segment.optional;
-
-        currentState = addSegment(currentState, segment);
-        regex += segment.optional ? '/?' : '/';
-        regex += segment.regex();
-      }
-
-      if (isAllOptional) {
-        if (isEmpty) {
-          currentState = currentState.put({ validChars: '/' });
-          regex += '/';
-        } else {
-          var finalState = this.rootState.put({ validChars: '/' });
-          currentState.epsilon = [finalState];
-          currentState = finalState;
-        }
-      }
-
-      var handlers = [{ handler: route.handler, names: names }];
-
-      if (routeName) {
-        var routeNames = Array.isArray(routeName) ? routeName : [routeName];
-        for (var _i2 = 0; _i2 < routeNames.length; _i2++) {
-          this.names[routeNames[_i2]] = {
-            segments: segments,
-            handlers: handlers
-          };
-        }
-      }
-
-      currentState.handlers = handlers;
-      currentState.regex = new RegExp(regex + '$', route.caseSensitive ? '' : 'i');
-      currentState.types = types;
-
-      return currentState;
-    };
-
-    RouteRecognizer.prototype.handlersFor = function handlersFor(name) {
-      var route = this.names[name];
-      if (!route) {
-        throw new Error('There is no route named ' + name);
-      }
-
-      return [].concat(route.handlers);
-    };
-
-    RouteRecognizer.prototype.hasRoute = function hasRoute(name) {
-      return !!this.names[name];
-    };
-
-    RouteRecognizer.prototype.generate = function generate(name, params) {
-      var route = this.names[name];
-      if (!route) {
-        throw new Error('There is no route named ' + name);
-      }
-
-      var handler = route.handlers[0].handler;
-      if (handler.generationUsesHref) {
-        return handler.href;
-      }
-
-      var routeParams = Object.assign({}, params);
-      var segments = route.segments;
-      var consumed = {};
-      var output = '';
-
-      for (var i = 0, l = segments.length; i < l; i++) {
-        var segment = segments[i];
-
-        if (segment instanceof EpsilonSegment) {
-          continue;
-        }
-
-        var segmentValue = segment.generate(routeParams, consumed);
-        if (segmentValue === null || segmentValue === undefined) {
-          if (!segment.optional) {
-            throw new Error('A value is required for route parameter \'' + segment.name + '\' in route \'' + name + '\'.');
-          }
-        } else {
-          output += '/';
-          output += segmentValue;
-        }
-      }
-
-      if (output.charAt(0) !== '/') {
-        output = '/' + output;
-      }
-
-      for (var param in consumed) {
-        delete routeParams[param];
-      }
-
-      var queryString = (0, _aureliaPath.buildQueryString)(routeParams);
-      output += queryString ? '?' + queryString : '';
-
-      return output;
-    };
-
-    RouteRecognizer.prototype.recognize = function recognize(path) {
-      var states = [this.rootState];
-      var queryParams = {};
-      var isSlashDropped = false;
-      var normalizedPath = path;
-
-      var queryStart = normalizedPath.indexOf('?');
-      if (queryStart !== -1) {
-        var queryString = normalizedPath.substr(queryStart + 1, normalizedPath.length);
-        normalizedPath = normalizedPath.substr(0, queryStart);
-        queryParams = (0, _aureliaPath.parseQueryString)(queryString);
-      }
-
-      normalizedPath = decodeURI(normalizedPath);
-
-      if (normalizedPath.charAt(0) !== '/') {
-        normalizedPath = '/' + normalizedPath;
-      }
-
-      var pathLen = normalizedPath.length;
-      if (pathLen > 1 && normalizedPath.charAt(pathLen - 1) === '/') {
-        normalizedPath = normalizedPath.substr(0, pathLen - 1);
-        isSlashDropped = true;
-      }
-
-      for (var i = 0, l = normalizedPath.length; i < l; i++) {
-        states = recognizeChar(states, normalizedPath.charAt(i));
-        if (!states.length) {
-          break;
-        }
-      }
-
-      var solutions = [];
-      for (var _i3 = 0, _l = states.length; _i3 < _l; _i3++) {
-        if (states[_i3].handlers) {
-          solutions.push(states[_i3]);
-        }
-      }
-
-      states = sortSolutions(solutions);
-
-      var state = solutions[0];
-      if (state && state.handlers) {
-        if (isSlashDropped && state.regex.source.slice(-5) === '(.+)$') {
-          normalizedPath = normalizedPath + '/';
-        }
-
-        return findHandler(state, normalizedPath, queryParams);
-      }
-
-      return undefined;
-    };
-
-    return RouteRecognizer;
-  }();
-
-  var RecognizeResults = function RecognizeResults(queryParams) {
-    
-
-    this.splice = Array.prototype.splice;
-    this.slice = Array.prototype.slice;
-    this.push = Array.prototype.push;
-    this.length = 0;
-    this.queryParams = queryParams || {};
-  };
-
-  function parse(route, names, types, caseSensitive) {
-    var normalizedRoute = route;
-    if (route.charAt(0) === '/') {
-      normalizedRoute = route.substr(1);
-    }
-
-    var results = [];
-
-    var splitRoute = normalizedRoute.split('/');
-    for (var i = 0, ii = splitRoute.length; i < ii; ++i) {
-      var segment = splitRoute[i];
-
-      var match = segment.match(/^:([^?]+)(\?)?$/);
-      if (match) {
-        var _match = match;
-        var _name = _match[1];
-        var optional = _match[2];
-
-        if (_name.indexOf('=') !== -1) {
-          throw new Error('Parameter ' + _name + ' in route ' + route + ' has a default value, which is not supported.');
-        }
-        results.push(new DynamicSegment(_name, !!optional));
-        names.push(_name);
-        types.dynamics++;
-        continue;
-      }
-
-      match = segment.match(/^\*(.+)$/);
-      if (match) {
-        results.push(new StarSegment(match[1]));
-        names.push(match[1]);
-        types.stars++;
-      } else if (segment === '') {
-        results.push(new EpsilonSegment());
-      } else {
-        results.push(new StaticSegment(segment, caseSensitive));
-        types.statics++;
-      }
-    }
-
-    return results;
-  }
-
-  function sortSolutions(states) {
-    return states.sort(function (a, b) {
-      if (a.types.stars !== b.types.stars) {
-        return a.types.stars - b.types.stars;
-      }
-
-      if (a.types.stars) {
-        if (a.types.statics !== b.types.statics) {
-          return b.types.statics - a.types.statics;
-        }
-        if (a.types.dynamics !== b.types.dynamics) {
-          return b.types.dynamics - a.types.dynamics;
-        }
-      }
-
-      if (a.types.dynamics !== b.types.dynamics) {
-        return a.types.dynamics - b.types.dynamics;
-      }
-
-      if (a.types.statics !== b.types.statics) {
-        return b.types.statics - a.types.statics;
-      }
-
-      return 0;
-    });
-  }
-
-  function recognizeChar(states, ch) {
-    var nextStates = [];
-
-    for (var i = 0, l = states.length; i < l; i++) {
-      var state = states[i];
-      nextStates.push.apply(nextStates, state.match(ch));
-    }
-
-    var skippableStates = nextStates.filter(function (s) {
-      return s.epsilon;
-    });
-
-    var _loop = function _loop() {
-      var newStates = [];
-      skippableStates.forEach(function (s) {
-        nextStates.push.apply(nextStates, s.epsilon);
-        newStates.push.apply(newStates, s.epsilon);
-      });
-      skippableStates = newStates.filter(function (s) {
-        return s.epsilon;
-      });
-    };
-
-    while (skippableStates.length > 0) {
-      _loop();
-    }
-
-    return nextStates;
-  }
-
-  function findHandler(state, path, queryParams) {
-    var handlers = state.handlers;
-    var regex = state.regex;
-    var captures = path.match(regex);
-    var currentCapture = 1;
-    var result = new RecognizeResults(queryParams);
-
-    for (var i = 0, l = handlers.length; i < l; i++) {
-      var _handler = handlers[i];
-      var _names = _handler.names;
-      var _params = {};
-
-      for (var j = 0, m = _names.length; j < m; j++) {
-        _params[_names[j]] = captures[currentCapture++];
-      }
-
-      result.push({ handler: _handler.handler, params: _params, isDynamic: !!_names.length });
-    }
-
-    return result;
-  }
-
-  function addSegment(currentState, segment) {
-    var state = currentState.put({ validChars: '/' });
-    segment.eachChar(function (ch) {
-      state = state.put(ch);
-    });
-
-    if (segment.optional) {
-      currentState.epsilon = currentState.epsilon || [];
-      currentState.epsilon.push(state);
-    }
-
-    return state;
-  }
-});
-define('aurelia-polyfills',['aurelia-pal'], function (_aureliaPal) {
-  'use strict';
-
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-  };
-
-  if (typeof FEATURE_NO_ES2015 === 'undefined') {
-
-    (function (Object, GOPS) {
-      'use strict';
-
-      if (GOPS in Object) return;
-
-      var setDescriptor,
-          G = _aureliaPal.PLATFORM.global,
-          id = 0,
-          random = '' + Math.random(),
-          prefix = '__\x01symbol:',
-          prefixLength = prefix.length,
-          internalSymbol = '__\x01symbol@@' + random,
-          DP = 'defineProperty',
-          DPies = 'defineProperties',
-          GOPN = 'getOwnPropertyNames',
-          GOPD = 'getOwnPropertyDescriptor',
-          PIE = 'propertyIsEnumerable',
-          gOPN = Object[GOPN],
-          gOPD = Object[GOPD],
-          create = Object.create,
-          keys = Object.keys,
-          defineProperty = Object[DP],
-          $defineProperties = Object[DPies],
-          descriptor = gOPD(Object, GOPN),
-          ObjectProto = Object.prototype,
-          hOP = ObjectProto.hasOwnProperty,
-          pIE = ObjectProto[PIE],
-          toString = ObjectProto.toString,
-          indexOf = Array.prototype.indexOf || function (v) {
-        for (var i = this.length; i-- && this[i] !== v;) {}
-        return i;
-      },
-          addInternalIfNeeded = function addInternalIfNeeded(o, uid, enumerable) {
-        if (!hOP.call(o, internalSymbol)) {
-          defineProperty(o, internalSymbol, {
-            enumerable: false,
-            configurable: false,
-            writable: false,
-            value: {}
-          });
-        }
-        o[internalSymbol]['@@' + uid] = enumerable;
-      },
-          createWithSymbols = function createWithSymbols(proto, descriptors) {
-        var self = create(proto);
-        if (descriptors !== null && (typeof descriptors === 'undefined' ? 'undefined' : _typeof(descriptors)) === 'object') {
-          gOPN(descriptors).forEach(function (key) {
-            if (propertyIsEnumerable.call(descriptors, key)) {
-              $defineProperty(self, key, descriptors[key]);
-            }
-          });
-        }
-        return self;
-      },
-          copyAsNonEnumerable = function copyAsNonEnumerable(descriptor) {
-        var newDescriptor = create(descriptor);
-        newDescriptor.enumerable = false;
-        return newDescriptor;
-      },
-          get = function get() {},
-          onlyNonSymbols = function onlyNonSymbols(name) {
-        return name != internalSymbol && !hOP.call(source, name);
-      },
-          onlySymbols = function onlySymbols(name) {
-        return name != internalSymbol && hOP.call(source, name);
-      },
-          propertyIsEnumerable = function propertyIsEnumerable(key) {
-        var uid = '' + key;
-        return onlySymbols(uid) ? hOP.call(this, uid) && this[internalSymbol]['@@' + uid] : pIE.call(this, key);
-      },
-          setAndGetSymbol = function setAndGetSymbol(uid) {
-        var descriptor = {
-          enumerable: false,
-          configurable: true,
-          get: get,
-          set: function set(value) {
-            setDescriptor(this, uid, {
-              enumerable: false,
-              configurable: true,
-              writable: true,
-              value: value
-            });
-            addInternalIfNeeded(this, uid, true);
-          }
-        };
-        defineProperty(ObjectProto, uid, descriptor);
-        return source[uid] = defineProperty(Object(uid), 'constructor', sourceConstructor);
-      },
-          _Symbol = function _Symbol2(description) {
-        if (this && this !== G) {
-          throw new TypeError('Symbol is not a constructor');
-        }
-        return setAndGetSymbol(prefix.concat(description || '', random, ++id));
-      },
-          source = create(null),
-          sourceConstructor = { value: _Symbol },
-          sourceMap = function sourceMap(uid) {
-        return source[uid];
-      },
-          $defineProperty = function defineProp(o, key, descriptor) {
-        var uid = '' + key;
-        if (onlySymbols(uid)) {
-          setDescriptor(o, uid, descriptor.enumerable ? copyAsNonEnumerable(descriptor) : descriptor);
-          addInternalIfNeeded(o, uid, !!descriptor.enumerable);
-        } else {
-          defineProperty(o, key, descriptor);
-        }
-        return o;
-      },
-          $getOwnPropertySymbols = function getOwnPropertySymbols(o) {
-        var cof = toString.call(o);
-        o = cof === '[object String]' ? o.split('') : Object(o);
-        return gOPN(o).filter(onlySymbols).map(sourceMap);
-      };
-
-      descriptor.value = $defineProperty;
-      defineProperty(Object, DP, descriptor);
-
-      descriptor.value = $getOwnPropertySymbols;
-      defineProperty(Object, GOPS, descriptor);
-
-      descriptor.value = function getOwnPropertyNames(o) {
-        return gOPN(o).filter(onlyNonSymbols);
-      };
-      defineProperty(Object, GOPN, descriptor);
-
-      descriptor.value = function defineProperties(o, descriptors) {
-        var symbols = $getOwnPropertySymbols(descriptors);
-        if (symbols.length) {
-          keys(descriptors).concat(symbols).forEach(function (uid) {
-            if (propertyIsEnumerable.call(descriptors, uid)) {
-              $defineProperty(o, uid, descriptors[uid]);
-            }
-          });
-        } else {
-          $defineProperties(o, descriptors);
-        }
-        return o;
-      };
-      defineProperty(Object, DPies, descriptor);
-
-      descriptor.value = propertyIsEnumerable;
-      defineProperty(ObjectProto, PIE, descriptor);
-
-      descriptor.value = _Symbol;
-      defineProperty(G, 'Symbol', descriptor);
-
-      descriptor.value = function (key) {
-        var uid = prefix.concat(prefix, key, random);
-        return uid in ObjectProto ? source[uid] : setAndGetSymbol(uid);
-      };
-      defineProperty(_Symbol, 'for', descriptor);
-
-      descriptor.value = function (symbol) {
-        return hOP.call(source, symbol) ? symbol.slice(prefixLength * 2, -random.length) : void 0;
-      };
-      defineProperty(_Symbol, 'keyFor', descriptor);
-
-      descriptor.value = function getOwnPropertyDescriptor(o, key) {
-        var descriptor = gOPD(o, key);
-        if (descriptor && onlySymbols(key)) {
-          descriptor.enumerable = propertyIsEnumerable.call(o, key);
-        }
-        return descriptor;
-      };
-      defineProperty(Object, GOPD, descriptor);
-
-      descriptor.value = function (proto, descriptors) {
-        return arguments.length === 1 ? create(proto) : createWithSymbols(proto, descriptors);
-      };
-      defineProperty(Object, 'create', descriptor);
-
-      descriptor.value = function () {
-        var str = toString.call(this);
-        return str === '[object String]' && onlySymbols(this) ? '[object Symbol]' : str;
-      };
-      defineProperty(ObjectProto, 'toString', descriptor);
-
-      try {
-        setDescriptor = create(defineProperty({}, prefix, {
-          get: function get() {
-            return defineProperty(this, prefix, { value: false })[prefix];
-          }
-        }))[prefix] || defineProperty;
-      } catch (o_O) {
-        setDescriptor = function setDescriptor(o, key, descriptor) {
-          var protoDescriptor = gOPD(ObjectProto, key);
-          delete ObjectProto[key];
-          defineProperty(o, key, descriptor);
-          defineProperty(ObjectProto, key, protoDescriptor);
-        };
-      }
-    })(Object, 'getOwnPropertySymbols');
-
-    (function (O, S) {
-      var dP = O.defineProperty,
-          ObjectProto = O.prototype,
-          toString = ObjectProto.toString,
-          toStringTag = 'toStringTag',
-          descriptor;
-      ['iterator', 'match', 'replace', 'search', 'split', 'hasInstance', 'isConcatSpreadable', 'unscopables', 'species', 'toPrimitive', toStringTag].forEach(function (name) {
-        if (!(name in Symbol)) {
-          dP(Symbol, name, { value: Symbol(name) });
-          switch (name) {
-            case toStringTag:
-              descriptor = O.getOwnPropertyDescriptor(ObjectProto, 'toString');
-              descriptor.value = function () {
-                var str = toString.call(this),
-                    tst = typeof this === 'undefined' || this === null ? undefined : this[Symbol.toStringTag];
-                return typeof tst === 'undefined' ? str : '[object ' + tst + ']';
-              };
-              dP(ObjectProto, 'toString', descriptor);
-              break;
-          }
-        }
-      });
-    })(Object, Symbol);
-
-    (function (Si, AP, SP) {
-
-      function returnThis() {
-        return this;
-      }
-
-      if (!AP[Si]) AP[Si] = function () {
-        var i = 0,
-            self = this,
-            iterator = {
-          next: function next() {
-            var done = self.length <= i;
-            return done ? { done: done } : { done: done, value: self[i++] };
-          }
-        };
-        iterator[Si] = returnThis;
-        return iterator;
-      };
-
-      if (!SP[Si]) SP[Si] = function () {
-        var fromCodePoint = String.fromCodePoint,
-            self = this,
-            i = 0,
-            length = self.length,
-            iterator = {
-          next: function next() {
-            var done = length <= i,
-                c = done ? '' : fromCodePoint(self.codePointAt(i));
-            i += c.length;
-            return done ? { done: done } : { done: done, value: c };
-          }
-        };
-        iterator[Si] = returnThis;
-        return iterator;
-      };
-    })(Symbol.iterator, Array.prototype, String.prototype);
-  }
-
-  if (typeof FEATURE_NO_ES2015 === 'undefined') {
-
-    Number.isNaN = Number.isNaN || function (value) {
-      return value !== value;
-    };
-
-    Number.isFinite = Number.isFinite || function (value) {
-      return typeof value === "number" && isFinite(value);
-    };
-  }
-
-  if (!String.prototype.endsWith || function () {
-    try {
-      return !"ab".endsWith("a", 1);
-    } catch (e) {
-      return true;
-    }
-  }()) {
-    String.prototype.endsWith = function (searchString, position) {
-      var subjectString = this.toString();
-      if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
-        position = subjectString.length;
-      }
-      position -= searchString.length;
-      var lastIndex = subjectString.indexOf(searchString, position);
-      return lastIndex !== -1 && lastIndex === position;
-    };
-  }
-
-  if (!String.prototype.startsWith || function () {
-    try {
-      return !"ab".startsWith("b", 1);
-    } catch (e) {
-      return true;
-    }
-  }()) {
-    String.prototype.startsWith = function (searchString, position) {
-      position = position || 0;
-      return this.substr(position, searchString.length) === searchString;
-    };
-  }
-
-  if (typeof FEATURE_NO_ES2015 === 'undefined') {
-
-    if (!Array.from) {
-      Array.from = function () {
-        var toInteger = function toInteger(it) {
-          return isNaN(it = +it) ? 0 : (it > 0 ? Math.floor : Math.ceil)(it);
-        };
-        var toLength = function toLength(it) {
-          return it > 0 ? Math.min(toInteger(it), 0x1fffffffffffff) : 0;
-        };
-        var iterCall = function iterCall(iter, fn, val, index) {
-          try {
-            return fn(val, index);
-          } catch (E) {
-            if (typeof iter.return == 'function') iter.return();
-            throw E;
-          }
-        };
-
-        return function from(arrayLike) {
-          var O = Object(arrayLike),
-              C = typeof this == 'function' ? this : Array,
-              aLen = arguments.length,
-              mapfn = aLen > 1 ? arguments[1] : undefined,
-              mapping = mapfn !== undefined,
-              index = 0,
-              iterFn = O[Symbol.iterator],
-              length,
-              result,
-              step,
-              iterator;
-          if (mapping) mapfn = mapfn.bind(aLen > 2 ? arguments[2] : undefined);
-          if (iterFn != undefined && !Array.isArray(arrayLike)) {
-            for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
-              result[index] = mapping ? iterCall(iterator, mapfn, step.value, index) : step.value;
-            }
-          } else {
-            length = toLength(O.length);
-            for (result = new C(length); length > index; index++) {
-              result[index] = mapping ? mapfn(O[index], index) : O[index];
-            }
-          }
-          result.length = index;
-          return result;
-        };
-      }();
-    }
-
-    if (!Array.prototype.find) {
-      Object.defineProperty(Array.prototype, 'find', {
-        configurable: true,
-        writable: true,
-        enumerable: false,
-        value: function value(predicate) {
-          if (this === null) {
-            throw new TypeError('Array.prototype.find called on null or undefined');
-          }
-          if (typeof predicate !== 'function') {
-            throw new TypeError('predicate must be a function');
-          }
-          var list = Object(this);
-          var length = list.length >>> 0;
-          var thisArg = arguments[1];
-          var value;
-
-          for (var i = 0; i < length; i++) {
-            value = list[i];
-            if (predicate.call(thisArg, value, i, list)) {
-              return value;
-            }
-          }
-          return undefined;
-        }
-      });
-    }
-
-    if (!Array.prototype.findIndex) {
-      Object.defineProperty(Array.prototype, 'findIndex', {
-        configurable: true,
-        writable: true,
-        enumerable: false,
-        value: function value(predicate) {
-          if (this === null) {
-            throw new TypeError('Array.prototype.findIndex called on null or undefined');
-          }
-          if (typeof predicate !== 'function') {
-            throw new TypeError('predicate must be a function');
-          }
-          var list = Object(this);
-          var length = list.length >>> 0;
-          var thisArg = arguments[1];
-          var value;
-
-          for (var i = 0; i < length; i++) {
-            value = list[i];
-            if (predicate.call(thisArg, value, i, list)) {
-              return i;
-            }
-          }
-          return -1;
-        }
-      });
-    }
-  }
-
-  if (typeof FEATURE_NO_ES2016 === 'undefined' && !Array.prototype.includes) {
-    Object.defineProperty(Array.prototype, 'includes', {
-      configurable: true,
-      writable: true,
-      enumerable: false,
-      value: function value(searchElement) {
-        var O = Object(this);
-        var len = parseInt(O.length) || 0;
-        if (len === 0) {
-          return false;
-        }
-        var n = parseInt(arguments[1]) || 0;
-        var k;
-        if (n >= 0) {
-          k = n;
-        } else {
-          k = len + n;
-          if (k < 0) {
-            k = 0;
-          }
-        }
-        var currentElement;
-        while (k < len) {
-          currentElement = O[k];
-          if (searchElement === currentElement || searchElement !== searchElement && currentElement !== currentElement) {
-            return true;
-          }
-          k++;
-        }
-        return false;
-      }
-    });
-  }
-
-  if (typeof FEATURE_NO_ES2015 === 'undefined') {
-
-    (function () {
-      var needsFix = false;
-
-      try {
-        var s = Object.keys('a');
-        needsFix = s.length !== 1 || s[0] !== '0';
-      } catch (e) {
-        needsFix = true;
-      }
-
-      if (needsFix) {
-        Object.keys = function () {
-          var hasOwnProperty = Object.prototype.hasOwnProperty,
-              hasDontEnumBug = !{ toString: null }.propertyIsEnumerable('toString'),
-              dontEnums = ['toString', 'toLocaleString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'constructor'],
-              dontEnumsLength = dontEnums.length;
-
-          return function (obj) {
-            if (obj === undefined || obj === null) {
-              throw TypeError('Cannot convert undefined or null to object');
-            }
-
-            obj = Object(obj);
-
-            var result = [],
-                prop,
-                i;
-
-            for (prop in obj) {
-              if (hasOwnProperty.call(obj, prop)) {
-                result.push(prop);
-              }
-            }
-
-            if (hasDontEnumBug) {
-              for (i = 0; i < dontEnumsLength; i++) {
-                if (hasOwnProperty.call(obj, dontEnums[i])) {
-                  result.push(dontEnums[i]);
-                }
-              }
-            }
-
-            return result;
-          };
-        }();
-      }
-    })();
-
-    (function (O) {
-      if ('assign' in O) {
-        return;
-      }
-
-      O.defineProperty(O, 'assign', {
-        configurable: true,
-        writable: true,
-        value: function () {
-          var gOPS = O.getOwnPropertySymbols,
-              pIE = O.propertyIsEnumerable,
-              filterOS = gOPS ? function (self) {
-            return gOPS(self).filter(pIE, self);
-          } : function () {
-            return Array.prototype;
-          };
-
-          return function assign(where) {
-            if (gOPS && !(where instanceof O)) {
-              console.warn('problematic Symbols', where);
-            }
-
-            function set(keyOrSymbol) {
-              where[keyOrSymbol] = arg[keyOrSymbol];
-            }
-
-            for (var i = 1, ii = arguments.length; i < ii; ++i) {
-              var arg = arguments[i];
-
-              if (arg === null || arg === undefined) {
-                continue;
-              }
-
-              O.keys(arg).concat(filterOS(arg)).forEach(set);
-            }
-
-            return where;
-          };
-        }()
-      });
-    })(Object);
-  }
-
-  if (typeof FEATURE_NO_ES2015 === 'undefined') {
-
-    (function (global) {
-      var i;
-
-      var defineProperty = Object.defineProperty,
-          is = function is(a, b) {
-        return a === b || a !== a && b !== b;
-      };
-
-      if (typeof WeakMap == 'undefined') {
-        global.WeakMap = createCollection({
-          'delete': sharedDelete,
-
-          clear: sharedClear,
-
-          get: sharedGet,
-
-          has: mapHas,
-
-          set: sharedSet
-        }, true);
-      }
-
-      if (typeof Map == 'undefined' || typeof new Map().values !== 'function' || !new Map().values().next) {
-        var _createCollection;
-
-        global.Map = createCollection((_createCollection = {
-          'delete': sharedDelete,
-
-          has: mapHas,
-
-          get: sharedGet,
-
-          set: sharedSet,
-
-          keys: sharedKeys,
-
-          values: sharedValues,
-
-          entries: mapEntries,
-
-          forEach: sharedForEach,
-
-          clear: sharedClear
-        }, _createCollection[Symbol.iterator] = mapEntries, _createCollection));
-      }
-
-      if (typeof Set == 'undefined' || typeof new Set().values !== 'function' || !new Set().values().next) {
-        var _createCollection2;
-
-        global.Set = createCollection((_createCollection2 = {
-          has: setHas,
-
-          add: sharedAdd,
-
-          'delete': sharedDelete,
-
-          clear: sharedClear,
-
-          keys: sharedValues,
-          values: sharedValues,
-
-          entries: setEntries,
-
-          forEach: sharedForEach
-        }, _createCollection2[Symbol.iterator] = sharedValues, _createCollection2));
-      }
-
-      if (typeof WeakSet == 'undefined') {
-        global.WeakSet = createCollection({
-          'delete': sharedDelete,
-
-          add: sharedAdd,
-
-          clear: sharedClear,
-
-          has: setHas
-        }, true);
-      }
-
-      function createCollection(proto, objectOnly) {
-        function Collection(a) {
-          if (!this || this.constructor !== Collection) return new Collection(a);
-          this._keys = [];
-          this._values = [];
-          this._itp = [];
-          this.objectOnly = objectOnly;
-
-          if (a) init.call(this, a);
-        }
-
-        if (!objectOnly) {
-          defineProperty(proto, 'size', {
-            get: sharedSize
-          });
-        }
-
-        proto.constructor = Collection;
-        Collection.prototype = proto;
-
-        return Collection;
-      }
-
-      function init(a) {
-        var i;
-
-        if (this.add) a.forEach(this.add, this);else a.forEach(function (a) {
-            this.set(a[0], a[1]);
-          }, this);
-      }
-
-      function sharedDelete(key) {
-        if (this.has(key)) {
-          this._keys.splice(i, 1);
-          this._values.splice(i, 1);
-
-          this._itp.forEach(function (p) {
-            if (i < p[0]) p[0]--;
-          });
-        }
-
-        return -1 < i;
-      };
-
-      function sharedGet(key) {
-        return this.has(key) ? this._values[i] : undefined;
-      }
-
-      function has(list, key) {
-        if (this.objectOnly && key !== Object(key)) throw new TypeError("Invalid value used as weak collection key");
-
-        if (key != key || key === 0) for (i = list.length; i-- && !is(list[i], key);) {} else i = list.indexOf(key);
-        return -1 < i;
-      }
-
-      function setHas(value) {
-        return has.call(this, this._values, value);
-      }
-
-      function mapHas(value) {
-        return has.call(this, this._keys, value);
-      }
-
-      function sharedSet(key, value) {
-        this.has(key) ? this._values[i] = value : this._values[this._keys.push(key) - 1] = value;
-        return this;
-      }
-
-      function sharedAdd(value) {
-        if (!this.has(value)) this._values.push(value);
-        return this;
-      }
-
-      function sharedClear() {
-        (this._keys || 0).length = this._values.length = 0;
-      }
-
-      function sharedKeys() {
-        return sharedIterator(this._itp, this._keys);
-      }
-
-      function sharedValues() {
-        return sharedIterator(this._itp, this._values);
-      }
-
-      function mapEntries() {
-        return sharedIterator(this._itp, this._keys, this._values);
-      }
-
-      function setEntries() {
-        return sharedIterator(this._itp, this._values, this._values);
-      }
-
-      function sharedIterator(itp, array, array2) {
-        var _ref;
-
-        var p = [0],
-            done = false;
-        itp.push(p);
-        return _ref = {}, _ref[Symbol.iterator] = function () {
-          return this;
-        }, _ref.next = function next() {
-          var v,
-              k = p[0];
-          if (!done && k < array.length) {
-            v = array2 ? [array[k], array2[k]] : array[k];
-            p[0]++;
-          } else {
-            done = true;
-            itp.splice(itp.indexOf(p), 1);
-          }
-          return { done: done, value: v };
-        }, _ref;
-      }
-
-      function sharedSize() {
-        return this._values.length;
-      }
-
-      function sharedForEach(callback, context) {
-        var it = this.entries();
-        for (;;) {
-          var r = it.next();
-          if (r.done) break;
-          callback.call(context, r.value[1], r.value[0], this);
-        }
-      }
-    })(_aureliaPal.PLATFORM.global);
-  }
-
-  if (typeof FEATURE_NO_ES2015 === 'undefined') {
-    (function () {
-
-      var bind = Function.prototype.bind;
-
-      if (typeof _aureliaPal.PLATFORM.global.Reflect === 'undefined') {
-        _aureliaPal.PLATFORM.global.Reflect = {};
-      }
-
-      if (typeof Reflect.defineProperty !== 'function') {
-        Reflect.defineProperty = function (target, propertyKey, descriptor) {
-          if ((typeof target === 'undefined' ? 'undefined' : _typeof(target)) === 'object' ? target === null : typeof target !== 'function') {
-            throw new TypeError('Reflect.defineProperty called on non-object');
-          }
-          try {
-            Object.defineProperty(target, propertyKey, descriptor);
-            return true;
-          } catch (e) {
-            return false;
-          }
-        };
-      }
-
-      if (typeof Reflect.construct !== 'function') {
-        Reflect.construct = function (Target, args) {
-          if (args) {
-            switch (args.length) {
-              case 0:
-                return new Target();
-              case 1:
-                return new Target(args[0]);
-              case 2:
-                return new Target(args[0], args[1]);
-              case 3:
-                return new Target(args[0], args[1], args[2]);
-              case 4:
-                return new Target(args[0], args[1], args[2], args[3]);
-            }
-          }
-
-          var a = [null];
-          a.push.apply(a, args);
-          return new (bind.apply(Target, a))();
-        };
-      }
-
-      if (typeof Reflect.ownKeys !== 'function') {
-        Reflect.ownKeys = function (o) {
-          return Object.getOwnPropertyNames(o).concat(Object.getOwnPropertySymbols(o));
-        };
-      }
-    })();
-  }
-
-  if (typeof FEATURE_NO_ESNEXT === 'undefined') {
-    (function () {
-
-      var emptyMetadata = Object.freeze({});
-      var metadataContainerKey = '__metadata__';
-
-      if (typeof Reflect.getOwnMetadata !== 'function') {
-        Reflect.getOwnMetadata = function (metadataKey, target, targetKey) {
-          if (target.hasOwnProperty(metadataContainerKey)) {
-            return (target[metadataContainerKey][targetKey] || emptyMetadata)[metadataKey];
-          }
-        };
-      }
-
-      if (typeof Reflect.defineMetadata !== 'function') {
-        Reflect.defineMetadata = function (metadataKey, metadataValue, target, targetKey) {
-          var metadataContainer = target.hasOwnProperty(metadataContainerKey) ? target[metadataContainerKey] : target[metadataContainerKey] = {};
-          var targetContainer = metadataContainer[targetKey] || (metadataContainer[targetKey] = {});
-          targetContainer[metadataKey] = metadataValue;
-        };
-      }
-
-      if (typeof Reflect.metadata !== 'function') {
-        Reflect.metadata = function (metadataKey, metadataValue) {
-          return function (target, targetKey) {
-            Reflect.defineMetadata(metadataKey, metadataValue, target, targetKey);
-          };
-        };
-      }
-    })();
   }
 });
 define('aurelia-router',['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-dependency-injection', 'aurelia-history', 'aurelia-event-aggregator'], function (exports, _aureliaLogging, _aureliaRouteRecognizer, _aureliaDependencyInjection, _aureliaHistory, _aureliaEventAggregator) {
@@ -18346,6 +16992,1360 @@ define('aurelia-router',['exports', 'aurelia-logging', 'aurelia-route-recognizer
     } else {
       logger.error('Router navigation failed, and no previous location or fallbackRoute could be restored.');
     }
+  }
+});
+define('aurelia-route-recognizer',['exports', 'aurelia-path'], function (exports, _aureliaPath) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.RouteRecognizer = exports.EpsilonSegment = exports.StarSegment = exports.DynamicSegment = exports.StaticSegment = exports.State = undefined;
+
+  
+
+  var State = exports.State = function () {
+    function State(charSpec) {
+      
+
+      this.charSpec = charSpec;
+      this.nextStates = [];
+    }
+
+    State.prototype.get = function get(charSpec) {
+      for (var _iterator = this.nextStates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+        var _ref;
+
+        if (_isArray) {
+          if (_i >= _iterator.length) break;
+          _ref = _iterator[_i++];
+        } else {
+          _i = _iterator.next();
+          if (_i.done) break;
+          _ref = _i.value;
+        }
+
+        var child = _ref;
+
+        var isEqual = child.charSpec.validChars === charSpec.validChars && child.charSpec.invalidChars === charSpec.invalidChars;
+
+        if (isEqual) {
+          return child;
+        }
+      }
+
+      return undefined;
+    };
+
+    State.prototype.put = function put(charSpec) {
+      var state = this.get(charSpec);
+
+      if (state) {
+        return state;
+      }
+
+      state = new State(charSpec);
+
+      this.nextStates.push(state);
+
+      if (charSpec.repeat) {
+        state.nextStates.push(state);
+      }
+
+      return state;
+    };
+
+    State.prototype.match = function match(ch) {
+      var nextStates = this.nextStates;
+      var results = [];
+
+      for (var i = 0, l = nextStates.length; i < l; i++) {
+        var child = nextStates[i];
+        var charSpec = child.charSpec;
+
+        if (charSpec.validChars !== undefined) {
+          if (charSpec.validChars.indexOf(ch) !== -1) {
+            results.push(child);
+          }
+        } else if (charSpec.invalidChars !== undefined) {
+          if (charSpec.invalidChars.indexOf(ch) === -1) {
+            results.push(child);
+          }
+        }
+      }
+
+      return results;
+    };
+
+    return State;
+  }();
+
+  var specials = ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'];
+
+  var escapeRegex = new RegExp('(\\' + specials.join('|\\') + ')', 'g');
+
+  var StaticSegment = exports.StaticSegment = function () {
+    function StaticSegment(string, caseSensitive) {
+      
+
+      this.string = string;
+      this.caseSensitive = caseSensitive;
+    }
+
+    StaticSegment.prototype.eachChar = function eachChar(callback) {
+      var s = this.string;
+      for (var i = 0, ii = s.length; i < ii; ++i) {
+        var ch = s[i];
+        callback({ validChars: this.caseSensitive ? ch : ch.toUpperCase() + ch.toLowerCase() });
+      }
+    };
+
+    StaticSegment.prototype.regex = function regex() {
+      return this.string.replace(escapeRegex, '\\$1');
+    };
+
+    StaticSegment.prototype.generate = function generate() {
+      return this.string;
+    };
+
+    return StaticSegment;
+  }();
+
+  var DynamicSegment = exports.DynamicSegment = function () {
+    function DynamicSegment(name, optional) {
+      
+
+      this.name = name;
+      this.optional = optional;
+    }
+
+    DynamicSegment.prototype.eachChar = function eachChar(callback) {
+      callback({ invalidChars: '/', repeat: true });
+    };
+
+    DynamicSegment.prototype.regex = function regex() {
+      return this.optional ? '([^/]+)?' : '([^/]+)';
+    };
+
+    DynamicSegment.prototype.generate = function generate(params, consumed) {
+      consumed[this.name] = true;
+      return params[this.name];
+    };
+
+    return DynamicSegment;
+  }();
+
+  var StarSegment = exports.StarSegment = function () {
+    function StarSegment(name) {
+      
+
+      this.name = name;
+    }
+
+    StarSegment.prototype.eachChar = function eachChar(callback) {
+      callback({ invalidChars: '', repeat: true });
+    };
+
+    StarSegment.prototype.regex = function regex() {
+      return '(.+)';
+    };
+
+    StarSegment.prototype.generate = function generate(params, consumed) {
+      consumed[this.name] = true;
+      return params[this.name];
+    };
+
+    return StarSegment;
+  }();
+
+  var EpsilonSegment = exports.EpsilonSegment = function () {
+    function EpsilonSegment() {
+      
+    }
+
+    EpsilonSegment.prototype.eachChar = function eachChar() {};
+
+    EpsilonSegment.prototype.regex = function regex() {
+      return '';
+    };
+
+    EpsilonSegment.prototype.generate = function generate() {
+      return '';
+    };
+
+    return EpsilonSegment;
+  }();
+
+  var RouteRecognizer = exports.RouteRecognizer = function () {
+    function RouteRecognizer() {
+      
+
+      this.rootState = new State();
+      this.names = {};
+    }
+
+    RouteRecognizer.prototype.add = function add(route) {
+      var _this = this;
+
+      if (Array.isArray(route)) {
+        route.forEach(function (r) {
+          return _this.add(r);
+        });
+        return undefined;
+      }
+
+      var currentState = this.rootState;
+      var regex = '^';
+      var types = { statics: 0, dynamics: 0, stars: 0 };
+      var names = [];
+      var routeName = route.handler.name;
+      var isEmpty = true;
+      var isAllOptional = true;
+      var segments = parse(route.path, names, types, route.caseSensitive);
+
+      for (var i = 0, ii = segments.length; i < ii; i++) {
+        var segment = segments[i];
+        if (segment instanceof EpsilonSegment) {
+          continue;
+        }
+
+        isEmpty = false;
+        isAllOptional = isAllOptional && segment.optional;
+
+        currentState = addSegment(currentState, segment);
+        regex += segment.optional ? '/?' : '/';
+        regex += segment.regex();
+      }
+
+      if (isAllOptional) {
+        if (isEmpty) {
+          currentState = currentState.put({ validChars: '/' });
+          regex += '/';
+        } else {
+          var finalState = this.rootState.put({ validChars: '/' });
+          currentState.epsilon = [finalState];
+          currentState = finalState;
+        }
+      }
+
+      var handlers = [{ handler: route.handler, names: names }];
+
+      if (routeName) {
+        var routeNames = Array.isArray(routeName) ? routeName : [routeName];
+        for (var _i2 = 0; _i2 < routeNames.length; _i2++) {
+          this.names[routeNames[_i2]] = {
+            segments: segments,
+            handlers: handlers
+          };
+        }
+      }
+
+      currentState.handlers = handlers;
+      currentState.regex = new RegExp(regex + '$', route.caseSensitive ? '' : 'i');
+      currentState.types = types;
+
+      return currentState;
+    };
+
+    RouteRecognizer.prototype.handlersFor = function handlersFor(name) {
+      var route = this.names[name];
+      if (!route) {
+        throw new Error('There is no route named ' + name);
+      }
+
+      return [].concat(route.handlers);
+    };
+
+    RouteRecognizer.prototype.hasRoute = function hasRoute(name) {
+      return !!this.names[name];
+    };
+
+    RouteRecognizer.prototype.generate = function generate(name, params) {
+      var route = this.names[name];
+      if (!route) {
+        throw new Error('There is no route named ' + name);
+      }
+
+      var handler = route.handlers[0].handler;
+      if (handler.generationUsesHref) {
+        return handler.href;
+      }
+
+      var routeParams = Object.assign({}, params);
+      var segments = route.segments;
+      var consumed = {};
+      var output = '';
+
+      for (var i = 0, l = segments.length; i < l; i++) {
+        var segment = segments[i];
+
+        if (segment instanceof EpsilonSegment) {
+          continue;
+        }
+
+        var segmentValue = segment.generate(routeParams, consumed);
+        if (segmentValue === null || segmentValue === undefined) {
+          if (!segment.optional) {
+            throw new Error('A value is required for route parameter \'' + segment.name + '\' in route \'' + name + '\'.');
+          }
+        } else {
+          output += '/';
+          output += segmentValue;
+        }
+      }
+
+      if (output.charAt(0) !== '/') {
+        output = '/' + output;
+      }
+
+      for (var param in consumed) {
+        delete routeParams[param];
+      }
+
+      var queryString = (0, _aureliaPath.buildQueryString)(routeParams);
+      output += queryString ? '?' + queryString : '';
+
+      return output;
+    };
+
+    RouteRecognizer.prototype.recognize = function recognize(path) {
+      var states = [this.rootState];
+      var queryParams = {};
+      var isSlashDropped = false;
+      var normalizedPath = path;
+
+      var queryStart = normalizedPath.indexOf('?');
+      if (queryStart !== -1) {
+        var queryString = normalizedPath.substr(queryStart + 1, normalizedPath.length);
+        normalizedPath = normalizedPath.substr(0, queryStart);
+        queryParams = (0, _aureliaPath.parseQueryString)(queryString);
+      }
+
+      normalizedPath = decodeURI(normalizedPath);
+
+      if (normalizedPath.charAt(0) !== '/') {
+        normalizedPath = '/' + normalizedPath;
+      }
+
+      var pathLen = normalizedPath.length;
+      if (pathLen > 1 && normalizedPath.charAt(pathLen - 1) === '/') {
+        normalizedPath = normalizedPath.substr(0, pathLen - 1);
+        isSlashDropped = true;
+      }
+
+      for (var i = 0, l = normalizedPath.length; i < l; i++) {
+        states = recognizeChar(states, normalizedPath.charAt(i));
+        if (!states.length) {
+          break;
+        }
+      }
+
+      var solutions = [];
+      for (var _i3 = 0, _l = states.length; _i3 < _l; _i3++) {
+        if (states[_i3].handlers) {
+          solutions.push(states[_i3]);
+        }
+      }
+
+      states = sortSolutions(solutions);
+
+      var state = solutions[0];
+      if (state && state.handlers) {
+        if (isSlashDropped && state.regex.source.slice(-5) === '(.+)$') {
+          normalizedPath = normalizedPath + '/';
+        }
+
+        return findHandler(state, normalizedPath, queryParams);
+      }
+
+      return undefined;
+    };
+
+    return RouteRecognizer;
+  }();
+
+  var RecognizeResults = function RecognizeResults(queryParams) {
+    
+
+    this.splice = Array.prototype.splice;
+    this.slice = Array.prototype.slice;
+    this.push = Array.prototype.push;
+    this.length = 0;
+    this.queryParams = queryParams || {};
+  };
+
+  function parse(route, names, types, caseSensitive) {
+    var normalizedRoute = route;
+    if (route.charAt(0) === '/') {
+      normalizedRoute = route.substr(1);
+    }
+
+    var results = [];
+
+    var splitRoute = normalizedRoute.split('/');
+    for (var i = 0, ii = splitRoute.length; i < ii; ++i) {
+      var segment = splitRoute[i];
+
+      var match = segment.match(/^:([^?]+)(\?)?$/);
+      if (match) {
+        var _match = match;
+        var _name = _match[1];
+        var optional = _match[2];
+
+        if (_name.indexOf('=') !== -1) {
+          throw new Error('Parameter ' + _name + ' in route ' + route + ' has a default value, which is not supported.');
+        }
+        results.push(new DynamicSegment(_name, !!optional));
+        names.push(_name);
+        types.dynamics++;
+        continue;
+      }
+
+      match = segment.match(/^\*(.+)$/);
+      if (match) {
+        results.push(new StarSegment(match[1]));
+        names.push(match[1]);
+        types.stars++;
+      } else if (segment === '') {
+        results.push(new EpsilonSegment());
+      } else {
+        results.push(new StaticSegment(segment, caseSensitive));
+        types.statics++;
+      }
+    }
+
+    return results;
+  }
+
+  function sortSolutions(states) {
+    return states.sort(function (a, b) {
+      if (a.types.stars !== b.types.stars) {
+        return a.types.stars - b.types.stars;
+      }
+
+      if (a.types.stars) {
+        if (a.types.statics !== b.types.statics) {
+          return b.types.statics - a.types.statics;
+        }
+        if (a.types.dynamics !== b.types.dynamics) {
+          return b.types.dynamics - a.types.dynamics;
+        }
+      }
+
+      if (a.types.dynamics !== b.types.dynamics) {
+        return a.types.dynamics - b.types.dynamics;
+      }
+
+      if (a.types.statics !== b.types.statics) {
+        return b.types.statics - a.types.statics;
+      }
+
+      return 0;
+    });
+  }
+
+  function recognizeChar(states, ch) {
+    var nextStates = [];
+
+    for (var i = 0, l = states.length; i < l; i++) {
+      var state = states[i];
+      nextStates.push.apply(nextStates, state.match(ch));
+    }
+
+    var skippableStates = nextStates.filter(function (s) {
+      return s.epsilon;
+    });
+
+    var _loop = function _loop() {
+      var newStates = [];
+      skippableStates.forEach(function (s) {
+        nextStates.push.apply(nextStates, s.epsilon);
+        newStates.push.apply(newStates, s.epsilon);
+      });
+      skippableStates = newStates.filter(function (s) {
+        return s.epsilon;
+      });
+    };
+
+    while (skippableStates.length > 0) {
+      _loop();
+    }
+
+    return nextStates;
+  }
+
+  function findHandler(state, path, queryParams) {
+    var handlers = state.handlers;
+    var regex = state.regex;
+    var captures = path.match(regex);
+    var currentCapture = 1;
+    var result = new RecognizeResults(queryParams);
+
+    for (var i = 0, l = handlers.length; i < l; i++) {
+      var _handler = handlers[i];
+      var _names = _handler.names;
+      var _params = {};
+
+      for (var j = 0, m = _names.length; j < m; j++) {
+        _params[_names[j]] = captures[currentCapture++];
+      }
+
+      result.push({ handler: _handler.handler, params: _params, isDynamic: !!_names.length });
+    }
+
+    return result;
+  }
+
+  function addSegment(currentState, segment) {
+    var state = currentState.put({ validChars: '/' });
+    segment.eachChar(function (ch) {
+      state = state.put(ch);
+    });
+
+    if (segment.optional) {
+      currentState.epsilon = currentState.epsilon || [];
+      currentState.epsilon.push(state);
+    }
+
+    return state;
+  }
+});
+define('aurelia-polyfills',['aurelia-pal'], function (_aureliaPal) {
+  'use strict';
+
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+
+  if (typeof FEATURE_NO_ES2015 === 'undefined') {
+
+    (function (Object, GOPS) {
+      'use strict';
+
+      if (GOPS in Object) return;
+
+      var setDescriptor,
+          G = _aureliaPal.PLATFORM.global,
+          id = 0,
+          random = '' + Math.random(),
+          prefix = '__\x01symbol:',
+          prefixLength = prefix.length,
+          internalSymbol = '__\x01symbol@@' + random,
+          DP = 'defineProperty',
+          DPies = 'defineProperties',
+          GOPN = 'getOwnPropertyNames',
+          GOPD = 'getOwnPropertyDescriptor',
+          PIE = 'propertyIsEnumerable',
+          gOPN = Object[GOPN],
+          gOPD = Object[GOPD],
+          create = Object.create,
+          keys = Object.keys,
+          defineProperty = Object[DP],
+          $defineProperties = Object[DPies],
+          descriptor = gOPD(Object, GOPN),
+          ObjectProto = Object.prototype,
+          hOP = ObjectProto.hasOwnProperty,
+          pIE = ObjectProto[PIE],
+          toString = ObjectProto.toString,
+          indexOf = Array.prototype.indexOf || function (v) {
+        for (var i = this.length; i-- && this[i] !== v;) {}
+        return i;
+      },
+          addInternalIfNeeded = function addInternalIfNeeded(o, uid, enumerable) {
+        if (!hOP.call(o, internalSymbol)) {
+          defineProperty(o, internalSymbol, {
+            enumerable: false,
+            configurable: false,
+            writable: false,
+            value: {}
+          });
+        }
+        o[internalSymbol]['@@' + uid] = enumerable;
+      },
+          createWithSymbols = function createWithSymbols(proto, descriptors) {
+        var self = create(proto);
+        if (descriptors !== null && (typeof descriptors === 'undefined' ? 'undefined' : _typeof(descriptors)) === 'object') {
+          gOPN(descriptors).forEach(function (key) {
+            if (propertyIsEnumerable.call(descriptors, key)) {
+              $defineProperty(self, key, descriptors[key]);
+            }
+          });
+        }
+        return self;
+      },
+          copyAsNonEnumerable = function copyAsNonEnumerable(descriptor) {
+        var newDescriptor = create(descriptor);
+        newDescriptor.enumerable = false;
+        return newDescriptor;
+      },
+          get = function get() {},
+          onlyNonSymbols = function onlyNonSymbols(name) {
+        return name != internalSymbol && !hOP.call(source, name);
+      },
+          onlySymbols = function onlySymbols(name) {
+        return name != internalSymbol && hOP.call(source, name);
+      },
+          propertyIsEnumerable = function propertyIsEnumerable(key) {
+        var uid = '' + key;
+        return onlySymbols(uid) ? hOP.call(this, uid) && this[internalSymbol]['@@' + uid] : pIE.call(this, key);
+      },
+          setAndGetSymbol = function setAndGetSymbol(uid) {
+        var descriptor = {
+          enumerable: false,
+          configurable: true,
+          get: get,
+          set: function set(value) {
+            setDescriptor(this, uid, {
+              enumerable: false,
+              configurable: true,
+              writable: true,
+              value: value
+            });
+            addInternalIfNeeded(this, uid, true);
+          }
+        };
+        defineProperty(ObjectProto, uid, descriptor);
+        return source[uid] = defineProperty(Object(uid), 'constructor', sourceConstructor);
+      },
+          _Symbol = function _Symbol2(description) {
+        if (this && this !== G) {
+          throw new TypeError('Symbol is not a constructor');
+        }
+        return setAndGetSymbol(prefix.concat(description || '', random, ++id));
+      },
+          source = create(null),
+          sourceConstructor = { value: _Symbol },
+          sourceMap = function sourceMap(uid) {
+        return source[uid];
+      },
+          $defineProperty = function defineProp(o, key, descriptor) {
+        var uid = '' + key;
+        if (onlySymbols(uid)) {
+          setDescriptor(o, uid, descriptor.enumerable ? copyAsNonEnumerable(descriptor) : descriptor);
+          addInternalIfNeeded(o, uid, !!descriptor.enumerable);
+        } else {
+          defineProperty(o, key, descriptor);
+        }
+        return o;
+      },
+          $getOwnPropertySymbols = function getOwnPropertySymbols(o) {
+        var cof = toString.call(o);
+        o = cof === '[object String]' ? o.split('') : Object(o);
+        return gOPN(o).filter(onlySymbols).map(sourceMap);
+      };
+
+      descriptor.value = $defineProperty;
+      defineProperty(Object, DP, descriptor);
+
+      descriptor.value = $getOwnPropertySymbols;
+      defineProperty(Object, GOPS, descriptor);
+
+      descriptor.value = function getOwnPropertyNames(o) {
+        return gOPN(o).filter(onlyNonSymbols);
+      };
+      defineProperty(Object, GOPN, descriptor);
+
+      descriptor.value = function defineProperties(o, descriptors) {
+        var symbols = $getOwnPropertySymbols(descriptors);
+        if (symbols.length) {
+          keys(descriptors).concat(symbols).forEach(function (uid) {
+            if (propertyIsEnumerable.call(descriptors, uid)) {
+              $defineProperty(o, uid, descriptors[uid]);
+            }
+          });
+        } else {
+          $defineProperties(o, descriptors);
+        }
+        return o;
+      };
+      defineProperty(Object, DPies, descriptor);
+
+      descriptor.value = propertyIsEnumerable;
+      defineProperty(ObjectProto, PIE, descriptor);
+
+      descriptor.value = _Symbol;
+      defineProperty(G, 'Symbol', descriptor);
+
+      descriptor.value = function (key) {
+        var uid = prefix.concat(prefix, key, random);
+        return uid in ObjectProto ? source[uid] : setAndGetSymbol(uid);
+      };
+      defineProperty(_Symbol, 'for', descriptor);
+
+      descriptor.value = function (symbol) {
+        return hOP.call(source, symbol) ? symbol.slice(prefixLength * 2, -random.length) : void 0;
+      };
+      defineProperty(_Symbol, 'keyFor', descriptor);
+
+      descriptor.value = function getOwnPropertyDescriptor(o, key) {
+        var descriptor = gOPD(o, key);
+        if (descriptor && onlySymbols(key)) {
+          descriptor.enumerable = propertyIsEnumerable.call(o, key);
+        }
+        return descriptor;
+      };
+      defineProperty(Object, GOPD, descriptor);
+
+      descriptor.value = function (proto, descriptors) {
+        return arguments.length === 1 ? create(proto) : createWithSymbols(proto, descriptors);
+      };
+      defineProperty(Object, 'create', descriptor);
+
+      descriptor.value = function () {
+        var str = toString.call(this);
+        return str === '[object String]' && onlySymbols(this) ? '[object Symbol]' : str;
+      };
+      defineProperty(ObjectProto, 'toString', descriptor);
+
+      try {
+        setDescriptor = create(defineProperty({}, prefix, {
+          get: function get() {
+            return defineProperty(this, prefix, { value: false })[prefix];
+          }
+        }))[prefix] || defineProperty;
+      } catch (o_O) {
+        setDescriptor = function setDescriptor(o, key, descriptor) {
+          var protoDescriptor = gOPD(ObjectProto, key);
+          delete ObjectProto[key];
+          defineProperty(o, key, descriptor);
+          defineProperty(ObjectProto, key, protoDescriptor);
+        };
+      }
+    })(Object, 'getOwnPropertySymbols');
+
+    (function (O, S) {
+      var dP = O.defineProperty,
+          ObjectProto = O.prototype,
+          toString = ObjectProto.toString,
+          toStringTag = 'toStringTag',
+          descriptor;
+      ['iterator', 'match', 'replace', 'search', 'split', 'hasInstance', 'isConcatSpreadable', 'unscopables', 'species', 'toPrimitive', toStringTag].forEach(function (name) {
+        if (!(name in Symbol)) {
+          dP(Symbol, name, { value: Symbol(name) });
+          switch (name) {
+            case toStringTag:
+              descriptor = O.getOwnPropertyDescriptor(ObjectProto, 'toString');
+              descriptor.value = function () {
+                var str = toString.call(this),
+                    tst = typeof this === 'undefined' || this === null ? undefined : this[Symbol.toStringTag];
+                return typeof tst === 'undefined' ? str : '[object ' + tst + ']';
+              };
+              dP(ObjectProto, 'toString', descriptor);
+              break;
+          }
+        }
+      });
+    })(Object, Symbol);
+
+    (function (Si, AP, SP) {
+
+      function returnThis() {
+        return this;
+      }
+
+      if (!AP[Si]) AP[Si] = function () {
+        var i = 0,
+            self = this,
+            iterator = {
+          next: function next() {
+            var done = self.length <= i;
+            return done ? { done: done } : { done: done, value: self[i++] };
+          }
+        };
+        iterator[Si] = returnThis;
+        return iterator;
+      };
+
+      if (!SP[Si]) SP[Si] = function () {
+        var fromCodePoint = String.fromCodePoint,
+            self = this,
+            i = 0,
+            length = self.length,
+            iterator = {
+          next: function next() {
+            var done = length <= i,
+                c = done ? '' : fromCodePoint(self.codePointAt(i));
+            i += c.length;
+            return done ? { done: done } : { done: done, value: c };
+          }
+        };
+        iterator[Si] = returnThis;
+        return iterator;
+      };
+    })(Symbol.iterator, Array.prototype, String.prototype);
+  }
+
+  if (typeof FEATURE_NO_ES2015 === 'undefined') {
+
+    Number.isNaN = Number.isNaN || function (value) {
+      return value !== value;
+    };
+
+    Number.isFinite = Number.isFinite || function (value) {
+      return typeof value === "number" && isFinite(value);
+    };
+  }
+
+  if (!String.prototype.endsWith || function () {
+    try {
+      return !"ab".endsWith("a", 1);
+    } catch (e) {
+      return true;
+    }
+  }()) {
+    String.prototype.endsWith = function (searchString, position) {
+      var subjectString = this.toString();
+      if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
+        position = subjectString.length;
+      }
+      position -= searchString.length;
+      var lastIndex = subjectString.indexOf(searchString, position);
+      return lastIndex !== -1 && lastIndex === position;
+    };
+  }
+
+  if (!String.prototype.startsWith || function () {
+    try {
+      return !"ab".startsWith("b", 1);
+    } catch (e) {
+      return true;
+    }
+  }()) {
+    String.prototype.startsWith = function (searchString, position) {
+      position = position || 0;
+      return this.substr(position, searchString.length) === searchString;
+    };
+  }
+
+  if (typeof FEATURE_NO_ES2015 === 'undefined') {
+
+    if (!Array.from) {
+      Array.from = function () {
+        var toInteger = function toInteger(it) {
+          return isNaN(it = +it) ? 0 : (it > 0 ? Math.floor : Math.ceil)(it);
+        };
+        var toLength = function toLength(it) {
+          return it > 0 ? Math.min(toInteger(it), 0x1fffffffffffff) : 0;
+        };
+        var iterCall = function iterCall(iter, fn, val, index) {
+          try {
+            return fn(val, index);
+          } catch (E) {
+            if (typeof iter.return == 'function') iter.return();
+            throw E;
+          }
+        };
+
+        return function from(arrayLike) {
+          var O = Object(arrayLike),
+              C = typeof this == 'function' ? this : Array,
+              aLen = arguments.length,
+              mapfn = aLen > 1 ? arguments[1] : undefined,
+              mapping = mapfn !== undefined,
+              index = 0,
+              iterFn = O[Symbol.iterator],
+              length,
+              result,
+              step,
+              iterator;
+          if (mapping) mapfn = mapfn.bind(aLen > 2 ? arguments[2] : undefined);
+          if (iterFn != undefined && !Array.isArray(arrayLike)) {
+            for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
+              result[index] = mapping ? iterCall(iterator, mapfn, step.value, index) : step.value;
+            }
+          } else {
+            length = toLength(O.length);
+            for (result = new C(length); length > index; index++) {
+              result[index] = mapping ? mapfn(O[index], index) : O[index];
+            }
+          }
+          result.length = index;
+          return result;
+        };
+      }();
+    }
+
+    if (!Array.prototype.find) {
+      Object.defineProperty(Array.prototype, 'find', {
+        configurable: true,
+        writable: true,
+        enumerable: false,
+        value: function value(predicate) {
+          if (this === null) {
+            throw new TypeError('Array.prototype.find called on null or undefined');
+          }
+          if (typeof predicate !== 'function') {
+            throw new TypeError('predicate must be a function');
+          }
+          var list = Object(this);
+          var length = list.length >>> 0;
+          var thisArg = arguments[1];
+          var value;
+
+          for (var i = 0; i < length; i++) {
+            value = list[i];
+            if (predicate.call(thisArg, value, i, list)) {
+              return value;
+            }
+          }
+          return undefined;
+        }
+      });
+    }
+
+    if (!Array.prototype.findIndex) {
+      Object.defineProperty(Array.prototype, 'findIndex', {
+        configurable: true,
+        writable: true,
+        enumerable: false,
+        value: function value(predicate) {
+          if (this === null) {
+            throw new TypeError('Array.prototype.findIndex called on null or undefined');
+          }
+          if (typeof predicate !== 'function') {
+            throw new TypeError('predicate must be a function');
+          }
+          var list = Object(this);
+          var length = list.length >>> 0;
+          var thisArg = arguments[1];
+          var value;
+
+          for (var i = 0; i < length; i++) {
+            value = list[i];
+            if (predicate.call(thisArg, value, i, list)) {
+              return i;
+            }
+          }
+          return -1;
+        }
+      });
+    }
+  }
+
+  if (typeof FEATURE_NO_ES2016 === 'undefined' && !Array.prototype.includes) {
+    Object.defineProperty(Array.prototype, 'includes', {
+      configurable: true,
+      writable: true,
+      enumerable: false,
+      value: function value(searchElement) {
+        var O = Object(this);
+        var len = parseInt(O.length) || 0;
+        if (len === 0) {
+          return false;
+        }
+        var n = parseInt(arguments[1]) || 0;
+        var k;
+        if (n >= 0) {
+          k = n;
+        } else {
+          k = len + n;
+          if (k < 0) {
+            k = 0;
+          }
+        }
+        var currentElement;
+        while (k < len) {
+          currentElement = O[k];
+          if (searchElement === currentElement || searchElement !== searchElement && currentElement !== currentElement) {
+            return true;
+          }
+          k++;
+        }
+        return false;
+      }
+    });
+  }
+
+  if (typeof FEATURE_NO_ES2015 === 'undefined') {
+
+    (function () {
+      var needsFix = false;
+
+      try {
+        var s = Object.keys('a');
+        needsFix = s.length !== 1 || s[0] !== '0';
+      } catch (e) {
+        needsFix = true;
+      }
+
+      if (needsFix) {
+        Object.keys = function () {
+          var hasOwnProperty = Object.prototype.hasOwnProperty,
+              hasDontEnumBug = !{ toString: null }.propertyIsEnumerable('toString'),
+              dontEnums = ['toString', 'toLocaleString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'constructor'],
+              dontEnumsLength = dontEnums.length;
+
+          return function (obj) {
+            if (obj === undefined || obj === null) {
+              throw TypeError('Cannot convert undefined or null to object');
+            }
+
+            obj = Object(obj);
+
+            var result = [],
+                prop,
+                i;
+
+            for (prop in obj) {
+              if (hasOwnProperty.call(obj, prop)) {
+                result.push(prop);
+              }
+            }
+
+            if (hasDontEnumBug) {
+              for (i = 0; i < dontEnumsLength; i++) {
+                if (hasOwnProperty.call(obj, dontEnums[i])) {
+                  result.push(dontEnums[i]);
+                }
+              }
+            }
+
+            return result;
+          };
+        }();
+      }
+    })();
+
+    (function (O) {
+      if ('assign' in O) {
+        return;
+      }
+
+      O.defineProperty(O, 'assign', {
+        configurable: true,
+        writable: true,
+        value: function () {
+          var gOPS = O.getOwnPropertySymbols,
+              pIE = O.propertyIsEnumerable,
+              filterOS = gOPS ? function (self) {
+            return gOPS(self).filter(pIE, self);
+          } : function () {
+            return Array.prototype;
+          };
+
+          return function assign(where) {
+            if (gOPS && !(where instanceof O)) {
+              console.warn('problematic Symbols', where);
+            }
+
+            function set(keyOrSymbol) {
+              where[keyOrSymbol] = arg[keyOrSymbol];
+            }
+
+            for (var i = 1, ii = arguments.length; i < ii; ++i) {
+              var arg = arguments[i];
+
+              if (arg === null || arg === undefined) {
+                continue;
+              }
+
+              O.keys(arg).concat(filterOS(arg)).forEach(set);
+            }
+
+            return where;
+          };
+        }()
+      });
+    })(Object);
+  }
+
+  if (typeof FEATURE_NO_ES2015 === 'undefined') {
+
+    (function (global) {
+      var i;
+
+      var defineProperty = Object.defineProperty,
+          is = function is(a, b) {
+        return a === b || a !== a && b !== b;
+      };
+
+      if (typeof WeakMap == 'undefined') {
+        global.WeakMap = createCollection({
+          'delete': sharedDelete,
+
+          clear: sharedClear,
+
+          get: sharedGet,
+
+          has: mapHas,
+
+          set: sharedSet
+        }, true);
+      }
+
+      if (typeof Map == 'undefined' || typeof new Map().values !== 'function' || !new Map().values().next) {
+        var _createCollection;
+
+        global.Map = createCollection((_createCollection = {
+          'delete': sharedDelete,
+
+          has: mapHas,
+
+          get: sharedGet,
+
+          set: sharedSet,
+
+          keys: sharedKeys,
+
+          values: sharedValues,
+
+          entries: mapEntries,
+
+          forEach: sharedForEach,
+
+          clear: sharedClear
+        }, _createCollection[Symbol.iterator] = mapEntries, _createCollection));
+      }
+
+      if (typeof Set == 'undefined' || typeof new Set().values !== 'function' || !new Set().values().next) {
+        var _createCollection2;
+
+        global.Set = createCollection((_createCollection2 = {
+          has: setHas,
+
+          add: sharedAdd,
+
+          'delete': sharedDelete,
+
+          clear: sharedClear,
+
+          keys: sharedValues,
+          values: sharedValues,
+
+          entries: setEntries,
+
+          forEach: sharedForEach
+        }, _createCollection2[Symbol.iterator] = sharedValues, _createCollection2));
+      }
+
+      if (typeof WeakSet == 'undefined') {
+        global.WeakSet = createCollection({
+          'delete': sharedDelete,
+
+          add: sharedAdd,
+
+          clear: sharedClear,
+
+          has: setHas
+        }, true);
+      }
+
+      function createCollection(proto, objectOnly) {
+        function Collection(a) {
+          if (!this || this.constructor !== Collection) return new Collection(a);
+          this._keys = [];
+          this._values = [];
+          this._itp = [];
+          this.objectOnly = objectOnly;
+
+          if (a) init.call(this, a);
+        }
+
+        if (!objectOnly) {
+          defineProperty(proto, 'size', {
+            get: sharedSize
+          });
+        }
+
+        proto.constructor = Collection;
+        Collection.prototype = proto;
+
+        return Collection;
+      }
+
+      function init(a) {
+        var i;
+
+        if (this.add) a.forEach(this.add, this);else a.forEach(function (a) {
+            this.set(a[0], a[1]);
+          }, this);
+      }
+
+      function sharedDelete(key) {
+        if (this.has(key)) {
+          this._keys.splice(i, 1);
+          this._values.splice(i, 1);
+
+          this._itp.forEach(function (p) {
+            if (i < p[0]) p[0]--;
+          });
+        }
+
+        return -1 < i;
+      };
+
+      function sharedGet(key) {
+        return this.has(key) ? this._values[i] : undefined;
+      }
+
+      function has(list, key) {
+        if (this.objectOnly && key !== Object(key)) throw new TypeError("Invalid value used as weak collection key");
+
+        if (key != key || key === 0) for (i = list.length; i-- && !is(list[i], key);) {} else i = list.indexOf(key);
+        return -1 < i;
+      }
+
+      function setHas(value) {
+        return has.call(this, this._values, value);
+      }
+
+      function mapHas(value) {
+        return has.call(this, this._keys, value);
+      }
+
+      function sharedSet(key, value) {
+        this.has(key) ? this._values[i] = value : this._values[this._keys.push(key) - 1] = value;
+        return this;
+      }
+
+      function sharedAdd(value) {
+        if (!this.has(value)) this._values.push(value);
+        return this;
+      }
+
+      function sharedClear() {
+        (this._keys || 0).length = this._values.length = 0;
+      }
+
+      function sharedKeys() {
+        return sharedIterator(this._itp, this._keys);
+      }
+
+      function sharedValues() {
+        return sharedIterator(this._itp, this._values);
+      }
+
+      function mapEntries() {
+        return sharedIterator(this._itp, this._keys, this._values);
+      }
+
+      function setEntries() {
+        return sharedIterator(this._itp, this._values, this._values);
+      }
+
+      function sharedIterator(itp, array, array2) {
+        var _ref;
+
+        var p = [0],
+            done = false;
+        itp.push(p);
+        return _ref = {}, _ref[Symbol.iterator] = function () {
+          return this;
+        }, _ref.next = function next() {
+          var v,
+              k = p[0];
+          if (!done && k < array.length) {
+            v = array2 ? [array[k], array2[k]] : array[k];
+            p[0]++;
+          } else {
+            done = true;
+            itp.splice(itp.indexOf(p), 1);
+          }
+          return { done: done, value: v };
+        }, _ref;
+      }
+
+      function sharedSize() {
+        return this._values.length;
+      }
+
+      function sharedForEach(callback, context) {
+        var it = this.entries();
+        for (;;) {
+          var r = it.next();
+          if (r.done) break;
+          callback.call(context, r.value[1], r.value[0], this);
+        }
+      }
+    })(_aureliaPal.PLATFORM.global);
+  }
+
+  if (typeof FEATURE_NO_ES2015 === 'undefined') {
+    (function () {
+
+      var bind = Function.prototype.bind;
+
+      if (typeof _aureliaPal.PLATFORM.global.Reflect === 'undefined') {
+        _aureliaPal.PLATFORM.global.Reflect = {};
+      }
+
+      if (typeof Reflect.defineProperty !== 'function') {
+        Reflect.defineProperty = function (target, propertyKey, descriptor) {
+          if ((typeof target === 'undefined' ? 'undefined' : _typeof(target)) === 'object' ? target === null : typeof target !== 'function') {
+            throw new TypeError('Reflect.defineProperty called on non-object');
+          }
+          try {
+            Object.defineProperty(target, propertyKey, descriptor);
+            return true;
+          } catch (e) {
+            return false;
+          }
+        };
+      }
+
+      if (typeof Reflect.construct !== 'function') {
+        Reflect.construct = function (Target, args) {
+          if (args) {
+            switch (args.length) {
+              case 0:
+                return new Target();
+              case 1:
+                return new Target(args[0]);
+              case 2:
+                return new Target(args[0], args[1]);
+              case 3:
+                return new Target(args[0], args[1], args[2]);
+              case 4:
+                return new Target(args[0], args[1], args[2], args[3]);
+            }
+          }
+
+          var a = [null];
+          a.push.apply(a, args);
+          return new (bind.apply(Target, a))();
+        };
+      }
+
+      if (typeof Reflect.ownKeys !== 'function') {
+        Reflect.ownKeys = function (o) {
+          return Object.getOwnPropertyNames(o).concat(Object.getOwnPropertySymbols(o));
+        };
+      }
+    })();
+  }
+
+  if (typeof FEATURE_NO_ESNEXT === 'undefined') {
+    (function () {
+
+      var emptyMetadata = Object.freeze({});
+      var metadataContainerKey = '__metadata__';
+
+      if (typeof Reflect.getOwnMetadata !== 'function') {
+        Reflect.getOwnMetadata = function (metadataKey, target, targetKey) {
+          if (target.hasOwnProperty(metadataContainerKey)) {
+            return (target[metadataContainerKey][targetKey] || emptyMetadata)[metadataKey];
+          }
+        };
+      }
+
+      if (typeof Reflect.defineMetadata !== 'function') {
+        Reflect.defineMetadata = function (metadataKey, metadataValue, target, targetKey) {
+          var metadataContainer = target.hasOwnProperty(metadataContainerKey) ? target[metadataContainerKey] : target[metadataContainerKey] = {};
+          var targetContainer = metadataContainer[targetKey] || (metadataContainer[targetKey] = {});
+          targetContainer[metadataKey] = metadataValue;
+        };
+      }
+
+      if (typeof Reflect.metadata !== 'function') {
+        Reflect.metadata = function (metadataKey, metadataValue) {
+          return function (target, targetKey) {
+            Reflect.defineMetadata(metadataKey, metadataValue, target, targetKey);
+          };
+        };
+      }
+    })();
   }
 });
 define('aurelia-task-queue',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
@@ -48703,6 +48703,95 @@ a.fn.repeater.Constructor.prototype.list_sizeActionsTable=function(){var b=this.
 var c=Math.max(document.documentElement.clientHeight,window.innerHeight||0),d=a(document).scrollTop(),e=b.$popup.offset();return e.top+b.$popup.outerHeight(!0)>c+d||e.top<d},e=function(a){a.$popup.css("visibility","hidden"),g(a),d(a)&&(f(a),d(a)&&g(a)),a.$popup.css("visibility","visible")},f=function(a){a.$popup.css("top",-a.$popup.outerHeight(!0)+"px")},g=function(a){a.$popup.css("top",a.$trigger.outerHeight(!0)+"px")};c.prototype={constructor:c,complete:function(a){var b={accepted:"onAccept",cancelled:"onCancel",exited:"onExit"},c=this.options[b[a]],d={contents:this.$body};c?(c(d),this.$element.trigger(a+".fu.picker",d)):(this.$element.trigger(a+".fu.picker",d),this.hide())},keyComplete:function(a){this.isInput&&13===a.keyCode?(this.complete("accepted"),this.$trigger.blur()):27===a.keyCode&&(this.complete("exited"),this.$trigger.blur())},destroy:function(){return this.$element.remove(),a(document).off("click.fu.picker.externalClick."+this.clickStamp),this.$element[0].outerHTML},disable:function(){this.$element.addClass("disabled"),this.$trigger.attr("disabled","disabled")},enable:function(){this.$element.removeClass("disabled"),this.$trigger.removeAttr("disabled")},toggle:function(){this.$element.hasClass("showing")?this.hide():this.show()},hide:function(){this.$element.hasClass("showing")&&(this.$element.removeClass("showing"),a(document).off("click.fu.picker.externalClick."+this.clickStamp),this.$element.trigger("hidden.fu.picker"))},externalClickListener:function(a,b){(!0===b||this.isExternalClick(a))&&this.complete("exited")},isExternalClick:function(b){var c,d,e=this.$element.get(0),f=this.options.externalClickExceptions||[],g=a(b.target);if(b.target===e||g.parents(".picker:first").get(0)===e)return!1;for(c=0,d=f.length;c<d;c++)if(g.is(f[c])||g.parents(f[c]).length>0)return!1;return!0},show:function(){var b;if(b=a(document).find(".picker.showing"),b.length>0){if(b.data("fu.picker")&&b.data("fu.picker").options.explicit)return;b.picker("externalClickListener",{},!0)}this.$element.addClass("showing"),e(this),this.$element.trigger("shown.fu.picker"),this.clickStamp=(new Date).getTime()+(Math.floor(100*Math.random())+1),this.options.explicit||a(document).on("click.fu.picker.externalClick."+this.clickStamp,a.proxy(this.externalClickListener,this))}},a.fn.picker=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.picker"),h="object"==typeof b&&b;g||f.data("fu.picker",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.picker.defaults={onAccept:void 0,onCancel:void 0,onExit:void 0,externalClickExceptions:[],explicit:!1},a.fn.picker.Constructor=c,a.fn.picker.noConflict=function(){return a.fn.picker=b,this},a(document).on("focus.fu.picker.data-api","[data-initialize=picker]",function(b){var c=a(b.target).closest(".picker");c.data("fu.picker")||c.picker(c.data())}),a(function(){a("[data-initialize=picker]").each(function(){var b=a(this);b.data("fu.picker")||b.picker(b.data())})})}(a)});;define('fuelux', ['fuelux/js/fuelux.min'], function (main) { return main; });
 
 define('text!fuelux/css/fuelux.min.css', ['module'], function(module) { module.exports = "/*!\n * Fuel UX v3.16.0 \n * Copyright 2012-2017 ExactTarget\n * Licensed under the BSD-3-Clause license (https://github.com/ExactTarget/fuelux/blob/master/LICENSE)\n */\n\n@charset \"UTF-8\";.clearfix{*zoom:1}.clearfix:before,.clearfix:after{display:table;content:\"\";line-height:0}.clearfix:after{clear:both}@font-face{font-family:\"fuelux\";src:url(\"../fonts/fuelux.eot\");src:url(\"../fonts/fuelux.eot?#iefix\") format(\"embedded-opentype\"),url(data:font-woff;base64,d09GRk9UVE8AAAUUAAsAAAAABuAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABDRkYgAAABCAAAAegAAAIisWS2RkZGVE0AAALwAAAAGQAAABxvEtzhR0RFRgAAAwwAAAAdAAAAIAA4AARPUy8yAAADLAAAAEoAAABgL7lMbGNtYXAAAAN4AAAAPAAAAUrAGiK3aGVhZAAAA7QAAAAvAAAANgDSVuNoaGVhAAAD5AAAABwAAAAkBCkCA2htdHgAAAQAAAAAGgAAABoHmgL4bWF4cAAABBwAAAAGAAAABgALUABuYW1lAAAEJAAAAN0AAAF3kxoWmXBvc3QAAAUEAAAAEAAAACAAAwABeJw90M9rE0EUB/D30uzusLtuNTqiGIs/+gt6ifVHtgfRHqQHLTYumEsrpSSWRVNozNJc2t6S2K2bBATbS0tLe9jDUlJ6aS85hFT8H6SCFPwTZiCIbpnq6fMe8+Y7j0GIRgERlbdO9r1TBIwAwijvi/D+Ln4tuqqjq3e5erRHhetW7I/r/i90xfN4ndelOHztjgNcjMP3S3HQ41iIgX4WQ6AbrsJN6IUhGIYReApjMA6WM2c/SyQSgnuCYcF9wQPBQ8EjQVJgCkbEvudbA2AZK/gRV9DFVfyEHlaxBhpiJPlk7GX6TebdhxWDDfEb9JbaGezI9Laa74zTOyqTn9O7KosFtFdlg0ymfeE5e0X7VTZaogOqwXz+OOwM/pqbZz2vs+VwyGC/2YXwjsGWf4YBxrdfYZjhMT9M/veQwU7ZHD3MNianstmpyUb28KjROOox+OcrLnV1Nfysy0AQ6YD5Yjpf+jJxLB0Eza2WR0zFruSW5otEq7W2m3v7pJ2SFvKLubJNNPvAaVZa5ET27LXcxjzRkopVS29n9ki7Le0s+ItBmWjHE9KMnXasCjlRAs9f290gWskqpGczJNWWNnfW/WpAtB9Kq9Qs7M+SVErKb+bW7SrRgpmttGcRU64ES35xl2h/Ac9Ys4h4nGNgYGBkAILzccd+gelbXJ9hNABYswg7AAAAeJxjYGRgYOADYgkGEGBiYARCLiBmAfMYAAS4AD0AAAB4nGNgZmJgnMDAysDB6MOYxsDA4A6lvzJIMrQwMDAxsHIywIEAgskQkOaawuDwgOEBJ+OD/w8Y9Bj//v8LFGaEK1AAQkYALokNlwAAeJxjYGBgZoBgGQZGBhBwAfIYwXwWBg0gzQakGRmYGBgecP7/D1LwgAFEKzBC1QMBIxsDgjNCAQBlrAaweJxjYGRgYADiH2cX2sfz23xl4GZiAIHzt7g+w2lmBmbGv4x/gVwOBrA0AFSyC6wAeJxjYGRgYPzLwMCgx8QAAkA2IwMqYAIANwYCMQIAAAACAAADARUBhwGDAQ8AWAADAAMAXACnAAAAAFAAAAsAAHicbY49asNAEIU/2bJMsEmX1JsipYS0BAwuU/gAKdy7WAuDkPDagtzDkD5djpED5AQ5TZ7kKVJ4l9n59vHmB1jyQcJwEjLujSfMeTae8sTROJXn03jGgm/jTPdXziS9k7IcqwaeqOOD8ZRXcuNUnovxjEe+jDPpP+zpCTR632Hfh6ZXfpNUS2rYEfUNdd/sBBs6Ws5jjnIEHJ6CUnmt+N/sqnitsVJ4eSpe1KJrz5su1sH5onRrdx0p8Pkq92Uly82VtpIiJw7jCk7NhrFsQzwdutZVRXm78A9U7zY2AAAAeJxjYGZABowMaAAAAI4ABQ==) format(\"woff\"),url(\"../fonts/fuelux.ttf\") format(\"truetype\"),url(\"../fonts/fuelux.svg#fuelux\") format(\"svg\");font-weight:normal;font-style:normal}.fuelux [class^=\"fueluxicon-\"]:before,.fuelux [class*=\" fueluxicon-\"]:before{font-family:\"fuelux\" !important;font-style:normal !important;font-weight:normal !important;font-variant:normal !important;text-transform:none !important;line-height:1;speak:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.fuelux .fueluxicon-loader-full:before{content:\"\\e000\"}.fuelux .fueluxicon-loader-1:before{content:\"\\e001\"}.fuelux .fueluxicon-loader-2:before{content:\"\\e002\"}.fuelux .fueluxicon-loader-3:before{content:\"\\e003\"}.fuelux .fueluxicon-loader-4:before{content:\"\\e004\"}.fuelux .fueluxicon-loader-5:before{content:\"\\e005\"}.fuelux .fueluxicon-loader-6:before{content:\"\\e006\"}.fuelux .fueluxicon-loader-7:before{content:\"\\e007\"}.fuelux .fueluxicon-loader-8:before{content:\"\\e008\"}.fuelux .fueluxicon-bullet:before{content:\"\\e009\"}.fuelux .radio-inline,.fuelux .checkbox-inline{padding-left:0}.fuelux .radio-inline.highlight,.fuelux .checkbox-inline.highlight{left:-8px}.fuelux .radio-inline label,.fuelux .checkbox-inline label{margin-bottom:0}label.fuelux .radio:hover:before,label.fuelux .checkbox:hover:before,label.fuelux .radio-inline:hover:before,label.fuelux .checkbox-inline:hover:before,.input-label.fuelux .radio:hover:before,.input-label.fuelux .checkbox:hover:before,.input-label.fuelux .radio-inline:hover:before,.input-label.fuelux .checkbox-inline:hover:before,.fuelux .radio label:hover:before,.fuelux .checkbox label:hover:before,.fuelux .radio-inline label:hover:before,.fuelux .checkbox-inline label:hover:before,.fuelux .radio .input-label:hover:before,.fuelux .checkbox .input-label:hover:before,.fuelux .radio-inline .input-label:hover:before,.fuelux .checkbox-inline .input-label:hover:before{box-shadow:inset 0 0 2px 1px rgba(91,157,217,0.7),0 0 5px 0 rgba(91,157,217,0.7)}.fuelux .radio label,.fuelux .checkbox label,.fuelux .radio-inline label,.fuelux .checkbox-inline label,.fuelux .radio .input-label,.fuelux .checkbox .input-label,.fuelux .radio-inline .input-label,.fuelux .checkbox-inline .input-label,label.fuelux .radio,label.fuelux .checkbox,label.fuelux .radio-inline,label.fuelux .checkbox-inline{cursor:pointer;font-weight:normal}.fuelux .radio.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio-inline.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox-inline.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio.highlight input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox.highlight input[type=\"radio\"]:not(.sr-only)~label,.fuelux .radio-inline.highlight input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox-inline.highlight input[type=\"radio\"]:not(.sr-only)~label{padding:4px;border-radius:4px}.fuelux .radio.highlight input[type=\"checkbox\"]:not(.sr-only):checked~label,.fuelux .checkbox.highlight input[type=\"checkbox\"]:not(.sr-only):checked~label,.fuelux .radio-inline.highlight input[type=\"checkbox\"]:not(.sr-only):checked~label,.fuelux .checkbox-inline.highlight input[type=\"checkbox\"]:not(.sr-only):checked~label,.fuelux .radio.highlight input[type=\"radio\"]:not(.sr-only):checked~label,.fuelux .checkbox.highlight input[type=\"radio\"]:not(.sr-only):checked~label,.fuelux .radio-inline.highlight input[type=\"radio\"]:not(.sr-only):checked~label,.fuelux .checkbox-inline.highlight input[type=\"radio\"]:not(.sr-only):checked~label{background-color:#e6e6e6;opacity:1;z-index:0}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only),.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only),.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only),.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only),.fuelux .radio input[type=\"radio\"]:not(.sr-only),.fuelux .checkbox input[type=\"radio\"]:not(.sr-only),.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only),.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only){position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)~label{padding-left:0}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only)~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)~label:before{font-family:\"Glyphicons Halflings\";font-style:normal;font-weight:normal;font-variant:normal;text-transform:none;line-height:1;speak:none;border:1px solid #aaaaaa;color:#FFF;font-size:9px;width:14px;height:14px;padding:0;margin-top:0;margin-bottom:-2px;cursor:pointer;display:inline-block;text-align:left;z-index:2;content:\"\"}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus~label{color:#333333;color:#39b3d7;cursor:pointer}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus~label:before{box-shadow:inset 0 0 2px 1px #5b9dd9,0 0 5px 0 #5b9dd9;outline:none}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active~label:hover,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus~label:hover{color:#333333;cursor:pointer}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active:hover~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active:hover~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active:hover~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):checked:hover~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):checked:hover~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):checked:hover~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):checked:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active:hover~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active:hover~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):checked:hover~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):checked:hover~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):checked:hover~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):checked:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover{color:#333333;cursor:pointer}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)[disabled]~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)[disabled]~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)[disabled]~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)[disabled]~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only)[disabled]~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)[disabled]~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)[disabled]~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)[disabled]~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):disabled~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):disabled~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):disabled~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):disabled~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):disabled~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):disabled~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):disabled~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):disabled~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)[disabled]~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)[disabled]~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)[disabled]~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)[disabled]~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only)[disabled]~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)[disabled]~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)[disabled]~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)[disabled]~label:before,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):disabled~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):disabled~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):disabled~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):disabled~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):disabled~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):disabled~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):disabled~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):disabled~label:before{color:#333333;opacity:.65;cursor:not-allowed !important;outline:none;box-shadow:none}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):checked~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):checked~label:before{background:#39b3d7;border-color:#39b3d7}.fuelux .radio.highlight:before,.fuelux .checkbox.highlight:before,.fuelux .radio-inline.highlight:before,.fuelux .checkbox-inline.highlight:before{left:4px;top:7px}.fuelux .radio.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio.highlight input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox.highlight input[type=\"radio\"]:not(.sr-only)~label{left:-8px;position:relative}.fuelux .radio-inline,.fuelux .checkbox-inline{padding-left:0}.fuelux .radio-inline:before,.fuelux .checkbox-inline:before{left:0;top:3px}.fuelux .checkbox.multiline,.fuelux .radio.multiline{float:left;margin-left:15px}.fuelux .checkbox.multiline~.control-label,.fuelux .radio.multiline~.control-label{float:left;width:80%;margin-left:10px;text-align:left}.fuelux .checkbox.multiline~.control-label>label,.fuelux .radio.multiline~.control-label>label{font-weight:normal;cursor:pointer}.fuelux .form-group.required .control-label:before{content:'*';color:#a94442;margin-right:5px}.fuelux .checkbox.highlight+.checkbox.highlight{margin-top:-5px}.fuelux .checkbox.highlight label.checkbox-custom{padding:4px 4px 4px 24px}.fuelux .checkbox.highlight.checked label.checkbox-custom,.fuelux .checkbox.highlight label.checked.checkbox-custom{background:#e6e6e6;border-radius:4px}.fuelux .checkbox input[type=\"checkbox\"]:focus+.checkbox-label,.fuelux .checkbox input[type=\"checkbox\"]:hover+.checkbox-label,.fuelux .checkbox .checkbox-label:hover{color:#999999}.fuelux .checkbox input[type=\"checkbox\"]:disabled:focus+.checkbox-label,.fuelux .checkbox input[type=\"checkbox\"]:disabled:hover+.checkbox-label,.fuelux .checkbox.disabled label:hover{color:inherit}.fuelux .form-horizontal .checkbox-inline{padding-top:0}.fuelux .input-group-addon.checkbox-custom{margin-bottom:0;cursor:pointer;padding-left:24px}.fuelux .input-group-addon.checkbox-custom input[type=checkbox]{position:absolute;margin-left:-24px}.fuelux .input-group-addon.checkbox-custom:before{left:11px;top:9px}.fuelux .checkbox-custom{position:relative}.fuelux .checkbox-custom:before{font-family:\"Glyphicons Halflings\" !important;font-style:normal !important;font-weight:normal !important;font-variant:normal !important;text-transform:none !important;line-height:1;speak:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;border:1px solid #aaaaaa;border-radius:4px;color:#FFF;content:\" \";font-size:9px;height:14px;left:0;padding:1px 0 0 1px;position:absolute;top:3px;width:14px}.fuelux .checkbox-custom:active:before,.fuelux .checkbox-custom:focus:before{color:#5B9DD9;cursor:pointer;box-shadow:inset 0 0 2px 1px #5B9DD9,0 0 5px 0 #5B9DD9}.fuelux .checkbox-custom.highlight:before{left:4px;top:6px}.fuelux .checkbox-custom.checked:before{background:#39b3d7;border-color:#39b3d7;content:\"\\e013\"}.fuelux .checkbox-custom.disabled{cursor:not-allowed;opacity:.65}.fuelux .checkbox-custom.disabled:before{cursor:not-allowed;opacity:.65}.fuelux .checkbox-custom.checkbox-inline:before{left:0;top:3px}.fuelux .checkbox-custom.checkbox-inline.highlight{padding:4px 4px 4px 24px;left:-4px}.fuelux .checkbox-custom.checkbox-inline.highlight:before{left:4px;top:7px}.fuelux .checkbox-custom.checkbox-inline.highlight.checked{background:#e6e6e6;border-radius:4px}.fuelux .checkbox-custom input[type=\"checkbox\"]:focus+.checkbox-label{color:#999999}.fuelux .checkbox-custom input[type=\"checkbox\"]+.checkbox-label.truncate{display:inherit;line-height:14px;margin-top:3px;margin-bottom:-3px}.fuelux label.checkbox-custom.checkbox-inline{padding-left:20px}.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)~label:before{border-radius:4px;z-index:1}.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):checked~label:before{color:white;content:\"\\e013\";line-height:1em;padding-left:1px;font-size:8px;padding-top:2px}.fuelux .checkbox.hightlight+.checkbox-inline.highlight,.fuelux .checkbox-inline.hightlight+.checkbox-inline.highlight{margin-left:-14px}.fuelux .checkbox.hightlight+.checkbox-inline.highlight.checkbox-custom,.fuelux .checkbox-inline.hightlight+.checkbox-inline.highlight.checkbox-custom{margin-left:0}.fuelux .checkbox.highlight input[type=\"checkbox\"]:not(.sr-only)~label{left:-4px}.fuelux .radio.highlight{padding:4px;margin:0 0 5px 0}.fuelux .radio.highlight+.radio.highlight{margin-top:-9px}.fuelux .radio.highlight label.radio-custom{left:-8px;padding:4px 4px 4px 24px;border-radius:4px}.fuelux .radio.highlight label.radio-custom:before{left:5px;top:7px}.fuelux .radio.highlight label.radio-custom:after{left:9px;top:11px}.fuelux .radio.highlight.checked label.radio-custom,.fuelux .radio.highlight label.radio-custom.checked{background:#e6e6e6;border-radius:4px}.fuelux .radio input[type=\"radio\"]:focus+.radio-label,.fuelux .radio input[type=\"radio\"]:hover+.radio-label,.fuelux .radio .radio-label:hover{color:#999999}.fuelux .form-horizontal .radio-inline{padding-top:0}.fuelux .input-group-addon.radio-custom.radio-inline:before{left:11px;top:9px}.fuelux .input-group-addon.radio-custom.radio-inline:after{left:15px;top:13px}.fuelux .radio-custom{position:relative}.fuelux .radio-custom .highlight{padding:4px;margin:0 0 5px 0}.fuelux .radio-custom .highlight.checked{background:#e6e6e6;border-radius:4px}.fuelux .radio-custom:after{background:transparent;border-radius:6px;content:\" \";height:6px;left:4px;position:absolute;top:7px;width:6px}.fuelux .radio-custom:before{border:1px solid #aaaaaa;border-radius:14px;content:\" \";height:14px;left:0;position:absolute;top:3px;width:14px}.fuelux .radio-custom.checked:after{background:#FFF}.fuelux .radio-custom.checked:before{background:#39b3d7;border-color:#39b3d7}.fuelux .radio-custom.disabled{cursor:not-allowed;opacity:.65}.fuelux .radio-custom.disabled:after{cursor:not-allowed}.fuelux .radio-custom.disabled:before{cursor:not-allowed;opacity:.65}.fuelux .radio-custom.radio-inline:after{left:4px;top:7px}.fuelux .radio-custom.radio-inline:before{left:0;top:3px}.fuelux .radio-custom.radio-inline.highlight{left:-3px;padding:4px 4px 4px 24px}.fuelux .radio-custom.radio-inline.highlight:after{left:8px;top:11px}.fuelux .radio-custom.radio-inline.highlight:before{left:4px;top:7px}.fuelux .radio-custom.radio-inline.highlight.checked{background:#e6e6e6;border-radius:4px}.fuelux .radio-custom input[type=\"radio\"]:focus+.radio-label{color:#999999}.fuelux .radio-custom input[type=\"radio\"]+.radio-label.truncate{display:inherit;line-height:14px;margin-top:3px;margin-bottom:-3px}.fuelux label.radio-custom.radio-inline{padding-left:20px}.fuelux .radio input[type=\"radio\"]:not(.sr-only)~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)~label:before{border-radius:8px;z-index:1}.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked~label:before{background:#39b3d7;background:-moz-radial-gradient(center, ellipse cover, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);background:-webkit-gradient(radial, center center, 0, center center, 100%, color-stop(0, #FFF), color-stop(40%, #FFF), color-stop(41%, #39b3d7), color-stop(100%, #39b3d7));background:-webkit-radial-gradient(center, ellipse cover, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);background:-o-radial-gradient(center, ellipse cover, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);background:-ms-radial-gradient(center, ellipse cover, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);background:radial-gradient(ellipse at center, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFF', endColorstr='#39b3d7', GradientType=1)}.fuelux .radio input[type=\"radio\"]:not(.sr-only):hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):hover~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label:before{box-shadow:inset 0 0 2px 1px #5b9dd9,0 0 5px 0 #5b9dd9}.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label:before{outline-color:none;outline-offset:0;outline-style:none;outline-width:0;cursor:default}.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover{color:#333333;cursor:default}.fuelux .combobox.disabled .input-group-btn{cursor:not-allowed}.fuelux .combobox input::-ms-clear{display:none}.fuelux .combobox .dropdown-menu>li.selected>a{color:#262626;text-decoration:none;background-color:#f5f5f5}.fuelux .combobox .dropdown-menu>li>em{display:block;padding:3px 20px;clear:both;font-weight:normal;line-height:1.42857143;color:#333;white-space:nowrap}.fuelux .datepicker-calendar{padding:16px 16px 0;min-height:262px}.fuelux .datepicker-calendar button{border:0;padding:0;background-color:transparent}.fuelux .datepicker-calendar-days{height:182px;margin:10px 0 12px;width:100%}.fuelux .datepicker-calendar-days thead{border-bottom:1px solid #cccccc}.fuelux .datepicker-calendar-days tbody:before{color:transparent;content:\"\\200C\";display:block;line-height:3px;visibility:hidden}.fuelux .datepicker-calendar-days td,.fuelux .datepicker-calendar-days th{font-size:14px;height:32px;text-align:center;vertical-align:middle;width:14.29%}.fuelux .datepicker-calendar-days td b,.fuelux .datepicker-calendar-days td button{color:#333333;display:inline-block;font-weight:normal;height:30px;text-decoration:none;width:30px}.fuelux .datepicker-calendar-days td b{line-height:30px}.fuelux .datepicker-calendar-days td span{display:block;border-radius:4px}.fuelux .datepicker-calendar-days td span:hover{background:#f5f5f5;text-decoration:none}.fuelux .datepicker-calendar-days td.current-day span{border:1px solid #333333}.fuelux .datepicker-calendar-days td.last-month,.fuelux .datepicker-calendar-days td.next-month{background:#d5d5d5}.fuelux .datepicker-calendar-days td.last-month.first,.fuelux .datepicker-calendar-days td.next-month.first{border-top-left-radius:4px;border-bottom-left-radius:4px;padding-left:1px}.fuelux .datepicker-calendar-days td.last-month.last,.fuelux .datepicker-calendar-days td.next-month.last{border-top-right-radius:4px;border-bottom-right-radius:4px;padding-right:1px}.fuelux .datepicker-calendar-days td.past b,.fuelux .datepicker-calendar-days td.past button{color:#999999}.fuelux .datepicker-calendar-days td.restricted b,.fuelux .datepicker-calendar-days td.restricted button{cursor:no-drop;position:relative}.fuelux .datepicker-calendar-days td.restricted b:before,.fuelux .datepicker-calendar-days td.restricted button:before{border-top:1px solid #e9322d;bottom:0;content:\" \";display:block;left:5px;position:absolute;right:5px;top:50%}.fuelux .datepicker-calendar-days td.restricted b:hover,.fuelux .datepicker-calendar-days td.restricted button:hover{background:none}.fuelux .datepicker-calendar-days td.selected span{background:#eeeeee}.fuelux .datepicker-calendar-days td.selected span:hover{background:#dddddd}.fuelux .datepicker-calendar-days td.selected b,.fuelux .datepicker-calendar-days td.selected button{color:#878787}.fuelux .datepicker-calendar-days td.selected.current-day{box-shadow:0 0 0 1px #FFF offset}.fuelux .datepicker-calendar-days td.selected.current-day b,.fuelux .datepicker-calendar-days td.selected.current-day button{color:#222222}.fuelux .datepicker-calendar-days td.selected.current-day span:hover b,.fuelux .datepicker-calendar-days td.selected.current-day span:hover button{border-color:#0f5f9f}.fuelux .datepicker-calendar-days th{font-weight:bold;height:22px;vertical-align:top}.fuelux .datepicker-calendar-header{*zoom:1}.fuelux .datepicker-calendar-header:before,.fuelux .datepicker-calendar-header:after{display:table;content:\"\";line-height:0}.fuelux .datepicker-calendar-header:after{clear:both}.fuelux .datepicker-calendar-header button{border:0;padding:0;background-color:transparent}.fuelux .datepicker-calendar-header .title{margin:0 auto;text-align:center;display:block;width:174px;color:#222222;font-size:20px;line-height:30px;text-decoration:underline;vertical-align:middle}.fuelux .datepicker-calendar-header .title:hover{color:#0f5f9f;text-decoration:underline}.fuelux .datepicker-calendar-header .title.disabled{cursor:default;pointer-events:none;text-decoration:none}.fuelux .datepicker-calendar-header .title .month{display:inline;margin:0;padding:0}.fuelux .datepicker-calendar-header .title .month span{display:none}.fuelux .datepicker-calendar-header .title .month span.current{display:inline}.fuelux .datepicker-calendar-header .next,.fuelux .datepicker-calendar-header .prev{background:#666666;background-clip:padding-box;border-radius:30px;cursor:pointer;float:left;height:30px;text-align:center;width:30px}.fuelux .datepicker-calendar-header .next span.glyphicon,.fuelux .datepicker-calendar-header .prev span.glyphicon{color:#FFF;font-size:16px;line-height:30px}.fuelux .datepicker-calendar-header .next:hover,.fuelux .datepicker-calendar-header .prev:hover{background:#0f5f9f}.fuelux .datepicker-calendar-header .next{float:right}.fuelux .datepicker-calendar-header .next span.glyphicon{line-height:28px}.fuelux .datepicker-calendar-footer{background:#e6e6e6;background-clip:padding-box;border-radius:0 0 4px 4px;border-top:1px solid #cccccc;height:30px;margin:0 -16px;padding:4px 14px}.fuelux .datepicker-calendar-footer .datepicker-today{color:#333333;font-size:14px;text-decoration:underline}.fuelux .datepicker-calendar-footer .datepicker-today:hover{color:#1b75bb;text-decoration:underline}.fuelux .datepicker-calendar-footer .datepicker-today.disabled{color:#878787;cursor:default;pointer-events:none}.fuelux .datepicker-calendar-footer .datepicker-today.disabled:hover{color:#878787}.fuelux .datepicker-calendar-wrapper{border:1px solid #757575;min-height:20px;padding:0;width:300px}.fuelux .datepicker-wheels{display:none}.fuelux .datepicker-wheels ul button{border:0;padding:0;background-color:transparent}.fuelux .datepicker-wheels-footer{background:#e6e6e6;border-radius:0 0 4px 4px;border-top:1px solid #cccccc;clear:both}.fuelux .datepicker-wheels-footer .datepicker-wheels-back{display:block;color:#222222;float:left;line-height:22px;border:0;background-color:transparent}.fuelux .datepicker-wheels-footer .datepicker-wheels-back:hover{color:#1b75bb}.fuelux .datepicker-wheels-footer .datepicker-wheels-select{float:right;background-color:transparent;color:#5B9DD9}.fuelux .datepicker-wheels-footer .datepicker-wheels-select:hover{color:#1b75bb}.fuelux .datepicker-wheels-month,.fuelux .datepicker-wheels-year{float:left;width:50%}.fuelux .datepicker-wheels-month ul,.fuelux .datepicker-wheels-year ul{height:217px;list-style-type:none;margin:0;overflow:auto;padding:0;text-align:center}.fuelux .datepicker-wheels-month ul li,.fuelux .datepicker-wheels-year ul li{margin:4px 0}.fuelux .datepicker-wheels-month ul li button,.fuelux .datepicker-wheels-year ul li button{width:100%;text-align:center;color:#454545;display:block;font-size:16px;line-height:24px;text-decoration:none}.fuelux .datepicker-wheels-month ul li button:hover,.fuelux .datepicker-wheels-year ul li button:hover{background:#d9edf7;text-decoration:none}.fuelux .datepicker-wheels-month ul li.selected button,.fuelux .datepicker-wheels-year ul li.selected button{background:#1b75bb;color:#FFF}.fuelux .datepicker-wheels-month ul li.selected button:hover,.fuelux .datepicker-wheels-year ul li.selected button:hover{background:#0f5f9f}.fuelux .datepicker-wheels-month .header,.fuelux .datepicker-wheels-year .header{background:#e6e6e6;background-clip:padding-box;border-bottom:1px solid #cccccc;border-radius:4px 0 0 0;color:#222222;font-size:20px;font-weight:bold;line-height:30px;margin-top:0;margin-bottom:0;text-align:center}.fuelux .datepicker-wheels-month.full,.fuelux .datepicker-wheels-year.full{border-left:0;width:100%}.fuelux .datepicker-wheels-month.full .header,.fuelux .datepicker-wheels-year.full .header{border-radius:4px 4px 0 0}.fuelux .datepicker-wheels-year{border-left:1px solid #cccccc;float:right}.fuelux .datepicker-wheels-year .header{border-radius:0 4px 0 0}.fuelux .datepicker input::-ms-clear{display:none}.fuelux .infinitescroll{overflow-y:auto}.fuelux .infinitescroll .infinitescroll-end{clear:both;font-style:italic;padding:6px;text-align:center}.fuelux .infinitescroll .infinitescroll-load{clear:both;padding:6px}.fuelux .infinitescroll .infinitescroll-load button{padding:5px 12px;width:100%}.fuelux .infinitescroll .infinitescroll-load .loader{font-size:32px;height:32px;margin:0 auto;width:32px}.fuelux .dropUp,.fuelux .dropup{-webkit-box-shadow:0 0 10px rgba(0,0,0,0.2);-moz-box-shadow:0 0 10px rgba(0,0,0,0.2);box-shadow:0 0 10px rgba(0,0,0,0.2)}.fuelux .loader{height:64px;font-size:64px;position:relative;width:64px;background-image:url(\"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjRweCIgaGVpZ2h0PSI2NHB4IiB2aWV3Qm94PSIwIDAgNjQgNjQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PGcgd2lkdGg9IjU0cHgiIGhlaWdodD0iNTRweCIgdmlld0JveD0iNSA1IDU0IDU0IiBpZD0ibG9hZGVyIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNS4wMDAwMDAsIDUuMDAwMDAwKSIgZmlsbD0iIzE1ODllZSI+PGcgaWQ9InNwaW5uZXItbWVkaXVtIj48ZyBpZD0iT3ZhbC0zNSI+PGNpcmNsZSBpZD0iVG9wIiBjeD0iMjciIGN5PSI2IiByPSI1Ij48L2NpcmNsZT48Y2lyY2xlIGlkPSJUb3BSaWdodCIgY3g9IjQ4IiBjeT0iMTciIHI9IjUiPjwvY2lyY2xlPjxjaXJjbGUgaWQ9IkJvdHRvbVJpZ2h0IiBjeD0iNDgiIGN5PSIzNiIgcj0iNSI+PC9jaXJjbGU+PGNpcmNsZSBpZD0iQm90dG9tIiBjeD0iMjciIGN5PSI0OCIgcj0iNSI+PC9jaXJjbGU+PGNpcmNsZSBpZD0iQm90dG9tTGVmdCIgY3g9IjYiIGN5PSIzNiIgcj0iNSI+PC9jaXJjbGU+PGNpcmNsZSBpZD0iVG9wTGVmdCIgY3g9IjYiIGN5PSIxNyIgcj0iNSI+PC9jaXJjbGU+PC9nPjwvZz48L2c+PGFuaW1hdGVNb3Rpb24geGxpbms6aHJlZj0iI1RvcCIgcGF0aD0iTSAwIDAgViAtNSBaIiBkdXI9Ii4yNXMiIGJlZ2luPSIwczsgVG9wTGVmdEFuaW0uZW5kIiBpZD0iVG9wQW5pbSIgLz48YW5pbWF0ZU1vdGlvbiB4bGluazpocmVmPSIjVG9wUmlnaHQiIHBhdGg9Ik0gMCAwIEwgNSAtNSBaIiBkdXI9Ii4yNXMiIGJlZ2luPSJUb3BBbmltLmVuZCIgaWQ9IlRvcFJpZ2h0QW5pbSIgLz48YW5pbWF0ZU1vdGlvbiB4bGluazpocmVmPSIjQm90dG9tUmlnaHQiIHBhdGg9Ik0gMCAwIEwgNSA1IFoiIGR1cj0iLjI1cyIgYmVnaW49IlRvcFJpZ2h0QW5pbS5lbmQiIGlkPSJCb3R0b21SaWdodEFuaW0iIC8+PGFuaW1hdGVNb3Rpb24geGxpbms6aHJlZj0iI0JvdHRvbSIgcGF0aD0iTSAwIDAgViA1IFoiIGR1cj0iLjI1cyIgYmVnaW49IkJvdHRvbVJpZ2h0QW5pbS5lbmQiIGlkPSJCb3R0b21BbmltIiAvPjxhbmltYXRlTW90aW9uIHhsaW5rOmhyZWY9IiNCb3R0b21MZWZ0IiBwYXRoPSJNIDAgMCBMIC01IDUgWiIgZHVyPSIuMjVzIiBiZWdpbj0iQm90dG9tQW5pbS5lbmQiIGlkPSJCb3R0b21MZWZ0QW5pbSIgLz48YW5pbWF0ZU1vdGlvbiB4bGluazpocmVmPSIjVG9wTGVmdCIgcGF0aD0iTSAwIDAgTCAtNSAtNSBaIiBkdXI9Ii4yNXMiIGJlZ2luPSJCb3R0b21MZWZ0QW5pbS5lbmQiIGlkPSJUb3BMZWZ0QW5pbSIgLz48L3N2Zz4=\");background-size:contain}.fuelux .pillbox{border:1px solid #bbbbbb;border-radius:4px;cursor:text;padding:3px}.fuelux .pillbox[data-readonly]{border:1px solid transparent}.fuelux .pillbox[data-readonly].truncate .pillbox-input-wrap{display:inline-block}.fuelux .pillbox[data-readonly].truncate .pillbox-input-wrap.truncated{display:none}.fuelux .pillbox[data-readonly].truncate .pillbox-more{display:inline}.fuelux .pillbox[data-readonly] .pill span.glyphicon-close{display:none}.fuelux .pillbox[data-readonly] .pillbox-add-item{display:none}.fuelux .pillbox[data-readonly] .pillbox-input-wrap{display:none}.fuelux .pillbox[data-readonly] .pillbox-input-wrap button.dropdown-toggle{display:none}.fuelux .pillbox.pills-editable .pill-group .pill span{cursor:text}.fuelux .pillbox.pills-editable .pill-group .pill span.glyphicon-close{cursor:pointer}.fuelux .pillbox>.pill-group{margin:0;padding:0;width:100%}.fuelux .pillbox>.pill-group>.pill{margin:2px;cursor:default;float:left;word-break:break-all}.fuelux .pillbox>.pill-group>.pill.pillbox-highlight{outline:1px dotted #999999}.fuelux .pillbox>.pill-group>.pill.truncated{display:none}.fuelux .pillbox>.pill-group>.pill .pillbox-list-edit{border:none;color:#333333;font-weight:normal;border-radius:2px}.fuelux .pillbox>.pill-group>.pill .pillbox-list-edit:focus{outline:none;border:none}.fuelux .pillbox>.pill-group>.pill .glyphicon-close{cursor:pointer;top:-1px;left:2px}.fuelux .pillbox>.pill-group>.pill .glyphicon-close:before{content:\" \\00d7\"}.fuelux .pillbox>.pill-group>.pill .glyphicon-close:hover{opacity:.4}.fuelux .pillbox .pillbox-input-wrap{position:relative;margin:4px 0 3px 3px;float:left}.fuelux .pillbox .pillbox-input-wrap.editing{border:1px solid #cccccc;border-radius:4px;margin:2px 0 3px 3px}.fuelux .pillbox .pillbox-input-wrap.editing input.pillbox-add-item{border-radius:4px;color:#333333;height:32px}.fuelux .pillbox .pillbox-add-item{border:none;box-shadow:none}.fuelux .pillbox .pillbox-add-item:focus{outline:none;border:none}.fuelux .pillbox .pillbox-more{cursor:pointer;display:none;line-height:30px}.fuelux .pillbox .suggest{max-height:166px;overflow-y:auto}.fuelux .pillbox .suggest>li{white-space:nowrap;cursor:pointer;padding:3px 20px}.fuelux .pillbox .suggest>li.pillbox-suggest-sel{background-color:#eeeeee}.fuelux .pillbox .suggest>li:hover{background-color:#eeeeee}.fuelux .pillbox input::-ms-clear{display:none}.fuelux .placard{display:inline-block;position:relative}.fuelux .placard[data-ellipsis=\"true\"].showing div.placard-field,.fuelux .placard[data-ellipsis=\"true\"].showing input.placard-field{overflow:auto;text-overflow:clip;white-space:normal}.fuelux .placard[data-ellipsis=\"true\"] div.placard-field,.fuelux .placard[data-ellipsis=\"true\"] input.placard-field{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fuelux .placard[data-ellipsis=\"true\"] div.placard-field::-ms-clear,.fuelux .placard[data-ellipsis=\"true\"] input.placard-field::-ms-clear{display:none}.fuelux .placard[data-ellipsis=\"true\"] div.placard-field[data-textarea]{overflow:auto;text-overflow:clip;white-space:normal}.fuelux .placard[data-ellipsis=\"true\"] textarea.placard-field[readonly]{overflow:hidden}.fuelux .placard.showing .placard-footer,.fuelux .placard.showing .placard-header,.fuelux .placard.showing .placard-popup{display:block;z-index:1}.fuelux .placard.showing div.placard-field,.fuelux .placard.showing input.placard-field,.fuelux .placard.showing textarea.placard-field{background:#FFF;border:1px solid #cccccc;box-shadow:none;position:relative;z-index:1}.fuelux .placard div.placard-field,.fuelux .placard input.placard-field,.fuelux .placard textarea.placard-field{resize:none}.fuelux .placard div.placard-field[readonly],.fuelux .placard input.placard-field[readonly],.fuelux .placard textarea.placard-field[readonly]{background:#FFF;cursor:auto}.fuelux .placard div.placard-field[readonly].glass,.fuelux .placard input.placard-field[readonly].glass,.fuelux .placard textarea.placard-field[readonly].glass{background:none}.fuelux .placard div.placard-field[readonly].glass:hover,.fuelux .placard input.placard-field[readonly].glass:hover,.fuelux .placard textarea.placard-field[readonly].glass:hover{background:#d9edf7;cursor:pointer}.fuelux .placard div.placard-field:focus,.fuelux .placard input.placard-field:focus,.fuelux .placard textarea.placard-field:focus{border:1px solid #cccccc;box-shadow:none}.fuelux .placard div.placard-field{width:168px;overflow:auto}.fuelux .placard div.placard-field[data-textarea]{height:54px}.fuelux .placard-cancel{font-size:12px;margin-right:4px;vertical-align:middle}.fuelux .placard-footer,.fuelux .placard-header{display:none;left:0;line-height:1;position:absolute;right:0}.fuelux .placard-footer{padding:4px 0 8px 0;text-align:right;top:100%}.fuelux .placard-header{bottom:100%;padding:8px 0 4px 0}.fuelux .placard-header h1,.fuelux .placard-header h2,.fuelux .placard-header h3,.fuelux .placard-header h4,.fuelux .placard-header h5,.fuelux .placard-header h6{margin:0}.fuelux .placard-popup{background:#d9edf7;background-clip:padding-box;border:1px solid #cccccc;border-radius:4px;bottom:-8px;box-shadow:0 0 0 1px #FFF inset;display:none;left:-8px;position:absolute;right:-8px;top:-8px}.fuelux .placard .glass{background:transparent;border:1px solid #FFF;box-shadow:none}.fuelux .placard .glass:hover{background:#d9edf7;border-color:#5B9DD9;cursor:pointer}.fuelux .placard .glass:hover[disabled]{background:transparent;border-color:#FFF;cursor:not-allowed}.fuelux .placard .glass:focus{background:#FFF;border-color:#5B9DD9;box-shadow:inset 0 1px 1px rgba(0,0,0,0.75),0 0 8px rgba(91,157,217,0.6);cursor:auto}.fuelux .placard .glass:focus[disabled]{background:transparent;border-color:#FFF;cursor:not-allowed}.fuelux .placard .glass[disabled]{cursor:not-allowed}.fuelux .repeater{border:1px solid #dddddd;border-radius:4px}.fuelux .repeater-canvas.scrolling{bottom:0;left:0;overflow-y:auto;position:absolute;right:0;top:0}.fuelux .repeater-header,.fuelux .repeater-footer{background:#fafafa;min-height:50px;padding:8px;*zoom:1}.fuelux .repeater-header:before,.fuelux .repeater-footer:before,.fuelux .repeater-header:after,.fuelux .repeater-footer:after{display:table;content:\"\";line-height:0}.fuelux .repeater-header:after,.fuelux .repeater-footer:after{clear:both}.fuelux .repeater-header-left,.fuelux .repeater-footer-left{float:left}.fuelux .repeater-header-right,.fuelux .repeater-footer-right{float:right}@media (max-width:625px){.fuelux .repeater-header-left,.fuelux .repeater-footer-left,.fuelux .repeater-header-right,.fuelux .repeater-footer-right{float:none;*zoom:1}.fuelux .repeater-header-left:before,.fuelux .repeater-footer-left:before,.fuelux .repeater-header-right:before,.fuelux .repeater-footer-right:before,.fuelux .repeater-header-left:after,.fuelux .repeater-footer-left:after,.fuelux .repeater-header-right:after,.fuelux .repeater-footer-right:after{display:table;content:\"\";line-height:0}.fuelux .repeater-header-left:after,.fuelux .repeater-footer-left:after,.fuelux .repeater-header-right:after,.fuelux .repeater-footer-right:after{clear:both}.fuelux .repeater-header-left,.fuelux .repeater-footer-left{margin-bottom:8px}}.fuelux .repeater-header{border-bottom:1px solid #dddddd;border-top-right-radius:4px;border-top-left-radius:4px}.fuelux .repeater-footer{border-top:1px solid #dddddd;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.fuelux .repeater-loader{display:none;left:50%;position:absolute;margin:-32px 0 0 -32px;top:50%}.fuelux .repeater-viewport{min-height:80px;position:relative}.fuelux .repeater-pagination label{font-weight:normal}.fuelux .repeater-pagination .repeater-primaryPaging{display:none;vertical-align:middle;width:116px}.fuelux .repeater-pagination .repeater-primaryPaging.active{display:inline-block}.fuelux .repeater-pagination .repeater-primaryPaging ul.dropdown-menu{min-width:116px}.fuelux .repeater-pagination .repeater-secondaryPaging{display:none;width:82px}.fuelux .repeater-pagination .repeater-secondaryPaging.active{display:inline-block}.fuelux .repeater-search{float:left;width:200px}.fuelux .repeater-title{display:block;float:left;line-height:34px;margin-right:10px}.fuelux .repeater-itemization .selectlist,.fuelux .repeater-filters,.fuelux .repeater-secondaryPaging,.fuelux .repeater-primaryPaging,.fuelux .repeater-next,.fuelux .repeater-prev{margin:auto .3em}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable:hover td,.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable.hovered td{background:#fff}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-select-checkbox{cursor:not-allowed}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table thead tr th.sortable,.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table thead tr th .repeater-list-heading.sortable{background:#fafafa;cursor:auto}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table tbody tr.selectable:hover.selected td,.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table tbody tr.selectable.hovered.selected td{background:#eee}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table tbody tr.selectable:hover td,.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table tbody tr.selectable.hovered td{background:#fff;cursor:auto}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.scrolling{overflow:visible}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.scrolling .repeater-list{bottom:0;left:0;position:absolute;right:0;top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.scrolling .repeater-list-wrapper{height:100%;overflow:auto}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list{position:relative}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table{margin-bottom:0;width:100%}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody td{border-bottom:1px solid #dddddd;border-left:1px solid #dddddd;border-top:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody td:first-child{border-left:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody td.sorted{background:#fafafa}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody td.truncate{display:inherit}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr:focus{outline:1px dotted #dddddd}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.empty td{border-bottom:none;font-size:14px;font-style:italic;padding:20px;text-align:center;width:100%}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selectable:hover td,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selectable.hovered td{background:#f5f5f5;cursor:pointer}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selectable .checkbox-custom:before{margin-top:-4px;top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selected td{background:#eeeeee;color:#333333}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selected td:first-child{padding-left:30px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th{background:#fafafa;border-bottom:1px solid #dddddd;border-left:1px solid transparent;border-top:none;color:rgba(0,0,0,0);line-height:1.42857;padding:8px;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th:first-child{border-left:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th:first-child .header-checkbox{width:37px;padding-left:12px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th:first-child .header-checkbox .checkbox-inline:before{top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th.sortable:hover,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th.sortable.sorted{background:#f5f5f5;cursor:pointer;background-color:#f2f2f2;background-image:-moz-linear-gradient(top, #fafafa, #e6e6e6);background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#fafafa), to(#e6e6e6));background-image:-webkit-linear-gradient(top, #fafafa, #e6e6e6);background-image:-o-linear-gradient(top, #fafafa, #e6e6e6);background-image:linear-gradient(to bottom, #fafafa, #e6e6e6);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffafafa', endColorstr='#ffe6e6e6', GradientType=0)}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th.sorted span.glyphicon{display:block;visibility:hidden}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th span.glyphicon{display:none;float:right;margin-top:2px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th .actions-hidden{visibility:hidden}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-check{display:inline-block;height:0;line-height:0;position:relative;vertical-align:top;width:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-check span.glyphicon{left:-22px;position:absolute;top:2px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading{background:#fafafa;border-bottom:1px solid #dddddd;border-left:1px solid #dddddd;border-top:none;color:#333333;line-height:1.42857;margin-left:-9px;padding:8px;position:absolute;top:0;z-index:1;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.shifted{margin-left:-1px}@media screen and (-webkit-min-device-pixel-ratio:0){.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.shifted{margin-left:0}}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.sortable:hover,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.sortable.sorted{background:#f5f5f5;cursor:pointer;background-color:#f2f2f2;background-image:-moz-linear-gradient(top, #fafafa, #e6e6e6);background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#fafafa), to(#e6e6e6));background-image:-webkit-linear-gradient(top, #fafafa, #e6e6e6);background-image:-o-linear-gradient(top, #fafafa, #e6e6e6);background-image:linear-gradient(to bottom, #fafafa, #e6e6e6);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffafafa', endColorstr='#ffe6e6e6', GradientType=0)}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.sortable.sorted span.glyphicon{display:block;visibility:visible}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading span.glyphicon{display:none;float:right;margin-top:2px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled{overflow:auto}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list-wrapper{overflow:visible}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list .frozen-column-wrapper{position:absolute;z-index:2;left:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list .frozen-thead-wrapper{position:absolute;top:0;left:0;z-index:3}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list .frozen-thead-wrapper table{border-right:1px solid #dddddd}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table{table-layout:fixed;word-wrap:break-word}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen{border-right:1px solid #dddddd;z-index:2;background:#FFF;border-collapse:collapse;table-layout:fixed;float:left}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen td,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen th{border-collapse:collapse;word-wrap:break-word}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen .repeater-frozen-heading{background:#fafafa}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen .repeater-frozen-heading.shifted{left:-1px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled{overflow:auto}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list-wrapper{overflow:visible}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper{position:absolute;z-index:2;right:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table{table-layout:fixed;word-wrap:break-word}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions{border-left:1px solid #dddddd;z-index:2;border-collapse:collapse;table-layout:fixed;float:right}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr{border-left:1px solid #dddddd}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.empty-heading{background:transparent;border-left:1px solid transparent}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.empty-heading th{background:transparent}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr td{background:#FFF}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable:hover td,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable.hovered td{background:#f5f5f5;cursor:pointer}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable .checkbox-custom:before{margin-top:-4px;top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selected td{background:#eeeeee;color:#333333}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selected td:first-child{padding-left:30px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr td,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th{border-collapse:collapse;word-wrap:break-word;padding-bottom:5px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr td .btn-group,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .btn-group{width:100%;text-align:center}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr td .btn-group .btn,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .btn-group .btn{float:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selected td:first-child{padding-left:8px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th{border-bottom:1px solid #dddddd;padding-bottom:7px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .repeater-list-heading{padding:8px 0 7px;border-left:1px solid #fafafa;margin-left:-9px;width:100%}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .repeater-list-heading .glyphicon{display:inline-block;float:none;margin-top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions .caret{margin-left:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-thead-wrapper{position:absolute;top:0;right:0;z-index:3}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list table{table-layout:fixed;word-wrap:break-word}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list table thead tr th:last-child .repeater-list-heading{border-left:1px solid transparent}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions{background-color:#FFF}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions tr{background-color:transparent}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions tr.empty-heading{border-left:1px solid #fafafa}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions tr th{padding-bottom:8px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions tr td{padding-bottom:6px;line-height:1.39}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled .repeater-list thead tr:first-child .header-checkbox{width:37px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled .repeater-list thead tr:first-child .header-checkbox .checkbox{margin:0 4px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled .repeater-list tbody tr .body-checkbox{left:4px;top:-3px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled .repeater-list tr.selected td:first-child{padding-left:8px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .repeater-list-heading{border-left:1px solid #dddddd}.fuelux .repeater[data-viewtype=\"list\"] .repeater-loader{margin-top:-12px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-loader.noHeader{margin-top:-32px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-viewport{overflow:hidden}.fuelux .repeater[data-viewtype=\"list\"] .actions-wrapper{z-index:10;text-align:right}.fuelux .repeater.disabled .repeater-thumbnail.selectable:hover{background:#fff;cursor:auto}.fuelux .repeater.disabled .repeater-thumbnail.selectable.selected:hover{background:#eeeeee}.fuelux .repeater-thumbnail{border:1px solid #dddddd;color:#666666;float:left;font-size:14px;min-height:110px;min-width:100px;margin:8px 7px;text-align:center}.fuelux .repeater-thumbnail img{display:block;margin-top:10px;margin-bottom:3px}.fuelux .repeater-thumbnail-cont{height:100%;overflow-y:auto;padding:6px;width:100%}.fuelux .repeater-thumbnail-cont.align-center,.fuelux .repeater-thumbnail-cont.align-justify,.fuelux .repeater-thumbnail-cont.align-left,.fuelux .repeater-thumbnail-cont.align-right{position:relative;font-size:.1px}.fuelux .repeater-thumbnail-cont.align-center:after,.fuelux .repeater-thumbnail-cont.align-justify:after,.fuelux .repeater-thumbnail-cont.align-left:after,.fuelux .repeater-thumbnail-cont.align-right:after{display:inline-block;width:100%;content:''}.fuelux .repeater-thumbnail-cont.align-center .infinitescroll-end,.fuelux .repeater-thumbnail-cont.align-justify .infinitescroll-end,.fuelux .repeater-thumbnail-cont.align-left .infinitescroll-end,.fuelux .repeater-thumbnail-cont.align-right .infinitescroll-end,.fuelux .repeater-thumbnail-cont.align-center .infinitescroll-load,.fuelux .repeater-thumbnail-cont.align-justify .infinitescroll-load,.fuelux .repeater-thumbnail-cont.align-left .infinitescroll-load,.fuelux .repeater-thumbnail-cont.align-right .infinitescroll-load{display:inline-block;width:100%}.fuelux .repeater-thumbnail-cont.align-center .repeater-thumbnail,.fuelux .repeater-thumbnail-cont.align-justify .repeater-thumbnail,.fuelux .repeater-thumbnail-cont.align-left .repeater-thumbnail,.fuelux .repeater-thumbnail-cont.align-right .repeater-thumbnail{display:inline-block;float:none;font-size:14px}.fuelux .repeater-thumbnail-cont.align-center .repeater-thumbnail:after,.fuelux .repeater-thumbnail-cont.align-justify .repeater-thumbnail:after,.fuelux .repeater-thumbnail-cont.align-left .repeater-thumbnail:after,.fuelux .repeater-thumbnail-cont.align-right .repeater-thumbnail:after{content:' '}.fuelux .repeater-thumbnail-cont.align-center{text-align:center}.fuelux .repeater-thumbnail-cont.align-justify{text-align:justify}.fuelux .repeater-thumbnail-cont.align-left{text-align:left}.fuelux .repeater-thumbnail-cont.align-right{text-align:right}.fuelux .repeater-thumbnail-cont div.empty{font-size:14px;font-style:italic;padding:14px 10px 20px;text-align:center}.fuelux .repeater-thumbnail-cont .selectable:hover{background:#f5f5f5;cursor:pointer}.fuelux .repeater-thumbnail-cont .selectable.selected{background:#eeeeee}.fuelux .repeater-thumbnail-cont .selectable.selected:hover{background:#dddddd}.fuelux .spinbox{display:inline-block;position:relative}.fuelux .spinbox.digits-3{width:60px}.fuelux .spinbox.disabled .spinbox-buttons{cursor:not-allowed}.fuelux .spinbox .spinbox-input{float:left;padding-bottom:3px;padding:0 25px 0 7px}.fuelux .spinbox .spinbox-input::-ms-clear{display:none}.fuelux .spinbox .btn{position:relative;width:20px;height:13px;padding-top:0;padding-right:9px;padding-left:9px;overflow-y:hidden}.fuelux .spinbox .btn.disabled{cursor:not-allowed}.fuelux .spinbox .spinbox-buttons{position:absolute;height:28px;width:20px;right:2px}.fuelux .spinbox .spinbox-up{padding:0 0 14px 1px;top:2px}.fuelux .spinbox .spinbox-up .glyphicon-chevron-up{position:relative;top:0}.fuelux .spinbox .btn-group>.btn.spinbox-up{border-top-right-radius:4px}.fuelux .spinbox .spinbox-down{padding:0 0 8px 1px;top:2px;height:15px;border-bottom-left-radius:4px}.fuelux .spinbox .spinbox-down .glyphicon-chevron-down{position:relative;left:0;top:0}.fuelux .spinbox input::-ms-clear{display:none}.fuelux .scheduler .row{margin-bottom:10px}.fuelux .scheduler .row.no-margin{margin-bottom:0}.fuelux .scheduler .control-label{min-width:7em}.fuelux .scheduler .inline-form-text{float:left;line-height:27px;margin-top:4px}.fuelux .scheduler .form-group{margin-bottom:0}.fuelux .scheduler .start-datetime .form-group{margin-left:0}.fuelux .scheduler .start-datetime .combobox{max-width:9em}.fuelux .scheduler .start-datetime .combobox .dropdown-menu{max-height:200px;overflow:auto}.fuelux .scheduler .start-datetime .dropdown{float:left;margin:0 10px 0 0}.fuelux .scheduler .timezone-container .input-group{max-width:20em}.fuelux .scheduler .timezone-container .dropdown-label{height:18px;white-space:nowrap;max-width:20em;overflow:hidden;text-overflow:ellipsis}.fuelux .scheduler .timezone-container .dropdown-menu{max-height:200px;overflow:auto}.fuelux .scheduler .repeat-panel{margin-left:0}.fuelux .scheduler .repeat-panel label{font-weight:normal}.fuelux .scheduler .repeat-panel .radio{margin-right:10px}.fuelux .scheduler .repeat-panel .form-group{margin-left:0}.fuelux .scheduler .repeat-interval{margin-left:0;*zoom:1}.fuelux .scheduler .repeat-interval:before,.fuelux .scheduler .repeat-interval:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-interval:after{clear:both}.fuelux .scheduler .repeat-interval .form-group{margin-left:0}.fuelux .scheduler .repeat-interval .dropdown-menu{max-height:200px;overflow:auto}.fuelux .scheduler .repeat-interval .repeat-every-panel{float:left}.fuelux .scheduler .repeat-interval .repeat-every-panel .repeat-every-pretext{padding:0 10px}.fuelux .scheduler .repeat-interval .repeat-every-panel .spinbox{float:left;margin-right:10px}.fuelux .scheduler .repeat-interval .repeat-every-panel .spinbox input{margin-bottom:0}.fuelux .scheduler .repeat-monthly .repeat-monthly-date{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-monthly .repeat-monthly-date:before,.fuelux .scheduler .repeat-monthly .repeat-monthly-date:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-monthly .repeat-monthly-date:after{clear:both}.fuelux .scheduler .repeat-monthly .repeat-monthly-date .selectlist{margin-left:5px}.fuelux .scheduler .repeat-monthly .repeat-monthly-day{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-monthly .repeat-monthly-day:before,.fuelux .scheduler .repeat-monthly .repeat-monthly-day:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-monthly .repeat-monthly-day:after{clear:both}.fuelux .scheduler .repeat-monthly .month-days{margin-left:10px}.fuelux .scheduler .repeat-yearly .repeat-yearly-date{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-yearly .repeat-yearly-date:before,.fuelux .scheduler .repeat-yearly .repeat-yearly-date:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-yearly .repeat-yearly-date:after{clear:both}.fuelux .scheduler .repeat-yearly .repeat-yearly-date .year-month-day{margin-left:10px}.fuelux .scheduler .repeat-yearly .year-month-days{margin-left:10px}.fuelux .scheduler .repeat-yearly .year-month{margin-left:10px}.fuelux .scheduler .repeat-yearly .repeat-yearly-day{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-yearly .repeat-yearly-day:before,.fuelux .scheduler .repeat-yearly .repeat-yearly-day:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-yearly .repeat-yearly-day:after{clear:both}.fuelux .scheduler .repeat-yearly .repeat-yearly-day .repeat-yearly-day-text{margin-left:10px}.fuelux .scheduler .repeat-weekly.repeat-days-of-the-week{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-weekly.repeat-days-of-the-week:before,.fuelux .scheduler .repeat-weekly.repeat-days-of-the-week:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-weekly.repeat-days-of-the-week:after{clear:both}.fuelux .scheduler .repeat-weekly button:not(.active){background-color:#FFF}.fuelux .scheduler .repeat-weekly .btn-group.disabled{position:relative;opacity:.65}.fuelux .scheduler .repeat-weekly .btn-group.disabled:before{background:transparent;bottom:0;content:\"\";left:0;position:absolute;right:0;top:0;z-index:5}.fuelux .scheduler .selectlist{float:left}.fuelux .scheduler label.radio{float:left;line-height:27px}.fuelux .scheduler label.radio input{margin-top:8px}.fuelux .scheduler .repeat-end .end-after{float:left;display:inline-block;margin-right:10px}.fuelux .scheduler .repeat-end .form-group{margin-left:0}.fuelux .scheduler .repeat-end .end-option-panel{padding-left:10px}.fuelux .scheduler .repeat-end .selectlist{min-width:100%}.fuelux .scheduler .repeat-end .selectlist button,.fuelux .scheduler .repeat-end .selectlist ul{min-width:100%}.fuelux .scheduler input::-ms-clear{display:none}.fuelux .search.disabled .input-group-btn{cursor:not-allowed}.fuelux .search input::-ms-clear{display:none}.fuelux .selectlist.disabled{cursor:not-allowed}.fuelux .selectlist .selected-label{overflow:hidden;min-width:2em}.fuelux .selectlist .dropdown-menu{min-width:inherit;overflow-y:auto}.fuelux .selectlist .btn.dropdown-toggle{text-align:left;padding-right:28px}.fuelux .selectlist .btn.dropdown-toggle .caret{margin:auto;position:absolute;top:0;bottom:0;right:12px}.fuelux .button-sizer,.fuelux .selectlist-sizer{display:inline-block;position:absolute;visibility:hidden;top:0;float:left}.fuelux .button-sizer .selectlist,.fuelux .selectlist-sizer .selectlist{display:block !important}.fuelux .button-sizer .dropdown-menu,.fuelux .selectlist-sizer .dropdown-menu{display:block;min-width:inherit}.fuelux .button-sizer .selected-label,.fuelux .selectlist-sizer .selected-label{width:auto !important}.fuelux .picker{display:inline-block;position:relative}.fuelux .picker[data-ellipsis=\"true\"].showing input.picker-field{overflow:visible;text-overflow:clip;white-space:normal}.fuelux .picker[data-ellipsis=\"true\"] input.picker-field{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fuelux .picker[data-ellipsis=\"true\"] input.picker-field::-ms-clear{display:none}.fuelux .picker[data-ellipsis=\"true\"] textarea.picker-field[readonly]{overflow:hidden}.fuelux .picker.showing .picker-footer,.fuelux .picker.showing .picker-header,.fuelux .picker.showing .picker-popup{display:block;z-index:1}.fuelux .picker.showing input.picker-field,.fuelux .picker.showing textarea.picker-field{background:#FFF;border:1px solid #cccccc;box-shadow:none;position:relative;z-index:1}.fuelux .picker input.picker-field,.fuelux .picker textarea.picker-field{resize:none}.fuelux .picker input.picker-field[readonly],.fuelux .picker textarea.picker-field[readonly]{background:#FFF;cursor:auto}.fuelux .picker input.picker-field[readonly].glass,.fuelux .picker textarea.picker-field[readonly].glass{background:none}.fuelux .picker input.picker-field[readonly].glass:hover,.fuelux .picker textarea.picker-field[readonly].glass:hover{background:#d9edf7;cursor:pointer}.fuelux .picker input.picker-field:focus,.fuelux .picker textarea.picker-field:focus{border:1px solid #cccccc;box-shadow:none}.fuelux .picker-cancel{font-size:12px;margin-right:4px;vertical-align:middle}.fuelux .picker-footer,.fuelux .picker-header{display:none;left:0;line-height:1;right:0}.fuelux .picker-footer{padding:8px 10px 8px 0;text-align:right;bottom:0;position:absolute}.fuelux .picker-header{height:31px;padding:8px 0 0 10px}.fuelux .picker-header h1,.fuelux .picker-header h2,.fuelux .picker-header h3,.fuelux .picker-header h4,.fuelux .picker-header h5,.fuelux .picker-header h6{margin:0}.fuelux .picker-popup{background:#d9edf7;background-clip:padding-box;border:1px solid #cccccc;border-radius:4px;box-shadow:0 0 0 1px #FFF inset;display:none;position:absolute;padding-left:6px;padding-right:6px;height:234px;width:350px;margin:4px 0}.fuelux .picker .picker-body.well{background-color:#fff;overflow:scroll;padding:0;height:165px}.fuelux .picker .tree{border:none}.fuelux .picker .glass{background:transparent;border:1px solid #FFF;box-shadow:none}.fuelux .picker .glass:hover{background:#d9edf7;border-color:#5B9DD9;cursor:pointer}.fuelux .picker .glass:hover[disabled]{background:transparent;border-color:#FFF;cursor:not-allowed}.fuelux .picker .glass:focus{background:#FFF;border-color:#5B9DD9;box-shadow:inset 0 1px 1px rgba(0,0,0,0.75),0 0 8px rgba(91,157,217,0.6);cursor:auto}.fuelux .picker .glass:focus[disabled]{background:transparent;border-color:#FFF;cursor:not-allowed}.fuelux .picker .glass[disabled]{cursor:not-allowed}.fuelux .tree{border:1px solid #999999;border-radius:4px 4px 4px 4px;padding:10px 15px 0 15px;overflow-x:auto;overflow-y:auto;position:relative;list-style:none}.fuelux .tree *:focus{outline:none}.fuelux .tree button:focus{color:#999999}.fuelux .tree ul{padding-left:0;margin-top:0;margin-bottom:0;list-style:none}.fuelux .tree li{margin:0;margin-top:5px;margin-bottom:5px}.fuelux .tree .tree-loader{margin-left:65px}.fuelux .tree>.tree-loader{margin-left:50px}.fuelux .tree .tree-open>.tree-branch-header .glyphicon-play{transform:rotate(90deg);-ms-transform:rotate(90deg);-webkit-transform:rotate(90deg);position:relative}.fuelux .tree [data-children=false]>.tree-branch-header .icon-caret:before{content:'\\00a0'}.fuelux .tree .tree-branch .tree-branch-header{position:relative;border-radius:6px;white-space:nowrap}.fuelux .tree .tree-branch .tree-branch-header .tree-branch-name:hover{color:#999999}.fuelux .tree .tree-branch .tree-branch-header .glyphicon-play{font-size:10px;padding-right:5px;padding-left:7px}.fuelux .tree .tree-branch .tree-branch-header .glyphicon-play:before{position:relative;top:-2px}.fuelux .tree .tree-branch .tree-branch-header .tree-branch-name{white-space:nowrap;border-radius:6px;background-color:transparent;border:0}.fuelux .tree .tree-branch .tree-branch-header label{font-weight:normal;padding-left:3px;margin-bottom:0;cursor:pointer}.fuelux .tree .tree-branch .tree-branch-children{margin-left:14px}.fuelux .tree .tree-branch[haschildren='false'] .icon-caret,.fuelux .tree .tree-branch[data-has-children='false'] .icon-caret{visibility:hidden}.fuelux .tree .tree-item,.fuelux .tree .tree-overflow{white-space:nowrap;position:relative;cursor:pointer;border-radius:6px;margin-left:26px}.fuelux .tree .tree-item .tree-item-name,.fuelux .tree .tree-overflow .tree-item-name,.fuelux .tree .tree-item .tree-overflow-name,.fuelux .tree .tree-overflow .tree-overflow-name{white-space:nowrap;border-radius:6px;background-color:transparent;border:0}.fuelux .tree .tree-item .tree-overflow-name .tree-label,.fuelux .tree .tree-overflow .tree-overflow-name .tree-label{margin-left:15px;color:#0088cc}.fuelux .tree .tree-item .tree-item-name:hover,.fuelux .tree .tree-overflow .tree-item-name:hover,.fuelux .tree .tree-item .tree-overflow-name:hover,.fuelux .tree .tree-overflow .tree-overflow-name:hover{color:#999999}.fuelux .tree .tree-item.tree-selected .tree-item-name,.fuelux .tree .tree-overflow.tree-selected .tree-item-name{background-color:#eeeeee;color:#333333}.fuelux .tree .tree-item label,.fuelux .tree .tree-overflow label{font-weight:normal;padding-left:7px;margin-bottom:0;cursor:pointer}.fuelux .tree .icon-caret:hover+.tree-branch-name{color:#999999}.fuelux .tree.tree-folder-select .tree-branch .icon-caret{background-color:transparent;border:0}.fuelux .tree.tree-folder-select .tree-branch .icon-caret:hover{cursor:pointer;color:#999999}.fuelux .tree.tree-folder-select .tree-branch>.tree-branch-name{padding:1px 5px 0 5px;border-radius:6px}.fuelux .tree.tree-folder-select .tree-branch>.tree-branch-name.tree-selected{background-color:#eeeeee}.fuelux .tree.tree-folder-select .tree-branch.tree-selected>.tree-branch-header .tree-branch-name{background-color:#eeeeee}.fuelux .tree.tree-folder-select .tree-branch.tree-selected>.tree-branch-header .tree-branch-name:hover{background-color:#eeeeee}.fuelux .truncate .tree .tree-branch-header .tree-branch-name,.fuelux .truncate .tree .tree-item .tree-item-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fuelux .wizard{*zoom:1;border:1px solid #d4d4d4;border-radius:4px;background-color:#fafafa;position:relative;min-height:48px}.fuelux .wizard:before,.fuelux .wizard:after{display:table;content:\"\";line-height:0}.fuelux .wizard:after{clear:both}.fuelux .wizard.no-steps-container{overflow:hidden}.fuelux .wizard .steps-container{border-radius:4px 4px 0 0;overflow:hidden}.fuelux .wizard>ul.steps,.fuelux .wizard>.steps-container>ul.steps{list-style:none outside none;padding:0;margin:0;width:999999px}.fuelux .wizard>ul.steps.previous-disabled li.complete,.fuelux .wizard>.steps-container>ul.steps.previous-disabled li.complete{cursor:default}.fuelux .wizard>ul.steps.previous-disabled li.complete:hover,.fuelux .wizard>.steps-container>ul.steps.previous-disabled li.complete:hover{background:#f5f5f5;color:#468847;cursor:default}.fuelux .wizard>ul.steps.previous-disabled li.complete:hover .chevron:before,.fuelux .wizard>.steps-container>ul.steps.previous-disabled li.complete:hover .chevron:before{border-left-color:#f5f5f5}.fuelux .wizard>ul.steps li,.fuelux .wizard>.steps-container>ul.steps li{float:left;margin:0;padding:0 20px 0 30px;height:46px;line-height:46px;position:relative;background:#eeeeee;color:#999999;font-size:16px;cursor:not-allowed}.fuelux .wizard>ul.steps li>.has-secondary-text,.fuelux .wizard>.steps-container>ul.steps li>.has-secondary-text{display:inline}.fuelux .wizard>ul.steps li>.has-secondary-text>h4,.fuelux .wizard>.steps-container>ul.steps li>.has-secondary-text>h4{display:inline;font-size:16px;font-weight:normal}.fuelux .wizard>ul.steps li>.has-secondary-text>small,.fuelux .wizard>.steps-container>ul.steps li>.has-secondary-text>small{display:none}.fuelux .wizard>ul.steps li .chevron,.fuelux .wizard>.steps-container>ul.steps li .chevron{border:24px solid transparent;border-left:14px solid #d4d4d4;border-right:0;display:block;position:absolute;right:-14px;top:0;z-index:1}.fuelux .wizard>ul.steps li .chevron:before,.fuelux .wizard>.steps-container>ul.steps li .chevron:before{border:24px solid transparent;border-left:14px solid #eeeeee;border-right:0;content:\"\";display:block;position:absolute;right:1px;top:-24px}.fuelux .wizard>ul.steps li.complete,.fuelux .wizard>.steps-container>ul.steps li.complete{background:#f5f5f5;color:#468847}.fuelux .wizard>ul.steps li.complete:hover,.fuelux .wizard>.steps-container>ul.steps li.complete:hover{background:#e2eaee;cursor:pointer}.fuelux .wizard>ul.steps li.complete:hover .chevron:before,.fuelux .wizard>.steps-container>ul.steps li.complete:hover .chevron:before{border-left:14px solid #e2eaee}.fuelux .wizard>ul.steps li.complete .chevron:before,.fuelux .wizard>.steps-container>ul.steps li.complete .chevron:before{border-left:14px solid #f5f5f5}.fuelux .wizard>ul.steps li.active,.fuelux .wizard>.steps-container>ul.steps li.active{background:#eef7fb;color:#3a87ad;cursor:default}.fuelux .wizard>ul.steps li.active .chevron:before,.fuelux .wizard>.steps-container>ul.steps li.active .chevron:before{border-left:14px solid #eef7fb}.fuelux .wizard>ul.steps li.active .badge,.fuelux .wizard>.steps-container>ul.steps li.active .badge{background-color:#3a87ad}.fuelux .wizard>ul.steps li .badge,.fuelux .wizard>.steps-container>ul.steps li .badge{margin-right:8px}.fuelux .wizard>ul.steps li .badge-success,.fuelux .wizard>.steps-container>ul.steps li .badge-success{background-color:#468847}.fuelux .wizard>ul.steps li:first-child,.fuelux .wizard>.steps-container>ul.steps li:first-child{border-radius:4px 0 0 0;padding-left:20px}.fuelux .wizard.rtl{direction:rtl}.fuelux .wizard.rtl>ul.steps,.fuelux .wizard.rtl>.steps-container>ul.steps{right:0;left:auto;float:right}.fuelux .wizard.rtl>ul.steps.previous-disabled li.complete:hover .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps.previous-disabled li.complete:hover .chevron:before{border-right-color:#f5f5f5}.fuelux .wizard.rtl>ul.steps li,.fuelux .wizard.rtl>.steps-container>ul.steps li{float:right}.fuelux .wizard.rtl>ul.steps li .chevron,.fuelux .wizard.rtl>.steps-container>ul.steps li .chevron{right:auto;left:-14px;border-right:14px solid #cccccc;border-left:0}.fuelux .wizard.rtl>ul.steps li .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps li .chevron:before{right:auto;left:1px;border-right:14px solid #eeeeee;border-left:0}.fuelux .wizard.rtl>ul.steps li.active .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps li.active .chevron:before{border-right:14px solid #eef7fb}.fuelux .wizard.rtl>ul.steps li.complete .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps li.complete .chevron:before{border-right:14px solid #f5f5f5}.fuelux .wizard.rtl>ul.steps li.complete:hover .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps li.complete:hover .chevron:before{border-right:14px solid #e2eaee;border-left:none}.fuelux .wizard.rtl>ul.steps li .badge,.fuelux .wizard.rtl>.steps-container>ul.steps li .badge{margin-left:8px}.fuelux .wizard.rtl>.actions{right:auto;left:0;float:left;border-left:none;border-right:1px solid #d4d4d4;border-radius:4px 0 0 0}.fuelux .wizard.rtl>.actions .btn-prev span{margin-left:5px;margin-right:0}.fuelux .wizard.rtl>.actions .btn-next span{margin-left:0;margin-right:5px}.fuelux .wizard>.actions{z-index:1000;position:absolute;right:0;top:0;line-height:46px;float:right;padding-left:15px;padding-right:15px;vertical-align:middle;background-color:#e6e6e6;border-left:1px solid #d4d4d4;border-radius:0 4px 0 0}.fuelux .wizard>.actions a{line-height:45px;font-size:12px;margin-right:8px}.fuelux .wizard>.actions .btn-prev[disabled]{cursor:not-allowed}.fuelux .wizard>.actions .btn-prev span{margin-right:5px}.fuelux .wizard>.actions .btn-next[disabled]{cursor:not-allowed}.fuelux .wizard>.actions .btn-next span{margin-left:5px}.fuelux .wizard .step-content{border-top:1px solid #cccccc;padding:10px;float:left;width:100%}.fuelux .wizard .step-content .step-pane{display:none}.fuelux .wizard .step-content>.active{display:block}.fuelux .wizard .step-content>.active .btn-group .active{display:inline-block}.fuelux .wizard.complete>.actions .btn-next .glyphicon{display:none}.fuelux .serif{font-family:Georgia,\"Times New Roman\",Times,serif}.fuelux .monospace{font-family:Monaco,Menlo,Consolas,\"Courier New\",monospace}.fuelux .text-sm{font-size:11.9px}.fuelux .text-lg{font-size:17.5px}.fuelux .padding-xs{padding:5px}.fuelux .padding-xs-horizontal{padding:0 5px}.fuelux .padding-xs-vertical{padding:5px 0}.fuelux .padding-xs-top{padding-top:5px}.fuelux .padding-xs-bottom{padding-bottom:5px}.fuelux .padding-xs-left{padding-left:5px}.fuelux .padding-xs-right{padding-right:5px}.fuelux .padding-sm{padding:10px}.fuelux .padding-sm-horizontal{padding:0 10px}.fuelux .padding-sm-vertical{padding:10px 0}.fuelux .padding-sm-top{padding-top:10px}.fuelux .padding-sm-bottom{padding-bottom:10px}.fuelux .padding-sm-left{padding-left:10px}.fuelux .padding-sm-right{padding-right:10px}.fuelux .padding-md{padding:15px}.fuelux .padding-md-horizontal{padding:0 15px}.fuelux .padding-md-vertical{padding:15px 0}.fuelux .padding-md-top{padding-top:15px}.fuelux .padding-md-bottom{padding-bottom:15px}.fuelux .padding-md-left{padding-left:15px}.fuelux .padding-md-right{padding-right:15px}.fuelux .padding-lg{padding:20px}.fuelux .padding-lg-horizontal{padding:0 20px}.fuelux .padding-lg-vertical{padding:20px 0}.fuelux .padding-lg-top{padding-top:20px}.fuelux .padding-lg-bottom{padding-bottom:20px}.fuelux .padding-lg-left{padding-left:20px}.fuelux .padding-lg-right{padding-right:20px}.fuelux .margin-xs{margin:5px}.fuelux .margin-xs-horizontal{margin:0 5px}.fuelux .margin-xs-vertical{margin:5px 0}.fuelux .margin-xs-top{margin-top:5px}.fuelux .margin-xs-bottom{margin-bottom:5px}.fuelux .margin-xs-left{margin-left:5px}.fuelux .margin-xs-right{margin-right:5px}.fuelux .margin-sm{margin:10px}.fuelux .margin-sm-horizontal{margin:0 10px}.fuelux .margin-sm-vertical{margin:10px 0}.fuelux .margin-sm-top{margin-top:10px}.fuelux .margin-sm-bottom{margin-bottom:10px}.fuelux .margin-sm-left{margin-left:10px}.fuelux .margin-sm-right{margin-right:10px}.fuelux .margin-md{margin:15px}.fuelux .margin-md-horizontal{margin:0 15px}.fuelux .margin-md-vertical{margin:15px 0}.fuelux .margin-md-top{margin-top:15px}.fuelux .margin-md-bottom{margin-bottom:15px}.fuelux .margin-md-left{margin-left:15px}.fuelux .margin-md-right{margin-right:15px}.fuelux .margin-lg{margin:20px}.fuelux .margin-lg-horizontal{margin:0 20px}.fuelux .margin-lg-vertical{margin:20px 0}.fuelux .margin-lg-top{margin-top:20px}.fuelux .margin-lg-bottom{margin-bottom:20px}.fuelux .margin-lg-left{margin-left:20px}.fuelux .margin-lg-right{margin-right:20px}.fuelux .data-label{text-transform:uppercase;font-size:10px;margin-bottom:2px;text-shadow:0 1px #FFF;color:#666666}.fuelux .data-value{font-size:14px}.fuelux .section-heading{font-size:16px;color:#333333;margin:0 0 10px;padding:0;text-shadow:0 1px #FFF}.fuelux .truncate{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"; });
+define('extend',['require','exports','module'],function (require, exports, module) {'use strict';
+
+var hasOwn = Object.prototype.hasOwnProperty;
+var toStr = Object.prototype.toString;
+
+var isArray = function isArray(arr) {
+	if (typeof Array.isArray === 'function') {
+		return Array.isArray(arr);
+	}
+
+	return toStr.call(arr) === '[object Array]';
+};
+
+var isPlainObject = function isPlainObject(obj) {
+	if (!obj || toStr.call(obj) !== '[object Object]') {
+		return false;
+	}
+
+	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
+	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+	// Not own constructor property must be Object
+	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
+		return false;
+	}
+
+	// Own properties are enumerated firstly, so to speed up,
+	// if last one is own, then all properties are own.
+	var key;
+	for (key in obj) { /**/ }
+
+	return typeof key === 'undefined' || hasOwn.call(obj, key);
+};
+
+module.exports = function extend() {
+	var options, name, src, copy, copyIsArray, clone;
+	var target = arguments[0];
+	var i = 1;
+	var length = arguments.length;
+	var deep = false;
+
+	// Handle a deep copy situation
+	if (typeof target === 'boolean') {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	}
+	if (target == null || (typeof target !== 'object' && typeof target !== 'function')) {
+		target = {};
+	}
+
+	for (; i < length; ++i) {
+		options = arguments[i];
+		// Only deal with non-null/undefined values
+		if (options != null) {
+			// Extend the base object
+			for (name in options) {
+				src = target[name];
+				copy = options[name];
+
+				// Prevent never-ending loop
+				if (target !== copy) {
+					// Recurse if we're merging plain objects or arrays
+					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+						if (copyIsArray) {
+							copyIsArray = false;
+							clone = src && isArray(src) ? src : [];
+						} else {
+							clone = src && isPlainObject(src) ? src : {};
+						}
+
+						// Never move original objects, clone them
+						target[name] = extend(deep, clone, copy);
+
+					// Don't bring in undefined values
+					} else if (typeof copy !== 'undefined') {
+						target[name] = copy;
+					}
+				}
+			}
+		}
+	}
+
+	// Return the modified object
+	return target;
+};
+
+});
+
 //! moment.js
 //! version : 2.18.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -53166,95 +53255,6 @@ hooks.prototype             = proto;
 return hooks;
 
 })));
-
-define('extend',['require','exports','module'],function (require, exports, module) {'use strict';
-
-var hasOwn = Object.prototype.hasOwnProperty;
-var toStr = Object.prototype.toString;
-
-var isArray = function isArray(arr) {
-	if (typeof Array.isArray === 'function') {
-		return Array.isArray(arr);
-	}
-
-	return toStr.call(arr) === '[object Array]';
-};
-
-var isPlainObject = function isPlainObject(obj) {
-	if (!obj || toStr.call(obj) !== '[object Object]') {
-		return false;
-	}
-
-	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
-	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
-	// Not own constructor property must be Object
-	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
-		return false;
-	}
-
-	// Own properties are enumerated firstly, so to speed up,
-	// if last one is own, then all properties are own.
-	var key;
-	for (key in obj) { /**/ }
-
-	return typeof key === 'undefined' || hasOwn.call(obj, key);
-};
-
-module.exports = function extend() {
-	var options, name, src, copy, copyIsArray, clone;
-	var target = arguments[0];
-	var i = 1;
-	var length = arguments.length;
-	var deep = false;
-
-	// Handle a deep copy situation
-	if (typeof target === 'boolean') {
-		deep = target;
-		target = arguments[1] || {};
-		// skip the boolean and the target
-		i = 2;
-	}
-	if (target == null || (typeof target !== 'object' && typeof target !== 'function')) {
-		target = {};
-	}
-
-	for (; i < length; ++i) {
-		options = arguments[i];
-		// Only deal with non-null/undefined values
-		if (options != null) {
-			// Extend the base object
-			for (name in options) {
-				src = target[name];
-				copy = options[name];
-
-				// Prevent never-ending loop
-				if (target !== copy) {
-					// Recurse if we're merging plain objects or arrays
-					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
-						if (copyIsArray) {
-							copyIsArray = false;
-							clone = src && isArray(src) ? src : [];
-						} else {
-							clone = src && isPlainObject(src) ? src : {};
-						}
-
-						// Never move original objects, clone them
-						target[name] = extend(deep, clone, copy);
-
-					// Don't bring in undefined values
-					} else if (typeof copy !== 'undefined') {
-						target[name] = copy;
-					}
-				}
-			}
-		}
-	}
-
-	// Return the modified object
-	return target;
-};
-
-});
 
 /*!
  * FullCalendar v3.4.0
@@ -71165,4 +71165,4 @@ define('aurelia-chart/attributes/chart-attribute',["exports", "aurelia-framework
 ;define('bootstrap-select', ['bootstrap-select/js/bootstrap-select'], function (main) { return main; });
 
 define('text!bootstrap-select/css/bootstrap-select.css', ['module'], function(module) { module.exports = "/*!\r\n * Bootstrap-select v1.12.4 (http://silviomoreto.github.io/bootstrap-select)\r\n *\r\n * Copyright 2013-2017 bootstrap-select\r\n * Licensed under MIT (https://github.com/silviomoreto/bootstrap-select/blob/master/LICENSE)\r\n */\r\n\r\nselect.bs-select-hidden,\nselect.selectpicker {\n  display: none !important;\n}\n.bootstrap-select {\n  width: 220px \\0;\n  /*IE9 and below*/\n}\n.bootstrap-select > .dropdown-toggle {\n  width: 100%;\n  padding-right: 25px;\n  z-index: 1;\n}\n.bootstrap-select > .dropdown-toggle.bs-placeholder,\n.bootstrap-select > .dropdown-toggle.bs-placeholder:hover,\n.bootstrap-select > .dropdown-toggle.bs-placeholder:focus,\n.bootstrap-select > .dropdown-toggle.bs-placeholder:active {\n  color: #999;\n}\n.bootstrap-select > select {\n  position: absolute !important;\n  bottom: 0;\n  left: 50%;\n  display: block !important;\n  width: 0.5px !important;\n  height: 100% !important;\n  padding: 0 !important;\n  opacity: 0 !important;\n  border: none;\n}\n.bootstrap-select > select.mobile-device {\n  top: 0;\n  left: 0;\n  display: block !important;\n  width: 100% !important;\n  z-index: 2;\n}\n.has-error .bootstrap-select .dropdown-toggle,\n.error .bootstrap-select .dropdown-toggle {\n  border-color: #b94a48;\n}\n.bootstrap-select.fit-width {\n  width: auto !important;\n}\n.bootstrap-select:not([class*=\"col-\"]):not([class*=\"form-control\"]):not(.input-group-btn) {\n  width: 220px;\n}\n.bootstrap-select .dropdown-toggle:focus {\n  outline: thin dotted #333333 !important;\n  outline: 5px auto -webkit-focus-ring-color !important;\n  outline-offset: -2px;\n}\n.bootstrap-select.form-control {\n  margin-bottom: 0;\n  padding: 0;\n  border: none;\n}\n.bootstrap-select.form-control:not([class*=\"col-\"]) {\n  width: 100%;\n}\n.bootstrap-select.form-control.input-group-btn {\n  z-index: auto;\n}\n.bootstrap-select.form-control.input-group-btn:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n.bootstrap-select.btn-group:not(.input-group-btn),\n.bootstrap-select.btn-group[class*=\"col-\"] {\n  float: none;\n  display: inline-block;\n  margin-left: 0;\n}\n.bootstrap-select.btn-group.dropdown-menu-right,\n.bootstrap-select.btn-group[class*=\"col-\"].dropdown-menu-right,\n.row .bootstrap-select.btn-group[class*=\"col-\"].dropdown-menu-right {\n  float: right;\n}\n.form-inline .bootstrap-select.btn-group,\n.form-horizontal .bootstrap-select.btn-group,\n.form-group .bootstrap-select.btn-group {\n  margin-bottom: 0;\n}\n.form-group-lg .bootstrap-select.btn-group.form-control,\n.form-group-sm .bootstrap-select.btn-group.form-control {\n  padding: 0;\n}\n.form-group-lg .bootstrap-select.btn-group.form-control .dropdown-toggle,\n.form-group-sm .bootstrap-select.btn-group.form-control .dropdown-toggle {\n  height: 100%;\n  font-size: inherit;\n  line-height: inherit;\n  border-radius: inherit;\n}\n.form-inline .bootstrap-select.btn-group .form-control {\n  width: 100%;\n}\n.bootstrap-select.btn-group.disabled,\n.bootstrap-select.btn-group > .disabled {\n  cursor: not-allowed;\n}\n.bootstrap-select.btn-group.disabled:focus,\n.bootstrap-select.btn-group > .disabled:focus {\n  outline: none !important;\n}\n.bootstrap-select.btn-group.bs-container {\n  position: absolute;\n  height: 0 !important;\n  padding: 0 !important;\n}\n.bootstrap-select.btn-group.bs-container .dropdown-menu {\n  z-index: 1060;\n}\n.bootstrap-select.btn-group .dropdown-toggle .filter-option {\n  display: inline-block;\n  overflow: hidden;\n  width: 100%;\n  text-align: left;\n}\n.bootstrap-select.btn-group .dropdown-toggle .caret {\n  position: absolute;\n  top: 50%;\n  right: 12px;\n  margin-top: -2px;\n  vertical-align: middle;\n}\n.bootstrap-select.btn-group[class*=\"col-\"] .dropdown-toggle {\n  width: 100%;\n}\n.bootstrap-select.btn-group .dropdown-menu {\n  min-width: 100%;\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.bootstrap-select.btn-group .dropdown-menu.inner {\n  position: static;\n  float: none;\n  border: 0;\n  padding: 0;\n  margin: 0;\n  border-radius: 0;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n}\n.bootstrap-select.btn-group .dropdown-menu li {\n  position: relative;\n}\n.bootstrap-select.btn-group .dropdown-menu li.active small {\n  color: #fff;\n}\n.bootstrap-select.btn-group .dropdown-menu li.disabled a {\n  cursor: not-allowed;\n}\n.bootstrap-select.btn-group .dropdown-menu li a {\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n}\n.bootstrap-select.btn-group .dropdown-menu li a.opt {\n  position: relative;\n  padding-left: 2.25em;\n}\n.bootstrap-select.btn-group .dropdown-menu li a span.check-mark {\n  display: none;\n}\n.bootstrap-select.btn-group .dropdown-menu li a span.text {\n  display: inline-block;\n}\n.bootstrap-select.btn-group .dropdown-menu li small {\n  padding-left: 0.5em;\n}\n.bootstrap-select.btn-group .dropdown-menu .notify {\n  position: absolute;\n  bottom: 5px;\n  width: 96%;\n  margin: 0 2%;\n  min-height: 26px;\n  padding: 3px 5px;\n  background: #f5f5f5;\n  border: 1px solid #e3e3e3;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);\n  pointer-events: none;\n  opacity: 0.9;\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.bootstrap-select.btn-group .no-results {\n  padding: 3px;\n  background: #f5f5f5;\n  margin: 0 5px;\n  white-space: nowrap;\n}\n.bootstrap-select.btn-group.fit-width .dropdown-toggle .filter-option {\n  position: static;\n}\n.bootstrap-select.btn-group.fit-width .dropdown-toggle .caret {\n  position: static;\n  top: auto;\n  margin-top: -1px;\n}\n.bootstrap-select.btn-group.show-tick .dropdown-menu li.selected a span.check-mark {\n  position: absolute;\n  display: inline-block;\n  right: 15px;\n  margin-top: 5px;\n}\n.bootstrap-select.btn-group.show-tick .dropdown-menu li a span.text {\n  margin-right: 34px;\n}\n.bootstrap-select.show-menu-arrow.open > .dropdown-toggle {\n  z-index: 1061;\n}\n.bootstrap-select.show-menu-arrow .dropdown-toggle:before {\n  content: '';\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-bottom: 7px solid rgba(204, 204, 204, 0.2);\n  position: absolute;\n  bottom: -4px;\n  left: 9px;\n  display: none;\n}\n.bootstrap-select.show-menu-arrow .dropdown-toggle:after {\n  content: '';\n  border-left: 6px solid transparent;\n  border-right: 6px solid transparent;\n  border-bottom: 6px solid white;\n  position: absolute;\n  bottom: -4px;\n  left: 10px;\n  display: none;\n}\n.bootstrap-select.show-menu-arrow.dropup .dropdown-toggle:before {\n  bottom: auto;\n  top: -3px;\n  border-top: 7px solid rgba(204, 204, 204, 0.2);\n  border-bottom: 0;\n}\n.bootstrap-select.show-menu-arrow.dropup .dropdown-toggle:after {\n  bottom: auto;\n  top: -3px;\n  border-top: 6px solid white;\n  border-bottom: 0;\n}\n.bootstrap-select.show-menu-arrow.pull-right .dropdown-toggle:before {\n  right: 12px;\n  left: auto;\n}\n.bootstrap-select.show-menu-arrow.pull-right .dropdown-toggle:after {\n  right: 13px;\n  left: auto;\n}\n.bootstrap-select.show-menu-arrow.open > .dropdown-toggle:before,\n.bootstrap-select.show-menu-arrow.open > .dropdown-toggle:after {\n  display: block;\n}\n.bs-searchbox,\n.bs-actionsbox,\n.bs-donebutton {\n  padding: 4px 8px;\n}\n.bs-actionsbox {\n  width: 100%;\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.bs-actionsbox .btn-group button {\n  width: 50%;\n}\n.bs-donebutton {\n  float: left;\n  width: 100%;\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.bs-donebutton .btn-group button {\n  width: 100%;\n}\n.bs-searchbox + .bs-actionsbox {\n  padding: 0 8px 4px;\n}\n.bs-searchbox .form-control {\n  margin-bottom: 0;\n  width: 100%;\n  float: none;\n}\n/*# sourceMappingURL=bootstrap-select.css.map */"; });
-function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","text":"../node_modules\\text\\text","jquery":"../node_modules\\jquery\\dist\\jquery","moment":"../node_modules\\moment\\moment","extend":"../node_modules\\extend\\index","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-notification","location":"../node_modules/aurelia-notification/dist/amd","main":"aurelia-notification"},{"name":"aurelia-http-client","location":"../node_modules/aurelia-http-client/dist/amd","main":"aurelia-http-client"},{"name":"humane-js","location":"../node_modules/humane-js","main":"humane"},{"name":"aurelia-i18n","location":"../node_modules/aurelia-i18n/dist/amd","main":"aurelia-i18n"},{"name":"i18next","location":"../node_modules/i18next/dist/commonjs","main":"index"},{"name":"regenerator-runtime","location":"../node_modules/regenerator-runtime","main":"runtime-module"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr"},{"name":"aurelia-dialog","location":"../node_modules/aurelia-dialog/dist/amd","main":"aurelia-dialog"},{"name":"nprogress","location":"../node_modules/nprogress","main":"nprogress"},{"name":"bootstrap","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min.js"},{"name":"aurelia-mask","location":"../node_modules/aurelia-mask/dist","main":"masked-input"},{"name":"flatpickr","location":"../node_modules/flatpickr/dist","main":"flatpickr"},{"name":"summernote","location":"../node_modules/summernote/dist/","main":"summernote"},{"name":"fuelux","location":"../node_modules/fuelux/dist","main":"js/fuelux.min"},{"name":"fullcalendar","location":"../node_modules/fullcalendar/dist","main":"fullcalendar"},{"name":"chart.js","location":"../node_modules/chart.js/dist","main":"Chart.min.js"},{"name":"aurelia-chart","location":"../node_modules/aurelia-chart/dist/amd","main":"index"},{"name":"bootstrap-select","location":"../node_modules/bootstrap-select/dist/","main":"js/bootstrap-select"}],"stubModules":["text"],"shim":{"bootstrap":{"deps":["jquery"],"exports":"$"},"aurelia-chart":{"deps":["chart.js"]}},"bundles":{"app-bundle":["app","environment","main","config/appConfig","config/routerConfig","resources/index","modules/analytics/analytics","modules/analytics/clientRequests","modules/analytics/helpTickets","modules/analytics/institutions","modules/facco/editPeople","modules/facco/facco","modules/facco/viewRequests","modules/home/about","modules/home/contact","modules/home/home","modules/home/institutions","modules/home/products","modules/home/register","modules/social/editBlog","modules/social/social","modules/social/viewBlogs","modules/social/viewForums","modules/social/writeBlog","modules/user/profile","modules/user/resetPassword","modules/user/user","resources/charts/bar-chart","resources/charts/chart-data","resources/charts/chart-element","resources/charts/doughnut-chart","resources/data/admin","resources/data/auth","resources/data/clientRequests","resources/data/config","resources/data/curriculum","resources/data/dataServices","resources/data/documents","resources/data/downloads","resources/data/events","resources/data/helpTickets","resources/data/inventory","resources/data/is4ua","resources/data/people","resources/data/products","resources/data/sessionData","resources/data/sessions","resources/data/siteInfo","resources/data/social","resources/data/systems","resources/dialogs/common-dialogs","resources/dialogs/confirm-dialog","resources/dialogs/document-dialog","resources/dialogs/email-dialog","resources/dialogs/event-dialog","resources/dialogs/input-dialog","resources/dialogs/message-dialog","resources/dialogs/note-dialog","resources/dialogs/password-dialog","resources/editor/editor","resources/editor/styles","resources/elements/add-systems","resources/elements/calendar","resources/elements/flat-picker","resources/elements/loading-indicator","resources/elements/multiselect","resources/elements/nav-bar","resources/elements/rate-it","resources/elements/submenu","resources/elements/table-navigation-bar","resources/elements/tree-node","resources/utils/dataTable","resources/utils/utils","resources/utils/validation","resources/value-converters/activate-button","resources/value-converters/arrow","resources/value-converters/check-box","resources/value-converters/course-name","resources/value-converters/date-format","resources/value-converters/file-type","resources/value-converters/filter-array","resources/value-converters/filter-clients","resources/value-converters/filter-sessions","resources/value-converters/format-digits","resources/value-converters/format-number","resources/value-converters/format-phone","resources/value-converters/get-array-value","resources/value-converters/gravatar-url-id","resources/value-converters/gravatar-url","resources/value-converters/help-ticket-statuses","resources/value-converters/help-ticket-subtypes","resources/value-converters/help-ticket-type","resources/value-converters/idsRequested","resources/value-converters/info-filter","resources/value-converters/lookup-value","resources/value-converters/onoff-switch","resources/value-converters/overlap","resources/value-converters/person-status-button","resources/value-converters/phone-number","resources/value-converters/request-status-class","resources/value-converters/sandbox","resources/value-converters/session-name","resources/value-converters/session-status-button","resources/value-converters/session-systems","resources/value-converters/session-type","resources/value-converters/session","resources/value-converters/sort-array","resources/value-converters/sort-date-time","resources/value-converters/stat-value","resources/value-converters/system-list","resources/value-converters/to-uppercase","resources/value-converters/translate-status","resources/value-converters/ucc-staff","resources/value-converters/ucc-title","modules/admin/Customers/bulkEmails","modules/admin/Customers/customers","modules/admin/Customers/editInstitutions","modules/admin/Customers/editPeople","modules/admin/documents/documents","modules/admin/inventory/editInventory","modules/admin/notes/editCalendar","modules/admin/notes/editNotes","modules/admin/notes/notes","modules/admin/site/admin","modules/admin/site/editConfig","modules/admin/site/editCurriculum","modules/admin/site/editDownloads","modules/admin/site/editHelpTickets","modules/admin/site/editMessages","modules/admin/site/editNews","modules/admin/site/site","modules/admin/system/editProduct","modules/admin/system/editSession","modules/admin/system/editSystem","modules/admin/system/system","modules/tech/requests/archiveClientRequests","modules/tech/requests/assignments","modules/tech/requests/createRequest","modules/tech/requests/techRequests","modules/tech/support/archiveHelpTickets","modules/tech/support/createHelpTickets","modules/tech/support/support","modules/tech/support/viewHelpTickets","modules/user/requests/clientRequests","modules/user/requests/createRequests","modules/user/requests/viewProducts","modules/user/requests/viewRequests","modules/user/support/createHelpTickets","modules/user/support/curriculum","modules/user/support/downloads","modules/user/support/links","modules/user/support/support","modules/user/support/viewHelpTickets","aurelia-templating-resources/compose","aurelia-templating-resources/if","aurelia-templating-resources/with","aurelia-templating-resources/repeat","aurelia-templating-resources/repeat-strategy-locator","aurelia-templating-resources/null-repeat-strategy","aurelia-templating-resources/array-repeat-strategy","aurelia-templating-resources/repeat-utilities","aurelia-templating-resources/map-repeat-strategy","aurelia-templating-resources/set-repeat-strategy","aurelia-templating-resources/number-repeat-strategy","aurelia-templating-resources/analyze-view-factory","aurelia-templating-resources/abstract-repeater","aurelia-templating-resources/show","aurelia-templating-resources/aurelia-hide-style","aurelia-templating-resources/hide","aurelia-templating-resources/sanitize-html","aurelia-templating-resources/html-sanitizer","aurelia-templating-resources/replaceable","aurelia-templating-resources/focus","aurelia-templating-resources/css-resource","aurelia-templating-resources/attr-binding-behavior","aurelia-templating-resources/binding-mode-behaviors","aurelia-templating-resources/throttle-binding-behavior","aurelia-templating-resources/debounce-binding-behavior","aurelia-templating-resources/self-binding-behavior","aurelia-templating-resources/signal-binding-behavior","aurelia-templating-resources/binding-signaler","aurelia-templating-resources/update-trigger-binding-behavior","aurelia-templating-resources/html-resource-plugin","aurelia-templating-resources/dynamic-element","aurelia-i18n/i18n","i18next/i18next","i18next/logger","i18next/EventEmitter","i18next/ResourceStore","i18next/utils","i18next/Translator","i18next/postProcessor","i18next/compatibility/v1","i18next/LanguageUtils","i18next/PluralResolver","i18next/Interpolator","i18next/BackendConnector","i18next/CacheConnector","i18next/defaults","aurelia-i18n/relativeTime","aurelia-i18n/defaultTranslations/relative.time","aurelia-i18n/df","aurelia-i18n/utils","aurelia-i18n/nf","aurelia-i18n/rt","aurelia-i18n/t","aurelia-i18n/base-i18n","aurelia-i18n/aurelia-i18n-loader","regenerator-runtime/runtime","aurelia-dialog/dialog-configuration","aurelia-dialog/renderer","aurelia-dialog/dialog-settings","aurelia-dialog/dialog-renderer","aurelia-dialog/ux-dialog","aurelia-dialog/ux-dialog-header","aurelia-dialog/dialog-controller","aurelia-dialog/lifecycle","aurelia-dialog/dialog-cancel-error","aurelia-dialog/ux-dialog-body","aurelia-dialog/ux-dialog-footer","aurelia-dialog/attach-focus","aurelia-dialog/dialog-service","node_modules/chart.js/dist/Chart.js","resources/css/fullcalendar","resources/css/styles","resources/editor/skins/moono-lisa/dialog","resources/editor/skins/moono-lisa/dialog_ie","resources/editor/skins/moono-lisa/dialog_ie8","resources/editor/skins/moono-lisa/dialog_iequirks","resources/editor/skins/moono-lisa/editor","resources/editor/skins/moono-lisa/editor_gecko","resources/editor/skins/moono-lisa/editor_ie","resources/editor/skins/moono-lisa/editor_ie8","resources/editor/skins/moono-lisa/editor_iequirks","resources/dialogs/documentForm","resources/dialogs/documentsTable","resources/htTimeline/response","resources/htTimeline/timeline","modules/admin/site/downloadForm","modules/admin/site/downloadTable","modules/analytics/components/curriculumHTChart","modules/analytics/components/curriculumHTTable","modules/analytics/components/helpTicketsByCurriculum","modules/analytics/components/helpTicketsByInstitution","modules/analytics/components/helpTicketsByPeople","modules/analytics/components/helpTicketsByStatus","modules/analytics/components/helpTicketsByType","modules/analytics/components/institutionHTChart","modules/analytics/components/institutionHTTable","modules/analytics/components/institutionRequestsDetail","modules/analytics/components/institutionsCharts","modules/analytics/components/institutionsTable","modules/analytics/components/peopleHTChart","modules/analytics/components/peopleHTTable","modules/analytics/components/productRequestsDetail","modules/analytics/components/productRequestsTable","modules/analytics/components/requestsByInstitution","modules/analytics/components/requestsByProducts","modules/analytics/components/requestsBySAPProducts","modules/analytics/components/requestsInstitutionChart","modules/analytics/components/requestsProductChart","modules/analytics/components/requestsSAPProductChart","modules/analytics/components/requestsTable","modules/analytics/components/sapProductRequestsTable","modules/analytics/components/statusHTChart","modules/analytics/components/statusHTTable","modules/analytics/components/typeHTChart","modules/analytics/components/typeHTTable","modules/facco/components/peopleTable","modules/facco/components/requestDetailDetails","modules/facco/components/requestsTable","modules/facco/components/viewRequestsTable","modules/home/components/homeContent","modules/home/components/homePageLinks","modules/home/components/newsItem","modules/home/components/uccInformation","modules/social/components/blogForm","modules/social/components/blogList","modules/social/components/blogListUCC","modules/social/components/blogPage","modules/social/components/blogPageUCC","modules/social/components/forumList","modules/social/components/forumPage","modules/social/components/writeBlogList","modules/user/components/banner","modules/user/components/carousel","modules/user/components/homePageLinks","modules/user/components/newsItem","modules/user/components/uccInformation","modules/admin/inventory/components/documentForm","modules/admin/inventory/components/Documents","modules/admin/inventory/components/documentsTable","modules/admin/inventory/components/History","modules/admin/inventory/components/inventoryForm","modules/admin/inventory/components/inventoryTable","modules/admin/inventory/components/Maintenance","modules/admin/inventory/components/Purchase","modules/admin/inventory/components/Technical","modules/admin/Customers/components/Address","modules/admin/Customers/components/Audit","modules/admin/Customers/components/Courses","modules/admin/Customers/components/Email","modules/admin/Customers/components/emailTable","modules/admin/Customers/components/instAddress","modules/admin/Customers/components/instIs4ua","modules/admin/Customers/components/institutionsForm","modules/admin/Customers/components/institutionsTable","modules/admin/Customers/components/instPeople","modules/admin/Customers/components/is4ua","modules/admin/Customers/components/Log","modules/admin/Customers/components/Password","modules/admin/Customers/components/peopleForm","modules/admin/Customers/components/peopleTable","modules/admin/Customers/components/Roles","modules/admin/Customers/components/selectionForm","modules/admin/documents/components/documentForm","modules/admin/documents/components/documentsTable","modules/admin/notes/components/ArchiveRequestsForm","modules/admin/notes/components/helpTicket","modules/admin/notes/components/notesForm","modules/admin/notes/components/notesTable","modules/admin/site/components/configForm","modules/admin/site/components/configTable","modules/admin/site/components/curriculumForm","modules/admin/site/components/curriculumTable","modules/admin/site/components/document","modules/admin/site/components/documentForm","modules/admin/site/components/documentsTable","modules/admin/site/components/downloadForm","modules/admin/site/components/downloadTable","modules/admin/site/components/foreverLogs","modules/admin/site/components/htTypeForm","modules/admin/site/components/htTypeTable","modules/admin/site/components/logFileTable","modules/admin/site/components/messageForm","modules/admin/site/components/messageTable","modules/admin/site/components/newsForm","modules/admin/site/components/newsTable","modules/admin/site/components/uploadedFilesTable","modules/admin/system/components/Assignments","modules/admin/system/components/Description","modules/admin/system/components/documentForm","modules/admin/system/components/Documents","modules/admin/system/components/documentsTable","modules/admin/system/components/edit-client-form","modules/admin/system/components/is4ua","modules/admin/system/components/Notes","modules/admin/system/components/productForm","modules/admin/system/components/productTable","modules/admin/system/components/sessionConfigTable","modules/admin/system/components/sessionForm","modules/admin/system/components/sessionTable","modules/admin/system/components/systemForm","modules/admin/system/components/Systems","modules/admin/system/components/systemTable","modules/tech/requests/components/ArchiveRequestsForm","modules/tech/requests/components/ArchiveRequestsTable","modules/tech/requests/components/archiveTable","modules/tech/requests/components/assignmentDetails","modules/tech/requests/components/bo","modules/tech/requests/components/bulkEmailForm","modules/tech/requests/components/Courses","modules/tech/requests/components/editRequestsForm","modules/tech/requests/components/erp","modules/tech/requests/components/hana","modules/tech/requests/components/requestDetailDetails","modules/tech/requests/components/requestDetails.1","modules/tech/requests/components/requestDetails","modules/tech/requests/components/requestsTable","modules/tech/requests/components/viewAssignmentForm","modules/tech/requests/components/viewRequestsForm","modules/tech/requests/components/viewRequestsFormOLD","modules/tech/requests/components/viewRequestsTable","modules/tech/support/components/additiontalInfo","modules/tech/support/components/documentForm","modules/tech/support/components/Documents","modules/tech/support/components/documentsTable","modules/tech/support/components/helpTicketDetails","modules/tech/support/components/helpTicketType","modules/tech/support/components/Requests","modules/tech/support/components/searchHTForm","modules/tech/support/components/selectProduct","modules/tech/support/components/viewArchiveHTForm","modules/tech/support/components/viewHelpTicketTableFilters","modules/tech/support/components/viewHTForm","modules/tech/support/components/viewHTSearchResults","modules/tech/support/components/viewHTTable","modules/user/requests/components/assignmentDetails","modules/user/requests/components/bo","modules/user/requests/components/client-request-step1","modules/user/requests/components/client-request-step2","modules/user/requests/components/client-request-step3","modules/user/requests/components/client-request-step4","modules/user/requests/components/Courses","modules/user/requests/components/erp","modules/user/requests/components/hana","modules/user/requests/components/requestDetails","modules/user/requests/components/viewRequestsForm","modules/user/requests/components/viewRequestsTable","modules/user/support/components/comment","modules/user/support/components/helpTicketDetails","modules/user/support/components/helpTicketType","modules/user/support/components/Requests","modules/user/support/components/viewHTForm","modules/user/support/components/viewHTTable"]}})}
+function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","text":"../node_modules\\text\\text","jquery":"../node_modules\\jquery\\dist\\jquery","extend":"../node_modules\\extend\\index","moment":"../node_modules\\moment\\moment","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-notification","location":"../node_modules/aurelia-notification/dist/amd","main":"aurelia-notification"},{"name":"aurelia-http-client","location":"../node_modules/aurelia-http-client/dist/amd","main":"aurelia-http-client"},{"name":"humane-js","location":"../node_modules/humane-js","main":"humane"},{"name":"aurelia-i18n","location":"../node_modules/aurelia-i18n/dist/amd","main":"aurelia-i18n"},{"name":"i18next","location":"../node_modules/i18next/dist/commonjs","main":"index"},{"name":"regenerator-runtime","location":"../node_modules/regenerator-runtime","main":"runtime-module"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr"},{"name":"aurelia-dialog","location":"../node_modules/aurelia-dialog/dist/amd","main":"aurelia-dialog"},{"name":"nprogress","location":"../node_modules/nprogress","main":"nprogress"},{"name":"bootstrap","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min.js"},{"name":"aurelia-mask","location":"../node_modules/aurelia-mask/dist","main":"masked-input"},{"name":"flatpickr","location":"../node_modules/flatpickr/dist","main":"flatpickr"},{"name":"summernote","location":"../node_modules/summernote/dist/","main":"summernote"},{"name":"fuelux","location":"../node_modules/fuelux/dist","main":"js/fuelux.min"},{"name":"fullcalendar","location":"../node_modules/fullcalendar/dist","main":"fullcalendar"},{"name":"chart.js","location":"../node_modules/chart.js/dist","main":"Chart.min.js"},{"name":"aurelia-chart","location":"../node_modules/aurelia-chart/dist/amd","main":"index"},{"name":"bootstrap-select","location":"../node_modules/bootstrap-select/dist/","main":"js/bootstrap-select"}],"stubModules":["text"],"shim":{"bootstrap":{"deps":["jquery"],"exports":"$"},"aurelia-chart":{"deps":["chart.js"]}},"bundles":{"app-bundle":["app","environment","main","config/appConfig","config/routerConfig","resources/index","resources/charts/bar-chart","resources/charts/chart-data","resources/charts/chart-element","resources/charts/doughnut-chart","resources/data/admin","resources/data/auth","resources/data/clientRequests","resources/data/config","resources/data/curriculum","resources/data/dataServices","resources/data/documents","resources/data/downloads","resources/data/events","resources/data/helpTickets","resources/data/inventory","resources/data/is4ua","resources/data/people","resources/data/products","resources/data/sessionData","resources/data/sessions","resources/data/siteInfo","resources/data/social","resources/data/systems","resources/dialogs/common-dialogs","resources/dialogs/confirm-dialog","resources/dialogs/document-dialog","resources/dialogs/email-dialog","resources/dialogs/event-dialog","resources/dialogs/input-dialog","resources/dialogs/message-dialog","resources/dialogs/note-dialog","resources/dialogs/password-dialog","resources/editor/editor","resources/editor/styles","resources/elements/add-systems","resources/elements/calendar","resources/elements/flat-picker","resources/elements/loading-indicator","resources/elements/multiselect","resources/elements/nav-bar","resources/elements/rate-it","resources/elements/submenu","resources/elements/table-navigation-bar","resources/elements/tree-node","resources/utils/dataTable","resources/utils/utils","resources/utils/validation","resources/value-converters/activate-button","resources/value-converters/arrow","resources/value-converters/check-box","resources/value-converters/course-name","resources/value-converters/date-format","resources/value-converters/file-type","resources/value-converters/filter-array","resources/value-converters/filter-clients","resources/value-converters/filter-sessions","resources/value-converters/format-digits","resources/value-converters/format-number","resources/value-converters/format-phone","resources/value-converters/get-array-value","resources/value-converters/gravatar-url-id","resources/value-converters/gravatar-url","resources/value-converters/help-ticket-statuses","resources/value-converters/help-ticket-subtypes","resources/value-converters/help-ticket-type","resources/value-converters/idsRequested","resources/value-converters/info-filter","resources/value-converters/lookup-value","resources/value-converters/onoff-switch","resources/value-converters/overlap","resources/value-converters/person-status-button","resources/value-converters/phone-number","resources/value-converters/request-status-class","resources/value-converters/sandbox","resources/value-converters/session-name","resources/value-converters/session-status-button","resources/value-converters/session-systems","resources/value-converters/session-type","resources/value-converters/session","resources/value-converters/sort-array","resources/value-converters/sort-date-time","resources/value-converters/stat-value","resources/value-converters/system-list","resources/value-converters/to-uppercase","resources/value-converters/translate-status","resources/value-converters/ucc-staff","resources/value-converters/ucc-title","modules/analytics/analytics","modules/analytics/clientRequests","modules/analytics/helpTickets","modules/analytics/institutions","modules/facco/editPeople","modules/facco/facco","modules/facco/viewRequests","modules/home/about","modules/home/contact","modules/home/home","modules/home/institutions","modules/home/products","modules/home/register","modules/social/editBlog","modules/social/social","modules/social/viewBlogs","modules/social/viewForums","modules/social/writeBlog","modules/user/profile","modules/user/resetPassword","modules/user/user","modules/admin/Customers/bulkEmails","modules/admin/Customers/customers","modules/admin/Customers/editInstitutions","modules/admin/Customers/editPeople","modules/admin/documents/documents","modules/admin/inventory/editInventory","modules/admin/site/admin","modules/admin/site/editConfig","modules/admin/site/editCurriculum","modules/admin/site/editDownloads","modules/admin/site/editHelpTickets","modules/admin/site/editMessages","modules/admin/site/editNews","modules/admin/site/site","modules/admin/notes/editCalendar","modules/admin/notes/editNotes","modules/admin/notes/notes","modules/admin/system/editProduct","modules/admin/system/editSession","modules/admin/system/editSystem","modules/admin/system/system","modules/tech/requests/archiveClientRequests","modules/tech/requests/assignments","modules/tech/requests/createRequest","modules/tech/requests/techRequests","modules/tech/support/archiveHelpTickets","modules/tech/support/createHelpTickets","modules/tech/support/support","modules/tech/support/viewHelpTickets","modules/user/requests/clientRequests","modules/user/requests/createRequests","modules/user/requests/viewProducts","modules/user/requests/viewRequests","modules/user/support/createHelpTickets","modules/user/support/curriculum","modules/user/support/downloads","modules/user/support/links","modules/user/support/support","modules/user/support/viewHelpTickets","aurelia-templating-resources/compose","aurelia-templating-resources/if","aurelia-templating-resources/with","aurelia-templating-resources/repeat","aurelia-templating-resources/repeat-strategy-locator","aurelia-templating-resources/null-repeat-strategy","aurelia-templating-resources/array-repeat-strategy","aurelia-templating-resources/repeat-utilities","aurelia-templating-resources/map-repeat-strategy","aurelia-templating-resources/set-repeat-strategy","aurelia-templating-resources/number-repeat-strategy","aurelia-templating-resources/analyze-view-factory","aurelia-templating-resources/abstract-repeater","aurelia-templating-resources/show","aurelia-templating-resources/aurelia-hide-style","aurelia-templating-resources/hide","aurelia-templating-resources/sanitize-html","aurelia-templating-resources/html-sanitizer","aurelia-templating-resources/replaceable","aurelia-templating-resources/focus","aurelia-templating-resources/css-resource","aurelia-templating-resources/attr-binding-behavior","aurelia-templating-resources/binding-mode-behaviors","aurelia-templating-resources/throttle-binding-behavior","aurelia-templating-resources/debounce-binding-behavior","aurelia-templating-resources/self-binding-behavior","aurelia-templating-resources/signal-binding-behavior","aurelia-templating-resources/binding-signaler","aurelia-templating-resources/update-trigger-binding-behavior","aurelia-templating-resources/html-resource-plugin","aurelia-templating-resources/dynamic-element","aurelia-i18n/i18n","i18next/i18next","i18next/logger","i18next/EventEmitter","i18next/ResourceStore","i18next/utils","i18next/Translator","i18next/postProcessor","i18next/compatibility/v1","i18next/LanguageUtils","i18next/PluralResolver","i18next/Interpolator","i18next/BackendConnector","i18next/CacheConnector","i18next/defaults","aurelia-i18n/relativeTime","aurelia-i18n/defaultTranslations/relative.time","aurelia-i18n/df","aurelia-i18n/utils","aurelia-i18n/nf","aurelia-i18n/rt","aurelia-i18n/t","aurelia-i18n/base-i18n","aurelia-i18n/aurelia-i18n-loader","regenerator-runtime/runtime","node_modules/chart.js/dist/Chart.js","aurelia-dialog/dialog-configuration","aurelia-dialog/renderer","aurelia-dialog/dialog-settings","aurelia-dialog/dialog-renderer","aurelia-dialog/ux-dialog","aurelia-dialog/ux-dialog-header","aurelia-dialog/dialog-controller","aurelia-dialog/lifecycle","aurelia-dialog/dialog-cancel-error","aurelia-dialog/ux-dialog-body","aurelia-dialog/ux-dialog-footer","aurelia-dialog/attach-focus","aurelia-dialog/dialog-service","resources/css/fullcalendar","resources/css/styles","resources/dialogs/documentForm","resources/editor/skins/moono-lisa/dialog","resources/dialogs/documentsTable","resources/editor/skins/moono-lisa/dialog_ie","resources/editor/skins/moono-lisa/dialog_ie8","resources/editor/skins/moono-lisa/dialog_iequirks","resources/editor/skins/moono-lisa/editor","resources/editor/skins/moono-lisa/editor_gecko","resources/editor/skins/moono-lisa/editor_ie","resources/editor/skins/moono-lisa/editor_ie8","resources/editor/skins/moono-lisa/editor_iequirks","resources/htTimeline/response","resources/htTimeline/timeline","modules/admin/site/downloadForm","modules/admin/site/downloadTable","modules/analytics/components/curriculumHTChart","modules/analytics/components/curriculumHTTable","modules/analytics/components/helpTicketsByCurriculum","modules/analytics/components/helpTicketsByInstitution","modules/analytics/components/helpTicketsByPeople","modules/analytics/components/helpTicketsByStatus","modules/analytics/components/helpTicketsByType","modules/analytics/components/institutionHTChart","modules/analytics/components/institutionHTTable","modules/analytics/components/institutionRequestsDetail","modules/analytics/components/institutionsCharts","modules/analytics/components/institutionsTable","modules/analytics/components/peopleHTChart","modules/analytics/components/peopleHTTable","modules/analytics/components/productRequestsDetail","modules/analytics/components/productRequestsTable","modules/analytics/components/requestsByInstitution","modules/analytics/components/requestsByProducts","modules/analytics/components/requestsBySAPProducts","modules/analytics/components/requestsInstitutionChart","modules/analytics/components/requestsProductChart","modules/analytics/components/requestsSAPProductChart","modules/analytics/components/requestsTable","modules/analytics/components/sapProductRequestsTable","modules/analytics/components/statusHTChart","modules/analytics/components/statusHTTable","modules/analytics/components/typeHTChart","modules/analytics/components/typeHTTable","modules/facco/components/peopleTable","modules/facco/components/requestDetailDetails","modules/facco/components/requestsTable","modules/facco/components/viewRequestsTable","modules/home/components/homeContent","modules/home/components/homePageLinks","modules/home/components/newsItem","modules/home/components/uccInformation","modules/social/components/blogForm","modules/social/components/blogList","modules/social/components/blogListUCC","modules/social/components/blogPage","modules/social/components/blogPageUCC","modules/social/components/forumList","modules/social/components/forumPage","modules/social/components/writeBlogList","modules/user/components/banner","modules/user/components/carousel","modules/user/components/homePageLinks","modules/user/components/newsItem","modules/user/components/uccInformation","modules/admin/Customers/components/Address","modules/admin/Customers/components/Audit","modules/admin/Customers/components/Courses","modules/admin/Customers/components/Email","modules/admin/Customers/components/emailTable","modules/admin/Customers/components/instAddress","modules/admin/Customers/components/instIs4ua","modules/admin/Customers/components/institutionsForm","modules/admin/Customers/components/institutionsTable","modules/admin/Customers/components/instPeople","modules/admin/Customers/components/is4ua","modules/admin/Customers/components/Log","modules/admin/Customers/components/Password","modules/admin/Customers/components/peopleForm","modules/admin/Customers/components/peopleTable","modules/admin/Customers/components/Roles","modules/admin/Customers/components/selectionForm","modules/admin/documents/components/documentForm","modules/admin/documents/components/documentsTable","modules/admin/inventory/components/documentForm","modules/admin/inventory/components/Documents","modules/admin/inventory/components/documentsTable","modules/admin/inventory/components/History","modules/admin/inventory/components/inventoryForm","modules/admin/inventory/components/inventoryTable","modules/admin/inventory/components/Maintenance","modules/admin/inventory/components/Purchase","modules/admin/inventory/components/Technical","modules/admin/notes/components/ArchiveRequestsForm","modules/admin/notes/components/helpTicket","modules/admin/notes/components/notesForm","modules/admin/notes/components/notesTable","modules/admin/system/components/Assignments","modules/admin/system/components/Description","modules/admin/system/components/documentForm","modules/admin/system/components/Documents","modules/admin/system/components/documentsTable","modules/admin/system/components/edit-client-form","modules/admin/system/components/is4ua","modules/admin/system/components/Notes","modules/admin/system/components/productForm","modules/admin/system/components/productTable","modules/admin/system/components/sessionConfigTable","modules/admin/system/components/sessionForm","modules/admin/system/components/sessionTable","modules/admin/system/components/systemForm","modules/admin/system/components/Systems","modules/admin/system/components/systemTable","modules/admin/site/components/configForm","modules/admin/site/components/configTable","modules/admin/site/components/curriculumForm","modules/admin/site/components/curriculumTable","modules/admin/site/components/document","modules/admin/site/components/documentForm","modules/admin/site/components/documentsTable","modules/admin/site/components/downloadForm","modules/admin/site/components/downloadTable","modules/admin/site/components/foreverLogs","modules/admin/site/components/htTypeForm","modules/admin/site/components/htTypeTable","modules/admin/site/components/logFileTable","modules/admin/site/components/messageForm","modules/admin/site/components/messageTable","modules/admin/site/components/newsForm","modules/admin/site/components/newsTable","modules/admin/site/components/uploadedFilesTable","modules/tech/requests/components/ArchiveRequestsForm","modules/tech/requests/components/ArchiveRequestsTable","modules/tech/requests/components/archiveTable","modules/tech/requests/components/assignmentDetails","modules/tech/requests/components/bo","modules/tech/requests/components/bulkEmailForm","modules/tech/requests/components/Courses","modules/tech/requests/components/editRequestsForm","modules/tech/requests/components/erp","modules/tech/requests/components/hana","modules/tech/requests/components/requestDetailDetails","modules/tech/requests/components/requestDetails.1","modules/tech/requests/components/requestDetails","modules/tech/requests/components/requestsTable","modules/tech/requests/components/viewAssignmentForm","modules/tech/requests/components/viewRequestsForm","modules/tech/requests/components/viewRequestsFormOLD","modules/tech/requests/components/viewRequestsTable","modules/tech/support/components/additiontalInfo","modules/tech/support/components/documentForm","modules/tech/support/components/Documents","modules/tech/support/components/documentsTable","modules/tech/support/components/helpTicketDetails","modules/tech/support/components/helpTicketType","modules/tech/support/components/Requests","modules/tech/support/components/searchHTForm","modules/tech/support/components/selectProduct","modules/tech/support/components/viewArchiveHTForm","modules/tech/support/components/viewHelpTicketTableFilters","modules/tech/support/components/viewHTForm","modules/tech/support/components/viewHTSearchResults","modules/tech/support/components/viewHTTable","modules/user/requests/components/assignmentDetails","modules/user/requests/components/bo","modules/user/requests/components/client-request-step1","modules/user/requests/components/client-request-step2","modules/user/requests/components/client-request-step3","modules/user/requests/components/client-request-step4","modules/user/requests/components/Courses","modules/user/requests/components/erp","modules/user/requests/components/hana","modules/user/requests/components/requestDetails","modules/user/requests/components/viewRequestsForm","modules/user/requests/components/viewRequestsTable","modules/user/support/components/comment","modules/user/support/components/helpTicketDetails","modules/user/support/components/helpTicketType","modules/user/support/components/Requests","modules/user/support/components/viewHTForm","modules/user/support/components/viewHTTable"]}})}

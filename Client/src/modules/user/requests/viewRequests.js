@@ -65,6 +65,9 @@ export class ViewRequests {
       this.config.getConfig() 
     ]);
     this.people.coursesArray.push({_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME});
+    this.sessions.sessionsArray = this.sessions.sessionsArray.filter(item => {
+      return item.sessionStatus !== 'Next';
+    });
     this.selectedSession = this.sessions.sessionsArray[0]._id;
     this.getRequests();
   }

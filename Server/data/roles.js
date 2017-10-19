@@ -41,8 +41,11 @@ Model.find()
 			// Model.findOne({firstName: item[3], lastName: item[2]})
 			// .then(person => {
 			if(person && person.active){
-				if(person.roles.indexOf('FACU') == -1){
-					person.roles.push('FACU')
+				if(item[24] == -1){
+					console.log(person.fullName + " " + item[20] + " " + "faculty")
+					if(person.roles.indexOf('FACU') == -1){
+						person.roles.push('FACU')
+					}
 				}
 				if(item[20] == -1){
 					console.log(person.fullName + " " + item[20] + " " + "legal")
