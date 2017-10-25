@@ -83,7 +83,7 @@ export class ViewRequests {
           if(this.requests.requestsArray && this.requests.requestsArray.length){
             this.dataTable.updateArray(this.requests.requestsArray);
             this.noRequests = false;
-          } else {
+          } else { 
             this.noRequests = true;
           }
       } 
