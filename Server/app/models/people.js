@@ -4,6 +4,7 @@ var Mongoose = require('mongoose'),
 
 var EmailLogSchema = new Schema({
     personId: { type: Schema.Types.ObjectId },
+    personName: { type: String },
     email: { type: String },
     subject: { type: String },
     body: { type: String },

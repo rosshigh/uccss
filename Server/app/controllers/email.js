@@ -1,13 +1,14 @@
 // var config = require('../../config/config'),
 var    mongoose = require('mongoose'),
-    Promise = require('bluebird'),
-    Person = mongoose.model('Person'),
-    Institution = mongoose.model('Institution'),
-    logger = require('../../config/logger'),
-    hbs = require('handlebars'),
-    path = require('path'),
-    fs = require('fs'),
-    emailConfig = require('../../config/email-config');
+      Promise = require('bluebird'),
+      Person = mongoose.model('Person'),
+      Institution = mongoose.model('Institution'),
+      logger = require('../../config/logger'),
+      hbs = require('handlebars'),
+      path = require('path'),
+      fs = require('fs'),
+      EmailLog = mongoose.model('EmailLog'),
+      emailConfig = require('../../config/email-config');
 
     // var env = 'production';
 
@@ -73,6 +74,14 @@ if(env === 'development'){
         sg.API(request)
           .then(response => {
               logger.log(response, "verbose");
+              var emailLog = new EmailLog({
+                email: mailObject.email,
+                subject: mailObject.subject,
+                body: JSON.stringify(mailObject.context),
+                from: mailObject.from,
+                topic: mailObject.topic ? mailObject.topic : ""
+              })
+              emailLog.save();
           })
           .catch(error => {
               logger.log(error, "verbose");
@@ -294,6 +303,14 @@ if(env === 'development'){
   nodeMailerSendMail = function(mailObject){     
         transporter.sendMail(mailObject)
         .then(result => {       
+            var emailLog = new EmailLog({
+              email: mailObject.to,
+              subject: mailObject.subject,
+              body: JSON.stringify(mailObject.context),
+              from: mailObject.from,
+              topic: mailObject.topic ? mailObject.topic : ""
+            });
+            emailLog.save();
             logger.log(result, 'verbose ');
         })
         .catch(error => {         
@@ -315,7 +332,8 @@ if(env === 'development'){
         to: mailObject.email,
         subject: 'UWM UCC Account Created',
         template: 'welcome',
-        context: mailObject.context
+        context: mailObject.context,
+        topic: "welcome"
       };
 
     nodeMailerSendMail(mail);
@@ -334,7 +352,8 @@ if(env === 'development'){
         to: mailObject.email,
         subject: 'UCCSS Account Activated',
         template: 'activate-customer',
-        context: mailObject.context
+        context: mailObject.context,
+        topic: "newCustomerActivate"
     };
      nodeMailerSendMail(mail); 
   }
@@ -353,7 +372,8 @@ if(env === 'development'){
         cc: mailObject.cc,
         subject: 'UCCSS account created',
         template: 'new-customer',
-        context: mailObject.context
+        context: mailObject.context,
+        topic: "newCustomer"
     };
      nodeMailerSendMail(mail);
   }
@@ -371,7 +391,8 @@ if(env === 'development'){
         cc: mailObject.cc,
         subject: 'Help Ticket Created',
         template: 'help-ticket-created',
-        context: mailObject.context
+        context: mailObject.context,
+        topic: "helpTicketCreated"
       };
 
       nodeMailerSendMail(mail)  
@@ -392,7 +413,8 @@ if(env === 'development'){
           cc: mailObject.cc,
           subject: 'Help Ticket Updated',
           template: 'help-ticket-updated',
-          context: mailObject.context
+          context: mailObject.context,
+          topic: "helpTicketUpdated"
       };
 
       nodeMailerSendMail(mail);
@@ -412,7 +434,8 @@ if(env === 'development'){
           cc: mailObject.cc,
           subject: 'Help Ticket Closed',
           template: 'help-ticket-closed',
-          context: mailObject.context
+          context: mailObject.context,
+          topic: "helpTicketClosed"
       };
 
       nodeMailerSendMail(mail); 
@@ -431,7 +454,8 @@ if(env === 'development'){
             cc: mailObject.cc,
             subject: 'Product Request Created',
             template: 'client-request-created',
-            context: mailObject.context
+            context: mailObject.context,
+            topic: "requestCreated"
         };
 
         nodeMailerSendMail(mail) 
@@ -451,7 +475,8 @@ if(env === 'development'){
           // cc: mailObject.cc,
           subject: 'Product Request Updated',
           template: 'client-request-updated',
-          context: mailObject.context
+          context: mailObject.context,
+          topic: "requestUpdated"
       };
 
       nodeMailerSendMail(mail)   
@@ -468,7 +493,8 @@ if(env === 'development'){
         to: mailObject.email,
         subject: 'Customer Action Required',
         template: 'client-request-customer-action',
-        context: mailObject.context
+        context: mailObject.context,
+        topic: "customerAction"
     };
 
     nodeMailerSendMail(mail)
@@ -485,7 +511,8 @@ if(env === 'development'){
         to: mailObject.email,
         subject: mailObject.subject,
         template: 'generic',
-        context: mailObject.context
+        context: mailObject.context,
+        topic: "genericEmail"
     };
     nodeMailerSendMail(mail)    
   }
@@ -506,7 +533,8 @@ if(env === 'development'){
           to: mailObject.email,
           subject: mailObject.subject,
           template: 'password-reset',
-          context: mailObject.context
+          context: mailObject.context,
+          topic: "passwordReset"
       };
         console.log(mail);  
       nodeMailerSendMail(mail)   

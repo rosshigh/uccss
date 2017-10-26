@@ -21,7 +21,8 @@
                     <th class="hidden-xs hidden-sm">Instance</th>
                     <th class="hidden-xs hidden-sm">Status</th>
                     <th>Gold Backup</th>
-                    <th>Snapshot</th>
+                    <th>Gold Backup Date</th>
+                    <th>Snapshot </th>
                 </tr>
 
                 <tr>
@@ -42,8 +43,23 @@
                             <option value=false>Inactive</option>
                         </select>
                     </th>
-                    <th></th>
-                    <th></th>
+                    <th>
+                        <select value.bind="goldBackupFilter" input.delegate="dataTable.filterList($event, { type: 'boolean',  filter: 'goldBackup', collectionProperty: 'goldBackup', displayProperty: 'goldBackup', compare:'boolean'} )" class="form-control">
+                            <option value=""></option>
+                            <option value=true>Backup</option>
+                            <option value=false>No Backup</option>
+                        </select>
+                    </th>
+                    <th>
+                            <input type="date" value.bind="goldBackupDateFilterValue" input.delegate="dataTable.filterList(goldBackupDateFilterValue, {type: 'date', filter: 'goldBackupDate',  collectionProperty: 'goldBackupDate', compare: 'after'} )"  class="form-control hidden-sm" />
+                    </th>
+                    <th>
+                        <select value.bind="snapShotFilter" input.delegate="dataTable.filterList($event, { type: 'boolean',  filter: '', collectionProperty: 'snapShot', displayProperty: 'snapShot', compare:'boolean'} )" class="form-control">
+                            <option value=""></option>
+                            <option value=true>Snapshot</option>
+                            <option value=false>No Snapshot</option>
+                        </select>                        
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -60,6 +76,7 @@
                             </label>
                         </div>
                     </td>
+                    <td click.trigger="edit($index, $event)" class="hidden-xs hidden-sm" data-title="Gold Date">${system.goldBackupDate | dateFormat}</td>
                     <td  data-title="Snapshot">
                         <div class="checkbox">
                             <label>

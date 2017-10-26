@@ -64,7 +64,7 @@ var ClientRequestDetailsSchema = new Schema({
     eventDate: { type: Date, default: Date.now },
     oldValue: { type: Schema.Types.Mixed },
     newValue: { type: Schema.Types.Mixed },
-    personId: { type: Schema.Types.ObjectId }
+    personId: { type: Schema.Types.Mixed }
   }]
 });
 
@@ -98,7 +98,7 @@ var ClientRequestSchema = new Schema({
     eventDate: { type: Date, default: Date.now },
     oldValue: { type: Schema.Types.Mixed },
     newValue: { type: Schema.Types.Mixed },
-    personId: { type: Schema.Types.ObjectId }
+    personId: { type: Schema.Types.Mixed }
   }]
 });
 

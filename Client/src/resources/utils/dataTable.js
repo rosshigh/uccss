@@ -243,7 +243,7 @@ export class DataTable{
           matchValue = eval(filterItem.options.collectionProperty);
         }
 
-        if(matchValue != undefined) {
+        if(matchValue != undefined || (filterItem.options.type === "boolean" && matchValue == undefined)) {
           switch(filterItem.options.type){
             case 'custom':
               keep = filterItem.options.filter(filterItem.value, item, that.context);
@@ -263,7 +263,11 @@ export class DataTable{
                 }
               break;  
             case "boolean":
-                keep = matchValue === eval(filterItem.value);
+                if(matchValue == undefined) {
+                  keep = eval(filterItem.value) == false;
+                } else {
+                  keep = matchValue === eval(filterItem.value);
+                }
                 break;
             case "date":
               switch(filterItem.options.compare){

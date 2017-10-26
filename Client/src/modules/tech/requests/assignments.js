@@ -802,6 +802,13 @@ export class Assignments {
         this.selectedRequestDetail.idsAssigned = parseInt(this.selectedRequestDetail.idsAssigned) - parseInt(this.assignment.idsAssigned);
         this.selectedRequestDetail.assignments = this.assignmentDetails;
         this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
+        this.requestToSave.audit.push({
+            property: 'Delete Assignment',
+            newValue: JSON.stringify(this.assignment),
+            oldValue: this.selectedRequestDetail.productId.name,
+            eventDate: new  Date(),
+            personId: this.userObj.fullName
+        })
         this.requestToSave.requestDetailsToSave = new Array();
         var request = this.utils.copyObject(this.selectedRequestDetail);
         delete request['requestId'];
@@ -1020,10 +1027,10 @@ export class Assignments {
         this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
         this.requestToSave.audit.push({
            property: 'Assigned',
-           newValue: this.selectedRequestDetail.requestNo,
-           oldValue: this.selectedRequestDetail.productId._id,
+           newValue: JSON.stringify(this.selectedRequestDetail.assignments),
+           oldValue: this.selectedRequestDetail.productId.name,
            eventDate: new  Date(),
-           personId: this.userObj._id
+           personId: this.userObj.fullName
         })
         this.requestToSave.requestDetailsToSave = new Array();
         var request = this.utils.copyObject(this.selectedRequestDetail);

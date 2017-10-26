@@ -77,6 +77,27 @@
 					<option value="${session.session}"  repeat.for="session of config.SESSION_PARAMS">${session.session}</option>
 				</select>
 			</div>
+			<div class="col-lg-6">
+				<div class="checkbox">
+					<label class="form-control-label topMargin">
+						<input  checked.bind="systems.selectedSystem.goldBackup" type="checkbox"> Gold Backup
+					</label>
+				</div>
+			</div>
+			<div class="col-lg-6">
+				<div class="checkbox">
+					<label class="form-control-label topMargin">
+						<input checked.bind="systems.selectedSystem.snapShot" type="checkbox"> Snapshot
+					</label>
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="form-group">
+					<label class="form-control-label">Gold Backup Date</label>
+					<flat-picker controlid="goldBackupDate" config.bind="dateConfig" value.bind="systems.selectedSystem.goldBackupDate"></flat-picker>
+				</div>
+			</div>
+			
 		</div>
 		<div class="col-lg-12 bottomMargin">
 				<label for="editNotes" class="form-control-label">Notes</label>

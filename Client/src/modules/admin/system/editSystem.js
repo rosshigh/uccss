@@ -17,6 +17,8 @@ export class EditSystem {
     spinnerHTML = "";
     selectedProduct = "";
 
+    dateConfig = {wrap: true};
+
     constructor(systems, products, validation, utils, datatable, config, dialog, sessions) {
         this.systems = systems;
         this.products = products;

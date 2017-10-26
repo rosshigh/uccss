@@ -7,7 +7,8 @@ var express = require('express'),
     fs = require('fs'),
     path = require('path'),
     AsyncPolling = require('async-polling'),
-    logger = require('./config/logger');
+    logger = require('./config/logger'),
+    glob = require('glob');
 
   AsyncPolling(function (end) {
     // Do whatever you want.
@@ -52,19 +53,14 @@ var express = require('express'),
     // This will schedule the next call.
 }, 3600000).run();
 
+// var rename = require('./forever-log/rename');
+
 // AsyncPolling(function (end) {
-//     let newFile = new Date().toString() + ".log";
-//     let file = "/forever-log/forever.log";
-//     fs.rename(file, newFile, function(err) {
-//         if ( err ) console.log('ERROR: ' + err);
-//     });
-//     fs.writeFile("./forever-log/forever.log", "", (err) => {
-//         if (err) throw err;
-//         console.log("The file was succesfully saved!");
-//     }); 
+//     rename.renameLog();
 //     end();
-// },  3000).run();
-// 86400000
+// },  60000).run();
+// // 86400000
+
 var app = express();
 
 require('./config/express')(app, config);

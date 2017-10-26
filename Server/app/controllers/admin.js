@@ -17,7 +17,7 @@ var express = require('express'),
   const foreverLogFolder = './forever-log/';
 
 module.exports = function (app, config) {
-  app.use('/api', router);
+  app.use('/api', router); 
 
 
   	router.route('/adminLog').get(function(req, res, next){

@@ -8,10 +8,10 @@ logger = require('../config/logger');
 
 logger.log("Loading Mongoose functionality");
 mongoose.Promise = require('bluebird');
-mongoose.connect('mongodb://127.0.0.1/uccss-dev', {useMongoClient: true});
+mongoose.connect('mongodb://127.0.0.1/uccss-test', {useMongoClient: true});
 var db = mongoose.connection;
 db.on('error', function () {
-  throw new Error('unable to connect to database at ' + 'mongodb://127.0.0.1/uccss-dev');
+  throw new Error('unable to connect to database at ' + 'mongodb://127.0.0.1/uccss-test');
 });
 mongoose.connection.once('open', function callback() {
   logger.log("Mongoose connected to the database");
@@ -37,10 +37,9 @@ Model.find()
 					var person = people[i];
 					break;
 				}
-			}
-			// Model.findOne({firstName: item[3], lastName: item[2]})
-			// .then(person => {
-			if(person && person.active){
+			}		
+	
+			if(person && person.personStatus == '01'){	
 				if(item[24] == -1){
 					console.log(person.fullName + " " + item[20] + " " + "faculty")
 					if(person.roles.indexOf('FACU') == -1){
@@ -52,39 +51,21 @@ Model.find()
 					if(person.roles.indexOf('LEGL') == -1){
 						person.roles.push('LEGL')
 					}
-					// var detail = person.toObject();
-					// updates.push({
-					// 	updateOne: { 
-					// 		"filter": { "_id": person._id },              
-					// 		"update": detailInvoice 
-					// 	} 
-					// })
+					
 				}				
 				if(item[21] == -1){
 					console.log(person.fullName + " " + item[21] + " " + "invoice")
 					if(person.roles.indexOf('BUSI') == -1){
 						person.roles.push('BUSI')
 					}
-					// var detailLegal = person.toObject();
-					// updates.push({
-					// 	updateOne: { 
-					// 		"filter": { "_id": person._id },              
-					// 		"update": detailLegal 
-					// 	} 
-					// })
+
 				}
 				if(item[22] == -1){
 					console.log(person.fullName + " " + item[22] + " " + "technical")
 					if(person.roles.indexOf('TECH') == -1){
 						person.roles.push('TECH')
 					}
-					// var detailTech = person.toObject();
-					// updates.push({
-					// 	updateOne: { 
-					// 		"filter": { "_id": person._id },              
-					// 		"update": detailTech 
-					// 	} 
-					// })
+
 				}
 				var detail = person.toObject();
 				updates.push({
@@ -95,7 +76,7 @@ Model.find()
 				})
 			}
 		})
-
+		
 		Model.bulkWrite(updates, function(err, result) {
 			if(err){
 				console.log(err)
@@ -105,7 +86,9 @@ Model.find()
 		})
 
 	})
-	
+	.catch(err => {
+		console.log(err)
+	})
 
 	
 })

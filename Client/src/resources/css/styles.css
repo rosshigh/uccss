@@ -78,6 +78,10 @@
     margin-left: 50px;
 }
 
+.smallMarginTop {
+    margin-top: 5px;
+}
+
 .smallMarginRight {
     margin-right: 10px;
 }

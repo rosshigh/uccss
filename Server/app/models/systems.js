@@ -23,6 +23,7 @@ var SystemSchema = new Schema({
   dateModified: { type: Date },
   goldBackup: { type: Boolean },
   snapShot: { type: Boolean },
+  goldBackupDate: { type: Date },
   type: { type: String, default: "ERP" } 
 });
 

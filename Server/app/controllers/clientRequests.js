@@ -215,15 +215,17 @@ module.exports = function (app) {
   })
 
   router.put('/api/clientRequests/assign', requireAuth, function(req, res, next){
-    logger.log('Assign clientRequest ' + req.body._id);          
-    
+    logger.log('Assign clientRequest ' + req.body._id);             
     if(req.body._id){
       var detailId;
       var query = Model.findById(req.body._id, function(err, clientRequest){
         if(err){
           return next(error);
         }
-        if(clientRequest) clientRequest.requestStatus = req.body.requestStatus;
+        if(clientRequest) {
+          clientRequest.requestStatus = req.body.requestStatus;
+          clientRequest.audit = req.body.audit;
+        }
         let tasks = new Array();   
         if(req.body.requestDetailsToSave){
           req.body.requestDetailsToSave.forEach((detail, index) => { 
@@ -233,7 +235,7 @@ module.exports = function (app) {
         }      
     
         Promise.all(tasks)
-            .then(request => {      
+            .then(request => {                   
               Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
                     if(error){
                       return next(error);
