@@ -51,6 +51,7 @@ export class ClientRequestAnalytics {
         this.systems = systems;
 
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        this.chartCount = 10;
     };
 
     attached() {
@@ -153,11 +154,11 @@ export class ClientRequestAnalytics {
     }
 
     institutionChartDataFunction(){        
-        var data = new Array();
-        var categories = new Array();
+        this.instChartData = new Array();
+        this.instChartCategories = new Array();
         
         this.config.REQUEST_STATUS.forEach(item => {
-            data.push(new Array());
+            this.instChartData.push(new Array());
         })
 
         var sortedArray = this.requests.analyticsInstitutionResultArray.sort((a,b) => {
@@ -165,19 +166,120 @@ export class ClientRequestAnalytics {
         });
 
         sortedArray.forEach(item => {
-            data[0].push(item["1"]);
-            data[1].push(item["2"]);
-            data[2].push(item["3"]);
-            data[3].push(item["4"]);
-            data[4].push(item["5"]);
-            data[5].push(item["6"]);
-            data[6].push(item["7"]);
-            categories.push(item.name); 
+            this.instChartData[0].push(item["1"]);
+            this.instChartData[1].push(item["2"]);
+            this.instChartData[2].push(item["3"]);
+            this.instChartData[3].push(item["4"]);
+            this.instChartData[4].push(item["5"]);
+            this.instChartData[5].push(item["6"]);
+            this.instChartData[6].push(item["7"]);
+            this.instChartCategories.push(item.name); 
         });
+
+        // this.institutionChartData = {
+        //     labels: categories,
+        //     maintainAspectRatio: false,
+        //     datasets: [
+        //         {
+        //             label: this.config.REQUEST_STATUS[0].description,
+        //             data: data[0],
+        //             backgroundColor: this.backgroundColors[0],
+        //             hoverBackgroundColor: this.backgroundColors[0],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         },
+        //         {
+        //             label: this.config.REQUEST_STATUS[1].description,
+        //             data: data[1],
+        //             backgroundColor: this.backgroundColors[1],
+        //             hoverBackgroundColor: this.backgroundColors[1],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         },
+        //         {
+        //             label: this.config.REQUEST_STATUS[2].description,
+        //             data: data[2],
+        //             backgroundColor: this.backgroundColors[2],
+        //             hoverBackgroundColor: this.backgroundColors[2],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         },
+        //         {
+        //             label: this.config.REQUEST_STATUS[3].description,
+        //             data: data[3],
+        //             backgroundColor: this.backgroundColors[3],
+        //             hoverBackgroundColor: this.backgroundColors[3],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         },
+        //         {
+        //             label: this.config.REQUEST_STATUS[4].description,
+        //             data: data[4],
+        //             backgroundColor: this.backgroundColors[4],
+        //             hoverBackgroundColor: this.backgroundColors[4],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         },
+        //         {
+        //             label: this.config.REQUEST_STATUS[5].description,
+        //             data: data[5],
+        //             backgroundColor: this.backgroundColors[5],
+        //             hoverBackgroundColor: this.backgroundColors[5],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         },
+        //         {
+        //             label: this.config.REQUEST_STATUS[6].description,
+        //             data: data[6],
+        //             backgroundColor: this.backgroundColors[6],
+        //             hoverBackgroundColor: this.backgroundColors[6],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         }
+        //     ]
+        // };
+
+        this.firstInstitutionChartRecord = 0;
+        if(this.firstInstitutionChartRecord + this.chartCount < this.instChartCategories.length){
+            var count = this.chartCount;
+        } else {
+            var count =  this.instChartCategories.length - this.firstInstitutionChartRecord;
+        }
+        this.pageInstitutionChartData(count);
+    }
+
+    backwardIns(){
+        if(this.firstInstitutionChartRecord - this.chartCount < 0){
+            return;
+        } else {
+            var count =  this.chartCount;
+            this.firstInstitutionChartRecord = this.firstInstitutionChartRecord - this.chartCount;
+        }
+        this.pageInstitutionChartData(count);
+    }
+
+    forwardIns(){
+        if(this.firstInstitutionChartRecord + this.chartCount < this.instChartCategories.length){
+            var count = this.chartCount;
+            this.firstInstitutionChartRecord = this.firstInstitutionChartRecord + this.chartCount;
+        } else {
+            return;
+        }
+        
+        this.pageInstitutionChartData(count);
+    }
+
+    pageInstitutionChartData(count){
+        var data = [];
+        for(let index = 0; index < this.instChartData.length; index++){
+            data[index] = this.instChartData[index].slice(this.firstInstitutionChartRecord, this.firstInstitutionChartRecord + count);
+        }
+        
+        var categories = this.instChartCategories.slice(this.firstInstitutionChartRecord, this.firstInstitutionChartRecord + count);
 
         this.institutionChartData = {
             labels: categories,
-             maintainAspectRatio: false,
+            maintainAspectRatio: false,
             datasets: [
                 {
                     label: this.config.REQUEST_STATUS[0].description,
@@ -259,11 +361,11 @@ export class ClientRequestAnalytics {
 
     productChartDataFunction(){
         
-        var data = new Array();
-        var categories = new Array();
+        this.prodChartdata = new Array();
+        this.prodChartCategories = new Array();
 
         this.config.REQUEST_STATUS.forEach(item => {
-            data.push(new Array());
+            this.prodChartdata.push(new Array());
         })
 
         var sortedArray = this.requests.analyticsProductsResultArray.sort((a,b) => {
@@ -271,15 +373,118 @@ export class ClientRequestAnalytics {
         });
 
         sortedArray.forEach(item => {
-            data[0].push(item["1"]);
-            data[1].push(item["2"]);
-            data[2].push(item["3"]);
-            data[3].push(item["4"]);
-            data[4].push(item["5"]);
-            data[5].push(item["6"]);
-            data[6].push(item["7"]);
-            categories.push(item.productId.name); 
+            this.prodChartdata[0].push(item["1"]);
+            this.prodChartdata[1].push(item["2"]);
+            this.prodChartdata[2].push(item["3"]);
+            this.prodChartdata[3].push(item["4"]);
+            this.prodChartdata[4].push(item["5"]);
+            this.prodChartdata[5].push(item["6"]);
+            this.prodChartdata[6].push(item["7"]);
+            this.prodChartCategories.push(item.productId.name); 
         });
+
+        // this.productChartData = {
+        //     labels: categories,
+
+        //             maintainAspectRatio: false,
+
+        //     datasets: [
+        //         {
+        //             label: this.config.REQUEST_STATUS[0].description,
+        //             data: data[0],
+        //             backgroundColor: this.backgroundColors[0],
+        //             hoverBackgroundColor: this.backgroundColors[0],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         },
+        //         {
+        //             label: this.config.REQUEST_STATUS[1].description,
+        //             data: data[1],
+        //             backgroundColor: this.backgroundColors[1],
+        //             hoverBackgroundColor: this.backgroundColors[1],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         },
+        //         {
+        //             label: this.config.REQUEST_STATUS[2].description,
+        //             data: data[2],
+        //             backgroundColor: this.backgroundColors[2],
+        //             hoverBackgroundColor: this.backgroundColors[2],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         },
+        //         {
+        //             label: this.config.REQUEST_STATUS[3].description,
+        //             data: data[3],
+        //             backgroundColor: this.backgroundColors[3],
+        //             hoverBackgroundColor: this.backgroundColors[3],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         },
+        //         {
+        //             label: this.config.REQUEST_STATUS[4].description,
+        //             data: data[4],
+        //             backgroundColor: this.backgroundColors[4],
+        //             hoverBackgroundColor: this.backgroundColors[4],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         },
+        //         {
+        //             label: this.config.REQUEST_STATUS[5].description,
+        //             data: data[5],
+        //             backgroundColor: this.backgroundColors[5],
+        //             hoverBackgroundColor: this.backgroundColors[5],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         },
+        //         {
+        //             label: this.config.REQUEST_STATUS[6].description,
+        //             data: data[6],
+        //             backgroundColor: this.backgroundColors[6],
+        //             hoverBackgroundColor: this.backgroundColors[6],
+        //             hoverBorderWidth: 2,
+        //             hoverBorderColor: 'lightgrey'
+        //         }
+        //     ]
+        // };
+
+        this.firstProductChartRecord = 0;
+        if(this.firstProductChartRecord + this.chartCount < this.prodChartCategories.length){
+            var count = this.chartCount;
+        } else {
+            var count =  this.prodChartCategories.length - this.firstProductChartRecord;
+        }
+        this.pageProductChartData(count);
+    }
+
+    backwardProd(){
+        if(this.firstProductChartRecord - this.chartCount < 0){
+            return;
+        } else {
+            var count =  this.chartCount;
+            this.firstProductChartRecord = this.firstProductChartRecord - this.chartCount;
+        }
+        this.pageProductChartData(count);
+    }
+
+    forwardProd(){
+        if(this.firstProductChartRecord + this.chartCount < this.instChartCategories.length){
+            var count = this.chartCount;
+            this.firstProductChartRecord = this.firstProductChartRecord + this.chartCount;
+        } else {
+            return;
+        }
+        
+        this.pageProductChartData(count);
+    }
+
+    pageProductChartData(count){
+        var data = [];
+        for(let index = 0; index < this.prodChartdata.length; index++){
+            data[index] = this.prodChartdata[index].slice(this.firstProductChartRecord, this.firstProductChartRecord + count);
+        }
+        
+        var categories = this.prodChartCategories.slice(this.firstProductChartRecord, this.firstProductChartRecord + count);
 
         this.productChartData = {
             labels: categories,

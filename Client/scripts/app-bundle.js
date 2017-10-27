@@ -741,6 +741,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
             this.systems = systems;
 
             this.userObj = JSON.parse(sessionStorage.getItem('user'));
+            this.chartCount = 10;
         }
 
         ClientRequestAnalytics.prototype.attached = function attached() {
@@ -965,11 +966,13 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
         }();
 
         ClientRequestAnalytics.prototype.institutionChartDataFunction = function institutionChartDataFunction() {
-            var data = new Array();
-            var categories = new Array();
+            var _this2 = this;
+
+            this.instChartData = new Array();
+            this.instChartCategories = new Array();
 
             this.config.REQUEST_STATUS.forEach(function (item) {
-                data.push(new Array());
+                _this2.instChartData.push(new Array());
             });
 
             var sortedArray = this.requests.analyticsInstitutionResultArray.sort(function (a, b) {
@@ -977,15 +980,53 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
             });
 
             sortedArray.forEach(function (item) {
-                data[0].push(item["1"]);
-                data[1].push(item["2"]);
-                data[2].push(item["3"]);
-                data[3].push(item["4"]);
-                data[4].push(item["5"]);
-                data[5].push(item["6"]);
-                data[6].push(item["7"]);
-                categories.push(item.name);
+                _this2.instChartData[0].push(item["1"]);
+                _this2.instChartData[1].push(item["2"]);
+                _this2.instChartData[2].push(item["3"]);
+                _this2.instChartData[3].push(item["4"]);
+                _this2.instChartData[4].push(item["5"]);
+                _this2.instChartData[5].push(item["6"]);
+                _this2.instChartData[6].push(item["7"]);
+                _this2.instChartCategories.push(item.name);
             });
+
+            this.firstInstitutionChartRecord = 0;
+            if (this.firstInstitutionChartRecord + this.chartCount < this.instChartCategories.length) {
+                var count = this.chartCount;
+            } else {
+                var count = this.instChartCategories.length - this.firstInstitutionChartRecord;
+            }
+            this.pageInstitutionChartData(count);
+        };
+
+        ClientRequestAnalytics.prototype.backwardIns = function backwardIns() {
+            if (this.firstInstitutionChartRecord - this.chartCount < 0) {
+                return;
+            } else {
+                var count = this.chartCount;
+                this.firstInstitutionChartRecord = this.firstInstitutionChartRecord - this.chartCount;
+            }
+            this.pageInstitutionChartData(count);
+        };
+
+        ClientRequestAnalytics.prototype.forwardIns = function forwardIns() {
+            if (this.firstInstitutionChartRecord + this.chartCount < this.instChartCategories.length) {
+                var count = this.chartCount;
+                this.firstInstitutionChartRecord = this.firstInstitutionChartRecord + this.chartCount;
+            } else {
+                return;
+            }
+
+            this.pageInstitutionChartData(count);
+        };
+
+        ClientRequestAnalytics.prototype.pageInstitutionChartData = function pageInstitutionChartData(count) {
+            var data = [];
+            for (var index = 0; index < this.instChartData.length; index++) {
+                data[index] = this.instChartData[index].slice(this.firstInstitutionChartRecord, this.firstInstitutionChartRecord + count);
+            }
+
+            var categories = this.instChartCategories.slice(this.firstInstitutionChartRecord, this.firstInstitutionChartRecord + count);
 
             this.institutionChartData = {
                 labels: categories,
@@ -1087,12 +1128,13 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
         }();
 
         ClientRequestAnalytics.prototype.productChartDataFunction = function productChartDataFunction() {
+            var _this3 = this;
 
-            var data = new Array();
-            var categories = new Array();
+            this.prodChartdata = new Array();
+            this.prodChartCategories = new Array();
 
             this.config.REQUEST_STATUS.forEach(function (item) {
-                data.push(new Array());
+                _this3.prodChartdata.push(new Array());
             });
 
             var sortedArray = this.requests.analyticsProductsResultArray.sort(function (a, b) {
@@ -1100,15 +1142,53 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
             });
 
             sortedArray.forEach(function (item) {
-                data[0].push(item["1"]);
-                data[1].push(item["2"]);
-                data[2].push(item["3"]);
-                data[3].push(item["4"]);
-                data[4].push(item["5"]);
-                data[5].push(item["6"]);
-                data[6].push(item["7"]);
-                categories.push(item.productId.name);
+                _this3.prodChartdata[0].push(item["1"]);
+                _this3.prodChartdata[1].push(item["2"]);
+                _this3.prodChartdata[2].push(item["3"]);
+                _this3.prodChartdata[3].push(item["4"]);
+                _this3.prodChartdata[4].push(item["5"]);
+                _this3.prodChartdata[5].push(item["6"]);
+                _this3.prodChartdata[6].push(item["7"]);
+                _this3.prodChartCategories.push(item.productId.name);
             });
+
+            this.firstProductChartRecord = 0;
+            if (this.firstProductChartRecord + this.chartCount < this.prodChartCategories.length) {
+                var count = this.chartCount;
+            } else {
+                var count = this.prodChartCategories.length - this.firstProductChartRecord;
+            }
+            this.pageProductChartData(count);
+        };
+
+        ClientRequestAnalytics.prototype.backwardProd = function backwardProd() {
+            if (this.firstProductChartRecord - this.chartCount < 0) {
+                return;
+            } else {
+                var count = this.chartCount;
+                this.firstProductChartRecord = this.firstProductChartRecord - this.chartCount;
+            }
+            this.pageProductChartData(count);
+        };
+
+        ClientRequestAnalytics.prototype.forwardProd = function forwardProd() {
+            if (this.firstProductChartRecord + this.chartCount < this.instChartCategories.length) {
+                var count = this.chartCount;
+                this.firstProductChartRecord = this.firstProductChartRecord + this.chartCount;
+            } else {
+                return;
+            }
+
+            this.pageProductChartData(count);
+        };
+
+        ClientRequestAnalytics.prototype.pageProductChartData = function pageProductChartData(count) {
+            var data = [];
+            for (var index = 0; index < this.prodChartdata.length; index++) {
+                data[index] = this.prodChartdata[index].slice(this.firstProductChartRecord, this.firstProductChartRecord + count);
+            }
+
+            var categories = this.prodChartCategories.slice(this.firstProductChartRecord, this.firstProductChartRecord + count);
 
             this.productChartData = {
                 labels: categories,
@@ -1170,7 +1250,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
 
         ClientRequestAnalytics.prototype.getSAPProductsRequests = function () {
             var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var _this2 = this;
+                var _this4 = this;
 
                 return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
@@ -1198,18 +1278,18 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                             case 8:
                                 this.totalsInstitutionArray = new Array();
                                 this.config.REQUEST_STATUS.forEach(function (item) {
-                                    _this2.totalsInstitutionArray.push(0);
+                                    _this4.totalsInstitutionArray.push(0);
                                 });
                                 this.totalsInstitutionArray.push(0);
                                 this.requests.analyticsInstitutionResultArray.forEach(function (item) {
-                                    _this2.totalsInstitutionArray[0] += item['total'];
-                                    _this2.totalsInstitutionArray[1] += item[1];
-                                    _this2.totalsInstitutionArray[2] += item[2];
-                                    _this2.totalsInstitutionArray[3] += item[3];
-                                    _this2.totalsInstitutionArray[4] += item[4];
-                                    _this2.totalsInstitutionArray[5] += item[5];
-                                    _this2.totalsInstitutionArray[6] += item[6];
-                                    _this2.totalsInstitutionArray[7] += item[7];
+                                    _this4.totalsInstitutionArray[0] += item['total'];
+                                    _this4.totalsInstitutionArray[1] += item[1];
+                                    _this4.totalsInstitutionArray[2] += item[2];
+                                    _this4.totalsInstitutionArray[3] += item[3];
+                                    _this4.totalsInstitutionArray[4] += item[4];
+                                    _this4.totalsInstitutionArray[5] += item[5];
+                                    _this4.totalsInstitutionArray[6] += item[6];
+                                    _this4.totalsInstitutionArray[7] += item[7];
                                 });
 
                             case 12:
@@ -1417,7 +1497,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
         };
 
         ClientRequestAnalytics.prototype.customerActionDialog = function customerActionDialog() {
-            var _this3 = this;
+            var _this5 = this;
 
             if (this.profileRequest) {
                 this.model = 'header';
@@ -1434,7 +1514,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
             var email = { emailBody: "", emailSubject: subject, emailId: this.email };
             return this.dialog.showEmail("Enter Email", email, ['Submit', 'Cancel']).whenClosed(function (response) {
                 if (!response.wasCancelled) {
-                    _this3.sendTheEmail(response.output);
+                    _this5.sendTheEmail(response.output);
                 } else {
                     console.log("Cancelled");
                 }
@@ -1514,7 +1594,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
         };
 
         ClientRequestAnalytics.prototype.downloadExcel = function downloadExcel() {
-            var _this4 = this;
+            var _this6 = this;
 
             var exportArray = this.utils.copyArray(this.requests.analyticsProductsResultArray);
             var htmlContent = "<table><tr><th>Product</th>";
@@ -1527,7 +1607,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
 
             exportArray.forEach(function (item) {
                 var line = "<tr><td>" + item.productId.name + "</td>";
-                _this4.config.REQUEST_STATUS.forEach(function (field, index) {
+                _this6.config.REQUEST_STATUS.forEach(function (field, index) {
                     line += "<td>" + item[field.code] + "</td>";
                 });
                 line += "</tr>";
@@ -1538,7 +1618,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
         };
 
         ClientRequestAnalytics.prototype.downloadInstExcel = function downloadInstExcel() {
-            var _this5 = this;
+            var _this7 = this;
 
             var exportArray = this.utils.copyArray(this.requests.analyticsInstitutionResultArray);
             var htmlContent = "<table><tr><th>Product</th>";
@@ -1551,7 +1631,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
 
             exportArray.forEach(function (item) {
                 var line = "<tr><td>" + item.name + "</td>";
-                _this5.config.REQUEST_STATUS.forEach(function (field, index) {
+                _this7.config.REQUEST_STATUS.forEach(function (field, index) {
                     line += "<td>" + item[field.code] + "</td>";
                 });
                 line += "</tr>";
@@ -57135,8 +57215,8 @@ define('text!modules/analytics/components/productRequestsTable.html', ['module']
 define('text!modules/analytics/components/requestsByInstitution.html', ['module'], function(module) { module.exports = "<template>\n  <div show.bind=\"selectedSession\">\n    <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"showInstitutionTable()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Table\"><i class=\"fa fa-table fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"showInstitutionGraph()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Graphs\"><i class=\"fa fa-pie-chart fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div show.bind=\"institutionTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./requestsTable.html\"></compose>\n          </div> \n          <div show.bind=\"!institutionTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./requestsInstitutionChart.html\"></compose>\n          </div>\n        </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/analytics/components/requestsByProducts.html', ['module'], function(module) { module.exports = "<template>\n    <div show.bind=\"selectedSession\">\n    <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"showProductTable()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Table\"><i class=\"fa fa-table fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"showProductGraph()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Graphs\"><i class=\"fa fa-pie-chart fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div show.bind=\"productTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./productRequestsTable.html\"></compose>\n          </div> \n          <div show.bind=\"!productTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./requestsProductChart.html\"></compose>\n          </div>\n        </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/analytics/components/requestsBySAPProducts.html', ['module'], function(module) { module.exports = "<template>\n    <div show.bind=\"selectedSession\">\n    <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"showSAPProductTable()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Table\"><i class=\"fa fa-table fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"showSAPProductGraph()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Graphs\"><i class=\"fa fa-pie-chart fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div show.bind=\"sapProductTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./sapProductRequestsTable.html\"></compose>\n          </div> \n          <div show.bind=\"!sapProductTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./requestsSAPProductChart.html\"></compose>\n          </div>\n        </div>\n    </div>\n  </div>\n</template>"; });
-define('text!modules/analytics/components/requestsInstitutionChart.html', ['module'], function(module) { module.exports = "<template>\n\t</fieldset>\n\t    <fieldset if.bind=\"!institutionTableSelected\" class=\"col-lg-12\">\n\t\t\t<legend>Requests</legend>\n\t\t\t<chart id=\"institutionRequestsChart\" type=\"horizontalBar\" style=\"width: 100%; height: 100%; display: block;\" should-update=\"true\" throttle=\"2000\" data.bind=\"institutionChartData\"></chart>\n\t\t</fieldset>\n</template>"; });
-define('text!modules/analytics/components/requestsProductChart.html', ['module'], function(module) { module.exports = "<template>\n\t    <fieldset if.bind=\"!productTableSelected\" class=\"col-lg-12\">\n\t\t\t<legend>Requests</legend>\n\t\t\t<chart id=\"regionsChart\" type=\"horizontalBar\" style=\"width: 100%; height: 100%; display: block;\" should-update=\"true\" throttle=\"2000\" data.bind=\"productChartData\"></chart>\n\t\t</fieldset>\n</template>"; });
+define('text!modules/analytics/components/requestsInstitutionChart.html', ['module'], function(module) { module.exports = "<template>\n\t</fieldset>\n\t    <fieldset if.bind=\"!institutionTableSelected\" class=\"col-lg-12\">\n\t\t\t<legend>Requests  \n\t\t\t\t<span click.delegate=\"backwardIns()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-step-backward fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"forwardIns()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Forward\"><i class=\"fa fa-step-forward fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</legend>\n\t\t\t<chart id=\"institutionRequestsChart\" type=\"horizontalBar\" style=\"width: 100%; height: 100%; display: block;\" should-update=\"true\" throttle=\"2000\" data.bind=\"institutionChartData\"></chart>\n\t\t</fieldset>\n</template>"; });
+define('text!modules/analytics/components/requestsProductChart.html', ['module'], function(module) { module.exports = "<template>\n\t    <fieldset if.bind=\"!productTableSelected\" class=\"col-lg-12\">\n\t\t\t<legend>Requests\n\t\t\t\t\t<span click.delegate=\"backwardProd()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-step-backward fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"forwardProd()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Forward\"><i class=\"fa fa-step-forward fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</legend>\n\t\t\t<chart id=\"regionsChart\" type=\"horizontalBar\" style=\"width: 100%; height: 100%; display: block;\" should-update=\"true\" throttle=\"2000\" data.bind=\"productChartData\"></chart>\n\t\t</fieldset>\n</template>"; });
 define('text!modules/analytics/components/requestsSAPProductChart.html', ['module'], function(module) { module.exports = ""; });
 define('text!modules/analytics/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div show.bind=\"summerInstTable\">\n    <h4 show.bind=\"dataTable.displayArray.length === 0\" class=\"topMargin leftMargin\">There are no items for this session</h4>\n    <div class=\"col-lg-10 col-lg-offset-1\">\n        <div class='row'  show.bind=\"dataTable.displayArray.length > 0\" >\n            <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n            <div id=\"no-more-tables\">\n                <table class=\"table table-striped table-hover cf\"> \n                    <thead class=\"cf\">\n                         <tr>\n                            <td colspan='9'>\n                                <span click.delegate=\"downloadInstExcel()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Export to Excel\"><i class=\"fa fa-download\" aria-hidden=\"true\"></i></span>\n                            </td>\n                        </tr>\n                        <tr>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customInstitutionSorter, propertyName: 'productId'})\">Institution  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'total'})\">Total  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '1'})\">${config.REQUEST_STATUS[0].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '2'})\">${config.REQUEST_STATUS[1].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '3'})\">${config.REQUEST_STATUS[2].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '4'})\">${config.REQUEST_STATUS[3].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '5'})\">${config.REQUEST_STATUS[4].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '6'})\">${config.REQUEST_STATUS[5].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '7'})\">${config.REQUEST_STATUS[6].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'studentIds'})\">Student IDs  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                        </tr>\n                        <tr>\n                            <th>\n                                <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'custom',  filter: customNameFilterValue, compare:'custom'} )\"  class=\"form-control\" />\n                            </th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                        </tr>\n                        <tr>\n                            <th>Totals:</th>\n                            <th repeat.for=\"total of totalsInstitutionArray\">${total | formatNumber}</th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        <tr click.delegate=\"showProductInstitutionDetail(stat)\" repeat.for=\"stat of dataTable.displayArray\">\n                            <td data-title=\"Institution\">${stat.name}</td>\n                            <td data-title=\"Total\">${stat.total}</td>\n                            <td data-title=\"${config.REQUEST_STATUS[$index].description}\" repeat.for=\"status of config.REQUEST_STATUS\">${stat | statValue:config.REQUEST_STATUS:$index}</td>\n                            <td>${stat.studentIds | formatNumber}</td>\n                        </tr>\n                    </tbody>\n                </table> \n            </div>\n        </div>\n    </div>\n    </div>\n    <compose show.bind=\"!summerInstTable\" view=\"./institutionRequestsDetail.html\"></compose>\n</template>"; });
 define('text!modules/analytics/components/sapProductRequestsTable.html', ['module'], function(module) { module.exports = ""; });
