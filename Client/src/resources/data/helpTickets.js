@@ -284,7 +284,9 @@ export class HelpTickets {
             try {
                 let serverResponse = await this.data.get(url);
                 if (!serverResponse.error) {
-                    this.helpTicketTypesArray = serverResponse;
+                    this.helpTicketTypesArray = serverResponse.sort((a,b) => {
+                        return a.category < b.category ? 0 : -1;
+                    });
                 } 
             } catch (error) {
                 console.log(error);

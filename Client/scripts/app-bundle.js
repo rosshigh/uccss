@@ -10807,7 +10807,9 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 serverResponse = _context11.sent;
 
                                 if (!serverResponse.error) {
-                                    this.helpTicketTypesArray = serverResponse;
+                                    this.helpTicketTypesArray = serverResponse.sort(function (a, b) {
+                                        return a.category < b.category ? 0 : -1;
+                                    });
                                 }
                                 _context11.next = 13;
                                 break;
