@@ -1845,7 +1845,7 @@ define('modules/analytics/helpTickets',['exports', 'aurelia-framework', '../../r
                         switch (_context.prev = _context.next) {
                             case 0:
                                 _context.next = 2;
-                                return Promise.all([this.helpTickets.getHelpTicketTypes(), this.config.getConfig()]);
+                                return Promise.all([this.helpTickets.getHelpTicketTypes(), this.config.getConfig(), this.helpTickets.getHelpTicketsArrayAnalytics()]);
 
                             case 2:
                                 responses = _context.sent;
@@ -1912,31 +1912,22 @@ define('modules/analytics/helpTickets',['exports', 'aurelia-framework', '../../r
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
-                                if (!this.selectedTab) {
-                                    _context2.next = 7;
-                                    break;
-                                }
+                                if (this.selectedTab) {
+                                    this.numCols = 2;
 
-                                this.numCols = 2;
-                                _context2.next = 4;
-                                return this.helpTickets.getHelpTicketsArrayAnalytics();
-
-                            case 4:
-                                if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
-                                    this.helpTickets.groupRequestsByType();
-                                    this.substituteTypeDescriptions();
-                                    this.dataTable.updateArray(this.helpTickets.helpTicketTypeArrayAnalytics);
-                                    this.typeChartDataFunction();
+                                    if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
+                                        this.helpTickets.groupRequestsByType();
+                                        this.substituteTypeDescriptions();
+                                        this.dataTable.updateArray(this.helpTickets.helpTicketTypeArrayAnalytics);
+                                        this.typeChartDataFunction();
+                                    } else {
+                                        this.displayArray = new Array();
+                                    }
                                 } else {
                                     this.displayArray = new Array();
                                 }
-                                _context2.next = 8;
-                                break;
 
-                            case 7:
-                                this.displayArray = new Array();
-
-                            case 8:
+                            case 1:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -1999,28 +1990,18 @@ define('modules/analytics/helpTickets',['exports', 'aurelia-framework', '../../r
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
-                                if (!this.selectedTab) {
-                                    _context3.next = 6;
-                                    break;
-                                }
-
-                                _context3.next = 3;
-                                return this.helpTickets.getHelpTicketsArrayAnalytics();
-
-                            case 3:
-                                if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
-                                    this.helpTickets.groupRequestsByCurriculum();
-                                    this.curriculumChartDataFunction();
+                                if (this.selectedTab) {
+                                    if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
+                                        this.helpTickets.groupRequestsByCurriculum();
+                                        this.curriculumChartDataFunction();
+                                    } else {
+                                        this.displayArray = new Array();
+                                    }
                                 } else {
                                     this.displayArray = new Array();
                                 }
-                                _context3.next = 7;
-                                break;
 
-                            case 6:
-                                this.displayArray = new Array();
-
-                            case 7:
+                            case 1:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -2067,28 +2048,18 @@ define('modules/analytics/helpTickets',['exports', 'aurelia-framework', '../../r
                     while (1) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
-                                if (!this.selectedTab) {
-                                    _context4.next = 6;
-                                    break;
-                                }
-
-                                _context4.next = 3;
-                                return this.helpTickets.getHelpTicketsArrayAnalytics();
-
-                            case 3:
-                                if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
-                                    this.helpTickets.groupHelpTicketsByInstitution();
-                                    this.institutionChartDataFunction();
+                                if (this.selectedTab) {
+                                    if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
+                                        this.helpTickets.groupHelpTicketsByInstitution();
+                                        this.institutionChartDataFunction();
+                                    } else {
+                                        this.displayArray = new Array();
+                                    }
                                 } else {
                                     this.displayArray = new Array();
                                 }
-                                _context4.next = 7;
-                                break;
 
-                            case 6:
-                                this.displayArray = new Array();
-
-                            case 7:
+                            case 1:
                             case 'end':
                                 return _context4.stop();
                         }
@@ -2135,28 +2106,18 @@ define('modules/analytics/helpTickets',['exports', 'aurelia-framework', '../../r
                     while (1) {
                         switch (_context5.prev = _context5.next) {
                             case 0:
-                                if (!this.selectedTab) {
-                                    _context5.next = 6;
-                                    break;
-                                }
-
-                                _context5.next = 3;
-                                return this.helpTickets.getHelpTicketsArrayAnalytics();
-
-                            case 3:
-                                if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
-                                    this.helpTickets.groupHelpTicketsByPeople();
-                                    this.peopleChartDataFunction();
+                                if (this.selectedTab) {
+                                    if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
+                                        this.helpTickets.groupHelpTicketsByPeople();
+                                        this.peopleChartDataFunction();
+                                    } else {
+                                        this.displayArray = new Array();
+                                    }
                                 } else {
                                     this.displayArray = new Array();
                                 }
-                                _context5.next = 7;
-                                break;
 
-                            case 6:
-                                this.displayArray = new Array();
-
-                            case 7:
+                            case 1:
                             case 'end':
                                 return _context5.stop();
                         }
@@ -2203,29 +2164,19 @@ define('modules/analytics/helpTickets',['exports', 'aurelia-framework', '../../r
                     while (1) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
-                                if (!this.selectedTab) {
-                                    _context6.next = 6;
-                                    break;
-                                }
-
-                                _context6.next = 3;
-                                return this.helpTickets.getHelpTicketsArrayAnalytics();
-
-                            case 3:
-                                if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
-                                    this.helpTickets.groupHelpTicketsByStatus();
-                                    this.substituteStatusDescriptions();
-                                    this.statusChartDataFunction();
+                                if (this.selectedTab) {
+                                    if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
+                                        this.helpTickets.groupHelpTicketsByStatus();
+                                        this.substituteStatusDescriptions();
+                                        this.statusChartDataFunction();
+                                    } else {
+                                        this.displayArray = new Array();
+                                    }
                                 } else {
                                     this.displayArray = new Array();
                                 }
-                                _context6.next = 7;
-                                break;
 
-                            case 6:
-                                this.displayArray = new Array();
-
-                            case 7:
+                            case 1:
                             case 'end':
                                 return _context6.stop();
                         }

@@ -62,7 +62,8 @@ export class HelpTicketAnalytics {
     async activate() {
         let responses = await Promise.all([
             this.helpTickets.getHelpTicketTypes(),
-            this.config.getConfig()
+            this.config.getConfig(),
+            this.helpTickets.getHelpTicketsArrayAnalytics()
         ]);
         this.selectedCategory = this.categories[0];
         this.getTypeHelpTickets();
@@ -113,7 +114,7 @@ export class HelpTicketAnalytics {
     async getTypeHelpTickets(){
         if (this.selectedTab) {
             this.numCols = 2;
-            await this.helpTickets.getHelpTicketsArrayAnalytics();
+            // await this.helpTickets.getHelpTicketsArrayAnalytics();
             if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
                 this.helpTickets.groupRequestsByType();
                 this.substituteTypeDescriptions();
@@ -171,7 +172,7 @@ export class HelpTicketAnalytics {
 
     async getCurriculumHelpTickets(){
         if (this.selectedTab) {
-            await this.helpTickets.getHelpTicketsArrayAnalytics();
+            // await this.helpTickets.getHelpTicketsArrayAnalytics();
             if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
                 this.helpTickets.groupRequestsByCurriculum();
                 this.curriculumChartDataFunction();
@@ -213,7 +214,7 @@ export class HelpTicketAnalytics {
 
     async getInstitutionHelpTickets(){
         if (this.selectedTab) {
-            await this.helpTickets.getHelpTicketsArrayAnalytics();
+            // await this.helpTickets.getHelpTicketsArrayAnalytics();
             if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
                 this.helpTickets.groupHelpTicketsByInstitution();
                 this.institutionChartDataFunction();
@@ -255,7 +256,7 @@ export class HelpTicketAnalytics {
 
     async getPeopleHelpTickets(){
         if (this.selectedTab) {
-            await this.helpTickets.getHelpTicketsArrayAnalytics();
+            // await this.helpTickets.getHelpTicketsArrayAnalytics();
             if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
                 this.helpTickets.groupHelpTicketsByPeople();
                 this.peopleChartDataFunction();
@@ -297,7 +298,7 @@ export class HelpTicketAnalytics {
 
     async getStatusHelpTickets(){
         if (this.selectedTab) {
-            await this.helpTickets.getHelpTicketsArrayAnalytics();
+            // await this.helpTickets.getHelpTicketsArrayAnalytics();
             if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
                 this.helpTickets.groupHelpTicketsByStatus();
                 this.substituteStatusDescriptions();
