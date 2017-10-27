@@ -239,13 +239,14 @@ export class ClientRequestAnalytics {
         //     ]
         // };
 
-        this.firstInstitutionChartRecord = 0;
-        if(this.firstInstitutionChartRecord + this.chartCount < this.instChartCategories.length){
-            var count = this.chartCount;
-        } else {
-            var count =  this.instChartCategories.length - this.firstInstitutionChartRecord;
-        }
-        this.pageInstitutionChartData(count);
+        // this.firstInstitutionChartRecord = 0;
+        // if(this.firstInstitutionChartRecord + this.chartCount < this.instChartCategories.length){
+        //     var count = this.chartCount;
+        // } else {
+        //     var count =  this.instChartCategories.length - this.firstInstitutionChartRecord;
+        // }
+        // this.pageInstitutionChartData(count);
+        this.fastBackIns()
     }
 
     backwardIns(){
@@ -266,6 +267,27 @@ export class ClientRequestAnalytics {
             return;
         }
         
+        this.pageInstitutionChartData(count);
+    }
+
+    fastBackIns(){
+        this.firstInstitutionChartRecord = 0;
+        if(this.firstInstitutionChartRecord + this.chartCount < this.instChartCategories.length){
+            var count = this.chartCount;
+        } else {
+            var count =  this.instChartCategories.length - this.firstInstitutionChartRecord;
+        } 
+        this.pageInstitutionChartData(count);
+    }
+
+    fastForwardIns(){
+        if(this.instChartCategories.length > this.chartCount){
+            this.firstInstitutionChartRecord = this.instChartCategories.length - this.chartCount;
+            var count = this.chartCount;
+        } else {
+            this.firstInstitutionChartRecord = 0;
+            var count =  this.instChartCategories.length - this.firstInstitutionChartRecord;
+        } 
         this.pageInstitutionChartData(count);
     }
 
@@ -448,13 +470,7 @@ export class ClientRequestAnalytics {
         //     ]
         // };
 
-        this.firstProductChartRecord = 0;
-        if(this.firstProductChartRecord + this.chartCount < this.prodChartCategories.length){
-            var count = this.chartCount;
-        } else {
-            var count =  this.prodChartCategories.length - this.firstProductChartRecord;
-        }
-        this.pageProductChartData(count);
+        this.fastBackProd();
     }
 
     backwardProd(){
@@ -468,13 +484,34 @@ export class ClientRequestAnalytics {
     }
 
     forwardProd(){
-        if(this.firstProductChartRecord + this.chartCount < this.instChartCategories.length){
+        if(this.firstProductChartRecord + this.chartCount < this.prodChartCategories.length){
             var count = this.chartCount;
             this.firstProductChartRecord = this.firstProductChartRecord + this.chartCount;
         } else {
             return;
         }
         
+        this.pageProductChartData(count);
+    }
+
+    fastBackProd(){
+        this.firstProductChartRecord = 0;
+        if(this.firstProductChartRecord + this.chartCount < this.prodChartCategories.length){
+            var count = this.chartCount;
+        } else {
+            var count =  this.prodChartCategories.length - this.firstProductChartRecord;
+        } 
+        this.pageProductChartData(count);
+    }
+
+    fastForwardProd(){
+        if(this.prodChartCategories.length > this.chartCount){
+            this.firstProductChartRecord = this.prodChartCategories.length - this.chartCount;
+            var count = this.chartCount;
+        } else {
+            this.firstProductChartRecord = 0;
+            var count =  this.prodChartCategories.length - this.firstProductChartRecord;
+        } 
         this.pageProductChartData(count);
     }
 

@@ -990,13 +990,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                 _this2.instChartCategories.push(item.name);
             });
 
-            this.firstInstitutionChartRecord = 0;
-            if (this.firstInstitutionChartRecord + this.chartCount < this.instChartCategories.length) {
-                var count = this.chartCount;
-            } else {
-                var count = this.instChartCategories.length - this.firstInstitutionChartRecord;
-            }
-            this.pageInstitutionChartData(count);
+            this.fastBackIns();
         };
 
         ClientRequestAnalytics.prototype.backwardIns = function backwardIns() {
@@ -1017,6 +1011,27 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                 return;
             }
 
+            this.pageInstitutionChartData(count);
+        };
+
+        ClientRequestAnalytics.prototype.fastBackIns = function fastBackIns() {
+            this.firstInstitutionChartRecord = 0;
+            if (this.firstInstitutionChartRecord + this.chartCount < this.instChartCategories.length) {
+                var count = this.chartCount;
+            } else {
+                var count = this.instChartCategories.length - this.firstInstitutionChartRecord;
+            }
+            this.pageInstitutionChartData(count);
+        };
+
+        ClientRequestAnalytics.prototype.fastForwardIns = function fastForwardIns() {
+            if (this.instChartCategories.length > this.chartCount) {
+                this.firstInstitutionChartRecord = this.instChartCategories.length - this.chartCount;
+                var count = this.chartCount;
+            } else {
+                this.firstInstitutionChartRecord = 0;
+                var count = this.instChartCategories.length - this.firstInstitutionChartRecord;
+            }
             this.pageInstitutionChartData(count);
         };
 
@@ -1152,13 +1167,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                 _this3.prodChartCategories.push(item.productId.name);
             });
 
-            this.firstProductChartRecord = 0;
-            if (this.firstProductChartRecord + this.chartCount < this.prodChartCategories.length) {
-                var count = this.chartCount;
-            } else {
-                var count = this.prodChartCategories.length - this.firstProductChartRecord;
-            }
-            this.pageProductChartData(count);
+            this.fastBackProd();
         };
 
         ClientRequestAnalytics.prototype.backwardProd = function backwardProd() {
@@ -1172,13 +1181,34 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
         };
 
         ClientRequestAnalytics.prototype.forwardProd = function forwardProd() {
-            if (this.firstProductChartRecord + this.chartCount < this.instChartCategories.length) {
+            if (this.firstProductChartRecord + this.chartCount < this.prodChartCategories.length) {
                 var count = this.chartCount;
                 this.firstProductChartRecord = this.firstProductChartRecord + this.chartCount;
             } else {
                 return;
             }
 
+            this.pageProductChartData(count);
+        };
+
+        ClientRequestAnalytics.prototype.fastBackProd = function fastBackProd() {
+            this.firstProductChartRecord = 0;
+            if (this.firstProductChartRecord + this.chartCount < this.prodChartCategories.length) {
+                var count = this.chartCount;
+            } else {
+                var count = this.prodChartCategories.length - this.firstProductChartRecord;
+            }
+            this.pageProductChartData(count);
+        };
+
+        ClientRequestAnalytics.prototype.fastForwardProd = function fastForwardProd() {
+            if (this.prodChartCategories.length > this.chartCount) {
+                this.firstProductChartRecord = this.prodChartCategories.length - this.chartCount;
+                var count = this.chartCount;
+            } else {
+                this.firstProductChartRecord = 0;
+                var count = this.prodChartCategories.length - this.firstProductChartRecord;
+            }
             this.pageProductChartData(count);
         };
 
@@ -57215,8 +57245,8 @@ define('text!modules/analytics/components/productRequestsTable.html', ['module']
 define('text!modules/analytics/components/requestsByInstitution.html', ['module'], function(module) { module.exports = "<template>\n  <div show.bind=\"selectedSession\">\n    <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"showInstitutionTable()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Table\"><i class=\"fa fa-table fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"showInstitutionGraph()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Graphs\"><i class=\"fa fa-pie-chart fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div show.bind=\"institutionTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./requestsTable.html\"></compose>\n          </div> \n          <div show.bind=\"!institutionTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./requestsInstitutionChart.html\"></compose>\n          </div>\n        </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/analytics/components/requestsByProducts.html', ['module'], function(module) { module.exports = "<template>\n    <div show.bind=\"selectedSession\">\n    <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"showProductTable()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Table\"><i class=\"fa fa-table fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"showProductGraph()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Graphs\"><i class=\"fa fa-pie-chart fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div show.bind=\"productTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./productRequestsTable.html\"></compose>\n          </div> \n          <div show.bind=\"!productTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./requestsProductChart.html\"></compose>\n          </div>\n        </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/analytics/components/requestsBySAPProducts.html', ['module'], function(module) { module.exports = "<template>\n    <div show.bind=\"selectedSession\">\n    <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"showSAPProductTable()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Table\"><i class=\"fa fa-table fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"showSAPProductGraph()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Graphs\"><i class=\"fa fa-pie-chart fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div show.bind=\"sapProductTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./sapProductRequestsTable.html\"></compose>\n          </div> \n          <div show.bind=\"!sapProductTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./requestsSAPProductChart.html\"></compose>\n          </div>\n        </div>\n    </div>\n  </div>\n</template>"; });
-define('text!modules/analytics/components/requestsInstitutionChart.html', ['module'], function(module) { module.exports = "<template>\n\t</fieldset>\n\t    <fieldset if.bind=\"!institutionTableSelected\" class=\"col-lg-12\">\n\t\t\t<legend>Requests  \n\t\t\t\t<span click.delegate=\"backwardIns()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-step-backward fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"forwardIns()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Forward\"><i class=\"fa fa-step-forward fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</legend>\n\t\t\t<chart id=\"institutionRequestsChart\" type=\"horizontalBar\" style=\"width: 100%; height: 100%; display: block;\" should-update=\"true\" throttle=\"2000\" data.bind=\"institutionChartData\"></chart>\n\t\t</fieldset>\n</template>"; });
-define('text!modules/analytics/components/requestsProductChart.html', ['module'], function(module) { module.exports = "<template>\n\t    <fieldset if.bind=\"!productTableSelected\" class=\"col-lg-12\">\n\t\t\t<legend>Requests\n\t\t\t\t\t<span click.delegate=\"backwardProd()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-step-backward fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"forwardProd()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Forward\"><i class=\"fa fa-step-forward fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</legend>\n\t\t\t<chart id=\"regionsChart\" type=\"horizontalBar\" style=\"width: 100%; height: 100%; display: block;\" should-update=\"true\" throttle=\"2000\" data.bind=\"productChartData\"></chart>\n\t\t</fieldset>\n</template>"; });
+define('text!modules/analytics/components/requestsInstitutionChart.html', ['module'], function(module) { module.exports = "<template>\n\t</fieldset>\n\t    <fieldset if.bind=\"!institutionTableSelected\" class=\"col-lg-12\">\n\t\t\t<legend>Requests  \n\t\t\t\t\t<span click.delegate=\"fastBackIns()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\t\ttitle=\"\" data-original-title=\"Beginning\">\n\t\t\t\t\t <i class=\"fa fa-fast-backward fa-border\" aria-hidden=\"true\"></i>\n\t\t\t\t\t </span>\n\t\t\t\t<span click.delegate=\"backwardIns()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-step-backward fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"forwardIns()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Forward\"><i class=\"fa fa-step-forward fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"fastForwardIns()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"End\">\n\t\t\t\t<i class=\"fa fa-fast-forward fa-border\" aria-hidden=\"true\"></i>\n\t\t\t</span>\n\t\t\t</legend>\n\t\t\t<chart id=\"institutionRequestsChart\" type=\"horizontalBar\" style=\"width: 100%; height: 100%; display: block;\" should-update=\"true\" throttle=\"2000\" data.bind=\"institutionChartData\"></chart>\n\t\t</fieldset>\n</template>"; });
+define('text!modules/analytics/components/requestsProductChart.html', ['module'], function(module) { module.exports = "<template>\n\t<fieldset if.bind=\"!productTableSelected\" class=\"col-lg-12\">\n\t\t<legend>Requests\n\t\t\t<span click.delegate=\"fastBackProd()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t title=\"\" data-original-title=\"Beginning\">\n\t\t\t\t<i class=\"fa fa-fast-backward fa-border\" aria-hidden=\"true\"></i>\n\t\t\t</span>\n\t\t\t<span click.delegate=\"backwardProd()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t title=\"\" data-original-title=\"Back\">\n\t\t\t\t<i class=\"fa fa-step-backward fa-border\" aria-hidden=\"true\"></i>\n\t\t\t</span>\n\t\t\t<span click.delegate=\"forwardProd()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t title=\"\" data-original-title=\"Forward\">\n\t\t\t\t<i class=\"fa fa-step-forward fa-border\" aria-hidden=\"true\"></i>\n\t\t\t</span>\n\t\t\t<span click.delegate=\"fastForwardProd()\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t title=\"\" data-original-title=\"End\">\n\t\t\t\t<i class=\"fa fa-fast-forward fa-border\" aria-hidden=\"true\"></i>\n\t\t\t</span>\n\t\t</legend>\n\t\t<chart id=\"regionsChart\" type=\"horizontalBar\" style=\"width: 100%; height: 100%; display: block;\" should-update=\"true\" throttle=\"2000\"\n\t\t data.bind=\"productChartData\"></chart>\n\t</fieldset>\n</template>"; });
 define('text!modules/analytics/components/requestsSAPProductChart.html', ['module'], function(module) { module.exports = ""; });
 define('text!modules/analytics/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div show.bind=\"summerInstTable\">\n    <h4 show.bind=\"dataTable.displayArray.length === 0\" class=\"topMargin leftMargin\">There are no items for this session</h4>\n    <div class=\"col-lg-10 col-lg-offset-1\">\n        <div class='row'  show.bind=\"dataTable.displayArray.length > 0\" >\n            <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n            <div id=\"no-more-tables\">\n                <table class=\"table table-striped table-hover cf\"> \n                    <thead class=\"cf\">\n                         <tr>\n                            <td colspan='9'>\n                                <span click.delegate=\"downloadInstExcel()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Export to Excel\"><i class=\"fa fa-download\" aria-hidden=\"true\"></i></span>\n                            </td>\n                        </tr>\n                        <tr>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customInstitutionSorter, propertyName: 'productId'})\">Institution  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'total'})\">Total  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '1'})\">${config.REQUEST_STATUS[0].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '2'})\">${config.REQUEST_STATUS[1].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '3'})\">${config.REQUEST_STATUS[2].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '4'})\">${config.REQUEST_STATUS[3].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '5'})\">${config.REQUEST_STATUS[4].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '6'})\">${config.REQUEST_STATUS[5].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '7'})\">${config.REQUEST_STATUS[6].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'studentIds'})\">Student IDs  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                        </tr>\n                        <tr>\n                            <th>\n                                <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'custom',  filter: customNameFilterValue, compare:'custom'} )\"  class=\"form-control\" />\n                            </th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                        </tr>\n                        <tr>\n                            <th>Totals:</th>\n                            <th repeat.for=\"total of totalsInstitutionArray\">${total | formatNumber}</th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        <tr click.delegate=\"showProductInstitutionDetail(stat)\" repeat.for=\"stat of dataTable.displayArray\">\n                            <td data-title=\"Institution\">${stat.name}</td>\n                            <td data-title=\"Total\">${stat.total}</td>\n                            <td data-title=\"${config.REQUEST_STATUS[$index].description}\" repeat.for=\"status of config.REQUEST_STATUS\">${stat | statValue:config.REQUEST_STATUS:$index}</td>\n                            <td>${stat.studentIds | formatNumber}</td>\n                        </tr>\n                    </tbody>\n                </table> \n            </div>\n        </div>\n    </div>\n    </div>\n    <compose show.bind=\"!summerInstTable\" view=\"./institutionRequestsDetail.html\"></compose>\n</template>"; });
 define('text!modules/analytics/components/sapProductRequestsTable.html', ['module'], function(module) { module.exports = ""; });
