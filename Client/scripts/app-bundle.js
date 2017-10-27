@@ -1852,12 +1852,9 @@ define('modules/analytics/helpTickets',['exports', 'aurelia-framework', '../../r
 
                                 this.selectedCategory = this.categories[0];
                                 this.getTypeHelpTickets();
-                                this.getInstitutionHelpTickets();
-                                this.getCurriculumHelpTickets();
-                                this.getPeopleHelpTickets();
-                                this.getStatusHelpTickets();
+                                this.selectedTab = "types";
 
-                            case 9:
+                            case 6:
                             case 'end':
                                 return _context.stop();
                         }
@@ -1883,14 +1880,16 @@ define('modules/analytics/helpTickets',['exports', 'aurelia-framework', '../../r
             }
             switch (category.code) {
                 case 0:
-                    this.dataTable.updateArray(this.helpTickets.helpTicketTypeArrayAnalytics);
+                    this.getTypeHelpTickets();
                     this.selectedTab = "types";
                     break;
                 case 1:
+                    this.getCurriculumHelpTickets();
                     this.selectedTab = "curriculum";
                     this.dataTable.updateArray(this.helpTickets.helpTicketCurriculumArrayAnalytics);
                     break;
                 case 2:
+                    this.getInstitutionHelpTickets();
                     this.dataTable.updateArray(this.helpTickets.helpTicketInstitutionArrayAnalytics);
                     this.selectedTab = 'institutions';
                     break;

@@ -65,11 +65,12 @@ export class HelpTicketAnalytics {
             this.config.getConfig()
         ]);
         this.selectedCategory = this.categories[0];
-		this.getTypeHelpTickets();
-		this.getInstitutionHelpTickets();
-        this.getCurriculumHelpTickets();
-        this.getPeopleHelpTickets();
-		this.getStatusHelpTickets();
+        this.getTypeHelpTickets();
+        this.selectedTab = "types";
+		// this.getInstitutionHelpTickets();
+        // this.getCurriculumHelpTickets();
+        // this.getPeopleHelpTickets();
+		// this.getStatusHelpTickets();
     }
 
     typeChanged(category, el){
@@ -83,17 +84,16 @@ export class HelpTicketAnalytics {
         } 
         switch(category.code){
             case 0:
-                // this.getTypeHelpTickets();
-                this.dataTable.updateArray(this.helpTickets.helpTicketTypeArrayAnalytics);
+                this.getTypeHelpTickets();
                 this.selectedTab = "types";
                 break;
             case 1:
-                // this.getCurriculumHelpTickets();
+                this.getCurriculumHelpTickets();
                 this.selectedTab = "curriculum";
                 this.dataTable.updateArray(this.helpTickets.helpTicketCurriculumArrayAnalytics);
 				break;
 			case 2:
-                // this.getInstitutionHelpTickets();
+                this.getInstitutionHelpTickets();
                  this.dataTable.updateArray(this.helpTickets.helpTicketInstitutionArrayAnalytics);
 				this.selectedTab = 'institutions';
 				break;
@@ -418,7 +418,7 @@ export class HelpTicketAnalytics {
         return item.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
-     customProductFilterValue(value, item, context){
+    customProductFilterValue(value, item, context){
         return item.productId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 }
