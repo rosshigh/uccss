@@ -64,6 +64,7 @@ export class ViewAssignments {
 				item.assignments.forEach(assign => {
 					this.assignmentsArray.push({
 						person: item.requestId.personId.fullName,
+						lastName: item.requestId.personId.lastName,
 						product: item.productId.name,
 						dateRequested: item.createdDate,
 						dateRequired: item.requiredDate,
@@ -72,6 +73,8 @@ export class ViewAssignments {
 						client: assign.client,
 						studentUserIds: assign.studentUserIds,
 						facultyUserIds: assign.facultyUserIds,
+						studentPasswords: assign.studentPassword,
+						facultyPasswords: assign.facultyPassword,
 						course: item.requestId.courseId !== null ? item.requestId.courseId.name : this.config.SANDBOX_NAME
 					});
 				})
@@ -110,19 +113,6 @@ export class ViewAssignments {
 			}
 			return result * sortDirection;
 		});
-	}
-
-	customSystemSorter(sortProperty, sortDirection, sortArray, context){ 
-		// return sortArray.sort((a, b) => {
-		// 	if(a['requestId']['personId']['lastName'] && b['requestId']['personId']['lastName']){
-		// 		var result = (a['requestId']['personId']['lastName'] < b['requestId']['personId']['lastName']) ? -1 : (a['requestId']['personId']['lastName'] > b['requestId']['personId']['lastName']) ? 1 : 0;
-		// 	} else {
-		// 		var result = -1;
-		// 	}
-		// 	return result * sortDirection;
-		// });
-
-		return sortArray;
 	}
 
 	customNameFilter(value, item, context){

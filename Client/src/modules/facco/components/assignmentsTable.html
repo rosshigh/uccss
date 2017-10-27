@@ -18,9 +18,9 @@
 						  <th class="col-lg-2"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'product'})">Product </span><span><i class="fa fa-sort"></i></span></th>
 						  <th>System</th>
 						  <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'client'})"></span>Client</th>
-						  <th>Student IDS</th>
-						  <th>Faculty IDS</th>
-						  <th class="col-lg-2"><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customPersonSorter, propertyName: 'requestId.personId.lastName'})">Faculty </span><span><i class="fa fa-sort"></i></span></th>
+						  <th>Student IDS/Passwords</th>
+						  <th>Faculty IDS/Passwords</th>
+						  <th class="col-lg-2"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'lastName'})">Faculty </span><span><i class="fa fa-sort"></i></span></th>
 						</tr>
 					  </thead>
 					  <tbody>
@@ -61,13 +61,12 @@
 						  <td data-title="Required Date">${request.dateRequired | dateFormat:config.DATE_FORMAT_TABLE}</td>
 						  <td data-title="Date Created">${request.dateRequested | dateFormat:config.DATE_FORMAT_TABLE}</td>
 						  <td data-title="Date Created">${request.dateAssigned | dateFormat:config.DATE_FORMAT_TABLE}</td>
-						  
 						  <td data-title="Course">${request.course}</td>
 						  <td data-title="Product">${request.product }</td>
 						  <td data-title="System">${request.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
 						  <td data-title="Client">${request.client}</td>
-						  <td data-title="Student IDs">${request.studentUserIds}</td>
-						  <td data-title="Faculty IDs">${request.facultyUserIds}</td>
+						  <td data-title="Student IDs"><p>${request.studentUserIds} </p> ${request.studentPasswords}</td>
+						  <td data-title="Faculty IDs"><p>${request.facultyUserIds} </p> ${request.facultyPasswords}</td>
 						  <td data-title="Person">${request.person}</td>
 						</tr>
 					  </tbody>
