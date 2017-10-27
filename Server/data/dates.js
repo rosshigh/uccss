@@ -5,12 +5,15 @@ Person = require('../app/models/institutions'),
 Model = mongoose.model('Institution'),
 logger = require('../config/logger');
 
+var db = "uccss-test";
+var mongooseDB = 'mongodb://127.0.0.1/'  + db;
+
 logger.log("Loading Mongoose functionality");
 mongoose.Promise = require('bluebird');
-mongoose.connect('mongodb://127.0.0.1/uccss', {useMongoClient: true});
+mongoose.connect(mongooseDB, {useMongoClient: true});
 var db = mongoose.connection;
 db.on('error', function () {
-  throw new Error('unable to connect to database at ' + 'mongodb://127.0.0.1/uccss');
+  throw new Error('unable to connect to database at ' + mongooseDB);
 });
 mongoose.connection.once('open', function callback() {
   logger.log("Mongoose connected to the database");
