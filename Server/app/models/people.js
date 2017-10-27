@@ -8,7 +8,7 @@ var EmailLogSchema = new Schema({
     email: { type: String },
     subject: { type: String },
     body: { type: String },
-    from: { type: Schema.Types.ObjectId },
+    from: { type: Schema.Types.Mixed },
     date: { type: Date, default: Date.now },
     topic: { type: String }
 });
