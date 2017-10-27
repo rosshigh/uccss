@@ -39,6 +39,14 @@ export class FacCo{
             nav: true,
             name: 'viewRequests',
             title: 'Clients Requests'
+        },
+        {
+            route: 'viewAssignments',
+            moduleId: './viewAssignments',
+            settings: { auth: true, roles: [] },
+            nav: true,
+            name: 'viewAssignments',
+            title: 'Assignments'
         }
         ]);
 

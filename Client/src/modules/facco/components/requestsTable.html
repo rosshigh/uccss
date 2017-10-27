@@ -60,7 +60,7 @@
               <td data-title="Date Created">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
               <td data-title="Course">${request.requestId.courseId | sandbox:config.SANDBOX_NAME}</td>
               <td data-title="Status">${request.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
-              <td data-title="IDs Requested">${request.requestId | idsRequested}
+              <td data-title="IDs Requested">${request.requestId | idsRequested}</td>
               <td data-title="Product">${request.productId.name }</td>
               <td data-title="Person">${request.requestId.personId.fullName}</td>
             </tr>

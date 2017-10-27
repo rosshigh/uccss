@@ -158,12 +158,14 @@ export class ClientRequests {
         }
     }
 
-    async getClientRequestsDetailFaccoArray(sessionId, institutionId){
-        let serverResponse = await this.data.get(this.CLIENT_REQUEST_DETAILS + '/' + sessionId + '/' + institutionId);
-        if (!serverResponse.error) {
-            this.requestsDetailsArray = serverResponse;
-        } else {
-            return undefined;
+    async getClientRequestsDetailFaccoArray(sessionId, institutionId, refresh){
+        if(!this.requestsDetailsArray || !this.requestsDetailsArray.length || refresh){
+            let serverResponse = await this.data.get(this.CLIENT_REQUEST_DETAILS + '/' + sessionId + '/' + institutionId);
+            if (!serverResponse.error) {
+                this.requestsDetailsArray = serverResponse;
+            } else {
+                return undefined;
+            }
         }
     }
 
