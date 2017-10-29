@@ -32344,7 +32344,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.selectHelpTicket = function () {
       var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(el, index) {
-        var categoryIndex, subTypeIndex;
+        var indices, subTypeIndex, categoryIndex;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
@@ -32354,10 +32354,9 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
                 this.openHelpTicket();
 
-                categoryIndex = this.helpTickets.selectedHelpTicket.helpTicketCategory;
-                subTypeIndex = this.getIndex();
-
-                this.clientRequired = this.getCategoryIndex();
+                indices = this.getIndex();
+                subTypeIndex = indices.subTypeIndex;
+                categoryIndex = indices.categoryIndex;
 
                 this.createOutputForm(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].outputForm);
 
@@ -32395,7 +32394,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       for (var j = 0; j < this.helpTickets.helpTicketTypesArray.length; j++) {
         for (var i = 0; i < this.helpTickets.helpTicketTypesArray[j].subtypes.length; i++) {
           if (this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type) {
-            return i;
+            return { subTypeIndex: i, categoryIndex: j };
           }
         }
       }

@@ -205,10 +205,12 @@ export class ViewHelpTickets {
     this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
     this.openHelpTicket();
 
-    let categoryIndex = this.helpTickets.selectedHelpTicket.helpTicketCategory;
+    // let categoryIndex = this.helpTickets.selectedHelpTicket.helpTicketCategory;
     // let subTypeIndex =  getIndex(this.getIndex[categoryIndex].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
-    let subTypeIndex =  this.getIndex();
-    this.clientRequired = this.getCategoryIndex();
+    let indices  =  this.getIndex();
+    let subTypeIndex = indices.subTypeIndex;
+    let categoryIndex = indices.categoryIndex;
+    // this.clientRequired = this.getCategoryIndex();
     //  this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].clientRequired;
     this.createOutputForm(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].outputForm);
 
@@ -233,7 +235,7 @@ export class ViewHelpTickets {
     for(var j = 0; j < this.helpTickets.helpTicketTypesArray.length; j++){
       for(var i = 0; i < this.helpTickets.helpTicketTypesArray[j].subtypes.length; i++){
         if( this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type){
-          return i;
+          return { subTypeIndex: i, categoryIndex: j};
         }
       }
     }
