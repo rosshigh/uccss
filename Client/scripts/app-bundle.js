@@ -32357,7 +32357,8 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 categoryIndex = this.helpTickets.selectedHelpTicket.helpTicketCategory;
                 subTypeIndex = this.getIndex();
 
-                this.clientRequired = this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].clientRequired;
+                this.clientRequired = this.getCategoryIndex();
+
                 this.createOutputForm(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].outputForm);
 
                 if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -32382,8 +32383,15 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       return selectHelpTicket;
     }();
 
+    ViewHelpTickets.prototype.getCategoryIndex = function getCategoryIndex() {
+      for (var i = 0; i < this.helpTickets.helpTicketTypesArray.length; i++) {
+        if (this.helpTickets.helpTicketTypesArray[i] == this.helpTickets.selectedHelpTicket.helpTicketCategory) {
+          return i;
+        }
+      }
+    };
+
     ViewHelpTickets.prototype.getIndex = function getIndex() {
-      var index;
       for (var j = 0; j < this.helpTickets.helpTicketTypesArray.length; j++) {
         for (var i = 0; i < this.helpTickets.helpTicketTypesArray[j].subtypes.length; i++) {
           if (this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type) {

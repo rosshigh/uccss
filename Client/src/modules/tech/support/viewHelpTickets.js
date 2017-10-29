@@ -208,7 +208,8 @@ export class ViewHelpTickets {
     let categoryIndex = this.helpTickets.selectedHelpTicket.helpTicketCategory;
     // let subTypeIndex =  getIndex(this.getIndex[categoryIndex].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
     let subTypeIndex =  this.getIndex();
-    this.clientRequired = this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].clientRequired;
+    this.clientRequired = this.getCategoryIndex();
+    //  this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].clientRequired;
     this.createOutputForm(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].outputForm);
 
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -220,8 +221,15 @@ export class ViewHelpTickets {
 
   }
 
+  getCategoryIndex(){
+    for(var i = 0; i < this.helpTickets.helpTicketTypesArray.length; i++){
+      if(this.helpTickets.helpTicketTypesArray[i] == this.helpTickets.selectedHelpTicket.helpTicketCategory){
+        return i;
+      }
+    }
+  }
+
   getIndex(){
-    var index;
     for(var j = 0; j < this.helpTickets.helpTicketTypesArray.length; j++){
       for(var i = 0; i < this.helpTickets.helpTicketTypesArray[j].subtypes.length; i++){
         if( this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type){
