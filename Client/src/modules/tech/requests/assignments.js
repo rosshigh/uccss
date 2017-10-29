@@ -205,7 +205,13 @@ export class Assignments {
     //  * el - event object
     //  * request - the selected request object
     //  ****************************************************************************************************/
-    selectARequest(index, el, request) {
+    async selectARequest(index, el, request) {
+        let response = await this.clientRequests.getRequestDetail(request._id);
+        if(!response.error){
+            this.selectedRequestDetail = response;
+            if(this.selectedRequestDetail.requestId && this.selectedRequestDetail.requestId.courseId === null) this.selectedRequestDetail.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
+            this.originalRequestDetail = this.utils.copyObject(this.selectedRequestDetail);
+        }
         //Initiate temp arrays to hold selected clients and assignment details
         this.proposedClient = new Array();
         this.assignmentDetails = new Array();
@@ -219,8 +225,8 @@ export class Assignments {
 
         // //Retrieve relevant data
         this.editIndex = this.dataTable.getOriginalIndex(index);
-        this.selectedRequestDetail = this.utils.copyObject(request);
-        this.originalRequestDetail = this.utils.copyObject(request);
+        // this.selectedRequestDetail = this.utils.copyObject(request);
+        // this.originalRequestDetail = this.utils.copyObject(request);
 		this.productId = this.selectedRequestDetail.productId._id;
         this.products.selectedProductFromId(this.productId);
 
@@ -271,13 +277,6 @@ export class Assignments {
 	}
 	
 	clientRequired(){
-        //Establish parameters
-        // this.lastIDAvailable = this.products.selectedProduct.lastAllowableId ? parseInt(this.products.selectedProduct.lastAllowableId) : parseInt(this.products.selectedProduct.idsAvailable)
-        // this.firstID = this.products.selectedProduct.firstAllowableId ? parseInt(this.products.selectedProduct.firstAllowableId) : this.config.FIRST_DEFAULT_ID;
-        // this.lastFirstID = this.firstID;
-        // this.firstAllowableID = this.firstID;
-        // this.firstNumericFacID = this.firstID;
-        // this.lastNumericFacID =  this.firstNumericFacID + this.numberOfFacIDs - 1;
 		
 		//Parse id templates into an array
         this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix ? this.products.selectedProduct.defaultStudentIdPrefix.split(":") : new Array();

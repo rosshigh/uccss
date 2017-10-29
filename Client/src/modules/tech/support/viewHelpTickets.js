@@ -206,7 +206,8 @@ export class ViewHelpTickets {
     this.openHelpTicket();
 
     let categoryIndex = this.helpTickets.selectedHelpTicket.helpTicketCategory;
-    let subTypeIndex = this.getIndex(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
+    // let subTypeIndex =  getIndex(this.getIndex[categoryIndex].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
+    let subTypeIndex =  this.getIndex();
     this.clientRequired = this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].clientRequired;
     this.createOutputForm(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].outputForm);
 
@@ -219,14 +220,25 @@ export class ViewHelpTickets {
 
   }
 
-  getIndex(subtypes, type){
-    for(let i = 0; i < subtypes.length; i++){
-      if(subtypes[i].type === type){
-        return i;
+  getIndex(){
+    var index;
+    for(var j = 0; j < this.helpTickets.helpTicketTypesArray.length; j++){
+      for(var i = 0; i < this.helpTickets.helpTicketTypesArray[j].subtypes.length; i++){
+        if( this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type){
+          return i;
+        }
       }
     }
-    return null;
   }
+
+  // getIndex(subtypes, type){
+  //   for(let i = 0; i < subtypes.length; i++){
+  //     if(subtypes[i].type === type){
+  //       return i;
+  //     }
+  //   }
+  //   return null;
+  // }
 
   createOutputForm(html){    
     let el = document.getElementById('container');
@@ -244,17 +256,6 @@ export class ViewHelpTickets {
       await this.getDetails();
       var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       if (!response.error) {
-        // if (response.helpTicketId === 0) {
-          //Lock help ticket
-          // this.helpTickets.lockHelpTicket({
-          //   helpTicketId: this.helpTickets.selectedHelpTicket._id,
-          //   personId: this.userObj._id,
-          //   name: this.userObj.fullName
-          // });
-          // this.lockMessage = "";
-          // this.showLockMessage = false;
-          // this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
-        // } else {
         if (response.helpTicketId !== 0) {
           if (response[0].personId === this.userObj._id) {
             this.showLockMessage = false;

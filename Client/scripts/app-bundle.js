@@ -28706,67 +28706,118 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
             }
         };
 
-        Assignments.prototype.selectARequest = function selectARequest(index, el, request) {
-            var _this2 = this;
+        Assignments.prototype.selectARequest = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(index, el, request) {
+                var _this2 = this;
 
-            this.proposedClient = new Array();
-            this.assignmentDetails = new Array();
-            this.profileRequest = undefined;
-            this.forceManual = false;
-            this.manualMode = localStorage.getItem('manualMode') ? localStorage.getItem('manualMode') == "true" : false;
+                var response, systemConfigured, i;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                _context5.next = 2;
+                                return this.clientRequests.getRequestDetail(request._id);
 
-            this.requestSelected = 'form';
-            if (this.manualMode) $(this.proposedIDRange).focus();
+                            case 2:
+                                response = _context5.sent;
 
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.selectedRequestDetail = this.utils.copyObject(request);
-            this.originalRequestDetail = this.utils.copyObject(request);
-            this.productId = this.selectedRequestDetail.productId._id;
-            this.products.selectedProductFromId(this.productId);
+                                if (!response.error) {
+                                    this.selectedRequestDetail = response;
+                                    if (this.selectedRequestDetail.requestId && this.selectedRequestDetail.requestId.courseId === null) this.selectedRequestDetail.requestId.courseId = { _id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME };
+                                    this.originalRequestDetail = this.utils.copyObject(this.selectedRequestDetail);
+                                }
 
-            this.provisionalAssignment = this.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
-            this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
+                                this.proposedClient = new Array();
+                                this.assignmentDetails = new Array();
+                                this.profileRequest = undefined;
+                                this.forceManual = false;
+                                this.manualMode = localStorage.getItem('manualMode') ? localStorage.getItem('manualMode') == "true" : false;
 
-            if (!this.products.selectedProduct.systems[0]) {
-                this.utils.showNotification("You need to assign a system to this product before you can assign this request");
-            } else {
-                var systemConfigured = false;
-                this.session = this.sessions.selectedSession.session;
-                this.productSystems = new Array();
-                this.products.selectedProduct.systems.forEach(function (item) {
-                    _this2.systems.selectedSystemFromId(item.systemId);
-                    if (_this2.systems.selectedSystem && _this2.systems.selectedSystem.sessions.indexOf(_this2.session) > -1) {
-                        _this2.systemConfigured = true;
-                        _this2.productSystems.push(_this2.systems.selectedSystem);
+                                this.requestSelected = 'form';
+                                if (this.manualMode) $(this.proposedIDRange).focus();
+
+                                this.editIndex = this.dataTable.getOriginalIndex(index);
+
+                                this.productId = this.selectedRequestDetail.productId._id;
+                                this.products.selectedProductFromId(this.productId);
+
+                                this.provisionalAssignment = this.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
+                                this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
+
+                                if (!this.products.selectedProduct.systems[0]) {
+                                    this.utils.showNotification("You need to assign a system to this product before you can assign this request");
+                                } else {
+                                    systemConfigured = false;
+
+                                    this.session = this.sessions.selectedSession.session;
+                                    this.productSystems = new Array();
+                                    this.products.selectedProduct.systems.forEach(function (item) {
+                                        _this2.systems.selectedSystemFromId(item.systemId);
+                                        if (_this2.systems.selectedSystem && _this2.systems.selectedSystem.sessions.indexOf(_this2.session) > -1) {
+                                            _this2.systemConfigured = true;
+                                            _this2.productSystems.push(_this2.systems.selectedSystem);
+                                        }
+                                    });
+                                    this.productSystems = this.productSystems.sort(function (a, b) {
+                                        return a['sid'] < b['sid'] ? -1 : a['sid'] > b['sid'] ? 1 : 0;
+                                    });
+                                    if (!this.systemConfigured) {
+                                        this.utils.showNotification("You need to assign a system to this product before you can assign this request");
+                                    }
+                                }
+
+                                if (!(this.productSystems && this.productSystems.length > 0)) {
+                                    _context5.next = 29;
+                                    break;
+                                }
+
+                                this.systems.selectedSystemFromId(this.productSystems[0]._id);
+
+                                this.selectedSystemId = this.systems.selectedSystem._id;
+                                this.clientsConfigured = false;
+                                i = 0;
+
+                            case 22:
+                                if (!(i < this.systems.selectedSystem.clients.length)) {
+                                    _context5.next = 29;
+                                    break;
+                                }
+
+                                if (!(this.systems.selectedSystem.clients[i].productId === this.products.selectedProduct._id)) {
+                                    _context5.next = 26;
+                                    break;
+                                }
+
+                                this.clientsConfigured = true;
+                                return _context5.abrupt('break', 29);
+
+                            case 26:
+                                i++;
+                                _context5.next = 22;
+                                break;
+
+                            case 29:
+
+                                this.clientRequired();
+
+                                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                                this.selectedRow = $(el.target).closest('tr');
+                                this.selectedRow.children().addClass('info');
+
+                            case 33:
+                            case 'end':
+                                return _context5.stop();
+                        }
                     }
-                });
-                this.productSystems = this.productSystems.sort(function (a, b) {
-                    return a['sid'] < b['sid'] ? -1 : a['sid'] > b['sid'] ? 1 : 0;
-                });
-                if (!this.systemConfigured) {
-                    this.utils.showNotification("You need to assign a system to this product before you can assign this request");
-                }
+                }, _callee5, this);
+            }));
+
+            function selectARequest(_x, _x2, _x3) {
+                return _ref5.apply(this, arguments);
             }
 
-            if (this.productSystems && this.productSystems.length > 0) {
-                this.systems.selectedSystemFromId(this.productSystems[0]._id);
-
-                this.selectedSystemId = this.systems.selectedSystem._id;
-                this.clientsConfigured = false;
-                for (var i = 0; i < this.systems.selectedSystem.clients.length; i++) {
-                    if (this.systems.selectedSystem.clients[i].productId === this.products.selectedProduct._id) {
-                        this.clientsConfigured = true;
-                        break;
-                    }
-                }
-            }
-
-            this.clientRequired();
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = $(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-        };
+            return selectARequest;
+        }();
 
         Assignments.prototype.clientRequired = function clientRequired() {
             this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix ? this.products.selectedProduct.defaultStudentIdPrefix.split(":") : new Array();
@@ -29158,19 +29209,19 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.deleteProposedClient = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(index) {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(index) {
                 var _this6 = this;
 
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context6.prev = _context6.next) {
                             case 0:
                                 if (!this.assignmentDetails[index].assignedDate) {
-                                    _context5.next = 4;
+                                    _context6.next = 4;
                                     break;
                                 }
 
-                                return _context5.abrupt('return', this.dialog.showMessage("This will delete the assignment.  Are you sure you want to do that?", "Delete Assignment", ['Yes', 'No']).whenClosed(function (response) {
+                                return _context6.abrupt('return', this.dialog.showMessage("This will delete the assignment.  Are you sure you want to do that?", "Delete Assignment", ['Yes', 'No']).whenClosed(function (response) {
                                     if (!response.wasCancelled) {
                                         _this6.deleteSaved(index);
                                     }
@@ -29190,25 +29241,25 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 12:
                             case 'end':
-                                return _context5.stop();
+                                return _context6.stop();
                         }
                     }
-                }, _callee5, this);
+                }, _callee6, this);
             }));
 
-            function deleteProposedClient(_x) {
-                return _ref5.apply(this, arguments);
+            function deleteProposedClient(_x4) {
+                return _ref6.apply(this, arguments);
             }
 
             return deleteProposedClient;
         }();
 
         Assignments.prototype.deleteSaved = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(index) {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(index) {
                 var i, request, serverResponse;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
                                 this.proposedClient[index].idsAvailable = parseInt(this.proposedClient[index].idsAvailable) + parseInt(this.assignmentDetails[index].idsAssigned);
                                 this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
@@ -29218,22 +29269,22 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 4:
                                 if (!(i < this.proposedClient[index].assignments.length)) {
-                                    _context6.next = 12;
+                                    _context7.next = 12;
                                     break;
                                 }
 
                                 if (!(this.proposedClient[index].assignments[i].assignment == this.selectedRequestDetail._id)) {
-                                    _context6.next = 9;
+                                    _context7.next = 9;
                                     break;
                                 }
 
                                 this.proposedClient[index].assignments.splice(i, 1);
                                 if (this.proposedClient[index].assignments.length == 0 && this.proposedClient[index].SANDBOX_CLIENT_CODE != this.config.SANDBOX_ID) this.proposedClient[index].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
-                                return _context6.abrupt('break', 12);
+                                return _context7.abrupt('break', 12);
 
                             case 9:
                                 i++;
-                                _context6.next = 4;
+                                _context7.next = 4;
                                 break;
 
                             case 12:
@@ -29261,14 +29312,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 this.requestToSave.requestDetailsToSave.push(request);
 
                                 this.clientRequests.setSelectedRequest(this.requestToSave);
-                                _context6.next = 29;
+                                _context7.next = 29;
                                 return this.clientRequests.deleteAssignment(this.editIndex);
 
                             case 29:
-                                serverResponse = _context6.sent;
+                                serverResponse = _context7.sent;
 
                                 if (serverResponse.status) {
-                                    _context6.next = 37;
+                                    _context7.next = 37;
                                     break;
                                 }
 
@@ -29276,7 +29327,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 this.reSort();
                                 this.filterInAssigned();
                                 this.utils.showNotification("The assignment was deleted");
-                                _context6.next = 37;
+                                _context7.next = 37;
                                 return this.systems.saveSystem();
 
                             case 37:
@@ -29284,14 +29335,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 38:
                             case 'end':
-                                return _context6.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee6, this);
+                }, _callee7, this);
             }));
 
-            function deleteSaved(_x2) {
-                return _ref6.apply(this, arguments);
+            function deleteSaved(_x5) {
+                return _ref7.apply(this, arguments);
             }
 
             return deleteSaved;
@@ -29316,18 +29367,18 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.deleteRequest = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
-                        switch (_context7.prev = _context7.next) {
+                        switch (_context8.prev = _context8.next) {
                             case 0:
                                 this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
-                                _context7.next = 3;
+                                _context8.next = 3;
                                 return this.clientRequests.deleteRequest();
 
                             case 3:
-                                serverResponse = _context7.sent;
+                                serverResponse = _context8.sent;
 
                                 if (!serverResponse.error) {
                                     this.filterInAssigned();
@@ -29339,50 +29390,50 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 6:
                             case 'end':
-                                return _context7.stop();
+                                return _context8.stop();
                         }
                     }
-                }, _callee7, this);
+                }, _callee8, this);
             }));
 
             function deleteRequest() {
-                return _ref7.apply(this, arguments);
+                return _ref8.apply(this, arguments);
             }
 
             return deleteRequest;
         }();
 
         Assignments.prototype.save = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
                 var _this8 = this;
 
                 var email, serverResponse, that;
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
-                        switch (_context8.prev = _context8.next) {
+                        switch (_context9.prev = _context9.next) {
                             case 0:
                                 if (!(this.assignmentDetails && this.assignmentDetails.length > 0)) {
-                                    _context8.next = 9;
+                                    _context9.next = 9;
                                     break;
                                 }
 
                                 if (!this.validation.validate(1)) {
-                                    _context8.next = 9;
+                                    _context9.next = 9;
                                     break;
                                 }
 
                                 if (!this._buildRequest()) {
-                                    _context8.next = 9;
+                                    _context9.next = 9;
                                     break;
                                 }
 
                                 this.clientRequests.setSelectedRequest(this.requestToSave);
                                 email = this._buildEmailObject();
-                                _context8.next = 7;
+                                _context9.next = 7;
                                 return this.clientRequests.assignRequest(email, this.editIndex);
 
                             case 7:
-                                serverResponse = _context8.sent;
+                                serverResponse = _context9.sent;
 
                                 if (!serverResponse.status) {
                                     this.utils.showNotification("The request was updated");
@@ -29402,14 +29453,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 9:
                             case 'end':
-                                return _context8.stop();
+                                return _context9.stop();
                         }
                     }
-                }, _callee8, this);
+                }, _callee9, this);
             }));
 
             function save() {
-                return _ref8.apply(this, arguments);
+                return _ref9.apply(this, arguments);
             }
 
             return save;
@@ -29597,30 +29648,30 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.customerActionDialog = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
                 var _this10 = this;
 
                 var subject, email;
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
-                        switch (_context9.prev = _context9.next) {
+                        switch (_context10.prev = _context10.next) {
                             case 0:
                                 if (!this.profileRequest) {
-                                    _context9.next = 7;
+                                    _context10.next = 7;
                                     break;
                                 }
 
-                                _context9.next = 3;
+                                _context10.next = 3;
                                 return this.clientRequests.getRequest(this.profileRequest.requestId._id);
 
                             case 3:
                                 this.model = 'header';
                                 this.hideProfile();
-                                _context9.next = 9;
+                                _context10.next = 9;
                                 break;
 
                             case 7:
-                                _context9.next = 9;
+                                _context10.next = 9;
                                 return this.clientRequests.getRequest(this.selectedRequestDetail.requestId._id);
 
                             case 9:
@@ -29635,7 +29686,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                                 subject = "Question about product request " + this.selectedRequestNo;
                                 email = { emailBody: "", emailSubject: subject, emailId: this.email, products: this.clientRequests.selectedRequest.requestDetails, productsSelected: this.productsSelected };
-                                return _context9.abrupt('return', this.dialog.showEmail("Enter Email", email, ['Submit', 'Cancel']).whenClosed(function (response) {
+                                return _context10.abrupt('return', this.dialog.showEmail("Enter Email", email, ['Submit', 'Cancel']).whenClosed(function (response) {
                                     if (!response.wasCancelled) {
                                         _this10.sendTheEmail(response.output);
                                     } else {
@@ -29645,30 +29696,30 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 19:
                             case 'end':
-                                return _context9.stop();
+                                return _context10.stop();
                         }
                     }
-                }, _callee9, this);
+                }, _callee10, this);
             }));
 
             function customerActionDialog() {
-                return _ref9.apply(this, arguments);
+                return _ref10.apply(this, arguments);
             }
 
             return customerActionDialog;
         }();
 
         Assignments.prototype.sendTheEmail = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(email) {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(email) {
                 var _this11 = this;
 
                 var updateIds, date, day, month, year, response, serverResponse;
-                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                return regeneratorRuntime.wrap(function _callee11$(_context11) {
                     while (1) {
-                        switch (_context10.prev = _context10.next) {
+                        switch (_context11.prev = _context11.next) {
                             case 0:
                                 if (!email) {
-                                    _context10.next = 23;
+                                    _context11.next = 23;
                                     break;
                                 }
 
@@ -29716,24 +29767,24 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                     personId: this.userObj._id
                                 });
                                 this.clientRequests.selectedRequest.customerMessage = email.email.emailBody;
-                                _context10.next = 14;
+                                _context11.next = 14;
                                 return this.clientRequests.saveRequestWithId();
 
                             case 14:
-                                response = _context10.sent;
+                                response = _context11.sent;
 
                                 if (response.error) {
-                                    _context10.next = 23;
+                                    _context11.next = 23;
                                     break;
                                 }
 
                                 this.clientRequests.updateStatuses(updateIds, this.config.CUSTOMER_ACTION_REQUEST_CODE);
                                 this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
-                                _context10.next = 20;
+                                _context11.next = 20;
                                 return this.clientRequests.sendCustomerMessage(this.message);
 
                             case 20:
-                                serverResponse = _context10.sent;
+                                serverResponse = _context11.sent;
 
                                 if (!serverResponse.error) {
                                     this.utils.showNotification("The message was sent");
@@ -29742,14 +29793,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 23:
                             case 'end':
-                                return _context10.stop();
+                                return _context11.stop();
                         }
                     }
-                }, _callee10, this);
+                }, _callee11, this);
             }));
 
-            function sendTheEmail(_x3) {
-                return _ref10.apply(this, arguments);
+            function sendTheEmail(_x6) {
+                return _ref11.apply(this, arguments);
             }
 
             return sendTheEmail;
@@ -29796,12 +29847,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.saveStudentTemplate = function () {
-            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
-                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
                     while (1) {
-                        switch (_context11.prev = _context11.next) {
+                        switch (_context12.prev = _context12.next) {
                             case 0:
-                                _context11.next = 2;
+                                _context12.next = 2;
                                 return this.products.saveProduct();
 
                             case 2:
@@ -29814,14 +29865,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 5:
                             case 'end':
-                                return _context11.stop();
+                                return _context12.stop();
                         }
                     }
-                }, _callee11, this);
+                }, _callee12, this);
             }));
 
             function saveStudentTemplate() {
-                return _ref11.apply(this, arguments);
+                return _ref12.apply(this, arguments);
             }
 
             return saveStudentTemplate;
@@ -29899,11 +29950,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.saveNote = function () {
-            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(note) {
+            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(note) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                return regeneratorRuntime.wrap(function _callee13$(_context13) {
                     while (1) {
-                        switch (_context12.prev = _context12.next) {
+                        switch (_context13.prev = _context13.next) {
                             case 0:
                                 this.people.selectNote();
                                 this.people.selectedNote.type = "r";
@@ -29912,11 +29963,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 this.people.selectedNote.note = note.note.noteBody;
                                 this.people.selectedNote.reference = this.selectedRequestDetail._id;
                                 this.people.selectedNote.referenceNo = this.selectedRequestDetail.requestId.clientRequestNo;
-                                _context12.next = 9;
+                                _context13.next = 9;
                                 return this.people.saveNote();
 
                             case 9:
-                                response = _context12.sent;
+                                response = _context13.sent;
 
                                 if (!response.error) {
                                     this.utils.showNotification('The note was saved');
@@ -29924,14 +29975,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 11:
                             case 'end':
-                                return _context12.stop();
+                                return _context13.stop();
                         }
                     }
-                }, _callee12, this);
+                }, _callee13, this);
             }));
 
-            function saveNote(_x4) {
-                return _ref12.apply(this, arguments);
+            function saveNote(_x7) {
+                return _ref13.apply(this, arguments);
             }
 
             return saveNote;
@@ -32304,7 +32355,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 this.openHelpTicket();
 
                 categoryIndex = this.helpTickets.selectedHelpTicket.helpTicketCategory;
-                subTypeIndex = this.getIndex(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
+                subTypeIndex = this.getIndex();
 
                 this.clientRequired = this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].clientRequired;
                 this.createOutputForm(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].outputForm);
@@ -32331,13 +32382,15 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       return selectHelpTicket;
     }();
 
-    ViewHelpTickets.prototype.getIndex = function getIndex(subtypes, type) {
-      for (var i = 0; i < subtypes.length; i++) {
-        if (subtypes[i].type === type) {
-          return i;
+    ViewHelpTickets.prototype.getIndex = function getIndex() {
+      var index;
+      for (var j = 0; j < this.helpTickets.helpTicketTypesArray.length; j++) {
+        for (var i = 0; i < this.helpTickets.helpTicketTypesArray[j].subtypes.length; i++) {
+          if (this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type) {
+            return i;
+          }
         }
       }
-      return null;
     };
 
     ViewHelpTickets.prototype.createOutputForm = function createOutputForm(html) {

@@ -312,7 +312,6 @@ export class ClientRequests {
         return serverResponse;
     }
 
-
     selectRequestDetailFromId(id){
         this.requestsDetailsArray.forEach((item, index) => {
           if(item._id === id){
