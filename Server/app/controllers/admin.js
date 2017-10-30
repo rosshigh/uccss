@@ -14,7 +14,7 @@ var express = require('express'),
   var requireAuth = passport.authenticate('jwt', { session: false });  
   const authFolder = './log-auth/';
   const logFolder = './log/';
-  const foreverLogFolder = './forever-log/';
+  const pm2LogFolder = './pm2Log/';
 
 module.exports = function (app, config) {
   app.use('/api', router); 
@@ -163,24 +163,25 @@ module.exports = function (app, config) {
 
 	})
 
-	router.route('/foreverLog/fileList/:type').get(function(req, res, next){
+	router.route('/pm2Log/fileList/:type').get(function(req, res, next){
 		logger.log('Get forever log files', 'verbose');
 		const fs = require('fs');
-		fs.readdir(foreverLogFolder, (err, files) => {
+		fs.readdir(pm2LogFolder, (err, files) => {
 			if(err) {
 				 return next(err);
 			} else {
 				files = files.filter(item => {
-					return item.substring(0,1) === req.params.type;
+					console.log(item.substring(0,3))
+					return item.substring(0,3) === req.params.type;
 				})
 				if(files) res.status(200).json(files);
 			}
 		})
 	});
 
-	router.route('/foreverLog/:fileName').get(function(req, res, next){
+	router.route('/pm2Log/:fileName').get(function(req, res, next){
 		logger.log('Get forever log file' + req.params.fileName, 'verbose');
-		let filePath = foreverLogFolder + req.params.fileName;
+		let filePath = pm2LogFolder + req.params.fileName;
 		fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data){
 			if (!err){
 				res.status(200).json(data)
@@ -191,12 +192,12 @@ module.exports = function (app, config) {
 		});
 	});
 
-	router.route('/foreverLog/').put(function(req, res, next){
+	router.route('/pm2Log/').put(function(req, res, next){
 		logger.log('Deleting ' + req.body.files.length + ' forever log files', 'verbose');
 		if(req.body.files){
 			try {
 				req.body.files.forEach(file => {
-					let fileName = foreverLogFolder + file + '.log';					
+					let fileName = pm2LogFolder + file + '.log';					
 					fs.unlink(fileName);
 				});
 				res.status(200).json({message: "Files deleted"});
@@ -207,11 +208,11 @@ module.exports = function (app, config) {
 		}
 	});
 
-	router.route('/foreverLog/rename/:file/:newName').put(function(req, res, next){
+	router.route('/pm2Log/rename/:file/:newName').put(function(req, res, next){
 		logger.log('Renaming forever log file', 'verbose');
 		try {
-			let fileName = foreverLogFolder + req.params.file + '.log';
-			let newFileName = foreverLogFolder + req.params.newName + '.log';
+			let fileName = pm2LogFolder + req.params.file + '.log';
+			let newFileName = pm2LogFolder + req.params.newName + '.log';
 		
 			fs.rename(fileName, newFileName, function(err) {
 				if ( err ) console.log('ERROR: ' + err);

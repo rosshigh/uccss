@@ -6,7 +6,7 @@ export class AdminData{
 	AUTH_SERVICE = "/adminLog/";
 	LOG_SERVICE = "/log/";
 	FILES_SERVICE = '/files/';
-	FOREVER_SERVICE = '/foreverLog/'
+	FOREVER_SERVICE = '/pm2Log/'
 
 	constructor(data){
 		this.data = data;
@@ -22,14 +22,14 @@ export class AdminData{
 				url = this.LOG_SERVICE;
 				break;
 			case 'forl':
-				url = this.FOREVER_SERVICE + 'fileList/f';
+				url = this.FOREVER_SERVICE + 'fileList/out';
 				break;
 			case 'fore':
-				url = this.FOREVER_SERVICE + 'fileList/e';
+				url = this.FOREVER_SERVICE + 'fileList/err';
 				break;
-			case 'foro':
-				url = this.FOREVER_SERVICE + 'fileList/o';
-				break;
+			// case 'foro':
+			// 	url = this.FOREVER_SERVICE + 'fileList/o';
+			// 	break;
 		}
 		let response = await this.data.get(url);
 		if(!response.error){

@@ -4,6 +4,7 @@ twitterBot/node_modules/
 twitterBot/public
 UCCSS/
 Server/log/
-Server/log-auth
-data/node_modules
-data/data
+Server/log-auth/
+data/node_modules/
+data/data/
+Server/pm2Log/

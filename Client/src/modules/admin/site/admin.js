@@ -18,9 +18,8 @@ export class Admin {
 		{ id: 'Authorization Log', screenToShow: 'auth' }, 
 		{ id: 'Transaction Log', screenToShow: 'log' }, 
 		{ id: 'Files', screenToShow: 'files' }, 
-		{ id: 'Forever Log', screenToShow: 'forl' }, 
-		{ id: 'Forever Error Log', screenToShow: 'fore' },
-		{id: "Forever Out Log", screenToShow: 'foro'}];
+		{ id: 'PM2 Log', screenToShow: 'forl' }, 
+		{ id: 'PM2 Error Log', screenToShow: 'fore' }];
     tabPath = './';
 
 
@@ -85,7 +84,6 @@ export class Admin {
 			case 'log':
 			case 'forl':
 			case 'fore':
-			case 'foro':
 				this.foreverLog = "";
 				let logResponse = await this.admin.getLogs(this.screenToShow);
 				if(!logResponse.error){
