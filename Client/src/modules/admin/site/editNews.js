@@ -61,9 +61,10 @@ export class EditNews {
         this.newsItemSelected = true;
     }
 
-    async edit(index, el) {
-        this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-        this.siteinfo.selectSiteItem(this.editIndex);
+    async edit(index, el, item) {
+        // this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+        // this.siteinfo.selectSiteItem(this.editIndex);
+        this.siteinfo.setSiteItem(item)
         this.originalSiteInfo = this.utils.copyObject(this.siteinfo.selectedItem);
 
         //Editing a product

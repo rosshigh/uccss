@@ -45,6 +45,10 @@ export class SiteInfo {
         }
     }
 
+    setSiteItem(item){
+        this.selectedItem = this.utils.copyObject(item);
+    }
+
     emptyItem(){
         var newItem = new Object();;
         newItem.title = "";

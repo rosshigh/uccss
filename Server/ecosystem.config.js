@@ -9,7 +9,8 @@ module.exports = {
     {
       name      : 'uccss',
       script    : 'index.js',
-      watch     : true,
+      log_date_format : "YYYY-MM-DD HH:mm Z",
+      date_format: "YYYY-MM-DD HH:mm Z",
       error_file : "c:/uccss/pm2Log/err.log",
       out_file : "c:/uccss/pm2Log/out.log",
       env: {
