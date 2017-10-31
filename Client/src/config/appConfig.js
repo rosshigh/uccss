@@ -417,6 +417,7 @@ export class AppConfig {
         this.BUTTONS_BACKGROUND = this.getParameter('BUTTONS_BACKGROUND');
         this.ACTIVE_REQUEST_OVERLAP = this.getParameter('ACTIVE_REQUEST_OVERLAP');
         this.SESSION_SORT_ORDER = this.getParameter('SESSION_SORT_ORDER');
+        this.REGISTER_PAGE_MESSAGE = this.getParameter('REGISTER_PAGE_MESSAGE');
 
     }
 
