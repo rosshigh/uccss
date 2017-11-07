@@ -55,7 +55,15 @@ export class TechRequests{
             nav: true,
             name: 'archiveClientRequests',
             title: 'Client Requests Archive'
-        }
+        },
+        {
+           route: 'viewUserRequests',
+           moduleId: './viewUserRequests',
+           settings: { auth: true, roles: [] },
+           nav: true,
+           name: 'viewUserRequests',
+           title: 'View User Requests'
+       }
         ]);
 
         this.router = router;

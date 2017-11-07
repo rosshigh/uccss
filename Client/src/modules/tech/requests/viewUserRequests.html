@@ -1,0 +1,40 @@
+<template>
+	<div class="fluid-container">
+		<div show.bind="!requestSelected" class="row">
+			<div class="col-lg-4">	
+				<div class="topMargin">
+					<select id="institution" value.bind="selectedInstitution" change.delegate="changeInstitution($event)" class="form-control">
+						<option value="">Choose the Institution</option>
+						<option repeat.for="item of people.institutionsArray" value="${item._id}">${item.name}</option>
+					</select>
+				</div>
+	
+				<div show.bind="institutionSelected" class="topMargin">
+					<select id="faculty" value.bind="selectedPerson" change.delegate="changePerson($event)" class="form-control">
+						<option value="">Choose the Faculty</option>
+						<option repeat.for="item of people.instutionPeopleArray" value="${item._id}">${item.fullName}</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-lg-8">
+				<div show.bind="personSelected && !requestSelected" class="col-lg-12">
+					<div class="topMargin">
+						<select id="session" value.bind="sessionId" class="form-control" change.delegate="changeSession($event)" id="session">
+							<option value="-1">Select a session</option>
+							<option repeat.for="session of sessions.sessionsArray"
+								value.bind="session._id">Session ${session.session} - ${session.year}</option>
+						</select>
+					</div>
+					<div show.bind="noRequests" class="bottomMargin topMargin leftMargin">
+						<h4>You have no existing requests for this session</h4>
+					</div>
+					<compose show.bind="!noRequests"view="./components/viewUserRequestsTable.html"></compose>
+				</div> 
+
+			</div>
+		</div>
+		<div show.bind="requestSelected" class="col-lg-12">
+			<compose view="./components/viewUserRequestsForm.html"></compose>
+		</div>
+	</div>
+</template>

@@ -1,0 +1,70 @@
+<template>
+  <style>
+    .warning {
+      background-color: #fcf8e3;
+    }
+    .assign{
+      background-color: #d9edf7;
+    }
+  </style>
+  <div class="container">
+    <div class='row'>
+      <div show.bind="dataTable.displayArray.length > 0" class='bottomMargin'>
+        <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
+        <div id="no-more-tables">
+          <table class="table table-striped table-hover cf">
+            <thead class="cf">
+              <tr>
+                <td colspan='6'>
+                  <span click.trigger="refresh()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+                    title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                  <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
+                </td>
+              </tr>
+              <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+              </tr>
+              <tr>
+                <th>
+                  Course <span click.trigger="dataTable.sortArray('courseId','id', people.coursesArray, '_id', 'name')"><i class="fa fa-sort"></i></span>
+                </th>
+                <th>
+                  Session <span click.trigger="dataTable.sortArray('sessionId','id',sessions.sessionsArray,'_id','startDate')"><i class="fa fa-sort"></i></span><br>
+                </th>
+                <th>
+                  Product Requests (Click to see the details)
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr  repeat.for="request of dataTable.displayArray">
+                <td click.trigger="customerActionResponse(request, $event)" data-title="Course">
+                  <h5>${request.courseId | courseName:people.coursesArray:config.SANDBOX_ID:config.SANDBOX_NAME}</h5>
+                  <h6>Undergraduates: ${request.undergradIds} Graduates: ${request.graduateIds}</h6>
+                  <h7>Request No: ${request.clientRequestNo}</h7>
+                  <h6 show.bind="request.requestStatus == config.CUSTOMER_ACTION_REQUEST_CODE" ><b>CUSTOMER ACTION REQUIRED (click here to respond)</b></h6>
+                </td>
+                <td data-title="Session">
+                  <h5>${request.sessionId | sessionName:sessions.sessionsArray}</h5>
+                </td>
+                <td>
+                  <ul>
+                    <li class="${detail.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1} list-group-item" click.trigger="edit(detail, $event, $index)" repeat.for="detail of request.requestDetails" >
+                      <h5>${detail.productId | lookupValue:products.productsArray:"_id":"name"}</h5>
+                      Status: ${detail.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}
+                      <h7 class="leftMargin">Required: ${detail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h7>
+                      <h7 class="pull-right" show.bind="detail.requestStatus == config.CUSTOMER_ACTION_REQUEST_CODE && request.requestStatus != config.CUSTOMER_ACTION_REQUEST_CODE" ><b>CUSTOMER ACTION REQUIRED (click here to respond)</b></h7>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</template>
