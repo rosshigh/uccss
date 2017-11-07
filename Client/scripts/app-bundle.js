@@ -194,7 +194,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.SHARED_CLIENT_CODE = 2;
             this.REFRESHED_CLIENT_CODE = 3;
             this.SANDBOX_CLIENT_CODE = 5;
-            this.CLIENT_STATUSES = [{ code: 1, description: "Unassigned", OKToDelete: true, lock: false }, { code: this.SHARED_CLIENT_CODE, description: "Shared", OKToDelete: false, lock: false }, { code: this.REFRESHED_CLIENT_CODE, description: "Refresh", OKToDelete: true, lock: true }, { code: this.ASSIGNED_CLIENT_CODE, description: "Assigned", OKToDelete: false, lock: true }, { code: this.SANDBOX_CLIENT_CODE, description: "SANDBOX", OKToDelete: false, lock: false }];
+            this.CLIENT_STATUSES = [{ code: 1, description: "Unassigned", OKToDelete: true, lock: false }, { code: this.SHARED_CLIENT_CODE, description: "Shared", OKToDelete: false, lock: false }, { code: this.REFRESHED_CLIENT_CODE, description: "Refresh", OKToDelete: true, lock: true }, { code: this.ASSIGNED_CLIENT_CODE, description: "Assigned", OKToDelete: false, lock: true }, { code: this.SANDBOX_CLIENT_CODE, description: this.SANDBOX_NAME, OKToDelete: false, lock: false }];
             this.HELP_TICKET_OTHER_TYPE = "2";
             this.HELP_TICKET_APP_TYPE = 3;
             this.HELP_TICKET_PASSWORD_RESET_TYPE = "02";
@@ -31843,7 +31843,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                             this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
                                             this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
                                             this.proposedClient[j].manual = this.manualMode;
-                                            if (this.proposedClient[i].assignments.length > 1) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
+                                            if (this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                                             this.systems.updateClient(this.proposedClient[j]);
                                             this.systemQueue.push(this.proposedClient[j].systemId);
                                         }
@@ -31870,7 +31870,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                     firstID: this.assignmentDetails[i].firstID,
                                     lastID: this.assignmentDetails[i].lastID
                                 });
-                                if (this.proposedClient[i].assignments.length > 1) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
+                                if (this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                                 this.systems.updateClient(this.proposedClient[i]);
                                 this.systemQueue.push(this.proposedClient[i].systemId);
                             }
@@ -31907,7 +31907,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                         lastID: this.assignmentDetails[i].lastID,
                         assignedDate: new Date()
                     });
-                    if (this.proposedClient[i].assignments.length > 1) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
+                    if (this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                     this.systems.updateClient(this.proposedClient[i]);
                     this.systemQueue.push(this.proposedClient[i].systemId);
                 };

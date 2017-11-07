@@ -945,7 +945,7 @@ export class Assignments {
                                         this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
                                         this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
                                         this.proposedClient[j].manual = this.manualMode;
-                                        if(this.proposedClient[i].assignments.length > 1) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
+                                        if(this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                                         this.systems.updateClient(this.proposedClient[j]);
                                         this.systemQueue.push(this.proposedClient[j].systemId);
                                     }
@@ -973,7 +973,7 @@ export class Assignments {
                                 firstID: this.assignmentDetails[i].firstID,
                                 lastID: this.assignmentDetails[i].lastID,  
                             });
-                            if(this.proposedClient[i].assignments.length > 1) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
+                            if(this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                             this.systems.updateClient(this.proposedClient[i]);
                             this.systemQueue.push(this.proposedClient[i].systemId);
                         }
@@ -1014,7 +1014,7 @@ export class Assignments {
                     lastID: this.assignmentDetails[i].lastID,   
                     assignedDate: new Date()                 
                 });
-                if(this.proposedClient[i].assignments.length > 1) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
+                if(this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                 this.systems.updateClient(this.proposedClient[i]);
                 this.systemQueue.push(this.proposedClient[i].systemId);
             };

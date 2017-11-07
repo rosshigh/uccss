@@ -92,7 +92,7 @@ export class AppConfig {
         { code: this.SHARED_CLIENT_CODE, description: "Shared", OKToDelete: false, lock: false },
         { code: this.REFRESHED_CLIENT_CODE, description: "Refresh", OKToDelete: true, lock: true },
         { code: this.ASSIGNED_CLIENT_CODE, description: "Assigned", OKToDelete: false, lock: true },
-        { code: this.SANDBOX_CLIENT_CODE, description: "SANDBOX", OKToDelete: false, lock: false }];          
+        { code: this.SANDBOX_CLIENT_CODE, description: this.SANDBOX_NAME, OKToDelete: false, lock: false }];          
 
         //Help Ticket parameters
     HELP_TICKET_OTHER_TYPE = "2";
