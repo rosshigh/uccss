@@ -534,7 +534,14 @@ export class ClientRequests {
             return;
         }
 
-        var sortedArray = this.requestsDetailsArrayAnalytics.sort(this.fieldSorter(['productId.name', 'requestId.institutionId.country']));
+        // var sortedArray = this.requestsDetailsArrayAnalytics.sort(this.fieldSorter(['productId.name', 'requestId.institutionId.country']));
+        var sortedArray = this.requestsDetailsArrayAnalytics.sort((a, b) =>{
+            if(!a.productId || !b.productId || !a.institutionId.country || !b.institutionId.country) return -1;
+            var one = a.productId + a.institutionId.country;
+            var two = b.productId + b.institutionId.country;
+            var result = (one < two) ? -1 : (one > two) ? 1 : 0;
+            return result;
+        });
 
         this.analyticsCountryProductsResultArray = new Array();
         var prodID = "";
