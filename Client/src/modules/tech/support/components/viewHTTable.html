@@ -53,7 +53,9 @@
               <th>Email</th>
             </tr>
             <tr>
-              <th></th>
+              <th>
+                  <input value.bind="helpTicketNoFilterValue" input.delegate="dataTable.filterList(helpTicketNoFilterValue, { type: 'value',  filter: 'helpTicketNoFilter', collectionProperty: 'helpTicketNo', displayProperty: 'helpTicketNo',  compare:'match'} )"  class="form-control" />
+              </th>
               <th>
                 <input value.bind="helpTicketTypeFilterValue" input.trigger="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )"  class="form-control" />
               </th>
@@ -85,7 +87,7 @@
           </thead>
           <tbody>
             <tr repeat.for="helpTicket of dataTable.displayArray" class="${helpTicket.priority | getArrayValue:config.HELP_TICKET_PRIORITIES:'status'}">
-              <td  data-title="Number">${helpTicket.helpTicketNo}</td>
+              <td style="width:100px;" data-title="Number">${helpTicket.helpTicketNo}</td>
               <td  mouseover.delegate="showComment(helpTicket, $event)" mouseout.delegate="hideComment()" click.trigger="selectHelpTicket($event, $index)"
                 data-title="Type">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}
               </td>
