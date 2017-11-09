@@ -467,7 +467,7 @@ export class ClientRequestAnalytics {
                     this.totalsCountryArray.push(0);
                 });
                 this.totalsCountryArray.push(0);
-                this.requests.analyticsInstitutionResultArray.forEach(item => {
+                this.requests.analyticsCountryProductsResultArray.forEach(item => {
                     this.totalsCountryArray[0] += item['total'];
                     this.totalsCountryArray[1] += item[1];
                     this.totalsCountryArray[2] += item[2];
@@ -707,6 +707,28 @@ export class ClientRequestAnalytics {
 			});
 			htmlContent += "</table>";
 			window.open('data:application/vnd.ms-excel,' + htmlContent);
+    }
+
+    downloadAllCountriesExcel(){
+        var exportArray = this.utils.copyArray(this.requests.analyticsCountryProductsResultArray);
+        var htmlContent = "<table><tr><th>Product</th><th>Country</th><th>Total</th>";
+        var numFields = this.config.REQUEST_STATUS.length;
+        
+        this.config.REQUEST_STATUS.forEach(item => {
+            htmlContent += "<th>" + item.description + "</th>";
+        })
+        htmlContent += "</tr>";
+
+        exportArray.forEach(item => { 
+            var line = "<tr><td>" + item.productId.name + "</td><td>" + item.country + "</td><td>" + item.total + "</td>";
+            this.config.REQUEST_STATUS.forEach((field, index) => {
+                line += "<td>" + item[field.code] + "</td>"; 
+            })
+            line += "</tr>";
+            htmlContent += line;
+        });
+        htmlContent += "</table>";
+        window.open('data:application/vnd.ms-excel,' + htmlContent);
     }
         
     downloadInstExcel(){

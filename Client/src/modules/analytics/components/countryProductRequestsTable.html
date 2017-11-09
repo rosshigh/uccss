@@ -5,12 +5,12 @@
             <thead class="cf">
                 <tr>
                     <td colspan='9'>
-                        <span click.delegate="downloadExcel()"  class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Export to Excel"><i class="fa fa-download" aria-hidden="true"></i></span>
+                        <span click.delegate="downloadAllCountriesExcel()"  class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Export to Excel"><i class="fa fa-download" aria-hidden="true"></i></span>
                     </td>
                 </tr>
                 <tr>
 					<th><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customProductSorter, propertyName: 'productId'})">Product </span><i class="fa fa-sort"></i></th>
-					<th>Country</th>
+					<th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'country'})">Country </span><i class="fa fa-sort"></i></th>
                     <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'total'})">Total  </span><span><i class="fa fa-sort"></i></span></th>
                     <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: '1'})">${config.REQUEST_STATUS[0].description}  </span><span><i class="fa fa-sort"></i></span></th>
                     <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: '2'})">${config.REQUEST_STATUS[1].description}  </span><span><i class="fa fa-sort"></i></span></th>
@@ -25,7 +25,9 @@
                     <th>
                         <input value.bind="productFilterValue" input.delegate="dataTable.filterList(productFilterValue, { type: 'custom',  filter: customProductFilterValue, compare:'custom'} )"  class="form-control" />
                     </th>
-					<th></th>
+					<th> 
+						<input value.bind="countryFilterValue" input.delegate="dataTable.filterList(countryFilterValue, { type: 'text',  filter: 'countryFilter', collectionProperty: 'country', displayProperty: 'country',  compare:'match'} )"  class="form-control" />
+					</th>
 					<th></th>
                     <th></th>
                     <th></th>
