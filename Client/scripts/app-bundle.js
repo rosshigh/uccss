@@ -8111,9 +8111,9 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             }
 
             var sortedArray = this.requestsDetailsArrayAnalytics.sort(function (a, b) {
-                if (!a.productId || !b.productId || !a.institutionId.country || !b.institutionId.country) return -1;
-                var one = a.productId + a.institutionId.country;
-                var two = b.productId + b.institutionId.country;
+                if (!a.productId || !b.productId || !a.requestId.institutionId.country || !b.requestId.institutionId.country) return -1;
+                var one = a.productId + a.requestId.institutionId.country;
+                var two = b.productId + b.requestId.institutionId.country;
                 var result = one < two ? -1 : one > two ? 1 : 0;
                 return result;
             });
