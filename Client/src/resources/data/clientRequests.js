@@ -534,12 +534,21 @@ export class ClientRequests {
             return;
         }
 
+        var preSortedArray = this.requestsDetailsArrayAnalytics.forEach(item => {
+            if(item.requestId.institutionId.country && item.productId.name) {
+                item.sortProperty = item.requestId.institutionId.country + item.productId.name;
+            } else {
+                item.sortProperty = "ZZZZ";
+            }
+            
+        });
+
         // var sortedArray = this.requestsDetailsArrayAnalytics.sort(this.fieldSorter(['productId.name', 'requestId.institutionId.country']));
         var sortedArray = this.requestsDetailsArrayAnalytics.sort((a, b) =>{
-            if(!a.productId || !b.productId || !a.requestId.institutionId.country || !b.requestId.institutionId.country) return -1;
-            var one = a.productId + a.requestId.institutionId.country;
-            var two = b.productId + b.requestId.institutionId.country;
-            var result = (one < two) ? -1 : (one > two) ? 1 : 0;
+            // if(!a.productId || !b.productId || !a.requestId.institutionId.country || !b.requestId.institutionId.country) return -1;
+            // var one = a.productId + a.requestId.institutionId.country;
+            // var two = b.productId + b.requestId.institutionId.country;
+            var result = (a.sortProperty < b.sortProperty) ? -1 : (a.sortProperty > b.sortProperty) ? 1 : 0;
             return result;
         });
 

@@ -43,7 +43,7 @@
             <tbody>
                 <tr click.delegate="showProductDetail(stat)" repeat.for="stat of dataTable.displayArray">
 					<td data-title="Product">${stat.productId.name}</td>
-					<td data-title="Country">${stat.country}</td>
+					<td style="width:100px;" data-title="Country">${stat.country}</td>
                     <td data-title="Institution">${stat.total | formatNumber}</td>
                     <td data-title="${config.REQUEST_STATUS[$index].description}" repeat.for="status of config.REQUEST_STATUS">${stat | statValue:config.REQUEST_STATUS:$index}</td>
                     <td>${stat.studentIds | formatNumber}</td>
