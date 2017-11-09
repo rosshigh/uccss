@@ -448,7 +448,7 @@ module.exports = function (app) {
     query
     .select('')
     .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
-    .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
+    .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name country'}})
     .populate({ path: 'productId', model: 'Product', select: 'name'})
     query.exec()
       .then(object => {

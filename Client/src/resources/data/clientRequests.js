@@ -494,7 +494,7 @@ export class ClientRequests {
         var prodID = "";
         var numStatuses = this.config.REQUEST_STATUS.length;
         var templateObj = new Object();
-         templateObj['total'] = 0;
+        templateObj['total'] = 0;
         templateObj['studentIds'] = 0;
         for(var i = 0; i < numStatuses; i++){
             templateObj[this.config.REQUEST_STATUS[i].code] = 0;
@@ -508,6 +508,7 @@ export class ClientRequests {
                 prodID = item.productId.name;
                 var obj = this.utils.copyObject(templateObj);
                 obj.productId = item.productId;
+                obj.country = item.requestId.institutionId.country;
                 this.analyticsProductsResultArray.push(obj);
             }
             if(item.requestStatus != skip){
@@ -517,6 +518,54 @@ export class ClientRequests {
                 this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1]['studentIds'] += gradIds + underIds;
             }            
             this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1][item.requestStatus] += 1;
+        })
+    }
+
+    fieldSorter(fields) {
+        return (a, b) => fields.map(o => {
+            let dir = 1;
+            if (o[0] === '-') { dir = -1; o=o.substring(1); }
+            return a[o] > b[o] ? dir : a[o] < b[o] ? -(dir) : 0;
+        }).reduce((p,n) => p ? p : n, 0);
+    }
+
+    groupRequestsByCountry(){
+        if(!this.requestsDetailsArrayAnalytics) {
+            return;
+        }
+
+        var sortedArray = this.requestsDetailsArrayAnalytics.sort(this.fieldSorter(['productId.name', 'requestId.institutionId.country']));
+
+        this.analyticsCountryProductsResultArray = new Array();
+        var prodID = "";
+        var country = "";
+        var numStatuses = this.config.REQUEST_STATUS.length;
+        var templateObj = new Object();
+        templateObj['total'] = 0;
+        templateObj['studentIds'] = 0;
+        for(var i = 0; i < numStatuses; i++){
+            templateObj[this.config.REQUEST_STATUS[i].code] = 0;
+            if(this.config.REQUEST_STATUS[i].description === "Cancelled") {
+                var skip = this.config.REQUEST_STATUS[i].code;
+            }            
+        }
+
+        sortedArray.forEach(item => {
+            if(item.productId.name != prodID || item.requestId.institutionId.country != country){ 
+                prodID = item.productId.name;
+                country = item.requestId.institutionId.country;
+                var obj = this.utils.copyObject(templateObj);
+                obj.productId = item.productId;
+                obj.country = item.requestId.institutionId.country;
+                this.analyticsCountryProductsResultArray.push(obj);
+            }
+            if(item.requestStatus != skip){
+                this.analyticsCountryProductsResultArray[this.analyticsCountryProductsResultArray.length-1]['total'] += 1;
+                var gradIds = item.requestId.graduateIds != null ? parseInt(item.requestId.graduateIds) : 0;
+                var underIds = item.requestId.undergradIds != null ? parseInt(item.requestId.undergradIds) : 0;
+                this.analyticsCountryProductsResultArray[this.analyticsCountryProductsResultArray.length-1]['studentIds'] += gradIds + underIds;
+            }            
+            this.analyticsCountryProductsResultArray[this.analyticsCountryProductsResultArray.length-1][item.requestStatus] += 1;
         })
     }
 

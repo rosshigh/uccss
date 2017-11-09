@@ -26,15 +26,16 @@ export class ClientRequestAnalytics {
             code: 1,
             description: 'Requests by Product'
         },
-        // {
-        //     code: 2,
-        //     description: 'Requests by SAP Product'
-        // }
+        {
+            code: 2,
+            description: 'Products by Country'
+        }
     ]
     backgroundColors =['#cc3300','#99e600','#0099cc','#ff0066','#6666ff','#1a8cff','#000080','#66ff99','#1aff66','#808000','#ffff66','#4d4d00','#ccffff','#006666','#339933','#b3ffff','#000099','#66ff33','#269900','#ffff00','#ffff66','#9999ff','#6600cc','#009933','','#0000b3','#ff0000','#00004d','#0000cc','#ff0000','#ff0000','#ffb3b3','#ffb3b3','#e63900','#ffb3b3','#330d00','#ffb3b3','#3333ff','#0000cc'];
     selectedTab = "institution";
     institutionTableSelected = true;
     productTableSelected = true;
+    sapCountryTableSelected = true;
     showExportPanel = false;
 
     constructor(router, config, dialog, people, datatable, utils, sessions, products, systems, requests) {
@@ -101,11 +102,11 @@ export class ClientRequestAnalytics {
                 this.selectedTab = "products";
                 break;
              case 2:
-                if(!this.requests.analyticsSAPProductsResultArray || this.requests.analyticsSAPProductsResultArray.length === 0){
-                    await this.getSAPProductsRequests();
+                if(!this.requests.analyticsCountryProductsResultArray || this.requests.analyticsCountryProductsResultArray.length === 0){
+                    await this.getCountryProductsRequests();
                 }       
-                this.dataTable.updateArray(this.requests.analyticsSAPProductsResultArray);
-                this.sapProductChartDataFunction();
+                this.dataTable.updateArray(this.requests.analyticsCountryProductsResultArray);
+                // this.sapProductChartDataFunction();
                 this.selectedTab = "sapProducts";
                 break;                
         }
@@ -454,27 +455,27 @@ export class ClientRequestAnalytics {
         };
     }
 
-    async getSAPProductsRequests() {
+    async getCountryProductsRequests() {
         if (this.selectedSession) {
             this.numCols = this.config.REQUEST_STATUS.length + 1
             this.sessions.selectSessionById(this.selectedSession);
             await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession, true);
             if (this.requests.requestsDetailsArrayAnalytics && this.requests.requestsDetailsArrayAnalytics.length) {
-                await this.requests.groupRequestsByInstitution();
-                this.totalsInstitutionArray = new Array();
+                await this.requests.groupRequestsByCountry();
+                this.totalsCountryArray = new Array();
                 this.config.REQUEST_STATUS.forEach(item => {
-                    this.totalsInstitutionArray.push(0);
+                    this.totalsCountryArray.push(0);
                 });
-                this.totalsInstitutionArray.push(0);
+                this.totalsCountryArray.push(0);
                 this.requests.analyticsInstitutionResultArray.forEach(item => {
-                    this.totalsInstitutionArray[0] += item['total'];
-                    this.totalsInstitutionArray[1] += item[1];
-                    this.totalsInstitutionArray[2] += item[2];
-                    this.totalsInstitutionArray[3] += item[3];
-                    this.totalsInstitutionArray[4] += item[4];
-                    this.totalsInstitutionArray[5] += item[5];
-                    this.totalsInstitutionArray[6] += item[6];
-                    this.totalsInstitutionArray[7] += item[7];
+                    this.totalsCountryArray[0] += item['total'];
+                    this.totalsCountryArray[1] += item[1];
+                    this.totalsCountryArray[2] += item[2];
+                    this.totalsCountryArray[3] += item[3];
+                    this.totalsCountryArray[4] += item[4];
+                    this.totalsCountryArray[5] += item[5];
+                    this.totalsCountryArray[6] += item[6];
+                    this.totalsCountryArray[7] += item[7];
                     
                 });
                 // this.dataTable.updateArray(this.requests.analyticsInstitutionResultArray);
