@@ -569,10 +569,10 @@ export class ClientRequests {
         sortedArray.forEach(item => {
             if(item.productId.name != prodID || item.requestId.institutionId.country != country){ 
                 prodID = item.productId.name;
-                country = item.requestId.institutionId.country;
+                country = item.requestId.institutionId ? item.requestId.institutionId.country : "";
                 var obj = this.utils.copyObject(templateObj);
                 obj.productId = item.productId;
-                obj.country = item.requestId.institutionId.country;
+                obj.country = item.requestId.institutionId ? item.requestId.institutionId.country : "";
                 this.analyticsCountryProductsResultArray.push(obj);
             }
             if(item.requestStatus != skip){
