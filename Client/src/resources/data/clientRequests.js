@@ -537,7 +537,7 @@ export class ClientRequests {
         var preSortedArray = this.requestsDetailsArrayAnalytics.forEach(item => {
             if(item.requestId.institutionId && item.requestId.institutionId.country && item.productId.name) {
                 item.sortProperty = item.requestId.institutionId.country + item.productId.name;
-            } else {
+            } else { 
                 item.sortProperty = "ZZZZ";
             }
             
