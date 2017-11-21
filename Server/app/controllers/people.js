@@ -356,11 +356,11 @@ module.exports = function (app, config) {
     var city = req.params.city.split(' ').join('%20');
     return http.get({
         host: 'api.openweathermap.org',
-        path: '/data/2.5/weather?q=' + req.params.city + '&APPID=0f85bb931f8faad7e35b6f685aa4e931'
+        path: '/data/2.5/weather?zip=' + req.params.city + '&APPID=0f85bb931f8faad7e35b6f685aa4e931'
     }, function(response) {
         // Continuously update stream with data
         var str = '';
-        response.on('data', function(d) {
+        response.on('data', function(d) {     
             str = JSON.parse(d);
         });
         response.on('end', function() {
