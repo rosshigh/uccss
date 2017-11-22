@@ -18,10 +18,10 @@ import {DocumentsServices} from '../../../resources/data/documents';
 export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
-  showLockMessage = false;
+  // showLockMessage = false;
   sendMailDisable = false;
   notesHistory = false;
-  lockMessage = "";
+  // lockMessage = "";
 
   toolbar;
 
@@ -102,9 +102,9 @@ export class ViewHelpTickets {
     $('[data-toggle="tooltip"]').tooltip();
   }
   
-  detached() {
-    this._unLock();
-  }
+  // detached() {
+  //   this._unLock();
+  // }
 
   sendMailNow() {
     this.helpTickets.sendMail();
@@ -264,22 +264,22 @@ export class ViewHelpTickets {
   async openHelpTicket(){
     if(this.helpTickets.selectedHelpTicket._id.length){
       await this.getDetails();
-      var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-      if (!response.error) {
-        if (response.helpTicketId !== 0) {
-          if (response[0].personId === this.userObj._id) {
-            this.showLockMessage = false;
-            this.lockMessage = "";
-            this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
-          } else {
-             if(response[0].personId !== this.userObj._id){
-              this.lockObject = response[0];
-              this.lockMessage = "Help Ticket is currently locked by " + this.getName();
-              this.showLockMessage = true;
-             }
-          }
-        }
-      }
+      // var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      // if (!response.error) {
+      //   if (response.helpTicketId !== 0) {
+      //     if (response[0].personId === this.userObj._id) {
+      //       this.showLockMessage = false;
+      //       this.lockMessage = "";
+      //       this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
+      //     } else {
+      //        if(response[0].personId !== this.userObj._id){
+      //         this.lockObject = response[0];
+      //         this.lockMessage = "Help Ticket is currently locked by " + this.getName();
+      //         this.showLockMessage = true;
+      //        }
+      //     }
+      //   }
+      // }
     } else {
       this.utils.showNotification('Help Ticket not found')
     }
@@ -301,9 +301,9 @@ export class ViewHelpTickets {
     } 
   }
 
-  getName(){
-    return this.lockObject.name ? this.lockObject.name : 'someone';
-  }
+  // getName(){
+  //   return this.lockObject.name ? this.lockObject.name : 'someone';
+  // }
 
   async save(changes){
     changes =  changes ?  changes : this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket,["requestId","courseId","personId","institutionId"]);
@@ -319,9 +319,9 @@ export class ViewHelpTickets {
        })
      }
     
-      var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-      if (!response.error) {
-        if (response.helpTicketId === 0 || response[0].personId === this.userObj._id) {
+      // var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      // if (!response.error) {
+      //   if (response.helpTicketId === 0 || response[0].personId === this.userObj._id) {
           var email = new Object();
           let serverResponse = await this.helpTickets.saveHelpTicket(email);
           if (!serverResponse.error) {
@@ -329,8 +329,8 @@ export class ViewHelpTickets {
             this.utils.showNotification("The help ticket was updated");
           }
           this._cleanUp();
-        }
-    }
+    //     }
+    // }
   }
 
   getStatusDescription(status){
@@ -346,15 +346,15 @@ export class ViewHelpTickets {
   * Open the response form and create an empty help ticket content object
   *****************************************************************************************/
   respond() {
-    if (!this.showLockMessage && !this.enterResponse) {
-      this.helpTickets.lockHelpTicket({
-        helpTicketId: this.helpTickets.selectedHelpTicket._id,
-        personId: this.userObj._id,
-        name: this.userObj.fullName
-      });
-      this.lockMessage = "";
-      this.showLockMessage = false;
-      this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
+    if (/*!this.showLockMessage && */!this.enterResponse) {
+      // this.helpTickets.lockHelpTicket({
+      //   helpTicketId: this.helpTickets.selectedHelpTicket._id,
+      //   personId: this.userObj._id,
+      //   name: this.userObj.fullName
+      // });
+      // this.lockMessage = "";
+      // this.showLockMessage = false;
+      // this.lockObject = { personId: this.userObj._id, name: this.userObj.fullName };
       this.sendMailDisable = false;
 
       this.responseMessage = "";
@@ -368,7 +368,7 @@ export class ViewHelpTickets {
     this.response = new Object();
     this.isUnchanged = true;
     this.enterResponse = false;
-    this.unlockIt();
+    // this.unlockIt();
   }
 
   /*****************************************************************************************
@@ -422,7 +422,7 @@ export class ViewHelpTickets {
       if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
     }
     this._cleanUp();
-    this.unlockIt();
+    // this.unlockIt();
   }
 
   async ownHelpTicket(helpTicket) {
@@ -430,7 +430,7 @@ export class ViewHelpTickets {
       this.helpTickets.selectHelpTicketByID(helpTicket._id);
     }
     if(this.helpTickets.selectedHelpTicket.owner[0].personId === null || this.helpTickets.selectedHelpTicket.owner[0].personId._id != this.userObj._id){
-      if(!this.showLockMessage){
+      // if(!this.showLockMessage){
           var obj = {status: this.config.REVIEW_HELPTICKET_STATUS, personId: this.userObj._id}
           let serverResponse = await this.helpTickets.updateOwner(obj);
           if (!serverResponse.error) {
@@ -440,15 +440,15 @@ export class ViewHelpTickets {
           if(helpTicket){
             this._cleanUp();
           }
-      }
+      // }
     }
   }
 
   async changeStatus(helpTicket, status, description){
     this.helpTickets.selectHelpTicketByID(helpTicket._id);
-      var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-      if (!response.error) {
-        if (response.helpTicketId === 0) {
+      // var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      // if (!response.error) {
+      //   if (response.helpTicketId === 0) {
           var obj = {
             property: "helpTicketStatus",
             oldValue: this.helpTickets.selectedHelpTicket.helpTicketStatus,
@@ -464,30 +464,30 @@ export class ViewHelpTickets {
             this.utils.showNotification("The help ticket was updated");
           }
           this._cleanUp();
-        }
-    }
+    //     }
+    // }
   }
 
-  unlockIt(){
-    if (this.helpTickets.selectedHelpTicket && this.helpTickets.selectedHelpTicket._id) {
-      this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-    }
-  }
+  // unlockIt(){
+  //   if (this.helpTickets.selectedHelpTicket && this.helpTickets.selectedHelpTicket._id) {
+  //     this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+  //   }
+  // }
 
-  _unLock() {
-    if (!this.showLockMessage) {
-      if (this.helpTickets.selectedHelpTicket && this.helpTickets.selectedHelpTicket._id) {
-        this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-      }
-    }
-  }
+  // _unLock() {
+  //   if (!this.showLockMessage) {
+  //     if (this.helpTickets.selectedHelpTicket && this.helpTickets.selectedHelpTicket._id) {
+  //       this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+  //     }
+  //   }
+  // }
 
   _cleanUp() {
     this.enterResponse = false;
     this.filesToUpload = new Array();
     this.files = new Array();
     this.filesSelected = "";
-    this._unLock();
+    // this._unLock();
     this.helpTicketSelected = false;
     $('input[type=file]').wrap('<form></form>').parent().trigger('reset').children().unwrap();
   }

@@ -64,19 +64,22 @@
               
             </thead>
             <tbody>
-              <tr click.trigger="selectHelpTicket(helpTicket, $event)" repeat.for="helpTicket of dataTable.displayArray">
-                <td  data-title="Number">${helpTicket.helpTicketNo}</td>
-                <td data-title="Type">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>
-                <td data-title="Owner">
+              <tr repeat.for="helpTicket of dataTable.displayArray">
+                <td click.trigger="selectHelpTicket(helpTicket, $event)" data-title="Number">${helpTicket.helpTicketNo}</td>
+                <td click.trigger="selectHelpTicket(helpTicket, $event)" data-title="Type">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>
+                <td click.trigger="selectHelpTicket(helpTicket, $event)" data-title="Owner">
                   <span show.bind="helpTicket.owner[0].personId === null"></span>
                   <span show.bind="helpTicket.owner[0].personId !== null"> ${helpTicket.owner[0].personId.fullName}</span>
                 </td>
-                <td data-title="Status"> ${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:"code":"description"}</td>
-                <td  data-title="Created Date" >${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
-                <td  data-title="Modified Date">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
-                <td class="hidden-xs hidden-sm hidden-md" style="width:10rem;" data-title="Customer">${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>
-                <td  data-title="Insitution">${helpTicket.institutionId.name}</td>
-                <td  data-title="Email" >${helpTicket.personId.email}</td>
+                <td data-title="Status"> 
+                  ${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:"code":"description"}
+                  <span show.bind="helpTicket.helpTicketStatus === config.CLOSED_HELPTICKET_STATUS" click.delegate="openHelpTicket(helpTicket)" class="marginLeft" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Open"><i class="fa fa-folder-open-o" aria-hidden="true"></i></span>
+                </td>
+                <td click.trigger="selectHelpTicket(helpTicket, $event)" data-title="Created Date" >${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
+                <td click.trigger="selectHelpTicket(helpTicket, $event)" data-title="Modified Date">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
+                <td click.trigger="selectHelpTicket(helpTicket, $event)" class="hidden-xs hidden-sm hidden-md" style="width:10rem;" data-title="Customer">${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>
+                <td click.trigger="selectHelpTicket(helpTicket, $event)" data-title="Insitution">${helpTicket.institutionId.name}</td>
+                <td click.trigger="selectHelpTicket(helpTicket, $event)" data-title="Email" >${helpTicket.personId.email}</td>
               </tr>
             </tbody>
           </table>

@@ -93,6 +93,18 @@ export class Utils{
                    newValue: obj1[property]
                  });
                  }
+         } else if(typeof obj1[property] === 'object'){
+            var areEqual = true;
+            for(x in obj1[property]){
+              if(obj1[property][x] != obj2[property][x]) areEqual = false;
+            }
+            if(!areEequal){
+              changes.push({
+                property: property,
+                oldValue: obj2[property],
+                newValue: obj1[property]
+              });              
+            }
          } else {
              if(obj1[property] != obj2[property]) {
                  if(!(obj1[property] === ""  && obj2[property] === undefined)){

@@ -142,7 +142,6 @@ module.exports = function (app, config) {
     query.populate({path: 'owner.personId', model: 'Person', select: 'firstName lastName'}) 
     query.exec()
       .then(response => {
-        console.log(response)  
         if(response && response.length > 0){
         
           if(req.body.content){

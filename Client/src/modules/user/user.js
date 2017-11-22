@@ -164,15 +164,17 @@ export class User {
     if(!sessionStorage.getItem('weather')){
             if(this.userObj.postalCode){
             let weather = await this.siteinfo.getWeather(this.userObj.institutionId.postalCode); 
-            this.temp =  (parseFloat(weather.main.temp) - 273.15);
-            if(this.config.TEMP_SCALE == 'C'){
-                this.temp = this.temp.toFixed(1) + "\u00b0 C";
-            } else {
-                this.temp = (parseFloat(this.temp) * 1.8 + 32).toFixed(1) + "\u00b0 F";
+            if(weather && weather.main){
+                this.temp =  (parseFloat(weather.main.temp) - 273.15);
+                if(this.config.TEMP_SCALE == 'C'){
+                    this.temp = this.temp.toFixed(1) + "\u00b0 C";
+                } else {
+                    this.temp = (parseFloat(this.temp) * 1.8 + 32).toFixed(1) + "\u00b0 F";
+                }
+                this.weatherIcon = this.config.IMG_DOWNLOAD_URL + "icons/" +  weather.weather[0].icon + ".png";
+                var weatherObj = {temp: this.temp, url: this.weatherIcon};
+                sessionStorage.setItem('weather', JSON.stringify(weatherObj));
             }
-            this.weatherIcon = this.config.IMG_DOWNLOAD_URL + "icons/" +  weather.weather[0].icon + ".png";
-            var weatherObj = {temp: this.temp, url: this.weatherIcon};
-            sessionStorage.setItem('weather', JSON.stringify(weatherObj));
         }
     } else {
         let weather = JSON.parse(sessionStorage.getItem('weather'));
