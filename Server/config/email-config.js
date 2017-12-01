@@ -8,7 +8,7 @@ var emailConfig = {
 	UCC_NAME: "UWM",
 	UNIVERSITY_NAME: "University of Wisconsin-Milwaukee",
 	UCCSS_NAME: "University of Wisconsin-Milwaukee UCCSS",
-	UCC_LOGO: HOST + 'img/UCC_LOGO_UCCSS.PNG',
+	UCC_LOGO: HOST + 'img/UCC_LOGO_HOME.PNG',
 	UA_LOGO: HOST + 'img/sap_ua3.png',
 	UNIVERSITY_LOGO: HOST + 'img/uwm_logo.jpg',
 	HOST: "http://ucc.uwm.edu/",

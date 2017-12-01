@@ -65,7 +65,7 @@ require('http').createServer(app).listen(config.port, function () {
 logger.log("Creating HTTPS server on port: " + config.https_port);
 require('https').createServer({
     key: fs.readFileSync("config/server.key"),
-    cert: fs.readFileSync("config/server.crt") 
+    cert: fs.readFileSync("config/uccsstest_ucc_uwm_edu.cer") 
 }, app).listen(config.https_port, function () {
     logger.log("HTTPS Server listening on port: " + config.https_port + ", in " + app.get('env') + " mode");
 });
