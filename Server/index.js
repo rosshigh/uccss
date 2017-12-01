@@ -8,7 +8,8 @@ var express = require('express'),
     path = require('path'),
     AsyncPolling = require('async-polling'),
     logger = require('./config/logger'),
-    glob = require('glob');
+    glob = require('glob'),
+    tls = require('tls');
 
   AsyncPolling(function (end) {
     // Do whatever you want.
@@ -69,3 +70,12 @@ require('https').createServer({
 }, app).listen(config.https_port, function () {
     logger.log("HTTPS Server listening on port: " + config.https_port + ", in " + app.get('env') + " mode");
 });
+// var options = {
+//     key: fs.readFileSync('config/uccsstest.key'),
+//     cert: fs.readFileSync('config/uccsstest_ucc_uwm_edu.cer')
+//   };
+  
+//   tls.createServer(options, function (s) {
+//     s.write(msg+"\n");
+//     s.pipe(s);
+//   }).listen(config.https_port);
