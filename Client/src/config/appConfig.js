@@ -9,11 +9,11 @@ export class AppConfig {
 
     DOWNLOAD_URL = this.HOST + '/uploadedFiles';  
 
-    // BASE_URL = "https://localhost:5001/api/";
-    // IMG_DOWNLOAD_URL = "https://localhost:5001/img/";  
+    BASE_URL = "https://localhost:5001/api/";
+    IMG_DOWNLOAD_URL = "https://localhost:5001/img/";  
 
-    BASE_URL = this.HOST + "/api/";
-    IMG_DOWNLOAD_URL = this.HOST + '/img/'  
+    // BASE_URL = this.HOST + "/api/";
+    // IMG_DOWNLOAD_URL = this.HOST + '/img/'  
 
     isMobile = false;
 
