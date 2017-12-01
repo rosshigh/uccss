@@ -39,6 +39,7 @@ if(env === 'development'){
   var RequestCreatedTemplate = fs.readFileSync(viewPath + "/client-request-created.handlebars", "utf-8");
   var NewCustomerStaffTemplate = fs.readFileSync(viewPath + "/new-customer.handlebars", "utf-8");
   var ActivateTemplate = fs.readFileSync(viewPath + "/activate-customer.handlebars", "utf-8");
+  var emailTemplate = fs.readFileSync(viewPath + "/email-template.handlebars", "utf-8");
 
   var HelpTicketCreateTemplateCompiled = hbs.compile(HelpTicketCreateTemplate);
   var HelpTicketCreateStaffTemplateCompiled = hbs.compile(HelpTicketCreateStaffTemplate);
@@ -54,6 +55,7 @@ if(env === 'development'){
   var RequestCreatedTemplateCompiled = hbs.compile(RequestCreatedTemplate); 
   var NewCustomerStaffTemplateCompiled = hbs.compile(NewCustomerStaffTemplate);
   var ActivateTemplateCompiled = hbs.compile(ActivateTemplate);
+  var emailTemplateCompiled = hbs.compile(emailTemplate);
 
   sendGrid = function(mailObject){
     mailObject.body = mailObject.body.split('&lt;').join('<').split('&gt;').join('>'); 
@@ -120,12 +122,19 @@ if(env === 'development'){
   helpTicketCreated = function(mailObject){
     logger.log("Help Ticket Created email", "verbose");
     var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
-    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+    // mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
-    mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME; 
+    // mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME; 
 
-    mailObject.body = HelpTicketCreateTemplateCompiled(mailObject.context);
+    mailObject.context.UNIVERSITY_NAME = emailConfig.UNIVERSITY_NAME;
+    mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+    mailObject.context.UA_LOGO = emailConfig.UA_LOGO;
+    mailObject.context.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
+
+    // mailObject.body = HelpTicketCreateTemplateCompiled(mailObject.context);
+    mailObject.body = emailTemplateCompiled(mailObject.context);
     mailObject.email = mailObject.email;
     mailObject.subject = 'Help Ticket Created';      
     sendGrid(mailObject)

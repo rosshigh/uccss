@@ -53,14 +53,6 @@ var express = require('express'),
     // This will schedule the next call.
 }, 3600000).run();
 
-// var rename = require('./forever-log/rename');
-
-// AsyncPolling(function (end) {
-//     rename.renameLog();
-//     end();
-// },  60000).run();
-// // 86400000
-
 var app = express();
 
 require('./config/express')(app, config);
@@ -70,10 +62,10 @@ require('http').createServer(app).listen(config.port, function () {
     logger.log("HTTP Server listening on port: " + config.port + " in " + app.get('env') + " mode");
 });
 
-// logger.log("Creating HTTPS server on port: " + config.https_port);
-// require('https').createServer({
-//     key: fs.readFileSync("config/server.key"),
-//     cert: fs.readFileSync("config/server.crt") 
-// }, app).listen(config.https_port, function () {
-//     logger.log("HTTPS Server listening on port: " + config.https_port + ", in " + app.get('env') + " mode");
-// });
+logger.log("Creating HTTPS server on port: " + config.https_port);
+require('https').createServer({
+    key: fs.readFileSync("config/server.key"),
+    cert: fs.readFileSync("config/server.crt") 
+}, app).listen(config.https_port, function () {
+    logger.log("HTTPS Server listening on port: " + config.https_port + ", in " + app.get('env') + " mode");
+});
