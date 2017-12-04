@@ -367,39 +367,42 @@ module.exports = function (app, config) {
   router.post('/api/helpTickets/sendMail', requireAuth, function(req, res, next){
     writeLog.log("Send email to " + req.body.email, 'verbose');
     if(req.body){
-       switch(req.body.reason){
-         case 1: //help ticket created
-          var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName, helpTicketContext: req.body.helpTicketContext}            
-          var mailObj = {
-            email: req.body.email,
-            cc: req.body.cc,
-            context: context
-          }         
+      sendEmail(req.body);
+
+
+    //    switch(req.body.reason){
+    //      case 1: //help ticket created
+    //       var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName, helpTicketContext: req.body.helpTicketContext}            
+    //       var mailObj = {
+    //         email: req.body.email,
+    //         cc: req.body.cc,
+    //         context: context
+    //       }         
                                  
-          helpTicketCreated(mailObj);
-          break;
-        case 2:
-        case 3:
-        case 4:
-        case 5: 
-          var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName, message: req.body.message};            
-          var mailObj = {
-            email: req.body.email,
-            cc: req.body.cc,
-            context: context
-          }                                 
-          helpTicketUpdated(mailObj);
-          break;
-        case 6: //help ticket closed
-          var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName, message: req.body.message}            
-          var mailObj = {
-            email: req.body.email,
-            cc: req.body.cc,
-            context: context
-          }                                 
-          helpTicketClosed(mailObj);
-          break;
-       }
+    //       helpTicketCreated(mailObj);
+    //       break;
+    //     case 2:
+    //     case 3:
+    //     case 4:
+    //     case 5: 
+    //       var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName, message: req.body.message};            
+    //       var mailObj = {
+    //         email: req.body.email,
+    //         cc: req.body.cc,
+    //         context: context
+    //       }                                 
+    //       helpTicketUpdated(mailObj);
+    //       break;
+    //     case 6: //help ticket closed
+    //       var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName, message: req.body.message}            
+    //       var mailObj = {
+    //         email: req.body.email,
+    //         cc: req.body.cc,
+    //         context: context
+    //       }                                 
+    //       helpTicketClosed(mailObj);
+    //       break;
+    //    }
     }
     res.status(201).json({message: "Email sent"});
   })

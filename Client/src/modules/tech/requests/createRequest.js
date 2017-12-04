@@ -55,6 +55,7 @@ export class CreateRequestTech {
 		this.filterList();
 		this._setUpValidation();
 
+		this.useSandbox = this.config.SANDBOX_USED;
 		if (!this.config.SANDBOX_USED) {
 			this.typeSelected = true;
 			this.regularClient = true;
@@ -207,7 +208,11 @@ export class CreateRequestTech {
 		this.personSelected = false
 		this.typeSelected = false;
 		this.courseSelected = false;
-		this.regularClient = false;
+		if (!this.config.SANDBOX_USED) {
+			this.typeSelected = true;
+			this.regularClient = true;
+			this.requestType = "regularCourse";
+		}
 		this.sandBoxClient = false;
 		$("#existingRequestInfo").hide();
 		this.courseId = "-1";
@@ -241,7 +246,11 @@ export class CreateRequestTech {
 		this.institutionSelected = true;
 		this.courseSelected = false;
 		this.personSelected = false;
-		this.regularClient = false;
+		if (!this.config.SANDBOX_USED) {
+			this.typeSelected = true;
+			this.regularClient = true;
+			this.requestType = "regularCourse";
+		}
 		this.selectedPerson = "";
 		this.requestType = "";
 		 $("#existingRequestInfo").empty().hide();
@@ -251,15 +260,26 @@ export class CreateRequestTech {
 	changePerson(el) {
 		this.personSelected = true;
 		this.people.selectedPersonFromId(this.selectedPerson, 'i');
+		if (!this.config.SANDBOX_USED) {
+			this.people.getCoursesArray(true, '?filter=personId|eq|' + this.selectedPerson + '&order=number', true);
+		}
 	}
 
 	changeRequestType(el) {
 		switch (this.requestType) {
 			case -1:
-				this.regularClient = false;
+			if (!this.config.SANDBOX_USED) {
+				this.typeSelected = true;
+				this.regularClient = true;
+				this.requestType = "regularCourse";
+			}
 				break;
 			case "regularCourse":
+			if (!this.config.SANDBOX_USED) {
+				this.typeSelected = true;
 				this.regularClient = true;
+				this.requestType = "regularCourse";
+			}
 				this.people.getCoursesArray(true, '?filter=personId|eq|' + this.selectedPerson + '&order=number', true);
 				break;
 			case "sandboxCourse":

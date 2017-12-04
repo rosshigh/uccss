@@ -9,11 +9,14 @@ export class AppConfig {
 
     DOWNLOAD_URL = this.HOST + '/uploadedFiles';  
 
-    BASE_URL = "https://localhost:5001/api/";
-    IMG_DOWNLOAD_URL = "https://localhost:5001/img/";  
+    // BASE_URL = "https://uccsstest.ucc.uwm.edu/api/";
+    // IMG_DOWNLOAD_URL = "https://uccsstest.ucc.uwm.edu/img/";  
 
-    // BASE_URL = this.HOST + "/api/";
-    // IMG_DOWNLOAD_URL = this.HOST + '/img/'  
+    // BASE_URL = "http://localhost/api/";
+    // IMG_DOWNLOAD_URL = "http://localhost/img/";  
+
+    BASE_URL = this.HOST + "/api/";
+    IMG_DOWNLOAD_URL = this.HOST + '/img/'  
 
     isMobile = false;
 
@@ -418,7 +421,17 @@ export class AppConfig {
         this.ACTIVE_REQUEST_OVERLAP = this.getParameter('ACTIVE_REQUEST_OVERLAP');
         this.SESSION_SORT_ORDER = this.getParameter('SESSION_SORT_ORDER');
         this.REGISTER_PAGE_MESSAGE = this.getParameter('REGISTER_PAGE_MESSAGE');
-
+        this.TECH_STAFF_CREATED_HELP_TICKET_MESSAGE = this.getParameter('TECH_STAFF_CREATED_HELP_TICKET_MESSAGE');
+        this.TECH_STAFF_CREATED_HELP_TICKET_SUBJECT = this.getParameter('TECH_STAFF_CREATED_HELP_TICKET_SUBJECT');
+        this.HELP_TICKET_INSTRUCTIONS = this.getParameter('HELP_TICKET_INSTRUCTIONS');
+        this.HELP_TICKET_CREATED_SUBJECT = this.getParameter('HELP_TICKET_CREATED_SUBJECT');
+        this.HELP_TICKET_CREATED_MESSAGE = this.getParameter('HELP_TICKET_CREATED_MESSAGE');
+        this.HELP_TICKET_UPDATED_MESSAGE_CA = this.getParameter('HELP_TICKET_UPDATED_MESSAGE_CA');
+        this.HELP_TICKET_UPDATED_SUBJECT_CA = this.getParameter('HELP_TICKET_UPDATED_SUBJECT_CA');
+        this.HELP_TICKET_UPDATE_MESSAGE_R = this.getParameter('HELP_TICKET_UPDATE_MESSAGE_R');
+        this.HELP_TICKET_UPDATE_SUBJECT_R = this.getParameter('HELP_TICKET_UPDATE_SUBJECT_R');
+        this.HELP_TICKET_UPDATE_CLOSED_MESSAGE_C = this.getParameter('HELP_TICKET_UPDATE_CLOSED_MESSAGE_C');
+        this.HELP_TICKET_UPDATE_CLOSED_SUBJECT_C = this.getParameter('HELP_TICKET_UPDATE_CLOSED_SUBJECT_C');
     }
 
     getParameter(parameter){

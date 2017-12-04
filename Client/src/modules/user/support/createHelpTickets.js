@@ -307,11 +307,14 @@ export class CreateHelpTickets{
             await this.buldHelpTicket();
             var email = new Object();
             if(this.sendEmail){
-                email.reason = this.config.HELP_TICKET_EMAIL_CREATE;
-                email.fullName = this.userObj.fullName;
+                email.MESSAGE = this.config.HELP_TICKET_CREATED_MESSAGE;
+                email.INSTRUCTIONS = this.config.HELP_TICKET_INSTRUCTIONS;
+                email.subject = this.config.HELP_TICKET_CREATED_SUBJECT.replace('[[faculty name]]',this.userObj.fullName);
+                // email.reason = this.config.HELP_TICKET_EMAIL_CREATE;
+                // email.fullName = this.userObj.fullName;
                 email.email = this.userObj.email;
                 email.helpTicketNo = 0;
-                email.helpTicketContext = this.buildHelpTicketContext();
+                // email.helpTicketContext = this.buildHelpTicketContext();
                 email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
             } 
 

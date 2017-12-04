@@ -29,7 +29,7 @@
 				</select>
 			</div>
   
-			<div id="course" show.bind="personSelected && config.SANDBOX_USED" class="topMargin">
+			<div id="course" show.bind="personSelected && useSandbox" class="topMargin">
 				<select value.bind="requestType" change.delegate="changeRequestType($event)" id="requestType" class="form-control">
 					<option value="-1">Choose the Type of The Request</option>
 					<option value="sandboxCourse">${config.SANDBOX_NAME}</option>

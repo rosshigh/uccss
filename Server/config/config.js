@@ -8,8 +8,8 @@ var config = {
     app: {
       name: 'UCCSS'
     },
-    port: 5000,
-    https_port: 5001,
+    port: 80,
+    https_port: 443,
     db: 'mongodb://127.0.0.1/uccss-dev',
     corsDomain: 'http://localhost:5000',
     secret: "Ci23fWtahDYE3dfirAHrJhzrUEoslIxqwcDN9VNhRJCWf8Tyc1F1mqYrjGYF",
@@ -41,6 +41,7 @@ var config = {
       name: 'UCCSS'
     },
     port: 80,
+    https_port: 443,
     db: 'mongodb://localhost/uccss',
     corsDomain: 'http://ucc.uwm.edu',
     secret: "Ci23fWtahDYE3dfirAHrJhzrUEoslIxqwcDN9VNhRJCWf8Tyc1F1mqYrjGYF",

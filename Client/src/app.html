@@ -1,11 +1,11 @@
 <template>
-   <require from="resources/css/styles.css"></require>
-   <require from="humane-js/themes/jackedup.css"></require>
+  <require from="resources/css/styles.css"></require>
+  <!--<require from="summernote/summernote.css"></require>-->
+  <require from="humane-js/themes/jackedup.css"></require>
   <require from="bootstrap-select/css/bootstrap-select.css"></require>
- <!--  <require from="bootstrap/css/bootstrap.min.css"></require> -->
-   <nav-bar></nav-bar>
-  <div class="page-host"> 
+  <nav-bar></nav-bar>
+  <div class="page-host">
     <loading-indicator progress.bind="data.progress" loading.bind="router.isNavigating || data.isRequesting"></loading-indicator>
     <router-view></router-view>
-</div>
+  </div>
 </template>

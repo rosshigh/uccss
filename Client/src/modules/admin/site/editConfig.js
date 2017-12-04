@@ -13,7 +13,7 @@ export class EditConfig {
     spinnerHTML = "";
     tabCode = "a";
 
-    tabs = [{ id: 'Assignments' }, { id: 'Interface' }, { id: 'UCC Information' }];
+    tabs = [{ id: 'Assignments' }, { id: 'Interface' }, { id: 'UCC Information' }, {id: "Email Content"}];
     tabPath = './';
 
 
@@ -82,7 +82,6 @@ export class EditConfig {
             }
         }
         this.siteConfig.configArray[index].value = this.siteConfig.configArray[index].value == 'false' || this.siteConfig.configArray[index].value == false;
-        // this.dataTable.updateArray(this.siteConfig.configArray);
     }
 
 	cancel(){

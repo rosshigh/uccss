@@ -407,17 +407,24 @@ export class ViewHelpTickets {
     this._createResponse();
     var email = new Object();
     if(this.sendEmail){
-        email.reason = status;
-        email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; 
+      if(status ==  this.config.CUSTOMER_ACTION_HELPTICKET_STATUS){
+        email.MESSAGE = this.config.HELP_TICKET_UPDATED_MESSAGE_CA.replace('[[No]]',this.helpTickets.selectedHelpTicket.helpTicketNo);
+        email.subject = this.config.HELP_TICKET_UPDATED_SUBJECT_CA.replace('[[No]]',this.helpTickets.selectedHelpTicket.helpTicketNo);
+      } else if (status == this.config.CLOSED_HELPTICKET_STATUS) {
+        email.MESSAGE = this.config.HELP_TICKET_UPDATE_CLOSED_MESSAGE_C.replace('[[No]]',this.helpTickets.selectedHelpTicket.helpTicketNo);;
+        email.subject = this.config.HELP_TICKET_UPDATE_CLOSED_SUBJECT_C.replace('[[No]]',this.helpTickets.selectedHelpTicket.helpTicketNo);
+      } else {
+        email.MESSAGE = this.config.HELP_TICKET_UPDATE_MESSAGE_R.replace('[[No]]',this.helpTickets.selectedHelpTicket.helpTicketNo);;
+        email.subject = this.config.HELP_TICKET_UPDATE_SUBJECT_R.replace('[[No]]',this.helpTickets.selectedHelpTicket.helpTicketNo);
+      }
+        email.INSTRUCTIONS = this.config.HELP_TICKET_INSTRUCTIONS;
+        
         email.email = this.helpTickets.selectedHelpTicket.personId.email; 
-        email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
         email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
-        email.message = status == this.config.CUSTOMER_ACTION_HELPTICKET_STATUS ? this.userObj.fullName + " has asked for more information." : this.userObj.fullName + " has responded to the help ticket."
     }
     let serverResponse = await this.helpTickets.saveHelpTicketResponse(email);
     if (!serverResponse.error) {
       if(status == this.config.CLOSED_HELPTICKET_STATUS) await this.refresh();
-      // this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
       this.utils.showNotification("The help ticket was updated");
       if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
     }

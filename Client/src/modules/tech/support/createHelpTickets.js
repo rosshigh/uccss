@@ -87,6 +87,7 @@ export class CreateHelpTickets{
         })
         this.editorMessage = this.getMessage('EDITOR_DESCRIPTION_MESSAGE');
         this.fileUploadMessage = this.getMessage('FILE_UPLOAD_DESCRIPTION');
+
     }
 
     async changeInstitution(event){
@@ -95,6 +96,7 @@ export class CreateHelpTickets{
 
     changePerson(){
         this.showCategories = this.selectedPerson != "";
+        this.people.selectedPersonFromId(this.selectedPerson);
     }
 
     categoryChanged(){
@@ -304,7 +306,15 @@ export class CreateHelpTickets{
     async save(){
         if(this.validation.validate(1)){ 
             await this.buldHelpTicket();
-            var email = this.sendEmail ? 1 : 0;
+            var email = new Object();
+            if(this.sendEmail){
+                email.MESSAGE = this.config.TECH_STAFF_CREATED_HELP_TICKET_MESSAGE;
+                email.INSTRUCTIONS = this.config.HELP_TICKET_INSTRUCTIONS;
+                email.subject = this.config.TECH_STAFF_CREATED_HELP_TICKET_SUBJECT.replace('[[faculty name]]', this.people.selectedPerson.fullName);
+                email.email = this.userObj.email;
+                email.helpTicketNo = 0;
+                email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+            } 
             let serverResponse = await this.helpTickets.saveHelpTicket(email);
             if (!serverResponse.status) { 
                 this.utils.showNotification("The help ticket was created");

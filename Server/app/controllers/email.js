@@ -119,8 +119,30 @@ if(env === 'development'){
     sendGrid(mailObject);
   }
 
+  sendEmail = function(mailObject){
+    logger.log("Email Sent", "verbose");
+    var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+    mailObject.logoExists = emailConfig.UCC_LOGO != "";
+    mailObject.HOST = emailConfig.HOST;
+    mailObject.UCC_PHONE = emailConfig.UCC_PHONE;
+    mailObject.UCC_EMAIL = emailConfig.UCC_EMAIL;
+    mailObject.UNIVERSITY_NAME = emailConfig.UNIVERSITY_NAME;
+    mailObject.UCCSS_NAME = emailConfig.UCCSS_NAME;
+    mailObject.UCC_LOGO = emailConfig.UCC_LOGO;
+    mailObject.UA_LOGO = emailConfig.UA_LOGO;
+    mailObject.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
+
+    mailObject.body = emailTemplateCompiled(mailObject);
+    mailObject.email = mailObject.email;
+    mailObject.subject = mailObject.subject;      
+    console.log(mailObject)
+    sendGrid(mailObject)
+  }
+
   helpTicketCreated = function(mailObject){
     logger.log("Help Ticket Created email", "verbose");
+    mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
+   
     var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
     // mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
@@ -132,6 +154,7 @@ if(env === 'development'){
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UA_LOGO = emailConfig.UA_LOGO;
     mailObject.context.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
+    mailObject.context.INSTRUCTIONS = emailConfig.HELP_TICKET_INSTRUCTIONS.replace('[[HOST]]', emailConfig.HOST);
 
     // mailObject.body = HelpTicketCreateTemplateCompiled(mailObject.context);
     mailObject.body = emailTemplateCompiled(mailObject.context);

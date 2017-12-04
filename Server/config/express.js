@@ -22,7 +22,7 @@ module.exports = function(app, config) {
   app.use(helmet())
   app.use(express.static(config.root + '/public'));
   app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
-  app.use(cors());
+  app.use(cors({origin: "http://localhost:9000"}));
 
   logger.log("Loading Mongoose functionality");
   mongoose.Promise = require('bluebird');

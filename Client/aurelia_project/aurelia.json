@@ -220,7 +220,10 @@
           {
             "name": "summernote",
             "path": "../node_modules/summernote/dist/",
-            "main": "summernote"
+            "main": "summernote",
+            "resources": [
+              "summernote.css"
+            ]
           },
           {
             "name": "fuelux",
