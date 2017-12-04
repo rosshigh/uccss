@@ -338,7 +338,7 @@ if(env === 'development'){
             var emailLog = new EmailLog({
               email: mailObject.to,
               subject: mailObject.subject,
-              body: JSON.stringify(mailObject.context),
+              body: JSON.stringify(mailObject),
               from: mailObject.from,
               topic: mailObject.topic ? mailObject.topic : ""
             });
@@ -349,6 +349,28 @@ if(env === 'development'){
             logger.log(error, 'error');
         })
   };
+
+  sendEmail = function(mailObject){
+    logger.log("Email Sent", "verbose");
+    var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+    mailObject.logoExists = emailConfig.UCC_LOGO != "";
+    mailObject.HOST = emailConfig.HOST;
+    mailObject.UCC_PHONE = emailConfig.UCC_PHONE;
+    mailObject.UCC_EMAIL = emailConfig.UCC_EMAIL;
+    mailObject.UNIVERSITY_NAME = emailConfig.UNIVERSITY_NAME;
+    mailObject.UCCSS_NAME = emailConfig.UCCSS_NAME;
+    mailObject.UCC_LOGO = emailConfig.UCC_LOGO;
+    mailObject.UA_LOGO = emailConfig.UA_LOGO;
+    mailObject.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
+
+    mailObject.body = emailTemplateCompiled(mailObject);
+    mailObject.to = mailObject.email;
+    mailObject.subject = mailObject.subject;   
+    mailObject.from = emailConfig.emailAddress;
+    mailObject.template = 'email-template';
+    
+    nodeMailerSendMail(mail);
+  }
 
   welcome = function(mailObject){
     logger.log("Welcome to the UCCSS email", 'verbose');
