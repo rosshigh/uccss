@@ -1,0 +1,568 @@
+{ 
+    "_id" : ObjectId("57f7b6902003b53442a43dec"), 
+    "parameter" : "DEFAULT_FACULTY_IDS", 
+    "value" : "2", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2016-10-07T14:52:00.880+0000"), 
+    "__v" : NumberInt(0), 
+    "description" : "Default number of faculty IDs", 
+    "category" : "a"
+}
+{ 
+    "_id" : ObjectId("57f7b6a42003b53442a43ded"), 
+    "parameter" : "REQUEST_LIMIT", 
+    "value" : "5", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2016-10-07T14:52:20.193+0000"), 
+    "__v" : NumberInt(0), 
+    "description" : "Maximum products in a request", 
+    "category" : "a"
+}
+{ 
+    "_id" : ObjectId("57f7b7110772f2dc18780347"), 
+    "parameter" : "REGULAR_ID_BUFFER", 
+    "value" : "5", 
+    "type" : "value", 
+    "description" : "IDS between assignments in shared clients", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2016-10-07T14:54:09.447+0000"), 
+    "__v" : NumberInt(0), 
+    "category" : "a"
+}
+{ 
+    "_id" : ObjectId("57f7b7290772f2dc18780348"), 
+    "parameter" : "REGULAR_ID_ALLOWANCE", 
+    "value" : "5", 
+    "type" : "value", 
+    "description" : "Additional IDs assigned", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2016-10-07T14:54:33.694+0000"), 
+    "__v" : NumberInt(0), 
+    "category" : "a"
+}
+{ 
+    "_id" : ObjectId("57f7b7440772f2dc18780349"), 
+    "parameter" : "SANDBOX_ID_BUFFER", 
+    "value" : "2", 
+    "type" : "value", 
+    "description" : "IDS between assigned sandbox ranges", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2016-10-07T14:55:00.581+0000"), 
+    "__v" : NumberInt(0)
+}
+{ 
+    "_id" : ObjectId("57f7b76e0772f2dc1878034a"), 
+    "parameter" : "SHARED_ID_BUFFER", 
+    "value" : "5", 
+    "type" : "value", 
+    "description" : "IDS between assigned shared ranges", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2016-10-07T14:55:42.724+0000"), 
+    "__v" : NumberInt(0)
+}
+{ 
+    "_id" : ObjectId("57f7b78a0772f2dc1878034b"), 
+    "parameter" : "SANDBOX_ID_COUNT", 
+    "value" : "2", 
+    "type" : "value", 
+    "description" : "Default ids assigned to sandbox", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2016-10-07T14:56:10.408+0000"), 
+    "__v" : NumberInt(0), 
+    "category" : "a"
+}
+{ 
+    "_id" : ObjectId("57f7d146e190d6c02d213954"), 
+    "parameter" : "REQUEST_LEEWAY", 
+    "value" : "5", 
+    "type" : "value", 
+    "description" : "Minimum days before request can be completed.", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2016-10-07T16:45:58.754+0000"), 
+    "__v" : NumberInt(0), 
+    "category" : "a"
+}
+{ 
+    "_id" : ObjectId("5800f26773b426b81c9512ea"), 
+    "parameter" : "CLIENT_INTERVAL", 
+    "value" : "1", 
+    "type" : "value", 
+    "description" : "Interval between generated system clients.", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2016-10-14T14:57:43.885+0000"), 
+    "__v" : NumberInt(0), 
+    "category" : "a"
+}
+{ 
+    "_id" : ObjectId("5813baa3ca25dcf451b571a1"), 
+    "parameter" : "DATE_FORMAT_TABLE", 
+    "value" : "MMM Do YYYY", 
+    "type" : "value", 
+    "description" : "Date format", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2016-10-28T20:52:51.087+0000"), 
+    "__v" : NumberInt(0), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("58d9683065e850216c1298e3"), 
+    "parameter" : "SANDBOX_USED", 
+    "type" : "boolean", 
+    "description" : "Whether sandbox courses are used", 
+    "readOnly" : false, 
+    "value" : "false", 
+    "dateModified" : ISODate("2017-03-27T19:37:44.355+0000"), 
+    "category" : "a"
+}
+{ 
+    "_id" : ObjectId("58f0daf91fda141924169ca2"), 
+    "parameter" : "HOME_WELCOME", 
+    "value" : "", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2017-04-21T15:28:37.189+0000"), 
+    "description" : "Welcome message on landing page", 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("58f0dccc1fda141924169ca4"), 
+    "parameter" : "DEFAULT_HOME_IMAGE", 
+    "value" : "defaultImage.JPG", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2017-04-21T15:28:37.189+0000"), 
+    "description" : "Default image on home page if no carousel images are uploaded", 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("58fa1fa26a2f8723a4b85a83"), 
+    "parameter" : "UCC_EMAIL", 
+    "value" : "rhightower@gmail.com", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2017-04-21T15:28:37.189+0000"), 
+    "description" : "Tech staff group email", 
+    "category" : "u"
+}
+{ 
+    "_id" : ObjectId("58fa1fd16a2f8723a4b85a85"), 
+    "parameter" : "UCC_PHONE", 
+    "value" : "4142293333", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2017-04-21T15:28:37.189+0000"), 
+    "description" : "Tech staff phone", 
+    "category" : "u"
+}
+{ 
+    "_id" : ObjectId("58fa20636a2f8723a4b85a87"), 
+    "parameter" : "UCC_ADMIN_PHONE", 
+    "value" : "4142293992", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2017-04-21T15:28:37.189+0000"), 
+    "description" : "Admin contact phone", 
+    "category" : "u"
+}
+{ 
+    "_id" : ObjectId("58fa20916a2f8723a4b85a89"), 
+    "parameter" : "UCC_ADMIN_EMAIL", 
+    "value" : "cti@uwm.edu", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2017-04-21T15:28:37.189+0000"), 
+    "description" : "The admin email address", 
+    "category" : "u"
+}
+{ 
+    "_id" : ObjectId("58fa271f6a2f8723a4b85a8d"), 
+    "parameter" : "SHOW_STAFF_CONTACT", 
+    "value" : "false", 
+    "type" : "boolean", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2017-04-21T15:41:27.128+0000"), 
+    "description" : "Whether individual staff contact info is shown", 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("58fa29fa6a2f8723a4b85a8f"), 
+    "parameter" : "UCC_HEADER_IMAGE", 
+    "value" : "UCCHeader.jpg", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2017-04-21T16:26:53.658+0000"), 
+    "description" : "Image on the right side of the header on the contact page", 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("58fa326b6a2f8723a4b85a91"), 
+    "parameter" : "CONTACT_CONTENT", 
+    "value" : "<div class=\"col-lg-12 bottomMargin\"><h1>Welcome</h1>Welcome to the University of Wisconsin-Milwaukee SAP University Competence Center.  The goal of the UWM UCC is to provide the best service possible to those universities that are our customers.  While some of the website features are available to the public, most are designed to provide a self service website for our customers.  These customer specific sections require a login (your email address) and a password.</div><div class=\"col-lg-4\"><img src=\"http://localhost:5000/img/ucc_logo.jpg\" style=\"height:200px;\" class=\"img-responsive\"></div><div class=\"col-lg-4\"><img src=\"http://localhost:5000/img/sap_ua2.PNG\" style=\"height:200px;\" class=\"img-responsive pull-right\"></div>", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2017-04-21T16:26:53.658+0000"), 
+    "description" : "Content on the right side of the contact page", 
+    "category" : "u"
+}
+{ 
+    "_id" : ObjectId("58fa21f76a2f8723a4b85a8b"), 
+    "parameter" : "UCC_ADDRESS", 
+    "value" : "<h3>Center for Technology Innovation<h3><h4>Lubar School of Business<h4>PO Box 742<br>Milwaukee, WI 53201<br>Fax: 414-229-4477", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2017-04-21T15:28:37.189+0000"), 
+    "description" : "UCC address on contact page", 
+    "category" : "u"
+}
+{ 
+    "_id" : ObjectId("58fa6f926a2f8723a4b85a93"), 
+    "parameter" : "SEND_EMAILS", 
+    "value" : "true", 
+    "type" : "boolean", 
+    "readOnly" : false, 
+    "description" : "Controls whether emails are sent on help tickets and product requests", 
+    "dateModified" : ISODate("2017-04-22T16:35:14.418+0000"), 
+    "category" : "u"
+}
+{ 
+    "_id" : ObjectId("58fb841e6a2f8723a4b85a95"), 
+    "parameter" : "TEMP_SCALE", 
+    "value" : "F", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "description" : "Temperature scale to use for temps on home page", 
+    "dateModified" : ISODate("2017-04-22T16:35:14.418+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("5907af3b6a2f8723a4b85a97"), 
+    "parameter" : "HELP_TICKET_EMAIL_LIST", 
+    "value" : "rhightower@gmail.com", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2017-05-01T22:15:33.288+0000"), 
+    "category" : "u"
+}
+{ 
+    "_id" : ObjectId("590e14dcaec3422274a64c65"), 
+    "parameter" : "SESSION_EXPLANATION", 
+    "value" : "The UCC sessions are used to define when systems are available and when you can request products. A session classified as Active is the currently active session whereas when a session classified as Requests it means customers may request products but the systems are not yet available. A Next status means that we are not taking requests yet but will be soon. Use the information on this page to plan. We don't extend products across sessions so make sure you choose the session that matches your requirements.", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "Explanation of sessions on home page", 
+    "dateModified" : ISODate("2017-05-12T16:04:29.428+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("5919e373792be525e4b7869d"), 
+    "property" : "REQUESTS_EMAIL_LIST", 
+    "value" : "rhightower@gmail.com", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2017-07-08T13:55:34.203+0000"), 
+    "category" : "u", 
+    "parameter" : "REQUESTS_EMAIL_LIST"
+}
+{ 
+    "_id" : ObjectId("5960e390a2f947398c570a60"), 
+    "parameter" : "SUBMENU_COLOR", 
+    "value" : "black", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "description" : "Text color on submenu", 
+    "dateModified" : ISODate("2017-07-08T13:55:34.204+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("5960e3f4a2f947398c570a62"), 
+    "parameter" : "SUBMENU_BACKGROUND", 
+    "value:" : "#ffbd00", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "description" : "Background color on submenu", 
+    "value" : "#ffbd00", 
+    "dateModified" : ISODate("2017-07-08T13:55:34.204+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("5960e868a2f947398c570a64"), 
+    "parameter" : "ACTIVE_SUBMENU_COLOR", 
+    "value" : "white", 
+    "readOnly" : false, 
+    "description" : "Submenu text color for active items", 
+    "type" : "value", 
+    "dateModified" : ISODate("2017-07-08T14:51:27.246+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("5960e980a2f947398c570a68"), 
+    "parameter" : "MENU_BACKGROUND", 
+    "value" : "black", 
+    "readOnly" : false, 
+    "description" : "Menu background color", 
+    "type" : "value", 
+    "dateModified" : ISODate("2017-07-08T14:51:27.246+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("5960e9cea2f947398c570a6a"), 
+    "parameter" : "ACTIVE_MENU_COLOR", 
+    "value" : "white", 
+    "readOnly" : false, 
+    "description" : "Menu active text color", 
+    "type" : "value", 
+    "dateModified" : ISODate("2017-07-08T14:51:27.246+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("5960ea0fa2f947398c570a6c"), 
+    "parameter" : "MENU_BACKGROUND", 
+    "value" : "black", 
+    "readOnly" : false, 
+    "description" : "Menu active background color", 
+    "type" : "value", 
+    "dateModified" : ISODate("2017-07-08T14:51:27.246+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("5960e937a2f947398c570a66"), 
+    "parameter" : "MENU_COLOR", 
+    "value" : "white", 
+    "readOnly" : false, 
+    "description" : "Menu text color", 
+    "type" : "value", 
+    "dateModified" : ISODate("2017-07-08T14:51:27.246+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("5961045ca2f947398c570a6e"), 
+    "value" : "#FFD700", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "description" : "Submenu hover background color", 
+    "parameter" : "HOVER_SUBMENU_BACKGROUND", 
+    "dateModified" : ISODate("2017-07-08T16:16:11.566+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("597113c2a2f9473700ae9ece"), 
+    "parameter" : "HOME_PAGE_UCC_TITLE", 
+    "value" : "SAP University Competence Center", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "description" : "Centered text below first parallax image on home page", 
+    "dateModified" : ISODate("2017-07-20T20:39:11.532+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("59711477a2f9473700ae9ed0"), 
+    "parameter" : "HOME_PAGE_LEFT", 
+    "value" : "<h3 class=\"underline\">Current Sessions</h3>\t\t<div class=\"list-group\">\t\t\t<a class=\"list-group-item\" repeat.for=\"session of sessions.sessionsArray | sessionType:'Active:Requests:Next'\">\t\t\t\t<h4 class=\"list-group-item-heading\">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>\t\t\t\t<p class=\"list-group-item-text\">Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\t\t\t\t<p class=\"list-group-item-text\">Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\t\t\t\t<p class=\"list-group-item-text\">Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\t\t\t</a>\t\t</div>", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "Appears below top parallax image on left side", 
+    "dateModified" : ISODate("2017-07-20T20:39:11.534+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("59711952a2f9473700ae9ed2"), 
+    "parameter" : "HOME_PAGE_MIDDLE", 
+    "value" : "<h3 class=\"underline\" style=\"color: rgb(119, 119, 119); text-align: justify;\">Sessions Schedule</h3><div style=\"color: rgb(119, 119, 119); text-align: justify;\"><h3></h3><span class=\"au-target\" au-target-id=\"110\"><p>Spring - Jan 4th 2016 to June 30th<br>Summer - May 1st to September 30th<br>Fall - August 1st to December 24th&nbsp;<br>Winter - November 1st to March 31st</p><p>Client requests open 1 month before the term begins.</p></span></div>", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "Appears below top parallax image in the middle", 
+    "dateModified" : ISODate("2017-07-20T21:00:38.432+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("59711a52a2f9473700ae9ed4"), 
+    "parameter" : "HOME_PAGE_RIGHT", 
+    "value" : "<h3>What is a SAP UCC</h3>The SAP University Competence Center (UCC) at the Lubar School of Business is one of only six&nbsp;UCCs throughout the world. The center provides hosting services and technical support to universities that participate in SAP’s University Alliance.", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "Appears below top parallax image on right side", 
+    "dateModified" : ISODate("2017-07-20T21:05:08.564+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("59723d38a2f9473700ae9ed6"), 
+    "parameter" : "UCC_PARALLAX_LOGO", 
+    "value" : "UCC_LOGO_UCCSS.png", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "description" : "Appears top right of top parallax image on home page", 
+    "dateModified" : ISODate("2017-07-21T17:46:55.528+0000"), 
+    "category" : "i"
+}
+{ 
+    "_id" : ObjectId("59725175a2f9473700ae9ed8"), 
+    "parameter" : "NAVBAR_LOGO", 
+    "value" : "", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "description" : "Appears on the top left of the navbar", 
+    "category" : "i", 
+    "dateModified" : ISODate("2017-07-29T13:56:19.104+0000")
+}
+{ 
+    "_id" : ObjectId("5978cbeea2f9473700ae9edc"), 
+    "parameter" : "PRODUCT_REQUESTS_EMAIL_LIST", 
+    "value" : "ucc@uwm.edu", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "description" : "Distibution list for product request emails", 
+    "category" : "u", 
+    "dateModified" : ISODate("2017-07-29T13:56:19.104+0000")
+}
+{ 
+    "_id" : ObjectId("597c9ccb0c5cf174413d0cd9"), 
+    "parameter" : "BUTTONS_BACKGROUND", 
+    "value" : "#ffbd00", 
+    "type" : "value", 
+    "description" : "Background color for active button bars", 
+    "category" : "i", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2016-10-07T14:52:00.880+0000"), 
+    "__v" : NumberInt(0)
+}
+{ 
+    "_id" : ObjectId("5980a1a5a7e731e03d952974"), 
+    "parameter" : "ACTIVE_REQUEST_OVERLAP", 
+    "value" : "true", 
+    "type" : "boolean", 
+    "description" : "Wheather users are allowed to make requests in active sessions when requests open for the next session", 
+    "category" : "a", 
+    "readOnly" : false, 
+    "dateModified" : ISODate("2016-10-07T14:52:20.193+0000"), 
+    "__v" : NumberInt(0)
+}
+{ 
+    "_id" : ObjectId("59e775072b2b803b746f5b75"), 
+    "parameter" : "SESSION_SORT_ORDER", 
+    "value" : "true", 
+    "readOnly" : false, 
+    "description" : "Sessions in create product request drop down are sorted from most recent to oldest", 
+    "category" : "i", 
+    "type" : "boolean", 
+    "dateModified" : ISODate("2017-10-18T15:51:37.314+0000")
+}
+{ 
+    "_id" : ObjectId("59f8d91e26f13852b02e49e4"), 
+    "parameter" : "REGISTER_PAGE_MESSAGE", 
+    "value" : "This site is for the faculty of the SAP University Alliances only.  Please do not register if you are not a faculty member.", 
+    "type" : "value", 
+    "readOnly" : false, 
+    "description" : "Message shown in the toolbar on the register page."
+}
+{ 
+    "_id" : ObjectId("5a2564a95a11705f3ce68264"), 
+    "parameter" : "TECH_STAFF_CREATED_HELP_TICKET_MESSAGE", 
+    "value" : "<p>This is a computer generated notification that the UWM UCC staff has created a help ticket for&nbsp; you. This ticket may be regarding your SAP client request/assignment, created from an email you sent to the UCC or other matters. Without your attention, the UCC is not able to proceed with your requests or inquiry.If you do not respond within 5 business days, the UWM UCC may presume the email, client request or other information is no longer relevant. We may cancel a requested client if follow-up is not received. </p><p>To review and respond to the help ticket, logon to &lt;a href='http://ucc.uwm.edu'&gt;http://ucc.uwm.edu&lt;/a&gt;.&nbsp; Go to the Support menu and select View Help Tickets. Open your help ticket by selecting the line of the referenced ticket number.&nbsp; Select the Respond icon to respond and/or attach documents. Select Save. The system will update the ticket status and notify the UCC staff.<br></p>", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "Email body for UCC created help tickets", 
+    "category" : "e", 
+    "dateModified" : ISODate("2017-12-04T15:09:56.251+0000")
+}
+{ 
+    "_id" : ObjectId("5a2577fc5a11705f3ce68266"), 
+    "parameter" : "TECH_STAFF_CREATED_HELP_TICKET_SUBJECT", 
+    "value" : "The UCC has created Help Ticket [[No]] for [[faculty name]]", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "Subject line for UCC created help tickets", 
+    "category" : "e", 
+    "dateModified" : ISODate("2017-12-04T19:48:24.314+0000")
+}
+{ 
+    "_id" : ObjectId("5a257dd65a11705f3ce68268"), 
+    "parameter" : "HELP_TICKET_INSTRUCTIONS", 
+    "value" : "<b>Do not reply to this email.</b>  If you wish to respond, please contact the UCC directly.  The <a href='[[HOST]]'>UCCSS website</a> Help Ticket system is the preferred communication channel. ", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "Instructions in help ticket emails", 
+    "category" : "e", 
+    "dateModified" : ISODate("2017-12-04T19:48:24.314+0000")
+}
+{ 
+    "_id" : ObjectId("5a259be75a11705f3ce6826a"), 
+    "parameter" : "HELP_TICKET_CREATED_MESSAGE", 
+    "value" : "This is a computer generated notification that your help ticket number <#> has been submitted and will be reviewed by the UWM UCC staff. You will receive an email when we have information to share, need further information from you, or when we resolve your issue. To monitor the status or update your help ticket, logon to http://ucc.uwm.edu.  Go to the Support menu and select View Help Tickets. Open your help ticket by selecting the line of the referenced ticket number.  Select the Respond icon to respond and/or attach documents. Select Save. The system will update the ticket status and notify the UCC staff.", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "Email body when user creates Help Ticket", 
+    "category" : "e", 
+    "dateModified" : ISODate("2017-12-04T19:48:24.314+0000")
+}
+{ 
+    "_id" : ObjectId("5a25a02a5a11705f3ce6826e"), 
+    "parameter" : "HELP_TICKET_UPDATED_MESSAGE_CA", 
+    "value" : "<p>This is a computer generated notification that the UWM UCC staff has updated the status of help ticket &lt;No&gt; to Customer Action. The UCC is either requesting additional information from you or has provided a solution and is awaiting confirmation that the issue is resolved. Without your attention, the UCC staff may not not be able to provide further support on this ticket. If you do not respond within 5 business days, the UWM UCC may presume the issue has been resolved or is no longer relevant and may close the ticket. </p><p>To review and respond to the help ticket, logon to <a href=\"http://ucc.uwm.edu\">http://ucc.uwm.edu</a>.  Go to the Support menu and select View Help Tickets. Open your help ticket by selecting the line of the referenced ticket number.  Select the Respond icon to respond and/or attach documents. Select Save. The system will update the ticket status and notify the UCC staff.  </p>", 
+    "readOnly" : false, 
+    "description" : "Email body when help ticket is updated by UCC", 
+    "category" : "e", 
+    "type" : "html", 
+    "dateModified" : ISODate("2017-12-04T19:48:24.314+0000")
+}
+{ 
+    "_id" : ObjectId("5a25a0cf5a11705f3ce68270"), 
+    "parameter" : "HELP_TICKET_UPDATED_SUBJECT_CA", 
+    "value" : "The UCC has updated your Help Ticket [[No]]. Ticket status is Customer Action.", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "Subject line when UCC updates a help ticket", 
+    "category" : "e", 
+    "dateModified" : ISODate("2017-12-04T19:48:24.314+0000")
+}
+{ 
+    "_id" : ObjectId("5a259c725a11705f3ce6826c"), 
+    "parameter" : "HELP_TICKET_CREATED_SUBJECT", 
+    "value" : "Help Ticket [[No]] submitted by [[faculty name]]", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "Subject when user creates Help Ticket", 
+    "category" : "e", 
+    "dateModified" : ISODate("2017-12-04T19:48:24.314+0000")
+}
+{ 
+    "_id" : ObjectId("5a25b2b35a11705f3ce68272"), 
+    "parameter" : "HELP_TICKET_UPDATE_MESSAGE_R", 
+    "value" : "This is a computer generated notification that the UWM UCC staff has updated your help ticket [[No]].  To monitor the status or update your help ticket logon to &lt;a href='http://ucc.uwm.edu'&gt;http://ucc.uwm.edu&lt;/a&gt;.  Go to the Support menu and select View Help Tickets. Open your help ticket by selecting the line of the referenced ticket number.  Select the Respond icon to respond and/or attach documents. Select Save. The system will update the ticket status and notify the UCC staff.   The UCC staff will update the ticket and generate another system email when we have additional information to provide, need further information from you, or have resolved your issue. ", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "", 
+    "category" : "e", 
+    "dateModified" : ISODate("2017-12-04T20:53:39.087+0000")
+}
+{ 
+    "_id" : ObjectId("5a25b3185a11705f3ce68274"), 
+    "parameter" : "HELP_TICKET_UPDATE_SUBJECT_R", 
+    "value" : "The UCC has updated your Help Ticket <No>. Ticket status is Under Review.", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "category" : "e", 
+    "description" : "", 
+    "dateModified" : ISODate("2017-12-04T20:53:39.087+0000")
+}
+{ 
+    "_id" : ObjectId("5a25b5135a11705f3ce68278"), 
+    "parameter" : "HELP_TICKET_UPDATE_CLOSED_SUBJECT_C", 
+    "value" : "The UCC has closed your Help ticket [[No]]", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "", 
+    "category" : "e", 
+    "dateModified" : ISODate("2017-12-04T20:53:39.087+0000")
+}
+{ 
+    "_id" : ObjectId("5a25b4895a11705f3ce68276"), 
+    "parameter" : "HELP_TICKET_UPDATE_CLOSED_MESSAGE_C", 
+    "value" : "This is a computer generated notification that the UWM UCC staff has closed your ticket [[No]].To review our closing comments, logon to http://ucc.uwm.edu.  Go to the Support Menu and select View Help Tickets. Open your help ticket by selecting the line of the referenced help ticket number.  (Toggle hide/unhide closed tickets with the check box.)", 
+    "type" : "html", 
+    "readOnly" : false, 
+    "description" : "", 
+    "category" : "e", 
+    "dateModified" : ISODate("2017-12-04T20:53:39.087+0000")
+}
