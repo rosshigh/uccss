@@ -590,7 +590,6 @@ export class ViewHelpTickets {
   }
 
   checkSendMail() {
-    console.log(this.sendMail)
     this.sendMail = !this.sendMail;
   }
 

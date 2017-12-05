@@ -257,15 +257,18 @@ module.exports = function (app, config) {
     .then(person => {
         var obj = {
           email: req.body.email,
-          type: 'generic',
+          // type: 'generic',
           subject: req.body.subject,
-          context: {
-            name: person.fullName,
-            message: req.body.message
-          }
+          MESSAGE: req.body.message,
+          name: person.name
+          // context: {
+          //   name: person.fullName,
+          //   message: req.body.message
+          // }
         };
-  
-        genericEmail(obj)
+        sendEmail(obj);
+
+        // genericEmail(obj)
 
         var LogEntry = new EmailLog({
           personId: req.body.id,

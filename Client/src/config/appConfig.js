@@ -432,6 +432,8 @@ export class AppConfig {
         this.HELP_TICKET_UPDATE_SUBJECT_R = this.getParameter('HELP_TICKET_UPDATE_SUBJECT_R');
         this.HELP_TICKET_UPDATE_CLOSED_MESSAGE_C = this.getParameter('HELP_TICKET_UPDATE_CLOSED_MESSAGE_C');
         this.HELP_TICKET_UPDATE_CLOSED_SUBJECT_C = this.getParameter('HELP_TICKET_UPDATE_CLOSED_SUBJECT_C');
+        this.HELP_TICKET_USER_UPDATE_MESSAGE = this.getParameter('HELP_TICKET_USER_UPDATE_MESSAGE');
+        this.HELP_TICKET_USER_UPDATE_SUBJECT = this.getParameter('HELP_TICKET_USER_UPDATE_SUBJECT');
     }
 
     getParameter(parameter){

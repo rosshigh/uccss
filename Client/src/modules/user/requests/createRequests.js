@@ -75,7 +75,7 @@ export class ViewHelpTickets {
 
   async activate() {
     let responses =  await Promise.all([
-      this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true),
+      this.sessions.getSessionsArray('?filter=[or]sessionStatus|Requests&order=startDate', true),
       this.products.getProductsArray('?filter=active|eq|true&order=name', true),
       this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS',true),
       this.config.getConfig()

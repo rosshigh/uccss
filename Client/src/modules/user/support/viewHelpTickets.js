@@ -228,12 +228,14 @@ export class ViewHelpTickets {
     this._createResponse();
      var email = new Object();
     if(this.sendEmail){
-        email.reason = 2;
-        email.fullName = this.userObj.fullName;
+        // email.reason = 2;
+        // email.fullName = this.userObj.fullName;
+        email.MESSAGE = this.config.HELP_TICKET_USER_UPDATE_MESSAGE.replace('[[No]]',this.helpTickets.selectedHelpTicket.helpTicketNo);
+        email.subject = this.config.HELP_TICKET_USER_UPDATE_SUBJECT.replace('[[No]]',this.helpTickets.selectedHelpTicket.helpTicketNo);
         email.email = this.userObj.email;
-        email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
+        // email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
         email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
-        email.message = this.userObj.fullName + " has responded to the help ticket."
+        // email.message = this.userObj.fullName + " has responded to the help ticket."
     }
     let serverResponse = await this.helpTickets.saveHelpTicketResponse(email);
     if (!serverResponse.error) {
