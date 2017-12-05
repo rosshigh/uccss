@@ -187,16 +187,16 @@ export class ClientRequests {
         if(!this.selectedRequest){
             return;
         }
-        var url =  this.CLIENT_REQUESTS_SERVICES;
+        var url =  this.CLIENT_REQUESTS_SERVICES; 
 
         if(!this.selectedRequest._id){
             let serverResponse = await this.data.saveObject(this.selectedRequest, url, "post");
             if(!serverResponse.error){
-                // if(email.email){
-                //     email.clientRequestNo = serverResponse.clientRequestNo;
-                //     email.reason = 1;
-                //     this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
-                // }
+                if(email.email){
+                    email.clientRequestNo = serverResponse.clientRequestNo;
+                    email.reason = 1;
+                    this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
+                }
                 if(this.requestsArray){
                     this.requestsArray.push(this.selectedRequest);
                 }
@@ -205,11 +205,11 @@ export class ClientRequests {
         } else {
             var serverResponse = await this.data.saveObject(this.selectedRequest, url, "put");
             if(!serverResponse.error){
-                //  if(email.email){
-                //     email.requestNo = this.selectedRequest.requestNo;
-                //      email.reason = 2;
-                //     this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
-                // }
+                 if(email.email){
+                    email.requestNo = this.selectedRequest.requestNo;
+                     email.reason = 2;
+                    this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
+                }
                 if(this.requestsArray && this.editRequestIndex){
                     this.requestsArray[this.editRequestIndex]  = this.utils.copyObject(this.selectedRequest);
                 }

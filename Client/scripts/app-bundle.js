@@ -7510,6 +7510,11 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 _serverResponse = _context9.sent;
 
                                 if (!_serverResponse.error) {
+                                    if (email.email) {
+                                        email.clientRequestNo = _serverResponse.clientRequestNo;
+                                        email.reason = 1;
+                                        this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
+                                    }
                                     if (this.requestsArray) {
                                         this.requestsArray.push(this.selectedRequest);
                                     }
@@ -7524,6 +7529,11 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 serverResponse = _context9.sent;
 
                                 if (!serverResponse.error) {
+                                    if (email.email) {
+                                        email.requestNo = this.selectedRequest.requestNo;
+                                        email.reason = 2;
+                                        this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
+                                    }
                                     if (this.requestsArray && this.editRequestIndex) {
                                         this.requestsArray[this.editRequestIndex] = this.utils.copyObject(this.selectedRequest);
                                     }
