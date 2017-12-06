@@ -173,11 +173,12 @@ module.exports = function (app, config) {
         }
         var context = {facultyCoordinator: facCoordName, name: req.body.fullName, institutions: req.body.institution};
         var mailObj = {
-          email: req.body.email, 
-          context: context
+          email: req.body.email,  
+          context: context,
+          MESSAGE: req.body.USER_MESSAGE.replace('[[facultyCoordinator]]', facCoordName)
         }    
-
-       welcome(mailObj)
+        sendEmail(mailObj)
+      //  welcome(mailObj)
 
         var facCoordEmail = "";
         people.forEach(item => {

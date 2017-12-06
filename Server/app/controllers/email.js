@@ -134,83 +134,83 @@ if(env === 'development'){
 
     mailObject.template='email-template'
 
-    // mailObject.body = emailTemplateCompiled(mailObject);
+    mailObject.body = emailTemplateCompiled(mailObject);
     mailObject.email = mailObject.email;
     mailObject.subject = mailObject.subject;      
     console.log(mailObject)
     sendGrid(mailObject)
   }
 
-  helpTicketCreated = function(mailObject){
-    logger.log("Help Ticket Created email", "verbose");
-    mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
+  // helpTicketCreated = function(mailObject){
+  //   logger.log("Help Ticket Created email", "verbose");
+  //   mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
    
-    var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
-    // mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
-    mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
-    mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
-    // mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME; 
+  //   var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+  //   // mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+  //   mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+  //   mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+  //   // mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME; 
 
-    mailObject.context.UNIVERSITY_NAME = emailConfig.UNIVERSITY_NAME;
-    mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
-    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
-    mailObject.context.UA_LOGO = emailConfig.UA_LOGO;
-    mailObject.context.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
-    mailObject.context.INSTRUCTIONS = emailConfig.HELP_TICKET_INSTRUCTIONS.replace('[[HOST]]', emailConfig.HOST);
+  //   mailObject.context.UNIVERSITY_NAME = emailConfig.UNIVERSITY_NAME;
+  //   mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+  //   mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+  //   mailObject.context.UA_LOGO = emailConfig.UA_LOGO;
+  //   mailObject.context.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
+  //   mailObject.context.INSTRUCTIONS = emailConfig.HELP_TICKET_INSTRUCTIONS.replace('[[HOST]]', emailConfig.HOST);
 
-    // mailObject.body = HelpTicketCreateTemplateCompiled(mailObject.context);
-    mailObject.body = emailTemplateCompiled(mailObject.context);
-    mailObject.email = mailObject.email;
-    mailObject.subject = 'Help Ticket Created';      
-    sendGrid(mailObject)
+  //   // mailObject.body = HelpTicketCreateTemplateCompiled(mailObject.context);
+  //   mailObject.body = emailTemplateCompiled(mailObject.context);
+  //   mailObject.email = mailObject.email;
+  //   mailObject.subject = 'Help Ticket Created';      
+  //   sendGrid(mailObject)
 
-    if(mailObject.cc) {       
-      mailObject.body = HelpTicketCreateStaffTemplateCompiled(mailObject.context);
-      mailObject.email = mailObject.cc;      
-      sendGrid(mailObject)
-    }
-  }
+  //   if(mailObject.cc) {       
+  //     mailObject.body = HelpTicketCreateStaffTemplateCompiled(mailObject.context);
+  //     mailObject.email = mailObject.cc;      
+  //     sendGrid(mailObject)
+  //   }
+  // }
 
-  helpTicketUpdated = function(mailObject){
-    logger.log("Help Ticket Update email", "verbose");
-     var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
-      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
-      mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
-      mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
-      mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+  // helpTicketUpdated = function(mailObject){
+  //   logger.log("Help Ticket Update email", "verbose");
+  //    var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+  //     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+  //     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+  //     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+  //     mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
 
-      mailObject.body = HelpTicketUpdatedTemplateCompiled(mailObject.context);
-      mailObject.email = mailObject.email;
-      mailObject.subject = 'Help Ticket Updated'; 
-      sendGrid(mailObject)
+  //     mailObject.body = HelpTicketUpdatedTemplateCompiled(mailObject.context);
+  //     mailObject.email = mailObject.email;
+  //     mailObject.subject = 'Help Ticket Updated'; 
+  //     sendGrid(mailObject)
 
-      if(mailObject.cc) {     
-        mailObject.email = mailObject.cc;      
-        sendGrid(mailObject)
-      }
-  }
+  //     if(mailObject.cc) {     
+  //       mailObject.email = mailObject.cc;      
+  //       sendGrid(mailObject)
+  //     }
+  // }
 
-  helpTicketClosed = function(mailObject){
-    logger.log("Help Ticket Closed email", "verbose");
+  // helpTicketClosed = function(mailObject){
+  //   logger.log("Help Ticket Closed email", "verbose");
 
-    var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
-    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
-    mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
-    mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
-    mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+  //   var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+  //   mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+  //   mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+  //   mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+  //   mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
 
-    mailObject.body = HelpTicketClosedTemplateCompiled(mailObject.context);
-    mailObject.to_email = mailObject.email;
-    mailObject.subject = 'Help Ticket Closed'; 
-    sendGrid(mailObject)
+  //   mailObject.body = HelpTicketClosedTemplateCompiled(mailObject.context);
+  //   mailObject.to_email = mailObject.email;
+  //   mailObject.subject = 'Help Ticket Closed'; 
+  //   sendGrid(mailObject)
 
-    if(mailObject.cc) {   
-      mailObject.body = HelpTicketStaffClosedTemplateCompiled(mailObject.context);    
-      mailObject.email = mailObject.cc;      
-      sendGrid(mailObject)
-    }
+  //   if(mailObject.cc) {   
+  //     mailObject.body = HelpTicketStaffClosedTemplateCompiled(mailObject.context);    
+  //     mailObject.email = mailObject.cc;      
+  //     sendGrid(mailObject)
+  //   }
 
-  }
+  // }
 
   newCustomer = function(mailObject){
     logger.log("Fac Dev new account email", "verbose");
@@ -436,68 +436,68 @@ if(env === 'development'){
      nodeMailerSendMail(mail);
   }
 
-  helpTicketCreated = function(mailObject){
-      logger.log("Help Ticket Created email", "verbose");
+  // helpTicketCreated = function(mailObject){
+  //     logger.log("Help Ticket Created email", "verbose");
 
-      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
-      mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
-      mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
-      mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
-      var mail = {
-        from: emailConfig.emailAddress,
-        to: mailObject.email,
-        cc: mailObject.cc,
-        subject: 'Help Ticket Created',
-        template: 'help-ticket-created',
-        context: mailObject.context,
-        topic: "helpTicketCreated"
-      };
+  //     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+  //     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+  //     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+  //     mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+  //     var mail = {
+  //       from: emailConfig.emailAddress,
+  //       to: mailObject.email,
+  //       cc: mailObject.cc,
+  //       subject: 'Help Ticket Created',
+  //       template: 'help-ticket-created',
+  //       context: mailObject.context,
+  //       topic: "helpTicketCreated"
+  //     };
 
-      nodeMailerSendMail(mail)  
+  //     nodeMailerSendMail(mail)  
 
-  }
+  // }
 
-  helpTicketUpdated = function(mailObject){
-      logger.log("Help Ticket Update email", "verbose");
+  // helpTicketUpdated = function(mailObject){
+  //     logger.log("Help Ticket Update email", "verbose");
       
-      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
-      mailObject.context.HOST = emailConfig.HOST;
-      mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
-      mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
-      mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
-      var mail = {
-          from: emailConfig.emailAddress,
-          to: mailObject.email,
-          cc: mailObject.cc,
-          subject: 'Help Ticket Updated',
-          template: 'help-ticket-updated',
-          context: mailObject.context,
-          topic: "helpTicketUpdated"
-      };
+  //     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+  //     mailObject.context.HOST = emailConfig.HOST;
+  //     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+  //     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+  //     mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+  //     var mail = {
+  //         from: emailConfig.emailAddress,
+  //         to: mailObject.email,
+  //         cc: mailObject.cc,
+  //         subject: 'Help Ticket Updated',
+  //         template: 'help-ticket-updated',
+  //         context: mailObject.context,
+  //         topic: "helpTicketUpdated"
+  //     };
 
-      nodeMailerSendMail(mail);
-  }
+  //     nodeMailerSendMail(mail);
+  // }
 
-  helpTicketClosed = function(mailObject){
-    logger.log("Help Ticket Closed email", "verbose");
+  // helpTicketClosed = function(mailObject){
+  //   logger.log("Help Ticket Closed email", "verbose");
     
-    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
-    mailObject.context.HOST = emailConfig.HOST;
-    mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
-    mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
-    mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
-     var mail = {
-          from: emailConfig.emailAddress,
-          to: mailObject.email,
-          cc: mailObject.cc,
-          subject: 'Help Ticket Closed',
-          template: 'help-ticket-closed',
-          context: mailObject.context,
-          topic: "helpTicketClosed"
-      };
+  //   mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+  //   mailObject.context.HOST = emailConfig.HOST;
+  //   mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+  //   mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+  //   mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+  //    var mail = {
+  //         from: emailConfig.emailAddress,
+  //         to: mailObject.email,
+  //         cc: mailObject.cc,
+  //         subject: 'Help Ticket Closed',
+  //         template: 'help-ticket-closed',
+  //         context: mailObject.context,
+  //         topic: "helpTicketClosed"
+  //     };
 
-      nodeMailerSendMail(mail); 
-  }
+  //     nodeMailerSendMail(mail); 
+  // }
 
   requestCreated = function(mailObject){
      logger.log("Request Created email", "verbose");

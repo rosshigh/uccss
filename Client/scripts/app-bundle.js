@@ -418,6 +418,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.HELP_TICKET_UPDATE_CLOSED_SUBJECT_C = this.getParameter('HELP_TICKET_UPDATE_CLOSED_SUBJECT_C');
             this.HELP_TICKET_USER_UPDATE_MESSAGE = this.getParameter('HELP_TICKET_USER_UPDATE_MESSAGE');
             this.HELP_TICKET_USER_UPDATE_SUBJECT = this.getParameter('HELP_TICKET_USER_UPDATE_SUBJECT');
+            this.WELCOME_MESSAGE = this.getParameter('WELCOME_MESSAGE');
         };
 
         AppConfig.prototype.getParameter = function getParameter(parameter) {
@@ -4501,7 +4502,8 @@ define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router'
       email.email = this.people.selectedPerson.email;
       email.institutionId = this.people.selectedPerson.institutionId;
       email.institution = this.people.selectedInstitution.name;
-      email.fullName = this.people.selectedPerson.firstName + " " + this.people.selectedPerson.lastName;
+      email.USER_MESSAGE = this.config.WELCOME_MESSAGE.replace("[[Name]]", this.people.selectedPerson.firstName + " " + this.people.selectedPerson.lastName);
+
       email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
 
       this.people.sendNewRegisterEmail(email);

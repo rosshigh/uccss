@@ -140,7 +140,8 @@ export class Register {
     email.email = this.people.selectedPerson.email;
     email.institutionId = this.people.selectedPerson.institutionId;
     email.institution = this.people.selectedInstitution.name;
-    email.fullName = this.people.selectedPerson.firstName + " " +  this.people.selectedPerson.lastName;
+    email.USER_MESSAGE = this.config.WELCOME_MESSAGE.replace("[[Name]]", this.people.selectedPerson.firstName + " " +  this.people.selectedPerson.lastName);
+    // email.fullName = this.people.selectedPerson.firstName + " " +  this.people.selectedPerson.lastName;
     email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
 
     this.people.sendNewRegisterEmail(email);
