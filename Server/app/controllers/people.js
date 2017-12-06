@@ -176,7 +176,8 @@ module.exports = function (app, config) {
           email: req.body.email,  
           // context: context,
           // facultyCoordinator: facCoordName,
-          MESSAGE: req.body.USER_MESSAGE.replace('[[facultyCoordinator]]', facCoordName)
+          MESSAGE: req.body.USER_MESSAGE.replace('[[facultyCoordinator]]', facCoordName),
+          SUBJECT: req.body.USER_SUBJECT
         }    
         sendEmail(mailObj);
       //  welcome(mailObj)
@@ -193,7 +194,8 @@ module.exports = function (app, config) {
               // institution: req.body.institution,
               cc: req.body.cc,
               // context: context
-              MESSAGE: req.body.FACDEV_MESSAGE
+              MESSAGE: req.body.FACDEV_MESSAGE,
+              SUBJECT: req.body.FACDEV_SUBJECT
             }      
             sendEmail(mailObj);                                                          
           //  newCustomer(mailObj);

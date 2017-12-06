@@ -420,6 +420,8 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.HELP_TICKET_USER_UPDATE_SUBJECT = this.getParameter('HELP_TICKET_USER_UPDATE_SUBJECT');
             this.WELCOME_MESSAGE = this.getParameter('WELCOME_MESSAGE');
             this.FACDEV_NEW_CUSTOMER_MESSAGE = this.getParameter('FACDEV_NEW_CUSTOMER_MESSAGE');
+            this.USER_NEW_CUSTOMER_SUBJECT = this.getParameter('USER_NEW_CUSTOMER_SUBJECT');
+            this.FACDEV_NEW_CUSTOMER_SUBJECT = this.getParameter('FACDEV_NEW_CUSTOMER_SUBJECT');
         };
 
         AppConfig.prototype.getParameter = function getParameter(parameter) {
