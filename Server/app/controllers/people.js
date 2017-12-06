@@ -171,13 +171,14 @@ module.exports = function (app, config) {
         }  else {
           var facCoordName = "";
         }
-        var context = {facultyCoordinator: facCoordName, name: req.body.fullName, institutions: req.body.institution};
+        // var context = {facultyCoordinator: facCoordName, name: req.body.fullName, institutions: req.body.institution};
         var mailObj = {
           email: req.body.email,  
-          context: context,
+          // context: context,
+          // facultyCoordinator: facCoordName,
           MESSAGE: req.body.USER_MESSAGE.replace('[[facultyCoordinator]]', facCoordName)
         }    
-        sendEmail(mailObj)
+        sendEmail(mailObj);
       //  welcome(mailObj)
 
         var facCoordEmail = "";
@@ -186,14 +187,16 @@ module.exports = function (app, config) {
         });
 
         if(people.length > 0){
-            var context = {name: req.body.fullName, institution: req.body.institution};            
+            // var context = {name: req.body.fullName, institution: req.body.institution};            
             var mailObj = {
               email: facCoordEmail,
-              institution: req.body.institution,
+              // institution: req.body.institution,
               cc: req.body.cc,
-              context: context
-            }                                                                
-           newCustomer(mailObj);
+              // context: context
+              MESSAGE: req.body.FACDEV_MESSAGE
+            }      
+            sendEmail(mailObj);                                                          
+          //  newCustomer(mailObj);
         }
 
       }

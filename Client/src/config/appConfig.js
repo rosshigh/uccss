@@ -439,6 +439,7 @@ export class AppConfig {
         this.HELP_TICKET_USER_UPDATE_MESSAGE = this.getParameter('HELP_TICKET_USER_UPDATE_MESSAGE');
         this.HELP_TICKET_USER_UPDATE_SUBJECT = this.getParameter('HELP_TICKET_USER_UPDATE_SUBJECT');
         this.WELCOME_MESSAGE = this.getParameter('WELCOME_MESSAGE');
+        this.FACDEV_NEW_CUSTOMER_MESSAGE = this.getParameter('FACDEV_NEW_CUSTOMER_MESSAGE');
     }
 
     getParameter(parameter){

@@ -140,8 +140,13 @@ export class Register {
     email.email = this.people.selectedPerson.email;
     email.institutionId = this.people.selectedPerson.institutionId;
     email.institution = this.people.selectedInstitution.name;
-    email.USER_MESSAGE = this.config.WELCOME_MESSAGE.replace("[[Name]]", this.people.selectedPerson.firstName + " " +  this.people.selectedPerson.lastName);
-    // email.fullName = this.people.selectedPerson.firstName + " " +  this.people.selectedPerson.lastName;
+
+    email.USER_MESSAGE = this.config.WELCOME_MESSAGE
+      .replace("[[Name]]", this.people.selectedPerson.firstName + " " +  this.people.selectedPerson.lastName);
+    email.FACDEV_MESSAGE = this.config.FACDEV_NEW_CUSTOMER_MESSAGE
+      .replace("[[Name]]", this.people.selectedPerson.firstName + " " +  this.people.selectedPerson.lastName)
+      .replace("[[Institution]]", this.people.selectedInstitution.name);
+    email.Name = this.people.selectedPerson.firstName + " " +  this.people.selectedPerson.lastName;
     email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
 
     this.people.sendNewRegisterEmail(email);

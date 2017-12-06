@@ -91,19 +91,19 @@ if(env === 'development'){
     }
   }
 
-  welcome = function(mailObject){
-    logger.log("Welcome email", "verbose");    
-    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
-    mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
-    mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
-    mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
-    mailObject.context.WELCOME_MESSAGE = emailConfig.WELCOME_MESSAGE;
+  // welcome = function(mailObject){
+  //   logger.log("Welcome email", "verbose");    
+  //   mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+  //   mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+  //   mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+  //   mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+  //   mailObject.context.WELCOME_MESSAGE = emailConfig.WELCOME_MESSAGE;
 
-    mailObject.body = WelcomeTemplateCompiled(mailObject.context);
-    mailObject.email = mailObject.email;
-    mailObject.subject = 'UCCSS Account Created';
-    sendGrid(mailObject);
-  }
+  //   mailObject.body = WelcomeTemplateCompiled(mailObject.context);
+  //   mailObject.email = mailObject.email;
+  //   mailObject.subject = 'UCCSS Account Created';
+  //   sendGrid(mailObject);
+  // }
 
   newCustomerActivate = function(mailObject){
     logger.log("Activate email", "verbose");    
@@ -123,6 +123,7 @@ if(env === 'development'){
     logger.log("Email Sent", "verbose");
     var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
     mailObject.logoExists = emailConfig.UCC_LOGO != "";
+    mailObject.context = {};
     mailObject.context.HOST = emailConfig.HOST;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
@@ -131,13 +132,15 @@ if(env === 'development'){
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UA_LOGO = emailConfig.UA_LOGO;
     mailObject.context.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
+    mailObject.context.MESSAGE = mailObject.MESSAGE;
+    mailObject.context.INSTRUCTIONS = mailObject.INSTRUCTIONS;
 
     mailObject.template='email-template'
 
     mailObject.body = emailTemplateCompiled(mailObject);
     mailObject.email = mailObject.email;
     mailObject.subject = mailObject.subject;      
-    console.log(mailObject)
+  
     sendGrid(mailObject)
   }
 
@@ -365,6 +368,8 @@ if(env === 'development'){
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UA_LOGO = emailConfig.UA_LOGO;
     mailObject.context.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
+
+
     mailObject.context.MESSAGE = mailObject.MESSAGE;
     mailObject.context.INSTRUCTIONS = mailObject.INSTRUCTIONS;
 
