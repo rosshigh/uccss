@@ -123,16 +123,18 @@ if(env === 'development'){
     logger.log("Email Sent", "verbose");
     var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
     mailObject.logoExists = emailConfig.UCC_LOGO != "";
-    mailObject.HOST = emailConfig.HOST;
-    mailObject.UCC_PHONE = emailConfig.UCC_PHONE;
-    mailObject.UCC_EMAIL = emailConfig.UCC_EMAIL;
-    mailObject.UNIVERSITY_NAME = emailConfig.UNIVERSITY_NAME;
-    mailObject.UCCSS_NAME = emailConfig.UCCSS_NAME;
-    mailObject.UCC_LOGO = emailConfig.UCC_LOGO;
-    mailObject.UA_LOGO = emailConfig.UA_LOGO;
-    mailObject.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
+    mailObject.context.HOST = emailConfig.HOST;
+    mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+    mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+    mailObject.context.UNIVERSITY_NAME = emailConfig.UNIVERSITY_NAME;
+    mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+    mailObject.context.UA_LOGO = emailConfig.UA_LOGO;
+    mailObject.context.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
 
-    mailObject.body = emailTemplateCompiled(mailObject);
+    mailObject.template='email-template'
+
+    // mailObject.body = emailTemplateCompiled(mailObject);
     mailObject.email = mailObject.email;
     mailObject.subject = mailObject.subject;      
     console.log(mailObject)
@@ -369,6 +371,7 @@ if(env === 'development'){
     mailObject.to = mailObject.email;
     mailObject.subject = mailObject.subject;   
     mailObject.from = emailConfig.emailAddress;
+    mailObject.template = 'email-template';
 
     nodeMailerSendMail(mailObject);
   }

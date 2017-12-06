@@ -40,6 +40,8 @@ export class User {
             this.openAlert(this.siteinfo.siteArray[this.alertIndex]);
         }
     }
+
+    $("#notice").fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
   }
 
   canActivate(){

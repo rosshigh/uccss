@@ -40,6 +40,12 @@
     border-bottom-width: 1px;
 }
 
+.banner #notice {
+    margin-left: 30px;
+    font-size: 1.25em;
+    color: indianred;
+}
+
 .browse .textContainer {
     height: 430px;
     line-height: 400px;

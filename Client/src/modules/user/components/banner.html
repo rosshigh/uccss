@@ -9,6 +9,9 @@
         <h4>UCC weather: ${ucctemp} </h4>
         <img src="${uccweatherIcon}" class="weatherIcon smallLeftMargin">
       </span>
+      <span id="notice" repeat.for="site of siteinfo.siteArray | infoFilter:'BANN'" innerhtml.bind="site.content">
+       
+      </span>
       <div class="pull-right">
         <span show.bind="userObj.userRole < config.UCC_ROLE" class="hidden-sm hidden-xs">
 					<a href="#/clientRequests" class="rightMargin" if.bind="showRequests > 0" style="text-decoration: none;">Requests <span class="badge">${showRequests}</span></a>            

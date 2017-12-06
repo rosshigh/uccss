@@ -323,6 +323,10 @@ export class AppConfig {
         {
             'type': "CONT",
             'description': 'Contact Info'
+        },
+        {
+            'type': "BANN",
+            'description': 'Banner Notification'
         }
     ];
 
