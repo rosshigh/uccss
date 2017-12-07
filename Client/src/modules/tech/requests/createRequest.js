@@ -275,11 +275,9 @@ export class CreateRequestTech {
 			}
 				break;
 			case "regularCourse":
-			if (!this.config.SANDBOX_USED) {
 				this.typeSelected = true;
 				this.regularClient = true;
 				this.requestType = "regularCourse";
-			}
 				this.people.getCoursesArray(true, '?filter=personId|eq|' + this.selectedPerson + '&order=number', true);
 				break;
 			case "sandboxCourse":
