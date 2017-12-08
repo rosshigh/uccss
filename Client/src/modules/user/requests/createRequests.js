@@ -447,7 +447,7 @@ export class ViewHelpTickets {
           var nowPlusLeeway = moment(new Date()).add(context.config.REQUEST_LEEWAY + 1, 'days');
           var minRequiredDate = moment.max(nowPlusLeeway, moment(context.sessions.selectedSession.startDate));
           for(var i = context.existingRequestLength; i < context.requests.selectedRequest.requestDetails.length; i++ ){
-            if(moment(context.requests.selectedRequest.requestDetails[i].requiredDate).isBefore(minRequiredDate)){
+            if(moment(context.requests.selectedRequest.requestDetails[i].requiredDate).isBefore(minRequiredDate, 'day')){
               return false;
             }
           }

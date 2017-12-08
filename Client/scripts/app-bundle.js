@@ -34409,7 +34409,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
           var nowPlusLeeway = (0, _moment2.default)(new Date()).add(context.config.REQUEST_LEEWAY + 1, 'days');
           var minRequiredDate = _moment2.default.max(nowPlusLeeway, (0, _moment2.default)(context.sessions.selectedSession.startDate));
           for (var i = context.existingRequestLength; i < context.requests.selectedRequest.requestDetails.length; i++) {
-            if ((0, _moment2.default)(context.requests.selectedRequest.requestDetails[i].requiredDate).isBefore(minRequiredDate)) {
+            if ((0, _moment2.default)(context.requests.selectedRequest.requestDetails[i].requiredDate).isBefore(minRequiredDate, 'day')) {
               return false;
             }
           }
