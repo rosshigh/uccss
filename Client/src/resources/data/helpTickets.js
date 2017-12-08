@@ -219,6 +219,7 @@ export class HelpTickets {
             if (!response.error) {
                 if(email && email.email){
                     email.subject = email.subject.replace('[[No]]', response.helpTicketNo);
+                    email.MESSAGE = email.MESSAGE.replace('[[No]]', response.helpTicketNo);
                     this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                 }
                 this.selectedHelpTicket = this.utils.copyObject(response);
