@@ -35,7 +35,11 @@ module.exports = function (app) {
           var component = item.split('|');
           switch(component[1]) {
             case 'eq':
-              reqQuery.where(component[0]).eq(component[2]);
+              if(component[2] == 'true' || component[2] == 'false'){
+                reqQuery.where(component[0]);
+              } else {
+                reqQuery.where(component[0]).eq(component[2]);
+              }
               break;
             case 'gt':
               reqQuery.where(component[0]).gt(component[2]);
