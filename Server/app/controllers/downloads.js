@@ -27,15 +27,15 @@ module.exports = function (app, config) {
           }
         });
     } else {
-      Model.find({})
-        .sort(req.query.order)
-        .exec(function (err, object) {
-          if (err) {
-            return next(err);
-          } else {
-            res.status(200).json(object);
-          }
-        });
+      var query = buildQuery(req.query, Model.find());
+      query.sort(req.query.order)
+        .exec()
+        .then(object => {
+          res.status(200).json(object);
+        })
+        .catch(err => {
+          return next(err);
+        })
     }
   });
 
