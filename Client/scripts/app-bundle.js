@@ -36181,7 +36181,7 @@ define('modules/user/support/downloads',['exports', 'aurelia-framework', '../../
                         switch (_context.prev = _context.next) {
                             case 0:
                                 _context.next = 2;
-                                return this.downloads.getDownloadsArray(true, "?filter=active|eq|true");
+                                return this.downloads.getDownloadsArray(true, "?filter=active|eq|true&order=name");
 
                             case 2:
                                 _context.next = 4;

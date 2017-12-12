@@ -19,7 +19,7 @@ export class Download {
     }
 
     async activate() {
-        await this.downloads.getDownloadsArray(true, "?filter=active|eq|true"); 
+        await this.downloads.getDownloadsArray(true, "?filter=active|eq|true&order=name"); 
         await this.downloads.getDownloadCategoriesArray();
 
         this.updateArray();
