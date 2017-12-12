@@ -12,11 +12,11 @@ export class AppConfig {
     // BASE_URL = "https://uccsstest.ucc.uwm.edu/api/";
     // IMG_DOWNLOAD_URL = "https://uccsstest.ucc.uwm.edu/img/";  
 
-    BASE_URL = "http://localhost/api/";
-    IMG_DOWNLOAD_URL = "http://localhost/img/";  
+    // BASE_URL = "http://localhost/api/";
+    // IMG_DOWNLOAD_URL = "http://localhost/img/";  
 
-    // BASE_URL = this.HOST + "/api/";
-    // IMG_DOWNLOAD_URL = this.HOST + '/img/'  
+    BASE_URL = this.HOST + "/api/";
+    IMG_DOWNLOAD_URL = this.HOST + '/img/'  
 
     isMobile = false;
 
