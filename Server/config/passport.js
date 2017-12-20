@@ -23,12 +23,15 @@ var localLogin = new localStrategy(localOptions, function(email, password, next)
         return next(err);
       } else {    
         if(!user){
+          logAuth.log('Wrong email logon-' + user.email, 'info');
           next(new NotFoundError("404",{ message: "Email not found."}));
         } else {       
           user.comparePassword(password, function (err, isMatch) {
             if (err) {
+              logAuth.log('wrong password logon-' + user.email, 'info');
               return next(err);
             } else if(!isMatch){
+              logAuth.log('Unauthorized logon-' + user.email, 'info');
               return next(new UnauthorizedAccessError("401", {message: 'Invalid username or password'}));
             } else {
               logAuth.log('logon-' + user.email, 'info');
