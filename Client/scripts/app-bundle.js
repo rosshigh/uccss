@@ -28065,7 +28065,6 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
         EditSystem.prototype.refreshClients = function refreshClients() {
             var _this7 = this;
 
-            var that = this;
             if (!this.systems.selectedSystem.clients || this.systems.selectedSystem.clients.length === 0) {
                 return this.dialog.showMessage("The system doesn't have clients to refresh", "No Clients", ['OK']).whenClosed(function (response) {
                     return;
@@ -28074,9 +28073,9 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
             return this.dialog.showMessage("This will return clients to an initial state.  You must save the system for this to take effect. Do you want to continue?", "Refresh Clients", ['Yes', 'No']).whenClosed(function (response) {
                 if (!response.wasCancelled) {
                     _this7.systems.refreshClients(_this7.config.UNASSIGNED_REQUEST_CODE, _this7.products.productsArray);
-                    console.log('done');
                 }
             });
+            console.log('done');
         };
 
         EditSystem.prototype.deleteClients = function deleteClients() {

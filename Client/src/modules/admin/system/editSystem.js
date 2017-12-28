@@ -286,7 +286,6 @@ export class EditSystem {
     }
 
     refreshClients() {
-        var that = this;
         if(!this.systems.selectedSystem.clients || this.systems.selectedSystem.clients.length === 0){
             return this.dialog.showMessage(
                 "The system doesn't have clients to refresh", 
@@ -303,9 +302,10 @@ export class EditSystem {
             ).whenClosed(response => {
                 if(!response.wasCancelled){
                     this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE, this.products.productsArray);  
-                    console.log('done') 
+                   
                 }
             });
+            console.log('done') 
     }
 
     deleteClients() {
