@@ -180,7 +180,7 @@ export class Systems{
                     }
                 }
             })
-            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status, aProduct, this.selectedSystem.clients[i].idsAvailable );
+            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status, aProduct, aProduct.idsAvailable);
         }
     }
 
