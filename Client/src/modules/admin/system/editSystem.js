@@ -286,6 +286,7 @@ export class EditSystem {
     }
 
     refreshClients() {
+        var that = this;
         if(!this.systems.selectedSystem.clients || this.systems.selectedSystem.clients.length === 0){
             return this.dialog.showMessage(
                 "The system doesn't have clients to refresh", 
