@@ -28066,16 +28066,21 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
             var _this7 = this;
 
             if (!this.systems.selectedSystem.clients || this.systems.selectedSystem.clients.length === 0) {
-                return this.dialog.showMessage("The system doesn't have clients to refresh", "No Clients", ['OK']).whenClosed(function (response) {
+                this.dialog.showMessage("The system doesn't have clients to refresh", "No Clients", ['OK']).whenClosed(function (response) {
                     return;
                 });
             }
-            return this.dialog.showMessage("This will return clients to an initial state.  You must save the system for this to take effect. Do you want to continue?", "Refresh Clients", ['Yes', 'No']).whenClosed(function (response) {
+            this.dialog.showMessage("This will return clients to an initial state.  You must save the system for this to take effect. Do you want to continue?", "Refresh Clients", ['Yes', 'No']).whenClosed(function (response) {
                 if (!response.wasCancelled) {
                     _this7.systems.refreshClients(_this7.config.UNASSIGNED_REQUEST_CODE, _this7.products.productsArray);
+                    _this7.systems.selectedSystem = _this7.systems.selectedSystem;
                 }
             });
-            console.log('done');
+        };
+
+        EditSystem.prototype.refreshTheClients = function refreshTheClients() {
+            this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE, this.products.productsArray);
+            console.log(this.systems.selectedSystem);
         };
 
         EditSystem.prototype.deleteClients = function deleteClients() {

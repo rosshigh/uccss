@@ -287,7 +287,7 @@ export class EditSystem {
 
     refreshClients() {
         if(!this.systems.selectedSystem.clients || this.systems.selectedSystem.clients.length === 0){
-            return this.dialog.showMessage(
+            this.dialog.showMessage(
                 "The system doesn't have clients to refresh", 
                 "No Clients",
                 ['OK']
@@ -295,17 +295,21 @@ export class EditSystem {
                     return;
                 });
         }
-        return this.dialog.showMessage(
+        this.dialog.showMessage(
             "This will return clients to an initial state.  You must save the system for this to take effect. Do you want to continue?", 
             "Refresh Clients", 
             ['Yes', 'No']
             ).whenClosed(response => {
                 if(!response.wasCancelled){
-                    this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE, this.products.productsArray);  
-                   
+                    this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE, this.products.productsArray); 
+                    this.systems.selectedSystem = this.systems.selectedSystem;
                 }
             });
-            console.log('done') 
+    }
+
+    refreshTheClients(){
+        this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE, this.products.productsArray);
+        console.log(this.systems.selectedSystem)
     }
 
     deleteClients() {
