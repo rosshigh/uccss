@@ -396,7 +396,7 @@
               			</table>
             		</div>
           		</div>
-          <div show.bind="!clientsConfigured"><h5>There are no clients configured for this product in ${systems.selectedSystem.sid}</h5>
+          <div show.bind="!clientsConfigured && productSystems.length"><h5>There are no clients configured for this product in ${systems.selectedSystem.sid}</h5>
 		</div>
 	</div>
 </template>
