@@ -179,7 +179,6 @@ export class EditSystem {
                         }
                         if(this.saveProduct){
                             this.products.selectedProduct.systems.push({systemId: this.systems.selectedSystem._id, sid: this.systems.selectedSystem.sid} );
-                            
                         }
                     }
                 });
@@ -302,7 +301,8 @@ export class EditSystem {
             ['Yes', 'No']
             ).whenClosed(response => {
                 if(!response.wasCancelled){
-                    this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE, this.products.productsArray);   
+                    this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE, this.products.productsArray);  
+                    console.log('done') 
                 }
             });
     }

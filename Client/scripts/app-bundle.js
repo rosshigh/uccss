@@ -15649,7 +15649,7 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
             obj.client = clientNo;
             obj.clientStatus = status;
             obj.systemId = this.selectedSystem._id;
-            obj.idsAvailable = idsAvailable;
+            obj.idsAvailable = product.idsAvailable;
             obj.assignments = new Array();
             obj.createdDate = new Date();
             obj.lastIdAssigned = 0;
@@ -28073,6 +28073,7 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
             return this.dialog.showMessage("This will return clients to an initial state.  You must save the system for this to take effect. Do you want to continue?", "Refresh Clients", ['Yes', 'No']).whenClosed(function (response) {
                 if (!response.wasCancelled) {
                     _this7.systems.refreshClients(_this7.config.UNASSIGNED_REQUEST_CODE, _this7.products.productsArray);
+                    console.log('done');
                 }
             });
         };

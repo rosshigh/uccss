@@ -252,7 +252,7 @@ export class Systems{
         obj.client = clientNo;
         obj.clientStatus = status;
         obj.systemId = this.selectedSystem._id;
-        obj.idsAvailable = idsAvailable;
+        obj.idsAvailable = product.idsAvailable;
         obj.assignments = new Array(); 
         obj.createdDate = new Date();
         obj.lastIdAssigned = 0;
