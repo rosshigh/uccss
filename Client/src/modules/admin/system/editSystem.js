@@ -157,7 +157,7 @@ export class EditSystem {
         if(this.selectedProduct === "") {
              this.utils.showNotification("Select a product first");
         } else {
-            return this.dialog.showMessage(
+            this.dialog.showMessage(
                 "This will only update the products for clients that have no assignments. Continue?", 
                 "Refresh Clients", 
                 ['Yes', 'No']
@@ -186,7 +186,7 @@ export class EditSystem {
     }
 
     refreshClient(index){
-        return this.dialog.showMessage(
+        this.dialog.showMessage(
             "This will return the client to the initial state.  You must save the system for this to take effect. Do you want to continue?", 
             "Refresh Clients", 
             ['Yes', 'No']
@@ -200,7 +200,7 @@ export class EditSystem {
     }
 
     delete(){
-        return this.dialog.showMessage(
+        this.dialog.showMessage(
             "Are you sure you want to delete the system?",
             "Delete System",
             ['Yes', 'No']
@@ -228,7 +228,7 @@ export class EditSystem {
 
     generateClients() {
          if(this.selectedProduct === ""){
-             return this.dialog.showMessage(
+             this.dialog.showMessage(
                 "You must select a product.", 
                 "Select a Product", 
                 ['OK']
@@ -237,7 +237,7 @@ export class EditSystem {
                 });
         }
         if(this.idsAvailable === "0"){
-             return this.dialog.showMessage(
+             this.dialog.showMessage(
                 "You must enter the number of IDs available.", 
                 "Enter IDS Available", 
                 ['OK']
@@ -246,7 +246,7 @@ export class EditSystem {
                 });
         }
         if(!this.editFirstClient || !this.editLastClient || this.editFirstClient.length != 3 || this.editLastClient.length != 3){
-            return this.dialog.showMessage(
+            this.dialog.showMessage(
                 "Clients must have three digits", 
                 "Invalid Client Number", 
                 ['OK']
@@ -257,7 +257,7 @@ export class EditSystem {
         var start = parseInt(this.editFirstClient);
         var end = parseInt(this.editLastClient);
         if(end < start){
-             return this.dialog.showMessage(
+             this.dialog.showMessage(
                 "The first client number must be less than the last client number.", 
                 "Invalid Client Number", 
                 ['OK']
@@ -302,7 +302,6 @@ export class EditSystem {
             ).whenClosed(response => {
                 if(!response.wasCancelled){
                     this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE, this.products.productsArray); 
-                    this.systems.selectedSystem = this.systems.selectedSystem;
                 }
             });
     }
@@ -313,7 +312,7 @@ export class EditSystem {
     }
 
     deleteClients() {
-        return this.dialog.showMessage(
+        this.dialog.showMessage(
             "Are you sure about this, this action cannot be undone?", 
             "Delete Clients", 
             ['Yes', 'No']
@@ -364,7 +363,7 @@ export class EditSystem {
         if(!this. _okToDeleteClient(this.systems.selectedSystem.clients[index])){
             this.utils.showNotification("The client either has assignments or the status doesn't allow deletion. You must refresh it before deleting it.");
         } else {
-            return this.dialog.showMessage(
+            this.dialog.showMessage(
                 "Are you sure about this, this action cannot be undone?", 
                 "Delete Clients", 
                 ['Yes', 'No']
@@ -461,7 +460,7 @@ export class EditSystem {
 
     back() {
         if (this.systems.isDirty(this.originalSystem).length) {
-            return this.dialog.showMessage(
+            this.dialog.showMessage(
                 "The system has been changed. Do you want to save your changes?", 
                 "Save Changes", 
                 ['Yes', 'No']

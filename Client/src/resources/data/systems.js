@@ -175,12 +175,16 @@ export class Systems{
                 if(item.productId !== aProduct._id){
                     for(let j = 0; j < products.length; j++){
                         if(products[j]._id === item.productId){
-                            aProduct = products[j]
+                            aProduct = products[j];
+                            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status, aProduct, aProduct.idsAvailable);
+                            break;
                         }
                     }
+                } else {
+                    this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status, aProduct, aProduct.idsAvailable);
                 }
             })
-            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status, aProduct, aProduct.idsAvailable);
+            
         }
     }
 
