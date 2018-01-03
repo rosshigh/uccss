@@ -268,14 +268,23 @@ export class ClientRequests {
             return;
         }
 
-       let serverResponse = await this.data.deleteObject(this.CLIENT_REQUEST_DETAILS + '/' + this.selectedRequestDetail._id + '/' + this.selectedRequestDetail.requestId._id);
-        if (!serverResponse.error) {
-            this.requestsDetailsArray.splice(this.requestDetailIndex, 1);
-            return serverResponse;
+        if(this.selectedRequestDetail.requestId){
+            let serverResponse = await this.data.deleteObject(this.CLIENT_REQUEST_DETAILS + '/' + this.selectedRequestDetail._id + '/' + this.selectedRequestDetail.requestId._id);
+            if (!serverResponse.error) {
+                this.requestsDetailsArray.splice(this.requestDetailIndex, 1);
+                return serverResponse;
+            } else {
+                return undefined;
+            }
         } else {
-            return undefined;
+            let serverResponse = await this.data.deleteObject(this.CLIENT_REQUEST_DETAILS + '/' + this.selectedRequestDetail._id);
+            if (!serverResponse.error) {
+                this.requestsDetailsArray.splice(this.requestDetailIndex, 1);
+                return serverResponse;
+            } else {
+                return undefined;
+            }
         }
-
     }
 
     isRequestDirty(obj, skip){ 

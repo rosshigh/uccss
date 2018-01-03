@@ -549,35 +549,49 @@ module.exports = function (app) {
     }); 
   });
 
+  router.delete('/api/clientRequestsDetails/:id', requireAuth, function(req, res, next){
+    logger.log('Delete clientRequestsDetails ', req.params.id);
+
+    ClientRequestDetail.findByIdAndRemove(req.params.id, function(err, result){
+      if (err) {
+        return next(err);
+      } else {
+        res.status(204).json({message: "Request deleted"});
+      }
+    })
+  });
+
   router.delete('/api/clientRequestsDetails/:id/:requestid', requireAuth, function(req, res, next){
     logger.log('Delete clientRequestsDetails ', req.params.id);
 
-    Model.findById(req.params.requestid, function(err, request) {
-      if(err){
-        return next(err);
-      } else {
-        if(request){
-        
-          if(request.requestDetails && request.requestDetails.length > 0){      
-            request.requestDetails.splice(request.requestDetails.indexOf(req.params.id), 1);        
-               
-            if(request.requestDetails.length === 0) { 
-              Model.findOneAndRemove({_id: request._id}, function(err, request) {
-                if(err) {
-                  return next(err);
-                }                       
-              });            
-            } else {
-              request.save(function(err, request) {
-                if(err) {
-                  return next(err);
-                } 
-              });
+    if(req.params.reqeustid){
+      Model.findById(req.params.requestid, function(err, request) {
+        if(err){
+          return next(err);
+        } else {
+          if(request){
+          
+            if(request.requestDetails && request.requestDetails.length > 0){      
+              request.requestDetails.splice(request.requestDetails.indexOf(req.params.id), 1);        
+                 
+              if(request.requestDetails.length === 0) { 
+                Model.findOneAndRemove({_id: request._id}, function(err, request) {
+                  if(err) {
+                    return next(err);
+                  }                       
+                });            
+              } else {
+                request.save(function(err, request) {
+                  if(err) {
+                    return next(err);
+                  } 
+                });
+              }
             }
           }
         }
-      }
-    })
+      })
+    }
 
     ClientRequestDetail.findByIdAndRemove(req.params.id, function(err, result){
       if (err) {
