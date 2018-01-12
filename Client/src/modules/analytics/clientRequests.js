@@ -61,7 +61,7 @@ export class ClientRequestAnalytics {
 
     async activate() {
         let responses = await Promise.all([
-            this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true),
+            this.sessions.getSessionsArray('?order=startDate', true),
             this.people.getInstitutionsArray('?order=name'),
             this.config.getConfig()
         ]);
