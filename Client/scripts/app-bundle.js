@@ -993,29 +993,31 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
         ClientRequestAnalytics.prototype.institutionChartDataFunction = function institutionChartDataFunction() {
             var _this2 = this;
 
-            this.instChartData = new Array();
-            this.instChartCategories = new Array();
+            if (this.requests.analyticsInstitutionResultArray && this.requests.analyticsInstitutionResultArray.length) {
+                this.instChartData = new Array();
+                this.instChartCategories = new Array();
 
-            this.config.REQUEST_STATUS.forEach(function (item) {
-                _this2.instChartData.push(new Array());
-            });
+                this.config.REQUEST_STATUS.forEach(function (item) {
+                    _this2.instChartData.push(new Array());
+                });
 
-            var sortedArray = this.requests.analyticsInstitutionResultArray.sort(function (a, b) {
-                return a['total'] < b['total'] ? -1 : a['total'] > b['total'] ? 1 : 0;
-            });
+                var sortedArray = this.requests.analyticsInstitutionResultArray.sort(function (a, b) {
+                    return a['total'] < b['total'] ? -1 : a['total'] > b['total'] ? 1 : 0;
+                });
 
-            sortedArray.forEach(function (item) {
-                _this2.instChartData[0].push(item["1"]);
-                _this2.instChartData[1].push(item["2"]);
-                _this2.instChartData[2].push(item["3"]);
-                _this2.instChartData[3].push(item["4"]);
-                _this2.instChartData[4].push(item["5"]);
-                _this2.instChartData[5].push(item["6"]);
-                _this2.instChartData[6].push(item["7"]);
-                _this2.instChartCategories.push(item.name);
-            });
+                sortedArray.forEach(function (item) {
+                    _this2.instChartData[0].push(item["1"]);
+                    _this2.instChartData[1].push(item["2"]);
+                    _this2.instChartData[2].push(item["3"]);
+                    _this2.instChartData[3].push(item["4"]);
+                    _this2.instChartData[4].push(item["5"]);
+                    _this2.instChartData[5].push(item["6"]);
+                    _this2.instChartData[6].push(item["7"]);
+                    _this2.instChartCategories.push(item.name);
+                });
 
-            this.fastBackIns();
+                this.fastBackIns();
+            }
         };
 
         ClientRequestAnalytics.prototype.backwardIns = function backwardIns() {

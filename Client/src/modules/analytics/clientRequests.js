@@ -154,30 +154,32 @@ export class ClientRequestAnalytics {
         }
     }
 
-    institutionChartDataFunction(){        
-        this.instChartData = new Array();
-        this.instChartCategories = new Array();
-        
-        this.config.REQUEST_STATUS.forEach(item => {
-            this.instChartData.push(new Array());
-        })
+    institutionChartDataFunction(){    
+        if(this.requests.analyticsInstitutionResultArray && this.requests.analyticsInstitutionResultArray.length){
+            this.instChartData = new Array();
+            this.instChartCategories = new Array();
+            
+            this.config.REQUEST_STATUS.forEach(item => {
+                this.instChartData.push(new Array());
+            })
 
-        var sortedArray = this.requests.analyticsInstitutionResultArray.sort((a,b) => {
-            return (a['total'] < b['total']) ? -1 : (a['total'] > b['total']) ? 1 : 0;
-        });
+            var sortedArray = this.requests.analyticsInstitutionResultArray.sort((a,b) => {
+                return (a['total'] < b['total']) ? -1 : (a['total'] > b['total']) ? 1 : 0;
+            });
 
-        sortedArray.forEach(item => {
-            this.instChartData[0].push(item["1"]);
-            this.instChartData[1].push(item["2"]);
-            this.instChartData[2].push(item["3"]);
-            this.instChartData[3].push(item["4"]);
-            this.instChartData[4].push(item["5"]);
-            this.instChartData[5].push(item["6"]);
-            this.instChartData[6].push(item["7"]);
-            this.instChartCategories.push(item.name); 
-        });
+            sortedArray.forEach(item => {
+                this.instChartData[0].push(item["1"]);
+                this.instChartData[1].push(item["2"]);
+                this.instChartData[2].push(item["3"]);
+                this.instChartData[3].push(item["4"]);
+                this.instChartData[4].push(item["5"]);
+                this.instChartData[5].push(item["6"]);
+                this.instChartData[6].push(item["7"]);
+                this.instChartCategories.push(item.name); 
+            });
 
-        this.fastBackIns()
+            this.fastBackIns()
+        }    
     }
 
     backwardIns(){
