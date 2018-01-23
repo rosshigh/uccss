@@ -13,16 +13,15 @@ var utils = require(path.join(__dirname, "utils.js"));
 var helmet = require('helmet');
 var compression = require('compression');
 var favicon = require('serve-favicon');
+var hsts = require('hsts');
 
 
 module.exports = function(app, config) {
 
   logger.log("Starting application");
-  app.use(function (req, res, next) {
-    console.log('in here')
-    res.set('Strict-Transport-Security', "max-age=0");
-    next();
-  });
+  app.use(hsts({
+    maxAge: 0  // 180 days in seconds
+  }));
   app.use(compression({threshold: 1}));
   app.use(helmet())
   app.use(express.static(config.root + '/public'));
