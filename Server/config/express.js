@@ -18,6 +18,11 @@ var favicon = require('serve-favicon');
 module.exports = function(app, config) {
 
   logger.log("Starting application");
+  app.use(function (req, res, next) {
+    console.log('in here')
+    res.set('Strict-Transport-Security', "max-age=0");
+    next();
+  });
   app.use(compression({threshold: 1}));
   app.use(helmet())
   app.use(express.static(config.root + '/public'));
