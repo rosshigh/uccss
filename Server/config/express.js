@@ -13,17 +13,18 @@ var utils = require(path.join(__dirname, "utils.js"));
 var helmet = require('helmet');
 var compression = require('compression');
 var favicon = require('serve-favicon');
-var hsts = require('hsts');
-
 
 module.exports = function(app, config) {
 
   logger.log("Starting application");
-  app.use(hsts({
-    maxAge: 0  // 180 days in seconds
-  }));
+
   app.use(compression({threshold: 1}));
   app.use(helmet())
+  app.use(helmet.hsts({
+    maxAge: 0,
+    includeSubDomains: false
+  }));
+ 
   app.use(express.static(config.root + '/public'));
   app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
   app.use(cors({origin: "http://localhost:9000"}));

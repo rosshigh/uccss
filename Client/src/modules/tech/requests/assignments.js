@@ -1334,10 +1334,19 @@ export class Assignments {
             if(item.requestId.personId.email === this.emailArray[i].email) keep = false;
         }
         if(keep){
+            var systemsAssigned = "Unassigned";
+            if(item.assignments && item.assignments.length){
+                systemsAssigned = ""
+                item.assignments.forEach(item => {
+                    this.systems.selectedSystemFromId(item.systemId);
+                    systemsAssigned += this.systems.selectedSystem.sid + "(" + item.client + ") ";
+                })
+            }
             this.emailArray.push({
                 fullName: item.requestId.personId.fullName,
                 email: item.requestId.personId.email,
-                institution: item.requestId.institutionId.name
+                institution: item.requestId.institutionId.name,
+                status: systemsAssigned
             })
         }
       })
