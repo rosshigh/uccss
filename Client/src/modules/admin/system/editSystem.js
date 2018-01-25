@@ -371,12 +371,12 @@ export class EditSystem {
                     if (!response.wasCancelled) {
                         var productId = this.systems.selectedSystem.clients[index].productId;
                         var id = this.systems.selectedSystem._id;
-                        var noUpdates = true;
+                        var noUpdates = false;
                         this.productsToUpdate = new Array();
                         if(this.systems.selectedSystem.clients.length > 0){
                             for(let i = 0; i < this.systems.selectedSystem.clients.length; i++){
                                 if(this.systems.selectedSystem.clients[i].productId === productId) {
-                                    noUpdates = false;
+                                    noUpdates = true;
                                     break;
                                 }
                             }
