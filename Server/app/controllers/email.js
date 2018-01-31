@@ -141,7 +141,7 @@ if(env === 'development'){
     mailObject.email = mailObject.email;
     mailObject.subject = mailObject.subject;      
   console.log(mailObject)
-    sendGrid(mailObject)
+    // sendGrid(mailObject)
   }
 
   // helpTicketCreated = function(mailObject){
@@ -306,16 +306,54 @@ if(env === 'development'){
   }
 
   sendBulkEmails = function(mailObject){
-    mailObject.recipients.forEach(item => { 
-      var mail = {
-        from: emailConfig.emailAddress,
-        to: item.email,
-        subject: mailObject.email.subject,
-        template: "generic",
-        context: { name: item.name, message: mailObject.email.emailMessage}
-      }
-     console.log(mail);
-    })  
+    
+    logger.log("Email Sent", "verbose");
+    // var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+       
+  console.log(mailObject)
+  mailObject.context = {};
+  mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
+  mailObject.context.HOST = emailConfig.HOST;
+  mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+  mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+  mailObject.context.UNIVERSITY_NAME = emailConfig.UNIVERSITY_NAME;
+  mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+  mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+  mailObject.context.UA_LOGO = emailConfig.UA_LOGO;
+  mailObject.context.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
+console.log(mailObject.email.MESSAGE)  
+  mailObject.context.MESSAGE = mailObject.email.MESSAGE;
+  mailObject.context.subject = mailObject.email.subject;  
+  mailObject.context.INSTRUCTIONS = mailObject.email.INSTRUCTIONS;
+  mailObject.from = emailConfig.emailAddress;
+  mailObject.template='email-template'
+  mailObject.recipients.forEach(item => { 
+    mailObject.to = mailObject.email; 
+     
+      // mailObject.body = emailTemplateCompiled(mailObject);
+      // mailObject.email = mailObject.email;
+      
+
+      // var mail = {
+      //   from: emailConfig.emailAddress,
+      //   to: item.email,
+      //   subject: mailObject.email.subject,
+      //   template: "generic",
+      //   context: { name: item.name, message: mailObject.email.emailMessage, UCC_PHONE: emailConfig.UCC_PHONE, UCC_EMAIL: emailConfig.UCC_EMAIL}
+      // }
+      // nodeMailerSendMail(mailObject); 
+      console.log(mailObject)
+    });
+    mailObject.to = emailConfig.emailAddress;
+    //  var mail = {
+    //     from: emailConfig.emailAddress,
+    //     to: emailConfig.emailAddress,
+    //     subject: mailObject.email.subject,
+    //     template: "generic",
+    //     context: { name: "UCC", message: mailObject.email.emailMessage, UCC_PHONE: emailConfig.UCC_PHONE, UCC_EMAIL: emailConfig.UCC_EMAIL}
+    //   }
+      // nodeMailerSendMail(mailObject);   
+      console.log(mailObject)
 
   }
 
@@ -604,24 +642,28 @@ if(env === 'development'){
   }
 
   sendBulkEmails = function(mailObject){
+    logger.log("Email Sent", "verbose");
+    mailObject.context = {};
+    mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
+    mailObject.context.HOST = emailConfig.HOST;
+    mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+    mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+    mailObject.context.UNIVERSITY_NAME = emailConfig.UNIVERSITY_NAME;
+    mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+    mailObject.context.UA_LOGO = emailConfig.UA_LOGO;
+    mailObject.context.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
+    mailObject.context.MESSAGE = mailObject.MESSAGE;
+    mailObject.context.subject = mailObject.subject;  
+    mailObject.context.INSTRUCTIONS = mailObject.INSTRUCTIONS;
+    mailObject.from = emailConfig.emailAddress;
+    mailObject.template='email-template'
     mailObject.recipients.forEach(item => { 
-      var mail = {
-        from: emailConfig.emailAddress,
-        to: item.email,
-        subject: mailObject.email.subject,
-        template: "generic",
-        context: { name: item.name, message: mailObject.email.emailMessage, UCC_PHONE: emailConfig.UCC_PHONE, UCC_EMAIL: emailConfig.UCC_EMAIL}
-      }
-      nodeMailerSendMail(mail); 
+      mailObject.to = mailObject.email; 
+      nodeMailerSendMail(mailObject); 
     });
-     var mail = {
-        from: emailConfig.emailAddress,
-        to: emailConfig.emailAddress,
-        subject: mailObject.email.subject,
-        template: "generic",
-        context: { name: "UCC", message: mailObject.email.emailMessage, UCC_PHONE: emailConfig.UCC_PHONE, UCC_EMAIL: emailConfig.UCC_EMAIL}
-      }
-      nodeMailerSendMail(mail);  
+    mailObject.to = emailConfig.emailAddress;
+    nodeMailerSendMail(mailObject);  
   }
 
   test = function(mailObj){

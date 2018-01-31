@@ -1326,7 +1326,7 @@ export class Assignments {
   }
 
   bulkEmail(){
-      this.email = {emailMessage: "", subject: ""} ;
+      this.email = {MESSAGE: "", INSTRUCTIONS: this.config.HELP_TICKET_INSTRUCTIONS, subject: ""} ;
       this.emailArray = new Array();
       this.dataTable.baseArray.forEach(item => {
         let keep = true;  
@@ -1358,7 +1358,7 @@ export class Assignments {
   }
 
   sendBulkEmail(){
-    if(this.email.emailMessage === "" || this.email.subject === ""){
+    if(this.email.MESSAGE === "" || this.email.subject === ""){
         this.utils.showNotification("Enter a subject and messsage");
         return;
     }

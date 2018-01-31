@@ -298,8 +298,7 @@ module.exports = function (app, config) {
   router.post('/api/people/sendBulkEmail', requireAuth, function(req, res, next){
     logger.log('Sending bulk email', 'verbose');
 
-    sendEmail(req.body);
-    // sendBulkEmails(req.body);
+    sendBulkEmails(req.body);
     res.status(201).json({message: "Emails sent"});
   });
 
