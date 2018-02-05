@@ -582,10 +582,12 @@ export class ViewHelpTickets {
   }
 
   _cleanUpFilters() {
-    $("#helpTicketType-description").val("");
-    $(this.ownerFilter).val("");
-    $(this.nameFilter).val("");
-    $("#helpTicketStatus").val("");
+    this.helpTicketNoFilterValue = "";
+    this.helpTicketTypeFilterValue = "";
+    this.ownerFilterValue = "";
+    this.helpTicketStatusFilter = "";
+    this.personFilterValue = "";
+    this.institutionFilterValue = "";
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
   }
 

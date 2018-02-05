@@ -553,7 +553,7 @@ export class ViewHelpTickets {
 
       mailObject.comments = this.requests.selectedRequest.comments;
       mailObject.name = this.userObj.fullName;
-      mailObject.numStudents =  parseInt(this.requests.selectedRequest.undergradIds) + parseInt(this.requests.selectedRequest.graduateIds);
+      mailObject.numStudents = parseInt(this.requests.selectedRequest.undergradIds) + parseInt(this.requests.selectedRequest.graduateIds);
       mailObject.email = this.userObj.email
       mailObject.cc = this.config.REQUESTS_EMAIL_LIST ? this.config.REQUESTS_EMAIL_LIST : "";
     }

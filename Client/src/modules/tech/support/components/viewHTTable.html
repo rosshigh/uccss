@@ -54,7 +54,7 @@
             </tr>
             <tr>
               <th>
-                  <input value.bind="helpTicketNoFilterValue" input.delegate="dataTable.filterList(helpTicketNoFilterValue, { type: 'value',  filter: 'helpTicketNoFilter', collectionProperty: 'helpTicketNo', displayProperty: 'helpTicketNo',  compare:'match'} )"  class="form-control" />
+                  <input value.bind="helpTicketNoFilterValue" input.trigger="dataTable.filterList(helpTicketNoFilterValue, { type: 'value',  filter: 'helpTicketNoFilter', collectionProperty: 'helpTicketNo', displayProperty: 'helpTicketNo',  compare:'match'} )"  class="form-control" />
               </th>
               <th>
                 <input value.bind="helpTicketTypeFilterValue" input.trigger="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )"  class="form-control" />
