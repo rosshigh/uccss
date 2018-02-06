@@ -424,6 +424,9 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.FACDEV_NEW_CUSTOMER_MESSAGE = this.getParameter('FACDEV_NEW_CUSTOMER_MESSAGE');
             this.USER_NEW_CUSTOMER_SUBJECT = this.getParameter('USER_NEW_CUSTOMER_SUBJECT');
             this.FACDEV_NEW_CUSTOMER_SUBJECT = this.getParameter('FACDEV_NEW_CUSTOMER_SUBJECT');
+            this.CLIENT_REQUEST_ASSIGNED_MESSAGE = this.getParameter('CLIENT_REQUEST_ASSIGNED_MESSAGE');
+            this.CLIENT_REQUEST_CREATED_TOP = this.getParameter('CLIENT_REQUEST_CREATED_TOP');
+            this.CLIENT_REQUEST_CREATED_BOTTOM = this.getParameter('CLIENT_REQUEST_CREATED_BOTTOM');
         };
 
         AppConfig.prototype.getParameter = function getParameter(parameter) {
@@ -29898,13 +29901,10 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
             var year = date.getFullYear();
             if (this.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE) {
                 mailObject.reason = 2;
-                mailObject.numStudents = parseInt(this.selectedRequestDetail.requestId.undergradIds) + parseInt(this.selectedRequestDetail.requestId.graduateIds);
-                mailObject.fullName = this.selectedRequestDetail.requestId.personId.fullName;
-                mailObject.requestNo = this.selectedRequestDetail.requestId.clientRequestNo;
                 mailObject.email = this.selectedRequestDetail.requestId.personId.email;
-                mailObject.product = [{ name: this.selectedRequestDetail.productId.name, requiredDate: month + "/" + day + "/" + year }], mailObject.course = this.selectedRequestDetail.requestId.courseId.name;
+                mailObject.subject = "Your product request has been assigned";
+                mailObject.MESSAGE = this.config.CLIENT_REQUEST_ASSIGNED_MESSAGE.replace('[CUSTOMER]', this.selectedRequestDetail.requestId.personId.fullName).replace('[SESSION]', this.sessions.selectedSession.session).replace('[PRODUCT]', this.selectedRequestDetail.productId.name).replace('[COURSE]', this.selectedRequestDetail.requestId.courseId.name);
                 mailObject.cc = this.config.PRODUCT_REQUESTS_EMAIL_LIST ? this.config.PRODUCT_REQUESTS_EMAIL_LIST : "";
-                mailObject.message = "Your product request has been updated.";
             }
 
             return mailObject;
@@ -34571,8 +34571,9 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
           mailObject.products.push({ id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: _this3.products.selectedProduct.name });
         });
 
-        mailObject.comments = this.requests.selectedRequest.comments;
-        mailObject.name = this.userObj.fullName;
+        mailObject.MESSAGE = this.config.CLIENT_REQUEST_CREATED_TOP.replace('[CUSTOMER]', this.userObj.fullName).replace('[SESSION]', this.sessions.selectedSession.session).replace('[COURSE]', this.people.selectedCourse.name);
+        mailObject.BOTTOM = this.config.CLIENT_REQUEST_CREATED_BOTTOM;
+
         mailObject.numStudents = parseInt(this.requests.selectedRequest.undergradIds) + parseInt(this.requests.selectedRequest.graduateIds);
         mailObject.email = this.userObj.email;
         mailObject.cc = this.config.REQUESTS_EMAIL_LIST ? this.config.REQUESTS_EMAIL_LIST : "";

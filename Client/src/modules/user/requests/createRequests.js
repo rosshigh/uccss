@@ -551,8 +551,13 @@ export class ViewHelpTickets {
         mailObject.products.push({id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: this.products.selectedProduct.name})    
       });
 
-      mailObject.comments = this.requests.selectedRequest.comments;
-      mailObject.name = this.userObj.fullName;
+      mailObject.MESSAGE = this.config.CLIENT_REQUEST_CREATED_TOP
+        .replace('[CUSTOMER]', this.userObj.fullName)
+        .replace('[SESSION]', this.sessions.selectedSession.session)
+        .replace('[COURSE]', this.people.selectedCourse.name)
+      mailObject.BOTTOM = this.config.CLIENT_REQUEST_CREATED_BOTTOM;
+      // mailObject.comments = this.requests.selectedRequest.comments;
+      // mailObject.name = this.userObj.fullName;
       mailObject.numStudents = parseInt(this.requests.selectedRequest.undergradIds) + parseInt(this.requests.selectedRequest.graduateIds);
       mailObject.email = this.userObj.email
       mailObject.cc = this.config.REQUESTS_EMAIL_LIST ? this.config.REQUESTS_EMAIL_LIST : "";

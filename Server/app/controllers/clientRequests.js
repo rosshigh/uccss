@@ -157,9 +157,11 @@ module.exports = function (app) {
         case 1: //request created
            var context = {
                       products: req.body.products,
-                      numStudents: req.body.numStudents,
-                      requestNo: req.body.clientRequestNo,
-                      comments: req.body.comments
+                      MESSAGE: req.body.MESSAGE,
+                      BOTTOM: req.body.BOTTOM
+                      // numStudents: req.body.numStudents,
+                      // requestNo: req.body.clientRequestNo,
+                      // comments: req.body.comments
                     }   
           var mailObj = {
             email: req.body.email,
@@ -181,8 +183,9 @@ module.exports = function (app) {
             email: req.body.email,
             cc: req.body.cc,
             context: context 
-          }                                  
-          requestUpdated(mailObj);
+          }     
+          sendEmail(req.body)                             
+          // requestUpdated(mailObj);
           break;
         case 3:
            var context = {

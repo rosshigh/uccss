@@ -442,6 +442,9 @@ export class AppConfig {
         this.FACDEV_NEW_CUSTOMER_MESSAGE = this.getParameter('FACDEV_NEW_CUSTOMER_MESSAGE');
         this.USER_NEW_CUSTOMER_SUBJECT = this.getParameter('USER_NEW_CUSTOMER_SUBJECT');
         this.FACDEV_NEW_CUSTOMER_SUBJECT = this.getParameter('FACDEV_NEW_CUSTOMER_SUBJECT');
+        this.CLIENT_REQUEST_ASSIGNED_MESSAGE = this.getParameter('CLIENT_REQUEST_ASSIGNED_MESSAGE');
+        this.CLIENT_REQUEST_CREATED_TOP = this.getParameter('CLIENT_REQUEST_CREATED_TOP');
+        this.CLIENT_REQUEST_CREATED_BOTTOM = this.getParameter('CLIENT_REQUEST_CREATED_BOTTOM');
     }
 
     getParameter(parameter){

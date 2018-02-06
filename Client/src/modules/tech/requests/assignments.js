@@ -904,14 +904,14 @@ export class Assignments {
         var year = date.getFullYear();  
         if(this.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE ){
             mailObject.reason = 2;
-            mailObject.numStudents = parseInt(this.selectedRequestDetail.requestId.undergradIds) + parseInt(this.selectedRequestDetail.requestId.graduateIds);
-            mailObject.fullName = this.selectedRequestDetail.requestId.personId.fullName; 
-            mailObject.requestNo = this.selectedRequestDetail.requestId.clientRequestNo;
             mailObject.email = this.selectedRequestDetail.requestId.personId.email; 
-            mailObject.product = [{name: this.selectedRequestDetail.productId.name, requiredDate: month + "/" + day + "/" + year}],
-            mailObject.course = this.selectedRequestDetail.requestId.courseId.name;
+            mailObject.subject = "Your product request has been assigned"
+            mailObject.MESSAGE = this.config.CLIENT_REQUEST_ASSIGNED_MESSAGE
+                .replace('[CUSTOMER]', this.selectedRequestDetail.requestId.personId.fullName)
+                .replace('[SESSION]', this.sessions.selectedSession.session)
+                .replace('[PRODUCT]', this.selectedRequestDetail.productId.name)
+                .replace('[COURSE]', this.selectedRequestDetail.requestId.courseId.name)
             mailObject.cc = this.config.PRODUCT_REQUESTS_EMAIL_LIST ? this.config.PRODUCT_REQUESTS_EMAIL_LIST : "";
-            mailObject.message = "Your product request has been updated."
         }       
 		
 		return mailObject;

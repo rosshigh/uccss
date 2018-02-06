@@ -138,7 +138,8 @@ if(env === 'development'){
 
     mailObject.body = emailTemplateCompiled(mailObject);
     mailObject.email = mailObject.email;
-    mailObject.subject = mailObject.subject;      
+    mailObject.subject = mailObject.subject;    
+    
     sendGrid(mailObject)
   }
 
@@ -164,6 +165,7 @@ if(env === 'development'){
   }
 
   requestCreated = function(mailObject){
+console.log(mailObject)    
      logger.log("Request Created email", "verbose");
       var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
@@ -175,11 +177,13 @@ if(env === 'development'){
       mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.UA_LOGO = emailConfig.UA_LOGO;
+      mailObject.context.MESSAGE = mailObject.context.MESSAGE;
+      mailObject.context.BOTTOM = mailObject.context.BOTTOM;
       mailObject.context.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
       mailObject.body = RequestCreatedTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = 'Product Request Created'; 
-
+console.log(mailObject)
       sendGrid(mailObject)
   }
 
