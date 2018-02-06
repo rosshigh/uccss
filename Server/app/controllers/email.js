@@ -186,12 +186,19 @@ if(env === 'development'){
   requestUpdated = function(mailObject){
     logger.log("Request Update email", "verbose");
     var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
-      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
-      mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
+      
+      mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
+      mailObject.context.HOST = emailConfig.HOST;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+      mailObject.context.UNIVERSITY_NAME = emailConfig.UNIVERSITY_NAME;
+      mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+      mailObject.context.UA_LOGO = emailConfig.UA_LOGO;
+      mailObject.context.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
       
-      mailObject.to_email = mailObject.email;mailObject.body = RequestUpdatedTemplateCompiled(mailObject.context);
+      mailObject.to_email = mailObject.email;
+      mailObject.body = RequestUpdatedTemplateCompiled(mailObject.context);
       mailObject.subject = 'Product Request Updated'; 
        sendGrid(mailObject)
   }
@@ -438,15 +445,19 @@ if(env === 'development'){
   requestUpdated = function(mailObject){
     logger.log("Request Update email", "verbose");
      
-      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
-      mailObject.context.ASSIGN_REQUEST = emailConfig.ASSIGN_REQUEST;
-      mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
-      mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
-      mailObject.context.topMessage = "Your client for the following product request has been updated"
+    mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
+    mailObject.context.HOST = emailConfig.HOST;
+    mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+    mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+    mailObject.context.UNIVERSITY_NAME = emailConfig.UNIVERSITY_NAME;
+    mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+    mailObject.context.UA_LOGO = emailConfig.UA_LOGO;
+    mailObject.context.UNIVERSITY_LOGO = emailConfig.UNIVERSITY_LOGO;
+      
       var mail = {
           from: emailConfig.emailAddress,
           to: mailObject.email,
-          // cc: mailObject.cc,
           subject: 'Product Request Updated',
           template: 'client-request-updated',
           context: mailObject.context,

@@ -901,7 +901,7 @@ export class Assignments {
         var date = new Date(this.selectedRequestDetail.requiredDate);
         var day = date.getDate();
         var month = date.getMonth() + 1;
-        var year = date.getFullYear(); 
+        var year = date.getFullYear();  
         if(this.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE ){
             mailObject.reason = 2;
             mailObject.numStudents = parseInt(this.selectedRequestDetail.requestId.undergradIds) + parseInt(this.selectedRequestDetail.requestId.graduateIds);
