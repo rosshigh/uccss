@@ -551,10 +551,11 @@ export class ViewHelpTickets {
         mailObject.products.push({id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: this.products.selectedProduct.name})    
       });
 
+      let course = this.people.selectedCourse ? this.people.selectedCourse.name : 'Trial Client';
       mailObject.MESSAGE = this.config.CLIENT_REQUEST_CREATED_TOP
         .replace('[CUSTOMER]', this.userObj.fullName)
         .replace('[SESSION]', this.sessions.selectedSession.session)
-        .replace('[COURSE]', this.people.selectedCourse.name)
+        .replace('[COURSE]', course)
       mailObject.BOTTOM = this.config.CLIENT_REQUEST_CREATED_BOTTOM;
       // mailObject.comments = this.requests.selectedRequest.comments;
       // mailObject.name = this.userObj.fullName;
