@@ -20,7 +20,6 @@ module.exports = function (app) {
         if (err) {
           return next(err);
         } else {
-          console.log(object)
           res.status(200).json(object);
         }
       });

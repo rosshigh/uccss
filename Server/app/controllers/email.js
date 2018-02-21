@@ -183,7 +183,7 @@ console.log(mailObject)
       mailObject.body = RequestCreatedTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = 'Product Request Created'; 
-console.log(mailObject)
+
       sendGrid(mailObject)
   }
 
@@ -251,7 +251,7 @@ console.log(mailObject)
 
   sendBulkEmails = function(mailObject){  
     logger.log("Email Sent", "verbose");       
-    console.log(mailObject)
+
     mailObject.context = {};
     mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
     mailObject.context.HOST = emailConfig.HOST;
@@ -282,7 +282,7 @@ console.log(mailObject)
       //   context: { name: item.name, message: mailObject.email.emailMessage, UCC_PHONE: emailConfig.UCC_PHONE, UCC_EMAIL: emailConfig.UCC_EMAIL}
       // }
       // nodeMailerSendMail(mailObject); 
-      console.log(mailObject)
+     
     });
     mailObject.to = emailConfig.emailAddress;
     //  var mail = {
@@ -293,7 +293,7 @@ console.log(mailObject)
     //     context: { name: "UCC", message: mailObject.email.emailMessage, UCC_PHONE: emailConfig.UCC_PHONE, UCC_EMAIL: emailConfig.UCC_EMAIL}
     //   }
       // nodeMailerSendMail(mailObject);   
-      console.log(mailObject)
+    
 
   }
 
@@ -525,7 +525,7 @@ console.log(mailObject)
           context: mailObject.context,
           topic: "passwordReset"
       };
-        console.log(mail);  
+        
       nodeMailerSendMail(mail)   
   }
 

@@ -112,11 +112,11 @@ export class ArchiveRequests {
     }
 
     institutionCustomFilter(value, item, context){
-        return item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+        return item.requestId && item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
     courseCustomFilter(value, item, context){
-        return item.requestId.courseId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+        return item.requestId && item.requestId.courseId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
     customProductNameFilter(value, item, context){

@@ -159,9 +159,6 @@ module.exports = function (app) {
                       products: req.body.products,
                       MESSAGE: req.body.MESSAGE,
                       BOTTOM: req.body.BOTTOM
-                      // numStudents: req.body.numStudents,
-                      // requestNo: req.body.clientRequestNo,
-                      // comments: req.body.comments
                     }   
           var mailObj = {
             email: req.body.email,
@@ -185,7 +182,6 @@ module.exports = function (app) {
             context: context 
           }     
           sendEmail(req.body)                             
-          // requestUpdated(mailObj);
           break;
         case 3:
            var context = {
@@ -565,23 +561,20 @@ module.exports = function (app) {
   });
 
   router.delete('/api/clientRequestsDetails/:id/:requestid', requireAuth, function(req, res, next){
-    logger.log('Delete clientRequestsDetails ', req.params.id);
-
-    if(req.params.reqeustid){
+    logger.log('Delete clientRequestsDetails ', req.params.id); 
+    if(req.params.requestid){    
       Model.findById(req.params.requestid, function(err, request) {
         if(err){
           return next(err);
-        } else {
-          if(request){
-          
+        } else {         
+          if(request){      
             if(request.requestDetails && request.requestDetails.length > 0){      
-              request.requestDetails.splice(request.requestDetails.indexOf(req.params.id), 1);        
-                 
+              request.requestDetails.splice(request.requestDetails.indexOf(req.params.id), 1);                     
               if(request.requestDetails.length === 0) { 
                 Model.findOneAndRemove({_id: request._id}, function(err, request) {
                   if(err) {
                     return next(err);
-                  }                       
+                  }                                    
                 });            
               } else {
                 request.save(function(err, request) {
