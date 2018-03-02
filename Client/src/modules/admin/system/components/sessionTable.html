@@ -15,7 +15,7 @@ sessionTable.html
 	                                </div>
 	                            </td>
 	                            <tr>
-	                                <td colspan='6'>
+	                                <td colspan='7'>
 	                                    <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
 	                                    <span click.delegate="new()" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New"><i class="smallMarginRight fa fa-plus" aria-hidden="true"></i></span>
 	                                    <span click.delegate="editSessionConfig()" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Config"><i class="fa fa-pencil" aria-hidden="true"></i></span>
@@ -26,7 +26,8 @@ sessionTable.html
 	                                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'session'})">Session </span> <span><i class="fa fa-sort"></i></span></th>
 	                                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'startDate'})">Start Date </span><span><i class="fa fa-sort"></i></span></th>
 	                                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'endDate'})">End Date </span><span><i class="fa fa-sort"></i></span></th>
-	                                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requestsOpenDate'})">Requests Open </span><span><i class="fa fa-sort"></i></span></th>
+									<th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requestsOpenDate'})">Requests Open </span><span><i class="fa fa-sort"></i></span></th>
+									<th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'sortOrder'})">Sort Order </span><span><i class="fa fa-sort"></i></span></th>
 	                                <th>Status</th>
 	                                <th></th>
 	                            </tr>
@@ -42,7 +43,8 @@ sessionTable.html
 	                            </td>
 	                            <td data-title="RequestsOpen" click.trigger="edit($index, $event)">
 	                                <div style="width: 100px">${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</div>
-	                            </td>
+								</td>
+								<td> <Input change.trigger="saveSortOrder(session)" type="number" value.bind="session.sortOrder" /> </td>
 	                            <td data-title="createdDate" click.trigger="edit($index, $event)">${session.sessionStatus}</td>
 	                            <td data-title="Update" style="width: 100px" click.trigger="updateStatus($index, session, $event)" innerhtml.bind="session.sessionStatus | sessionStatusButton">
 	                            </td>

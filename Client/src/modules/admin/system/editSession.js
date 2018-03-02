@@ -92,6 +92,11 @@ export class EditSessions {
         }
     }
 
+    saveSortOrder(session){
+        this.sessions.setSession(session);
+        let serverResponse = this.sessions.saveSession();
+    }
+
     async refreshConfig(){
        await this.config.getSessions(true);
         this.editSessionConfig();

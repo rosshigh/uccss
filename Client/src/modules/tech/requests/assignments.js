@@ -47,7 +47,7 @@ export class Assignments {
     
     async activate() { 
         let responses = await Promise.all([
-            this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true),
+            this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=sortOrder', true),
             this.products.getProductsArray('?filter=active|eq|true&order=name', true),
             this.systems.getSystemsArray('', true),
             this.config.getConfig(true)

@@ -38,7 +38,7 @@ export class ArchiveRequests {
     
     async activate() { 
         let responses = await Promise.all([
-            this.sessions.getSessionsArray('?filter=sessionStatus|eq|Closed&order=startDate', true),
+            this.sessions.getSessionsArray('?filter=sessionStatus|eq|Closed&order=sortOrder', true),
             this.products.getProductsArray('?filter=active|eq|true&order=name'),
             this.systems.getSystemsArray(),
             this.config.getConfig()

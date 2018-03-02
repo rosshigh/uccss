@@ -7,7 +7,8 @@ var SessionSchema = new Schema({
   startDate: { type: Date, require: true },
   endDate: { type: Date, require: true },
   requestsOpenDate: { type: Date, require: true },
-  sessionStatus: { type: String, require: true }
+  sessionStatus: { type: String, require: true },
+  sortOrder: { type: Number }
 
 });
 

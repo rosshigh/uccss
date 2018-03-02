@@ -61,6 +61,10 @@ export class Sessions {
         }
     }
 
+    setSession(session){
+        this.selectedSession = session;
+    }
+
     emptySession() {
         var newSessionObj = new Object();
         newSessionObj.session = "";
