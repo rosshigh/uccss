@@ -12,7 +12,7 @@ var InstitutionSchema = new Schema({
     universityDept: { type: String },
     joinDate: { type: Date, default: Date.now },
     modifiedDate: { type: Date, default: Date.now },
-    dropDate: { type: Date, default: Date.now },
+    dropDate: { type: Date },
     address1: { type: String },
     address2: { type: String },
     POBox: { type: String },

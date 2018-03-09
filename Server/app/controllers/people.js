@@ -136,7 +136,18 @@ module.exports = function (app, config) {
         if (err) {
            return next(err);
         } else {
-          res.status(200).json(object); 
+          var query = Model.findById(object._id);
+          query
+            .populate({ path: 'institutionId', model: 'Institution', select: 'name postalCode active'})
+            .exec( function(err, object){
+              if (err) { 
+                res.status(500).json(err);
+              } else {
+                res.status(200).json(object);
+              }
+            }); 
+          // .populate({ path: 'institutionId', model: 'Institution', select: 'name postalCode active'})
+          // res.status(200).json(object); 
         }
       });
   });

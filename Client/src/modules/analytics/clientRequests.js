@@ -587,7 +587,7 @@ export class ClientRequestAnalytics {
     async showProductInstitutionDetail(product){
         this.summerInstTable = !this.summerInstTable;
         if(!this.summerInstTable){
-            let response = await this.requests.getClientRequestsDetailFaccoArray(this.selectedSession,  product.institutionId);
+            let response = await this.requests.getClientRequestsDetailFaccoArray(this.selectedSession,  product.institutionId, true);
             this.dataTable.updateArray(this.requests.requestsDetailsArray);
             this.selectedInstitutionDetail = product.requestId.institutionId.name;
         } else {

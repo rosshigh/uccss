@@ -15,6 +15,7 @@ export function configure(config) {
     './value-converters/arrow',
     './value-converters/request-status-class',
     './value-converters/course-name',
+    './value-converters/parse-assignments',
     './value-converters/format-number',
     './value-converters/session-name',
     './value-converters/session-type',
