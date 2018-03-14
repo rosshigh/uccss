@@ -21417,7 +21417,7 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
             this.editIndex = this.dataTable.getOriginalIndex(index);
             this.people.selectPerson(this.editIndex);
             this.oldEmail = this.people.selectedPerson.email;
-            this.institutionId = this.people.selectedPerson.institutionId._id;
+            this.institutionId = this.people.selectedPerson.institutionId._id || null;
             this.orginalObject = this.people.selectedPerson;
             this.filterRoles();
             this.newPerson = false;
