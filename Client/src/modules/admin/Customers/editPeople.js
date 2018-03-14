@@ -515,7 +515,11 @@ export class EditPeople {
 	customInstitutionSorter(sortProperty, sortDirection, sortArray, context){
 
         return sortArray.sort((a, b) => {
-			var result = (a['institutionId'] != null && b['institutionId'] != null && a['institutionId']['name'] < b['institutionId']['name']) ? -1 : (a['institutionId']['name'] > b['institutionId']['name']) ? 1 : 0;
+            if(a['institutionId'] !== null && b['institutionId'] !== null){
+                var result = ( a['institutionId']['name'] < b['institutionId']['name']) ? -1 : (a['institutionId']['name'] > b['institutionId']['name']) ? 1 : 0;
+            } else {
+                var result = -1;
+            }
 			return result * sortDirection;
 		});
 	}
