@@ -515,13 +515,13 @@ export class EditPeople {
 	customInstitutionSorter(sortProperty, sortDirection, sortArray, context){
 
         return sortArray.sort((a, b) => {
-			var result = (a['institutionId']['name'] < b['institutionId']['name']) ? -1 : (a['institutionId']['name'] > b['institutionId']['name']) ? 1 : 0;
+			var result = (a['institutionId'] != null && b['institutionId'] != null && a['institutionId']['name'] < b['institutionId']['name']) ? -1 : (a['institutionId']['name'] > b['institutionId']['name']) ? 1 : 0;
 			return result * sortDirection;
 		});
 	}
 
 	institutionCustomFilter(value, item, context){
-        return item.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+        return item.institutionId && item.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
 	customRoleFilter(value, item, context){
