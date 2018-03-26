@@ -251,7 +251,7 @@ console.log(mailObject)
 
   sendBulkEmails = function(mailObject){  
     logger.log("Email Sent", "verbose");       
-
+    console.log(mailObject)
     mailObject.context = {};
     mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
     mailObject.context.HOST = emailConfig.HOST;
@@ -531,6 +531,7 @@ console.log(mailObject)
 
   sendBulkEmails = function(mailObject){
     logger.log("Email Sent", "verbose");
+    console.log(mailObject)
     mailObject.context = {};
     mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
     mailObject.context.HOST = emailConfig.HOST;
@@ -548,6 +549,9 @@ console.log(mailObject)
     mailObject.template='email-template'
     mailObject.recipients.forEach(item => { 
       mailObject.to = item.email; 
+console.log(mailObject.to);
+console.log(mailObject.context.MESSAGE)
+console.log(mailObject.subject)      
       nodeMailerSendMail(mailObject); 
     });
     mailObject.to = emailConfig.emailAddress;

@@ -689,70 +689,131 @@ export class ClientRequestAnalytics {
         $(".hoverProfile").css("display", "none");
     }
 
-    downloadExcel(){
-			var exportArray = this.utils.copyArray(this.requests.analyticsProductsResultArray);
-			var htmlContent = "<table><tr><th>Product</th>";
-			var numFields = this.config.REQUEST_STATUS.length;
-			
-			this.config.REQUEST_STATUS.forEach(item => {
-				htmlContent += "<th>" + item.description + "</th>";
-			})
-			htmlContent += "</tr>";
+    downloadExcel(){ 
+        let csvContent = "data:text/csv;charset=utf-8;,Product";
+        this.config.REQUEST_STATUS.forEach(item => {
+            csvContent += "," + item.description;
+        })
+        csvContent += "\r\n";
+        this.dataTable.baseArray.forEach(item => {
+            csvContent += item.productId.name;
+            this.config.REQUEST_STATUS.forEach((field, index) => {
+                csvContent += "," + item[field.code]; 
+            })
+            csvContent +=  "\r\n";
+        })
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "requestsByProduct.csv");
+        document.body.appendChild(link); 
 
-			exportArray.forEach(item => {
-				var line = "<tr><td>" + item.productId.name + "</td>";
-				this.config.REQUEST_STATUS.forEach((field, index) => {
-					line += "<td>" + item[field.code] + "</td>"; 
-				})
-				line += "</tr>";
-				htmlContent += line;
-			});
-			htmlContent += "</table>";
-			window.open('data:application/vnd.ms-excel,' + htmlContent);
+        link.click();
+
+			// var exportArray = this.utils.copyArray(this.requests.analyticsProductsResultArray);
+			// var htmlContent = "<table><tr><th>Product</th>";
+			// var numFields = this.config.REQUEST_STATUS.length;
+			
+			// this.config.REQUEST_STATUS.forEach(item => {
+			// 	htmlContent += "<th>" + item.description + "</th>";
+			// })
+			// htmlContent += "</tr>";
+
+			// exportArray.forEach(item => {
+			// 	var line = "<tr><td>" + item.productId.name + "</td>";
+			// 	this.config.REQUEST_STATUS.forEach((field, index) => {
+			// 		line += "<td>" + item[field.code] + "</td>"; 
+			// 	})
+			// 	line += "</tr>";
+			// 	htmlContent += line;
+			// });
+			// htmlContent += "</table>";
+			// window.open('data:application/vnd.ms-excel,' + htmlContent);
     }
 
     downloadAllCountriesExcel(){
-        var exportArray = this.utils.copyArray(this.requests.analyticsCountryProductsResultArray);
-        var htmlContent = "<table><tr><th>Product</th><th>Country</th><th>Total</th>";
-        var numFields = this.config.REQUEST_STATUS.length;
-        
+        let csvContent = "data:text/csv;charset=utf-8;,Product,Country,Total";
         this.config.REQUEST_STATUS.forEach(item => {
-            htmlContent += "<th>" + item.description + "</th>";
+            csvContent += "," + item.description;
         })
-        htmlContent += "</tr>";
-
-        exportArray.forEach(item => { 
-            var line = "<tr><td>" + item.productId.name + "</td><td>" + item.country + "</td><td>" + item.total + "</td>";
+        csvContent +=  "\r\n";
+        this.dataTable.baseArray.forEach(item => { 
+            csvContent +=  item.productId.name + "," + item.country + "," + item.total;
             this.config.REQUEST_STATUS.forEach((field, index) => {
-                line += "<td>" + item[field.code] + "</td>"; 
+                csvContent += "," + item[field.code]; 
             })
-            line += "</tr>";
-            htmlContent += line;
+            csvContent +=  "\r\n";
         });
-        htmlContent += "</table>";
-        window.open('data:application/vnd.ms-excel,' + htmlContent);
+
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "requestsByCountries.csv");
+        document.body.appendChild(link); // Required for FF
+
+        link.click();
+
+        // var exportArray = this.utils.copyArray(this.requests.analyticsCountryProductsResultArray);
+        // var htmlContent = "<table><tr><th>Product</th><th>Country</th><th>Total</th>";
+        // var numFields = this.config.REQUEST_STATUS.length;
+        
+        // this.config.REQUEST_STATUS.forEach(item => {
+        //     htmlContent += "<th>" + item.description + "</th>";
+        // })
+        // htmlContent += "</tr>";
+
+        // exportArray.forEach(item => { 
+        //     var line = "<tr><td>" + item.productId.name + "</td><td>" + item.country + "</td><td>" + item.total + "</td>";
+        //     this.config.REQUEST_STATUS.forEach((field, index) => {
+        //         line += "<td>" + item[field.code] + "</td>"; 
+        //     })
+        //     line += "</tr>";
+        //     htmlContent += line;
+        // });
+        // htmlContent += "</table>";
+        // window.open('data:application/vnd.ms-excel,' + htmlContent);
     }
         
     downloadInstExcel(){
-        var exportArray = this.utils.copyArray(this.requests.analyticsInstitutionResultArray);
-        var htmlContent = "<table><tr><th>Product</th>";
-        var numFields = this.config.REQUEST_STATUS.length;
-        
+        let csvContent = "data:text/csv;charset=utf-8;,Institution";
         this.config.REQUEST_STATUS.forEach(item => {
-            htmlContent += "<th>" + item.description + "</th>";
+            csvContent += "," + item.description;
         })
-        htmlContent += "</tr>";
-
-        exportArray.forEach(item => {
-            var line = "<tr><td>" + item.name + "</td>";
+        csvContent += "\r\n";
+        this.dataTable.baseArray.forEach(item => {
+            csvContent += item.name;
             this.config.REQUEST_STATUS.forEach((field, index) => {
-                line += "<td>" + item[field.code] + "</td>"; 
+                csvContent += "," + item[field.code]; 
             })
-            line += "</tr>";
-            htmlContent += line;
-        });
-        htmlContent += "</table>";
-        window.open('data:application/vnd.ms-excel,' + htmlContent);
+            csvContent +=  "\r\n";
+        })
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "requestsByInstitution.csv");
+        document.body.appendChild(link); 
+
+        link.click();
+
+        // var exportArray = this.utils.copyArray(this.requests.analyticsInstitutionResultArray);
+        // var htmlContent = "<table><tr><th>Product</th>";
+        // var numFields = this.config.REQUEST_STATUS.length;
+        
+        // this.config.REQUEST_STATUS.forEach(item => {
+        //     htmlContent += "<th>" + item.description + "</th>";
+        // })
+        // htmlContent += "</tr>";
+
+        // exportArray.forEach(item => {
+        //     var line = "<tr><td>" + item.name + "</td>";
+        //     this.config.REQUEST_STATUS.forEach((field, index) => {
+        //         line += "<td>" + item[field.code] + "</td>"; 
+        //     })
+        //     line += "</tr>";
+        //     htmlContent += line;
+        // });
+        // htmlContent += "</table>";
+        // window.open('data:application/vnd.ms-excel,' + htmlContent);
     }
 
     customProductSorter(sortProperty, sortDirection, sortArray, context){  

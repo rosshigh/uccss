@@ -11,8 +11,8 @@ import $ from 'jquery';
 @inject(DataTable, AppConfig, People, Utils, is4ua, CommonDialogs, Validation)
 export class BulkEmails {
     composeEmailPanel = false;
-    emailSubject = "";
-    emailMessage = "";
+    subject = "";
+    MESSAGE = "";
     spinnerHTML = "";
     email = new Object();
 
@@ -85,17 +85,19 @@ export class BulkEmails {
 	}
 
     composeEmail(){
+        this.email = {MESSAGE: "", INSTRUCTIONS: this.config.HELP_TICKET_INSTRUCTIONS, subject: ""} ;
         this.composeEmailPanel = true;
     }
 
     cancel(){
         this.composeEmailPanel = false;
-        this.email.emailMessage = "";
-        this.email.subject = "";
+        this.email = {MESSAGE: "", INSTRUCTIONS: this.config.HELP_TICKET_INSTRUCTIONS, subject: ""} ;
+        // this.email.emailMessage = "";
+        // this.email.subject = "";
     }
 
     sendBulkEmail(){
-        if(this.email.emailMessage === "" || this.email.subject === ""){
+        if(this.email.MESSAGE === "" || this.email.subject === ""){
             this.utils.showNotification("Enter a subject and messsage");
             return;
         }
@@ -127,25 +129,20 @@ export class BulkEmails {
         this.utils.showNotification("Message sent");
     }
 
+    downloadInstExcel(){
+        let csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,City,Region,Roles,Institution\r\n";
+        this.dataTable.baseArray.forEach(item => {
+            csvContent += item.firstName + "," + item.lastName + "," + item.email + "," + item.institutionId.city + "," + item.institutionId.region + "," + item.roles.join(':') + "," + item.institutionId.name ;
+            csvContent +=  "\r\n";
+        })
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "bulkEmail.csv");
+        document.body.appendChild(link); // Required for FF
 
-    // send(){
-    //     var recipients = new Array();
-    //     this.dataTable.baseArray.forEach(item => {
-    //         recipients.push({name: item.fullName, email: item.email});
-    //     });
-
-    //     var email = {email.email: this.config.UCC_EMAIL, recipients: recipients}; 
-    //     this.people.sendBuikEmail(email);
-    // }
-
-    // institutionCustomFilter(value, item, context){
-    //     for(let i = 0; i < context.people.institutionsArray.length; i++){
-    //         if(item.institutionId._id == context.people.institutionsArray[i]._id) {
-    //             return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-    //         }
-    //     }
-    //     return false;
-    // }
+        link.click();
+    }
 
     regionCustomFilter(value, item, context){
         for(let i = 0; i < context.people.institutionsArray.length; i++){

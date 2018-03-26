@@ -347,26 +347,49 @@ export class Institutions {
 	downloadExcel(){
 		if(this.selectedFields.length){
 			var exportArray = this.utils.copyArray(this.dataTable.baseArray);
-			var htmlContent = "<table><tr>";
-			var numFields = this.selectedFields.length;
 			if(this.substituteDescriptions) exportArray = this.subIs4uaValues(exportArray);
-			
-			this.selectedFields.forEach(item => {
-				htmlContent += "<th>" + item.displayName + "</th>";
-			})
-			htmlContent += "</tr>";
 
-			exportArray.forEach(item => {
-				var line = "<tr>";
+			let csvContent = "data:text/csv;charset=utf-8;";
+			this.selectedFields.forEach(item => {
+				csvContent += "," + item.displayName;
+			})
+			csvContent += "\r\n";
+			exportArray.forEach(item => { 
 				this.selectedFields.forEach((field, index) => {
-					line += "<td>" + item[field.field] + "</td>"; 
+					if(index > 0) csvContent += ","; 
+					csvContent +=  item[field.field] ? item[field.field].replace(","," ") : "" ; 
 				})
-				line += "</tr>";
-				htmlContent += line;
+				csvContent += "\r\n";
 			});
-			htmlContent += "</table>";
-			window.open('data:application/vnd.ms-excel,' + htmlContent);
-			this.showExportPanel = false;
+			var encodedUri = encodeURI(csvContent);
+			var link = document.createElement("a");
+			link.setAttribute("href", encodedUri);
+			link.setAttribute("download", "institutions.csv");
+			document.body.appendChild(link); 
+	
+			link.click();
+
+			// var exportArray = this.utils.copyArray(this.dataTable.baseArray);
+			// var htmlContent = "<table><tr>";
+			// var numFields = this.selectedFields.length;
+			// if(this.substituteDescriptions) exportArray = this.subIs4uaValues(exportArray);
+			
+			// this.selectedFields.forEach(item => {
+			// 	htmlContent += "<th>" + item.displayName + "</th>";
+			// })
+			// htmlContent += "</tr>";
+
+			// exportArray.forEach(item => {
+			// 	var line = "<tr>";
+			// 	this.selectedFields.forEach((field, index) => {
+			// 		line += "<td>" + item[field.field] + "</td>"; 
+			// 	})
+			// 	line += "</tr>";
+			// 	htmlContent += line;
+			// });
+			// htmlContent += "</table>";
+			// window.open('data:application/vnd.ms-excel,' + htmlContent);
+			// this.showExportPanel = false;
 		} else {
 			this.utils.showNotification("You haven't chosen any fields to include");
 		}

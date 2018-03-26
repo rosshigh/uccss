@@ -512,6 +512,25 @@ export class EditPeople {
         this.institutionFilterValue = "";
     }
 
+    downloadInstExcel(){
+        var exportArray = this.utils.copyArray(this.dataTable.baseArray);
+        var htmlContent = "<table><tr><th>First Name</th><th>Last Name</th><th>Institution</th><th>Phone</th><th>Email</th><th>Status</th></tr>";
+        var numFields = this.config.REQUEST_STATUS.length;
+
+        exportArray.forEach(item => {
+            var line = "<tr><td>" + item.firstName + "</td>";
+            line += "<td>" + item.lastName + "</td>";
+            line += "<td>" + item.institutionId.name +"</td>";
+            line += "<td>" + item.phone +"</td>";
+            line += "<td>" + item.email +"</td>";
+            line += "<td>" + item.personStatus +"</td>";
+            line += "</tr>";
+            htmlContent += line;
+        });
+        htmlContent += "</table>";
+        window.open('data:application/vnd.ms-excel,' + htmlContent);
+    }
+
 	customInstitutionSorter(sortProperty, sortDirection, sortArray, context){
 
         return sortArray.sort((a, b) => {
