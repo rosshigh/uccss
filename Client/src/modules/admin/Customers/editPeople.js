@@ -513,22 +513,35 @@ export class EditPeople {
     }
 
     downloadInstExcel(){
-        var exportArray = this.utils.copyArray(this.dataTable.baseArray);
-        var htmlContent = "<table><tr><th>First Name</th><th>Last Name</th><th>Institution</th><th>Phone</th><th>Email</th><th>Status</th></tr>";
-        var numFields = this.config.REQUEST_STATUS.length;
+        let csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,Phone,Institution\r\n";
+        this.dataTable.baseArray.forEach(item => {
+            csvContent += item.firstName + "," + item.lastName + "," + item.email + "," + item.phone + "," + item.institutionId.name ;
+            csvContent +=  "\r\n";
+        })
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "people.csv");
+        document.body.appendChild(link); // Required for FF
 
-        exportArray.forEach(item => {
-            var line = "<tr><td>" + item.firstName + "</td>";
-            line += "<td>" + item.lastName + "</td>";
-            line += "<td>" + item.institutionId.name +"</td>";
-            line += "<td>" + item.phone +"</td>";
-            line += "<td>" + item.email +"</td>";
-            line += "<td>" + item.personStatus +"</td>";
-            line += "</tr>";
-            htmlContent += line;
-        });
-        htmlContent += "</table>";
-        window.open('data:application/vnd.ms-excel,' + htmlContent);
+        link.click();
+
+        // var exportArray = this.utils.copyArray(this.dataTable.baseArray);
+        // var htmlContent = "<table><tr><th>First Name</th><th>Last Name</th><th>Institution</th><th>Phone</th><th>Email</th><th>Status</th></tr>";
+        // var numFields = this.config.REQUEST_STATUS.length;
+
+        // exportArray.forEach(item => {
+        //     var line = "<tr><td>" + item.firstName + "</td>";
+        //     line += "<td>" + item.lastName + "</td>";
+        //     line += "<td>" + item.institutionId.name +"</td>";
+        //     line += "<td>" + item.phone +"</td>";
+        //     line += "<td>" + item.email +"</td>";
+        //     line += "<td>" + item.personStatus +"</td>";
+        //     line += "</tr>";
+        //     htmlContent += line;
+        // });
+        // htmlContent += "</table>";
+        // window.open('data:application/vnd.ms-excel,' + htmlContent);
     }
 
 	customInstitutionSorter(sortProperty, sortDirection, sortArray, context){
