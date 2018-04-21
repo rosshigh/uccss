@@ -26,7 +26,7 @@ var express = require('express'),
 module.exports = function (app, config) {
   app.use('/', router);
 
-  router.get('/api/people', requireAuth,  function(req, res, next){
+  router.get('/api/people',   function(req, res, next){
     logger.log('Get people','verbose');
     var query = buildQuery(req.query, Model.find())
 

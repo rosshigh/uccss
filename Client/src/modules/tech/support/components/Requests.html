@@ -10,6 +10,8 @@
             <th>System</th>
             <th>Client</th>
             <th>Status</th>
+            <th show.bind="viewHelpTickets">User IDS</th>
+            <th show.bind="viewHelpTickets">Faculty IDs</th>
           </tr>
           </thead>
           <tbody>
@@ -22,6 +24,8 @@
               <td>${product.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
               <td>${product.client}</td>
               <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
+              <td show.bind="viewHelpTickets">${product.studentIds}<br>${product.studentPassword}</td>
+              <td show.bind="viewHelpTickets">${product.facultyIds}<br>${product.facultyPassword}</td>
             </tr>
           </tbody>
         </table>

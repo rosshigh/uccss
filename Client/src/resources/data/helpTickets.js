@@ -278,6 +278,34 @@ export class HelpTickets {
         }
     }
 
+    calcHelpTicketAges(){
+        this.helpTickeAges = {
+            today: [0, 0],
+            yesterday: [0, 0],
+            oneWeek: [0, 0],
+            twoWeeks: [0, 0],
+            older: [0, 0]
+        };
+        let today = moment(new Date());
+
+        this.helpTicketsArray.forEach(item => {
+            let index = item.owner[0].personId === null ? 1 : 0;
+            let age = today.diff(moment(item.createdDate), 'days');
+            if(age === 0){
+                this.helpTickeAges.today[index] += 1;
+            } else if (age === 1){
+                this.helpTickeAges.yesterday[index] += 1;
+            } else if (age <= 7){
+                this.helpTickeAges.oneWeek[index] += 1;
+            } else if (age <= 14){
+                this.helpTickeAges.twoWeeks[index] += 1;
+            } else {
+                this.helpTickeAges.older[index] += 1;
+            }
+            
+        });
+    }
+
     async getHelpTicketTypes(options, refresh){
          if (!this.helpTicketTypesArray || refresh) {
            var url = this.HELP_TICKET_TYPES;

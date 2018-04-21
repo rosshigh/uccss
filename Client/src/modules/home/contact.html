@@ -14,7 +14,8 @@
 			<div class="col-lg-12" show.bind="directors.length > 0">
 				<ul>
 					<li class="list-group-item  topMargin" repeat.for="person of directors">
-						<div class="media-left" innerhtml='${person.item.email | gravatarUrl:100:1}'></div>
+						<img if.bind="helpTickets.selectedHelpTicket.personId.file.fileName" class="smart-timeline-icon bottomMarginLg" src ="${config.PERSON_IMAGE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.personId.file.fileName}" height="100">
+						<div if.bind="!helpTickets.selectedHelpTicket.personId.file.fileName" class="media-left" innerhtml='${person.item.email | gravatarUrl:100:1}'></div>
 						<div class="media-body">
 							<div class="col-lg-12">
 								<h4>${person.item.fullName}</h4>
