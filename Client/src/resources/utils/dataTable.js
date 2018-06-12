@@ -12,7 +12,7 @@ export class DataTable{
   filterValues = [];
   displayLength;
 
-  DEFAULT_TAKE = 20;
+  DEFAULT_TAKE = 50;
   DEFAULT_START = 0;
 
   sortProperty = '';
@@ -205,7 +205,7 @@ export class DataTable{
     }
 
     //If the filter value is not set to empty, add it to filterValues 
-    if(typeof value == 'object' && !(value instanceof Date)) value = value.target.value;
+    if(typeof value == 'object' && !(value instanceof Date) && !Array.isArray(value)) value = value.target.value;
     if(value !== ""){
       this.filterValues.push({options: options, value: value});
     }

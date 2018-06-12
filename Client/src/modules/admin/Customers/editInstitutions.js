@@ -156,6 +156,21 @@ export class EditInstitutions {
         this.validation.addRule(1,"editHighestDegree",[{"rule":"required","message":"Institution type is required", "value": "people.selectedInstitution.highestDegree"}]);
     }
 
+    downloadInstExcel(){
+        let csvContent = "data:text/csv;charset=utf-8;,Name,City,State,Type\r\n";
+        this.dataTable.baseArray.forEach(item => {
+            csvContent += item.name + "," + item.city + "," + item.state + "," + item.institutionType;
+            csvContent +=  "\r\n";
+        })
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "institutions.csv");
+        document.body.appendChild(link); // Required for FF
+
+        link.click();
+    }
+
     _cleanUp(){
         this.newInstitution = false;
         this.institutionSelected = false;

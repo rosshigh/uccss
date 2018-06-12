@@ -16,6 +16,10 @@ export class MultiselectCustomElement {
     if(newValue && newValue.length === 0) $('span.filter-option').html("");
   }
 
+  bind(){
+    console.log('laksjdflj')
+  }
+
   attached() {
     $(this.select).selectpicker({ 
       onChange: (option, checked) => {

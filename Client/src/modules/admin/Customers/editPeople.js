@@ -19,6 +19,7 @@ export class EditPeople {
     emailSubject = "";
     emailMessage = "";
     spinnerHTML = "";
+    phoneMask = "";
 
     tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'Audit' },{id: "Email"},{id: "Log"}];
     tabPath = './';
@@ -90,6 +91,7 @@ export class EditPeople {
         this.filterRoles();
         this.newPerson = false;
         $("#editFirstName").focus();
+        this.getPhoneMask();
 
         this.people.getEmailLog('?filter=personId|eq|' + this.people.selectedPerson._id + '&order=date', true);
 
@@ -99,6 +101,18 @@ export class EditPeople {
         this.personSelected = true;
         
         this.setFirstTab();
+    }
+
+    getPhoneMask(){
+        this.phoneMask = "";
+        setTimeout(() =>{
+            for(let i = 0; i < this.config.PHONE_MASKS.length; i++){
+                if(this.people.selectedPerson.country === this.config.PHONE_MASKS[i].country){
+                    this.phoneMask = this.config.PHONE_MASKS[i].mask;
+                    break;
+                }
+            }
+        },500)
     }
 
     selectEmail(email){
@@ -117,7 +131,7 @@ export class EditPeople {
         this.oldEmail = this.people.selectedPerson.email;
         $("#editFirstName").focus();
         this.personSelected = true;
-
+        this.phoneMask = "";
         this.setFirstTab();
     }
 
@@ -239,6 +253,8 @@ export class EditPeople {
                     this.institutionId = this.people.selectedPerson.institutionId._id;
                 }
             });
+        } else {
+            setTimeout(()=> {this.copyInstAddress()}, 500);
         }
     }
 
@@ -326,6 +342,7 @@ export class EditPeople {
                 this.people.selectedPerson.postalCode = this.people.selectedInstitution.postalCode;
                 this.people.selectedPerson.country = this.people.selectedInstitution.country;
                 this.people.selectedPerson.POBox = this.people.selectedInstitution.POBox;
+                this.getPhoneMask();
             }
         }
     }
@@ -515,7 +532,7 @@ export class EditPeople {
     downloadInstExcel(){
         let csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,Phone,Institution\r\n";
         this.dataTable.baseArray.forEach(item => {
-            csvContent += item.firstName + "," + item.lastName + "," + item.email + "," + item.phone + "," + item.institutionId.name ;
+            csvContent += item.firstName + "," + item.lastName.replace(',',' ') + "," + item.email + "," + item.phone + "," + item.institutionId.name ;
             csvContent +=  "\r\n";
         })
         var encodedUri = encodeURI(csvContent);
@@ -525,23 +542,6 @@ export class EditPeople {
         document.body.appendChild(link); // Required for FF
 
         link.click();
-
-        // var exportArray = this.utils.copyArray(this.dataTable.baseArray);
-        // var htmlContent = "<table><tr><th>First Name</th><th>Last Name</th><th>Institution</th><th>Phone</th><th>Email</th><th>Status</th></tr>";
-        // var numFields = this.config.REQUEST_STATUS.length;
-
-        // exportArray.forEach(item => {
-        //     var line = "<tr><td>" + item.firstName + "</td>";
-        //     line += "<td>" + item.lastName + "</td>";
-        //     line += "<td>" + item.institutionId.name +"</td>";
-        //     line += "<td>" + item.phone +"</td>";
-        //     line += "<td>" + item.email +"</td>";
-        //     line += "<td>" + item.personStatus +"</td>";
-        //     line += "</tr>";
-        //     htmlContent += line;
-        // });
-        // htmlContent += "</table>";
-        // window.open('data:application/vnd.ms-excel,' + htmlContent);
     }
 
 	customInstitutionSorter(sortProperty, sortDirection, sortArray, context){

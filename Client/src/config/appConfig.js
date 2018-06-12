@@ -32,6 +32,13 @@ export class AppConfig {
     ACTIVE_PERSON = "01";
     INACTIVE_PERSON = "02";
 
+    PHONE_MASKS = [
+        {country: 'US', mask: '999-999-9999'},
+        {country: 'CA', mask: '999-999-9999'},
+        {country: 'BR', mask: '99 99999 9999'},
+        {country: 'CO', mash: '9999999999999'}
+    ];
+
     ROLES = [{ role: 'USER', label: 'User', UCConly: false, authLevel: 2 },
             { role: 'FACU', label: 'Faculty', UCConly: false, authLevel: 3 },
             { role: 'PROV', label: "Provisional", UCConly: false, authLevel: 1 },

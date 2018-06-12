@@ -441,6 +441,53 @@ export class ClientRequests {
         })
     }
 
+    async groupRequestsByInstitutionCountry(){
+        if(!this.requestsDetailsArrayAnalytics) {
+            return;
+        }
+        var sortedArray = new Array();
+        this.requestsDetailsArrayAnalytics.forEach(item => {
+            if(item['requestId'] &&  item['requestId'].institutionId && item['productId'] && item['productId'].name ){
+                item.sortValue = item['requestId'].institutionId.name + item['productId'].name;
+                sortedArray.push(item);
+            } 
+        });
+
+        var sortedArray = this.requestsDetailsArrayAnalytics 
+            .sort((a, b) => {
+                var result = (a.sortValue < b.sortValue) ? -1 : (a.sortValue > b.sortValue) ? 1 : 0;
+                return result;
+            });
+
+        this.analyticsInstitutionCountryResultArray = new Array();
+        var instID = "";
+        var templateObj = new Object();
+        var that = this;
+        sortedArray.forEach(function(item){
+            // if(item.requestId){
+                if(item.sortValue != instID){
+                    instID = item.sortValue;
+                    var obj = that.utils.copyObject(templateObj);
+                    obj.name = item.requestId.institutionId.name;
+                    obj.institutionId = item.requestId.institutionId._id;
+                    obj.productName = item.productId.name;
+                    obj.country = item.requestId.institutionId.country;
+                    obj.total = 0;
+                    that.analyticsInstitutionCountryResultArray.push(obj);
+                }
+                // if(item.requestStatus != skip){
+                    that.analyticsInstitutionCountryResultArray[that.analyticsInstitutionCountryResultArray.length-1]['total'] += 1;
+                    // var gradIds = item.requestId.graduateIds != null ? parseInt(item.requestId.graduateIds) : 0;
+                    // var underIds = item.requestId.undergradIds != null ? parseInt(item.requestId.undergradIds) : 0;
+                    // that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['studentIds'] += gradIds + underIds;
+                    // that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['studentIds'] += parseInt(item.requestId.graduateIds) + parseInt(item.requestId.undergradIds);
+                // }
+                // that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1][item.requestStatus] += 1;
+            // }
+          
+        })
+    }
+
     async groupRequestsByInstitution(){
         if(!this.requestsDetailsArrayAnalytics) {
             return;
@@ -552,11 +599,7 @@ export class ClientRequests {
             
         });
 
-        // var sortedArray = this.requestsDetailsArrayAnalytics.sort(this.fieldSorter(['productId.name', 'requestId.institutionId.country']));
         var sortedArray = this.requestsDetailsArrayAnalytics.sort((a, b) =>{
-            // if(!a.productId || !b.productId || !a.requestId.institutionId.country || !b.requestId.institutionId.country) return -1;
-            // var one = a.productId + a.requestId.institutionId.country;
-            // var two = b.productId + b.requestId.institutionId.country;
             var result = (a.sortProperty < b.sortProperty) ? -1 : (a.sortProperty > b.sortProperty) ? 1 : 0;
             return result;
         });

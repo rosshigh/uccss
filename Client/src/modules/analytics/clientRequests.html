@@ -37,6 +37,9 @@
             <div show.bind="selectedCategory.code === 2">
                 <compose view="./components/requestsByCountry.html"></compose>
             </div>
+            <div show.bind="selectedCategory.code === 3">
+                <compose view="./components/requestsByInstitutionCountry.html"></compose>
+            </div>
         </div> 
       </div> 
 </template>

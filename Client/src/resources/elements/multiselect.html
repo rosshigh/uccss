@@ -1,6 +1,6 @@
 <template>
 	<label>${label}</label><br/>
-	<select value.bind="value" multiple ref="select" class="selectpicker" style="background-color:white;">
+	<select style="background-color:white;" value.bind="value" multiple ref="select" class="selectpicker form-control">
     	<option repeat.for="option of options" value.bind="option.code">${option.description}</option>
   	</select>
 </template>

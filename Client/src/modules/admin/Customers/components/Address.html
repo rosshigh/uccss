@@ -28,7 +28,7 @@
             </div>
             <div class="col-sm-12 col-lg-12">
                 <label for="editCountry" class="control-label hideOnPhone">Country</label>
-                <input value.bind="people.selectedPerson.country" id="editCountry" class="form-control " placeholder="Country" type="text" />
+                <input value.bind="people.selectedPerson.country" change.trigger="getPhoneMask()" id="editCountry" class="form-control" placeholder="Country" type="text" />
             </div>
         </div>
     </div>

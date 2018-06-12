@@ -15,6 +15,8 @@ export class BulkEmails {
     MESSAGE = "";
     spinnerHTML = "";
     email = new Object();
+    roleFilterValue = new Array();
+    roleExcludeFilterValue = new Array();
 
     toolbar = [
 		['style', ['style', 'bold', 'italic', 'underline','clear']],
@@ -41,7 +43,7 @@ export class BulkEmails {
 
     async activate() {
         let responses = await Promise.all([
-            this.people. getPeopleBulkEmailArray('?order=lastName&filter=personStatus|eq|01'),
+            this.people.getPeopleBulkEmailArray('?order=lastName&filter=personStatus|eq|01'),
             this.people.getInstitutionsArray('?order=name', true),
             this.is4ua.loadIs4ua(),
             this.config.getConfig()
@@ -49,6 +51,11 @@ export class BulkEmails {
         this.activeFilterValue = "01";
         this.filteredArray = this.config.ROLES;
         this.dataTable.updateArray(this.people.peopleBulkEmailArray);
+
+        this.roleSelect = new Array();
+        this.config.ROLES.forEach(item => {
+            this.roleSelect.push({code: item.role, description: item.role });
+        });
     }
 
     async filterActive(){
@@ -59,8 +66,10 @@ export class BulkEmails {
 
     attached() {
         $('[data-toggle="tooltip"]').tooltip();
-        // this._setupValidation();
+        this.institutionStatusValue = '01';
+        this.dataTable.filterList(this.institutionStatusValue, { type: 'value',  filter: 'institutionStatusFilter',  collectionProperty: 'institutionId.institutionStatus', displayProperty: 'institutionId.institutionStatus', matchProperty:'', compare:'match'} );
     }
+    
 
     async refresh() {
         this._cleanUpFilters();
@@ -71,17 +80,18 @@ export class BulkEmails {
     }
 
 	_clearFilters(){
-        this.nameFilter = "";
-		this.institutionFilter = "";
+        this.CustomerFilter = "";
+		// this.activeFilterValue = "";
+        this.roleFilterValue = new Array();
+        this.roleExcludeFilterValue = new Array();
+        this.institutionFilterValue = "";
+        this.institutionStatusValue = "";
         this.institutionTypeFilter = "";
-        this.memberTypeFilter = "";
-        this.cityFilter = "";
-        this.regionFilter = "";
-        this.countryFilter = "";
-        this.roleFilterValue = "";
-        // this.activeFilterValue = "01";
+        this.memberTypeFilterValue = "";
+        this.countryFilterValue = "";
+        this.regionFilterValue = "";
+        $(".filter-option-inner-inner").html('Nothing selected');
         this.dataTable.updateArray(this.people.peopleBulkEmailArray);
-        // this.filterActive();
 	}
 
     composeEmail(){
@@ -132,7 +142,7 @@ export class BulkEmails {
     downloadInstExcel(){
         let csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,City,Region,Roles,Institution\r\n";
         this.dataTable.baseArray.forEach(item => {
-            csvContent += item.firstName + "," + item.lastName + "," + item.email + "," + item.institutionId.city + "," + item.institutionId.region + "," + item.roles.join(':') + "," + item.institutionId.name ;
+            csvContent += item.firstName + "," + item.lastName.replace(',',' ') + "," + item.email + "," + item.institutionId.city + "," + item.institutionId.region + "," + item.roles.join(':') + "," + item.institutionId.name ;
             csvContent +=  "\r\n";
         })
         var encodedUri = encodeURI(csvContent);
@@ -145,42 +155,75 @@ export class BulkEmails {
     }
 
     regionCustomFilter(value, item, context){
-        for(let i = 0; i < context.people.institutionsArray.length; i++){
-            if(item.institutionId._id == context.people.institutionsArray[i]._id) {
-                return context.people.institutionsArray[i].region.toUpperCase().indexOf(value.toUpperCase()) > -1;
-            }
+        if(item.institutionId && item.institutionId.region){
+            return item.institutionId.region.toUpperCase().indexOf(value.toUpperCase()) > -1;
         }
         return false;
+        // for(let i = 0; i < context.people.institutionsArray.length; i++){
+        //     if(item.institutionId._id == context.people.institutionsArray[i]._id) {
+        //         return context.people.institutionsArray[i].region.toUpperCase().indexOf(value.toUpperCase()) > -1;
+        //     }
+        // }
+        // return false;
     }
 
-    cityCustomFilter(value, item, context){
-        for(let i = 0; i < context.people.institutionsArray.length; i++){
-            if(item.institutionId._id == context.people.institutionsArray[i]._id) {
-                return context.people.institutionsArray[i].city.toUpperCase().indexOf(value.toUpperCase()) > -1;
-            }
-        }
-        return false;
-    }
+    // cityCustomFilter(value, item, context){
+    //     if(item.institutionId && item.institutionId.city){
+    //         return item.institutionId.city.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    //     }
+    //     return false;
+    //     // for(let i = 0; i < context.people.institutionsArray.length; i++){
+    //     //     if(item.institutionId._id == context.people.institutionsArray[i]._id) {
+    //     //         return context.people.institutionsArray[i].city.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    //     //     }
+    //     // }
+    //     // return false;
+    // }
 
     countryCustomFilter(value, item, context){
-        for(let i = 0; i < context.people.institutionsArray.length; i++){
-            if(item.institutionId._id == context.people.institutionsArray[i]._id) {
-                return context.people.institutionsArray[i].country.toUpperCase().indexOf(value.toUpperCase()) > -1;
-            }
+        if(item.institutionId && item.institutionId.country){
+            return item.institutionId.country.toUpperCase().indexOf(value.toUpperCase()) > -1;
         }
         return false;
+        // for(let i = 0; i < context.people.institutionsArray.length; i++){
+        //     if(item.institutionId._id == context.people.institutionsArray[i]._id) {
+        //         return context.people.institutionsArray[i].country.toUpperCase().indexOf(value.toUpperCase()) > -1;
+        //     }
+        // }
+        // return false;
     }
 
     roleCustomFilter(value, item, context){
 		var keep = false;
-		if(item.roles && item.roles.length > 0){
+		if(item.roles && item.roles.length > 0 && value){
 			for(let i = 0; i < item.roles.length; i++){
-				if(item.roles[i].toUpperCase().indexOf(value.toUpperCase()) > -1) keep = true;
+                for(let j = 0; j < value.length; j++) {
+                    if(item.roles[i].toUpperCase().indexOf(value[j].toUpperCase()) > -1) keep = true;
+                }
 			}
 		}
         return keep;
     }
 
+    roleExcludeCustomFilter(value, item, context){
+        var keep = true;
+		if(item.roles && item.roles.length > 0 && value){
+			for(let i = 0; i < item.roles.length; i++){
+                for(let j = 0; j < value.length; j++) {
+                    if(item.roles[i].toUpperCase().indexOf(value[j].toUpperCase()) > -1) keep = false;
+                }
+			}
+		}
+        return keep;
+    }
+
+    memberTypeCustomFilter(value, item, context){
+        var keep = true;
+		if(item.instiutionId.memberType && value && item.instiutionId.memberType.indexOf(valu)){
+		
+		}
+        return keep;
+    }
 
     customerCustomFilter(value, item, context){
         return item.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
@@ -188,5 +231,13 @@ export class BulkEmails {
 
     institutionCustomFilter(value, item, context){
         return item.institutionId && item.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
+
+    filterRoles(){
+        this.dataTable.filterList(this.roleFilterValue, { type: 'custom',  filter: this.roleCustomFilter, compare:'custom'} )
+    }
+
+    excludeRoles(){
+        this.dataTable.filterList(this.roleExcludeFilterValue, { type: 'custom',  filter: this.roleExcludeCustomFilter, compare:'custom'} )
     }
 }

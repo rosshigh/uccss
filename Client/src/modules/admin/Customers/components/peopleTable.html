@@ -56,7 +56,7 @@
                                 <td click.trigger="edit($index, $event)" data-title="Name">${person.firstName} ${person.lastName}</td>
                                 <td click.trigger="edit($index, $event)" data-title="Nickname">${person.nickName}</td>
                                 <td click.trigger="edit($index, $event)" data-title="Insitution">${person.institutionId.name}</d> 
-                                <td click.trigger="edit($index, $event)" data-tile="Phone">${person.phone | phoneNumber}</td>
+                                <td click.trigger="edit($index, $event)" data-tile="Phone">${person.phone | phoneNumber:config.PHONE_MASKS:person.country}</td>
                                 <td class="dropbtn" data-title="Email" click.delegate="sendAnEmail(person._id)">${person.email}</td>
                                 <td click.trigger="edit($index, $event)" data-title="Role">${person.roles}</td>
                                 <td class="dropbtn" click.trigger="toggleStatus(person._id, person.personStatus)" data-title="Status">${person.personStatus | lookupValue:is4ua.personStatusArray:"code":"description"}

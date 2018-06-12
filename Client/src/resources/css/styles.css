@@ -1,5 +1,8 @@
 @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
+.btn-default{
+    background-color:white;
+}
     .hover_img a { position:relative; }
     .hover_img a span { position:absolute; display:none; z-index:99; }
     .hover_img a:hover span { display:block; }

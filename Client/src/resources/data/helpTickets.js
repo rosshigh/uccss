@@ -289,18 +289,30 @@ export class HelpTickets {
         let today = moment(new Date());
 
         this.helpTicketsArray.forEach(item => {
-            let index = item.owner[0].personId === null ? 1 : 0;
-            let age = today.diff(moment(item.createdDate), 'days');
-            if(age === 0){
-                this.helpTickeAges.today[index] += 1;
-            } else if (age === 1){
-                this.helpTickeAges.yesterday[index] += 1;
-            } else if (age <= 7){
-                this.helpTickeAges.oneWeek[index] += 1;
-            } else if (age <= 14){
-                this.helpTickeAges.twoWeeks[index] += 1;
+            // let index = item.owner[0].personId === null ? 1 : 0;
+            let ageCreated = today.diff(moment(item.createdDate), 'days');
+            let ageModifed = today.diff(moment(item.modifiedDate), 'days');
+            if(ageCreated === 0){
+                this.helpTickeAges.today[0] += 1;
+            } else if (ageCreated === 1){
+                this.helpTickeAges.yesterday[0] += 1;
+            } else if (ageCreated <= 7){
+                this.helpTickeAges.oneWeek[0] += 1;
+            } else if (ageCreated <= 14){
+                this.helpTickeAges.twoWeeks[0] += 1;
             } else {
-                this.helpTickeAges.older[index] += 1;
+                this.helpTickeAges.older[0] += 1;
+            }
+            if(ageModifed === 0){
+                this.helpTickeAges.today[1] += 1;
+            } else if (ageModifed === 1){
+                this.helpTickeAges.yesterday[1] += 1;
+            } else if (ageModifed <= 7){
+                this.helpTickeAges.oneWeek[1] += 1;
+            } else if (ageModifed <= 14){
+                this.helpTickeAges.twoWeeks[1] += 1;
+            } else {
+                this.helpTickeAges.older[1] += 1;
             }
             
         });

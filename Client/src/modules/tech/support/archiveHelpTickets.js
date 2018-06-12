@@ -45,6 +45,7 @@ export class ArchiveHelpTickets {
     this.products = products;
 
     this.userObj = JSON.parse(sessionStorage.getItem('user'));
+    this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
   };
 
   async activate() {
@@ -359,4 +360,7 @@ export class ArchiveHelpTickets {
     })
   }
 
+  changeMe(){
+    console.log(this.selectedStatus);
+  }
 }

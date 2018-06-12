@@ -30,19 +30,19 @@
                     </label>
                   </div>
                   <div class="col-xs-2">
-                    <h4>Today:</h4> <h7>Owned: ${helpTickets.helpTickeAges.today[0]} Unowned: ${helpTickets.helpTickeAges.today[1]}</h7>
+                    <h4>Today:</h4> <h7>Created: ${helpTickets.helpTickeAges.today[0]} Modified: ${helpTickets.helpTickeAges.today[1]}</h7>
                   </div>
                   <div class="col-xs-2">
-                    <h4>Yesterday:</h4><h7>Owned: ${helpTickets.helpTickeAges.yesterday[0]} Unowned: ${helpTickets.helpTickeAges.yesterday[1]}</h7>
+                    <h4>Yesterday:</h4><h7>Created: ${helpTickets.helpTickeAges.yesterday[0]} Modified: ${helpTickets.helpTickeAges.yesterday[1]}</h7>
                 </div>
                 <div class="col-xs-2">
-                  <h4>One Week:</h4> <h7>Owned: ${helpTickets.helpTickeAges.oneWeek[0]} Unowned: ${helpTickets.helpTickeAges.oneWeek[1]}</h7>
+                  <h4>One Week:</h4> <h7>Created: ${helpTickets.helpTickeAges.oneWeek[0]} Modified: ${helpTickets.helpTickeAges.oneWeek[1]}</h7>
                 </div>
                 <div class="col-xs-2">
-                  <h4>Two Weeks:</h4> <h7>Owned: ${helpTickets.helpTickeAges.twoWeeks[0]} Unowned: ${helpTickets.helpTickeAges.twoWeeks[1]}</h7>
+                  <h4>Two Weeks:</h4> <h7>Created: ${helpTickets.helpTickeAges.twoWeeks[0]} Modified: ${helpTickets.helpTickeAges.twoWeeks[1]}</h7>
                 </div>
                 <div class="col-xs-2" style="color:red;" show.bind="helpTickets.helpTickeAges.older[0]>0 || helpTickets.helpTickeAges.older[1] > 0">
-                  <h4>Older:</h4> <h7>Owned: ${helpTickets.helpTickeAges.older[0]} Unowned: ${helpTickets.helpTickeAges.older[1]}</h7>
+                  <h4>Older:</h4> <h7>Created: ${helpTickets.helpTickeAges.older[0]} Modified: ${helpTickets.helpTickeAges.older[1]}</h7>
                 </div>
                 </td>
             </tr>
@@ -62,7 +62,7 @@
               <th style="width:15em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customOwnerSorter, propertyName: 'ownder'})">Owner </span><i class="fa fa-sort"></i></th>                   
               <th style="width:10em;"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})">Status </span><span><i class="fa fa-sort"></i></span></th>
               <th style="width:8em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'createdDate'})">Date Created </span><span><i class="fa fa-sort"></i></span></th>
-              <th style="width:8em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'modifiedDate'})">Modified Created </span><span><i class="fa fa-sort"></i></span></th>
+              <th style="width:8em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'modifiedDate'})">Date Modified </span><span><i class="fa fa-sort"></i></span></th>
               <th style="width:15em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'personId.lastName'})">Faculty </span><span><i class="fa fa-sort"></i></span></th>
               <th style="width:20em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'institutionId.name'})">Institution </span><span><i class="fa fa-sort"></i></span></th>
               <th>Email</th>

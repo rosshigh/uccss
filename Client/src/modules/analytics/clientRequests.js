@@ -29,6 +29,10 @@ export class ClientRequestAnalytics {
         {
             code: 2,
             description: 'Products by Country'
+        },
+        {
+            code: 3,
+            description: 'Institution, Country and Products'
         }
     ]
     backgroundColors =['#cc3300','#99e600','#0099cc','#ff0066','#6666ff','#1a8cff','#000080','#66ff99','#1aff66','#808000','#ffff66','#4d4d00','#ccffff','#006666','#339933','#b3ffff','#000099','#66ff33','#269900','#ffff00','#ffff66','#9999ff','#6600cc','#009933','','#0000b3','#ff0000','#00004d','#0000cc','#ff0000','#ff0000','#ffb3b3','#ffb3b3','#e63900','#ffb3b3','#330d00','#ffb3b3','#3333ff','#0000cc'];
@@ -108,7 +112,10 @@ export class ClientRequestAnalytics {
                 this.dataTable.updateArray(this.requests.analyticsCountryProductsResultArray);
                 // this.sapProductChartDataFunction();
                 this.selectedTab = "sapProducts";
-                break;                
+                break;   
+            case 3:
+                this.getInstitutionsProductsCountryRequests();             
+                this.dataTable.updateArray(this.requests.analyticsInstitutionCountryResultArray);
         }
     }
 
@@ -486,6 +493,10 @@ export class ClientRequestAnalytics {
         }
     }
 
+    async getInstitutionsProductsCountryRequests(){
+        await this.requests.groupRequestsByInstitutionCountry()
+    }
+
     sapProductChartDataFunction(){        
         var data = new Array();
         var categories = new Array();
@@ -709,26 +720,23 @@ export class ClientRequestAnalytics {
         document.body.appendChild(link); 
 
         link.click();
+    }
 
-			// var exportArray = this.utils.copyArray(this.requests.analyticsProductsResultArray);
-			// var htmlContent = "<table><tr><th>Product</th>";
-			// var numFields = this.config.REQUEST_STATUS.length;
-			
-			// this.config.REQUEST_STATUS.forEach(item => {
-			// 	htmlContent += "<th>" + item.description + "</th>";
-			// })
-			// htmlContent += "</tr>";
+    downloadAllInstitutionCountriesExcel(){
+        let csvContent = "data:text/csv;charset=utf-8;,Institution,Country,Product,Total";
+        csvContent +=  "\r\n";
+        this.dataTable.baseArray.forEach(item => { 
+            csvContent +=  item.name + "," + item.country+ "," + item.productName + "," + item.total;
+            csvContent +=  "\r\n";
+        });
 
-			// exportArray.forEach(item => {
-			// 	var line = "<tr><td>" + item.productId.name + "</td>";
-			// 	this.config.REQUEST_STATUS.forEach((field, index) => {
-			// 		line += "<td>" + item[field.code] + "</td>"; 
-			// 	})
-			// 	line += "</tr>";
-			// 	htmlContent += line;
-			// });
-			// htmlContent += "</table>";
-			// window.open('data:application/vnd.ms-excel,' + htmlContent);
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "requestsByInstituionCountries.csv");
+        document.body.appendChild(link); // Required for FF
+
+        link.click();
     }
 
     downloadAllCountriesExcel(){
@@ -752,26 +760,6 @@ export class ClientRequestAnalytics {
         document.body.appendChild(link); // Required for FF
 
         link.click();
-
-        // var exportArray = this.utils.copyArray(this.requests.analyticsCountryProductsResultArray);
-        // var htmlContent = "<table><tr><th>Product</th><th>Country</th><th>Total</th>";
-        // var numFields = this.config.REQUEST_STATUS.length;
-        
-        // this.config.REQUEST_STATUS.forEach(item => {
-        //     htmlContent += "<th>" + item.description + "</th>";
-        // })
-        // htmlContent += "</tr>";
-
-        // exportArray.forEach(item => { 
-        //     var line = "<tr><td>" + item.productId.name + "</td><td>" + item.country + "</td><td>" + item.total + "</td>";
-        //     this.config.REQUEST_STATUS.forEach((field, index) => {
-        //         line += "<td>" + item[field.code] + "</td>"; 
-        //     })
-        //     line += "</tr>";
-        //     htmlContent += line;
-        // });
-        // htmlContent += "</table>";
-        // window.open('data:application/vnd.ms-excel,' + htmlContent);
     }
         
     downloadInstExcel(){
@@ -877,6 +865,14 @@ export class ClientRequestAnalytics {
 
     institutionCustomFilter(value, item, context){
         return item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
+
+    institutionCountryCustomFilter(value, item, context){
+        return item.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
+
+    productNameFilter(value, item, context){
+        return item.productName.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
     customProductFilter(value, item, context){
