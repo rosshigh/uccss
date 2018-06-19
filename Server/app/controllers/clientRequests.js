@@ -29,7 +29,7 @@ module.exports = function (app) {
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate('requestDetails')
-      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'})
+      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone ext mobile email institutionId file'})
       .exec()
       .then(object => {
         if(object){
@@ -48,7 +48,7 @@ module.exports = function (app) {
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate('requestDetails')
-      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'})
+      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone ext mobile email institutionId file'})
        .populate({ path: 'requestDetails', model: 'ClientRequestDetail', populate: {path: 'productId', model: 'Product', select: 'name'}})
       .exec()
       .then(object => {
@@ -109,7 +109,7 @@ module.exports = function (app) {
     logger.log('Get clientRequest' + req.params.id, 'verbose');
     Model.findById(req.params.id)
      .populate({path: 'courseId', model: 'Course', select: 'number name'})
-     .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'})
+     .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'})
      .populate({path: 'requestDetails', model: 'ClientRequestDetail'})
      .populate({ path: 'requestDetails', model: 'ClientRequestDetail', populate: {path: 'productId', model: 'Product', select: 'name'}})
      .exec()
@@ -240,7 +240,7 @@ module.exports = function (app) {
                       return next(error);
                     } else { 
                       ClientRequestDetail.findById(detailId)
-                      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+                      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'}})
                       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
                       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
                       .populate({ path: "productId", model: "Product", select: "name"})
@@ -290,7 +290,7 @@ module.exports = function (app) {
           return next(err);
         }                               
         ClientRequestDetail.findById(detailId)
-          .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+          .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'}})
           .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
           .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
           .populate({ path: "productId", model: "Product", select: "name"})
@@ -407,7 +407,7 @@ module.exports = function (app) {
     logger.log('Get clientRequests', 'verbose');
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country'}})
       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
       .populate({ path: "productId", model: "Product", select: "name"})
@@ -427,7 +427,7 @@ module.exports = function (app) {
   router.get('/api/clientRequestsDetailsOLD', requireAuth, function(req, res, next){
     logger.log('Get clientRequests', 'verbose');
     var query = buildQuery(req.query, ClientRequestDetail.find());
-    query.populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+    query.populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'}})
     query.exec()
       .then(object => {
         if(object){
@@ -446,7 +446,7 @@ module.exports = function (app) {
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
     .select('')
-    .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+    .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'}})
     .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name country'}})
     .populate({ path: 'productId', model: 'Product', select: 'name'})
     query.exec()
@@ -456,7 +456,7 @@ module.exports = function (app) {
           object.forEach(item => {
             if(item.requestId){
               result.push({
-                requestId: {personId: {fullName: item.requestId.personId.fullName}, institutionId: item.requestId.institutionId, undergradIds: item.requestId.undergradIds, undergradIds: item.requestId.undergradIds},
+                requestId: {clientRequestsDetails: {fullName: item.requestId.personId.fullName}, institutionId: item.requestId.institutionId, undergradIds: item.requestId.undergradIds, undergradIds: item.requestId.undergradIds},
                 requestStatus: item.requestStatus,
                 productId: item.productId
               });

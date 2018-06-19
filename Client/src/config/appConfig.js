@@ -36,7 +36,7 @@ export class AppConfig {
         {country: 'US', mask: '999-999-9999'},
         {country: 'CA', mask: '999-999-9999'},
         {country: 'BR', mask: '99 99999 9999'},
-        {country: 'CO', mash: '9999999999999'}
+        {country: 'CO', mask: '9999999999999'}
     ];
 
     ROLES = [{ role: 'USER', label: 'User', UCConly: false, authLevel: 2 },

@@ -19,7 +19,7 @@ export class ViewHelpTickets {
   enterResponse = false;
   showLockMessage = false; 
   responseMessage = "";
-  isChecked = true;
+  isChecked = false;
   nohelpTickets = true;
   toolbar;
 
@@ -386,6 +386,17 @@ export class ViewHelpTickets {
       $('[data-toggle="tooltip"]').tooltip();
   }
 
+  showComment(helpTicket, el) {
+    this.commentShown = helpTicket.content[0].content.comments;
+    $(".hover").css("top", el.clientY - 100);
+    $(".hover").css("left", el.clientX + 10);
+    $(".hover").css("display", "block");
+  }
+
+  hideComment() {
+    $(".hover").css("display", "none");
+  }
+  
   customHelpTicketTypeFilter(value, item, context){
     var foo = value.toUpperCase();
     for(let i = 0; i < context.helpTickets.helpTicketTypesArray.length; i++){

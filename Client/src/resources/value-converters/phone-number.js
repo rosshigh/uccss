@@ -1,5 +1,5 @@
 export class PhoneNumberValueConverter {
-  toView(value, masks, country) {
+  toView(value, masks, country, ext) {
 		// var mask = "___-___-____";
 		if(!country || country === '99') return value;
 	  if(value){
@@ -26,6 +26,7 @@ export class PhoneNumberValueConverter {
 					}
 				}
 			}
+			if(ext) returnValue += ' ext. ' + ext
 			return returnValue;
 
 			// if(value.length > 10) value = value.substr(0,10);

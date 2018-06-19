@@ -24,10 +24,10 @@ module.exports = function (app, config) {
     var query = buildQuery(req.query, Model.find())
     .populate('courseId', 'name number')
     .populate('requestId')
-    .populate('personId','email firstName lastName phone mobile nickName file')
+    .populate('personId','email firstName lastName fullName phone mobile nickName file')
     .populate('content.personId','email firstName lastName phone mobile nickName')
     .populate('institutionId', 'name')
-    .populate({path: 'owner.personId', model: 'Person', select: 'firstName lastName'})
+    .populate({path: 'owner.personId', model: 'Person', select: 'firstName lastName fullName'})
     query.exec()
     .then(object => {
       res.status(200).json(object);

@@ -13,8 +13,8 @@
       </div>
       <div class="col-md-8">
         <h5>Nickname: ${profileRequest.requestId.personId.nickName}</h5>
-        <h5>Phone: ${profileRequest.requestId.personId.phone | formatPhone}</h5>
-        <h5>Mobile: ${profileRequest.requestId.personId.mobile | formatPhone}</h5>
+        <h5>Phone: ${profileRequest.requestId.personId.phone | phoneNumber:config.PHONE_MASKS:profileRequest.requestId.personId.country:profileRequest.requestId.personId.ext}</h5>
+        <h5>Mobile: ${profileRequest.requestId.personId.mobile | phoneNumber:config.PHONE_MASKS:profileRequest.requestId.personId.country}</h5>
         <h5>Email: ${profileRequest.requestId.personId.email}</h5>
       </div>
   </div>
