@@ -910,7 +910,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                         switch (_context3.prev = _context3.next) {
                             case 0:
                                 _context3.t0 = this.selectedTab;
-                                _context3.next = _context3.t0 === 'institution' ? 3 : _context3.t0 === 'products' ? 6 : 9;
+                                _context3.next = _context3.t0 === 'institution' ? 3 : _context3.t0 === 'products' ? 6 : 10;
                                 break;
 
                             case 3:
@@ -918,16 +918,17 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                                 return this.getInstitutionRequests();
 
                             case 5:
-                                return _context3.abrupt('break', 9);
+                                return _context3.abrupt('break', 10);
 
                             case 6:
                                 _context3.next = 8;
                                 return this.getProductsRequests();
 
                             case 8:
-                                return _context3.abrupt('break', 9);
+                                this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
+                                return _context3.abrupt('break', 10);
 
-                            case 9:
+                            case 10:
                             case 'end':
                                 return _context3.stop();
                         }

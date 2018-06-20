@@ -126,6 +126,7 @@ export class ClientRequestAnalytics {
                 break;
             case 'products':
                 await this.getProductsRequests();
+                this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
                 break;
         }
     }
