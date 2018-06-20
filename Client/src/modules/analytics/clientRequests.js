@@ -119,10 +119,12 @@ export class ClientRequestAnalytics {
         }
     }
 
+
     async getSessionData(){
         switch(this.selectedTab){
             case 'institution':
                 await this.getInstitutionRequests();
+                this.dataTable.updateArray(this.requests.analyticsInstitutionResultArray);
                 break;
             case 'products':
                 await this.getProductsRequests();
