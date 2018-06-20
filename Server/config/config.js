@@ -52,7 +52,7 @@ var config = {
     smtp: 'smtprelay.uwm.edu',
     emailAddress: 'ucc@uwm.edu',
     weatherAPI: '0f85bb931f8faad7e35b6f685aa4e931',
-    emailNotification: 'hightowe@uwm.edu,rhightower@gmail.com'
+    emailNotification: 'hightowe@uwm.edu,ucc@uwm.edu'
   }
 };
 

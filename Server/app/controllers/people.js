@@ -63,8 +63,8 @@ module.exports = function (app, config) {
       }
     });
     end();
-  }, 300000).run();
-//86400000
+  }, 86400000).run();
+  
   router.get('/api/people',   function(req, res, next){
     logger.log('Get people','verbose');
     var query = buildQuery(req.query, Model.find())
