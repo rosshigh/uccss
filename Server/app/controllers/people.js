@@ -20,12 +20,51 @@ var express = require('express'),
     mkdirp = require('mkdirp'),
     DuplicateRecordError = require(path.join(__dirname, "../../config", "errors", "DuplicateRecordError.js"));
 
+    var AsyncPolling = require('async-polling');
+
     var requireAuth = passport.authenticate('jwt', { session: false }),
         requireLogin = passport.authenticate('local', { session: false });
 
 module.exports = function (app, config) {
   app.use('/', router);
 
+  AsyncPolling(function (end) {
+    logger.log("Check for notifications...");
+    var query = Event.find({scope: 'u', eventActive: true});
+    query.exec( function(err, object){    
+      if(!object || object.length === 0){          
+        logger.log('No events for ' + new Date())
+      } else {
+        let today = new Date();
+        let todayYear = today.getFullYear();
+        let todayDay = today.getDate();
+        object.forEach(item =>  {
+          let startDate = new Date(item.start);
+          let year = startDate.getFullYear();
+          let day = startDate.getDate() + 1;
+          if(todayYear === year && todayDay === day){
+            logger.log('This event occurs today');
+            var mailObj = {
+              email: config.emailNotification,  
+              MESSAGE: item.notes,
+              subject: item.title
+            }    
+            sendEmail(mailObj);
+            item.eventActive = false;
+            Event.findOneAndUpdate({_id: item._id}, item, {safe:true, multi:false}, function(err, event){
+              if(err){
+                console.log(err);
+              } else {
+                logger.log('Event updated'); 
+              }
+            });
+          }
+        })
+      }
+    });
+    end();
+  }, 300000).run();
+//86400000
   router.get('/api/people',   function(req, res, next){
     logger.log('Get people','verbose');
     var query = buildQuery(req.query, Model.find())

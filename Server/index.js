@@ -11,10 +11,11 @@ var express = require('express'),
     glob = require('glob'),
     tls = require('tls');
 
-    AsyncPolling(function (end) {
-        logger.log("Check for notifications...")
-        end();
-    }, 86400000).run();
+    // AsyncPolling(function (end) {
+    //     logger.log("Check for notifications...");
+
+    //     end();
+    // }, 86400000).run();
 
   AsyncPolling(function (end) {
     // Do whatever you want.

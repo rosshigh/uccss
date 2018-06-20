@@ -121,6 +121,7 @@ if(env === 'development'){
 
   sendEmail = function(mailObject){
     logger.log("Email Sent", "verbose");
+    logger.log(mailObject)
     var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
     mailObject.logoExists = emailConfig.UCC_LOGO != "";
     mailObject.HOST = emailConfig.HOST;
