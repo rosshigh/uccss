@@ -1153,7 +1153,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                                 this.numCols = this.config.REQUEST_STATUS.length + 1;
                                 this.sessions.selectSessionById(this.selectedSession);
                                 _context5.next = 5;
-                                return this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession);
+                                return this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession, true);
 
                             case 5:
                                 if (this.requests.requestsDetailsArrayAnalytics && this.requests.requestsDetailsArrayAnalytics.length) {

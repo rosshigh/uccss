@@ -307,7 +307,7 @@ export class ClientRequestAnalytics {
         if (this.selectedSession) {
             this.numCols = this.config.REQUEST_STATUS.length + 1
             this.sessions.selectSessionById(this.selectedSession);
-            await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession);
+            await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession, true);
             if (this.requests.requestsDetailsArrayAnalytics && this.requests.requestsDetailsArrayAnalytics.length) {
                 this.requests.groupRequestsByProduct();
             } else {
