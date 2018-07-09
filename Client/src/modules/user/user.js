@@ -74,49 +74,49 @@ export class User {
   async activate(){
     await this.getData();
     this.config.getConfig(true);
-    this.getEvents();
+    // this.getEvents();
 
-    this.helpTicketArray = [
-        {
-            value: this.helpTickets.newHelpTickets || 0,
-            color:"#F7464A",
-            highlight: "#FF5A5E",
-            label: "New"
-        },
-        {
-            value: this.helpTickets.underReviewHelpTickets || 0,
-            color: "#46BFBD",
-            highlight: "#5AD3D1",
-            label: "Under Review"
-        },
-        {
-            value: this.helpTickets.customerActionHelpTickets || 0,
-            color: "#FDB45C",
-            highlight: "#FFC870",
-            label: "Customer Action"
-        }
-    ]
+    // this.helpTicketArray = [
+    //     {
+    //         value: this.helpTickets.newHelpTickets || 0,
+    //         color:"#F7464A",
+    //         highlight: "#FF5A5E",
+    //         label: "New"
+    //     },
+    //     {
+    //         value: this.helpTickets.underReviewHelpTickets || 0,
+    //         color: "#46BFBD",
+    //         highlight: "#5AD3D1",
+    //         label: "Under Review"
+    //     },
+    //     {
+    //         value: this.helpTickets.customerActionHelpTickets || 0,
+    //         color: "#FDB45C",
+    //         highlight: "#FFC870",
+    //         label: "Customer Action"
+    //     }
+    // ]
 
-    this.clientRequestsArray = [
-        {
-            value: this.requests.unassignedRequests || 0,
-            color:"#F7464A",
-            highlight: "#FF5A5E",
-            label: "Unassigned"
-        },
-        {
-            value: this.requests.updatedRequests || 0,
-            color: "#46BFBD",
-            highlight: "#5AD3D1",
-            label: "Updated"
-        },
-        {
-            value: this.requests.customerActionRequests || 0,
-            color: "#FDB45C",
-            highlight: "#FFC870",
-            label: "Customer Action"
-        }
-    ]
+    // this.clientRequestsArray = [
+    //     {
+    //         value: this.requests.unassignedRequests || 0,
+    //         color:"#F7464A",
+    //         highlight: "#FF5A5E",
+    //         label: "Unassigned"
+    //     },
+    //     {
+    //         value: this.requests.updatedRequests || 0,
+    //         color: "#46BFBD",
+    //         highlight: "#5AD3D1",
+    //         label: "Updated"
+    //     },
+    //     {
+    //         value: this.requests.customerActionRequests || 0,
+    //         color: "#FDB45C",
+    //         highlight: "#FFC870",
+    //         label: "Customer Action"
+    //     }
+    // ]
 
   }
 
@@ -124,42 +124,42 @@ export class User {
     var currentDate = moment(new Date()).format("MM-DD-YYYY");
     var options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
     if(this.userObj.userRole >= this.config.UCC_ROLE){
-        var countOptions = '';
-        this.countHeader = "Recent Request History";
+        // var countOptions = '';
+        // this.countHeader = "Recent Request History";
         let responses = await Promise.all([
-            this.helpTickets.getCurrentCount(),
-            this.requests.getCurrentCount(),
+            // this.helpTickets.getCurrentCount(),
+            // this.requests.getCurrentCount(),
             // this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId._id, true),
             this.sessions.getSessionsArray('?order=startDate'),
             this.siteinfo.getInfoArray(false, options),
              this.config.getConfig()
           ]);
-          this.showRequests = this.requests.updatedRequests + this.requests.unassignedRequests;
-          this.showHelpTickets = this.helpTickets.newHelpTickets;
+        //   this.showRequests = this.requests.updatedRequests + this.requests.unassignedRequests;
+        //   this.showHelpTickets = this.helpTickets.newHelpTickets;
           this.showCarousel = this.siteinfo.showCarousel();
     } else {
-        var countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId._id;
-        this.countHeader = "Your Institution's Recent Request History";
+        // var countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId._id;
+        // this.countHeader = "Your Institution's Recent Request History";
         let responses = await Promise.all([
-          this.helpTickets.getCurrentCount('?filter=personId|eq|'+ this.userObj._id),
-          this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id),
+        //   this.helpTickets.getCurrentCount('?filter=personId|eq|'+ this.userObj._id),
+        //   this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id),
           this.sessions.getSessionsArray('?order=startDate'),
           this.siteinfo.getInfoArray(false, options),
            this.config.getConfig()
         ]);
-        this.showRequests = this.requests.customerActionRequests;
-        this.showHelpTickets = this.helpTickets.customerActionHelpTickets;
+        // this.showRequests = this.requests.customerActionRequests;
+        // this.showHelpTickets = this.helpTickets.customerActionHelpTickets;
         this.showCarousel = this.siteinfo.showCarousel();
     }
-    this.requestsCount = new Array();
-    this.countLabels = new Array();
-    var requestCountArray = await this.requests.getSessionCount(this.sessions.sessionsArray, 4, countOptions);
-    if(requestCountArray){
-        requestCountArray.forEach((item) => {
-            this.requestsCount.push(item.count);
-            this.countLabels.push(item.session);
-        })
-    }
+    // this.requestsCount = new Array();
+    // this.countLabels = new Array();
+    // var requestCountArray = await this.requests.getSessionCount(this.sessions.sessionsArray, 4, countOptions);
+    // if(requestCountArray){
+    //     requestCountArray.forEach((item) => {
+    //         this.requestsCount.push(item.count);
+    //         this.countLabels.push(item.session);
+    //     })
+    // }
 
     this.temp = undefined;
 
