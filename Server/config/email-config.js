@@ -1,6 +1,6 @@
 
 // var HOST = "http://ucc.uwm.edu/"
-var HOST = "http://localhost/"
+var HOST = "http://ucc.uwm.edu/"
 
 var emailConfig = {
 	smtp: 'smtprelay.uwm.edu',
@@ -13,7 +13,7 @@ var emailConfig = {
 	UA_LOGO: HOST + 'img/sap_ua4.PNG',
 	UNIVERSITY_LOGO: HOST + 'img/uwm_logos.jpg',
 	// HOST: "http://ucc.uwm.edu/",
-	HOST: "http://localhost/",
+	HOST: "http://ucc.uwm.edu/",
 	UCC_PHONE: '414-229-3333', 
 	UCC_EMAIL: 'ucc@uwm.edu',
 	CREATE_REQUEST_WHATS_NEXT: "We will assign the client in accordance with the required date. You will recieve an email when the client is assigned and you can check back in the UCCSS for the status of the request and the details when the client is assigned.",

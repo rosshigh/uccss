@@ -317,21 +317,28 @@ console.log(mailObject)
   transporter.use('compile', options);
 
   nodeMailerSendMail = function(mailObject){     
-        transporter.sendMail(mailObject)
-        .then(result => {       
-            var emailLog = new EmailLog({
-              email: mailObject.to,
-              subject: mailObject.subject,
-              body: JSON.stringify(mailObject),
-              from: mailObject.from,
-              topic: mailObject.topic ? mailObject.topic : ""
-            });
-            emailLog.save();
-            logger.log(result, 'verbose ');
-        })
-        .catch(error => {         
-            logger.log(error, 'error');
-        })
+    var thisMailObject = {
+      subject: mailObject.subject,
+      from: mailObject.from,
+      to: mailObject.to,
+      context: mailObject.context,
+      template: mailObject.template
+    };
+    transporter.sendMail(thisMailObject)
+    .then(result => {       
+        var emailLog = new EmailLog({
+          email: thisMailObject.to,
+          subject: thisMailObject.subject,
+          body: JSON.stringify(thisMailObject),
+          from: thisMailObject.from,
+          topic: thisMailObject.topic ? thisMailObject.topic : ""
+        });
+        emailLog.save();
+        logger.log(result, 'verbose ');
+    })
+    .catch(error => {         
+        logger.log(error, 'error');
+    })
   };
 
   sendEmail = function(mailObject){
@@ -352,7 +359,7 @@ console.log(mailObject)
     mailObject.context.MESSAGE = mailObject.MESSAGE;
     mailObject.context.INSTRUCTIONS = mailObject.INSTRUCTIONS;
 
-    mailObject.to = mailObject.email;
+    mailObject.to = toEmail; //mailObject.email;
     mailObject.subject = mailObject.subject;   
     mailObject.from = emailConfig.emailAddress;
     mailObject.template = 'email-template';
@@ -549,14 +556,11 @@ console.log(mailObject)
     mailObject.from = emailConfig.emailAddress;
     mailObject.template='email-template'
     mailObject.recipients.forEach(item => { 
-      mailObject.to = item.email; 
-console.log(mailObject.to);
-console.log(mailObject.context.MESSAGE)
-console.log(mailObject.subject)      
+      mailObject.to = item.email;      
       nodeMailerSendMail(mailObject); 
     });
-    mailObject.to = emailConfig.emailAddress;
-    nodeMailerSendMail(mailObject);  
+    // mailObject.to = emailConfig.emailAddress;
+    // nodeMailerSendMail(mailObject);  
   }
 
   test = function(mailObj){
