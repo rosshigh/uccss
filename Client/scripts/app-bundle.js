@@ -33188,6 +33188,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       this.filterValues = new Array();
       this.commentShown = "";
       this.responseMessage = "";
+      this.toolbar = [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]];
 
       this.router = router;
       this.config = config;
