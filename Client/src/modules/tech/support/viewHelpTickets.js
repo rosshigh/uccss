@@ -328,6 +328,7 @@ export class ViewHelpTickets {
       this.helpTickets.selectHelpTicketContent();
       this.enterResponse = true;
       this.enableButton = true;
+      setTimeout(()=>{$(".note-editable").focus().scroll();},500);
     }
   }
 

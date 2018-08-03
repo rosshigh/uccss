@@ -1,7 +1,7 @@
 <template>
-  <blockquote>
-    <h6>${item.title}</h6>
-     <p innerhtml.bind="item.content"></p>
-    <small show.bind="moreInfoExists(item)"><a show.bind="moreInfoExists(item)" href.bind="item.url" target="_blank">more info...</a></small>
+  <blockquote class="topMargin">
+    <a href.bind="item.url" target="_blank"><h6>${item.title}</h6></a>
+    <p class="customFont" innerhtml.bind="item.content"></p>
+    <!--innerhtml.bind="item.content"></p>
   </blockquote>
 </template>

@@ -1,5 +1,21 @@
 @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
+.customFont {
+    font-family: 'Montserrat', sans-serif;
+}
+.card-header{
+    font-size: 1.640625rem;
+}
+
+.card-title {
+    padding: 5px;
+}
+
+.card-title {
+    background-color: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
 .btn-default{
     background-color:white;
 }

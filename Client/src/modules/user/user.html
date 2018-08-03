@@ -1,52 +1,32 @@
 <template>
-  <compose view="./components/banner.html"></compose>
+    <compose view="./components/banner.html"></compose>
 
-  <div class="fluid-container">
-        <div class="hoverProfile" style="background-color:cyan">
-            <span  click.delegate="hideAlert()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Close"><i class="fa fa-window-close-o" aria-hidden="true"></i></span>
-            <h4 class="pull-right">${alert.title}</h4>
-            <hr/>
-            <div innerhtml.bind="alert.content"></div>
-        </div>
+    <div class="fluid-container">
 
         <div class="row">
-            <div class="col-lg-3 col-md-11 col-sm-11">
+            <div class="col-lg-3 col-lg-offset-1">
                 <div class="bigMarginTop leftMargin">
                     <compose view="./components/uccInformation.html"></compose>
                 </div>
             </div>
-
-            <div class="col-lg-4 hidden-sm hidden-xs">
-                <div style="height:500px;">
-                    <compose view="./components/carousel.html"></compose>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-lg-offset-1 hidden-sm hidden-xs">
-                <a class="twitter-timeline"  href="https://twitter.com/hashtag/SAPNextGen" data-widget-id="826153620517376000">#SAPNextGen Tweets</a>
-            </div>
-        </div>
-        <div class="row">
-             <div class="col-lg-3 col-md-11 col-sm-11 bigTopMargin leftMargin">
-                <h2 class="underline bottomMargin">Useful Links</h2>
-                <div repeat.for="item of siteinfo.siteArray | infoFilter:'OLNK'">
-                    <compose view="./components/homePageLinks.html"></compose>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-11 col-sm-11 bigTopMargin leftMargin">
+           
+            <div class="col-lg-3 col-md-11 col-sm-11 bigLeftMargin">
                 <h2 show.bind="siteinfo.siteArray | infoFilter:'NEWS':true" class="underline topMargin">UCC and UA News</h2>
+                <img style="height: 150px; width: 100%; display: block;" src="http://localhost/img/uaucc.png" alt="Card image">
                 <div repeat.for="item of siteinfo.siteArray | infoFilter:'NEWS'">
                     <compose view="./components/newsItem.html"></compose>
                 </div>
             </div>
- 
-            <div class="col-lg-3 col-md-11 col-sm-11 col-lg-offset-1 bigTopMargin">
-                <h2 class="underline">Useful Information</h2>
-                <div repeat.for="item of siteinfo.siteArray | infoFilter:'DLNK'">
-                    <compose view="./components/newsItem.html"></compose>
+
+            <div class="col-lg-3 col-md-11 col-sm-11  bigLeftMargin">
+                <h2 class="underline bottomMargin">Useful Links</h2>
+                <img style="height: 150px; width: 100%; display: block;" src="http://localhost/img/ua2.jpg" alt="Card image">
+                <div repeat.for="item of siteinfo.siteArray | infoFilter:'OLNK'">
+                    <compose view="./components/homePageLinks.html"></compose>
                 </div>
             </div>
+
         </div>
+
     </div>
 </template>
