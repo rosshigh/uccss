@@ -88,34 +88,6 @@ define('main',['exports', './environment', 'regenerator-runtime'], function (exp
           'info': 'humane-libnotify-info'
         }
       });
-    }).plugin('aurelia-google-analytics', function (config) {
-      config.init('UA-123747774-1');
-      config.attach({
-        logging: {
-          enabled: true
-        },
-        pageTracking: {
-          enabled: true,
-
-          getTitle: function getTitle(payload) {
-            return document.title;
-          },
-
-          getUrl: function getUrl(payload) {
-            return window.location.href;
-          }
-        },
-        clickTracking: {
-          enabled: true,
-
-          filter: function filter(element) {
-            return element instanceof HTMLElement && (element.nodeName.toLowerCase() === 'a' || element.nodeName.toLowerCase() === 'button' || element.nodeName.toLowerCase() === 'span');
-          }
-        },
-        exceptionTracking: {
-          enabled: true
-        }
-      });
     }).feature('resources');
 
     if (_environment2.default.debug) {
