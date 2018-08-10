@@ -17,7 +17,7 @@ import Validation from '../../../resources/utils/validation';
 export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
-  showLockMessage = false; 
+  // showLockMessage = false; 
   responseMessage = "";
   isChecked = false;
   nohelpTickets = true;
@@ -25,7 +25,7 @@ export class ViewHelpTickets {
 
   spinnerHTML = "";
   filterValues = new Array();
-  lockObject = new Object();
+  // lockObject = new Object();
 
   constructor( config, validation, people, datatable, utils, helpTickets, sessions, systems, apps, products, requests, dialog, templatingEngine) {
     this.config = config;
@@ -64,7 +64,7 @@ export class ViewHelpTickets {
   }
 
   deactivate(){
-    this._unLock();
+    // this._unLock();
   }
 
   async activate() {
@@ -129,25 +129,25 @@ export class ViewHelpTickets {
 
     await this.getDetails();
 
-    var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-    if(!response.error){
-      if(response.helpTicketId === 0){
-            //Lock help ticket
-          this.helpTickets.lockHelpTicket({
-            helpTicketId: this.helpTickets.selectedHelpTicket._id,
-            personId: this.userObj._id
-          });
-          this.responseMessage = "";
-          this.showLockMessage = false;
-          this.lockObject = {}; 
-      } else {
-        if(response[0].personId !== this.userObj._id){
-          this.lockObject = response[0];
-          this.responseMessage = "Help Ticket is currently locked by " + this.getName();
-          this.showLockMessage = true;  
-        }
-      }
-    }
+    // var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+    // if(!response.error){
+    //   if(response.helpTicketId === 0){
+    //         //Lock help ticket
+    //       this.helpTickets.lockHelpTicket({
+    //         helpTicketId: this.helpTickets.selectedHelpTicket._id,
+    //         personId: this.userObj._id
+    //       });
+    //       this.responseMessage = "";
+    //       this.showLockMessage = false;
+    //       this.lockObject = {}; 
+    //   } else {
+    //     if(response[0].personId !== this.userObj._id){
+    //       this.lockObject = response[0];
+    //       this.responseMessage = "Help Ticket is currently locked by " + this.getName();
+    //       this.showLockMessage = true;  
+    //     }
+    //   }
+    // }
 
     let subTypeIndex = this.getIndex(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
     this.createOutputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[subTypeIndex].outputForm)
@@ -197,13 +197,15 @@ export class ViewHelpTickets {
 
   getName(){
     for(var i = 0; i < this.people.uccPeople.length; i++){
-      if(this.people.uccPeople[i]._id == this.lockObject.personId) return this.people.uccPeople[i].fullName;
+      // if(this.people.uccPeople[i]._id == this.lockObject.personId) 
+      return this.people.uccPeople[i].fullName;
     }
     return "someone";
   }
 
   respond() {
-     if(!this.showLockMessage && !this.enterResponse){
+    //!this.showLockMessage && 
+     if(!this.enterResponse){
         this.helpTickets.selectHelpTicketContent();
         this.enterResponse = true;
         this.enableButton = true;
@@ -263,9 +265,9 @@ export class ViewHelpTickets {
 
   async closeTicket(helpTicket){
     this.helpTickets.selectHelpTicketByID(helpTicket._id);
-      var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-      if (!response.error) {
-        if (response.helpTicketId === 0) {
+      // var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      // if (!response.error) {
+      //   if (response.helpTicketId === 0) {
           var email = new Object();
           if(this.sendEmail){
               email.reason = this.config.CLOSED_HELPTICKET_STATUS;
@@ -284,15 +286,15 @@ export class ViewHelpTickets {
           }
           if(this.isChecked) this.filterOutClosed();
           this._cleanUp();
-        }
-    }
+    //     }
+    // }
   }
 
   async openHelpTicket(helpTicket){
     this.helpTickets.selectHelpTicketByID(helpTicket._id);
-      var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-      if (!response.error) {
-        if (response.helpTicketId === 0) {
+      // var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      // if (!response.error) {
+      //   if (response.helpTicketId === 0) {
            var email = new Object();
           if(this.sendEmail){
               email.reason = 2;
@@ -310,8 +312,8 @@ export class ViewHelpTickets {
             this.utils.showNotification("The help ticket was updated");
           }
           this._cleanUp();
-        }
-    }
+    //     }
+    // }
   }
 
   /*****************************************************************************************
@@ -334,18 +336,18 @@ export class ViewHelpTickets {
     this.filesToUpload = new Array();
   }
 
-  _unLock(){
-     if(!this.showLockMessage){
-      if(this.helpTickets.selectedHelpTicket && this.helpTickets.selectedHelpTicket._id){
-        this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-      }    
-    }
-  }
+  // _unLock(){
+  //    if(!this.showLockMessage){
+  //     if(this.helpTickets.selectedHelpTicket && this.helpTickets.selectedHelpTicket._id){
+  //       this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+  //     }    
+  //   }
+  // }
 
   back() {
     this.helpTicketSelected = false;
     this._cleanUp();
-    this._unLock();
+    // this._unLock();
   }
 
   filterOutClosed() {

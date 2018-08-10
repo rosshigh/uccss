@@ -16,13 +16,15 @@ export default class {
                   route: ['','home'],
                   moduleId: './modules/home/home',
                   name: 'Home',
-                  settings: { auth: false, roles: [] }
+                  settings: { auth: false, roles: [] },
+                  title: 'UCCSS'
                 },
                 {
                   route: 'about',
                   moduleId: './modules/home/about',
                   name: 'About',
-                  settings: { auth: false, roles: [] }
+                  settings: { auth: false, roles: [] },
+                  title: 'About the UCC'
                 },
                 {
                   route: 'register',

@@ -22,7 +22,7 @@
 								<h5>${person.role | uccTitle:config.ROLES}</h5>
 							</div>
 							<div class="col-lg-12">
-								<span>${person.item.phone | phoneNumber}</span>
+								<span>${person.item.phone | phoneNumber:config.PHONE_MASKS:person.item.country}</span>
 							</div>
 							<div class="col-lg-12">
 								<span><a href="mailto:${person.item.email}">${person.item.email}</a></span>
@@ -41,8 +41,8 @@
 								<h4>${person.fullName}</h4>
 							</div>
 							<div class="col-lg-12">
-								<span show.bind="!showPersonalContactInfo">${config.UCC_PHONE | phoneNumber}</span>
-								<span show.bind="showPersonalContactInfo">${person.phone | phoneNumber}</span>
+								<span show.bind="!showPersonalContactInfo">${config.UCC_PHONE | phoneNumber:config.PHONE_MASKS:person.country}</span>
+								<span show.bind="showPersonalContactInfo">${person.phone | phoneNumber:config.PHONE_MASKS:person.country}</span>
 							</div>
 							<div class="col-lg-12">
 								<span show.bind="!showPersonalContactInfo"><a href="mailto:${config.UCC_EMAIL}">${config.UCC_EMAIL}</a></span>
@@ -62,8 +62,8 @@
 								<h4>${person.fullName}</h4>
 							</div>
 							<div class="col-lg-12">
-								<span show.bind="!showPersonalContactInfo">${config.UCC_ADMIN_PHONE | phoneNumber}</span>
-								<span show.bind="showPersonalContactInfo">${person.phone | phoneNumber}</span>
+								<span show.bind="!showPersonalContactInfo">${config.UCC_ADMIN_PHONE | phoneNumber:config.PHONE_MASKS:person.country}</span>
+								<span show.bind="showPersonalContactInfo">${person.phone | phoneNumber:config.PHONE_MASKS:person.country}</span>
 							</div>
 							<div class="col-lg-12">
 								<span show.bind="!showPersonalContactInfo"><a href="mailto:${config.UCC_ADMIN_EMAIL}">${config.UCC_ADMIN_EMAIL}</a></span>
