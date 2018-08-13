@@ -18,7 +18,7 @@ export class AppConfig {
     BASE_URL = this.HOST + "/api/";
     IMG_DOWNLOAD_URL = this.HOST + '/img/'  
 
-    isMobile = false;
+    isMobile = false; 
 
      HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
