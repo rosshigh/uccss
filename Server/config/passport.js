@@ -15,6 +15,7 @@ var localOptions = {
 
 var localLogin = new localStrategy(localOptions, function(email, password, next){
   console.log(email)
+  console.log(password)
   var query = User.findOne({email: {$regex: new RegExp('^' + email.toLowerCase(), 'i')}});
   query
     .populate({ path: 'institutionId', model: 'Institution', select: 'name postalCode city institutionStatus'})
