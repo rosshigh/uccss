@@ -140,7 +140,7 @@
                 </div>
                 <div class="col-md-3">
                   <div class="form-group">
-                    <h5 class="col-md-offset-1">Phone: ${helpTickets.selectedHelpTicket.personId.phone | phoneNumber} Mobile: ${helpTickets.selectedHelpTicket.personId.mobile | phoneNumber}</h5>
+                    <h5 if.bind="phoneMask" class="col-md-offset-1">Phone: ${helpTickets.selectedHelpTicket.personId.phone | phoneNumber:config.PHONE_MASKS:helpTickets.selectedHelpTicket.personId.country} Mobile: ${helpTickets.selectedHelpTicket.personId.mobile | phoneNumber:config.PHONE_MASKS:helpTickets.selectedHelpTicket.personId..country}</h5>
                   </div>
                 </div>
                 <div class="col-md-3">

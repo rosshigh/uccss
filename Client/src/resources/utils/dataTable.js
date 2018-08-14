@@ -8,7 +8,7 @@ import {Utils} from './utils';
 export class DataTable{
   currentPage = 0;
   pages = [];
-  rowOptions = [5,10,15,20,50];
+  rowOptions = [5,10,15,20,50,100,200];
   filterValues = [];
   displayLength;
 

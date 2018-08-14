@@ -10,6 +10,7 @@ import {AppConfig} from '../../config/appConfig';
 @inject(is4ua,People, Router, Utils, Validation, CommonDialogs, AppConfig)
 export class Profile {
     title="Profile";
+    phoneMask = "";
 
     constructor(is4ua, people, router, utils, validation, dialog, config) {
         this.is4ua = is4ua;
@@ -44,6 +45,18 @@ export class Profile {
         $('[data-toggle="tooltip"]').tooltip();
     }
 
+    getPhoneMask(){
+        this.phoneMask = "";
+        setTimeout(() =>{
+            for(let i = 0; i < this.config.PHONE_MASKS.length; i++){
+                if(this.people.selectedPerson.country === this.config.PHONE_MASKS[i].country){
+                    this.phoneMask = this.config.PHONE_MASKS[i].mask;
+                    break;
+                }
+            }
+        },500)
+    }
+
     async activate() {
         let responses = await Promise.all([
             this.people.getPerson(this.userObj._id),
@@ -55,6 +68,7 @@ export class Profile {
         if(this.people.selectedPerson.file && this.people.selectedPerson.file.fileName) {
             this.personImage = this.people.selectedPerson.file.fileName;
         }
+        this.getPhoneMask();
     }
 
     canActivate(){
