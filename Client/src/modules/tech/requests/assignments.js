@@ -19,7 +19,6 @@ export class Assignments {
 	spinnerHTML = "";
     isCheckedAssigned = true; 
     noRequests = true;
-    // showTemplates = false;
     sortProperty = '';
     sortDirection;
 
@@ -57,7 +56,6 @@ export class Assignments {
 			if(item.UCConly) uccRoles += item.role + ":";
         });
         this.people.getUCCStaff(uccRoles);
-        this.sendEmail = this.config.SEND_EMAILS;
         this.manualMode = localStorage.getItem('manualMode')  ? localStorage.getItem('manualMode') == "true" : false;
         this.unassignedOnly = localStorage.getItem('unassignedOnly')  ? localStorage.getItem('unassignedOnly') == "true" : false;
         this.facultyDetails = localStorage.getItem("facultyDetails") ? localStorage.getItem("facultyDetails") == "true" : false;;
@@ -206,6 +204,7 @@ export class Assignments {
     //  * request - the selected request object
     //  ****************************************************************************************************/
     async selectARequest(index, el, request) {
+        this.sendEmail = this.config.SEND_EMAILS;
         let response = await this.clientRequests.getRequestDetail(request._id);
         if(!response.error){
             this.selectedRequestDetail = response;
@@ -666,6 +665,8 @@ export class Assignments {
     }
     
     firstFacIDChanged(){
+        // let firstFacID = parseInt(this.firstNumericFacID);
+        // this.firstNumericFacID = firstFacID >= 0 ? firstFacID : 0;
          this.lastNumericFacID = parseInt(this.firstNumericFacID) + parseInt(this.numberOfFacIDs) - 1;
          if (this.assignmentDetailIndex > -1){
              this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned =  this.firstNumericFacID;

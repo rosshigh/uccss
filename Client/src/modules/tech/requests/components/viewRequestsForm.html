@@ -167,7 +167,7 @@
 								</div>
 								<div show.bind="studentIDTemplateAvailable" class="form-group col-lg-2">
 									<label>First ID</label>
-									<input disabled.bind="manualMode" value.bind="firstID" change.trigger ="firstIDChanged()" style="width:75px;margin-right:10px;" id="firstID"  class="form-control input-sm"
+									<input disabled.bind="manualMode" min="0" value.bind="firstID" change.trigger ="firstIDChanged()" style="width:75px;margin-right:10px;" id="firstID"  class="form-control input-sm"
 									type="number" />
 								</div>
 								<div show.bind="studentIDTemplateAvailable" class="form-group col-lg-2">
@@ -190,7 +190,7 @@
 								</div>
 								<div show.bind="facultyIDTemplateAvailable" class="form-group col-lg-2">
 									<label>First ID</label>
-									<input disabled.bind="manualMode" value.bind="firstNumericFacID" change.trigger ="firstFacIDChanged()" style="width:75px;margin-right:10px;" id="firstFacID"  class="form-control input-sm"
+									<input disabled.bind="manualMode" min="0" value.bind="firstNumericFacID" change.trigger ="firstFacIDChanged()" style="width:75px;margin-right:10px;" id="firstFacID"  class="form-control input-sm"
 									type="number" />
 								</div>
 								<div show.bind="facultyIDTemplateAvailable" class="form-group col-lg-2">
