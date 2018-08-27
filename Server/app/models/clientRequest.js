@@ -35,7 +35,7 @@ var AssignmentSchema = new Schema({
   lastID: { type: Number },
   firstFacID: { type: Number },
   lastFacID: { type: Number }
-});
+}, { versionKey: false });
 
 AssignmentSchema.pre('update', function() {
   this.update({},{ $set: { modifiedDate: new Date() } });
@@ -66,7 +66,7 @@ var ClientRequestDetailsSchema = new Schema({
     newValue: { type: Schema.Types.Mixed },
     personId: { type: Schema.Types.Mixed }
   }]
-});
+}, { versionKey: false });
 
 ClientRequestDetailsSchema.plugin(AutoIncrement, {inc_field: 'requestNo'});
 
@@ -100,7 +100,7 @@ var ClientRequestSchema = new Schema({
     newValue: { type: Schema.Types.Mixed },
     personId: { type: Schema.Types.Mixed }
   }]
-});
+}, { versionKey: false });
 
 ClientRequestSchema.plugin(AutoIncrement, {inc_field: 'clientRequestNo'});
 

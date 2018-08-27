@@ -1,4 +1,4 @@
-require('look').start();
+// require('look').start();
 
 var express = require('express'),
     config = require('./config/config'),

@@ -236,25 +236,13 @@ export class Assignments {
             let systemConfigured = false;
             this.session = this.sessions.selectedSession.session;
             this.productSystems = new Array();
-            var productSystemsSIDs = "";
             this.products.selectedProduct.systems.forEach(item => {
-                let delimiterChar = productSystemsSIDs.length ? ":" : "";
-                productSystemsSIDs += delimiterChar + item.sid;
+                this.systems.selectedSystemFromId(item.systemId);
+                if(this.systems.selectedSystem && this.systems.selectedSystem.sessions.indexOf(this.session) > -1) {
+                    this.systemConfigured = true;
+                    this.productSystems.push(this.systems.selectedSystem);
+                }
             });
-            let response = await this.systems.getProductSystems(productSystemsSIDs);
-            if(!response.error){
-                this.productSystems = response;
-                // if(this.selectedRequestDetail.requestId && this.selectedRequestDetail.requestId.courseId === null) this.selectedRequestDetail.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
-                // this.originalRequestDetail = this.utils.copyObject(this.selectedRequestDetail);
-            }
-            if(this.productSystems != null && this.productSystems.length) this.systemConfigured = true;
-            // this.products.selectedProduct.systems.forEach(item => {
-            //     this.systems.selectedSystemFromId(item.systemId);
-            //     if(this.systems.selectedSystem && this.systems.selectedSystem.sessions.indexOf(this.session) > -1) {
-            //         this.systemConfigured = true;
-            //         this.productSystems.push(this.systems.selectedSystem);
-            //     }
-            // });
             this.productSystems = this.productSystems.sort((a, b) => {
                 return (a['sid'] < b['sid']) ? -1 : (a['sid'] > b['sid']) ? 1 : 0;
             });
@@ -265,22 +253,8 @@ export class Assignments {
 
          //If the product has a system configured, select the first system on the list
        
-        // if(this.productSystems && this.productSystems.length > 0) {
-		// 	this.systems.selectedSystemFromId(this.productSystems[0]._id);
-		// 	//Select the system in the interface
-        //     this.selectedSystemId = this.systems.selectedSystem._id;
-        //     this.clientsConfigured = false;
-        //     for(let i = 0; i < this.systems.selectedSystem.clients.length; i++){
-        //         if(this.systems.selectedSystem.clients[i].productId === this.products.selectedProduct._id){
-        //             this.clientsConfigured = true;
-        //             break;
-        //         }
-        //     }    
-        // }
-
-        //ADDED
-        if(this.systemConfigured) {
-            this.systems.setSelectedSystem(this.productSystems[0])
+        if(this.productSystems && this.productSystems.length > 0) {
+			this.systems.selectedSystemFromId(this.productSystems[0]._id);
 			//Select the system in the interface
             this.selectedSystemId = this.systems.selectedSystem._id;
             this.clientsConfigured = false;
@@ -291,8 +265,6 @@ export class Assignments {
                 }
             }    
         }
-
-        
         
         this.clientRequired();
 

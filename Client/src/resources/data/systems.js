@@ -44,6 +44,13 @@ export class Systems{
         }
     }
 
+    async getProductSystems(sids){
+        if(sids){
+            let serverResponse = await this.data.get(this.SYSTEMS_SERVICE + "/product/" + sids);
+            return serverResponse;
+        }
+    }
+
     selectSystem(index){
         if(!index && index != 0) {
             this.selectedSystem = this.emptySystem();

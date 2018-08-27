@@ -39,6 +39,21 @@ module.exports = function (app) {
   //     });
   // });
 
+  router.get('/api/systems/product/:systems', requireAuth, function(req, res, next){
+    logger.log('Getting product systems');
+    var productSystems = req.params.systems.split(':');
+    Model.find({sid: { $in: productSystems}})
+      .populate({path: 'clients.assignments.assignment', model: 'ClientRequestDetail'})
+      .populate({path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName'})
+      .exec(function(err, systems){
+      if(err){
+        return next(err);
+      } else {
+        res.status(200).json(systems)
+      }
+    });
+  });
+
   router.get('/api/systems/:id', requireAuth, function(req, res, next){
     logger.log('Get system ' + req.params.id,"verbose");
     Model.findById(req.params.id)
