@@ -19,6 +19,7 @@
               <th class="col-sm-1">IDS Requestd</th>
               <th class="col-lg-2"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'productId.name'})">Product </span><span><i class="fa fa-sort"></i></span></th>
               <th class="col-lg-2"><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customPersonSorter, propertyName: 'requestId.personId.lastName'})">Faculty </span><span><i class="fa fa-sort"></i></span></th>
+              <th class="col-lg-2"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'course'})">Course </span><i class="fa fa-sort"></i></th>
             </tr>
           </thead>
           <tbody>
@@ -45,14 +46,13 @@
               </th>
               <th></th>
               <th>
-              	<select value.bind="productFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'productFilter',  collectionProperty: 'productId._id', displayProperty: 'name',  compare:'match'} )" class="form-control" >
-	                  <option value=""></option>
-	                  <option repeat.for="product of products.productsArray" value="${product._id}">${product.name}</option>
-	              </select>
+                <input value.bind="productFilterValue" input.delegate="dataTable.filterList(productFilterValue, { type: 'custom',  filter: customProductNameFilter,  compare:'custom'} )"
+                class="form-control" />
               </th>
               <th>
                 <input value.bind="helpTicketTypeFilterValue" input.delegate="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )"  class="form-control" />
               </th>
+              <th></th>
             </tr>
             <tr click.trigger="selectRequest($index, $event, request)" repeat.for="request of dataTable.displayArray">
               <td data-title="Request No">${request.requestNo}</td>
@@ -63,6 +63,7 @@
               <td data-title="IDs Requested">${request.requestId | idsRequested}</td>
               <td data-title="Product">${request.productId.name }</td>
               <td data-title="Person">${request.requestId.personId.fullName}</td>
+              <td data-title="Course">${request.course}</td>
             </tr>
           </tbody>
         </table>

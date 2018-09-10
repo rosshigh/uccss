@@ -36,7 +36,7 @@ export class ViewAssignments {
 
 	async activate() {
 		let responses = await Promise.all([
-			this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true),
+			this.sessions.getSessionsArray('?order=startDate:DSC', true),
 			this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId._id + '&order=lastName'),
 			this.products.getProductsArray('?filter=active|eq|true&order=name'),
 			this.systems.getSystemsArray(),
@@ -47,7 +47,7 @@ export class ViewAssignments {
 	async getAssignments() {
 		if (this.selectedSession) {
 			this.sessions.selectSessionById(this.selectedSession);
-			await this.requests.getClientRequestsDetailFaccoArray(this.selectedSession,  this.userObj.institutionId._id);
+			await this.requests.getClientRequestsDetailFaccoArray(this.selectedSession,  this.userObj.institutionId._id, true);
 
 			this.getAssignmentsArray();
 
@@ -75,7 +75,7 @@ export class ViewAssignments {
 						facultyUserIds: assign.facultyUserIds,
 						studentPasswords: assign.studentPassword,
 						facultyPasswords: assign.facultyPassword,
-						course: item.requestId.courseId !== null ? item.requestId.courseId.name : this.config.SANDBOX_NAME
+						course: item.requestId.courseId !== null ? item.requestId.courseId.number : this.config.SANDBOX_NAME
 					});
 				})
 			}
@@ -116,6 +116,10 @@ export class ViewAssignments {
 	}
 
 	customNameFilter(value, item, context){
-		return item.requestId && item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
+		return item.person.toUpperCase().indexOf(value.toUpperCase()) > -1;
 	}
+
+	customProductNameFilter(value, item, context){
+        return item.product.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
 }

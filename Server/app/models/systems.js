@@ -25,7 +25,7 @@ var SystemSchema = new Schema({
   snapShot: { type: Boolean },
   goldBackupDate: { type: Date },
   type: { type: String, default: "ERP" } 
-});
+}, { versionKey: false });
 
 SystemSchema.pre('save', function(next){
   var system = this;

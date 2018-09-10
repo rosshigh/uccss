@@ -43,7 +43,7 @@ module.exports = function (app) {
     logger.log('Getting product systems');
     var productSystems = req.params.systems.split(':');
     Model.find({sid: { $in: productSystems}})
-      .populate({path: 'clients.assignments.assignment', model: 'ClientRequestDetail'})
+      .populate({path: 'clients.assignments.assignment', model: 'ClientRequestDetail'}) //, select: 'requestId _id studentIDRange'
       .populate({path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName'})
       .exec(function(err, systems){
       if(err){

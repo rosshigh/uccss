@@ -5,6 +5,7 @@ var express = require('express'),
   mongoose = require('mongoose'),
   Model = mongoose.model('ClientRequest'),
   ClientRequestDetail = mongoose.model('ClientRequestDetail'),
+  System = mongoose.model('System'),
   Assignment = mongoose.model('Assignment'),
   Course = mongoose.model('Course'),
   Person = mongoose.model('Person'),
@@ -29,7 +30,7 @@ module.exports = function (app) {
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate('requestDetails')
-      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone ext mobile email institutionId file'})
+      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone ext mobile email institutionId file country'})
       .exec()
       .then(object => {
         if(object){
@@ -48,7 +49,7 @@ module.exports = function (app) {
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate('requestDetails')
-      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone ext mobile email institutionId file'})
+      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone ext mobile email institutionId file country'})
        .populate({ path: 'requestDetails', model: 'ClientRequestDetail', populate: {path: 'productId', model: 'Product', select: 'name'}})
       .exec()
       .then(object => {
@@ -213,8 +214,8 @@ module.exports = function (app) {
     res.status(201).json({message: "Email sent"});
   })
 
-  router.put('/api/clientRequests/assign', requireAuth, function(req, res, next){
-    logger.log('Assign clientRequest ' + req.body._id);             
+  router.put('/api/clientRequests/assignBULK', requireAuth, function(req, res, next){
+    logger.log('Assign bulk');
     if(req.body._id){
       var detailId;
       var query = Model.findById(req.body._id, function(err, clientRequest){
@@ -225,17 +226,58 @@ module.exports = function (app) {
           clientRequest.requestStatus = req.body.requestStatus;
           clientRequest.audit = req.body.audit;
         }
+        if(req.body.systemsToSave){
+          
+        }
+
+        if(req.body.requestDetailsToSave){      
+          var updates = req.body.requestDetailsToSave.map(detail => {     
+            if(detail._id){
+              detailId = detail._id;              
+              return { 
+                updateOne: { 
+                    "filter": { "_id": detail._id },              
+                    "update": detail 
+                } 
+              }   
+            }
+          });      
+        } 
+
+
+      });
+    }
+  });
+
+  router.put('/api/clientRequests/assign', requireAuth, function(req, res, next){
+    logger.log('Assign clientRequest ' + req.body._id);      
+    if(req.body._id){
+      var detailId;
+      var query = Model.findById(req.body._id, function(err, clientRequest){
+        if(err){
+          return next(error);
+        }     
+        if(clientRequest) {
+          clientRequest.requestStatus = req.body.requestStatus;
+          clientRequest.audit = req.body.audit;
+        }
         let tasks = new Array();   
         if(req.body.requestDetailsToSave){
           req.body.requestDetailsToSave.forEach((detail, index) => { 
-            detailId = detail._id;              
+            detailId = detail._id;                        
             tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
           });
-        }      
+        }   
+        
+        if(req.body.systemsToSave){
+          req.body.systemsToSave.forEach(detail => {                     
+            tasks.push(System.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
+          });
+        }
     
         Promise.all(tasks)
-            .then(request => {                   
-              Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
+            .then(request => {                               
+              Model.findOneAndUpdate({_id: clientRequest._id}, {$set: clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
                     if(error){
                       return next(error);
                     } else { 
@@ -476,7 +518,7 @@ module.exports = function (app) {
     logger.log('Get clientRequests', 'verbose');
     
     ClientRequestDetail.findById(req.params.id)
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'}})
       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
       .populate({ path: "productId", model: "Product", select: "name"})
@@ -497,7 +539,7 @@ module.exports = function (app) {
     logger.log('Get clientRequests', 'verbose');  
    
     ClientRequestDetail.find()    
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'}})
       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
       .populate({ path: "productId", model: "Product", select: "name"})
@@ -529,7 +571,7 @@ module.exports = function (app) {
         ClientRequestDetail.findOneAndUpdate({_id: req.body._id}, req.body, function(err, requestDetail){
           if(err) return next(err);
           ClientRequestDetail.findById(requestDetail._id)
-            .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+            .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'}})
             .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
             .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
             .populate({ path: "productId", model: "Product", select: "name"})

@@ -36,7 +36,7 @@ export class ViewRequests {
 
     async activate() {
         let responses = await Promise.all([
-            this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true),
+            this.sessions.getSessionsArray('?order=startDate:DSC', true),
             this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId._id + '&order=lastName'),
             this.products.getProductsArray('?filter=active|eq|true&order=name'),
             this.systems.getSystemsArray(),
@@ -47,7 +47,10 @@ export class ViewRequests {
     async getRequests() {
         if (this.selectedSession) {
             this.sessions.selectSessionById(this.selectedSession);
-            await this.requests.getClientRequestsDetailFaccoArray(this.selectedSession,  this.userObj.institutionId._id);
+            await this.requests.getClientRequestsDetailFaccoArray(this.selectedSession,  this.userObj.institutionId._id, true);
+            this.requests.requestsDetailsArray.forEach(item => {
+                item.course = item.requestId.courseId !== null ? item.requestId.courseId.number : this.config.SANDBOX_NAME
+            })
             this.dataTable.updateArray(this.requests.requestsDetailsArray);
         } else {
             this.dataTable.updateArray([]);
@@ -89,5 +92,9 @@ export class ViewRequests {
 
     customNameFilter(value, item, context){
         return item.requestId && item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
+
+    customProductNameFilter(value, item, context){
+        return item.productId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 }

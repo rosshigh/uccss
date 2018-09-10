@@ -44,7 +44,7 @@ export class Systems{
         }
     }
 
-    async getProductSystems(sids){
+    async getConfiguredProductSystems(sids){
         if(sids){
             let serverResponse = await this.data.get(this.SYSTEMS_SERVICE + "/product/" + sids);
             return serverResponse;
@@ -78,6 +78,17 @@ export class Systems{
           break;
         }
       };
+    }
+
+    selectedProductSystemFromId(id, systems){
+        this.selectedSystem = null;
+        for(var i = 0, x = systems.length; i < x; i++){
+          if(systems[i]._id === id){
+            this.selectedSystem = this.utils.copyObject(systems[i]);
+            this.editIndex = i;
+            break;
+          }
+        };
     }
 
     setSelectedSystem(system){
@@ -212,6 +223,7 @@ export class Systems{
     }
 
     selectClientFromIDNoSystem(systemId, clientId){
+        console.log('The wrong function')
       this.selectedClient = null;
       for(var i = 0, x = this.systemsArray.length; i < x; i++){
         if(this.systemsArray[i]._id === systemId){
@@ -225,6 +237,22 @@ export class Systems{
         }
       }
     }
+
+    selectClientFromIDNoSystem(systemId, clientId, systems){
+        console.log('Using the right one');
+        this.selectedClient = null;
+        for(var i = 0, x = systems.length; i < x; i++){
+          if(systems[i]._id === systemId){
+              for(var j = 0; j < systems[i].clients.length; j++){
+                  if(systems[i].clients[j].client == clientId){
+                      this.selectedClient = this.utils.copyObject(systems[i].clients[j]);
+                      this.clientIndex = j;
+                      break;
+                  }
+              }  
+          }
+        }
+      }
     
     selectClientFromID(systemId, clientId){
       this.selectedClient = null;
@@ -307,6 +335,8 @@ export class Systems{
         }
         
     }
+
+
 
     async getAssignmentDetails(id){
         var url = "/serverAssignments/" + id;

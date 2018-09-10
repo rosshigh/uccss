@@ -14,13 +14,13 @@
 						  <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'dateRequired'})">Due </span><i class="fa fa-sort"></i></th>
 						  <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'dateRequested'})">Created </span><i class="fa fa-sort"></i></th>
 						  <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'dateAssigned'})">Assigned </span><i class="fa fa-sort"></i></th>
-						  <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'course'})">Course </span><i class="fa fa-sort"></i></th>
 						  <th class="col-lg-2"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'product'})">Product </span><span><i class="fa fa-sort"></i></span></th>
 						  <th>System</th>
 						  <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'client'})"></span>Client</th>
 						  <th>Student IDS/Passwords</th>
 						  <th>Faculty IDS/Passwords</th>
-						  <th class="col-lg-2"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'lastName'})">Faculty </span><span><i class="fa fa-sort"></i></span></th>
+							<th class="col-lg-2"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'lastName'})">Faculty </span><span><i class="fa fa-sort"></i></span></th>
+							<th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'course'})">Course </span><i class="fa fa-sort"></i></th>
 						</tr>
 					  </thead>
 					  <tbody>
@@ -35,39 +35,33 @@
 								<input value.bind="assigneddDateFilter" change.delegate="dataTable.filterList(assigneddDateFilter, { type: 'date',  filter: 'assigneddDateFilter', collectionProperty: 'dateAssigned', compare:'after' })" type="date" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
 							</th>
 							<th>
-								
+								<input value.bind="productFilterValue" input.delegate="dataTable.filterList(productFilterValue, { type: 'custom',  filter: customProductNameFilter,  compare:'custom'} )"
+                class="form-control" />
 							</th>
 							<th>
-								<select value.bind="productFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'productFilter',  collectionProperty: 'productId._id', displayProperty: 'name',  compare:'match'} )" class="form-control" >
-									<option value=""></option>
-									<option repeat.for="product of products.productsArray" value="${product._id}">${product.name}</option>
-								</select>
 							</th>
 							<th>
-										
 							</th>
 							<th>
-								
-							</th>
-							<th>
-		
 							</th>
 							<th></th>
 							<th>
 								<input value.bind="helpTicketTypeFilterValue" input.delegate="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )"  class="form-control" />
+							</th>
+							<th>
 							</th>
 						</tr>
 						<tr click.trigger="selectRequest($index, $event, request)" repeat.for="request of dataTable.displayArray">
 						  <td data-title="Required Date">${request.dateRequired | dateFormat:config.DATE_FORMAT_TABLE}</td>
 						  <td data-title="Date Created">${request.dateRequested | dateFormat:config.DATE_FORMAT_TABLE}</td>
 						  <td data-title="Date Created">${request.dateAssigned | dateFormat:config.DATE_FORMAT_TABLE}</td>
-						  <td data-title="Course">${request.course}</td>
 						  <td data-title="Product">${request.product }</td>
 						  <td data-title="System">${request.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
 						  <td data-title="Client">${request.client}</td>
 						  <td data-title="Student IDs"><p>${request.studentUserIds} </p> ${request.studentPasswords}</td>
 						  <td data-title="Faculty IDs"><p>${request.facultyUserIds} </p> ${request.facultyPasswords}</td>
-						  <td data-title="Person">${request.person}</td>
+							<td data-title="Person">${request.person}</td>
+							<td data-title="Course">${request.course}</td>
 						</tr>
 					  </tbody>
 					</table>

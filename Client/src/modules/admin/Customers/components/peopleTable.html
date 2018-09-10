@@ -40,7 +40,9 @@
                                     <input value.bind="institutionFilterValue" input.delegate="dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )"  class="form-control" />
                                 </th>
                                 <th></th>
-                                <th></th>
+                                <th>
+                                    <input value.bind="emailFilterValue" input.delegate="dataTable.filterList(emailFilterValue, { type: 'text',  filter: 'emailFilter',  collectionProperty: 'email', displayProperty: 'email',  compare:'match'} )"  class="form-control" /> 
+                                </th>
                                 <th>
                                     <input value.bind="roleFilter" input.delegate="dataTable.filterList($event, { type: 'custom',  filter: customRoleFilter, compare:'custom'} )"  class="form-control" />
 
