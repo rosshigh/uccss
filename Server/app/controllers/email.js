@@ -165,8 +165,7 @@ if(env === 'development'){
     }
   }
 
-  requestCreated = function(mailObject){
-console.log(mailObject)    
+  requestCreated = function(mailObject){    
      logger.log("Request Created email", "verbose");
       var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
@@ -252,7 +251,6 @@ console.log(mailObject)
 
   sendBulkEmails = function(mailObject){  
     logger.log("Email Sent", "verbose");       
-    console.log(mailObject)
     mailObject.context = {};
     mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
     mailObject.context.HOST = emailConfig.HOST;
@@ -539,7 +537,6 @@ console.log(mailObject)
 
   sendBulkEmails = function(mailObject){
     logger.log("Email Sent", "verbose");
-    console.log(mailObject)
     mailObject.context = {};
     mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
     mailObject.context.HOST = emailConfig.HOST;

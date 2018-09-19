@@ -244,14 +244,14 @@ export class ClientRequests {
         }
     }
 
-    async assignRequest(email, index){
+    async assignRequest(index, email){
         if(!this.selectedRequest){
             return;
         }
         var url = email ? this.CLIENT_REQUESTS_SERVICES + '/assign/?email=1' : this.CLIENT_REQUESTS_SERVICES + '/assign';
          var serverResponse = await this.data.saveObject(this.selectedRequest, url, "put");
         if(!serverResponse.error){
-            if(email.email){
+            if(email && email.email){
                 this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
             }
             this.selectedRequestDetail = serverResponse;

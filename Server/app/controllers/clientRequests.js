@@ -253,7 +253,7 @@ module.exports = function (app) {
     logger.log('Assign clientRequest ' + req.body._id);      
     if(req.body._id){
       var detailId;
-      var query = Model.findById(req.body._id, function(err, clientRequest){
+      var query = Model.findById(req.body._id, function(err, clientRequest){     
         if(err){
           return next(error);
         }     
@@ -263,14 +263,14 @@ module.exports = function (app) {
         }
         let tasks = new Array();   
         if(req.body.requestDetailsToSave){
-          req.body.requestDetailsToSave.forEach((detail, index) => { 
+          req.body.requestDetailsToSave.forEach((detail, index) => {            
             detailId = detail._id;                        
             tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
           });
         }   
         
         if(req.body.systemsToSave){
-          req.body.systemsToSave.forEach(detail => {                     
+          req.body.systemsToSave.forEach(detail => {                               
             tasks.push(System.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
           });
         }

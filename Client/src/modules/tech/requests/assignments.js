@@ -359,10 +359,10 @@ export class Assignments {
 
         let message, okToProcess = true;
         //Don't allow a client to be selected if there are no ids to be assigned
-        if (!this.idsRemaining > 0) {
-            this.utils.showNotification("There are no more ids required for this request");
-            return;
-		}
+        // if (!this.idsRemaining > 0) {
+        //     this.utils.showNotification("There are no more ids required for this request");
+        //     return;
+		// }
         //Make sure the selected client is compatible with the selected request
         if (this.selectedRequestDetail.requestId.courseId._id === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
             message = "The request is for a sandbox and the client isn't a sandbox client.  Are you sure you want to assign it?";
@@ -482,7 +482,9 @@ export class Assignments {
     }
     
     insertAssignmentIntoSystem(client, details){
+        client.idsAvailable = client.idsAvailable - (parseInt(details.lastID) - parseInt(details.firstID));
         let clientCopy = this.utils.copyObject(client);
+        
         clientCopy.assignments.push({
             assignment: this.selectedRequestDetail._id,
             studentIDRange: details.studentUserIds,
@@ -644,8 +646,9 @@ export class Assignments {
             this.calcIDRangeFromTemplate();
         }
         //Save the new firstID
+        this.selectedSystem.clients[this.selectedClientIndex].idsAvailable = this.selectedSystem.clients[this.selectedClientIndex].idsAvailable + (parseInt(this.firstID) - parseInt(this.lastFirstID));
         this.lastFirstID = this.firstID;
-
+       
         this.selectedSystem.clients[this.selectedClientIndex].assignments[this.clientSelectedIndex].studentIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentUserIds;
         // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex].studentIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentUserIds;
         setTimeout(() => { $("#lastID").focus(); $("#firstID").focus()},100);
@@ -677,8 +680,8 @@ export class Assignments {
             //No client selected and no assignment, adjus the ids remaining
             this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.lastID) - parseInt(this.oldLastID);
         }
+        this.selectedSystem.clients[this.selectedClientIndex].idsAvailable = this.selectedSystem.clients[this.selectedClientIndex].idsAvailable + (parseInt(this.oldLastID) - parseInt(this.lastID));
         this.oldLastID = this.lastID;
-
         this.selectedSystem.clients[this.selectedClientIndex].assignments[this.clientSelectedIndex].studentIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentUserIds;
         // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex].studentIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentUserIds;
         setTimeout(() => { $("#firstID").focus(); $("#lastID").focus()},100);
@@ -708,7 +711,7 @@ export class Assignments {
             this.selectedRequestDetail.assignments[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
             this.calcFacIDRangeFromTemplate();
         }
-
+        
         this.selectedSystem.clients[this.selectedClientIndex].assignments[this.clientSelectedIndex].facultyIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].facultyUserIds;
         // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex].facultyIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].facultyUserIds;
         setTimeout(() => { $("#lastFacID").focus(); $("#firstFacID").focus()},100);
@@ -772,6 +775,7 @@ export class Assignments {
             this.firstNumericFacID = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].firstFacID;
             this.lastNumericFacID = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].lastFacID;
             this.selectedSystem.clients[this.selectedClientIndex].lastFacIdAssigned = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].lastFacID;
+            
             // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex].lastFacIdAssigned = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].lastFacID;
             this.oldIdsAssigned = parseInt(this.lastID) - parseInt(this.lastID);
             this.oldLastID = this.lastID;
@@ -789,6 +793,7 @@ export class Assignments {
 
     deleteTest(assignment, index){
         this.setAssignmentIndex(assignment.client);
+        this.setClientIndex(assignment.client);
         this.clientSelectedIndex = index;
         this.deleteClicked = true;
     }
@@ -799,7 +804,6 @@ export class Assignments {
         this.setClientAssignmentIndex(this.selectedSystem.clients[this.selectedClientIndex]);
         this.deleteProposedClient(assignment);
     }
-
 
     /*****************************************************************************************************
      * The user deletes an assignment 
@@ -822,6 +826,7 @@ export class Assignments {
             this.forceManual = false;
             //Undo the changes made by the assignment
             this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].idsAssigned);
+            this.selectedSystem.clients[this.selectedClientIndex].idsAvailable = parseInt(this.selectedSystem.clients[this.selectedClientIndex].idsAvailable) + parseInt(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].idsAssigned);
             this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].idsAssigned);
            
             //Delete the assignment and the client
@@ -879,27 +884,15 @@ export class Assignments {
      ****************************************************************************************************/
     async deleteSaved(index){
         //Update the client
-        this.selectedSystem.clients[this.selectedClientIndex].idsAvailable = parseInt(this.selectedSystem.clients[this.selectedClientIndex].idsAvailable) + parseInt(this.assignmentDetails[index].idsAssigned);
-        this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
-        this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
-        
-        for(var i = 0; i<this.proposedClient[index].assignments.length; i++){
-            if(this.proposedClient[index].assignments[i].assignment == this.selectedRequestDetail._id){
-                this.proposedClient[index].assignments.splice(i,1);
-                if(this.proposedClient[index].assignments.length == 0 && this.proposedClient[index].SANDBOX_CLIENT_CODE != this.config.SANDBOX_ID ) this.proposedClient[index].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
-                break;
-            }
-        }
-        this.updateProductSystemsClient(this.proposedClient[index]);
-        this.systems.selectedSystemFromId(this.proposedClient[index].systemId);
-        this.assignment = this.assignmentDetails[index];
-        this.assignmentDetails.splice(index, 1);
-        this.proposedClient.splice(index, 1);
-        if(this.assignmentDetails.length == 0) this.selectedRequestDetail.requestStatus = this.config.UNASSIGNED_REQUEST_CODE
+        this.selectedSystem.clients[this.selectedClientIndex].idsAvailable = parseInt(this.selectedSystem.clients[this.selectedClientIndex].idsAvailable) + parseInt(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].idsAssigned);
+        this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].idsAssigned);
+        this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].idsAssigned);
         
         //Construct the object to submit to the server
-        this.selectedRequestDetail.idsAssigned = parseInt(this.selectedRequestDetail.idsAssigned) - parseInt(this.assignment.idsAssigned);
-        this.selectedRequestDetail.assignments = this.assignmentDetails;
+        this.selectedRequestDetail.idsAssigned = parseInt(this.selectedRequestDetail.idsAssigned) - parseInt(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].idsAssigned);
+        this.deleteProvisinoalClientAssignment()
+        this.assignClientStatus();
+        this.selectedRequestDetail.requestStatus = this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0 ? this.config.ASSIGNED_REQUEST_CODE : this.config.UNASSIGNED_REQUEST_CODE;
         this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
         this.requestToSave.audit.push({
             property: 'Delete Assignment',
@@ -912,18 +905,19 @@ export class Assignments {
         var request = this.utils.copyObject(this.selectedRequestDetail);
         delete request['requestId'];
         this.requestToSave.requestDetailsToSave.push(request);
+        this.requestToSave.systemsToSave =  [this.selectedSystem];
         
         this.clientRequests.setSelectedRequest(this.requestToSave);
-        let serverResponse = await this.clientRequests.deleteAssignment(this.editIndex);  
+        let serverResponse = await this.clientRequests.assignRequest(this.editIndex);
         if (!serverResponse.status) {
             this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
             this.reSort();
             await this.filterInAssigned();
-            this.utils.showNotification("The assignment was deleted");
-            await this.systems.saveSystem();
-           
+            this.utils.showNotification("The assignment was deleted")
         }
+
         this.selectedAssignedClient = "";
+
 	}	
 	
    	/**
@@ -974,7 +968,7 @@ export class Assignments {
             if(this._buildRequest()){
                 this.clientRequests.setSelectedRequest(this.requestToSave);
                 var email = this._buildEmailObject();
-                let serverResponse = await this.clientRequests.assignRequest(email, this.editIndex);
+                let serverResponse = await this.clientRequests.assignRequest(this.editIndex, email);
                 if (!serverResponse.status) {
                     this.utils.showNotification("The request was updated");
                     this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
@@ -1009,6 +1003,9 @@ export class Assignments {
 		return mailObject;
     }
     
+     /*****************************************************************************************************
+     * Build the data objects to send to the server 
+     ****************************************************************************************************/
     _buildRequest(){
         this.productSystems.forEach(system => {
             system.clients.forEach(client => {
@@ -1038,7 +1035,8 @@ export class Assignments {
         });
 
         this.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
-        this.selectedRequestDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
+        this.selectedRequestDetail.requestStatus = this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0 ? this.config.ASSIGNED_REQUEST_CODE : this.config.UNASSIGNED_REQUEST_CODE;
+        // this.selectedRequestDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
         this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
         this.requestToSave.audit.push({
            property: 'Assigned',
@@ -1063,138 +1061,16 @@ export class Assignments {
         return null;
     }
 
-    /*****************************************************************************************************
-     * Build the data objects to send to the server 
-     ****************************************************************************************************/
-    _buildRequestOLD(){
-        this.systemQueue = new Array();
-        //Check to see if this assignment already exists
-        if(this.selectedRequestDetail.requestStatus == this.config.ASSIGNED_REQUEST_CODE){  
-            for(var i = 0; i < this.assignmentDetails.length; i++){
-                for(var j = 0; j < this.proposedClient.length; j++){
-                    //Save the previous ids assigned and available from the proposed client
-                    this.proposedClient[j].idsAvailable = this.proposedClient[j].idsAvailable ? parseInt(this.proposedClient[j].idsAvailable) : parseInt(this.products.selectedProduct.idsAvailable);
-                    // var oldIdsAssigned = parseInt(this.proposedClient[j].idsAssigned);
-                    // var oldIdsAvailable = parseInt(this.proposedClient[j].idsAvailable);
-                    if((this.assignmentDetails[i].client == this.proposedClient[j].client) && (this.assignmentDetails[i].systemId == this.proposedClient[j].systemId)){
-                        //If this isn't a new assignment
-                        if(this.assignmentDetails[i].assignedDate){
-                            //If there are more than one assignment, make the client shared
-                            //Search for the assignment in the client and update it
-                            if(this.proposedClient[j].assignments){
-                                for(var k = 0; k<this.proposedClient[j].assignments.length; k++){
-                                    if(this.proposedClient[j].assignments[k].assignment == this.selectedRequestDetail._id){
-                                        var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                                        this.proposedClient[j].idsAvailable = parseInt(this.proposedClient[j].idsAvailable) + parseInt(this.oldRequest.assignments[i].idsAssigned) - totalIdsAssigned;
-                                        this.proposedClient[j].assignments[k].studentIDRange = this.assignmentDetails[i].studentUserIds;
-                                        this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
-                                        this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
-                                        this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
-                                        this.proposedClient[j].manual = this.manualMode;
-                                        if(this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
-                                        this.buildSystemToSave(this.proposedClient[j]);
-                                        this.systemQueue.push(this.proposedClient[j].systemId);
-                                    }
-                                }
-                            }
-                        } else {
-                            //It's a new assignment
-                            this.assignmentDetails[i].assignedDate = new Date();
-                            this.selectedRequestDetail.assignedDate = new Date();
-                            if(this.selectedRequestDetail.requestId.courseId._id != this.config.SANDBOX_ID) {
-                                this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
-                            } else {
-                                this.proposedClient[i].clientStatus = this.config.SANDBOX_CLIENT_CODE;
-                            }
-
-                            var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                            this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - parseInt(totalIdsAssigned);
-                            this.proposedClient[i].manual = this.manualMode;
-                            this.proposedClient[i].assignments.push({
-                                assignment: this.selectedRequestDetail._id,
-                                studentIDRange: this.assignmentDetails[i].studentUserIds,
-                                facultyIDRange: this.assignmentDetails[i].facultyUserIds,
-                                institutionId: this.selectedRequestDetail.requestId.institutionId,
-                                personId: this.selectedRequestDetail.requestId.personId._id,
-                                firstID: this.assignmentDetails[i].firstID,
-                                lastID: this.assignmentDetails[i].lastID,  
-                            });
-                            if(this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
-                            // this.buildSystemToSave(this.proposedClient[i]);
-                            // this.systemQueue.push(this.proposedClient[i].systemId);
-                            this.systemQueue.push(this.buildSystemToSave(this.proposedClient[i]));
-                        }
-                    }
-                }
-            }    
-            
-        } else {
-            //First assignment for this request
-            if(this.provisionalAssignment){
-                this.selectedRequestDetail.requestStatus = this.config.PROVISIONAL_REQUEST_CODE;
-            } else {
-                this.selectedRequestDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
-            }
-            
-            //Update the client records
-            for(var i = 0; i < this.proposedClient.length; i++){
-                this.assignmentDetails[i].assignedDate = new Date();
-                this.assignmentDetails[i].modifiedDate = new Date();
-                if(this.selectedRequestDetail.requestId.courseId._id != this.config.SANDBOX_ID) {
-                    this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
-                } else {
-                    this.proposedClient[i].clientStatus = this.config.SANDBOX_CLIENT_CODE;
-                }
-                if(this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
-                var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                this.proposedClient[i].idsAvailable = this.proposedClient[i].idsAvailable ? parseInt(this.proposedClient[i].idsAvailable) : parseInt(this.products.selectedProduct.idsAvailable);
-                this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - totalIdsAssigned;
-                this.proposedClient[i].manual = this.manualMode;
-                this.proposedClient[i].assignments.push({
-                    assignment: this.selectedRequestDetail._id,
-                    studentIDRange: this.assignmentDetails[i].studentUserIds,
-                    facultyIDRange: this.assignmentDetails[i].facultyUserIds,
-                    institutionId: this.selectedRequestDetail.requestId.institutionId,
-                    personId: this.selectedRequestDetail.requestId.personId._id,
-                    firstID: this.assignmentDetails[i].firstID,
-                    lastID: this.assignmentDetails[i].lastID,   
-                    assignedDate: new Date()                 
-                });
-                if(this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
-                this.systemQueue.push(this.buildSystemToSave(this.proposedClient[i]));
-            };
-        }
-        
-        //Construct the object to submit to the server
-        this.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
-        this.selectedRequestDetail.assignments = this.assignmentDetails;
-        this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
-        this.requestToSave.audit.push({
-           property: 'Assigned',
-           newValue: JSON.stringify(this.selectedRequestDetail.assignments),
-           oldValue: this.selectedRequestDetail.productId.name,
-           eventDate: new  Date(),
-           personId: this.userObj.fullName
-        })
-        this.requestToSave.requestDetailsToSave = new Array();
-        var request = this.utils.copyObject(this.selectedRequestDetail);
-        delete request['requestId'];
-        this.requestToSave.requestDetailsToSave.push(request);
-        this.requestToSave.systemsToSave =  this.systemQueue;
-        return true;
-    }
-    
-    buildSystemToSave(client){
-        let system = this.originalProductSystems[this.selectedSystemIndex].clients[this.selectedClientIndex] = this.utils.copyObject(client);
-        return system;
-    }
+   
+    // buildSystemToSave(client){
+    //     let system = this.originalProductSystems[this.selectedSystemIndex].clients[this.selectedClientIndex] = this.utils.copyObject(client);
+    //     return system;
+    // }
 
 
     updateProductSystemsClient(client){
-        // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex] = this.utils.copyObject(client);
         this.selectedSystem.clients[this.selectedClientIndex].assignments = client.assignments;
         this.clientSelectedIndex = client.assignments.length - 1;
-
     }
 
 	back() { 
@@ -1247,7 +1123,6 @@ export class Assignments {
         this.selectedSystemId = id;
         this.productSystems.forEach((item, index) => {
             if(item._id === id){
-                // this.selectedSystem = this.utils.copyObject(item);
                 this.selectedSystem = item;
                 this.selectedSystemIndex = index;
             }
