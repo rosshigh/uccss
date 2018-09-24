@@ -67,7 +67,7 @@ export class Assignments {
 	async getRequests() {
         if (this.selectedSession) {
             this.sessions.selectSessionById(this.selectedSession);
-            await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|eq|' + this.config.UNASSIGNED_REQUEST_CODE + ':' + this.config.UPDATED_REQUEST_CODE, true);
+            await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE, true);
             if(this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length){
                 this.noRequests = false;
                 this.clientRequests.requestsDetailsArray.forEach(item => {
@@ -1458,7 +1458,7 @@ export class Assignments {
         this.helpTicketTypeFilterValue = "";
         this.institutionFilterValue = "";
         if(this.isCheckedAssigned){
-            await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|eq|' + this.config.UNASSIGNED_REQUEST_CODE + ':' + this.config.UPDATED_REQUEST_CODE, true);
+            await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession  + ':requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE, true);
             this.dataTable.updateArray(this.clientRequests.requestsDetailsArray,'requiredDate',-1);
             // this.dataTable.filterList(this.config.ASSIGNED_REQUEST_CODE, { type: 'custom',  filter: this.statusCustomFilter, compare:'custom'} )
         } else {

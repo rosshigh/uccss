@@ -31561,7 +31561,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                                 this.sessions.selectSessionById(this.selectedSession);
                                 _context2.next = 4;
-                                return this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|eq|' + this.config.UNASSIGNED_REQUEST_CODE + ':' + this.config.UPDATED_REQUEST_CODE, true);
+                                return this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE, true);
 
                             case 4:
                                 if (!(this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length)) {
@@ -33244,7 +33244,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 }
 
                                 _context16.next = 10;
-                                return this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|eq|' + this.config.UNASSIGNED_REQUEST_CODE + ':' + this.config.UPDATED_REQUEST_CODE, true);
+                                return this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE, true);
 
                             case 10:
                                 this.dataTable.updateArray(this.clientRequests.requestsDetailsArray, 'requiredDate', -1);

@@ -46,6 +46,9 @@ module.exports = function (app) {
             case 'lte':
               reqQuery.where(component[0]).lte(component[2]);
               break;
+            case 'in':
+            let values = component[2].split('$');
+              reqQuery.where(component[0]).in(values);
           }
         });
       } else if (queryString.indexOf('[in]') > -1){
