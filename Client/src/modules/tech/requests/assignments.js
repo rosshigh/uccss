@@ -1458,7 +1458,7 @@ export class Assignments {
         this.helpTicketTypeFilterValue = "";
         this.institutionFilterValue = "";
         if(this.isCheckedAssigned){
-            await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|eq|' + this.config.UNASSIGNED_REQUEST_CODE, true);
+            await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|eq|' + this.config.UNASSIGNED_REQUEST_CODE + ':' + this.config.UPDATED_REQUEST_CODE, true);
             this.dataTable.updateArray(this.clientRequests.requestsDetailsArray,'requiredDate',-1);
             // this.dataTable.filterList(this.config.ASSIGNED_REQUEST_CODE, { type: 'custom',  filter: this.statusCustomFilter, compare:'custom'} )
         } else {
