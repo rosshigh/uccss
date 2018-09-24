@@ -124,9 +124,9 @@ export default class {
                    settings: { auth: true, roles: [] } 
                 },
                 { 
-                  route: 'social',          
-                  moduleId: './modules/social/social',                
-                  name: 'social',          
+                  route: 'chapters',          
+                  moduleId: './modules/social/chapters',                
+                  name: 'chapters',          
                   settings: { auth: true, roles: [] }
                  },
                 { 

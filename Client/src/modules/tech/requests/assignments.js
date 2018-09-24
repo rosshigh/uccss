@@ -67,7 +67,7 @@ export class Assignments {
 	async getRequests() {
         if (this.selectedSession) {
             this.sessions.selectSessionById(this.selectedSession);
-            await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|eq|' + this.config.UNASSIGNED_REQUEST_CODE, true);
+            await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|eq|' + this.config.UNASSIGNED_REQUEST_CODE + ':' + this.config.UPDATED_REQUEST_CODE, true);
             if(this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length){
                 this.noRequests = false;
                 this.clientRequests.requestsDetailsArray.forEach(item => {
