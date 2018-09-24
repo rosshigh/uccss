@@ -47,7 +47,7 @@ module.exports = function (app) {
               reqQuery.where(component[0]).lte(component[2]);
               break;
             case 'in':
-            let values = component[2].split('$');
+              var values = component[2].split('$');
               reqQuery.where(component[0]).in(values);
           }
         });
