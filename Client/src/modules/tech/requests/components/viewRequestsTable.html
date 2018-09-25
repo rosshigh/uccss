@@ -8,6 +8,11 @@
                       value.bind="session._id">Session ${session.session} - ${session.year}</option>
             </select>
         </div>
+        <div class="checkbox leftMargin">
+          <label>
+            <input checked.bind="isCheckedAssigned" change.trigger="filterInAssigned()" type="checkbox"> Filter out Assigned Requests
+          </label>
+        </div>
       </div>
     </div>
 
