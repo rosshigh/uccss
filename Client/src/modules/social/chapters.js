@@ -30,37 +30,38 @@ export class Chapters {
     configureRouter(config, router) {
         config.map([
         {
-            route: ['', 'blogs'],
-            moduleId: './viewBlogs',
+            route: ['', 'chapterlist'],
+            moduleId: './chapterList',
             settings: { auth: false, roles: [] },
             nav: true,
-            name: 'blogs',
-            title: 'Blogs'
-        },
-        {
-            route: 'forums',
-            moduleId: './viewForums',
-            settings: { auth: false, roles: [] },
-            nav: true,
-            name: 'forums',
-            title: 'Forums'
-        },
-        {
-            route: 'writeBlog',
-            moduleId: './writeBlog',
-            settings: { auth: false, roles: [] },
-            nav: false,
-            name: 'writeBlog',
-            title: 'Write Blog'
-        },
-        {
-            route: 'editBlog',
-            moduleId: './editBlog',
-            settings: { auth: false, roles: [] },
-            nav: false,
-            name: 'editBlog',
-            title: 'Edit Blog'
+            name: 'chapterlist',
+            title: 'Chapter List'
         }
+        // ,
+        // {
+        //     route: 'forums',
+        //     moduleId: './viewForums',
+        //     settings: { auth: false, roles: [] },
+        //     nav: true,
+        //     name: 'forums',
+        //     title: 'Forums'
+        // },
+        // {
+        //     route: 'writeBlog',
+        //     moduleId: './writeBlog',
+        //     settings: { auth: false, roles: [] },
+        //     nav: false,
+        //     name: 'writeBlog',
+        //     title: 'Write Blog'
+        // },
+        // {
+        //     route: 'editBlog',
+        //     moduleId: './editBlog',
+        //     settings: { auth: false, roles: [] },
+        //     nav: false,
+        //     name: 'editBlog',
+        //     title: 'Edit Blog'
+        // }
         ]);
 
         this.router = router;

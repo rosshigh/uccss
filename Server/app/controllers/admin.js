@@ -16,7 +16,7 @@ var express = require('express'),
   const logFolder = './log/';
   const pm2LogFolder = './pm2Log/';
 
-module.exports = function (app, config) {
+module.exports = function (app, config) { 
   app.use('/api', router); 
 
 
