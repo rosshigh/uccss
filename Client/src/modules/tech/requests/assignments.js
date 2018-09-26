@@ -257,7 +257,9 @@ export class Assignments {
         });
         let response = await this.systems.getConfiguredProductSystems(productSystemsSIDs);
         if(!response.error){
-            this.productSystems = response;
+            response.forEach(item => {
+                if(item.sessions.indexOf(this.sessions.selectedSession.session) > -1) this.productSystems.push(item);
+            });
         }
         if(this.productSystems != null && this.productSystems.length) this.systemConfigured = true;
         this.productSystems = this.productSystems.sort((a, b) => {
