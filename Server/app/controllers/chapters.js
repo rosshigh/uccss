@@ -10,7 +10,7 @@ var express = require('express'),
 module.exports = function (app) {
   app.use('/', router);
 
-  router.get('/api/chapters', requireAuth, function(req, res, next){
+  router.get('/api/chapters',  function(req, res, next){
     logger.log('Get chapters',"verbose");
     
     var query = buildQuery(req.query, Model.find());
@@ -23,7 +23,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/chapters/:id', requireAuth, function(req, res, next){
+  router.get('/api/chapters/:id',  function(req, res, next){
     logger.log('Get chapters ' + req.params.id,"verbose");
     Model.findById(req.params.id, function(err, object){
       if (err) {
@@ -34,7 +34,7 @@ module.exports = function (app) {
     });
   });
 
-  router.post('/api/chapters', requireAuth, function(req, res, next){
+  router.post('/api/chapters',  function(req, res, next){
      logger.log('Create a chapter',"verbose");
 
     var chapter =  new Model(req.body);
@@ -47,7 +47,7 @@ module.exports = function (app) {
     });
   });
 
-  router.put('/api/chapters', requireAuth, function(req, res, next){
+  router.put('/api/chapters',  function(req, res, next){
     logger.log('Update chapters ' + req.body._id,"verbose");
 
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, result){
@@ -59,7 +59,7 @@ module.exports = function (app) {
     })
   });
 
-  router.delete('/api/chapters/:id', requireAuth, function(req, res, next){
+  router.delete('/api/chapters/:id',  function(req, res, next){
     logger.log('Delete chapter ' + req.body._id,"verbose");
     Model.find({_id: req.params.id}).remove().exec(function(err, object){
         if (err) {

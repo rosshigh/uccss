@@ -1,3 +1,46 @@
 <template>
-    <h1>Coming Soon!</h1>
+    <style>
+        .card {
+            position: relative;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border: 1px solid rgba(0,0,0,.125);
+            border-radius: .25rem;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        }
+        .card-img-top{
+            height: 180px;
+            width: 95%;
+            display: block;
+            vertical-align: middle;
+            border-style: none;
+            margin:5px;
+        }
+        .card-body{
+            flex: 1 1 auto;
+            padding: 1.25rem;
+        }
+
+        .card-titlech {
+            margin-bottom: .75rem;
+        }
+    </style>
+
+    <div class="card" style="width:600px;" repeat.for="chapter of chapters.chaptersArray">
+        <img class="card-img-top" src="http://localhost/uploadedFiles/chapters/chapterLogos/${chapter.chapterLogo}" alt="Card image cap">
+        <div class="card-body">
+            <h4 class="card-titlech">${chapter.chapterTopic}</h4>
+            <p class="card-text">${chapter.chapterShortDescription}</p>
+            <a href="#" class="btn btn-primary">Visit the chapter web page</a>
+        </div>
+    </div>
 </template>

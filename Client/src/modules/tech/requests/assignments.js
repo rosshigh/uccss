@@ -67,18 +67,18 @@ export class Assignments {
 	async getRequests() {
         if (this.selectedSession) {
             this.sessions.selectSessionById(this.selectedSession);
-            await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE, true);
-            if(this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length){
-                this.noRequests = false;
-                this.clientRequests.requestsDetailsArray.forEach(item => {
-                    if(item.requestId && item.requestId.courseId === null) item.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
-                })
-                this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
+            // await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE, true);
+            // if(this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length){
+            //     this.noRequests = false;
+            //     this.clientRequests.requestsDetailsArray.forEach(item => {
+            //         if(item.requestId && item.requestId.courseId === null) item.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
+            //     })
+            //     this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
                 await this.filterInAssigned();
-            } else {
-                this.noRequests = true;
-                this.displayArray = new Array();
-            }
+            // } else {
+            //     this.noRequests = true;
+            //     this.displayArray = new Array();
+            // }
         } else {
             this.displayArray = new Array();
         }
@@ -1461,8 +1461,17 @@ export class Assignments {
         this.institutionFilterValue = "";
         if(this.isCheckedAssigned){
             await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession  + ':requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE, true);
-            this.dataTable.updateArray(this.clientRequests.requestsDetailsArray,'requiredDate',-1);
-            // this.dataTable.filterList(this.config.ASSIGNED_REQUEST_CODE, { type: 'custom',  filter: this.statusCustomFilter, compare:'custom'} )
+            if(this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length){
+                this.noRequests = false;
+                this.clientRequests.requestsDetailsArray.forEach(item => {
+                    if(item.requestId && item.requestId.courseId === null) item.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
+                })
+                this.dataTable.updateArray(this.clientRequests.requestsDetailsArray,'requiredDate',-1);
+            } else {
+                this.noRequests = true;
+                this.displayArray = new Array();
+            }
+        
         } else {
             await this.clientRequests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
             this.dataTable.updateArray(this.clientRequests.requestsDetailsArray,'requiredDate',-1);
