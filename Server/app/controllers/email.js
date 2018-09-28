@@ -140,9 +140,17 @@ if(env === 'development'){
     mailObject.body = emailTemplateCompiled(mailObject);
     mailObject.email = mailObject.email;
     mailObject.subject = mailObject.subject;    
-    
-    sendGrid(mailObject)
+    console.log(mailObject)
+    // sendGrid(mailObject)
   }
+
+  // mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+  // mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+  // mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+  // mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;  
+  // mailObject.body = PasswordResetTemplateCompiled(mailObject.context);
+  // mailObject.to_email = mailObject.email;
+  // mailObject.subject = mailObject.subject;  
 
   newCustomer = function(mailObject){
     logger.log("Fac Dev new account email", "verbose");
@@ -364,6 +372,25 @@ if(env === 'development'){
 
     nodeMailerSendMail(mailObject);
   }
+
+  // passwordReset = function(mailObject){
+  //   logger.log("Password reset request", "verbose"); 
+  //     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+  //     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+  //     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+  //     mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+    
+  //     var mail = {
+  //         from: emailConfig.emailAddress,
+  //         to: mailObject.email,
+  //         subject: mailObject.subject,
+  //         template: 'password-reset',
+  //         context: mailObject.context,
+  //         topic: "passwordReset"
+  //     };
+        
+  //     nodeMailerSendMail(mail)   
+  // }
 
   welcome = function(mailObject){
     logger.log("Welcome to the UCCSS email", 'verbose');

@@ -4,6 +4,7 @@ var express = require('express'),
   	router = express.Router(),
     mongoose = require('mongoose'),
     Model = mongoose.model('Person'),
+    PersonArchive = mongoose.model('PersonArchive'),
     Note = mongoose.model('Note'),
     http = require('http'),
     PasswordReset =  mongoose.model('PasswordReset'),
@@ -12,8 +13,8 @@ var express = require('express'),
     logAuth = require('../../config/log-authenticate'),
     passportService = require('../../config/passport'),
     passport = require('passport'),
-    Promise = require('bluebird'),
-    config = require('../../config/config'),
+    // Promise = require('bluebird'),
+    // config = require('../../config/config'),
     Event = mongoose.model('Event'),
     EmailLog = mongoose.model('EmailLog'),
     multer = require('multer'),
@@ -368,7 +369,9 @@ module.exports = function (app, config) {
                 subject: 'Password Reset',
                 context: context
               }     
-              passwordReset(mailObj)
+              
+              sendEmail(mailObj);
+              // passwordReset(mailObj)
                 // .then(emailResult => {
                     res.status(200).json(result);
                 // })
@@ -622,6 +625,45 @@ module.exports = function (app, config) {
             });
           }        
       });
+  });
+
+  router.post('/api/people/archive', function(req, res, next){
+    writeLog.log('Archive people', 'verbose'); 
+    Model.find({personStatus: '02'}, function(err, result){
+      if(err){
+        return next(err);
+      }    
+      var numPeople = result.length;
+      var bulk = PersonArchive.collection.initializeOrderedBulkOp();
+      var counter = 0;
+
+      result.forEach(function(doc) {
+          bulk.insert(doc);
+          counter++;
+      }); 
+      if (counter > 0) {
+          bulk.execute(function(err, result2) {
+            if(err){
+              return next(err);
+            }         
+            var bulk2 = Model.collection.initializeOrderedBulkOp();
+            var counter2 = 0;        
+            result.forEach(function(doc) {            
+              bulk2.find( { _id: doc._id } ).remove();             
+              counter2++;
+            });          
+            if(counter2){
+              bulk2.execute(function(err, results){
+                if(err){
+                  res.status(500).json({message: "people not deleted"});
+                }
+                res.status(200).json({message: 'People Archived', number: numPeople});
+              })
+            }
+          });
+      }
+    });
+
   });
 
 };

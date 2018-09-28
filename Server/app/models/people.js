@@ -133,5 +133,5 @@ PersonSchema.virtual('fullName')
     return this.firstName + ' ' + this.lastName;
   });
 
-module.exports = Mongoose.model('Person',PersonSchema);
-
+module.exports = Mongoose.model('Person', PersonSchema);
+module.exports = Mongoose.model('PersonArchive', PersonSchema);

@@ -641,4 +641,9 @@ export class HelpTickets {
     removeHelpTicketLock(id){
         var response = this.data.deleteObject(this.HELP_TICKET_LOCK_SERVICES + "/" + id);
     }
+
+    async archiveHelpTickets(){
+        let response = await this.data.saveObject({}, this.HELP_TICKET_SERVICES + '/archiveClosed', "post");
+        return response;
+    }
 }

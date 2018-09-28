@@ -9,10 +9,11 @@ import { AppConfig } from '../../../config/appConfig';
 import { Utils } from '../../../resources/utils/utils';
 import { People } from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 
 import moment from 'moment';
 
-@inject(Router, AppConfig, Validation, People, DataTable, Utils, HelpTickets, Sessions, Downloads, Products)
+@inject(Router, AppConfig, Validation, People, DataTable, Utils, HelpTickets, Sessions, Downloads, Products, CommonDialogs)
 export class ArchiveHelpTickets {
   searchResults = false;
   helpTicketSelected = false;
@@ -30,7 +31,7 @@ export class ArchiveHelpTickets {
   selectedPeople = new Array();
   selectedInstitutions = new Array();
 
-  constructor(router, config, validation, people, datatable, utils, helpTickets, sessions, apps, products) {
+  constructor(router, config, validation, people, datatable, utils, helpTickets, sessions, apps, products, dialogs) {
     this.router = router;
     this.config = config;
     this.validation = validation;
@@ -43,6 +44,7 @@ export class ArchiveHelpTickets {
     this.sessions = sessions;
     this.apps = apps;
     this.products = products;
+    this.dialogs = dialogs;
 
     this.userObj = JSON.parse(sessionStorage.getItem('user'));
     this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
@@ -321,6 +323,25 @@ export class ArchiveHelpTickets {
     if (!serverResponse.error) {
       this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
       this.utils.showNotification("The help ticket was updated");
+    }
+  }
+
+  async archiveClosedTickets(){
+    return this.dialogs.showMessage(
+      "This will archive closed help tickets.  Are you sure you want to do that?", 
+      "Archive Help Tickets", 
+      ['Yes', 'No']
+      ).whenClosed(response => {
+          if(!response.wasCancelled){
+           this.archiveTickets();  
+          }
+      });
+  }
+
+  async archiveTickets(){
+    let response = await this.helpTickets.archiveHelpTickets();
+    if(!response.error){
+      this.utils.showNotification(response.number + ' Help Tickets were archived successfully')
     }
   }
 

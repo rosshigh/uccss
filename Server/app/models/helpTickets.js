@@ -72,3 +72,4 @@ HelpTicketSchema.pre('update', function() {
 });
 
 module.exports = Mongoose.model('HelpTicket', HelpTicketSchema);
+module.exports = Mongoose.model('HelpTicketArchive', HelpTicketSchema);

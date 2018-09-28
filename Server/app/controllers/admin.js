@@ -5,11 +5,11 @@ var express = require('express'),
   	router = express.Router(),
   	passport = require('passport'),
   	path = require('path'),
-	rootPath = path.normalize(__dirname + '/..'),
+	// rootPath = path.normalize(__dirname + '/..'),
   	logger = require('../../config/logger'),
 	dir = require('node-dir'),
-	HelpTickets = mongoose.model('HelpTicket'),
-	ClientRequests = mongoose.model('ClientRequest');
+	HelpTickets = mongoose.model('HelpTicket');
+	// ClientRequests = mongoose.model('ClientRequest');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
   const authFolder = './log-auth/';
@@ -171,7 +171,6 @@ module.exports = function (app, config) {
 				 return next(err);
 			} else {
 				files = files.filter(item => {
-					console.log(item.substring(0,3))
 					return item.substring(0,3) === req.params.type;
 				})
 				if(files) res.status(200).json(files);
@@ -232,7 +231,6 @@ module.exports = function (app, config) {
 		}
 		HelpTickets.stats(function(err, stats) {
 			if(err) return next(err);
-          console.log(stats)
 
           res.status(200).json(stats);
         });

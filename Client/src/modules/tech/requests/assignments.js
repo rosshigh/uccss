@@ -1474,6 +1474,9 @@ export class Assignments {
         
         } else {
             await this.clientRequests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
+            this.clientRequests.requestsDetailsArray.forEach(item => {
+                if(item.requestId && item.requestId.courseId === null) item.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
+            })
             this.dataTable.updateArray(this.clientRequests.requestsDetailsArray,'requiredDate',-1);
         }
     }

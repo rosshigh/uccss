@@ -4,7 +4,8 @@ var express = require('express'),
     router = express.Router(),
     mongoose = require('mongoose'),
     Model = mongoose.model('HelpTicket'),
-    Person = mongoose.model('Person'),
+    // Person = mongoose.model('Person'),
+    HelpTicketArchive = mongoose.model('HelpTicketArchive'),
     Content = mongoose.model('HelpTicketContent'),
     multer = require('multer'),
     mkdirp = require('mkdirp'),
@@ -576,5 +577,62 @@ module.exports = function (app, config) {
         return next(error);
       })
   });
+
+  router.post('/api/helpTickets/archiveClosed', function(req, res, next){
+    writeLog.log('Archiving closed help tickets', 'verbose');
+    Model.find({helpTicketStatus: 6}, function(err, result){
+      if(err){
+        return next(err);
+      }    
+      var numTickets = result.length;
+      var bulk = HelpTicketArchive.collection.initializeOrderedBulkOp();
+      var counter = 0;
+
+      result.forEach(function(doc) {
+          bulk.insert(doc);
+          counter++;
+      }); 
+      if (counter > 0) {
+          bulk.execute(function(err, result2) {
+            if(err){
+              return next(err);
+            }         
+            var bulk2 = Model.collection.initializeOrderedBulkOp();
+            var counter2 = 0;        
+            result.forEach(function(doc) {            
+              bulk2.find( { _id: doc._id } ).remove();             
+              counter2++;
+            });          
+            if(counter2){
+              bulk2.execute(function(err, results){
+                if(err){
+                  res.status(500).json({message: "helptickets not deleted"});
+                }
+                res.status(200).json({message: 'Help Tickets Archived', number: numTickets});
+              })
+            }
+          });
+      }
+    });
+  });
+
+  router.get('/api/helpTicketsArchive', function(req, res, next){
+    writeLog.log('Get helpTicket','verbose');
+    var query = buildQuery(req.query, HelpTicketArchive.find())
+    .populate('courseId', 'name number')
+    .populate('requestId')
+    .populate('personId','email firstName lastName fullName phone mobile nickName file country')
+    .populate('content.personId','email firstName lastName phone mobile nickName')
+    .populate('institutionId', 'name')
+    .populate({path: 'owner.personId', model: 'Person', select: 'firstName lastName fullName'})
+    query.exec()
+    .then(object => {
+      res.status(200).json(object);
+    })
+    .catch(error => {
+       return next(error);
+    })
+  });
+
 
 };

@@ -16,6 +16,8 @@
             border: 1px solid rgba(0,0,0,.125);
             border-radius: .25rem;
             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            margin-left: 20px;
+            margin-top: 20px;
         }
         .card-img-top{
             height: 180px;
@@ -35,12 +37,13 @@
         }
     </style>
 
-    <div class="card" style="width:600px;" repeat.for="chapter of chapters.chaptersArray">
-        <img class="card-img-top" src="http://localhost/uploadedFiles/chapters/chapterLogos/${chapter.chapterLogo}" alt="Card image cap">
+    <div class="card col-lg-3" style="width:400px;" repeat.for="chapter of chapters.chaptersArray">
+       <!-- <img class="card-img-top" src="http://localhost/uploadedFiles/chapters/chapterLogos/${chapter.chapterLogo}" alt="Card image cap"> -->
         <div class="card-body">
             <h4 class="card-titlech">${chapter.chapterTopic}</h4>
+            <h5>${chapter.chapterUniversity}</h5>
             <p class="card-text">${chapter.chapterShortDescription}</p>
-            <a href="#" class="btn btn-primary">Visit the chapter web page</a>
+            <a href="#">Visit the chapter web page</a>
         </div>
     </div>
 </template>
