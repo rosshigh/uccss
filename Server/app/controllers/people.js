@@ -359,17 +359,18 @@ module.exports = function (app, config) {
      .then(person => {      
        if(person){
           var passwordreset = PasswordReset({personId: person[0]._id});
-          passwordreset.validationCode =  new Buffer(passwordreset._id + person[0]._id).toString('base64');       
-          passwordreset.save()
+          passwordreset.validationCode =  new Buffer(passwordreset._id + person[0]._id).toString('base64');                 passwordreset.save()
           .then(result => {
               var context = {fullName: person[0].fullName, result: result, host: config.corsDomain };
               result.fullName = person[0].fullName;
               var mailObj = {
                 email: person[0].email,
                 subject: 'Password Reset',
+                MESSAGE: "<H1>Forgot your password?</h1><br>It happens. Click the <a href='" + config.corsDomain + "/#/resetPassword/" + result.validationCode + "'>link</a> to reset your password.</br>",
                 context: context
               }     
-              
+              //It happens. Click the <a href="{{host}}/#/resetPassword/{{result.validationCode}}"
+
               sendEmail(mailObj);
               // passwordReset(mailObj)
                 // .then(emailResult => {

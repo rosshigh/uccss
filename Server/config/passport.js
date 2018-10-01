@@ -1,6 +1,7 @@
 var passport = require('passport'),
     jwt = require('jsonwebtoken')
-    User = require('../app/models/people'),
+    mongoose = require('mongoose'),
+    User = mongoose.model('Person'),
     config = require('./config'),
     jwtStrategy = require('passport-jwt').Strategy,
     extractJwt = require('passport-jwt').ExtractJwt,
