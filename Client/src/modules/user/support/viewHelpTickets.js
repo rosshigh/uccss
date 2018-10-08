@@ -74,7 +74,7 @@ export class ViewHelpTickets {
 		});
 
     let responses = await Promise.all([
-      this.helpTickets.getHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true),
+      this.helpTickets.getUserHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true),
       this.people.getUCCStaff(uccRoles),
       this.helpTickets.getHelpTicketTypes('?order=category'),
       this.products.getProductsArray('',true),
@@ -109,6 +109,10 @@ export class ViewHelpTickets {
       this.mobile = true;
       this.toolbar = [['style', ['style', 'bold', 'clear']]];
     }
+  }
+
+  async retrieveClosedHelpTickets(){
+    await this.helpTickets.getArchivedHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true)
   }
 
   async refresh() {

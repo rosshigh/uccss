@@ -38,6 +38,58 @@ module.exports = function (app, config) {
     })
   });
 
+  router.get('/api/helpTickets/archived', requireAuth, function(req, res, next){
+    writeLog.log('Get helpTicket','verbose');
+    var query = buildQuery(req.query, HelpTicketArchive.find())
+    .populate('courseId', 'name number')
+    .populate('requestId')
+    .populate('personId','email firstName lastName fullName phone mobile nickName file country')
+    .populate('content.personId','email firstName lastName phone mobile nickName')
+    .populate('institutionId', 'name')
+    .populate({path: 'owner.personId', model: 'Person', select: 'firstName lastName fullName'})
+    query.exec()
+    .then(object => {
+      res.status(200).json(object);
+    })
+    .catch(error => {
+       return next(error);
+    })
+  });
+
+  router.get('/api/helpTickets/users', requireAuth, function(req, res, next){
+    writeLog.log('Get user helpTicket','verbose');
+    var query1 =buildQuery(req.query, Model.find())
+    .populate('courseId', 'name number')
+    .populate('requestId')
+    .populate('personId','email firstName lastName fullName phone mobile nickName file country')
+    .populate('content.personId','email firstName lastName phone mobile nickName')
+    .populate('institutionId', 'name')
+    .populate({path: 'owner.personId', model: 'Person', select: 'firstName lastName fullName'})
+    query1.exec()
+    .then(object1 => {   
+      var query2 = buildQuery(req.query, HelpTicketArchive.find())
+      .populate('courseId', 'name number')
+      .populate('requestId')
+      .populate('personId','email firstName lastName fullName phone mobile nickName file country')
+      .populate('content.personId','email firstName lastName phone mobile nickName')
+      .populate('institutionId', 'name')
+      .populate({path: 'owner.personId', model: 'Person', select: 'firstName lastName fullName'})
+      query2.exec()
+      .then(object2 => {   
+        object1.forEach(item => {
+          object2.push(item);
+        })
+        res.status(200).json(object2);
+      })
+      .catch(error => {
+        return next(error);
+     })
+    })
+    .catch(error => {
+       return next(error);
+    })
+  });
+
   router.get('/api/helpTickets/analytics', requireAuth, function(req, res, next){
     writeLog.log('Get helpTicket','verbose');
     var query = buildQuery(req.query, Model.find())
@@ -106,9 +158,14 @@ module.exports = function (app, config) {
       })
   });
 
-  router.post('/api/helpTickets/archive', requireAuth, function(req, res, next){
+  router.post('/api/helpTickets/archive/:collection', requireAuth, function(req, res, next){
     writeLog.log('Archive search', 'verbose');
-    var query = Model.find();
+    if(req.params.collection && req.params.collection === 'current'){
+      var query = Model.find();
+    } else {
+      var query = HelpTicketArchive.find();
+    }
+    
     if(req.body.helpTicketNo){   
       query.where('helpTicketNo').equals(req.body.helpTicketNo);
     } else {
@@ -363,6 +420,16 @@ module.exports = function (app, config) {
       .catch(error => {
         return next(error);
       })
+  });
+
+  router.get('/api/helpTickets/count/:status', function(req, res, next){
+    writeLog.log('Count tickets with status ' + req.params.status, 'verbose');
+
+    Model.find({helpTicketStatus: req.params.status}, function(err, results){
+      if(err) return next(err);
+
+      res.status(200).json({count: results.length});
+    });
   });
 
   router.post('/api/helpTickets/sendMail', requireAuth, function(req, res, next){

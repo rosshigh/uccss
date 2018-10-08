@@ -16,6 +16,8 @@ export class People {
     SEND_MAIL = 'people/sendMail';
     PASSWORD_RESET = 'passwordReset';
     NOTES_SERVICE = "notes";
+    TECHNOTES_SERVICE = "techNotes";
+    TECHNOTESCAT_SERVICE = "technotecats";
     INSTITUTION_SERVICES = "institutions";
     COURSES_SERVICE = 'courses';
     PEOPLE_UPLOAD_SERVICE = '/people/upload/';
@@ -253,6 +255,10 @@ export class People {
         let response = await this.data.uploadFiles(files,  this.PEOPLE_UPLOAD_SERVICE + "/" + this.selectedPerson._id);
     }
 
+    async uploadTechFile(files, id){
+        let response = await this.data.uploadFiles(files,  this.TECHNOTES_SERVICE + "/upload/" + id);
+    }
+
     async sendCustomerMessage(message){
         if(message.email){
             var serverResponse = await this.data.saveObject(message, this.SEND_MAIL, "put");
@@ -306,6 +312,16 @@ export class People {
 
     activateAccountEmail(email){
         this.data.saveObject(email, this.PEOPLE_SERVICE + "/facDev/activate", 'post');
+    }
+
+    async countPeopleStatus(status){
+        let response = await this.data.get(this.PEOPLE_SERVICE + '/count/' + status);
+        return response;
+    }
+
+    async archiveInactivePeople(){
+        let response = await this.data.saveObject({}, this.PEOPLE_SERVICE + '/archive', "post");
+        return response;
     }
 
     //Institutions
@@ -545,7 +561,166 @@ export class People {
         return serverResponse;
 
     }
+    
+    //tech notes
+    async getTechNotesArray(options, refresh){
+        if (!this.notesArray || refresh) {
+            var url = this.TECHNOTES_SERVICE;
+            url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.techNotesArray = serverResponse;
+                } else {
+                    this.data.processError(serverResponse);
+                    return undefined;
+                }
+            } catch (error) {
+                console.log(error);
+                return undefined;
+            }
+        }
+    }
 
+    selectTechNote(index) {
+        if (index === undefined) {
+            this.selectedTechNote = this.emptyTechNote();
+        } else {
+            try {
+                this.selectedTechNote = this.utils.copyObject(this.techNotesArray[index]);
+                this.editTechNoteIndex = index;
+            } catch (error) {
+                console.log(error);
+                this.selectedTechNote = this.emptyTechNote();
+            }
+        }
+    }
+
+    emptyTechNote() {
+        var obj  = new Object();
+        obj.note = "";
+        obj.dateCreated = new Date();
+        obj.file = {};
+        obj.category = "";
+        return obj;
+    }
+
+    async saveTechNote(){
+        if(!this.selectedTechNote){
+            return;
+        }
+
+        if(!this.selectedTechNote._id){
+            let serverResponse = await this.data.saveObject(this.selectedTechNote, this.TECHNOTES_SERVICE, "post");
+            return serverResponse;
+        } else {
+            var serverResponse = await this.data.saveObject(this.selectedTechNote, this.TECHNOTES_SERVICE, "put");
+            return serverResponse;
+        }
+    }
+
+    async deleteTechNote(){
+        if(!this.selectedTechNote){
+            return;
+        }
+
+        let serverResponse = await this.data.deleteObject(this.TECHNOTES_SERVICE + '/' + this.selectedTechNote._id);
+        if (!serverResponse.error) {
+            this.techNotesArray.splice(this.editTechNoteIndex, 1);
+            this.editTechNoteIndex = - 1;
+        }
+        return serverResponse;
+
+    }
+
+    async getTechNotesCatArray(options, refresh){
+        if (!this.notesArray || refresh) {
+            var url = this.TECHNOTESCAT_SERVICE;
+            url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.techNotesCatArray = serverResponse;
+                } else {
+                    this.data.processError(serverResponse);
+                    return undefined;
+                }
+            } catch (error) {
+                console.log(error);
+                return undefined;
+            }
+        }
+    }
+
+    selectTechNoteCat(index) {
+        if (index === undefined) {
+            this.selectedTechNoteCat = this.emptyTechNoteCat();
+        } else {
+            try {
+                this.selectedTechNoteCat = this.utils.copyObject(this.techNotesCatArray[index]);
+                this.editTechNoteCatIndex = index;
+            } catch (error) {
+                console.log(error);
+                this.selectedTechNoteCat = this.emptyTechNoteCat();
+            }
+        }
+    }
+
+    selectTechNoteCatByID(id){
+        this.techNotesCatArray.forEach((item, index) => {
+          if(item._id === id){
+            this.selectedTechNoteCat = this.utils.copyObject(item);
+            this.editTechNoteCatIndex = index;
+            return;
+          }
+        });
+        return null;
+    }
+
+    emptyTechNoteCat() {
+        var obj  = new Object();
+        obj.category = "";
+        return obj;
+    }
+
+    async saveTechNoteCat(){
+        if(!this.selectedTechNoteCat){
+            return;
+        }
+
+        if(!this.selectedTechNoteCat._id){
+            let serverResponse = await this.data.saveObject(this.selectedTechNoteCat, this.TECHNOTESCAT_SERVICE, "post");
+            if (!serverResponse.error) {
+                if(this.notesArray){
+                    this.techNotesCatArray.push(this.selectedTechNoteCat);
+                    this.editTechNoteCatIndex = this.techNotesCatArray.length - 1;
+                }
+            } else {
+                this.data.processError(response, "There was an error creating the note.");
+                }
+            return serverResponse;
+        } else {
+            var serverResponse = await this.data.saveObject(this.selectedTechNoteCat, this.TECHNOTESCAT_SERVICE, "put");
+            if (!serverResponse.error) {
+                this.techNotesCatArray[this.editTechNoteCatIndex] = this.utils.copyObject(this.selectedTechNoteCat, this.techNotesCatArray[this.editTechNoteCatIndex]);
+            } else {
+                this.data.processError(response, "There was an error updating the tech note.");
+            }
+            return serverResponse;
+        }
+    }
+
+    async deleteTechNoteCat(){
+        if(this.selectedTechNoteCat._id){
+            let serverResponse = await this.data.deleteObject(this.TECHNOTESCAT_SERVICE + '/' + this.selectedTechNoteCat._id);
+            if (!serverResponse.error) {
+                this.techNotesCatArray.splice(this.editTechNoteCatIndex, 1);
+                this.editTechNoteCatIndex = - 1;
+            }
+            return serverResponse;
+        }
+        return null;
+    }
    
     //courses
     async getCoursesArray(refresh, options, fields) { 

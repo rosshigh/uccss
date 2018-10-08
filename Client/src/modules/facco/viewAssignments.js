@@ -55,6 +55,7 @@ export class ViewAssignments {
 		} else {
 			this.dataTable.updateArray([]);
 		}
+		this.clearFilters();
 	}
 
 	getAssignmentsArray(){
@@ -84,9 +85,14 @@ export class ViewAssignments {
 
 	async refresh() {
 		this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-		await this.getRequests();
+		await this.getAssignments();
 		this.spinnerHTML = "";
 	}
+
+	clearFilters(){
+		this.productFilterValue = "";
+		this.helpTicketTypeFilterValue = "";
+	} 
 
 	courseCustomFilter(value, item, context){
 		if(value == 'Regular' && item.requestId.courseId != context.config.SANDBOX_ID)  return true;

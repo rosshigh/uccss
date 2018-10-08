@@ -71,7 +71,8 @@ export class ViewHelpTickets {
   async activate(params) {
     let responses = await Promise.all([
       this.helpTickets.getHelpTicketTypes('?order=category'),
-      this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
+      this.helpTickets.getHelpTicketArray("?order=createdDate:DSC", true),
+      //filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&
       this.config.getConfig()
     ]);
     this.helpTickets.calcHelpTicketAges();

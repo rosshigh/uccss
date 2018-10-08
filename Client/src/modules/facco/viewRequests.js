@@ -45,7 +45,7 @@ export class ViewRequests {
     }
 
     async getRequests() {
-        if (this.selectedSession) {
+        if (this.selectedSession) { 
             this.sessions.selectSessionById(this.selectedSession);
             await this.requests.getClientRequestsDetailFaccoArray(this.selectedSession,  this.userObj.institutionId._id, true);
             this.requests.requestsDetailsArray.forEach(item => {
@@ -55,12 +55,20 @@ export class ViewRequests {
         } else {
             this.dataTable.updateArray([]);
         }
+        this.clearFilters();
     }
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.getRequests();
         this.spinnerHTML = "";
+    }
+
+    clearFilters(){
+        this.courseFilter = "";
+        this.requestStatusFilter = "";
+        this.productFilterValue = "";
+        this.helpTicketTypeFilterValue = "";
     }
 
     courseCustomFilter(value, item, context){

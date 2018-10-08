@@ -6,6 +6,8 @@ var express = require('express'),
     Model = mongoose.model('Person'),
     PersonArchive = mongoose.model('PersonArchive'),
     Note = mongoose.model('Note'),
+    TechNote = mongoose.model('TechNote'),
+    TechNoteCategory = mongoose.model('TechNoteCategory'),
     http = require('http'),
     PasswordReset =  mongoose.model('PasswordReset'),
     path = require('path'),
@@ -353,32 +355,75 @@ module.exports = function (app, config) {
     res.status(201).json({message: "Emails sent"});
   });
 
+  router.get('/api/people/count/:status', function(req, res, next){
+    logger.log('Count people with status ' + req.params.status, 'verbose');
+
+    Model.find({personStatus: req.params.status}, function(err, results){
+      if(err) return next(err);
+
+      res.status(200).json({count: results.length});
+    });
+  });
+
+  router.post('/api/people/archive', function(req, res, next){
+    logger.log('Archive people', 'verbose'); 
+    Model.find({personStatus: '02'}, function(err, result){
+      if(err){
+        return next(err);
+      }    
+      var numPeople = result.length;
+      var bulk = PersonArchive.collection.initializeOrderedBulkOp();
+      var counter = 0;
+
+      result.forEach(function(doc) {
+          bulk.insert(doc);
+          counter++;
+      }); 
+      if (counter > 0) {
+          bulk.execute(function(err, result2) {
+            if(err){
+              return next(err);
+            }         
+            var bulk2 = Model.collection.initializeOrderedBulkOp();
+            var counter2 = 0;        
+            result.forEach(function(doc) {            
+              bulk2.find( { _id: doc._id } ).remove();             
+              counter2++;
+            });          
+            if(counter2){
+              bulk2.execute(function(err, results){
+                if(err){
+                  res.status(500).json({message: "people not deleted"});
+                }
+                res.status(200).json({message: 'People Archived', number: numPeople});
+              })
+            }
+          });
+      }
+    });
+
+  });
+
   router.post('/api/passwordReset',  function(req, res, next){
     logger.log('Password Reset for ' + req.body.email, 'verbose');
      Model.find({ email : req.body.email}).exec()
      .then(person => {      
        if(person){
           var passwordreset = PasswordReset({personId: person[0]._id});
-          passwordreset.validationCode =  new Buffer(passwordreset._id + person[0]._id).toString('base64');                 passwordreset.save()
+          passwordreset.validationCode =  new Buffer(passwordreset._id + person[0]._id).toString('base64');                 
+          passwordreset.save()
           .then(result => {
               var context = {fullName: person[0].fullName, result: result, host: config.corsDomain };
               result.fullName = person[0].fullName;
               var mailObj = {
                 email: person[0].email,
                 subject: 'Password Reset',
-                MESSAGE: "<H1>Forgot your password?</h1><br>It happens. Click the <a href='" + config.corsDomain + "/#/resetPassword/" + result.validationCode + "'>link</a> to reset your password.</br>",
+                MESSAGE: "<H1 class='text-center' style='Margin:0;Margin-bottom:10px;color:inherit;font-family:Helvetica,Arial,sans-serif;font-size:34px;font-weight:400;line-height:1.3;margin:0;margin-bottom:10px;padding:0;text-align:center;word-wrap:normal'>Forgot your password?</h1><br class='text-center' style='Margin:0;Margin-bottom:10px;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;margin-bottom:10px;padding:0;text-align:center'>It happens. Click the <a href='" + config.corsDomain + "/#/resetPassword/" + result.validationCode + "'>link</a> to reset your password.</br></p>",
                 context: context
               }     
-              //It happens. Click the <a href="{{host}}/#/resetPassword/{{result.validationCode}}"
 
               sendEmail(mailObj);
-              // passwordReset(mailObj)
-                // .then(emailResult => {
-                    res.status(200).json(result);
-                // })
-                // .catch(error => {
-                //     return next(error);
-                // });  
+              res.status(200).json(result);
           })
           .catch(error => {
             return next(error);
@@ -518,6 +563,152 @@ module.exports = function (app, config) {
     })
   });
 
+  router.get('/api/technotes', requireAuth,  function(req, res, next){
+    logger.log('Get technotes','verbose');
+    var query = buildQuery(req.query, TechNote.find())
+    .populate({ path: 'personId', model: 'Person', select: 'firstName lastName fullName'})
+    .populate({ path: 'productId', model: 'Product', select: 'name'})
+    .populate({ path: 'systemId', model: 'System', select: 'sid'})
+    .populate({ path: 'categoryId', model: 'TechNoteCategory', select: 'category'})
+    query.exec( function(err, object){
+        if (err) {
+          res.status(500).json(err);
+        } else {       
+          if(!object || object.length === 0){          
+            res.status(200).json(new Array());
+          } else {
+            res.status(200).json(object);
+          }
+        }
+      });
+  });
+        
+  router.post('/api/technotes', requireAuth, function(req, res, next){
+    logger.log('Create technotes', 'verbose');
+    var note =  new TechNote(req.body);  
+      note.save(function ( err, object ){
+        if (err) {
+            return next(err);
+        } else {
+          res.status(201).json(object);
+        }
+      });
+  });
+        
+  router.put('/api/technotes', requireAuth, function(req, res, next){
+    logger.log('Update technotes ' + req.body._id, 'verbose');  
+    TechNote.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, person){
+      if (err) {
+        return next(err);
+      } else {
+        res.status(200).json(person);
+      }
+    })
+  });
+        
+  router.delete('/api/technotes/:id', requireAuth, function(req, res, next){
+    logger.log('Delete technotes ' + req.params.id,'verbose');
+    TechNote.remove({ _id: req.params.id }, function(err, result){
+      if (err) {
+          return next(err);
+      } else {
+        res.status(200).json({msg: "Note Deleted"});
+      }
+    })
+  });
+
+  var storageTech = multer.diskStorage({
+    destination: function (req, file, cb) {
+
+      var path = config.uploads + '/techNotes';
+     
+      mkdirp(path, function(err) {
+        if(err){
+          res.status(500).json(err);
+        } else {
+          cb(null, path);
+        }
+      });
+    },
+    filename: function (req, file, cb) {
+      cb(null, req.params.id + file.originalname.substring(file.originalname.indexOf('.')));
+    }
+  });
+
+  var uploadTechnotes = multer({ storage: storageTech});
+
+  router.post('/api/technotes/upload/:id',  uploadTechnotes.any(), function(req, res, next){
+     logger.log('Upload File ', 'verbose');    
+     TechNote.findById(req.params.id, function(err, techNote){   
+        if(err){
+          return next(err);
+        } else {                   
+          techNote.file =  {
+              originalFilename: req.files[0].originalname,
+              fileName: req.files[0].filename,
+              dateUploaded: new Date()
+            };                       
+            techNote.save(function(err, techNote) {
+              if(err){
+                return next(err);
+              } else {
+                res.status(200).json(techNote);
+              }
+            });
+          }        
+      });
+  });
+
+  router.get('/api/technotecats', requireAuth,  function(req, res, next){
+    logger.log('Get technotescat','verbose');
+    var query = buildQuery(req.query, TechNoteCategory.find())
+    query.exec( function(err, object){
+        if (err) {
+          res.status(500).json(err);
+        } else {       
+          if(!object || object.length === 0){          
+            res.status(200).json(new Array());
+          } else {
+            res.status(200).json(object);
+          }
+        }
+      });
+  });
+        
+  router.post('/api/technotecats', requireAuth, function(req, res, next){
+    logger.log('Create technotecats', 'verbose');
+    var note =  new TechNoteCategory(req.body);  
+      note.save(function ( err, object ){
+        if (err) {
+            return next(err);
+        } else {
+          res.status(201).json(object);
+        }
+      });
+  });
+        
+  router.put('/api/technotecats', requireAuth, function(req, res, next){
+    logger.log('Update technotecats ' + req.body._id, 'verbose');  
+    TechNoteCategory.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, person){
+      if (err) {
+        return next(err);
+      } else {
+        res.status(200).json(person);
+      }
+    })
+  });
+        
+  router.delete('/api/technotecats/:id', requireAuth, function(req, res, next){
+    logger.log('Delete technotecats ' + req.params.id,'verbose');
+    TechNoteCategory.remove({ _id: req.params.id }, function(err, result){
+      if (err) {
+          return next(err);
+      } else {
+        res.status(200).json({msg: "Note Deleted"});
+      }
+    })
+  });
+
   router.get('/api/events', requireAuth,  function(req, res, next){
     logger.log('Get events','verbose');
     var query = buildQuery(req.query, Event.find())
@@ -586,7 +777,7 @@ module.exports = function (app, config) {
     })
   });
 
-   var storage = multer.diskStorage({
+  var storage = multer.diskStorage({
     destination: function (req, file, cb) {
 
       var path = config.uploads + '/peopleImages';
@@ -607,7 +798,7 @@ module.exports = function (app, config) {
   var upload = multer({ storage: storage});
 
   router.post('/api/people/upload/:id',  upload.any(), function(req, res, next){
-     writeLog.log('Upload File ', 'verbose');    
+     logger.log('Upload File ', 'verbose');    
       Model.findById(req.params.id, function(err, person){   
         if(err){
           return next(err);
@@ -626,45 +817,6 @@ module.exports = function (app, config) {
             });
           }        
       });
-  });
-
-  router.post('/api/people/archive', function(req, res, next){
-    writeLog.log('Archive people', 'verbose'); 
-    Model.find({personStatus: '02'}, function(err, result){
-      if(err){
-        return next(err);
-      }    
-      var numPeople = result.length;
-      var bulk = PersonArchive.collection.initializeOrderedBulkOp();
-      var counter = 0;
-
-      result.forEach(function(doc) {
-          bulk.insert(doc);
-          counter++;
-      }); 
-      if (counter > 0) {
-          bulk.execute(function(err, result2) {
-            if(err){
-              return next(err);
-            }         
-            var bulk2 = Model.collection.initializeOrderedBulkOp();
-            var counter2 = 0;        
-            result.forEach(function(doc) {            
-              bulk2.find( { _id: doc._id } ).remove();             
-              counter2++;
-            });          
-            if(counter2){
-              bulk2.execute(function(err, results){
-                if(err){
-                  res.status(500).json({message: "people not deleted"});
-                }
-                res.status(200).json({message: 'People Archived', number: numPeople});
-              })
-            }
-          });
-      }
-    });
-
   });
 
 };

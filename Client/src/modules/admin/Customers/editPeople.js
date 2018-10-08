@@ -544,6 +544,32 @@ export class EditPeople {
         link.click();
     }
 
+    async archiveInactivePeople(){
+        var inactivePeople = 0;
+        let response = await this.people.countPeopleStatus(this.config.INACTIVE_PERSON);
+        if(!response.error) inactivePeople = response.count;
+        if(inactivePeople){
+          return this.dialogs.showMessage(
+            "This will archive " + inactivePeople + " inactive people.  Are you sure you want to do that?", 
+            "Archive People", 
+            ['Yes', 'No']
+            ).whenClosed(response => {
+                if(!response.wasCancelled){
+                 this.archiveTickets();  
+                }
+            });
+        } else {
+          this.utils.showNotification('There are currently no inactive people in the active person collection.');
+        }
+    }
+
+    async archivePeople(){
+        let response = await this.people.archiveInactivePeople();
+        if(!response.error){
+          this.utils.showNotification(response.number + ' people were archived successfully')
+        }
+    }
+
 	customInstitutionSorter(sortProperty, sortDirection, sortArray, context){
 
         return sortArray.sort((a, b) => {

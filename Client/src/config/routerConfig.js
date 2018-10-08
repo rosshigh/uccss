@@ -86,7 +86,6 @@ export default class {
                   name: 'notes',          
                   settings: { auth: true, roles: [] } 
                 },
-                // // { route: 'logout',          moduleId: './modules/home/logout',                  name: 'logout',        settings: { auth: true, roles: [] } },
                 {
                   route: 'facco',
                   moduleId: './modules/facco/facco',
@@ -133,6 +132,12 @@ export default class {
                   route: 'htNote/:id',      
                   moduleId: './modules/tech/support/support',         
                   name: 'htNote',         
+                  settings: { auth: true, roles: [] } 
+                },
+                { 
+                  route: 'techNotes',      
+                  moduleId: './modules/techNotes/techNotes',         
+                  name: 'techNotes',         
                   settings: { auth: true, roles: [] } 
                 }
             ]);

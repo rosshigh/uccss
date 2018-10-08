@@ -168,8 +168,8 @@ export class CreateRequestTech {
 	async save(){
 		if(this.validation.validate(1)){
 			this._buildRequest();
-			let email = this._buildEmailObject();
-			let serverResponse = await this.requests.saveRequest(email);
+			// let email = this._buildEmailObject();
+			let serverResponse = await this.requests.saveRequest({});
 			if (!serverResponse.status) {
 				this.utils.showNotification("The product request was updated");
 				this.systemSelected = false;

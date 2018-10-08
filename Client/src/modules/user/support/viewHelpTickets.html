@@ -5,7 +5,12 @@
         <div class="row">
             <div show.bind="!helpTicketSelected" class="col-lg-12">
                 <div show.bind="nohelpTickets" class="bottomMargin leftMargin">
-                    <h4>You have no help tickets</h4>
+                    <h4>You have no open help tickets</h4>
+                    <span class="checkbox marginLeft" style="white-space: nowrap;display:inline;">
+						<label>
+						  <input checked.bind="isCheckedCurrent" change.trigger="retrieveClosedHelpTickets()" type="checkbox"> View closed help tickets
+						</label>
+					</span>
                 </div>
                 <compose show.bind="!nohelpTickets" view="./components/viewHTTable.html"></compose>
             </div> 

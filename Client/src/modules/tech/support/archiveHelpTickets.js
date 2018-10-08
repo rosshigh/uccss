@@ -121,8 +121,9 @@ export class ArchiveHelpTickets {
   }
 
   async search() {
+    let searchCollection = this.isCheckedCurrent ? 'current' : 'archive';
     this.buildSearchCriteria();
-    this.resultArray = await this.helpTickets.archiveSearch(this.searchObj);
+    this.resultArray = await this.helpTickets.archiveSearch(this.searchObj, searchCollection);
     // this.resultArray = this.helpTickets.advancedSearch(this.searchObj);
     this.helpTicketSelected = true;
     this.dataTable.updateArray(this.resultArray);
@@ -327,15 +328,23 @@ export class ArchiveHelpTickets {
   }
 
   async archiveClosedTickets(){
-    return this.dialogs.showMessage(
-      "This will archive closed help tickets.  Are you sure you want to do that?", 
-      "Archive Help Tickets", 
-      ['Yes', 'No']
-      ).whenClosed(response => {
-          if(!response.wasCancelled){
-           this.archiveTickets();  
-          }
-      });
+    var closedHelpTickets = 0;
+    let response = await this.helpTickets.countHelpTicketsStatus(this.config.CLOSED_HELPTICKET_STATUS);
+    if(!response.error) closedHelpTickets = response.count;
+    if(closedHelpTickets){
+      return this.dialogs.showMessage(
+        "This will archive " + closedHelpTickets + " closed help tickets.  Are you sure you want to do that?", 
+        "Archive Help Tickets", 
+        ['Yes', 'No']
+        ).whenClosed(response => {
+            if(!response.wasCancelled){
+             this.archiveTickets();  
+            }
+        });
+    } else {
+      this.utils.showNotification('There are currently no closed help tickets in the active help ticket collection.');
+    }
+    
   }
 
   async archiveTickets(){

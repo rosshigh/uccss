@@ -36,6 +36,36 @@ export class HelpTickets {
         }
     }
 
+    async getUserHelpTicketArray(options, refresh){
+        if (!this.helpTicketsArray || refresh) {
+          var url = this.HELP_TICKET_SERVICES + '/users';
+          url += options ? options : "";
+           try {
+               let serverResponse = await this.data.get(url);
+               if (!serverResponse.error) {
+                   this.helpTicketsArray = serverResponse;
+               }
+           } catch (error) {
+               console.log(error);
+           }
+       }
+   }
+
+    async getArchivedHelpTicketArray(options, refresh){
+        if (!this.helpTicketsArray || refresh) {
+            var url = this.HELP_TICKET_SERVICES + '/archived';
+            url += options ? options : "";
+             try {
+                 let serverResponse = await this.data.get(url);
+                 if (!serverResponse.error) {
+                     this.helpTicketsArray = serverResponse;
+                 }
+             } catch (error) {
+                 console.log(error);
+             }
+         }
+    }
+
     async getHelpTicketsArrayAnalytics(options, refresh){
         if (!this.requestsArray || refresh) {
           var url = this.HELP_TICKET_SERVICES + "/analytics"; 
@@ -382,6 +412,11 @@ export class HelpTickets {
         }
     }  
 
+    async countHelpTicketsStatus(status){
+        let response = await this.data.get(this.HELP_TICKET_SERVICES + '/count/' + status);
+        return response;
+    }
+
     groupRequestsByType(){
         if(!this.helpTicketArrayAnalytics) {
             return;
@@ -520,10 +555,11 @@ export class HelpTickets {
         })
     }
 
-    async archiveSearch(searchObj){
+    async archiveSearch(searchObj, collection){
         if(searchObj){
+            var url = this.HELP_TICKET_SERVICES + "/archive" + (collection ? '/' + collection : '');
             var resultArray = new Array();
-            let response = await this.data.saveObject(searchObj, this.HELP_TICKET_SERVICES + "/archive", "post");
+            let response = await this.data.saveObject(searchObj, url, "post");
             if(!response.error){
                 resultArray = response;
                 return resultArray;

@@ -12,11 +12,11 @@ export class AppConfig {
     // BASE_URL = "https://uccsstest.ucc.uwm.edu/api/";
     // IMG_DOWNLOAD_URL = "https://uccsstest.ucc.uwm.edu/img/";  
 
-    // BASE_URL = "http://localhost/api/";
-    // IMG_DOWNLOAD_URL = "http://localhost/img/";  
+    BASE_URL = "http://localhost/api/";
+    IMG_DOWNLOAD_URL = "http://localhost/img/";  
 
-    BASE_URL = this.HOST + "/api/";
-    IMG_DOWNLOAD_URL = this.HOST + '/img/'  
+    // BASE_URL = this.HOST + "/api/";
+    // IMG_DOWNLOAD_URL = this.HOST + '/img/'  
 
     isMobile = false; 
 
@@ -24,6 +24,7 @@ export class AppConfig {
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
     DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
     DOCUMENT_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/documents';  
+    TECHNOTE_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/techNotes';  
     DOCUMENT_FILE_CURRICULUM_URL = this.HOST + '/uploadedFiles/curriculum';
     SITE_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/site/';
     PERSON_IMAGE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/peopleImages';

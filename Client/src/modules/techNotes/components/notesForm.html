@@ -1,0 +1,153 @@
+<template>
+    <div class="col-lg-12">
+        <div class="bottomMargin list-group-item leftMargin rightMargin">
+            <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border"
+                    aria-hidden="true"></i></span>
+            <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border"
+                    aria-hidden="true"></i></span>
+            <span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border"
+                    aria-hidden="true"></i></span>
+            <span show.bind="people.selectedNote._id" click.delegate="delete()" class="smallMarginRight"
+                bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i
+                    class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>
+        </div>
+        <form class="form-horizontal topMargin">
+            <div class="col-lg-4">
+                <div class="row">
+                    <div class="col-sm-12 col-lg-12">
+                        <div class="form-group">
+                            <label for="product" class="col-lg-2 control-label hideOnPhone">Product</label>
+                            <div class="col-lg-8">
+                                <select value.bind="people.selectedTechNote.productId._id" id="product" class="form-control">
+                                    <option model.bind="-1">Select a product</opton>
+                                    <option repeat.for="product of products.productsArray" model.bind="product._id">${product.name}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-lg-12">
+                        <div class="form-group">
+                            <label for="system" class="col-lg-2 control-label hideOnPhone">System</label>
+                            <div class="col-lg-8">
+                                <select value.bind="people.selectedTechNote.systemId._id" id="system" class="form-control">
+                                    <option model.bind="-1">Select a system</opton>
+                                    <option repeat.for="system of systems.systemsArray" model.bind="system._id">${system.sid}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-lg-12">
+                        <div class="form-group">
+                            <label for="category" class="col-lg-2 control-label hideOnPhone">Category *</label>
+                            <div class="col-lg-8">
+                                <select value.bind="people.selectedTechNote.categoryId._id" id="category" class="form-control">
+                                    <option value="">Select a category</opton>
+                                    <option repeat.for="category of people.techNotesCatArray" value.bind="category._id">${category.category}</option>
+                                </select>
+                                <a class="btn btn-link" click.trigger="openEditCatForm('new')" aria-hidden="true">(Add
+                                    a Category)</a>
+                                <a class="btn btn-link" disable.bind="people.selectedTechNote.categoryId == '-1'"
+                                    click.trigger="openEditCatForm('edit')" aria-hidden="true">(Edit this Category)</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div show.bind="showCategoryForm" class="row col-lg-8 col-lg-offset-2">
+                    <div class="panel panel-default" style="background-color:ghostwhite;">
+                        <div class="panel-body">
+                            <div class="list-group-item bottomMargin col-sm-12 topMargin">
+                                <span click.delegate="saveCategory()" class="smallMarginRight" bootstrap-tooltip
+                                    data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save Category"><i
+                                        class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+                                <span click.delegate="cancelEditCategory()" class="smallMarginRight" bootstrap-tooltip
+                                    data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel Changes"><i
+                                        class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+                                <span show.bind=" editCategoryFlag" click.delegate="deleteCat()" class="smallMarginRight"
+                                    bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+                                    data-original-title="Delete Category"><i class="fa fa-trash fa-lg fa-border text-danger"
+                                        aria-hidden="true"></i></span>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 col-lg-12">
+                                    <div class="form-group">
+                                        <label for="editTitle" class="col-sm-2 control-label hideOnPhone">Title</label>
+                                        <div class="col-sm-8">
+                                            <input value.bind="people.selectedTechNoteCat.category" id="editCategoryName"
+                                                class="form-control " placeholder="Category" type="text" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-lg-12">
+                        <div class="form-group">
+                            <label for="reminderDate" class="col-sm-2 control-label hideOnPhone">Reminder Date</label>
+                            <div class="col-sm-8">
+                                <flat-picker controlid="reminderDate" config.bind="config" value.bind="people.selectedTechNote.dateRemind"></flat-picker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-lg-12">
+                        <div class="form-group">
+                            <label for="editFileReference" class="col-sm-2 control-label hideOnPhone">File Reference</label>
+                            <div class="col-sm-8">
+                                <input value.bind="people.selectedTechNote.fileReference" id="editFileReference" class="form-control "
+                                    placeholder="File reference" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-lg-12">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label hideOnPhone">File</label>
+                            <div class="col-sm-8">
+                                <a href="${config.TECHNOTE_FILE_DOWNLOAD_URL}/${people.selectedTechNote.file.fileName}" target="_blank">${people.selectedTechNote.file.originalFilename}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div>
+                        <div class="col-lg-3 col-sm-offset-2 topMargin">
+                            <label class="btn btn-primary">
+                                Browse for files&hellip; <input type="file" style="display: none;" change.delegate="changeFiles()"
+                                    files.bind="files">
+                            </label>
+                        </div>
+                        <div class="col-lg-6">
+                            <ul>
+                                <li repeat.for="file of filesToUpload" class="list-group-item">${file.name}<span
+                                        click.delegate="removeFile($index)" class="pull-right"><i class="fa fa-trash"
+                                            aria-hidden="true"></i></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div>
+                    <span id="noteError"></span>
+                    <div>
+                        <span id="noteError"></span>
+                        <editor value.bind="people.selectedTechNote.note" toolbar.bind="toolbar" height="500"></editor>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</template>
