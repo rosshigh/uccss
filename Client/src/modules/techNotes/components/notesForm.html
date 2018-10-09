@@ -78,8 +78,8 @@
                             <div class="row">
                                 <div class="col-sm-12 col-lg-12">
                                     <div class="form-group">
-                                        <label for="editTitle" class="col-sm-2 control-label hideOnPhone">Title</label>
-                                        <div class="col-sm-8">
+                                        <label for="editTitle" class="col-lg-2 control-label hideOnPhone">Title</label>
+                                        <div class="col-sm-10">
                                             <input value.bind="people.selectedTechNoteCat.category" id="editCategoryName"
                                                 class="form-control " placeholder="Category" type="text" />
                                         </div>
@@ -122,13 +122,13 @@
                 </div>
                 <div class="row">
                     <div>
-                        <div class="col-lg-3 col-sm-offset-2 topMargin">
+                        <div class="col-lg-5 col-sm-offset-2 topMargin">
                             <label class="btn btn-primary">
                                 Browse for files&hellip; <input type="file" style="display: none;" change.delegate="changeFiles()"
                                     files.bind="files">
                             </label>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-10 topMargin">
                             <ul>
                                 <li repeat.for="file of filesToUpload" class="list-group-item">${file.name}<span
                                         click.delegate="removeFile($index)" class="pull-right"><i class="fa fa-trash"
