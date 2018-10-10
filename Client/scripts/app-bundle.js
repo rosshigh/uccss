@@ -34940,7 +34940,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return Promise.all([this.helpTickets.getHelpTicketTypes('?order=category'), this.helpTickets.getHelpTicketArray("?order=createdDate:DSC", true), this.config.getConfig()]);
+                return Promise.all([this.helpTickets.getHelpTicketTypes('?order=category'), this.helpTickets.getHelpTicketArray("", true), this.config.getConfig()]);
 
               case 2:
                 responses = _context.sent;
