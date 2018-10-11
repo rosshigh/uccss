@@ -15,6 +15,7 @@
                             </tr>
                             <tr>
                                 <th style="width:250px;"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'NoteNo'})">Note No </span><i class="fa fa-sort"></i></th>
+                                <th style="width:250px;"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'title'})">Title </span><i class="fa fa-sort"></i></th>
                                 <th style="width:150px;"><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customPersonSorter, propertyName: 'personId'})">Person </span><i class="fa fa-sort"></i></th>                   
                                 <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customCategorySorter, propertyName: 'personId'})">Category </span><i class="fa fa-sort"></i></th>                   
                                 <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customProductSorter, propertyName: 'personId'})">Product </span><i class="fa fa-sort"></i></th>                   
@@ -28,9 +29,11 @@
                                 <th></th>
                                 <th></th>
                                 <th></th>
+                                <th></th>
                             </tr>
                             <tr click.trigger="edit($index, $event)" repeat.for="item of dataTable.displayArray">
                                 <td  data-title="Note No">${item.NoteNo}</td>
+                                <td  data-title="Note No">${item.title}</td>
                                 <td  data-title="Person">${item.personId.fullName}</td>
                                 <td data-title="Catgory">${item.categoryId.category}</td>
                                 <td data-title="Catgory">${item.productId.name}</td>
