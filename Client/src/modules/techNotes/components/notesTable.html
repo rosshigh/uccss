@@ -15,10 +15,10 @@
                             </tr>
                             <tr>
                                 <th style="width:250px;"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'NoteNo'})">Note No </span><i class="fa fa-sort"></i></th>
-                                <th style="width:150px;"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'personId'})">Person </span><i class="fa fa-sort"></i></th>
-                                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'category'})">Category </span><i class="fa fa-sort"></i></th>
-                                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'productId'})">Product </span><i class="fa fa-sort"></i></th>
-                                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'systemId'})">System </span><i class="fa fa-sort"></i></th>
+                                <th style="width:150px;"><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customPersonSorter, propertyName: 'personId'})">Person </span><i class="fa fa-sort"></i></th>                   
+                                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customCategorySorter, propertyName: 'personId'})">Category </span><i class="fa fa-sort"></i></th>                   
+                                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customProductSorter, propertyName: 'personId'})">Product </span><i class="fa fa-sort"></i></th>                   
+                                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customSystemSorter, propertyName: 'personId'})">System </span><i class="fa fa-sort"></i></th>   
                             </tr>
                         </thead>
                         <tbody>

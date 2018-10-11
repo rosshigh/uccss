@@ -65,6 +65,8 @@ var HelpTicketSchema = new Schema({
   }]
 });
 
+// HelpTicketSchema.index( {createdDate: -1} );
+
 HelpTicketSchema.plugin(AutoIncrement, {inc_field: 'helpTicketNo'});
 
 HelpTicketSchema.pre('update', function() {

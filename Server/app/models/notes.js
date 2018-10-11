@@ -23,6 +23,7 @@ module.exports = Mongoose.model('Note', NoteSchema);
 
 var TechNoteSchema = new Schema({
   personId: { type: Schema.Types.ObjectId },
+  title: { type: String },
   type: { type: String },
   dateCreated: { type: Date, default: Date.now },
   dateRemind: { type: Date },

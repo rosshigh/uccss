@@ -19,6 +19,17 @@
                 <div class="row">
                     <div class="col-sm-12 col-lg-12">
                         <div class="form-group">
+                            <label for="editTitle" class="col-sm-2 control-label hideOnPhone">Title</label>
+                            <div class="col-sm-8">
+                                <input value.bind="people.selectedTechNote.title" id="editTitle" class="form-control "
+                                    placeholder="Title" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-lg-12">
+                        <div class="form-group">
                             <label for="product" class="col-lg-2 control-label hideOnPhone">Product</label>
                             <div class="col-lg-8">
                                 <select value.bind="people.selectedTechNote.productId._id" id="product" class="form-control">
@@ -78,7 +89,7 @@
                             <div class="row">
                                 <div class="col-sm-12 col-lg-12">
                                     <div class="form-group">
-                                        <label for="editTitle" class="col-lg-2 control-label hideOnPhone">Title</label>
+                                        <label for="editTitle" class="col-lg-2 control-label hideOnPhone">Category</label>
                                         <div class="col-sm-10">
                                             <input value.bind="people.selectedTechNoteCat.category" id="editCategoryName"
                                                 class="form-control " placeholder="Category" type="text" />
@@ -115,7 +126,8 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label hideOnPhone">File</label>
                             <div class="col-sm-8">
-                                <a href="${config.TECHNOTE_FILE_DOWNLOAD_URL}/${people.selectedTechNote.file.fileName}" target="_blank">${people.selectedTechNote.file.originalFilename}</a>
+                                <a href="${config.TECHNOTE_FILE_DOWNLOAD_URL}/${people.selectedTechNote.file.fileName}"
+                                    target="_blank">${people.selectedTechNote.file.originalFilename}</a>
                             </div>
                         </div>
                     </div>

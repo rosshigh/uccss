@@ -163,5 +163,52 @@ export class EditProducts {
         } else {
             this.showCategoryForm = false;
         }
-	}
+    }
+    
+    customPersonSorter(sortProperty, sortDirection, sortArray, context){
+        context.sortDirection = context.sortDirection === null ? 1 : context.sortDirection === 1 ? -1 : 1;
+        return sortArray.sort((a,b) => {
+          if(a.personId === null && b.personId === null) return 0;
+          if(a.personId === null && b.personId !== null) return context.sortDirection * -1;
+          if(a.personId !== null && b.personId === null) return context.sortDirection;
+          var result = (a.personId.lastName < b.personId.lastName) ? -1 : (a.personId.lastName > b.personId.lastName) ? 1 : 0;
+          return result *context.sortDirection;
+        })
+      }
+
+      customCategorySorter(sortProperty, sortDirection, sortArray, context){
+        context.sortDirection = context.sortDirection === null ? 1 : context.sortDirection === 1 ? -1 : 1;
+        return sortArray.sort((a,b) => {
+          if(a.categoryId === null && b.categoryId === null) return 0;
+          if(a.categoryId === null && b.categoryId !== null) return context.sortDirection * -1;
+          if(a.categoryId !== null && b.categoryId === null) return context.sortDirection;
+          var result = (a.categoryId.category < b.categoryId.category) ? -1 : (a.categoryId.category > b.categoryId.category) ? 1 : 0;
+          return result *context.sortDirection;
+        })
+      }
+
+      customProductSorter(sortProperty, sortDirection, sortArray, context){
+        context.sortDirection = context.sortDirection === null ? 1 : context.sortDirection === 1 ? -1 : 1;
+        return sortArray.sort((a,b) => {
+          if((a.productId === null && b.productId === null) || (a.productId === undefined && b.productId === undefined)) return 0;
+          if((a.productId === null && b.productId !== null) || (a.productId === undefined && b.productId !== undefined)) return context.sortDirection * -1;
+          if((a.productId !== null && b.productId === null) || (a.productId !== undefined && b.productId === undefined)) return context.sortDirection;
+          var result = (a.productId.name < b.productId.name) ? -1 : (a.productId.name > b.productId.name) ? 1 : 0;
+          return result *context.sortDirection;
+        })
+      }
+
+      customSystemSorter(sortProperty, sortDirection, sortArray, context){
+        context.sortDirection = context.sortDirection === null ? 1 : context.sortDirection === 1 ? -1 : 1;
+        return sortArray.sort((a,b) => {
+          if((a.systemId === null && b.systemId === null) || (a.systemId === undefined && b.systemId === undefined)) return 0;
+          if((a.systemId === null && b.systemId !== null) || (a.systemId === undefined && b.systemId !== undefined)) return context.sortDirection * -1;
+          if((a.systemId !== null && b.systemId === null) || (a.systemId !== undefined && b.systemId === undefined)) return context.sortDirection;
+          var result = (a.systemId.sid < b.systemId.sid) ? -1 : (a.systemId.sid > b.systemId.sid) ? 1 : 0;
+          return result *context.sortDirection;
+        })
+      }
+
+
+      
 }
