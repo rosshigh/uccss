@@ -389,6 +389,10 @@ export class Assignments {
             this.processClient(index, client, el);
         } 
     }
+
+    updateClientAssignments(){
+        this.selectedSystem.clients[this.selectedClientIndex].assignments[this.clientSelectedIndex].studentIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentUserIds;
+    }
 	
 	processClient(index, client, el){            
         if(client.manual) {
@@ -399,6 +403,7 @@ export class Assignments {
             this.manualMode = localStorage.getItem('manualMode')  ? localStorage.getItem('manualMode') == "true" : false;
         }
 
+        this.selectedClient = client;
         this.setClientIndex(client.client);
 
         if(this.manualMode) $(this.proposedIDRange).focus();
