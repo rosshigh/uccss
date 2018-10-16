@@ -432,7 +432,7 @@ export class Assignments {
 
 		//Save the first id 
 		this.lastFirstID = this.firstID;
-		this.firstNumericFacID = client.lastFacIdAssigned == 0 ? parseInt(client.lastFacIdAssigned) : parseInt(client.lastFacIdAssigned) + parseInt(this.config.numFacultyIDs);//FACULTY_ID_BUFFER);
+		this.firstNumericFacID = client.lastFacIdAssigned == 0 ? parseInt(client.lastFacIdAssigned) : parseInt(client.lastFacIdAssigned) + parseInt(this.numFacultyIDs);//FACULTY_ID_BUFFER);
         this.lastNumericFacID =  this.firstNumericFacID + this.numFacultyIDs
         //config.DEFAULT_FACULTY_IDS;
 		
@@ -744,7 +744,7 @@ export class Assignments {
         var valid = true;
         var x1 = parseInt(assignment.firstID);
         var x2 = parseInt(assignment.lastID);
-        for(var i = 0; i < client.assignments.length; i++){
+        for(var i = 0; i < client.assignments.length - 1; i++){
             // if(this.existingRequest  && client.assignments[i].assignment == id){
             var y1 = parseInt(client.assignments[i].firstID);
             var y2 = parseInt(client.assignments[i].lastID);
