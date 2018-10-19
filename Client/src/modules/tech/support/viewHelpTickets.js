@@ -71,11 +71,11 @@ export class ViewHelpTickets {
   async activate(params) {
     let responses = await Promise.all([
       this.helpTickets.getHelpTicketTypes('?order=category'),
-      this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + '&order=helpTicketNo:DSC', true),
+      // this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + '&order=helpTicketNo:DSC', true),
       //filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&
       this.config.getConfig()
     ]);
-    this.helpTickets.calcHelpTicketAges();
+    // this.helpTickets.calcHelpTicketAges();
     this.sessions.getSessionsArray('?order=startDate:DSC');
     this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name');
     this.systems.getSystemsArray();
@@ -104,7 +104,9 @@ export class ViewHelpTickets {
   }
 
   attached() {
+    this.refresh(false);
     if(!this.mobile) this.toolTips();
+    // $("#loading").hide();
   }
 
   toolTips(){
@@ -194,12 +196,14 @@ export class ViewHelpTickets {
   /*****************************************************************************************
   * Refresh the helpticket collection
   *****************************************************************************************/
-  async refresh() {
-    this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+  async refresh(clickRefresh) {
+    // this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+    if(!clickRefresh) $("#loading").show();
     await this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
     this.helpTickets.calcHelpTicketAges();
-    this.spinnerHTML = "";
+    // this.spinnerHTML = "";
+    $("#loading").hide();
     this._cleanUpFilters()
   }
 
@@ -392,7 +396,7 @@ export class ViewHelpTickets {
     }
     let serverResponse = await this.helpTickets.saveHelpTicketResponse(email);
     if (!serverResponse.error) {
-      if(status == this.config.CLOSED_HELPTICKET_STATUS) await this.refresh();
+      if(status == this.config.CLOSED_HELPTICKET_STATUS) await this.refresh(false);
       this.utils.showNotification("The help ticket was updated");
       if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
     }

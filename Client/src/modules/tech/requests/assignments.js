@@ -40,8 +40,11 @@ export class Assignments {
          this.userObj = JSON.parse(sessionStorage.getItem('user'));
 	};
 		
-	attached(){
+	async attached(){
         $('[data-toggle="tooltip"]').tooltip();
+        
+        await this.getRequests();
+        $('#loading').hide();
     }
     
     async activate() { 
@@ -61,33 +64,26 @@ export class Assignments {
         this.facultyDetails = localStorage.getItem("facultyDetails") ? localStorage.getItem("facultyDetails") == "true" : false;;
         this.numFacultyIDs = this.config.DEFAULT_FACULTY_IDS;
         this.selectedSession = this.sessions.sessionsArray[0]._id;
-        this.getRequests();
+       
 	}
 	
 	async getRequests() {
         if (this.selectedSession) {
             this.sessions.selectSessionById(this.selectedSession);
-            // await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE, true);
-            // if(this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length){
-            //     this.noRequests = false;
-            //     this.clientRequests.requestsDetailsArray.forEach(item => {
-            //         if(item.requestId && item.requestId.courseId === null) item.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
-            //     })
-            //     this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
                 await this.filterInAssigned();
-            // } else {
-            //     this.noRequests = true;
-            //     this.displayArray = new Array();
-            // }
         } else {
             this.displayArray = new Array();
         }
         this.clearFilters();
+        console.log('alsdjfl')
 	}
 
 	async refresh() {
-        this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+        // this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+        // this.spinnerHTML = '<span  id="loading translucent"><ul style="z-index:99;" class="bokeh"><li></li><li></li><li></li></ul></span>';
+        $('#loading').show();
         await this.getRequests();
+        $('#loading').hide();
         this.spinnerHTML = "";
     }
 
@@ -1453,10 +1449,12 @@ export class Assignments {
         this.helpTicketTypeFilterValue = "";
         this.institutionFilterValue = "";
          this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
-        await this.filterInAssigned();
+         console.log('here')
+        // await this.filterInAssigned();
     }
 		
 	async filterInAssigned() {
+       
         this.requiredDateFilterValue = "";
         this.createdDateFilterValue = "";
         this.requestStatusFilter = "";
@@ -1465,7 +1463,9 @@ export class Assignments {
         this.helpTicketTypeFilterValue = "";
         this.institutionFilterValue = "";
         if(this.isCheckedAssigned){
+            $('#loading').show();
             await this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession  + ':requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE, true);
+            $('#loading').hide();
             if(this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length){
                 this.noRequests = false;
                 this.clientRequests.requestsDetailsArray.forEach(item => {
@@ -1478,12 +1478,15 @@ export class Assignments {
             }
         
         } else {
+            $('#loading').show();
             await this.clientRequests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
+            $('#loading').hide();
             this.clientRequests.requestsDetailsArray.forEach(item => {
                 if(item.requestId && item.requestId.courseId === null) item.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
             })
             this.dataTable.updateArray(this.clientRequests.requestsDetailsArray,'requiredDate',-1);
         }
+        
     }
     
     changeManualMode(){
