@@ -51,7 +51,7 @@ var ClientRequestDetailsSchema = new Schema({
   productId: { type: Schema.Types.ObjectId, required: true, ref: 'product' },
   requestStatus: { type: String },
   sessionId: { type: Schema.Types.ObjectId },
-  requestId: { type: Schema.Types.ObjectId, ref: 'ClientRequest'},
+  requestId: { type: Schema.Types.ObjectId }, //, ref: 'ClientRequest'
   idsAssigned: { type: Number },
    documents: [{
     url: { type: String } 
@@ -90,7 +90,7 @@ var ClientRequestSchema = new Schema({
   endDate: { type: Date },
   requestStatus: { type: String },
   modifiedDate: { type: Date },
-  requestDetails: [ { type: Schema.Types.ObjectId, ref: 'ClientRequestDetail' } ],
+  requestDetails: [ { type: Schema.Types.ObjectId } ], //, ref: 'ClientRequestDetail'
   institutionId: { type: Schema.Types.ObjectId },
   customerMessage: { type: String },
   audit: [{

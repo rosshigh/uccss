@@ -444,9 +444,27 @@ module.exports = function (app) {
       }
     })
   });
-
-  router.get('/api/clientRequestsDetails', requireAuth, function(req, res, next){
+  router.get('/api/clientRequestsDetailsTest', requireAuth, function(req, res, next){ 
     logger.log('Get clientRequests', 'verbose');
+    console.log('is this it')
+    var query = buildQuery(req.query, ClientRequestDetail.find());
+    query
+    .exec()
+      .then(object => {
+        if(object){
+          res.status(200).json(object);
+        } else {
+          res.status(404).json({message: "No requests were found"});
+        }
+      })
+      .catch(err => {
+        return next(err);
+      })
+  });
+
+  router.get('/api/clientRequestsDetails', requireAuth, function(req, res, next){ 
+    logger.log('Get clientRequests', 'verbose');
+    console.log('is this it')
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country'}})
@@ -456,6 +474,9 @@ module.exports = function (app) {
       .exec()
       .then(object => {
         if(object){
+          object.forEach(item => {
+            if(item.requestId) item.requestId.audit = [];
+          });
           res.status(200).json(object);
         } else {
           res.status(404).json({message: "No requests were found"});
@@ -466,22 +487,22 @@ module.exports = function (app) {
       })
   });
 
-  router.get('/api/clientRequestsDetailsOLD', requireAuth, function(req, res, next){
-    logger.log('Get clientRequests', 'verbose');
-    var query = buildQuery(req.query, ClientRequestDetail.find());
-    query.populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country'}})
-    query.exec()
-      .then(object => {
-        if(object){
-          res.status(200).json(object);
-        } else {
-          res.status(404).json({message: "No requests were found"});
-        }
-      })
-      .catch(err => {
-        return next(err);
-      })
-  });
+  // router.get('/api/clientRequestsDetailsOLD', requireAuth, function(req, res, next){
+  //   logger.log('Get clientRequests', 'verbose');
+  //   var query = buildQuery(req.query, ClientRequestDetail.find());
+  //   query.populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country'}})
+  //   query.exec()
+  //     .then(object => {
+  //       if(object){
+  //         res.status(200).json(object);
+  //       } else {
+  //         res.status(404).json({message: "No requests were found"});
+  //       }
+  //     })
+  //     .catch(err => {
+  //       return next(err);
+  //     })
+  // });
 
   router.get('/api/clientRequestsDetails/analytics', requireAuth, function(req, res, next){
     logger.log('Get clientRequests', 'verbose');

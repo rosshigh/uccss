@@ -107,7 +107,7 @@ export class Assignments {
 	
 	async saveEdit(){
         var email = {};
-        this.buildAuditDetail();
+        // this.buildAuditDetail();
         this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
         let serverResponse = await this.clientRequests.saveRequestDetail();
         if (!serverResponse.error) {
@@ -121,81 +121,81 @@ export class Assignments {
 
     }
 
-    buildAuditDetail(){
-        var obj = this.selectedRequestDetail;
-        if(obj.productId != this.originalRequestDetail.productId._id){
-            this.selectedRequestDetail.requestId.audit.push({
-                property: "productId",
-                eventDate: new Date(),
-                oldValue: this.originalRequestDetail.productId._id,
-                newValue: obj.productId._id,
-                personId: this.userObj._id
-            })
-        }
-        if(obj.requestStatus != this.originalRequestDetail.requestStatus){
-            this.selectedRequestDetail.requestId.audit.push({
-                property: 'requestStatus',
-                eventDate: new Date(),
-                oldValue: this.originalRequestDetail.requestStatus,
-                newValue: obj.requestStatus,
-                personId: this.userObj._id
-            })
-        }
-        if(obj.requestId.undergradIds != this.originalRequestDetail.requestId.undergradIds){
-            this.selectedRequestDetail.requestId.audit.push({
-                property: "undergradIds",
-                eventDate: new Date(),
-                oldValue: this.originalRequestDetail.requestId.undergradIds,
-                newValue: obj.requestId.undergradIds,
-                personId: this.userObj._id
-            })
-        }
-        if(obj.requestId.graduateIds != this.originalRequestDetail.requestId.graduateIds){
-            this.selectedRequestDetail.requestId.audit.push({
-                property: "graduateIds",
-                eventDate: new Date(),
-                oldValue: this.originalRequestDetail.requestId.graduateIds,
-                newValue: obj.requestId.graduateIds,
-                personId: this.userObj._id
-            })
-        }
-        if(obj.requestId.startDate != this.originalRequestDetail.requestId.startDate){
-            this.selectedRequestDetail.requestId.audit.push({
-                property: 'startDate',
-                eventDate: new Date(),
-                oldValue: this.originalRequestDetailrequestId.startDate,
-                newValue: obj.requestId.startDate,
-                personId: this.userObj._id
-            })
-        }
-        if(obj.requestId.endDate != this.originalRequestDetail.requestId.endDate){
-            this.selectedRequestDetail.requestId.audit.push({
-                property: 'endDate',
-                eventDate: new Date(),
-                oldValue: this.originalRequestDetail.requestId.endDate,
-                newValue: obj.requestId.endDate,
-                personId: this.userObj._id
-            })
-        }
-        if(obj.requiredDate != this.originalRequestDetail.requiredDate){
-            this.selectedRequestDetail.requestId.audit.push({
-                property: "requiredDate",
-                eventDate: new Date(),
-                oldValue: this.originalRequestDetail.requiredDate,
-                newValue: obj.requiredDate,
-                personId: this.userObj._id
-            })
-        }
-         if(obj.requestId.courseId != this.originalRequestDetail.requestId.courseId){
-            this.selectedRequestDetail.requestId.audit.push({
-                property: 'courseId',
-                eventDate: new Date(),
-                oldValue: this.originalRequestDetail.requestId.courseId,
-                newValue: obj.requestId.courseId,
-                personId: this.userObj._id
-            })
-        }
-	}
+    // buildAuditDetail(){
+    //     var obj = this.selectedRequestDetail;
+    //     if(obj.productId != this.originalRequestDetail.productId._id){
+    //         this.selectedRequestDetail.requestId.audit.push({
+    //             property: "productId",
+    //             eventDate: new Date(),
+    //             oldValue: this.originalRequestDetail.productId._id,
+    //             newValue: obj.productId._id,
+    //             personId: this.userObj._id
+    //         })
+    //     }
+    //     if(obj.requestStatus != this.originalRequestDetail.requestStatus){
+    //         this.selectedRequestDetail.requestId.audit.push({
+    //             property: 'requestStatus',
+    //             eventDate: new Date(),
+    //             oldValue: this.originalRequestDetail.requestStatus,
+    //             newValue: obj.requestStatus,
+    //             personId: this.userObj._id
+    //         })
+    //     }
+    //     if(obj.requestId.undergradIds != this.originalRequestDetail.requestId.undergradIds){
+    //         this.selectedRequestDetail.requestId.audit.push({
+    //             property: "undergradIds",
+    //             eventDate: new Date(),
+    //             oldValue: this.originalRequestDetail.requestId.undergradIds,
+    //             newValue: obj.requestId.undergradIds,
+    //             personId: this.userObj._id
+    //         })
+    //     }
+    //     if(obj.requestId.graduateIds != this.originalRequestDetail.requestId.graduateIds){
+    //         this.selectedRequestDetail.requestId.audit.push({
+    //             property: "graduateIds",
+    //             eventDate: new Date(),
+    //             oldValue: this.originalRequestDetail.requestId.graduateIds,
+    //             newValue: obj.requestId.graduateIds,
+    //             personId: this.userObj._id
+    //         })
+    //     }
+    //     if(obj.requestId.startDate != this.originalRequestDetail.requestId.startDate){
+    //         this.selectedRequestDetail.requestId.audit.push({
+    //             property: 'startDate',
+    //             eventDate: new Date(),
+    //             oldValue: this.originalRequestDetailrequestId.startDate,
+    //             newValue: obj.requestId.startDate,
+    //             personId: this.userObj._id
+    //         })
+    //     }
+    //     if(obj.requestId.endDate != this.originalRequestDetail.requestId.endDate){
+    //         this.selectedRequestDetail.requestId.audit.push({
+    //             property: 'endDate',
+    //             eventDate: new Date(),
+    //             oldValue: this.originalRequestDetail.requestId.endDate,
+    //             newValue: obj.requestId.endDate,
+    //             personId: this.userObj._id
+    //         })
+    //     }
+    //     if(obj.requiredDate != this.originalRequestDetail.requiredDate){
+    //         this.selectedRequestDetail.requestId.audit.push({
+    //             property: "requiredDate",
+    //             eventDate: new Date(),
+    //             oldValue: this.originalRequestDetail.requiredDate,
+    //             newValue: obj.requiredDate,
+    //             personId: this.userObj._id
+    //         })
+    //     }
+    //      if(obj.requestId.courseId != this.originalRequestDetail.requestId.courseId){
+    //         this.selectedRequestDetail.requestId.audit.push({
+    //             property: 'courseId',
+    //             eventDate: new Date(),
+    //             oldValue: this.originalRequestDetail.requestId.courseId,
+    //             newValue: obj.requestId.courseId,
+    //             personId: this.userObj._id
+    //         })
+    //     }
+	// }
 	
 	 // /*****************************************************************************************************
     //  * User selected a requests table
@@ -901,13 +901,13 @@ export class Assignments {
         this.assignClientStatus();
         this.selectedRequestDetail.requestStatus = this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0 ? this.config.ASSIGNED_REQUEST_CODE : this.config.UNASSIGNED_REQUEST_CODE;
         this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
-        this.requestToSave.audit.push({
-            property: 'Delete Assignment',
-            newValue: JSON.stringify(this.assignment),
-            oldValue: this.selectedRequestDetail.productId.name,
-            eventDate: new  Date(),
-            personId: this.userObj.fullName
-        })
+        // this.requestToSave.audit.push({
+        //     property: 'Delete Assignment',
+        //     newValue: JSON.stringify(this.assignment),
+        //     oldValue: this.selectedRequestDetail.productId.name,
+        //     eventDate: new  Date(),
+        //     personId: this.userObj.fullName
+        // })
         this.requestToSave.requestDetailsToSave = new Array();
         var request = this.utils.copyObject(this.selectedRequestDetail);
         delete request['requestId'];
@@ -1045,13 +1045,13 @@ export class Assignments {
         this.selectedRequestDetail.requestStatus = this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0 ? this.config.ASSIGNED_REQUEST_CODE : this.config.UNASSIGNED_REQUEST_CODE;
         // this.selectedRequestDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
         this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
-        this.requestToSave.audit.push({
-           property: 'Assigned',
-           newValue: JSON.stringify(this.selectedRequestDetail.assignments),
-           oldValue: this.selectedRequestDetail.productId.name,
-           eventDate: new  Date(),
-           personId: this.userObj.fullName
-        })
+        // this.requestToSave.audit.push({
+        //    property: 'Assigned',
+        //    newValue: JSON.stringify(this.selectedRequestDetail.assignments),
+        //    oldValue: this.selectedRequestDetail.productId.name,
+        //    eventDate: new  Date(),
+        //    personId: this.userObj.fullName
+        // })
         this.requestToSave.requestDetailsToSave = new Array();
         var request = this.utils.copyObject(this.selectedRequestDetail);
         delete request['requestId'];
@@ -1185,13 +1185,13 @@ export class Assignments {
             this.clientRequests.selectedRequest.requestStatus = this.config.CUSTOMER_ACTION_REQUEST_CODE;
             var updateIds = new Array();
             this.productsSelected.forEach(item => {
-                this.clientRequests.selectedRequest.requestDetails[item.index].audit.push({
-                        property: 'Customer Action',
-                        newValue: this.config.CUSTOMER_ACTION_REQUEST_CODE,
-                        oldValue: item.requestStatus,
-                        eventDate: new  Date(),
-                        personId: this.userObj._id
-                    });
+                // this.clientRequests.selectedRequest.requestDetails[item.index].audit.push({
+                //         property: 'Customer Action',
+                //         newValue: this.config.CUSTOMER_ACTION_REQUEST_CODE,
+                //         oldValue: item.requestStatus,
+                //         eventDate: new  Date(),
+                //         personId: this.userObj._id
+                //     });
                     this.clientRequests.selectedRequest.requestDetails[item.index].requestStatus = this.config.CUSTOMER_ACTION_REQUEST_CODE;
                     updateIds.push(item._id);
             })
@@ -1217,12 +1217,12 @@ export class Assignments {
                 model: this.model,
             };     
 
-            this.clientRequests.selectedRequest.audit.push({
-                property: 'Send Message',
-                eventDate: new Date(),
-                newValue: email.email.emailBody,
-                personId: this.userObj._id
-            });
+            // this.clientRequests.selectedRequest.audit.push({
+            //     property: 'Send Message',
+            //     eventDate: new Date(),
+            //     newValue: email.email.emailBody,
+            //     personId: this.userObj._id
+            // });
             this.clientRequests.selectedRequest.customerMessage = email.email.emailBody;
             let response = await this.clientRequests.saveRequestWithId();
             if(!response.error){
@@ -1262,9 +1262,9 @@ export class Assignments {
             $(".hover").css("display", "none");
 	}
 
-	openAudit(){
-        this.showAudit = !this.showAudit;
-	}
+	// openAudit(){
+    //     this.showAudit = !this.showAudit;
+	// }
 
 	openEditStudentTemplate() {
         this.showAddStudentTemplate = !this.showAddStudentTemplate;
