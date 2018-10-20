@@ -29,7 +29,7 @@ module.exports = function (app) {
     logger.log('Get clientRequests');
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
-      .populate('requestDetails')
+      .populate({path: 'requestDetails', model: 'ClientRequestDetail'} )
       .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone ext mobile email institutionId file country'})
       .exec()
       .then(object => {
