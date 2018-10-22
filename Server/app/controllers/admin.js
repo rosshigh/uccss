@@ -8,8 +8,8 @@ var express = require('express'),
 	// rootPath = path.normalize(__dirname + '/..'),
   	logger = require('../../config/logger'),
 	dir = require('node-dir'),
-	HelpTickets = mongoose.model('HelpTicket');
-	// ClientRequests = mongoose.model('ClientRequest');
+	HelpTickets = mongoose.model('HelpTicket'),
+	ClientRequests = mongoose.model('ClientRequest');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
   const authFolder = './log-auth/';
@@ -249,5 +249,16 @@ module.exports = function (app, config) {
           }         
 		  
           test(mailObj); 
+	})
+
+	
+	router.route('/deleteAudit').put(function(req, res, next){
+		var bulk = ClientRequests.collection.initializeUnorderedBulkOp();
+		bulk.find({audit: {$not: {$eq: null} } }).update({$set: {audit: []}});  //{$set: {status: 'inactive'}}
+
+		bulk.execute(function(err) {
+			if(err) return next(err);
+			res.status(200).json({message: 'It worked!'});
+		});
 	})
 }
