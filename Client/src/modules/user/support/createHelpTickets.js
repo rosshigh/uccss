@@ -87,19 +87,20 @@ export class CreateHelpTickets{
 
 	async categoryChanged(){ 
         this.showAdditionalInfo = false;
+        this.catIndex = this.getCategoryIndex();
         if(this.helpTickets.selectedHelpTicket.helpTicketCategory > -1){
-            this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].requestsRequired;
+            this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired;
             if(this.requestsRequired) await this.getActiveRequests();
-            this.showTypes = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].showSubtypes && this.clientRequestsArray.length;
+            this.showTypes = this.helpTickets.helpTicketTypesArray[this.catIndex].showSubtypes && this.clientRequestsArray.length;
             if(!this.showTypes){
 				this.selectedHelpTicketType = 0;
-                this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type);
-                this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
-                this.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
+                this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[0].type);
+                this.resources = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[0].documents;
+                this.helpTicketType = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[0].type;
                 this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTicketType;
                 if((this.requestsRequired && clientRequestsArray.length > 0) || !this.requestsRequired) this.showAdditionalInfo = true;
-                this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm)
-                this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].validation);
+                this.createInputForm(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[0].inputForm)
+                this.setupValidation(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[0].validation);
             } else {
                 this.helpTicketTypeMessage = this.clientRequestsArray.length ? this.getMessage('SELECT_TYPE') : undefined;
                 this.inputForm = null;
@@ -112,6 +113,16 @@ export class CreateHelpTickets{
             this.helpTicketTypeMessage = undefined;
         }
          $("#helpTicketPurpose").addClass('focus');
+    }
+
+    getCategoryIndex(){
+        var index = 0;
+        this.helpTickets.helpTicketTypesArray.forEach((item, categoryIndex) => {
+            if(this.helpTickets.selectedHelpTicket.helpTicketCategory == item.category) {
+                index = categoryIndex;
+            }
+        });
+        return index;
     }
 
     getMessage(messageKey){
@@ -148,16 +159,16 @@ export class CreateHelpTickets{
         if(this.helpTicketType !== "NULL"){
             this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTicketType;
             this.selectedHelpTicketType = this.getIndex();
-            this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm)
-            this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].type);
-            this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm;
-            this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].validation);
+            this.createInputForm(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].inputForm)
+            this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].type);
+            this.inputForm = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].inputForm;
+            this.setupValidation(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].validation);
           
             await this.products.getProductsArray('?fields=_id name');
             this.showAdditionalInfo = false;
 
-            if(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].requestKeywords){
-                let keyWords = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].requestKeywords;
+            if(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].requestKeywords){
+                let keyWords = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].requestKeywords;
                 let refreshProductArray = new Array();
                 this.products.productsArray.forEach(item => {
                     var foo = item.name.toUpperCase();

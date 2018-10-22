@@ -91,7 +91,8 @@ module.exports = function (app) {
       .where('personId').eq(req.params.id)
       .where('sessionId').in(activeSessions)
       .sort(req.query.order)
-      .populate('requestDetails')
+      .populate({path: 'requestDetails', model: 'ClientRequestDetail'} )
+      .populate({path: 'courseId', model: 'Course', select: 'number name'})
       .exec()
       .then(object => {      
         if(object){

@@ -5,7 +5,7 @@
     <select value.bind="helpTickets.selectedHelpTicket.helpTicketCategory" change.delegate="categoryChanged()" id="helpTicketCategory" class="form-control">
           <option value="-1">Select the help ticket category</option>
           <option repeat.for="types of helpTickets.helpTicketTypesArray" 
-                  model.bind="types.category">${types.description}</option>
+                  model.bind="types.category">${types.description} - ${types.category}</option>
         </select>
   </div>
 
