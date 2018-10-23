@@ -157,7 +157,7 @@ export class CreateRequestTech {
 			this.requests.selectedRequest.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
 		}
 
-		this.requests.selectedRequest.audit[0].personId = this.userObj._id;
+		// this.requests.selectedRequest.audit[0].personId = this.userObj._id;
 		this.requests.selectedRequest.institutionId = this.selectedInstitution;
 		this.requests.selectedRequest.sessionId = this.sessionId;
 		this.requests.selectedRequest.courseId = this.courseId;

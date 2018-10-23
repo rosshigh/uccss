@@ -30785,9 +30785,8 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 7:
                                 this.clearFilters();
-                                console.log('alsdjfl');
 
-                            case 9:
+                            case 8:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -32304,9 +32303,8 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 this.helpTicketTypeFilterValue = "";
                                 this.institutionFilterValue = "";
                                 this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
-                                console.log('here');
 
-                            case 9:
+                            case 8:
                             case 'end':
                                 return _context16.stop();
                         }
@@ -32673,7 +32671,6 @@ define('modules/tech/requests/createRequest',['exports', 'aurelia-framework', 'a
 				this.requests.selectedRequest.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
 			}
 
-			this.requests.selectedRequest.audit[0].personId = this.userObj._id;
 			this.requests.selectedRequest.institutionId = this.selectedInstitution;
 			this.requests.selectedRequest.sessionId = this.sessionId;
 			this.requests.selectedRequest.courseId = this.courseId;

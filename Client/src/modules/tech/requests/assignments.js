@@ -75,7 +75,6 @@ export class Assignments {
             this.displayArray = new Array();
         }
         this.clearFilters();
-        console.log('alsdjfl')
     }
 
     async refresh() {
@@ -1449,7 +1448,6 @@ export class Assignments {
         this.helpTicketTypeFilterValue = "";
         this.institutionFilterValue = "";
         this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
-        console.log('here')
         // await this.filterInAssigned();
     }
 
