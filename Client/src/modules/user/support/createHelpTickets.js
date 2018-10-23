@@ -292,6 +292,7 @@ export class CreateHelpTickets{
         this.helpTickets.selectedHelpTicket.personId = this.userObj._id;
         this.helpTickets.selectedHelpTicket.institutionId = this.userObj.institutionId._id;
         this.helpTickets.selectedHelpTicket.sessionId = this.selectedSessionId;
+        // this.helpTickets.selectedHelpTicket.helpTicketCategory = this.catIndex;
        
         if(!this.showTypes){
             //If the help ticket type doesn't require a course, insert a dummy courseId
