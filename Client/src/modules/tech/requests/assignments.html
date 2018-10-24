@@ -1,23 +1,30 @@
 <template>
-    <div class="panel panel-default rightMargin leftMargin">
-      <div class="panel-body">
-        <div class="row">
-            <div show.bind="requestSelected == 'table'">
-                <compose view="./components/viewRequestsTable.html"></compose>
-            </div> 
-            <div show.bind="requestSelected == 'form'" >
-                <compose view="./components/viewRequestsForm.html"></compose>
+    <span id="loading">
+        <ul class="bokeh">
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </span>
+    <div show.bind="dataTable.displayArray && dataTable.displayArray.length" class="panel panel-default rightMargin leftMargin">
+        <div class="panel-body">
+            <div class="row">
+                <div show.bind="requestSelected == 'table'">
+                    <compose view="./components/viewRequestsTable.html"></compose>
+                </div>
+                <div show.bind="requestSelected == 'form'">
+                    <compose view="./components/viewRequestsForm.html"></compose>
+                </div>
+                <div show.bind="requestSelected == 'edit'">
+                    <compose view="./components/editRequestsForm.html"></compose>
+                </div>
+                <div show.bind="requestSelected == 'view'">
+                    <compose view="./components/viewAssignmentForm.html"></compose>
+                </div>
+                <div show.bind="requestSelected == 'email'">
+                    <compose view="./components/bulkEmailForm.html"></compose>
+                </div>
             </div>
-            <div show.bind="requestSelected == 'edit'" >
-                <compose view="./components/editRequestsForm.html"></compose>
-            </div>
-            <div show.bind="requestSelected == 'view'" >
-                <compose view="./components/viewAssignmentForm.html"></compose>
-            </div>
-            <div show.bind="requestSelected == 'email'" >
-                <compose view="./components/bulkEmailForm.html"></compose>
-            </div>
-        </div> 
-      </div> 
+        </div>
 
 </template>

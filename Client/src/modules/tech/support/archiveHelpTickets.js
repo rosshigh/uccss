@@ -51,6 +51,11 @@ export class ArchiveHelpTickets {
   };
 
   async activate() {
+
+  }
+
+  async attached() {
+    $("#loading").hide();
     let responses = await Promise.all([
       this.helpTickets.getHelpTicketTypes('?order=category'),
       this.sessions.getSessionsArray('?order=startDate', true),
@@ -62,9 +67,6 @@ export class ArchiveHelpTickets {
     this.filterList();
     this.filterPeopleList();
     this.filterInstitutionsList();
-  }
-
-  attached() {
     $("#helpTicketStatus").val(this.config.NEW_HELPTICKET_STATUS).change();
     this.dateFrom = "";
     this.dateTo = "";
@@ -121,6 +123,7 @@ export class ArchiveHelpTickets {
   }
 
   async search() {
+    $("#loading").show();
     let searchCollection = this.isCheckedCurrent ? 'current' : 'archive';
     this.buildSearchCriteria();
     this.resultArray = await this.helpTickets.archiveSearch(this.searchObj, searchCollection);
@@ -128,6 +131,7 @@ export class ArchiveHelpTickets {
     this.helpTicketSelected = true;
     this.dataTable.updateArray(this.resultArray);
     setTimeout(this.toolTips(), 3000);
+    $("#loading").hide();
   }
 
   helpTicketNoEntered() {
@@ -310,6 +314,7 @@ export class ArchiveHelpTickets {
   }
 
   async openHelpTicket(helpTicket) {
+    $("#loading").show();
     this.helpTickets.setHelpTicket(helpTicket);
     var obj = {
       property: "helpTicketStatus",
@@ -325,9 +330,11 @@ export class ArchiveHelpTickets {
       this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
       this.utils.showNotification("The help ticket was updated");
     }
+    $("#loading").hide();
   }
 
   async archiveClosedTickets(){
+    $("#loading").show();
     var closedHelpTickets = 0;
     let response = await this.helpTickets.countHelpTicketsStatus(this.config.CLOSED_HELPTICKET_STATUS);
     if(!response.error) closedHelpTickets = response.count;
@@ -344,7 +351,7 @@ export class ArchiveHelpTickets {
     } else {
       this.utils.showNotification('There are currently no closed help tickets in the active help ticket collection.');
     }
-    
+    $("#loading").hide();
   }
 
   async archiveTickets(){
