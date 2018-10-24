@@ -19,7 +19,7 @@
       <div if.bind="!profileRequest.requestId.personId.file.fileName" style="height:100px;width:100px;" innerhtml.bind="profileRequest.requestId.personId.email | gravatarUrl:100:6"></div>
     </div>
     <div class="col-md-8">
-      <h5>Nickname: ${profileRequest.requestId.personId.nickName}</h5>
+      <h5 if.bind="profileRequest.requestId.personId.nickName">Nickname: ${profileRequest.requestId.personId.nickName}</h5>
       <h5>Phone: ${profileRequest.requestId.personId.phone | phoneNumber:config.PHONE_MASKS:profileRequest.requestId.personId.country:profileRequest.requestId.personId.ext}<span if.bind="profileRequest.requestId.personId.ext">${profileRequest.requestId.personId.ext}</span></h5>
       <h5>Mobile: ${profileRequest.requestId.personId.mobile | phoneNumber:config.PHONE_MASKS:profileRequest.requestId.personId.country}</h5>
       <h5>Email: ${profileRequest.requestId.personId.email}</h5>
