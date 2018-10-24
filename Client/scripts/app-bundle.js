@@ -22548,7 +22548,6 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
             _classCallCheck(this, EditInstitutions);
 
             this.institutionSelected = false;
-            this.spinnerHTML = "";
             this.tabs = [{ id: 'instAddress', title: 'Address' }, { id: 'instPeople', title: 'People' }, { id: 'instIs4ua', title: "IS4UA" }];
             this.tabPath = './';
             this.dateConfig = { wrap: true };
@@ -22567,27 +22566,26 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
             this.userObj = JSON.parse(sessionStorage.getItem('user'));
         }
 
-        EditInstitutions.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        EditInstitutions.prototype.activate = function () {
+        EditInstitutions.prototype.attached = function () {
             var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
                 var responses;
                 return regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                _context.next = 2;
+                                (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+                                (0, _jquery2.default)('#loading').show();
+                                _context.next = 4;
                                 return Promise.all([this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?order=name'), this.is4ua.loadIs4ua()]);
 
-                            case 2:
+                            case 4:
                                 responses = _context.sent;
 
 
                                 this.dataTable.updateArray(this.people.institutionsArray);
+                                (0, _jquery2.default)('#loading').hide();
 
-                            case 4:
+                            case 7:
                             case 'end':
                                 return _context.stop();
                         }
@@ -22595,28 +22593,19 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
                 }, _callee, this);
             }));
 
-            function activate() {
+            function attached() {
                 return _ref.apply(this, arguments);
             }
 
-            return activate;
+            return attached;
         }();
 
-        EditInstitutions.prototype.refresh = function () {
+        EditInstitutions.prototype.activate = function () {
             var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.people.getInstitutionsArray('?order=name', true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.people.institutionArray);
-                                this.spinnerHTML = "";
-
-                            case 5:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -22624,8 +22613,38 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
                 }, _callee2, this);
             }));
 
-            function refresh() {
+            function activate() {
                 return _ref2.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditInstitutions.prototype.refresh = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                (0, _jquery2.default)('#loading').show();
+                                _context3.next = 3;
+                                return this.people.getInstitutionsArray('?order=name', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.people.institutionArray);
+
+                                (0, _jquery2.default)('#loading').hide();
+
+                            case 5:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function refresh() {
+                return _ref3.apply(this, arguments);
             }
 
             return refresh;
@@ -22647,10 +22666,10 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
         };
 
         EditInstitutions.prototype.new = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
-                        switch (_context3.prev = _context3.next) {
+                        switch (_context4.prev = _context4.next) {
                             case 0:
                                 this.editIndex = -1;
                                 this.people.getInstitutionPeople(-1);
@@ -22661,36 +22680,36 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
 
                             case 6:
                             case 'end':
-                                return _context3.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee3, this);
+                }, _callee4, this);
             }));
 
             function _new() {
-                return _ref3.apply(this, arguments);
+                return _ref4.apply(this, arguments);
             }
 
             return _new;
         }();
 
         EditInstitutions.prototype.save = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
-                        switch (_context4.prev = _context4.next) {
+                        switch (_context5.prev = _context5.next) {
                             case 0:
                                 if (!this.validation.validate(1)) {
-                                    _context4.next = 8;
+                                    _context5.next = 8;
                                     break;
                                 }
 
-                                _context4.next = 3;
+                                _context5.next = 3;
                                 return this.people.saveInstitution();
 
                             case 3:
-                                serverResponse = _context4.sent;
+                                serverResponse = _context5.sent;
 
                                 if (!serverResponse.error) {
                                     this.dataTable.updateArray(this.people.institutionsArray);
@@ -22699,27 +22718,27 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
                                     this.utils.showNotification("There was a problem updating saving the institution");
                                 }
                                 this._cleanUp();
-                                _context4.next = 10;
+                                _context5.next = 10;
                                 break;
 
                             case 8:
                                 if (!(!this.people.selectedInstitution.institutionType || !this.people.selectedInstitution.memberType || !this.people.selectedInstitution.institutionStatus || !this.people.selectedInstitution.highestDegree)) {
-                                    _context4.next = 10;
+                                    _context5.next = 10;
                                     break;
                                 }
 
-                                return _context4.abrupt('return', this.dialog.showMessage("The IS4UA fields on the IS4UA tab are required", "Missing Data", ['OK']).then(function (response) {}));
+                                return _context5.abrupt('return', this.dialog.showMessage("The IS4UA fields on the IS4UA tab are required", "Missing Data", ['OK']).then(function (response) {}));
 
                             case 10:
                             case 'end':
-                                return _context4.stop();
+                                return _context5.stop();
                         }
                     }
-                }, _callee4, this);
+                }, _callee5, this);
             }));
 
             function save() {
-                return _ref4.apply(this, arguments);
+                return _ref5.apply(this, arguments);
             }
 
             return save;
@@ -22736,18 +22755,18 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
         };
 
         EditInstitutions.prototype.deleteInstitution = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
                 var name, serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context6.prev = _context6.next) {
                             case 0:
                                 name = this.people.selectedInstitution.name;
-                                _context5.next = 3;
+                                _context6.next = 3;
                                 return this.people.deleteInstitution();
 
                             case 3:
-                                serverResponse = _context5.sent;
+                                serverResponse = _context6.sent;
 
                                 if (!serverResponse.error) {
                                     this.dataTable.updateArray(this.people.institutionsArray);
@@ -22759,14 +22778,14 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
 
                             case 6:
                             case 'end':
-                                return _context5.stop();
+                                return _context6.stop();
                         }
                     }
-                }, _callee5, this);
+                }, _callee6, this);
             }));
 
             function deleteInstitution() {
-                return _ref5.apply(this, arguments);
+                return _ref6.apply(this, arguments);
             }
 
             return deleteInstitution;
@@ -22836,10 +22855,10 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
         };
 
         EditInstitutions.prototype.changeTab = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(el, index) {
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(el, index) {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
                                 (0, _jquery2.default)("#instFormListGroup.list-group").children().removeClass('menuButtons');
                                 (0, _jquery2.default)("#instFormListGroup.list-group").children().css("background-color", "");
@@ -22851,14 +22870,14 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
 
                             case 7:
                             case 'end':
-                                return _context6.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee6, this);
+                }, _callee7, this);
             }));
 
             function changeTab(_x, _x2) {
-                return _ref6.apply(this, arguments);
+                return _ref7.apply(this, arguments);
             }
 
             return changeTab;
@@ -22933,7 +22952,6 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
             this.youSelectedAnEmail = false;
             this.emailSubject = "";
             this.emailMessage = "";
-            this.spinnerHTML = "";
             this.phoneMask = "";
             this.tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'Audit' }, { id: "Email" }, { id: "Log" }];
             this.tabPath = './';
@@ -22954,23 +22972,10 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
         EditPeople.prototype.activate = function () {
             var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
                 return regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                _context.next = 2;
-                                return Promise.all([this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01'), this.people.getInstitutionsArray('?order=name', true), this.is4ua.loadIs4ua(), this.config.getConfig()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.activeFilterValue = "01";
-                                this.filteredArray = this.config.ROLES;
-                                this.dataTable.updateArray(this.people.peopleArray);
-                                this._setupValidation();
-
-                            case 7:
                             case 'end':
                                 return _context.stop();
                         }
@@ -22992,27 +22997,29 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
                         switch (_context2.prev = _context2.next) {
                             case 0:
                                 this._clearFilters();
+                                $('#loading').show();
 
                                 if (!(this.activeFilterValue == "")) {
-                                    _context2.next = 6;
+                                    _context2.next = 7;
                                     break;
                                 }
 
-                                _context2.next = 4;
+                                _context2.next = 5;
                                 return this.people.getPeopleArray('?order=lastName', true);
 
-                            case 4:
-                                _context2.next = 8;
+                            case 5:
+                                _context2.next = 9;
                                 break;
 
-                            case 6:
-                                _context2.next = 8;
+                            case 7:
+                                _context2.next = 9;
                                 return this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|' + this.activeFilterValue, true);
 
-                            case 8:
-                                this.dataTable.updateArray(this.people.peopleArray);
-
                             case 9:
+                                this.dataTable.updateArray(this.people.peopleArray);
+                                $('#loading').hide();
+
+                            case 11:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -23027,27 +23034,29 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
             return filterActive;
         }();
 
-        EditPeople.prototype.attached = function attached() {
-            $('[data-toggle="tooltip"]').tooltip();
-        };
-
-        EditPeople.prototype.refresh = function () {
+        EditPeople.prototype.attached = function () {
             var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var responses;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
-                                this._cleanUpFilters();
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                $('[data-toggle="tooltip"]').tooltip();
+                                $('#loading').show();
                                 _context3.next = 4;
-                                return this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01', true);
+                                return Promise.all([this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01'), this.people.getInstitutionsArray('?order=name', true), this.is4ua.loadIs4ua(), this.config.getConfig()]);
 
                             case 4:
+                                responses = _context3.sent;
+
+
+                                this.activeFilterValue = "01";
+                                this.filteredArray = this.config.ROLES;
                                 this.dataTable.updateArray(this.people.peopleArray);
+                                this._setupValidation();
+                                $('#loading').hide();
 
-                                this.spinnerHTML = "";
-
-                            case 6:
+                            case 10:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -23055,8 +23064,40 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
                 }, _callee3, this);
             }));
 
-            function refresh() {
+            function attached() {
                 return _ref3.apply(this, arguments);
+            }
+
+            return attached;
+        }();
+
+        EditPeople.prototype.refresh = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                this._cleanUpFilters();
+
+                                $('#loading').show();
+                                _context4.next = 4;
+                                return this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01', true);
+
+                            case 4:
+                                this.dataTable.updateArray(this.people.peopleArray);
+
+                                $('#loading').hide();
+
+                            case 6:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function refresh() {
+                return _ref4.apply(this, arguments);
             }
 
             return refresh;
@@ -23107,10 +23148,10 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.new = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
-                        switch (_context4.prev = _context4.next) {
+                        switch (_context5.prev = _context5.next) {
                             case 0:
                                 this.editIndex = -1;
                                 this.people.selectPerson();
@@ -23123,14 +23164,14 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 8:
                             case 'end':
-                                return _context4.stop();
+                                return _context5.stop();
                         }
                     }
-                }, _callee4, this);
+                }, _callee5, this);
             }));
 
             function _new() {
-                return _ref4.apply(this, arguments);
+                return _ref5.apply(this, arguments);
             }
 
             return _new;
@@ -23172,14 +23213,14 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.save = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context6.prev = _context6.next) {
                             case 0:
                                 if (!this.validation.validate(1)) {
-                                    _context5.next = 7;
+                                    _context6.next = 7;
                                     break;
                                 }
 
@@ -23188,11 +23229,11 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
                                 } else {
                                     this.people.selectedPerson.institutionId = this.institutionId;
                                 }
-                                _context5.next = 4;
+                                _context6.next = 4;
                                 return this.people.savePerson();
 
                             case 4:
-                                serverResponse = _context5.sent;
+                                serverResponse = _context6.sent;
 
                                 if (!serverResponse.error) {
                                     this.dataTable.updateArray(this.people.peopleArray);
@@ -23204,14 +23245,14 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 7:
                             case 'end':
-                                return _context5.stop();
+                                return _context6.stop();
                         }
                     }
-                }, _callee5, this);
+                }, _callee6, this);
             }));
 
             function save() {
-                return _ref5.apply(this, arguments);
+                return _ref6.apply(this, arguments);
             }
 
             return save;
@@ -23228,18 +23269,18 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.deletePerson = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
                 var name, serverResponse;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
                                 name = this.people.selectedPerson.fullName;
-                                _context6.next = 3;
+                                _context7.next = 3;
                                 return this.people.deletePerson();
 
                             case 3:
-                                serverResponse = _context6.sent;
+                                serverResponse = _context7.sent;
 
                                 if (!serverResponse.error) {
                                     this.dataTable.updateArray(this.people.peopleArray);
@@ -23249,14 +23290,14 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 6:
                             case 'end':
-                                return _context6.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee6, this);
+                }, _callee7, this);
             }));
 
             function deletePerson() {
-                return _ref6.apply(this, arguments);
+                return _ref7.apply(this, arguments);
             }
 
             return deletePerson;
@@ -23283,28 +23324,28 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.checkEmail = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
-                        switch (_context7.prev = _context7.next) {
+                        switch (_context8.prev = _context8.next) {
                             case 0:
                                 if (!(this.oldEmail != this.people.selectedPerson.email)) {
-                                    _context7.next = 10;
+                                    _context8.next = 10;
                                     break;
                                 }
 
-                                _context7.next = 3;
+                                _context8.next = 3;
                                 return this.people.checkEmail();
 
                             case 3:
-                                if (!_context7.sent) {
-                                    _context7.next = 8;
+                                if (!_context8.sent) {
+                                    _context8.next = 8;
                                     break;
                                 }
 
                                 this.duplicateAccount = true;
                                 this.validation.validate(4);
-                                _context7.next = 10;
+                                _context8.next = 10;
                                 break;
 
                             case 8:
@@ -23313,14 +23354,14 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 10:
                             case 'end':
-                                return _context7.stop();
+                                return _context8.stop();
                         }
                     }
-                }, _callee7, this);
+                }, _callee8, this);
             }));
 
             function checkEmail() {
-                return _ref7.apply(this, arguments);
+                return _ref8.apply(this, arguments);
             }
 
             return checkEmail;
@@ -23345,17 +23386,17 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.openEditCourseForm = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
-                        switch (_context8.prev = _context8.next) {
+                        switch (_context9.prev = _context9.next) {
                             case 0:
                                 if (this.showCourses) {
-                                    _context8.next = 3;
+                                    _context9.next = 3;
                                     break;
                                 }
 
-                                _context8.next = 3;
+                                _context9.next = 3;
                                 return this.refreshCourses();
 
                             case 3:
@@ -23363,43 +23404,43 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 4:
                             case 'end':
-                                return _context8.stop();
-                        }
-                    }
-                }, _callee8, this);
-            }));
-
-            function openEditCourseForm() {
-                return _ref8.apply(this, arguments);
-            }
-
-            return openEditCourseForm;
-        }();
-
-        EditPeople.prototype.refreshCourses = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
-                    while (1) {
-                        switch (_context9.prev = _context9.next) {
-                            case 0:
-                                if (!this.people.selectedPerson._id) {
-                                    _context9.next = 3;
-                                    break;
-                                }
-
-                                _context9.next = 3;
-                                return this.people.getCoursesArray(true, '?filter=personId|eq|' + this.people.selectedPerson._id + '&order=number');
-
-                            case 3:
-                            case 'end':
                                 return _context9.stop();
                         }
                     }
                 }, _callee9, this);
             }));
 
-            function refreshCourses() {
+            function openEditCourseForm() {
                 return _ref9.apply(this, arguments);
+            }
+
+            return openEditCourseForm;
+        }();
+
+        EditPeople.prototype.refreshCourses = function () {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                    while (1) {
+                        switch (_context10.prev = _context10.next) {
+                            case 0:
+                                if (!this.people.selectedPerson._id) {
+                                    _context10.next = 3;
+                                    break;
+                                }
+
+                                _context10.next = 3;
+                                return this.people.getCoursesArray(true, '?filter=personId|eq|' + this.people.selectedPerson._id + '&order=number');
+
+                            case 3:
+                            case 'end':
+                                return _context10.stop();
+                        }
+                    }
+                }, _callee10, this);
+            }));
+
+            function refreshCourses() {
+                return _ref10.apply(this, arguments);
             }
 
             return refreshCourses;
@@ -23426,28 +23467,28 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.saveCourse = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                return regeneratorRuntime.wrap(function _callee11$(_context11) {
                     while (1) {
-                        switch (_context10.prev = _context10.next) {
+                        switch (_context11.prev = _context11.next) {
                             case 0:
                                 if (!this.validation.validate(2)) {
-                                    _context10.next = 7;
+                                    _context11.next = 7;
                                     break;
                                 }
 
                                 if (!this.people.selectedPerson._id) {
-                                    _context10.next = 7;
+                                    _context11.next = 7;
                                     break;
                                 }
 
                                 this.people.selectedCourse.personId = this.people.selectedPerson._id;
-                                _context10.next = 5;
+                                _context11.next = 5;
                                 return this.people.saveCourse();
 
                             case 5:
-                                serverResponse = _context10.sent;
+                                serverResponse = _context11.sent;
 
                                 if (!serverResponse.error) {
                                     this.utils.showNotification("The course was updated");
@@ -23455,14 +23496,14 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 7:
                             case 'end':
-                                return _context10.stop();
+                                return _context11.stop();
                         }
                     }
-                }, _callee10, this);
+                }, _callee11, this);
             }));
 
             function saveCourse() {
-                return _ref10.apply(this, arguments);
+                return _ref11.apply(this, arguments);
             }
 
             return saveCourse;
@@ -23483,27 +23524,27 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.savePassword = function () {
-            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
                 var obj, response;
-                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
                     while (1) {
-                        switch (_context11.prev = _context11.next) {
+                        switch (_context12.prev = _context12.next) {
                             case 0:
                                 this.newPassword = $("#newPassword").val();
 
                                 if (!this.validation.validate(3, this)) {
-                                    _context11.next = 8;
+                                    _context12.next = 8;
                                     break;
                                 }
 
                                 obj = {
                                     password: this.newPassword
                                 };
-                                _context11.next = 5;
+                                _context12.next = 5;
                                 return this.people.updatePassword(obj);
 
                             case 5:
-                                response = _context11.sent;
+                                response = _context12.sent;
 
                                 if (!response.error) {
                                     this.utils.showNotification("The password was updated");
@@ -23514,14 +23555,14 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 8:
                             case 'end':
-                                return _context11.stop();
+                                return _context12.stop();
                         }
                     }
-                }, _callee11, this);
+                }, _callee12, this);
             }));
 
             function savePassword() {
-                return _ref11.apply(this, arguments);
+                return _ref12.apply(this, arguments);
             }
 
             return savePassword;
@@ -23564,16 +23605,16 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.sendTheEmail = function () {
-            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(email) {
+            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(email) {
                 var message, serverResponse;
-                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                return regeneratorRuntime.wrap(function _callee13$(_context13) {
                     while (1) {
-                        switch (_context12.prev = _context12.next) {
+                        switch (_context13.prev = _context13.next) {
                             case 0:
                                 if (!this.people.selectedPerson || this.people.selectedPerson._id !== email.email.emailId) this.people.selectedPersonFromId(email.email.emailId);
 
                                 if (!email) {
-                                    _context12.next = 7;
+                                    _context13.next = 7;
                                     break;
                                 }
 
@@ -23585,11 +23626,11 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
                                     subject: email.email.emailSubject
 
                                 };
-                                _context12.next = 5;
+                                _context13.next = 5;
                                 return this.people.sendCustomerMessage(message);
 
                             case 5:
-                                serverResponse = _context12.sent;
+                                serverResponse = _context13.sent;
 
                                 if (!serverResponse.error) {
                                     this.utils.showNotification("The message was sent");
@@ -23597,28 +23638,28 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 7:
                             case 'end':
-                                return _context12.stop();
+                                return _context13.stop();
                         }
                     }
-                }, _callee12, this);
+                }, _callee13, this);
             }));
 
             function sendTheEmail(_x) {
-                return _ref12.apply(this, arguments);
+                return _ref13.apply(this, arguments);
             }
 
             return sendTheEmail;
         }();
 
         EditPeople.prototype.sendCustomerEmail = function () {
-            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
+            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
                 var message, serverResponse;
-                return regeneratorRuntime.wrap(function _callee13$(_context13) {
+                return regeneratorRuntime.wrap(function _callee14$(_context14) {
                     while (1) {
-                        switch (_context13.prev = _context13.next) {
+                        switch (_context14.prev = _context14.next) {
                             case 0:
                                 if (!this.emailMessage) {
-                                    _context13.next = 6;
+                                    _context14.next = 6;
                                     break;
                                 }
 
@@ -23635,11 +23676,11 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
                                         personId: this.userObj._id
                                     }
                                 };
-                                _context13.next = 4;
+                                _context14.next = 4;
                                 return this.people.sendCustomerMessage(message);
 
                             case 4:
-                                serverResponse = _context13.sent;
+                                serverResponse = _context14.sent;
 
                                 if (!serverResponse.error) {
                                     this.utils.showNotification("The message was sent");
@@ -23647,28 +23688,28 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 6:
                             case 'end':
-                                return _context13.stop();
+                                return _context14.stop();
                         }
                     }
-                }, _callee13, this);
+                }, _callee14, this);
             }));
 
             function sendCustomerEmail() {
-                return _ref13.apply(this, arguments);
+                return _ref14.apply(this, arguments);
             }
 
             return sendCustomerEmail;
         }();
 
         EditPeople.prototype.toggleStatus = function () {
-            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(id, personStatus) {
+            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(id, personStatus) {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                return regeneratorRuntime.wrap(function _callee15$(_context15) {
                     while (1) {
-                        switch (_context14.prev = _context14.next) {
+                        switch (_context15.prev = _context15.next) {
                             case 0:
                                 if (!(id && personStatus)) {
-                                    _context14.next = 8;
+                                    _context15.next = 8;
                                     break;
                                 }
 
@@ -23680,11 +23721,11 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
                                     newValue: this.people.selectedPerson.personStatus,
                                     personId: this.userObj._id
                                 });
-                                _context14.next = 6;
+                                _context15.next = 6;
                                 return this.people.savePerson();
 
                             case 6:
-                                serverResponse = _context14.sent;
+                                serverResponse = _context15.sent;
 
                                 if (!serverResponse.error) {
                                     this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
@@ -23694,14 +23735,14 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 8:
                             case 'end':
-                                return _context14.stop();
+                                return _context15.stop();
                         }
                     }
-                }, _callee14, this);
+                }, _callee15, this);
             }));
 
             function toggleStatus(_x2, _x3) {
-                return _ref14.apply(this, arguments);
+                return _ref15.apply(this, arguments);
             }
 
             return toggleStatus;
@@ -23713,10 +23754,10 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.changeTab = function () {
-            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(el, index) {
-                return regeneratorRuntime.wrap(function _callee15$(_context15) {
+            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(el, index) {
+                return regeneratorRuntime.wrap(function _callee16$(_context16) {
                     while (1) {
-                        switch (_context15.prev = _context15.next) {
+                        switch (_context16.prev = _context16.next) {
                             case 0:
                                 $("#peopleFormListGroup.list-group").children().removeClass('menuButtons');
                                 $("#peopleFormListGroup.list-group").children().css("background-color", "");
@@ -23725,27 +23766,27 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
                                 $(el.target).parent().css("color", this.config.ACTIVE_SUBMENU_COLOR);
                                 $(".in").removeClass('active').removeClass('in');
                                 $("#" + el.target.id + "Tab").addClass('in').addClass('active');
-                                _context15.t0 = el.target.id;
-                                _context15.next = _context15.t0 === 'Courses' ? 10 : 13;
+                                _context16.t0 = el.target.id;
+                                _context16.next = _context16.t0 === 'Courses' ? 10 : 13;
                                 break;
 
                             case 10:
-                                _context15.next = 12;
+                                _context16.next = 12;
                                 return this.refreshCourses();
 
                             case 12:
-                                return _context15.abrupt('break', 13);
+                                return _context16.abrupt('break', 13);
 
                             case 13:
                             case 'end':
-                                return _context15.stop();
+                                return _context16.stop();
                         }
                     }
-                }, _callee15, this);
+                }, _callee16, this);
             }));
 
             function changeTab(_x4, _x5) {
-                return _ref15.apply(this, arguments);
+                return _ref16.apply(this, arguments);
             }
 
             return changeTab;
@@ -23838,29 +23879,29 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.archiveInactivePeople = function () {
-            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16() {
+            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17() {
                 var _this8 = this;
 
                 var inactivePeople, response;
-                return regeneratorRuntime.wrap(function _callee16$(_context16) {
+                return regeneratorRuntime.wrap(function _callee17$(_context17) {
                     while (1) {
-                        switch (_context16.prev = _context16.next) {
+                        switch (_context17.prev = _context17.next) {
                             case 0:
                                 inactivePeople = 0;
-                                _context16.next = 3;
+                                _context17.next = 3;
                                 return this.people.countPeopleStatus(this.config.INACTIVE_PERSON);
 
                             case 3:
-                                response = _context16.sent;
+                                response = _context17.sent;
 
                                 if (!response.error) inactivePeople = response.count;
 
                                 if (!inactivePeople) {
-                                    _context16.next = 9;
+                                    _context17.next = 9;
                                     break;
                                 }
 
-                                return _context16.abrupt('return', this.dialogs.showMessage("This will archive " + inactivePeople + " inactive people.  Are you sure you want to do that?", "Archive People", ['Yes', 'No']).whenClosed(function (response) {
+                                return _context17.abrupt('return', this.dialogs.showMessage("This will archive " + inactivePeople + " inactive people.  Are you sure you want to do that?", "Archive People", ['Yes', 'No']).whenClosed(function (response) {
                                     if (!response.wasCancelled) {
                                         _this8.archiveTickets();
                                     }
@@ -23871,31 +23912,31 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 10:
                             case 'end':
-                                return _context16.stop();
+                                return _context17.stop();
                         }
                     }
-                }, _callee16, this);
+                }, _callee17, this);
             }));
 
             function archiveInactivePeople() {
-                return _ref16.apply(this, arguments);
+                return _ref17.apply(this, arguments);
             }
 
             return archiveInactivePeople;
         }();
 
         EditPeople.prototype.archivePeople = function () {
-            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17() {
+            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18() {
                 var response;
-                return regeneratorRuntime.wrap(function _callee17$(_context17) {
+                return regeneratorRuntime.wrap(function _callee18$(_context18) {
                     while (1) {
-                        switch (_context17.prev = _context17.next) {
+                        switch (_context18.prev = _context18.next) {
                             case 0:
-                                _context17.next = 2;
+                                _context18.next = 2;
                                 return this.people.archiveInactivePeople();
 
                             case 2:
-                                response = _context17.sent;
+                                response = _context18.sent;
 
                                 if (!response.error) {
                                     this.utils.showNotification(response.number + ' people were archived successfully');
@@ -23903,14 +23944,14 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 4:
                             case 'end':
-                                return _context17.stop();
+                                return _context18.stop();
                         }
                     }
-                }, _callee17, this);
+                }, _callee18, this);
             }));
 
             function archivePeople() {
-                return _ref17.apply(this, arguments);
+                return _ref18.apply(this, arguments);
             }
 
             return archivePeople;
@@ -28629,7 +28670,6 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
             this.showDocumentForm = false;
             this.showDocuments = false;
             this.removedFiles = new Array();
-            this.spinnerHTML = "";
             this.tabs = [{ id: 'Assignments' }, { id: 'Systems' }, { id: 'is4ua' }, { id: 'Documents' }, { id: 'Notes' }, { id: 'Description' }];
             this.tabPath = './';
             this.toolbar = [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['fontsize', ['fontsize']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]];
@@ -28650,28 +28690,27 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
             this.systemChanges = new Array();
         }
 
-        EditProducts.prototype.attached = function attached() {
-            $('[data-toggle="tooltip"]').tooltip();
-        };
-
-        EditProducts.prototype.activate = function () {
+        EditProducts.prototype.attached = function () {
             var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
                 var responses;
                 return regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                _context.next = 2;
+                                $('[data-toggle="tooltip"]').tooltip();
+                                $('#loading').show();
+                                _context.next = 4;
                                 return Promise.all([this.products.getProductsArray('?order=name', true), this.systems.getSystemsArray('?order=sid', true), this.is4ua.loadIs4ua(), this.documents.getDocumentsCategoriesArray(), this.config.getConfig()]);
 
-                            case 2:
+                            case 4:
                                 responses = _context.sent;
 
                                 this.dataTable.updateArray(this.products.productsArray);
                                 this.filteredDocumentArray = this.documents.docCatsArray;
                                 this.dataTable.createPageButtons(1);
+                                $('#loading').hide();
 
-                            case 6:
+                            case 9:
                             case 'end':
                                 return _context.stop();
                         }
@@ -28679,28 +28718,19 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
                 }, _callee, this);
             }));
 
-            function activate() {
+            function attached() {
                 return _ref.apply(this, arguments);
             }
 
-            return activate;
+            return attached;
         }();
 
-        EditProducts.prototype.refresh = function () {
+        EditProducts.prototype.activate = function () {
             var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.products.getProductsArray('?order=name', true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.products.productsArray);
-                                this.spinnerHTML = "";
-
-                            case 5:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -28708,18 +28738,48 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
                 }, _callee2, this);
             }));
 
-            function refresh() {
+            function activate() {
                 return _ref2.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditProducts.prototype.refresh = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                $('#loading').show();
+                                _context3.next = 3;
+                                return this.products.getProductsArray('?order=name', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.products.productsArray);
+
+                                $('#loading').hide();
+
+                            case 5:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function refresh() {
+                return _ref3.apply(this, arguments);
             }
 
             return refresh;
         }();
 
         EditProducts.prototype.new = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
-                        switch (_context3.prev = _context3.next) {
+                        switch (_context4.prev = _context4.next) {
                             case 0:
                                 this.editIndex = -1;
                                 this.products.selectProduct();
@@ -28736,24 +28796,24 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
 
                             case 8:
                             case 'end':
-                                return _context3.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee3, this);
+                }, _callee4, this);
             }));
 
             function _new() {
-                return _ref3.apply(this, arguments);
+                return _ref4.apply(this, arguments);
             }
 
             return _new;
         }();
 
         EditProducts.prototype.edit = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index, el) {
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(index, el) {
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
-                        switch (_context4.prev = _context4.next) {
+                        switch (_context5.prev = _context5.next) {
                             case 0:
                                 this.editIndex = this.dataTable.getOriginalIndex(index);
                                 this.products.selectProduct(this.editIndex);
@@ -28774,14 +28834,14 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
 
                             case 12:
                             case 'end':
-                                return _context4.stop();
+                                return _context5.stop();
                         }
                     }
-                }, _callee4, this);
+                }, _callee5, this);
             }));
 
             function edit(_x, _x2) {
-                return _ref4.apply(this, arguments);
+                return _ref5.apply(this, arguments);
             }
 
             return edit;
@@ -28792,30 +28852,30 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
         };
 
         EditProducts.prototype.save = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
                 var serverResponse, response;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context6.prev = _context6.next) {
                             case 0:
                                 if (!this.validation.validate(1)) {
-                                    _context5.next = 16;
+                                    _context6.next = 16;
                                     break;
                                 }
 
-                                _context5.next = 3;
+                                _context6.next = 3;
                                 return this.products.saveProduct();
 
                             case 3:
-                                serverResponse = _context5.sent;
+                                serverResponse = _context6.sent;
 
                                 if (serverResponse.error) {
-                                    _context5.next = 14;
+                                    _context6.next = 14;
                                     break;
                                 }
 
                                 if (!(this.systemChanges.length > 0)) {
-                                    _context5.next = 10;
+                                    _context6.next = 10;
                                     break;
                                 }
 
@@ -28824,16 +28884,16 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
                                         item.productId = serverResponse._id;
                                     });
                                 }
-                                _context5.next = 9;
+                                _context6.next = 9;
                                 return this.systems.saveProductChanges(this.systemChanges);
 
                             case 9:
-                                response = _context5.sent;
+                                response = _context6.sent;
 
                             case 10:
                                 this.dataTable.updateArray(this.products.productsArray);
                                 this.utils.showNotification("Product " + serverResponse.name + " was updated");
-                                _context5.next = 15;
+                                _context6.next = 15;
                                 break;
 
                             case 14:
@@ -28844,14 +28904,14 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
 
                             case 16:
                             case 'end':
-                                return _context5.stop();
+                                return _context6.stop();
                         }
                     }
-                }, _callee5, this);
+                }, _callee6, this);
             }));
 
             function save() {
-                return _ref5.apply(this, arguments);
+                return _ref6.apply(this, arguments);
             }
 
             return save;
@@ -28868,14 +28928,14 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
         };
 
         EditProducts.prototype.deleteProduct = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
                 var _this2 = this;
 
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
-                                return _context6.abrupt('return', this.dialog.showMessage("Are you sure you want to delete this product?", "Delete Product", ['Yes', 'No']).whenClosed(function (response) {
+                                return _context7.abrupt('return', this.dialog.showMessage("Are you sure you want to delete this product?", "Delete Product", ['Yes', 'No']).whenClosed(function (response) {
                                     if (!response.wasCancelled) {
                                         _this2.deleteAProduct();
                                     }
@@ -28883,32 +28943,32 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
 
                             case 1:
                             case 'end':
-                                return _context6.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee6, this);
+                }, _callee7, this);
             }));
 
             function deleteProduct() {
-                return _ref6.apply(this, arguments);
+                return _ref7.apply(this, arguments);
             }
 
             return deleteProduct;
         }();
 
         EditProducts.prototype.deleteAProduct = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
                 var name, serverResponse;
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
-                        switch (_context7.prev = _context7.next) {
+                        switch (_context8.prev = _context8.next) {
                             case 0:
                                 name = this.products.selectedProduct.name;
-                                _context7.next = 3;
+                                _context8.next = 3;
                                 return this.products.deleteProduct();
 
                             case 3:
-                                serverResponse = _context7.sent;
+                                serverResponse = _context8.sent;
 
                                 if (!serverResponse.error) {
                                     this.dataTable.updateArray(this.products.productsArray);
@@ -28919,14 +28979,14 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
 
                             case 7:
                             case 'end':
-                                return _context7.stop();
+                                return _context8.stop();
                         }
                     }
-                }, _callee7, this);
+                }, _callee8, this);
             }));
 
             function deleteAProduct() {
-                return _ref7.apply(this, arguments);
+                return _ref8.apply(this, arguments);
             }
 
             return deleteAProduct;
@@ -29001,19 +29061,19 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
         };
 
         EditProducts.prototype.typeChanged = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(index) {
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(index) {
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
-                        switch (_context8.prev = _context8.next) {
+                        switch (_context9.prev = _context9.next) {
                             case 0:
                                 if (!(index >= 0)) {
-                                    _context8.next = 7;
+                                    _context9.next = 7;
                                     break;
                                 }
 
                                 this.categoryIndex = index;
                                 this.documents.selectCategory(index);
-                                _context8.next = 5;
+                                _context9.next = 5;
                                 return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
 
                             case 5:
@@ -29022,14 +29082,14 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
 
                             case 7:
                             case 'end':
-                                return _context8.stop();
+                                return _context9.stop();
                         }
                     }
-                }, _callee8, this);
+                }, _callee9, this);
             }));
 
             function typeChanged(_x3) {
-                return _ref8.apply(this, arguments);
+                return _ref9.apply(this, arguments);
             }
 
             return typeChanged;
@@ -29053,10 +29113,10 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
         };
 
         EditProducts.prototype.changeTab = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(el, index) {
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(el, index) {
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
-                        switch (_context9.prev = _context9.next) {
+                        switch (_context10.prev = _context10.next) {
                             case 0:
                                 $("#productListGroup.list-group").children().removeClass('menuButtons');
                                 $("#productListGroup.list-group").children().css("background-color", "");
@@ -29068,14 +29128,14 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
 
                             case 7:
                             case 'end':
-                                return _context9.stop();
+                                return _context10.stop();
                         }
                     }
-                }, _callee9, this);
+                }, _callee10, this);
             }));
 
             function changeTab(_x4, _x5) {
-                return _ref9.apply(this, arguments);
+                return _ref10.apply(this, arguments);
             }
 
             return changeTab;
@@ -29520,7 +29580,6 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
 
             this.systemSelected = false;
             this.editClients = false;
-            this.spinnerHTML = "";
             this.selectedProduct = "";
             this.dateConfig = { wrap: true };
 
@@ -29537,27 +29596,26 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
             this._setupValidation();
         }
 
-        EditSystem.prototype.attached = function attached() {
-            $('[data-toggle="tooltip"]').tooltip();
-        };
-
-        EditSystem.prototype.activate = function () {
+        EditSystem.prototype.attached = function () {
             var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
                 var responses;
                 return regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                _context.next = 2;
+                                $('#loading').show();
+                                _context.next = 3;
                                 return Promise.all([this.systems.getSystemsArray('?order=sid'), this.products.getProductsArray('?filter=active|eq|true&order=name'), this.sessions.getSessionsArray(), this.config.getConfig(), this.config.getSessions()]);
 
-                            case 2:
+                            case 3:
                                 responses = _context.sent;
 
                                 this.dataTable.updateArray(this.systems.systemsArray);
                                 this.clientInterval = this.config.CLIENT_INTERVAL;
+                                $('#loading').hide();
+                                $('[data-toggle="tooltip"]').tooltip();
 
-                            case 5:
+                            case 8:
                             case 'end':
                                 return _context.stop();
                         }
@@ -29565,29 +29623,19 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
                 }, _callee, this);
             }));
 
-            function activate() {
+            function attached() {
                 return _ref.apply(this, arguments);
             }
 
-            return activate;
+            return attached;
         }();
 
-        EditSystem.prototype.refresh = function () {
+        EditSystem.prototype.activate = function () {
             var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.systems.getSystemsArray('?order=sid', true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.systems.systemsArray);
-                                this.spinnerHTML = "";
-                                this._cleanUpFilters();
-
-                            case 6:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -29595,8 +29643,39 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
                 }, _callee2, this);
             }));
 
-            function refresh() {
+            function activate() {
                 return _ref2.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditSystem.prototype.refresh = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                $('#loading').show();
+                                _context3.next = 3;
+                                return this.systems.getSystemsArray('?order=sid', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.systems.systemsArray);
+
+                                $('#loading').hide();
+                                this._cleanUpFilters();
+
+                            case 6:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function refresh() {
+                return _ref3.apply(this, arguments);
             }
 
             return refresh;
@@ -29614,27 +29693,27 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
         };
 
         EditSystem.prototype.edit = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(index, el) {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index, el) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
-                        switch (_context3.prev = _context3.next) {
+                        switch (_context4.prev = _context4.next) {
                             case 0:
                                 this.systemDetails = true;
                                 this.editIndex = this.dataTable.getOriginalIndex(index);
-                                _context3.next = 4;
+                                _context4.next = 4;
                                 return this.systems.getSystem(this.editIndex);
 
                             case 4:
-                                response = _context3.sent;
+                                response = _context4.sent;
 
                                 if (!response.error) {
-                                    _context3.next = 8;
+                                    _context4.next = 8;
                                     break;
                                 }
 
                                 this.utils.showNotification('There was an error retrieving the system');
-                                return _context3.abrupt('return');
+                                return _context4.abrupt('return');
 
                             case 8:
                                 this.originalSystem = this.utils.copyObject(this.systems.selectedSystem);
@@ -29653,40 +29732,40 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
 
                             case 18:
                             case 'end':
-                                return _context3.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee3, this);
+                }, _callee4, this);
             }));
 
             function edit(_x, _x2) {
-                return _ref3.apply(this, arguments);
+                return _ref4.apply(this, arguments);
             }
 
             return edit;
         }();
 
         EditSystem.prototype.save = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
                 var _this = this;
 
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
-                        switch (_context4.prev = _context4.next) {
+                        switch (_context5.prev = _context5.next) {
                             case 0:
                                 if (!this.validation.validate(1)) {
-                                    _context4.next = 7;
+                                    _context5.next = 7;
                                     break;
                                 }
 
                                 this.systems.selectedSystem.sid = this.systems.selectedSystem.sid.toUpperCase();
                                 this.systems.selectedSystem.server = this.systems.selectedSystem.server.toUpperCase();
-                                _context4.next = 5;
+                                _context5.next = 5;
                                 return this.systems.saveSystem();
 
                             case 5:
-                                serverResponse = _context4.sent;
+                                serverResponse = _context5.sent;
 
                                 if (!serverResponse.error) {
                                     if (this.saveProduct) this.products.saveProduct();
@@ -29704,32 +29783,32 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
 
                             case 7:
                             case 'end':
-                                return _context4.stop();
+                                return _context5.stop();
                         }
                     }
-                }, _callee4, this);
+                }, _callee5, this);
             }));
 
             function save() {
-                return _ref4.apply(this, arguments);
+                return _ref5.apply(this, arguments);
             }
 
             return save;
         }();
 
         EditSystem.prototype.saveBackups = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(system) {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(system) {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context6.prev = _context6.next) {
                             case 0:
                                 this.systems.setSelectedSystem(system);
-                                _context5.next = 3;
+                                _context6.next = 3;
                                 return this.systems.saveSystem();
 
                             case 3:
-                                serverResponse = _context5.sent;
+                                serverResponse = _context6.sent;
 
                                 if (!serverResponse.error) {
                                     this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
@@ -29737,14 +29816,14 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
 
                             case 5:
                             case 'end':
-                                return _context5.stop();
+                                return _context6.stop();
                         }
                     }
-                }, _callee5, this);
+                }, _callee6, this);
             }));
 
             function saveBackups(_x3) {
-                return _ref5.apply(this, arguments);
+                return _ref6.apply(this, arguments);
             }
 
             return saveBackups;
@@ -29837,18 +29916,18 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
         };
 
         EditSystem.prototype.deleteSystem = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
                 var name, serverResponse;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
                                 name = this.systems.selectedSystem.sid;
-                                _context6.next = 3;
+                                _context7.next = 3;
                                 return this.systems.deleteSystem();
 
                             case 3:
-                                serverResponse = _context6.sent;
+                                serverResponse = _context7.sent;
 
                                 if (!serverResponse.error) {
                                     this.dataTable.updateArray(this.systems.systemsArray);
@@ -29859,14 +29938,14 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
 
                             case 7:
                             case 'end':
-                                return _context6.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee6, this);
+                }, _callee7, this);
             }));
 
             function deleteSystem() {
-                return _ref6.apply(this, arguments);
+                return _ref7.apply(this, arguments);
             }
 
             return deleteSystem;
@@ -30036,24 +30115,24 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
         };
 
         EditSystem.prototype.deleteC = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
-                        switch (_context7.prev = _context7.next) {
+                        switch (_context8.prev = _context8.next) {
                             case 0:
                                 this.systems.deleteClient();
                                 this.utils.showNotification("The client was deleted but you must save the system to complete the deltion");
 
                             case 2:
                             case 'end':
-                                return _context7.stop();
+                                return _context8.stop();
                         }
                     }
-                }, _callee7, this);
+                }, _callee8, this);
             }));
 
             function deleteC() {
-                return _ref7.apply(this, arguments);
+                return _ref8.apply(this, arguments);
             }
 
             return deleteC;
@@ -30154,12 +30233,12 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
         };
 
         EditSystem.prototype.assignmentDetails = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
-                        switch (_context8.prev = _context8.next) {
+                        switch (_context9.prev = _context9.next) {
                             case 0:
-                                _context8.next = 2;
+                                _context9.next = 2;
                                 return this.systems.getAssignmentDetails(this.systems.selectedSystem._id);
 
                             case 2:
@@ -30167,14 +30246,14 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
 
                             case 3:
                             case 'end':
-                                return _context8.stop();
+                                return _context9.stop();
                         }
                     }
-                }, _callee8, this);
+                }, _callee9, this);
             }));
 
             function assignmentDetails() {
-                return _ref8.apply(this, arguments);
+                return _ref9.apply(this, arguments);
             }
 
             return assignmentDetails;
@@ -61908,7 +61987,7 @@ define('text!resources/css/fullcalendar.css', ['module'], function(module) { mod
 define('text!modules/analytics/analytics.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../resources/elements/submenu.html'></compose>\r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template>"; });
 define('text!resources/css/OLDsummernote.css', ['module'], function(module) { module.exports = "@font-face{font-family:\"summernote\";font-style:normal;font-weight:normal;src:url(\"font/summernote.eot?ad8d7e2d177d2473aecd9b35d16211fb\");src:url(\"font/summernote.eot?#iefix\") format(\"embedded-opentype\"),url(\"font/summernote.woff?ad8d7e2d177d2473aecd9b35d16211fb\") format(\"woff\"),url(\"font/summernote.ttf?ad8d7e2d177d2473aecd9b35d16211fb\") format(\"truetype\")}[class^=\"note-icon-\"]:before,[class*=\" note-icon-\"]:before{display:inline-block;font:normal normal normal 14px summernote;font-size:inherit;-webkit-font-smoothing:antialiased;text-decoration:inherit;text-rendering:auto;text-transform:none;vertical-align:middle;speak:none;-moz-osx-font-smoothing:grayscale}.note-icon-align-center:before{content:\"\\f101\"}.note-icon-align-indent:before{content:\"\\f102\"}.note-icon-align-justify:before{content:\"\\f103\"}.note-icon-align-left:before{content:\"\\f104\"}.note-icon-align-outdent:before{content:\"\\f105\"}.note-icon-align-right:before{content:\"\\f106\"}.note-icon-align:before{content:\"\\f107\"}.note-icon-arrows-alt:before{content:\"\\f108\"}.note-icon-bold:before{content:\"\\f109\"}.note-icon-caret:before{content:\"\\f10a\"}.note-icon-chain-broken:before{content:\"\\f10b\"}.note-icon-circle:before{content:\"\\f10c\"}.note-icon-close:before{content:\"\\f10d\"}.note-icon-code:before{content:\"\\f10e\"}.note-icon-eraser:before{content:\"\\f10f\"}.note-icon-font:before{content:\"\\f110\"}.note-icon-frame:before{content:\"\\f111\"}.note-icon-italic:before{content:\"\\f112\"}.note-icon-link:before{content:\"\\f113\"}.note-icon-magic:before{content:\"\\f114\"}.note-icon-menu-check:before{content:\"\\f115\"}.note-icon-minus:before{content:\"\\f116\"}.note-icon-orderedlist:before{content:\"\\f117\"}.note-icon-pencil:before{content:\"\\f118\"}.note-icon-picture:before{content:\"\\f119\"}.note-icon-question:before{content:\"\\f11a\"}.note-icon-redo:before{content:\"\\f11b\"}.note-icon-special-character:before{content:\"\\f11c\"}.note-icon-square:before{content:\"\\f11d\"}.note-icon-strikethrough:before{content:\"\\f11e\"}.note-icon-subscript:before{content:\"\\f11f\"}.note-icon-summernote:before{content:\"\\f120\"}.note-icon-superscript:before{content:\"\\f121\"}.note-icon-table:before{content:\"\\f122\"}.note-icon-text-height:before{content:\"\\f123\"}.note-icon-trash:before{content:\"\\f124\"}.note-icon-underline:before{content:\"\\f125\"}.note-icon-undo:before{content:\"\\f126\"}.note-icon-unorderedlist:before{content:\"\\f127\"}.note-icon-video:before{content:\"\\f128\"}.note-editor{position:relative}.note-editor .note-dropzone{position:absolute;z-index:100;display:none;color:#87cefa;background-color:white;opacity:.95}.note-editor .note-dropzone .note-dropzone-message{display:table-cell;font-size:28px;font-weight:bold;text-align:center;vertical-align:middle}.note-editor .note-dropzone.hover{color:#098ddf}.note-editor.dragover .note-dropzone{display:table}.note-editor .note-editing-area{position:relative}.note-editor .note-editing-area .note-editable{outline:0}.note-editor .note-editing-area .note-editable sup{vertical-align:super}.note-editor .note-editing-area .note-editable sub{vertical-align:sub}.note-editor.note-frame{border:1px solid #a9a9a9}.note-editor.note-frame.codeview .note-editing-area .note-editable{display:none}.note-editor.note-frame.codeview .note-editing-area .note-codable{display:block}.note-editor.note-frame .note-editing-area{overflow:hidden}.note-editor.note-frame .note-editing-area .note-editable{padding:10px;overflow:auto;color:#000;background-color:#fff}.note-editor.note-frame .note-editing-area .note-editable[contenteditable=\"false\"]{background-color:#e5e5e5}.note-editor.note-frame .note-editing-area .note-codable{display:none;width:100%;padding:10px;margin-bottom:0;font-family:Menlo,Monaco,monospace,sans-serif;font-size:14px;color:#ccc;background-color:#222;border:0;-webkit-border-radius:0;-moz-border-radius:0;border-radius:0;box-shadow:none;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;resize:none}.note-editor.note-frame.fullscreen{position:fixed;top:0;left:0;z-index:1050;width:100%!important}.note-editor.note-frame.fullscreen .note-editable{background-color:white}.note-editor.note-frame.fullscreen .note-resizebar{display:none}.note-editor.note-frame .note-statusbar{background-color:#f5f5f5;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.note-editor.note-frame .note-statusbar .note-resizebar{width:100%;height:8px;padding-top:1px;cursor:ns-resize}.note-editor.note-frame .note-statusbar .note-resizebar .note-icon-bar{width:20px;margin:1px auto;border-top:1px solid #a9a9a9}.note-editor.note-frame .note-placeholder{padding:10px}.note-popover.popover{max-width:none}.note-popover.popover .popover-content a{display:inline-block;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}.note-popover.popover .arrow{left:20px!important}.note-popover .popover-content,.panel-heading.note-toolbar{padding:0 0 5px 5px;margin:0}.note-popover .popover-content>.btn-group,.panel-heading.note-toolbar>.btn-group{margin-top:5px;margin-right:5px;margin-left:0}.note-popover .popover-content .btn-group .note-table,.panel-heading.note-toolbar .btn-group .note-table{min-width:0;padding:5px}.note-popover .popover-content .btn-group .note-table .note-dimension-picker,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker{font-size:18px}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-mousecatcher,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-mousecatcher{position:absolute!important;z-index:3;width:10em;height:10em;cursor:pointer}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-unhighlighted,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-unhighlighted{position:relative!important;z-index:1;width:5em;height:5em;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIj4+Pjp6ekKlAqjAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKhmnaJzPAAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-highlighted,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-highlighted{position:absolute!important;z-index:2;width:1em;height:1em;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIjd6vvD2f9LKLW+AAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKwNDEVT0AAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat}.note-popover .popover-content .note-style h1,.panel-heading.note-toolbar .note-style h1,.note-popover .popover-content .note-style h2,.panel-heading.note-toolbar .note-style h2,.note-popover .popover-content .note-style h3,.panel-heading.note-toolbar .note-style h3,.note-popover .popover-content .note-style h4,.panel-heading.note-toolbar .note-style h4,.note-popover .popover-content .note-style h5,.panel-heading.note-toolbar .note-style h5,.note-popover .popover-content .note-style h6,.panel-heading.note-toolbar .note-style h6,.note-popover .popover-content .note-style blockquote,.panel-heading.note-toolbar .note-style blockquote{margin:0}.note-popover .popover-content .note-color .dropdown-toggle,.panel-heading.note-toolbar .note-color .dropdown-toggle{width:20px;padding-left:5px}.note-popover .popover-content .note-color .dropdown-menu,.panel-heading.note-toolbar .note-color .dropdown-menu{min-width:340px}.note-popover .popover-content .note-color .dropdown-menu .btn-group,.panel-heading.note-toolbar .note-color .dropdown-menu .btn-group{margin:0}.note-popover .popover-content .note-color .dropdown-menu .btn-group:first-child,.panel-heading.note-toolbar .note-color .dropdown-menu .btn-group:first-child{margin:0 5px}.note-popover .popover-content .note-color .dropdown-menu .btn-group .note-palette-title,.panel-heading.note-toolbar .note-color .dropdown-menu .btn-group .note-palette-title{margin:2px 7px;font-size:12px;text-align:center;border-bottom:1px solid #eee}.note-popover .popover-content .note-color .dropdown-menu .btn-group .note-color-reset,.panel-heading.note-toolbar .note-color .dropdown-menu .btn-group .note-color-reset{width:100%;padding:0 3px;margin:3px;font-size:11px;cursor:pointer;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px}.note-popover .popover-content .note-color .dropdown-menu .btn-group .note-color-row,.panel-heading.note-toolbar .note-color .dropdown-menu .btn-group .note-color-row{height:20px}.note-popover .popover-content .note-color .dropdown-menu .btn-group .note-color-reset:hover,.panel-heading.note-toolbar .note-color .dropdown-menu .btn-group .note-color-reset:hover{background:#eee}.note-popover .popover-content .note-para .dropdown-menu,.panel-heading.note-toolbar .note-para .dropdown-menu{min-width:216px;padding:5px}.note-popover .popover-content .note-para .dropdown-menu>div:first-child,.panel-heading.note-toolbar .note-para .dropdown-menu>div:first-child{margin-right:5px}.note-popover .popover-content .dropdown-menu,.panel-heading.note-toolbar .dropdown-menu{min-width:90px}.note-popover .popover-content .dropdown-menu.right,.panel-heading.note-toolbar .dropdown-menu.right{right:0;left:auto}.note-popover .popover-content .dropdown-menu.right::before,.panel-heading.note-toolbar .dropdown-menu.right::before{right:9px;left:auto!important}.note-popover .popover-content .dropdown-menu.right::after,.panel-heading.note-toolbar .dropdown-menu.right::after{right:10px;left:auto!important}.note-popover .popover-content .dropdown-menu.note-check li a i,.panel-heading.note-toolbar .dropdown-menu.note-check li a i{color:deepskyblue;visibility:hidden}.note-popover .popover-content .dropdown-menu.note-check li a.checked i,.panel-heading.note-toolbar .dropdown-menu.note-check li a.checked i{visibility:visible}.note-popover .popover-content .note-fontsize-10,.panel-heading.note-toolbar .note-fontsize-10{font-size:10px}.note-popover .popover-content .note-color-palette,.panel-heading.note-toolbar .note-color-palette{line-height:1}.note-popover .popover-content .note-color-palette div .note-color-btn,.panel-heading.note-toolbar .note-color-palette div .note-color-btn{width:20px;height:20px;padding:0;margin:0;border:1px solid #fff}.note-popover .popover-content .note-color-palette div .note-color-btn:hover,.panel-heading.note-toolbar .note-color-palette div .note-color-btn:hover{border:1px solid #000}.note-dialog>div{display:none}.note-dialog .form-group{margin-right:0;margin-left:0}.note-dialog .note-modal-form{margin:0}.note-dialog .note-image-dialog .note-dropzone{min-height:100px;margin-bottom:10px;font-size:30px;line-height:4;color:lightgray;text-align:center;border:4px dashed lightgray}@-moz-document url-prefix(){.note-image-input{height:auto}}.note-placeholder{position:absolute;display:none;color:gray}.note-handle .note-control-selection{position:absolute;display:none;border:1px solid black}.note-handle .note-control-selection>div{position:absolute}.note-handle .note-control-selection .note-control-selection-bg{width:100%;height:100%;background-color:black;-webkit-opacity:.3;-khtml-opacity:.3;-moz-opacity:.3;opacity:.3;-ms-filter:alpha(opacity=30);filter:alpha(opacity=30)}.note-handle .note-control-selection .note-control-handle{width:7px;height:7px;border:1px solid black}.note-handle .note-control-selection .note-control-holder{width:7px;height:7px;border:1px solid black}.note-handle .note-control-selection .note-control-sizing{width:7px;height:7px;background-color:white;border:1px solid black}.note-handle .note-control-selection .note-control-nw{top:-5px;left:-5px;border-right:0;border-bottom:0}.note-handle .note-control-selection .note-control-ne{top:-5px;right:-5px;border-bottom:0;border-left:none}.note-handle .note-control-selection .note-control-sw{bottom:-5px;left:-5px;border-top:0;border-right:0}.note-handle .note-control-selection .note-control-se{right:-5px;bottom:-5px;cursor:se-resize}.note-handle .note-control-selection .note-control-se.note-control-holder{cursor:default;border-top:0;border-left:none}.note-handle .note-control-selection .note-control-selection-info{right:0;bottom:0;padding:5px;margin:5px;font-size:12px;color:white;background-color:black;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;-webkit-opacity:.7;-khtml-opacity:.7;-moz-opacity:.7;opacity:.7;-ms-filter:alpha(opacity=70);filter:alpha(opacity=70)}.note-hint-popover{min-width:100px;padding:2px}.note-hint-popover .popover-content{max-height:150px;padding:3px;overflow:auto}.note-hint-popover .popover-content .note-hint-group .note-hint-item{display:block!important;padding:3px}.note-hint-popover .popover-content .note-hint-group .note-hint-item.active,.note-hint-popover .popover-content .note-hint-group .note-hint-item:hover{display:block;clear:both;font-weight:400;line-height:1.4;color:white;text-decoration:none;white-space:nowrap;cursor:pointer;background-color:#428bca;outline:0}"; });
 define('text!modules/analytics/clientRequests.html', ['module'], function(module) { module.exports = "<template>\r\n    <style>\r\n        .menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\r\n        }\r\n    </style>\r\n    <div class=\"col-lg-2\">\r\n\t\t<div>\r\n\t\t\t<ul class=\"list-group\">\r\n\t\t\t\t<button click.trigger=\"typeChanged(category, $event)\" type=\"button\"  repeat.for=\"category of categories\"\r\n\t\t\t\t\tid=\"${category.code}\" class=\"${$first ? 'list-group-item menuButtons categoryButtons' : 'list-group-item categoryButtons'}\">${category.description}</button>\r\n\t\t\t</ul>\r\n\t\t</div>\r\n\t</div>\r\n\r\n    <div class=\"panel panel-default rightMargin leftMargin col-lg-9\">\r\n      <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n      <!-- Session Select -->\r\n      <div class=\"col-lg-4\">\r\n        <div class=\"form-group topMargin leftMargin\">\r\n            <select value.bind=\"selectedSession\" change.delegate=\"getSessionData()\" id=\"session\" class=\"form-control\">\r\n              <option repeat.for=\"session of sessions.sessionsArray\"\r\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\r\n            </select>\r\n        </div>\r\n      </div>\r\n    </div>\r\n        <div class=\"row\">\r\n            <div show.bind=\"selectedCategory.code === 0\">\r\n                <compose view=\"./components/requestsByInstitution.html\"></compose>\r\n            </div>\r\n             <div show.bind=\"selectedCategory.code === 1\">\r\n                <compose view=\"./components/requestsByProducts.html\"></compose>\r\n            </div>\r\n            <div show.bind=\"selectedCategory.code === 2\">\r\n                <compose view=\"./components/requestsByCountry.html\"></compose>\r\n            </div>\r\n            <div show.bind=\"selectedCategory.code === 3\">\r\n                <compose view=\"./components/requestsByInstitutionCountry.html\"></compose>\r\n            </div>\r\n        </div> \r\n      </div> \r\n</template>"; });
-define('text!resources/css/styles.css', ['module'], function(module) { module.exports = "@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);\r\n\r\n.provisional {\r\n    background-color: cyan;\r\n}\r\n\r\n.existing {\r\n    background-color: LightGoldenRodYellow;\r\n}\r\n\r\n.danger {\r\n    background-color:deeppink;\r\n}\r\n\r\n.customFont {\r\n    font-family: 'Montserrat', sans-serif;\r\n}\r\n.card-header{\r\n    font-size: 1.640625rem;\r\n}\r\n\r\n.card-title {\r\n    padding: 5px;\r\n}\r\n\r\n.card-title {\r\n    background-color: rgba(0, 0, 0, 0.03);\r\n    border: 1px solid rgba(0, 0, 0, 0.125);\r\n}\r\n\r\n.btn-default{\r\n    background-color:white;\r\n}\r\n    .hover_img a { position:relative; }\r\n    .hover_img a span { position:absolute; display:none; z-index:99; }\r\n    .hover_img a:hover span { display:block; }\r\n\r\n    .hover {\r\n        position:absolute;\r\n        height: 200px;\r\n        width: 600px;\r\n        z-index:99;\r\n        display:none; \r\n        box-shadow: 10px 10px 5px #888888;\r\n        overflow: hidden;\r\n        background-color: white;\r\n        padding: 10px;\r\n    }\r\n\r\n.fixed\r\n{\r\n    position: fixed;\r\n    top: 20px;\r\n    right: 40px;\r\n}\r\n\r\n.bold {\r\n    font-weight: bold;\r\n}\r\n\r\n.redText {\r\n    color: purple;\r\n    font-weight: bolder !important;\r\n}\r\n\r\n.banner {\r\n    height: 50px;\r\n    width: 100%;\r\n    background-color: white;\r\n    border-bottom-style: solid;\r\n    border-bottom-width: 1px;\r\n}\r\n\r\n.banner #notice {\r\n    margin-left: 30px;\r\n    font-size: 1.25em;\r\n    color: indianred;\r\n}\r\n\r\n.browse .textContainer {\r\n    height: 430px;\r\n    line-height: 400px;\r\n}\r\n\r\n.textContainer h4 {\r\n    vertical-align: middle;\r\n    display: inline-block;\r\n}\r\n\r\n.topMargin {\r\n    margin-top: 25px;\r\n}\r\n\r\n.bottomMargin {\r\n    margin-bottom: 25px;\r\n}\r\n\r\n.leftMargin {\r\n    margin-left: 25px;\r\n}\r\n\r\n.rightMargin {\r\n  margin-right: 25px;\r\n}\r\n\r\n.smallLeftMargin {\r\n    margin-left: 10px;\r\n}\r\n\r\n.bigTopMargin {\r\n    margin-top: 50px;\r\n}\r\n\r\n.bigLeftMargin {\r\n    margin-left: 50px;\r\n}\r\n\r\n.smallMarginTop {\r\n    margin-top: 5px;\r\n}\r\n\r\n.smallMarginRight {\r\n    margin-right: 10px;\r\n}\r\n\r\n.parallax1 {\r\n    /* The image used */\r\n    background-image: url(\"/img/parallax1.jpg\");\r\n\r\n    /* Set a specific height */\r\n    min-height: 300px;\r\n\r\n    /* Create the parallax scrolling effect */\r\n    background-attachment: fixed;\r\n    background-position: center;\r\n    background-repeat: no-repeat;\r\n    background-size: cover;\r\n}\r\n\r\n.parallax2 {\r\n    /* The image used */\r\n    background-image: url(\"/img/parallax2.jpg\");\r\n\r\n    /* Set a specific height */\r\n    min-height: 200px;\r\n\r\n    /* Create the parallax scrolling effect */\r\n    background-attachment: fixed;\r\n    background-position: center;\r\n    background-repeat: no-repeat;\r\n    background-size: cover;\r\n}\r\n\r\n.caption span.border {\r\n    background-color: #111;\r\n    color: #fff;\r\n    padding: 18px;\r\n    font-size: 25px;\r\n    letter-spacing: 10px;\r\n}\r\n\r\n.caption {\r\n  position: absolute;\r\n  left: 0;\r\n  top: 25%;\r\n  width: 100%;\r\n  text-align: center;\r\n  color: #000;\r\n}\r\n\r\n.center-text {\r\n   text-align: center;\r\n}\r\n\r\n.home-page-header{\r\n    text-align: center;\r\n    font-size: 30px;\r\n}\r\n\r\n.underline {\r\n    text-decoration: underline;\r\n}\r\n\r\n.subMenu{\r\n    position: relative;\r\n    top: -5px;\r\n    left: 0px;\r\n    width: 100%;\r\n}\r\n\r\n.subMenu-container {\r\n    position: fixed; /* Set the navbar to fixed position */\r\n    top: 5rem;\r\n    width: 100%;\r\n    z-index:99;\r\n}\r\n\r\n.hover {\r\n    position:absolute;\r\n    height: 200px;\r\n    width: 600px;\r\n    z-index:99;\r\n    display:none;\r\n    box-shadow: 10px 10px 5px #888888;\r\n    overflow: hidden;\r\n    background-color: white;\r\n    padding: 10px;\r\n}\r\n\r\n.hoverProfile {\r\n    position:absolute;\r\n    height: 250px;\r\n    width: 500px;\r\n    z-index:99;\r\n    display:none;\r\n    box-shadow: 10px 10px 5px #888888;\r\n    overflow: hidden;\r\n    background-color: white;\r\n    padding: 10px;\r\n     right:0;\r\n    bottom:0;\r\n}\r\n\r\n.overFlow {\r\n    overflow-y:scroll;\r\n}\r\n\r\n.carouselSize {\r\n    width:700px;\r\n    height:500px;\r\n}\r\n\r\n.carouselImage {\r\n    height:500px;\r\n}\r\n\r\n.weatherIcon {\r\n    height: 50px;\r\n    width: 50px;\r\n}\r\n\r\n.page-host {\r\n    margin-top: 10rem;\r\n}\r\n\r\nspan i {\r\n    cursor: pointer;\r\n}\r\n\r\n.sortable {\r\n    cursor: pointer;   \r\n}\r\n\r\n.aurelia-flatpickr {\r\n    background-color: white !important;\r\n}\r\n\r\n/* Dropdown Button */\r\n.dropbtn {\r\n    border: none;\r\n    cursor: pointer;\r\n}\r\n\r\n/* The container <div> - needed to position the dropdown content */\r\n.dropdown {\r\n    position: relative;\r\n    display: inline-block;\r\n}\r\n\r\n/* Dropdown Content (Hidden by Default) */\r\n.dropdown-content {\r\n    display: none;\r\n    position: absolute;\r\n    background-color: #f9f9f9;\r\n    min-width: 160px;\r\n    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);\r\n    z-index: 1;\r\n}\r\n\r\n/* Links inside the dropdown */\r\n.dropdown-content a {\r\n    color: black;\r\n    padding: 12px 16px;\r\n    text-decoration: none;\r\n    display: block;\r\n}\r\n\r\n/* Change color of dropdown links on hover */\r\n.dropdown-content a:hover {background-color: #f1f1f1}\r\n\r\n/* Show the dropdown menu on hover */\r\n.dropdown:hover .dropdown-content {\r\n    display: block;\r\n}\r\n\r\n/* Change the background color of the dropdown button when the dropdown content is shown */\r\n.dropdown:hover .dropbtn {\r\n    background-color: #3e8e41;\r\n}\r\n\r\n.smart-timeline{position:relative}\r\n.smart-timeline-list{list-style:none;margin:0;padding:0}\r\n.smart-timeline-list:after{content:\" \";background-color:#eee;position:absolute;display:block;width:2px;top:0;left:95px;bottom:0;z-index:1}\r\n.smart-timeline-list li{position:relative;margin:0;padding:15px 0}\r\n.smart-timeline-list>li:hover{background-color:#f4f4f4}\r\n.smart-timeline-hover li:hover{background-color:#f9f9f9}\r\n.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}\r\n.smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}\r\n.smart-timeline-time{float:left;width:70px;text-align:right}\r\n.smart-timeline-time>small{font-style:italic}\r\n.smart-timeline-content{margin-left:123px}\r\n\r\n\r\n/****** Style Star Rating Widget *****/\r\n\r\n.rating { \r\n  border: none;\r\n  float: left;\r\n}\r\n\r\n.rating > span > input { display: none; } \r\n.rating > span > label:before { \r\n  margin: 5px;\r\n  font-size: 1.25em;\r\n  font-family: FontAwesome;\r\n  display: inline-block;\r\n  content: \"\\f005\";\r\n}\r\n\r\n.rating > span > .half:before { \r\n  content: \"\\f089\";\r\n  position: absolute;\r\n}\r\n\r\n.rating > span > label { \r\n    color: #ddd; \r\n    float: right; \r\n}\r\n\r\n/***** CSS Magic to Highlight Stars on Hover *****/\r\n\r\n.rating > span > input:checked ~ label, /* show gold star when clicked */\r\n.rating:not(:checked) > span > label:hover, /* hover current star */\r\n.rating:not(:checked) > span > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */\r\n\r\n.rating > span > input:checked + label:hover, /* hover current star when changing rating */\r\n.rating > span >  input:checked ~ label:hover,\r\n.rating > span > label:hover ~ input:checked ~ label, /* lighten current selection */\r\n.rating > span > input:checked ~ label:hover ~ label { color: #FFED85;  }\r\n\r\n.link-shadow {\r\n    -webkit-box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);\r\n    -moz-box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);\r\n    box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);\r\n}\r\n\r\n#curriculumInfo{\r\n     display:none;\r\n}\r\n\r\nux-dialog-header {\r\n    background-color: #ffbd00 ;\r\n    color: white;\r\n}\r\n\r\n.col-centered{\r\n    float: none;\r\n    margin: 0 auto;\r\n}\r\n\r\n.circular--square {\r\n  border-radius: 50%;\r\n}\r\n\r\n@media only screen and (max-width: 800px) {\r\n    \r\n    /* Force table to not be like tables anymore */\r\n\t#no-more-tables table, \r\n\t#no-more-tables thead, \r\n\t#no-more-tables tbody, \r\n\t#no-more-tables th, \r\n\t#no-more-tables td, \r\n\t#no-more-tables tr { \r\n\t\tdisplay: block; \r\n\t}\r\n \r\n\t/* Hide table headers (but not display: none;, for accessibility) */\r\n\t#no-more-tables thead tr { \r\n\t\tposition: absolute;\r\n\t\ttop: -9999px;\r\n\t\tleft: -9999px;\r\n\t}\r\n \r\n\t#no-more-tables tr { border: 1px solid #ccc; }\r\n \r\n\t#no-more-tables td { \r\n\t\t/* Behave  like a \"row\" */\r\n\t\tborder: none;\r\n\t\tborder-bottom: 1px solid #eee; \r\n\t\tposition: relative;\r\n\t\tpadding-left: 50%; \r\n\t\twhite-space: normal;\r\n\t\ttext-align:left;\r\n\t}\r\n \r\n\t#no-more-tables td:before { \r\n\t\t/* Now like a table header */\r\n\t\tposition: absolute;\r\n\t\t/* Top/left values mimic padding */\r\n\t\ttop: 6px;\r\n\t\tleft: 6px;\r\n\t\twidth: 45%; \r\n\t\tpadding-right: 10px; \r\n\t\twhite-space: nowrap;\r\n\t\ttext-align:left;\r\n\t\tfont-weight: bold;\r\n\t}\r\n\r\n    .clickable{\r\n        cursor: pointer;   \r\n    }\r\n\r\n    .smallFont{\r\n        font-size: small;\r\n    }\r\n\r\n\t/*\r\n\tLabel the data\r\n\t*/\r\n    #no-more-tables td:before { content: attr(data-title); }\r\n    \r\n    }\r\n\r\n    #loading {\r\n        background: repeat scroll 0 0;\r\n        height: 100%;\r\n        left: 0;\r\n        margin: auto;\r\n        position: fixed;\r\n        top: 0;\r\n        width: 100%;\r\n    }\r\n\r\n    .bokeh {\r\n        border: 0.01em solid rgba(150, 150, 150, 0.1);\r\n        border-radius: 50%;\r\n        font-size: 100px;\r\n        height: 1em;\r\n        list-style: outside none none;\r\n        margin: 0 auto;\r\n        position: relative;\r\n        top: 35%;\r\n        width: 1em;\r\n        z-index: 2147483647;\r\n    }\r\n    .bokeh li {\r\n        border-radius: 50%;\r\n        height: 0.2em;\r\n        position: absolute;\r\n        width: 0.2em;\r\n    }\r\n    .bokeh li:nth-child(1) {\r\n        animation: 1.13s linear 0s normal none infinite running rota, 3.67s ease-in-out 0s alternate none infinite running opa;\r\n        background: #00c176 none repeat scroll 0 0;\r\n        left: 50%;\r\n        margin: 0 0 0 -0.1em;\r\n        top: 0;\r\n        transform-origin: 50% 250% 0;\r\n    }\r\n    .bokeh li:nth-child(2) {\r\n        animation: 1.86s linear 0s normal none infinite running rota, 4.29s ease-in-out 0s alternate none infinite running opa;\r\n        background: #ff003c none repeat scroll 0 0;\r\n        margin: -0.1em 0 0;\r\n        right: 0;\r\n        top: 50%;\r\n        transform-origin: -150% 50% 0;\r\n    }\r\n    .bokeh li:nth-child(3) {\r\n        animation: 1.45s linear 0s normal none infinite running rota, 5.12s ease-in-out 0s alternate none infinite running opa;\r\n        background: #fabe28 none repeat scroll 0 0;\r\n        bottom: 0;\r\n        left: 50%;\r\n        margin: 0 0 0 -0.1em;\r\n        transform-origin: 50% -150% 0;\r\n    }\r\n    .bokeh li:nth-child(4) {\r\n        animation: 1.72s linear 0s normal none infinite running rota, 5.25s ease-in-out 0s alternate none infinite running opa;\r\n        background: #88c100 none repeat scroll 0 0;\r\n        margin: -0.1em 0 0;\r\n        top: 50%;\r\n        transform-origin: 250% 50% 0;\r\n    }\r\n    \r\n    .translucent{\r\n        opacity: 0.2;\r\n    }\r\n    \r\n    @keyframes opa {\r\n    12% {\r\n        opacity: 0.8;\r\n    }\r\n    19.5% {\r\n        opacity: 0.88;\r\n    }\r\n    37.2% {\r\n        opacity: 0.64;\r\n    }\r\n    40.5% {\r\n        opacity: 0.52;\r\n    }\r\n    52.7% {\r\n        opacity: 0.69;\r\n    }\r\n    60.2% {\r\n        opacity: 0.6;\r\n    }\r\n    66.6% {\r\n        opacity: 0.52;\r\n    }\r\n    70% {\r\n        opacity: 0.63;\r\n    }\r\n    79.9% {\r\n        opacity: 0.6;\r\n    }\r\n    84.2% {\r\n        opacity: 0.75;\r\n    }\r\n    91% {\r\n        opacity: 0.87;\r\n    }\r\n    }\r\n    \r\n    @keyframes rota {\r\n        100% {\r\n            transform: rotate(360deg);\r\n        }\r\n    }"; });
+define('text!resources/css/styles.css', ['module'], function(module) { module.exports = "@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);\r\n\r\n.provisional {\r\n    background-color: cyan;\r\n}\r\n\r\n.existing {\r\n    background-color: LightGoldenRodYellow;\r\n}\r\n\r\n.danger {\r\n    background-color:deeppink;\r\n}\r\n\r\n.customFont {\r\n    font-family: 'Montserrat', sans-serif;\r\n}\r\n.card-header{\r\n    font-size: 1.640625rem;\r\n}\r\n\r\n.card-title {\r\n    padding: 5px;\r\n}\r\n\r\n.card-title {\r\n    background-color: rgba(0, 0, 0, 0.03);\r\n    border: 1px solid rgba(0, 0, 0, 0.125);\r\n}\r\n\r\n.btn-default{\r\n    background-color:white;\r\n}\r\n    .hover_img a { position:relative; }\r\n    .hover_img a span { position:absolute; display:none; z-index:99; }\r\n    .hover_img a:hover span { display:block; }\r\n\r\n    .hover {\r\n        position:absolute;\r\n        height: 200px;\r\n        width: 600px;\r\n        z-index:99;\r\n        display:none; \r\n        box-shadow: 10px 10px 5px #888888;\r\n        overflow: hidden;\r\n        background-color: white;\r\n        padding: 10px;\r\n    }\r\n\r\n.fixed\r\n{\r\n    position: fixed;\r\n    top: 20px;\r\n    right: 40px;\r\n}\r\n\r\n.bold {\r\n    font-weight: bold;\r\n}\r\n\r\n.redText {\r\n    color: purple;\r\n    font-weight: bolder !important;\r\n}\r\n\r\n.banner {\r\n    height: 50px;\r\n    width: 100%;\r\n    background-color: white;\r\n    border-bottom-style: solid;\r\n    border-bottom-width: 1px;\r\n}\r\n\r\n.banner #notice {\r\n    margin-left: 30px;\r\n    font-size: 1.25em;\r\n    color: indianred;\r\n}\r\n\r\n.browse .textContainer {\r\n    height: 430px;\r\n    line-height: 400px;\r\n}\r\n\r\n.textContainer h4 {\r\n    vertical-align: middle;\r\n    display: inline-block;\r\n}\r\n\r\n.topMargin {\r\n    margin-top: 25px;\r\n}\r\n\r\n.bottomMargin {\r\n    margin-bottom: 25px;\r\n}\r\n\r\n.leftMargin {\r\n    margin-left: 25px;\r\n}\r\n\r\n.rightMargin {\r\n  margin-right: 25px;\r\n}\r\n\r\n.smallLeftMargin {\r\n    margin-left: 10px;\r\n}\r\n\r\n.bigTopMargin {\r\n    margin-top: 50px;\r\n}\r\n\r\n.bigLeftMargin {\r\n    margin-left: 50px;\r\n}\r\n\r\n.smallMarginTop {\r\n    margin-top: 5px;\r\n}\r\n\r\n.smallMarginRight {\r\n    margin-right: 10px;\r\n}\r\n\r\n.parallax1 {\r\n    /* The image used */\r\n    background-image: url(\"/img/parallax1.jpg\");\r\n\r\n    /* Set a specific height */\r\n    min-height: 300px;\r\n\r\n    /* Create the parallax scrolling effect */\r\n    background-attachment: fixed;\r\n    background-position: center;\r\n    background-repeat: no-repeat;\r\n    background-size: cover;\r\n}\r\n\r\n.parallax2 {\r\n    /* The image used */\r\n    background-image: url(\"/img/parallax2.jpg\");\r\n\r\n    /* Set a specific height */\r\n    min-height: 200px;\r\n\r\n    /* Create the parallax scrolling effect */\r\n    background-attachment: fixed;\r\n    background-position: center;\r\n    background-repeat: no-repeat;\r\n    background-size: cover;\r\n}\r\n\r\n.caption span.border {\r\n    background-color: #111;\r\n    color: #fff;\r\n    padding: 18px;\r\n    font-size: 25px;\r\n    letter-spacing: 10px;\r\n}\r\n\r\n.caption {\r\n  position: absolute;\r\n  left: 0;\r\n  top: 25%;\r\n  width: 100%;\r\n  text-align: center;\r\n  color: #000;\r\n}\r\n\r\n.center-text {\r\n   text-align: center;\r\n}\r\n\r\n.home-page-header{\r\n    text-align: center;\r\n    font-size: 30px;\r\n}\r\n\r\n.underline {\r\n    text-decoration: underline;\r\n}\r\n\r\n.subMenu{\r\n    position: relative;\r\n    top: -5px;\r\n    left: 0px;\r\n    width: 100%;\r\n}\r\n\r\n.subMenu-container {\r\n    position: fixed; /* Set the navbar to fixed position */\r\n    top: 5rem;\r\n    width: 100%;\r\n    z-index:99;\r\n}\r\n\r\n.hover {\r\n    position:absolute;\r\n    height: 200px;\r\n    width: 600px;\r\n    z-index:99;\r\n    display:none;\r\n    box-shadow: 10px 10px 5px #888888;\r\n    overflow: hidden;\r\n    background-color: white;\r\n    padding: 10px;\r\n}\r\n\r\n.hoverProfile {\r\n    position:absolute;\r\n    height: 250px;\r\n    width: 500px;\r\n    z-index:99;\r\n    display:none;\r\n    box-shadow: 10px 10px 5px #888888;\r\n    overflow: hidden;\r\n    background-color: white;\r\n    padding: 10px;\r\n     right:0;\r\n    bottom:0;\r\n}\r\n\r\n.overFlow {\r\n    overflow-y:scroll;\r\n}\r\n\r\n.carouselSize {\r\n    width:700px;\r\n    height:500px;\r\n}\r\n\r\n.carouselImage {\r\n    height:500px;\r\n}\r\n\r\n.weatherIcon {\r\n    height: 50px;\r\n    width: 50px;\r\n}\r\n\r\n.page-host {\r\n    margin-top: 10rem;\r\n}\r\n\r\nspan i {\r\n    cursor: pointer;\r\n}\r\n\r\n.sortable {\r\n    cursor: pointer;   \r\n}\r\n\r\n.aurelia-flatpickr {\r\n    background-color: white !important;\r\n}\r\n\r\n/* Dropdown Button */\r\n.dropbtn {\r\n    border: none;\r\n    cursor: pointer;\r\n}\r\n\r\n/* The container <div> - needed to position the dropdown content */\r\n.dropdown {\r\n    position: relative;\r\n    display: inline-block;\r\n}\r\n\r\n/* Dropdown Content (Hidden by Default) */\r\n.dropdown-content {\r\n    display: none;\r\n    position: absolute;\r\n    background-color: #f9f9f9;\r\n    min-width: 160px;\r\n    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);\r\n    z-index: 1;\r\n}\r\n\r\n/* Links inside the dropdown */\r\n.dropdown-content a {\r\n    color: black;\r\n    padding: 12px 16px;\r\n    text-decoration: none;\r\n    display: block;\r\n}\r\n\r\n/* Change color of dropdown links on hover */\r\n.dropdown-content a:hover {background-color: #f1f1f1}\r\n\r\n/* Show the dropdown menu on hover */\r\n.dropdown:hover .dropdown-content {\r\n    display: block;\r\n}\r\n\r\n/* Change the background color of the dropdown button when the dropdown content is shown */\r\n.dropdown:hover .dropbtn {\r\n    background-color: #3e8e41;\r\n}\r\n\r\n.smart-timeline{position:relative}\r\n.smart-timeline-list{list-style:none;margin:0;padding:0}\r\n.smart-timeline-list:after{content:\" \";background-color:#eee;position:absolute;display:block;width:2px;top:0;left:95px;bottom:0;z-index:1}\r\n.smart-timeline-list li{position:relative;margin:0;padding:15px 0}\r\n.smart-timeline-list>li:hover{background-color:#f4f4f4}\r\n.smart-timeline-hover li:hover{background-color:#f9f9f9}\r\n.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}\r\n.smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}\r\n.smart-timeline-time{float:left;width:70px;text-align:right}\r\n.smart-timeline-time>small{font-style:italic}\r\n.smart-timeline-content{margin-left:123px}\r\n\r\n\r\n/****** Style Star Rating Widget *****/\r\n\r\n.rating { \r\n  border: none;\r\n  float: left;\r\n}\r\n\r\n.rating > span > input { display: none; } \r\n.rating > span > label:before { \r\n  margin: 5px;\r\n  font-size: 1.25em;\r\n  font-family: FontAwesome;\r\n  display: inline-block;\r\n  content: \"\\f005\";\r\n}\r\n\r\n.rating > span > .half:before { \r\n  content: \"\\f089\";\r\n  position: absolute;\r\n}\r\n\r\n.rating > span > label { \r\n    color: #ddd; \r\n    float: right; \r\n}\r\n\r\n/***** CSS Magic to Highlight Stars on Hover *****/\r\n\r\n.rating > span > input:checked ~ label, /* show gold star when clicked */\r\n.rating:not(:checked) > span > label:hover, /* hover current star */\r\n.rating:not(:checked) > span > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */\r\n\r\n.rating > span > input:checked + label:hover, /* hover current star when changing rating */\r\n.rating > span >  input:checked ~ label:hover,\r\n.rating > span > label:hover ~ input:checked ~ label, /* lighten current selection */\r\n.rating > span > input:checked ~ label:hover ~ label { color: #FFED85;  }\r\n\r\n.link-shadow {\r\n    -webkit-box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);\r\n    -moz-box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);\r\n    box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);\r\n}\r\n\r\n#curriculumInfo{\r\n     display:none;\r\n}\r\n\r\nux-dialog-header {\r\n    background-color: #ffbd00 ;\r\n    color: white;\r\n}\r\n\r\n.col-centered{\r\n    float: none;\r\n    margin: 0 auto;\r\n}\r\n\r\n.circular--square {\r\n  border-radius: 50%;\r\n}\r\n\r\n@media only screen and (max-width: 800px) {\r\n    \r\n    /* Force table to not be like tables anymore */\r\n\t#no-more-tables table, \r\n\t#no-more-tables thead, \r\n\t#no-more-tables tbody, \r\n\t#no-more-tables th, \r\n\t#no-more-tables td, \r\n\t#no-more-tables tr { \r\n\t\tdisplay: block; \r\n\t}\r\n \r\n\t/* Hide table headers (but not display: none;, for accessibility) */\r\n\t#no-more-tables thead tr { \r\n\t\tposition: absolute;\r\n\t\ttop: -9999px;\r\n\t\tleft: -9999px;\r\n\t}\r\n \r\n\t#no-more-tables tr { border: 1px solid #ccc; }\r\n \r\n\t#no-more-tables td { \r\n\t\t/* Behave  like a \"row\" */\r\n\t\tborder: none;\r\n\t\tborder-bottom: 1px solid #eee; \r\n\t\tposition: relative;\r\n\t\tpadding-left: 50%; \r\n\t\twhite-space: normal;\r\n\t\ttext-align:left;\r\n\t}\r\n \r\n\t#no-more-tables td:before { \r\n\t\t/* Now like a table header */\r\n\t\tposition: absolute;\r\n\t\t/* Top/left values mimic padding */\r\n\t\ttop: 6px;\r\n\t\tleft: 6px;\r\n\t\twidth: 45%; \r\n\t\tpadding-right: 10px; \r\n\t\twhite-space: nowrap;\r\n\t\ttext-align:left;\r\n\t\tfont-weight: bold;\r\n\t}\r\n\r\n    .clickable{\r\n        cursor: pointer;   \r\n    }\r\n\r\n    .smallFont{\r\n        font-size: small;\r\n    }\r\n\r\n\t/*\r\n\tLabel the data\r\n\t*/\r\n    #no-more-tables td:before { content: attr(data-title); }\r\n    \r\n    }\r\n\r\n    #loading {\r\n        background: repeat scroll 0 0;\r\n        height: 100%;\r\n        left: 0;\r\n        margin: auto;\r\n        position: fixed;\r\n        top: 0;\r\n        width: 100%;\r\n        z-index:99;\r\n    }\r\n\r\n    .bokeh {\r\n        border: 0.01em solid rgba(150, 150, 150, 0.1);\r\n        border-radius: 50%;\r\n        font-size: 100px;\r\n        height: 1em;\r\n        list-style: outside none none;\r\n        margin: 0 auto;\r\n        position: relative;\r\n        top: 35%;\r\n        width: 1em;\r\n        z-index: 2147483647;\r\n    }\r\n    .bokeh li {\r\n        border-radius: 50%;\r\n        height: 0.2em;\r\n        position: absolute;\r\n        width: 0.2em;\r\n    }\r\n    .bokeh li:nth-child(1) {\r\n        animation: 1.13s linear 0s normal none infinite running rota, 3.67s ease-in-out 0s alternate none infinite running opa;\r\n        background: #00c176 none repeat scroll 0 0;\r\n        left: 50%;\r\n        margin: 0 0 0 -0.1em;\r\n        top: 0;\r\n        transform-origin: 50% 250% 0;\r\n    }\r\n    .bokeh li:nth-child(2) {\r\n        animation: 1.86s linear 0s normal none infinite running rota, 4.29s ease-in-out 0s alternate none infinite running opa;\r\n        background: #ff003c none repeat scroll 0 0;\r\n        margin: -0.1em 0 0;\r\n        right: 0;\r\n        top: 50%;\r\n        transform-origin: -150% 50% 0;\r\n    }\r\n    .bokeh li:nth-child(3) {\r\n        animation: 1.45s linear 0s normal none infinite running rota, 5.12s ease-in-out 0s alternate none infinite running opa;\r\n        background: #fabe28 none repeat scroll 0 0;\r\n        bottom: 0;\r\n        left: 50%;\r\n        margin: 0 0 0 -0.1em;\r\n        transform-origin: 50% -150% 0;\r\n    }\r\n    .bokeh li:nth-child(4) {\r\n        animation: 1.72s linear 0s normal none infinite running rota, 5.25s ease-in-out 0s alternate none infinite running opa;\r\n        background: #88c100 none repeat scroll 0 0;\r\n        margin: -0.1em 0 0;\r\n        top: 50%;\r\n        transform-origin: 250% 50% 0;\r\n    }\r\n    \r\n    .translucent{\r\n        opacity: 0.2;\r\n    }\r\n    \r\n    @keyframes opa {\r\n    12% {\r\n        opacity: 0.8;\r\n    }\r\n    19.5% {\r\n        opacity: 0.88;\r\n    }\r\n    37.2% {\r\n        opacity: 0.64;\r\n    }\r\n    40.5% {\r\n        opacity: 0.52;\r\n    }\r\n    52.7% {\r\n        opacity: 0.69;\r\n    }\r\n    60.2% {\r\n        opacity: 0.6;\r\n    }\r\n    66.6% {\r\n        opacity: 0.52;\r\n    }\r\n    70% {\r\n        opacity: 0.63;\r\n    }\r\n    79.9% {\r\n        opacity: 0.6;\r\n    }\r\n    84.2% {\r\n        opacity: 0.75;\r\n    }\r\n    91% {\r\n        opacity: 0.87;\r\n    }\r\n    }\r\n    \r\n    @keyframes rota {\r\n        100% {\r\n            transform: rotate(360deg);\r\n        }\r\n    }"; });
 define('text!modules/analytics/helpTickets.html', ['module'], function(module) { module.exports = "<template>\r\n    <style>\r\n        .menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\r\n        }\r\n    </style>\r\n    <div class=\"col-lg-2\">\r\n\t\t<h4>Categories</h4>\r\n\t\t<div>\r\n\t\t\t<ul class=\"list-group\">\r\n\t\t\t\t<button click.trigger=\"typeChanged(category, $event)\" type=\"button\"  repeat.for=\"category of categories\"\r\n\t\t\t\t\tid=\"${category.code}\" class=\"${$first ? 'list-group-item menuButtons categoryButtons' : 'list-group-item categoryButtons'}\">${category.description}</button>\r\n\t\t\t</ul>\r\n\t\t</div>\r\n\t</div>\r\n\r\n    <div class=\"panel panel-default rightMargin leftMargin col-lg-9\">\r\n      <div class=\"panel-body\">\r\n        <div show.bind=\"selectedTab === 'types'\" >\r\n            <compose view=\"./components/helpTicketsByType.html\"></compose>\r\n        </div>\r\n        <div show.bind=\"selectedTab === 'curriculum'\">\r\n            <compose view=\"./components/helpTicketsByCurriculum.html\"></compose>\r\n        </div>\r\n        <div show.bind=\"selectedTab === 'institutions'\">\r\n            <compose view=\"./components/helpTicketsByInstitution.html\"></compose>\r\n        </div>\r\n         <div show.bind=\"selectedTab === 'people'\">\r\n            <compose view=\"./components/helpTicketsByPeople.html\"></compose>\r\n        </div>\r\n        <div show.bind=\"selectedTab === 'status'\">\r\n            <compose view=\"./components/helpTicketsByStatus.html\"></compose>\r\n        </div>\r\n      </div> \r\n    </div>\r\n</template>"; });
 define('text!resources/css/summernote.css', ['module'], function(module) { module.exports = "@font-face{font-family:\"summernote\";font-style:normal;font-weight:normal;src:url(\"./font/summernote.eot?dbafe969167589eda84514394d126413\");src:url(\"./font/summernote.eot?#iefix\") format(\"embedded-opentype\"),url(\"./font/summernote.woff?dbafe969167589eda84514394d126413\") format(\"woff\"),url(\"./font/summernote.ttf?dbafe969167589eda84514394d126413\") format(\"truetype\")}[class^=\"note-icon-\"]:before,[class*=\" note-icon-\"]:before{display:inline-block;font:normal normal normal 14px summernote;font-size:inherit;-webkit-font-smoothing:antialiased;text-decoration:inherit;text-rendering:auto;text-transform:none;vertical-align:middle;speak:none;-moz-osx-font-smoothing:grayscale}.note-icon-align-center:before,.note-icon-align-indent:before,.note-icon-align-justify:before,.note-icon-align-left:before,.note-icon-align-outdent:before,.note-icon-align-right:before,.note-icon-align:before,.note-icon-arrow-circle-down:before,.note-icon-arrow-circle-left:before,.note-icon-arrow-circle-right:before,.note-icon-arrow-circle-up:before,.note-icon-arrows-alt:before,.note-icon-arrows-h:before,.note-icon-arrows-v:before,.note-icon-bold:before,.note-icon-caret:before,.note-icon-chain-broken:before,.note-icon-circle:before,.note-icon-close:before,.note-icon-code:before,.note-icon-col-after:before,.note-icon-col-before:before,.note-icon-col-remove:before,.note-icon-eraser:before,.note-icon-font:before,.note-icon-frame:before,.note-icon-italic:before,.note-icon-link:before,.note-icon-magic:before,.note-icon-menu-check:before,.note-icon-minus:before,.note-icon-orderedlist:before,.note-icon-pencil:before,.note-icon-picture:before,.note-icon-question:before,.note-icon-redo:before,.note-icon-row-above:before,.note-icon-row-below:before,.note-icon-row-remove:before,.note-icon-special-character:before,.note-icon-square:before,.note-icon-strikethrough:before,.note-icon-subscript:before,.note-icon-summernote:before,.note-icon-superscript:before,.note-icon-table:before,.note-icon-text-height:before,.note-icon-trash:before,.note-icon-underline:before,.note-icon-undo:before,.note-icon-unorderedlist:before,.note-icon-video:before{display:inline-block;font-family:\"summernote\";font-style:normal;font-weight:normal;text-decoration:inherit}.note-icon-align-center:before{content:\"\\f101\"}.note-icon-align-indent:before{content:\"\\f102\"}.note-icon-align-justify:before{content:\"\\f103\"}.note-icon-align-left:before{content:\"\\f104\"}.note-icon-align-outdent:before{content:\"\\f105\"}.note-icon-align-right:before{content:\"\\f106\"}.note-icon-align:before{content:\"\\f107\"}.note-icon-arrow-circle-down:before{content:\"\\f108\"}.note-icon-arrow-circle-left:before{content:\"\\f109\"}.note-icon-arrow-circle-right:before{content:\"\\f10a\"}.note-icon-arrow-circle-up:before{content:\"\\f10b\"}.note-icon-arrows-alt:before{content:\"\\f10c\"}.note-icon-arrows-h:before{content:\"\\f10d\"}.note-icon-arrows-v:before{content:\"\\f10e\"}.note-icon-bold:before{content:\"\\f10f\"}.note-icon-caret:before{content:\"\\f110\"}.note-icon-chain-broken:before{content:\"\\f111\"}.note-icon-circle:before{content:\"\\f112\"}.note-icon-close:before{content:\"\\f113\"}.note-icon-code:before{content:\"\\f114\"}.note-icon-col-after:before{content:\"\\f115\"}.note-icon-col-before:before{content:\"\\f116\"}.note-icon-col-remove:before{content:\"\\f117\"}.note-icon-eraser:before{content:\"\\f118\"}.note-icon-font:before{content:\"\\f119\"}.note-icon-frame:before{content:\"\\f11a\"}.note-icon-italic:before{content:\"\\f11b\"}.note-icon-link:before{content:\"\\f11c\"}.note-icon-magic:before{content:\"\\f11d\"}.note-icon-menu-check:before{content:\"\\f11e\"}.note-icon-minus:before{content:\"\\f11f\"}.note-icon-orderedlist:before{content:\"\\f120\"}.note-icon-pencil:before{content:\"\\f121\"}.note-icon-picture:before{content:\"\\f122\"}.note-icon-question:before{content:\"\\f123\"}.note-icon-redo:before{content:\"\\f124\"}.note-icon-row-above:before{content:\"\\f125\"}.note-icon-row-below:before{content:\"\\f126\"}.note-icon-row-remove:before{content:\"\\f127\"}.note-icon-special-character:before{content:\"\\f128\"}.note-icon-square:before{content:\"\\f129\"}.note-icon-strikethrough:before{content:\"\\f12a\"}.note-icon-subscript:before{content:\"\\f12b\"}.note-icon-summernote:before{content:\"\\f12c\"}.note-icon-superscript:before{content:\"\\f12d\"}.note-icon-table:before{content:\"\\f12e\"}.note-icon-text-height:before{content:\"\\f12f\"}.note-icon-trash:before{content:\"\\f130\"}.note-icon-underline:before{content:\"\\f131\"}.note-icon-undo:before{content:\"\\f132\"}.note-icon-unorderedlist:before{content:\"\\f133\"}.note-icon-video:before{content:\"\\f134\"}.note-editor{position:relative}.note-editor .note-dropzone{position:absolute;z-index:100;display:none;color:#87cefa;background-color:#fff;opacity:.95}.note-editor .note-dropzone .note-dropzone-message{display:table-cell;font-size:28px;font-weight:700;text-align:center;vertical-align:middle}.note-editor .note-dropzone.hover{color:#098ddf}.note-editor.dragover .note-dropzone{display:table}.note-editor .note-editing-area{position:relative}.note-editor .note-editing-area .note-editable{outline:0}.note-editor .note-editing-area .note-editable sup{vertical-align:super}.note-editor .note-editing-area .note-editable sub{vertical-align:sub}.note-editor .note-editing-area img.note-float-left{margin-right:10px}.note-editor .note-editing-area img.note-float-right{margin-left:10px}.note-editor.note-frame{border:1px solid #a9a9a9}.note-editor.note-frame.codeview .note-editing-area .note-editable{display:none}.note-editor.note-frame.codeview .note-editing-area .note-codable{display:block}.note-editor.note-frame .note-editing-area{overflow:hidden}.note-editor.note-frame .note-editing-area .note-editable{padding:10px;overflow:auto;color:#000;word-wrap:break-word;background-color:#fff}.note-editor.note-frame .note-editing-area .note-editable[contenteditable=\"false\"]{background-color:#e5e5e5}.note-editor.note-frame .note-editing-area .note-codable{display:none;width:100%;padding:10px;margin-bottom:0;font-family:Menlo,Monaco,monospace,sans-serif;font-size:14px;color:#ccc;background-color:#222;border:0;-webkit-border-radius:0;-moz-border-radius:0;border-radius:0;box-shadow:none;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;resize:none}.note-editor.note-frame.fullscreen{position:fixed;top:0;left:0;z-index:1050;width:100%!important}.note-editor.note-frame.fullscreen .note-editable{background-color:#fff}.note-editor.note-frame.fullscreen .note-resizebar{display:none}.note-editor.note-frame .note-status-output{display:block;width:100%;height:20px;margin-bottom:0;font-size:14px;line-height:1.42857143;color:#000;border:0;border-top:1px solid #e2e2e2}.note-editor.note-frame .note-status-output:empty{height:0;border-top:0 solid transparent}.note-editor.note-frame .note-status-output .pull-right{float:right!important}.note-editor.note-frame .note-status-output .text-muted{color:#777}.note-editor.note-frame .note-status-output .text-primary{color:#286090}.note-editor.note-frame .note-status-output .text-success{color:#3c763d}.note-editor.note-frame .note-status-output .text-info{color:#31708f}.note-editor.note-frame .note-status-output .text-warning{color:#8a6d3b}.note-editor.note-frame .note-status-output .text-danger{color:#a94442}.note-editor.note-frame .note-status-output .alert{padding:7px 10px 2px 10px;margin:-7px 0 0 0;color:#000;background-color:#f5f5f5;border-radius:0}.note-editor.note-frame .note-status-output .alert .note-icon{margin-right:5px}.note-editor.note-frame .note-status-output .alert-success{color:#3c763d!important;background-color:#dff0d8!important}.note-editor.note-frame .note-status-output .alert-info{color:#31708f!important;background-color:#d9edf7!important}.note-editor.note-frame .note-status-output .alert-warning{color:#8a6d3b!important;background-color:#fcf8e3!important}.note-editor.note-frame .note-status-output .alert-danger{color:#a94442!important;background-color:#f2dede!important}.note-editor.note-frame .note-statusbar{background-color:#f5f5f5;border-top:1px solid #ddd;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.note-editor.note-frame .note-statusbar .note-resizebar{width:100%;height:9px;padding-top:1px;cursor:ns-resize}.note-editor.note-frame .note-statusbar .note-resizebar .note-icon-bar{width:20px;margin:1px auto;border-top:1px solid #a9a9a9}.note-editor.note-frame .note-statusbar.locked .note-resizebar{cursor:default}.note-editor.note-frame .note-statusbar.locked .note-resizebar .note-icon-bar{display:none}.note-editor.note-frame .note-placeholder{padding:10px}.note-popover.popover{max-width:none}.note-popover.popover .popover-content a{display:inline-block;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}.note-popover.popover .arrow{left:20px!important}.note-toolbar{position:relative;z-index:500}.note-popover .popover-content,.panel-heading.note-toolbar{padding:0 0 5px 5px;margin:0}.note-popover .popover-content>.btn-group,.panel-heading.note-toolbar>.btn-group{margin-top:5px;margin-right:5px;margin-left:0}.note-popover .popover-content .btn-group .note-table,.panel-heading.note-toolbar .btn-group .note-table{min-width:0;padding:5px}.note-popover .popover-content .btn-group .note-table .note-dimension-picker,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker{font-size:18px}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-mousecatcher,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-mousecatcher{position:absolute!important;z-index:3;width:10em;height:10em;cursor:pointer}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-unhighlighted,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-unhighlighted{position:relative!important;z-index:1;width:5em;height:5em;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIj4+Pjp6ekKlAqjAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKhmnaJzPAAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-highlighted,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-highlighted{position:absolute!important;z-index:2;width:1em;height:1em;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIjd6vvD2f9LKLW+AAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKwNDEVT0AAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat}.note-popover .popover-content .note-style .dropdown-style blockquote,.panel-heading.note-toolbar .note-style .dropdown-style blockquote,.note-popover .popover-content .note-style .dropdown-style pre,.panel-heading.note-toolbar .note-style .dropdown-style pre{padding:5px 10px;margin:0}.note-popover .popover-content .note-style .dropdown-style h1,.panel-heading.note-toolbar .note-style .dropdown-style h1,.note-popover .popover-content .note-style .dropdown-style h2,.panel-heading.note-toolbar .note-style .dropdown-style h2,.note-popover .popover-content .note-style .dropdown-style h3,.panel-heading.note-toolbar .note-style .dropdown-style h3,.note-popover .popover-content .note-style .dropdown-style h4,.panel-heading.note-toolbar .note-style .dropdown-style h4,.note-popover .popover-content .note-style .dropdown-style h5,.panel-heading.note-toolbar .note-style .dropdown-style h5,.note-popover .popover-content .note-style .dropdown-style h6,.panel-heading.note-toolbar .note-style .dropdown-style h6,.note-popover .popover-content .note-style .dropdown-style p,.panel-heading.note-toolbar .note-style .dropdown-style p{padding:0;margin:0}.note-popover .popover-content .note-color .dropdown-toggle,.panel-heading.note-toolbar .note-color .dropdown-toggle{width:20px;padding-left:5px}.note-popover .popover-content .note-color .dropdown-menu,.panel-heading.note-toolbar .note-color .dropdown-menu{min-width:337px}.note-popover .popover-content .note-color .dropdown-menu .note-palette,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette{display:inline-block;width:160px;margin:0}.note-popover .popover-content .note-color .dropdown-menu .note-palette:first-child,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette:first-child{margin:0 5px}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-palette-title,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-palette-title{margin:2px 7px;font-size:12px;text-align:center;border-bottom:1px solid #eee}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset{width:100%;padding:0 3px;margin:3px;font-size:11px;cursor:pointer;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-row,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-row{height:20px}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset:hover,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset:hover{background:#eee}.note-popover .popover-content .note-para .dropdown-menu,.panel-heading.note-toolbar .note-para .dropdown-menu{min-width:216px;padding:5px}.note-popover .popover-content .note-para .dropdown-menu>div:first-child,.panel-heading.note-toolbar .note-para .dropdown-menu>div:first-child{margin-right:5px}.note-popover .popover-content .dropdown-menu,.panel-heading.note-toolbar .dropdown-menu{min-width:90px}.note-popover .popover-content .dropdown-menu.right,.panel-heading.note-toolbar .dropdown-menu.right{right:0;left:auto}.note-popover .popover-content .dropdown-menu.right::before,.panel-heading.note-toolbar .dropdown-menu.right::before{right:9px;left:auto!important}.note-popover .popover-content .dropdown-menu.right::after,.panel-heading.note-toolbar .dropdown-menu.right::after{right:10px;left:auto!important}.note-popover .popover-content .dropdown-menu.note-check li a i,.panel-heading.note-toolbar .dropdown-menu.note-check li a i{color:deepskyblue;visibility:hidden}.note-popover .popover-content .dropdown-menu.note-check li a.checked i,.panel-heading.note-toolbar .dropdown-menu.note-check li a.checked i{visibility:visible}.note-popover .popover-content .note-fontsize-10,.panel-heading.note-toolbar .note-fontsize-10{font-size:10px}.note-popover .popover-content .note-color-palette,.panel-heading.note-toolbar .note-color-palette{line-height:1}.note-popover .popover-content .note-color-palette div .note-color-btn,.panel-heading.note-toolbar .note-color-palette div .note-color-btn{width:20px;height:20px;padding:0;margin:0;border:1px solid #fff}.note-popover .popover-content .note-color-palette div .note-color-btn:hover,.panel-heading.note-toolbar .note-color-palette div .note-color-btn:hover{border:1px solid #000}.note-dialog>div{display:none}.note-dialog .form-group{margin-right:0;margin-left:0}.note-dialog .note-modal-form{margin:0}.note-dialog .note-image-dialog .note-dropzone{min-height:100px;margin-bottom:10px;font-size:30px;line-height:4;color:lightgray;text-align:center;border:4px dashed lightgray}@-moz-document url-prefix(){.note-image-input{height:auto}}.note-placeholder{position:absolute;display:none;color:gray}.note-handle .note-control-selection{position:absolute;display:none;border:1px solid #000}.note-handle .note-control-selection>div{position:absolute}.note-handle .note-control-selection .note-control-selection-bg{width:100%;height:100%;background-color:#000;-webkit-opacity:.3;-khtml-opacity:.3;-moz-opacity:.3;opacity:.3;-ms-filter:alpha(opacity=30);filter:alpha(opacity=30)}.note-handle .note-control-selection .note-control-handle{width:7px;height:7px;border:1px solid #000}.note-handle .note-control-selection .note-control-holder{width:7px;height:7px;border:1px solid #000}.note-handle .note-control-selection .note-control-sizing{width:7px;height:7px;background-color:#fff;border:1px solid #000}.note-handle .note-control-selection .note-control-nw{top:-5px;left:-5px;border-right:0;border-bottom:0}.note-handle .note-control-selection .note-control-ne{top:-5px;right:-5px;border-bottom:0;border-left:none}.note-handle .note-control-selection .note-control-sw{bottom:-5px;left:-5px;border-top:0;border-right:0}.note-handle .note-control-selection .note-control-se{right:-5px;bottom:-5px;cursor:se-resize}.note-handle .note-control-selection .note-control-se.note-control-holder{cursor:default;border-top:0;border-left:none}.note-handle .note-control-selection .note-control-selection-info{right:0;bottom:0;padding:5px;margin:5px;font-size:12px;color:#fff;background-color:#000;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;-webkit-opacity:.7;-khtml-opacity:.7;-moz-opacity:.7;opacity:.7;-ms-filter:alpha(opacity=70);filter:alpha(opacity=70)}.note-hint-popover{min-width:100px;padding:2px}.note-hint-popover .popover-content{max-height:150px;padding:3px;overflow:auto}.note-hint-popover .popover-content .note-hint-group .note-hint-item{display:block!important;padding:3px}.note-hint-popover .popover-content .note-hint-group .note-hint-item.active,.note-hint-popover .popover-content .note-hint-group .note-hint-item:hover{display:block;clear:both;font-weight:400;line-height:1.4;color:#fff;text-decoration:none;white-space:nowrap;cursor:pointer;background-color:#428bca;outline:0}"; });
 define('text!modules/analytics/institutions.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"col-lg-10 col-lg-offset-1\">\r\n                <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                    <span click.delegate=\"showTable()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                        data-original-title=\"Table\"><i class=\"fa fa-table fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                    <span click.delegate=\"showGraph()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                        data-original-title=\"Graphs\"><i class=\"fa fa-pie-chart fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div show.bind=\"tableSelected\" class=\"col-lg-12\">\r\n                        <compose view=\"./components/institutionsTable.html\"></compose>\r\n                    </div> \r\n                    <div show.bind=\"!tableSelected\" class=\"col-lg-12\">\r\n                        <compose view=\"./components/institutionsCharts.html\"></compose>\r\n                    </div>\r\n                </div> \r\n            </div> \r\n        </div>\r\n    </div>\r\n</template>"; });
@@ -61970,8 +62049,8 @@ define('text!resources/htTimeline/response.html', ['module'], function(module) {
 define('text!resources/htTimeline/timeline.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"well well-sm topMargin\">\r\n      <div class=\"smart-timeline\">\r\n        <ul class=\"smart-timeline-list\">\r\n          <li>\r\n            <div class=\"topMargin\">\r\n                <img if.bind=\"helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.personId.file.fileName}\" height=\"100\">\r\n            </div>\r\n\r\n            <div if.bind=\"!helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"helpTickets.selectedHelpTicket.personId.email | gravatarUrl:100:1\"></div>\r\n              <div class=\"smart-timeline-time\">\r\n                <small>${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\r\n              </div>\r\n              <div class=\"smart-timeline-content borderTop leftJustify\">\r\n                <div class=\"form-group\">\r\n                  <p>${helpTickets.selectedHelpTicket.personId.fullName}</p>\r\n                  <div class=\"row\">\r\n                    <div class=\"col-lg-4\">\r\n                      <span class=\"col-sm-11 col-sm-offset-1\" id=\"container\"></span>\r\n                      <h4 show.bind=\"showCourse\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Course: ${course}</h4>\r\n                      <div show.bind=\"showRequestDetails\">\r\n                        <h4  class=\"col-sm-11 col-sm-offset-1 topMargin\">Request: ${helpTickets.selectedHelpTicket.requestId.requestNo}</h4>\r\n                        <h4  class=\"col-sm-11 col-sm-offset-1\">Product: ${helpTickets.selectedHelpTicket.productId | lookupValue:products.productsArray:\"_id\":\"name\"}</h4>\r\n                                                  \r\n                        <table class=\"col-sm-11 col-sm-offset-1\">\r\n                          <tr>\r\n                            <th class=\"col-lg-1\">System</th>\r\n                            <th class=\"col-lg-1\">Client</th>\r\n                          </tr>\r\n                          <tr repeat.for=\"assign of helpTickets.selectedHelpTicket.requestId.assignments\">\r\n                            <td class=\"${assign.client == helpTickets.selectedHelpTicket.client ? 'col-lg-1 redText' : 'col-lg-1'}\"><h4>${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h4></td>\r\n                            <td class=\"${assign.client == helpTickets.selectedHelpTicket.client ? 'col-lg-1 redText' : 'col-lg-1'}\"><h4>${assign.client}</h4></td>\r\n                            <td innerhtml=\"${assign.client | arrow:helpTickets.selectedHelpTicket.client:helpTickets.selectedHelpTicket.systemId:assign.systemId}\"></td>\r\n                          </tr>\r\n                      \r\n                        </table>\r\n                      </div>\r\n                      <h4 show.bind=\"!showRequestDetails && clientRequired\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\r\n                   \r\n                      <div class=\"form-group topMargin\">\r\n                          <div class=\"hover_img\" repeat.for=\"file of helpTickets.selectedHelpTicket.content[0].files\">\r\n                            <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\r\n                              target=\"_blank\"\r\n                              innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\r\n                          </div>\r\n                      </div>\r\n                     </div>\r\n                    <div class=\"col-lg-7\">\r\n                      <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.comments ? helpTickets.selectedHelpTicket.content[0].content.comments : ' ' \"></div>\r\n                      <div show.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps\">\r\n                        <hr/>\r\n                        <h4 >Steps to reproduce the problem</h4>\r\n                        <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps ? helpTickets.selectedHelpTicket.content[0].content.steps : ' ' \"></div>\r\n                      </div>\r\n                    </div>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </li>\r\n          <li repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC:true\">\r\n            <compose view=\"./response.html\"></compose>\r\n          </li>\r\n        </ul>\r\n      </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/Customers/bulkEmails.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n\t\t<compose view=\"./components/selectionForm.html\"></compose>\r\n\t\t<compose view=\"./components/emailTable.html\"></compose>\r\n        </div> \r\n      </div> \r\n</template>"; });
 define('text!modules/admin/Customers/customers.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../../resources/elements/submenu.html'></compose>\r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template"; });
-define('text!modules/admin/Customers/editInstitutions.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"!institutionSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/institutionsTable.html\"></compose>\r\n            </div> <!-- Table Div -->\r\n            <div show.bind=\"institutionSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/institutionsForm.html\"></compose>\r\n            </div> <!-- Form Div -->\r\n        </div> <!-- Row -->\r\n      </div> <!-- Panel Body -->\r\n</template>"; });
-define('text!modules/admin/Customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"!personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/peopleTable.html\"></compose>\r\n            </div> \r\n            <div show.bind=\"personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/peopleForm.html\"></compose>\r\n            </div>\r\n        </div> \r\n      </div> \r\n</template>"; });
+define('text!modules/admin/Customers/editInstitutions.html', ['module'], function(module) { module.exports = "<template>\r\n    <span id=\"loading\">\r\n        <ul class=\"bokeh\">\r\n            <li></li>\r\n            <li></li>\r\n            <li></li>\r\n        </ul>\r\n    </span>\r\n    <div show.bind=\"dataTable.displayArray && dataTable.displayArray.length\" class=\"panel panel-info\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div show.bind=\"!institutionSelected\" class=\"col-lg-12\">\r\n                    <compose view=\"./components/institutionsTable.html\"></compose>\r\n                </div> <!-- Table Div -->\r\n                <div show.bind=\"institutionSelected\" class=\"col-lg-12\">\r\n                    <compose view=\"./components/institutionsForm.html\"></compose>\r\n                </div> <!-- Form Div -->\r\n            </div> <!-- Row -->\r\n        </div> <!-- Panel Body -->\r\n</template>"; });
+define('text!modules/admin/Customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\r\n        <span id=\"loading\">\r\n                <ul  class=\"bokeh\">\r\n                    <li></li>\r\n                    <li></li>\r\n                    <li></li>\r\n                </ul>\r\n            </span>\r\n    <div show.bind=\"dataTable.displayArray && dataTable.displayArray.length\" class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"!personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/peopleTable.html\"></compose>\r\n            </div> \r\n            <div show.bind=\"personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/peopleForm.html\"></compose>\r\n            </div>\r\n        </div> \r\n      </div> \r\n</template>"; });
 define('text!modules/admin/documents/documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <style>\r\n        .menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\r\n        }\r\n    </style>\r\n    <compose view='../../../resources/elements/submenu.html'></compose>\r\n\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-3\">\r\n                    <div class=\"bottomMargin list-group-item\">\r\n                        <span click.delegate=\"newCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"New Category\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span disabled.bind=\"showDocuments\" click.delegate=\"editCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span> \r\n                    </div>\r\n                    <div show.bind=\"categoryForm\">\r\n                        <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                            <div class=\"panel-body\">\r\n                                <div class=\"bottomMargin\">\r\n                                    <div class=\"bottomMargin list-group-item\">\r\n                                        <span click.delegate=\"backCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \r\n                                            title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                                                                    \r\n                                    </div>\r\n                                </div>\r\n                                <div class=\"form-group\">\r\n                                    <input id=\"name\" value.bind=\"documents.selectedCat.description\" type=\"text\" placeholder=\"Category Name\" class=\"form-control\"/>\r\n                                </div>\r\n                            </div>\r\n\r\n                        </div>\r\n                    </div>\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:600px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul id=\"categoryList\" class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"${ $first ? 'menuButtons' : ''} list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-9\" >\r\n                    <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                        <h3>${documents.selectedCat.description}</h3>\r\n                        <h5>${displayTitle}</h5>\r\n                    </div>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./components/documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./components/documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n</template>"; });
 define('text!modules/admin/inventory/editInventory.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../../resources/elements/submenu.html'></compose>\r\n   \r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/inventoryTable.html\"></compose>\r\n            </div> \r\n            <div show.bind=\"systemSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/inventoryForm.html\"></compose>\r\n            </div>\r\n        </div> \r\n      </div> \r\n</template>"; });
 define('text!modules/admin/notes/editCalendar.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n  <div class=\"col-lg-9\">\r\n    <calendar events.bind=\"events\" view=\"month\" weekends.bind=\"true\" day-click.bind=\"dayClicked\" \r\n    event-click.bind=\"eventClicked\" options.bind=\"{ eventLimit: true, header: {left: 'My title', right:  'today month,agendaWeek,agendaDay,list prev,next'} }\" \r\n    change.delegate=\"eventDialog($event)\" click.delegate=\"selectEvent($event)\"></calendar>\r\n\t</div>\r\n\t<div show.bind=\"eventLayer.selectedEvent.title\" class=\"panel panel-default col-lg-3 bigTopMargin\">\r\n\t\t <div class=\"bottomMargin list-group-item topMargin\">\r\n\t\t\t\t\t\t<span click.delegate=\"edit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"eventLayer.selectedEvent._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n\t\t\t</div>\r\n      <div class=\"panel-body\">\r\n\t\t\t<h4>${eventLayer.selectedEvent.title}</h4>\r\n\t\t\t\t<br/>\r\n\t\t\t<h4>Start: ${eventLayer.selectedEvent.start | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>\r\n\t\t\t\t<br/>\r\n\t\t\t<h4 show.bind=\"eventLayer.selectedEvent.allDay\">All Day</h4>\r\n\t\t\t<br/>\r\n\t\t\t<div show.bind=\"!eventLayer.selectedEvent.allDay\">\r\n\t\t\t\t<h4>End: ${eventLayer.selectedEvent.end | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>\r\n\t\t\t</div>\r\n\t\t\t\t<br/>\r\n\t\t\t<div class=\"col-lg-12 topMargin\" show.bind=\"eventLayer.selectedEvent.notes && eventLayer.selectedEvent.notes.length > 0\" innerhtml.bind=\"eventLayer.selectedEvent.notes\" ></div>\r\n\t\t</div>\r\n  </div>\r\n</template>"; });
@@ -61987,9 +62066,9 @@ define('text!modules/admin/site/editHelpTickets.html', ['module'], function(modu
 define('text!modules/admin/site/editMessages.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"!messageItemSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/messageTable.html\"></compose>\r\n            </div> <!-- Table Div -->\r\n            <div show.bind=\"messageItemSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/messageForm.html\"></compose>\r\n            </div> <!-- Form Div -->\r\n        </div> <!-- Row -->\r\n      </div> <!-- Panel Body -->\r\n</template>"; });
 define('text!modules/admin/site/editNews.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\"> \r\n            <div show.bind=\"!newsItemSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/newsTable.html\"></compose>\r\n            </div> <!-- Table Div -->\r\n            <div show.bind=\"newsItemSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/newsForm.html\"></compose>\r\n            </div> <!-- Form Div -->\r\n        </div> <!-- Row -->\r\n      </div> <!-- Panel Body -->\r\n</template>"; });
 define('text!modules/admin/site/site.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../../resources/elements/submenu.html'></compose>\r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template>"; });
-define('text!modules/admin/system/editProduct.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"!productSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/productTable.html\"></compose>\r\n            </div> <!-- Table Div -->\r\n            <div show.bind=\"productSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/productForm.html\"></compose>\r\n            </div> <!-- Form Div -->\r\n        </div> <!-- Row -->\r\n      </div> <!-- Panel Body -->\r\n</template>"; });
+define('text!modules/admin/system/editProduct.html', ['module'], function(module) { module.exports = "<template>\r\n        <span id=\"loading\">\r\n                <ul class=\"bokeh\">\r\n                    <li></li>\r\n                    <li></li>\r\n                    <li></li>\r\n                </ul>\r\n            </span>\r\n    <div show.bind=\"dataTable.displayArray && dataTable.displayArray.length\" class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"!productSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/productTable.html\"></compose>\r\n            </div> <!-- Table Div -->\r\n            <div show.bind=\"productSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/productForm.html\"></compose>\r\n            </div> <!-- Form Div -->\r\n        </div> <!-- Row -->\r\n      </div> <!-- Panel Body -->\r\n</template>"; });
 define('text!modules/admin/system/editSession.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"showScreen == 'sessionTable'\" class=\"col-lg-12\">\r\n                <compose view=\"./components/sessionTable.html\"></compose>\r\n            </div> <!-- Table Div -->\r\n            <div show.bind=\"showScreen == 'editSession'\" class=\"col-lg-12\">\r\n                <compose view=\"./components/sessionForm.html\"></compose>\r\n            </div> <!-- Form Div -->\r\n            <div show.bind=\"showScreen == 'editConfig'\" class=\"col-lg-12\">\r\n                <compose view=\"./components/sessionConfigTable.html\"></compose>\r\n            </div>\r\n        </div> \r\n      </div> \r\n</template>"; });
-define('text!modules/admin/system/editSystem.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/systemTable.html\"></compose>\r\n            </div> <!-- Table Div -->\r\n            <div show.bind=\"systemSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/systemForm.html\"></compose>\r\n            </div> <!-- Form Div -->\r\n        </div> <!-- Row -->\r\n      </div> <!-- Panel Body -->\r\n</template>"; });
+define('text!modules/admin/system/editSystem.html', ['module'], function(module) { module.exports = "<template>\r\n    <span id=\"loading\">\r\n        <ul class=\"bokeh\">\r\n            <li></li>\r\n            <li></li>\r\n            <li></li>\r\n        </ul>\r\n    </span>\r\n    <div show.bind=\"dataTable.displayArray && dataTable.displayArray.length\" class=\"panel panel-info\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\r\n                    <compose view=\"./components/systemTable.html\"></compose>\r\n                </div> <!-- Table Div -->\r\n                <div show.bind=\"systemSelected\" class=\"col-lg-12\">\r\n                    <compose view=\"./components/systemForm.html\"></compose>\r\n                </div> <!-- Form Div -->\r\n            </div> <!-- Row -->\r\n        </div> <!-- Panel Body -->\r\n</template>"; });
 define('text!modules/admin/system/system.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../../resources/elements/submenu.html'></compose>\r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template>"; });
 define('text!modules/analytics/components/countryInstitutionProductRequestsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div show.bind=\"summerTable\" class='col-lg-12'>\r\n        <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n        <table class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr>\r\n                    <td colspan='9'>\r\n                        <span click.delegate=\"downloadAllInstitutionCountriesExcel()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Export to Excel\"><i class=\"fa fa-download\" aria-hidden=\"true\"></i></span>\r\n                    </td>\r\n                </tr>\r\n                <tr>\r\n                    <th style=\"width:40rem;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'name'})\">Institution </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'country'})\">Country </span><i class=\"fa fa-sort\"></i></th>\r\n\t\t\t\t\t<th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'productName'})\">Product </span><i class=\"fa fa-sort\"></i></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'total'})\">Total  </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                </tr>\r\n                 <tr>\r\n                    <th>\r\n                        <input value.bind=\"institutionCustomFilterValue\" input.delegate=\"dataTable.filterList(institutionCustomFilterValue, { type: 'custom',  filter: institutionCountryCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n                    </th>\r\n\t\t\t\t\t<th> \r\n\t\t\t\t\t\t<input value.bind=\"countryFilterValue\" input.delegate=\"dataTable.filterList(countryFilterValue, { type: 'text',  filter: 'countryFilter', collectionProperty: 'country', displayProperty: 'country',  compare:'match'} )\"  class=\"form-control\" />\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n                            <input value.bind=\"productNameFilterValue\" input.delegate=\"dataTable.filterList(productNameFilterValue, { type: 'text',  filter: 'productNameFilter', collectionProperty: 'productName', displayProperty: 'productName',  compare:'match'} )\"  class=\"form-control\" />\r\n                    </th>\r\n                    <th></th> \r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr click.delegate=\"showProductDetail(stat)\" repeat.for=\"stat of dataTable.displayArray\">\r\n                    <td data-title=\"Institution\">${stat.name}</td>\r\n\t\t\t\t\t<td data-title=\"Country\" style=\"width:100px;\">${stat.country}</td>\r\n\t\t\t\t\t<td data-title=\"Product\">${stat.productName}</td>\r\n                    <td data-title=\"Total\">${stat.total | formatNumber}</td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n    <compose show.bind=\"!summerTable\" view=\"./productRequestsDetail.html\"></compose>\r\n</template>"; });
 define('text!modules/analytics/components/countryProductRequestsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div show.bind=\"summerTable\" class='col-lg-12'>\r\n        <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n        <table class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr>\r\n                    <td colspan='9'>\r\n                        <span click.delegate=\"downloadAllCountriesExcel()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Export to Excel\"><i class=\"fa fa-download\" aria-hidden=\"true\"></i></span>\r\n                    </td>\r\n                </tr>\r\n                <tr>\r\n\t\t\t\t\t<th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customProductSorter, propertyName: 'productId'})\">Product </span><i class=\"fa fa-sort\"></i></th>\r\n\t\t\t\t\t<th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'country'})\">Country </span><i class=\"fa fa-sort\"></i></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'total'})\">Total  </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '1'})\">${config.REQUEST_STATUS[0].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '2'})\">${config.REQUEST_STATUS[1].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '3'})\">${config.REQUEST_STATUS[2].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '4'})\">${config.REQUEST_STATUS[3].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '5'})\">${config.REQUEST_STATUS[4].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '6'})\">${config.REQUEST_STATUS[5].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '7'})\">${config.REQUEST_STATUS[6].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'studentIds'})\">Student IDs  </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                </tr>\r\n                 <tr>\r\n                    <th>\r\n                        <input value.bind=\"productFilterValue\" input.delegate=\"dataTable.filterList(productFilterValue, { type: 'custom',  filter: customProductFilterValue, compare:'custom'} )\"  class=\"form-control\" />\r\n                    </th>\r\n\t\t\t\t\t<th> \r\n\t\t\t\t\t\t<input value.bind=\"countryFilterValue\" input.delegate=\"dataTable.filterList(countryFilterValue, { type: 'text',  filter: 'countryFilter', collectionProperty: 'country', displayProperty: 'country',  compare:'match'} )\"  class=\"form-control\" />\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th></th>\r\n                    <th></th>\r\n                    <th></th>\r\n                    <th></th>\r\n                    <th></th>\r\n                    <th></th>\r\n                    <th></th>\r\n                    <th></th> \r\n                    <th></th> \r\n                    <th></th> \r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr click.delegate=\"showProductDetail(stat)\" repeat.for=\"stat of dataTable.displayArray\">\r\n\t\t\t\t\t<td data-title=\"Product\">${stat.productId.name}</td>\r\n\t\t\t\t\t<td style=\"width:100px;\" data-title=\"Country\">${stat.country}</td>\r\n                    <td data-title=\"Institution\">${stat.total | formatNumber}</td>\r\n                    <td data-title=\"${config.REQUEST_STATUS[$index].description}\" repeat.for=\"status of config.REQUEST_STATUS\">${stat | statValue:config.REQUEST_STATUS:$index}</td>\r\n                    <td>${stat.studentIds | formatNumber}</td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n    <compose show.bind=\"!summerTable\" view=\"./productRequestsDetail.html\"></compose>\r\n</template>"; });
@@ -62075,13 +62154,13 @@ define('text!modules/admin/Customers/components/emailTable.html', ['module'], fu
 define('text!modules/admin/Customers/components/instAddress.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"row topMargin\">\r\n        <!-- Row 5 -->\r\n        <div class=\"col-lg-6 topMargin\">\r\n            <div class=\"col-sm-12 col-lg-12\">\r\n                <div class=\"form-group\">\r\n                    <div class=\"col-sm-10\">\r\n                        <label>Address 1</label>\r\n                        <input value.bind=\"people.selectedInstitution.address1\" id=\"editAddress1\" class=\"form-control\" placeholder=\"Address 1\" type=\"text\"\r\n                        />\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-sm-12 col-lg-12\">\r\n                <div class=\"form-group\">\r\n                    <div class=\"col-sm-10\">\r\n                        <label>Address 2</label>\r\n                        <input value.bind=\"people.selectedInstitution.address2\" id=\"editAddress1\" class=\"form-control\" placeholder=\"Address 2\" type=\"text\"\r\n                        />\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-sm-12 col-lg-12\">\r\n                <div class=\"form-group\">\r\n                    <div class=\"col-sm-10\">\r\n                        <label>City</label>\r\n                        <input value.bind=\"people.selectedInstitution.city\" id=\"editCity\" class=\"form-control\" placeholder=\"City\" type=\"text\" />\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-sm-12 col-lg-12\">\r\n                <div class=\"form-group\">\r\n                    <div class=\"col-sm-10\">\r\n                        <label>Region</label>\r\n                        <input value.bind=\"people.selectedInstitution.region\" id=\"editRegion\" class=\"form-control\" placeholder=\"Region\" type=\"text\"\r\n                        />\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-sm-12 col-lg-12\">\r\n                <div class=\"form-group\">\r\n                    <div class=\"col-sm-10\">\r\n                        <label>Postal Code</label>\r\n                        <input value.bind=\"people.selectedInstitution.postalCode\" id=\"editPostalCode\" class=\"form-control\" placeholder=\"Postal Code\"\r\n                            type=\"text\" />\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-sm-12 col-lg-12\">\r\n                <div class=\"form-group\">\r\n                    <div class=\"col-sm-10\">\r\n                        <label>Country</label>\r\n                        <input value.bind=\"people.selectedInstitution.country\" id=\"editCountry\" class=\"form-control\" placeholder=\"Country\" type=\"text\"\r\n                        />\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-lg-6 topMargin\">\r\n            <div class=\"col-sm-12 col-lg-12\">\r\n                <div class=\"form-group\">\r\n                    <div class=\"col-sm-10\">\r\n                        <label>URL</label>\r\n                        <input value.bind=\"people.selectedInstitution.url\" id=\"editCountry\" class=\"form-control\" placeholder=\"URL\" type=\"text\" />\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-sm-12 col-lg-12\">\r\n                <div class=\"form-group\">\r\n                    <div class=\"col-sm-10\">\r\n                        <label>Time Zone</label>\r\n                        <select value.bind=\"people.selectedInstitution.timeZone\" class=\"form-control\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"zone of config.TIMEZONES\" value=\"${zone}\">${zone}</option>\r\n                    </select>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/Customers/components/instIs4ua.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-6 topMargin\">\r\n        <div class=\"col-lg-12\">\r\n            <div class=\"form-group\">\r\n                <div class=\"col-sm-10\">\r\n                    <label>Institution Type *</label>\r\n                    <select value.bind=\"people.selectedInstitution.institutionType\" id=\"editInstitutionType\" class=\"form-control\">\r\n                        <option value=\"\">Select an option</option>\r\n                        <option repeat.for=\"status of is4ua.institutionTypes\" value=\"${status.code}\">${status.description}</option>\r\n                    </select>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-lg-12\">\r\n            <div class=\"form-group\">\r\n                <div class=\"col-sm-10\">\r\n                    <label>Member Type *</label>\r\n                    <select value.bind=\"people.selectedInstitution.memberType\" id=\"editMemberType\" class=\"form-control\">\r\n                        <option value=\"\">Select an option</option>\r\n                        <option repeat.for=\"status of is4ua.memberTypes\" value=\"${status.code}\">${status.description}</option>\r\n                    </select>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n     <div class=\"col-lg-6 topMargin\">\r\n        <div class=\"col-lg-12\">\r\n            <div class=\"form-group\">\r\n                <div class=\"col-sm-10\">\r\n                    <label class=\"left\">Highest Degree *</label>\r\n                    <select value.bind=\"people.selectedInstitution.highestDegree\" id=\"editHighestDegree\" class=\"form-control\">\r\n                        <option value=\"\">Select an option</option>\r\n                        <option repeat.for=\"status of is4ua.highestDegrees\" value=\"${status.code}\">${status.description}</option>\r\n                    </select>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-lg-12\">\r\n            <div class=\"form-group\">\r\n                <div class=\"col-sm-10\">\r\n                    <label>Department</label>\r\n                    <input value.bind=\"people.selectedInstitution.universityDept\" id=\"editDepartment\" class=\"form-control\" placeholder=\"Department\" type=\"text\" />\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/Customers/components/institutionsForm.html', ['module'], function(module) { module.exports = "<<template>\r\n    <style>\r\n        .menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\r\n        }\r\n    </style>\r\n    <div class=\"col-lg-12\">\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"!newInstitution\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>\r\n\r\n        <div class=\"topMargin\">\r\n            <form class=\"form-horizontal\">\r\n                <!-- Row 1 -->\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-3\">\r\n                        <div class=\"form-group\">\r\n                            <div class=\"col-sm-10\">\r\n                                <label>Name *</label>\r\n                                <input value.bind=\"people.selectedInstitution.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-sm-12 col-lg-3\">\r\n                        <div class=\"form-group\">\r\n                            <div class=\"col-sm-10\">\r\n                                <label>Modifed Date</label>\r\n                                 <flat-picker controlid=\"modifiedDate\" config.bind=\"dateConfig\" value.bind=\"people.selectedInstitution.dateModified\"></flat-picker>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-sm-12 col-lg-3\">\r\n                        <div class=\"form-group\">\r\n                            <div class=\"col-sm-10\">\r\n                                <label>Date Joined</label>\r\n                                <flat-picker controlid=\"joinDate\" config.bind=\"dateConfig\" value.bind=\"people.selectedInstitution.joinDate\"></flat-picker>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-sm-12 col-lg-3\">\r\n                        <div class=\"form-group\">\r\n                            <div class=\"col-sm-10\">\r\n                                <label>Date Dropped</label>\r\n                                 <flat-picker controlid=\"dropDate\" config.bind=\"dateConfig\" value.bind=\"people.selectedInstitution.dropDate\"></flat-picker>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-3\">\r\n                        <div class=\"form-group\"> \r\n                            <div class=\"col-sm-10\">\r\n                                <label class=\"left\">Status *</label>\r\n                                <select value.bind=\"people.selectedInstitution.institutionStatus\" id=\"editInstitutonStatusArray\" class=\"form-control\">\r\n                                    <option value=\"\">Select an option</option>\r\n                                    <option repeat.for=\"status of is4ua.institutonStatusArray\" value=\"${status.code}\">${status.description}</option>\r\n                                </select>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"row topMargin\">\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"row\">\r\n                            <div class=\"panel panel-default\">\r\n                                <div class=\"panel-body\">\r\n                                    <div class=\"col-lg-2\">\r\n                                        <div id=\"instFormListGroup\" class=\"list-group\">\r\n                                            <a class=\"${ $first ? 'menuButtons' : ''} list-group-item\" repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\r\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.title}</h4>\r\n                                            </a>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                    <div class=\"col-lg-10\">\r\n                                        <div class=\"tab-content\">\r\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\r\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </form>\r\n        </div>\r\n    </div>\r\n    </template>"; });
-define('text!modules/admin/Customers/components/institutionsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr colspan='6'>\r\n                                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                        </tr>\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"new()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"downloadInstExcel()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Export to Excel\"><i class=\"fa fa-download\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"_clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th style=\"width:20rem;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'name'})\">Name </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                            <th style=\"width:30rem;\">Institution Type</th>\r\n                            <th style=\"width:15rem;\">Member Type</th>\r\n                            <th style=\"width:20rem;\">Member Since</th>\r\n                            <th>Highest Degree</th>\r\n                            <th>Status</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr>\r\n                            <th>\r\n                            <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'name', displayProperty: 'fullnameName', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\r\n                            </th>\r\n                            <th>\r\n                                <select value.bind=\"institutionTypeFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'institutionTypeFilter',  collectionProperty: 'institutionType', displayProperty: 'institutionType', compare:'match'} )\" class=\"form-control\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of is4ua.institutionTypes\" value=\"${institution.code}\">${institution.description}</option>\r\n                                </select>\r\n                            </th>\r\n                            <th>\r\n                                <select value.bind=\"memberTypeFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'memberTypeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'memberType', displayProperty: 'memberType', matchProperty:'', compare:'match'} )\" class=\"form-control\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of is4ua.memberTypes\" value=\"${institution.code}\">${institution.description}</option>\r\n                                </select>\r\n                            </th>\r\n                            <th></th>\r\n                            <th>\r\n                            <select value.bind=\"highestDegreeFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'highestDegreeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'highestDegree', displayProperty: 'highestDegree', matchProperty:'', compare:'match'} )\" class=\"form-control\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of is4ua.highestDegrees\" value=\"${institution.code}\">${institution.description}</option>\r\n                                </select>\r\n                            </th>\r\n                            <th>\r\n                                <select value.bind=\"institutionStatusFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'institutionStatusFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'institutionStatus', displayProperty: 'institutionStatus', matchProperty:'', compare:'match'} )\" class=\"form-control\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for='status of is4ua.institutonStatusArray' value=\"${status.code}\">${status.description}</option>\r\n                                </select>\r\n                            </th>\r\n                        </tr>\r\n                        <tr click.trigger=\"edit($index, $event)\" repeat.for=\"inst of dataTable.displayArray\">\r\n                            <td data-title=\"Name\">${inst.name}</td>\r\n                            <td data-title=\"Type\">${inst.institutionType | lookupValue:is4ua.institutionTypes:\"code\":\"description\"}</td>\r\n                            <td data-tile=\"Phone\">${inst.memberType | lookupValue:is4ua.memberTypes:\"code\":\"description\"}</td>\r\n                            <td data-title=\"Email\">${inst.joinDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\r\n                            <td data-title=\"Role\">${inst.highestDegree | lookupValue:is4ua.highestDegrees:\"code\":\"description\"}</td>\r\n                            <td data-title=\"Status\">${inst.institutionStatus | lookupValue:is4ua.institutonStatusArray:\"code\":\"description\"}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/admin/Customers/components/institutionsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div id=\"no-more-tables\">\r\n\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr colspan='6'>\r\n                                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                        </tr>\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"new()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"downloadInstExcel()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Export to Excel\"><i class=\"fa fa-download\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"_clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\r\n                                <!--\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                -->\r\n                              \r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th style=\"width:20rem;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'name'})\">Name </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                            <th style=\"width:30rem;\">Institution Type</th>\r\n                            <th style=\"width:15rem;\">Member Type</th>\r\n                            <th style=\"width:20rem;\">Member Since</th>\r\n                            <th>Highest Degree</th>\r\n                            <th>Status</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr>\r\n                            <th>\r\n                            <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'name', displayProperty: 'fullnameName', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\r\n                            </th>\r\n                            <th>\r\n                                <select value.bind=\"institutionTypeFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'institutionTypeFilter',  collectionProperty: 'institutionType', displayProperty: 'institutionType', compare:'match'} )\" class=\"form-control\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of is4ua.institutionTypes\" value=\"${institution.code}\">${institution.description}</option>\r\n                                </select>\r\n                            </th>\r\n                            <th>\r\n                                <select value.bind=\"memberTypeFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'memberTypeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'memberType', displayProperty: 'memberType', matchProperty:'', compare:'match'} )\" class=\"form-control\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of is4ua.memberTypes\" value=\"${institution.code}\">${institution.description}</option>\r\n                                </select>\r\n                            </th>\r\n                            <th></th>\r\n                            <th>\r\n                            <select value.bind=\"highestDegreeFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'highestDegreeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'highestDegree', displayProperty: 'highestDegree', matchProperty:'', compare:'match'} )\" class=\"form-control\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of is4ua.highestDegrees\" value=\"${institution.code}\">${institution.description}</option>\r\n                                </select>\r\n                            </th>\r\n                            <th>\r\n                                <select value.bind=\"institutionStatusFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'institutionStatusFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'institutionStatus', displayProperty: 'institutionStatus', matchProperty:'', compare:'match'} )\" class=\"form-control\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for='status of is4ua.institutonStatusArray' value=\"${status.code}\">${status.description}</option>\r\n                                </select>\r\n                            </th>\r\n                        </tr>\r\n                        <tr click.trigger=\"edit($index, $event)\" repeat.for=\"inst of dataTable.displayArray\">\r\n                            <td data-title=\"Name\">${inst.name}</td>\r\n                            <td data-title=\"Type\">${inst.institutionType | lookupValue:is4ua.institutionTypes:\"code\":\"description\"}</td>\r\n                            <td data-tile=\"Phone\">${inst.memberType | lookupValue:is4ua.memberTypes:\"code\":\"description\"}</td>\r\n                            <td data-title=\"Email\">${inst.joinDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\r\n                            <td data-title=\"Role\">${inst.highestDegree | lookupValue:is4ua.highestDegrees:\"code\":\"description\"}</td>\r\n                            <td data-title=\"Status\">${inst.institutionStatus | lookupValue:is4ua.institutonStatusArray:\"code\":\"description\"}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/Customers/components/instPeople.html', ['module'], function(module) { module.exports = "<template>\r\n            <div class=\"col-lg-10 col-offset-lg-1\" style=\"padding:15px;\">\r\n\r\n            <table id=\"personTable2\" class=\"table table-striped table-hover\">\r\n                <thead>\r\n                    <tr>\r\n                        <th style=\"width:20rem;\">Name</th>\r\n                        <th style=\"width:15rem;\">Phone</th>\r\n                        <th style=\"width:20rem;\">eMail</th>\r\n                        <th>Role</th>\r\n                        <th>Status</th>\r\n                    </tr>\r\n                </thead>\r\n                <tbody>\r\n                    <tr repeat.for=\"person of people.instutionPeopleArray\" class=\"blackText\">\r\n                        <td data-title=\"name\">${person.firstName} ${person.lastName}</td>\r\n                        <td data-tile=\"phone\">${person.phone | phoneNumber}</td>\r\n                        <td data-title=\"email\">${person.email}</td>\r\n                        <td data-title=\"role\">${person.roles}</td>\r\n                        <td data-title=\"status\">${person.personStatus | lookupValue:is4ua.personStatusArray:\"code\":\"description\"}</td>\r\n                    </tr>\r\n                </tbody>\r\n            </table>\r\n        </div>\r\n</template>"; });
 define('text!modules/admin/Customers/components/is4ua.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"topMargin\">\r\n        <!-- Row 4 -->\r\n            <div class=\"col-lg-12\">\r\n                <div class=\"form-group\">\r\n                    <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\r\n                    <div class=\"col-sm-8\">\r\n                        <select value.two-way=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control \" placeholder=\"Specializatin\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-lg-12\">\r\n                <div class=\"form-group\">\r\n                    <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\r\n                    <div class=\"col-sm-8\">\r\n                        <select value.two-way=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control \" placeholder=\"Department\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/Customers/components/Log.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div if.bind=\"!youSelectedAnEmail\" class=\"topMargin\">\r\n        <table id=\"auditTable\" class=\"table table-striped table-hover\">\r\n            <thead>\r\n                <tr>\r\n                    <th style=\"width:20rem;\">Date </th>\r\n                    <th style=\"width:30rem;\">Subject</th>\r\n                    <th style=\"width:15rem;\">Sender</th>\r\n                    <th>Email</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr click.trigger=\"selectEmail(email)\" repeat.for=\"email of people.emailArray\" > \r\n                    <td>${email.date | dateFormat:config.DATE_FORMAT_TABLE} </td>\r\n                    <td>${email.subject}</td>\r\n                    <td>${email.from | lookupValue:people.peopleArray:\"_id\":\"fullName\"}</td>\r\n                    <td>${email.email}</td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n    <div if.bind=\"youSelectedAnEmail\">\r\n        <div class=\"bottomMargin list-group-item\"> \r\n            <span click.delegate=\"backEmail()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n        </div>\r\n        <div class=\"overflow topMargin\" innerhtml.bind=\"selectedEmail.body\">\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/Customers/components/Password.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"topMargin\">\r\n        <div class=\"panel panel-default col-md-12\">\r\n            <div class=\"panel-body\">\r\n                <div class=\"bottomMargin\">\r\n                        <div class=\"bottomMargin list-group-item\">\r\n                            <span click.delegate=\"savePassword()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                            <span click.delegate=\"cancelEditPassword()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        </div>  \r\n                    </div>\r\n                <div class=\"form-group\">\r\n                    <input id=\"newPassword\" type=\"text\" placeholder=\"New Password\"\r\n                        class=\"form-control topMargin\"\r\n                        value.bind=\"newPassword\" />\r\n                </div>\r\n                <!--\r\n                <div class=\"form-group\">\r\n                    <input id=\"password_repeat\" type=\"text\" placeholder=\"Repeat Password\"\r\n                        class=\"form-control topMargin\"\r\n                        value.bind=\"newPassword_repeat\" />\r\n                </div>\r\n                -->\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/Customers/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <style>\r\n        .menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\r\n        }\r\n    </style>\r\n    <div class=\"col-lg-12\">\r\n\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"!newPerson\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div> \r\n\r\n\r\n        <div class=\"topMargin\">\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-1\">\r\n                         <div  class=\"topMargin\">\r\n                            <img if.bind=\"profileHelpTicket.personId.file.fileName\" class=\"circular--square leftMargin\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${people.selectedPerson.file.fileName}\" height=\"100\">\r\n                        </div>\r\n                        <div if.bind=\"!profileHelpTicket.personId.file.fileName\" style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n                    </div>\r\n                    <div class=\"col-lg-11\">\r\n                    <form class=\"horizontal-form\">\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">First Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control \" placeholder=\"First Name\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control \" placeholder=\"Middle Name\"\r\n                                        type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Last Name\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Nickname</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.nickName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Nickname\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label class=\"control-label col-sm-3 hideOnPhone\">Status *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select keypress.bind=\"setStatus($event)\" value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control \" placeholder=\"Status\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input if.bind=\"phoneMask\" class=\"form-control\" id=\"editMobile\" masked=\"value.bind: people.selectedPerson.mobile; mask.bind: phoneMask; placeholder: *\"/>\r\n                                    <input if.bind=\"!phoneMask\" class=\"form-control\" id=\"editMobile\" value.bind=\"people.selectedPerson.mobile\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                         <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input if.bind=\"phoneMask\" class=\"form-control\" id=\"editPhone\" masked=\"value.bind: people.selectedPerson.phone; mask.bind: phoneMask; placeholder: *\"/>\r\n                                    <input if.bind=\"!phoneMask\" class=\"form-control\" id=\"editPhone\" value.bind=\"people.selectedPerson.phone\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Extension</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editPhoneExt\" value.bind=\"people.selectedPerson.ext\"/>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control \" placeholder=\"Email\" type=\"text\" blur.trigger=\"checkEmail()\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n \r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select change.trigger=\"changeInstitution()\" value.bind=\"institutionId\" id=\"editInstitution\" class=\"form-control \" placeholder=\"Institution\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.two-way=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control \" placeholder=\"Specializatin\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.two-way=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control \" placeholder=\"Department\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    </form>\r\n                </div>\r\n\r\n                <div class=\"row bigTopMargin\">\r\n                    <div class=\"col-lg-9 col-lg-offset-2\">\r\n                        <div class=\"row\">\r\n                            <div class=\"panel panel-default\">\r\n                                <div class=\"panel-body\">\r\n                                    <div class=\"col-lg-2\">\r\n                                        <div id=\"peopleFormListGroup\" class=\"list-group\">\r\n                                            <a class=\"${ $first ? 'menuButtons' : ''} list-group-item\" repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\r\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\r\n                                            </a>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                    <div class=\"col-lg-10\">\r\n                                        <div class=\"tab-content\">\r\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\r\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n            </form>\r\n        </div>\r\n        <div>\r\n\r\n</template>"; });
-define('text!modules/admin/Customers/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr colspan='7'>\r\n                                 <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                                 </tr>\r\n                            <tr>                            \r\n                            <tr>\r\n                                <td colspan='7'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"downloadInstExcel()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Export to Excel\"><i class=\"fa fa-download\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"_clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\r\n                                    <!--\r\n                                    <span  click.delegate=\"archiveInactivePeople()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Archive Inactive\"><i class=\"fa fa-archive\" aria-hidden=\"true\"></i></span> \r\n                                    -->\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:20rem;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'fullName'})\">Name </span><i class=\"fa fa-sort\"></i></th>\r\n                                <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'nickName'})\">Nickname </span><i class=\"fa fa-sort\"></i></th>                                \r\n                                <th style=\"width:30rem;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customInstitutionSorter, propertyName: 'intitutionId'})\">Institution </span><i class=\"fa fa-sort\"></i></th>\r\n                                <th style=\"width:15rem;\">Phone</th>\r\n                                <th style=\"width:20rem;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'email'})\">Email </span><i class=\"fa fa-sort\"></i></th>\r\n                                <th>Role</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilter', collectionProperty: 'fullName', displayProperty: 'fullName',  compare:'match'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                                <th>\r\n                                    <input value.bind=\"nickNameFilterValue\" input.delegate=\"dataTable.filterList(nickNameFilterValue, { type: 'text',  filter: 'nickNameFilter',  collectionProperty: 'nickName', displayProperty: 'nickName',  compare:'match'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                                <th>\r\n                                    <input value.bind=\"institutionFilterValue\" input.delegate=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                                <th></th>\r\n                                <th>\r\n                                    <input value.bind=\"emailFilterValue\" input.delegate=\"dataTable.filterList(emailFilterValue, { type: 'text',  filter: 'emailFilter',  collectionProperty: 'email', displayProperty: 'email',  compare:'match'} )\"  class=\"form-control\" /> \r\n                                </th>\r\n                                <th>\r\n                                    <input value.bind=\"roleFilter\" input.delegate=\"dataTable.filterList($event, { type: 'custom',  filter: customRoleFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n\r\n                                </th>\r\n                                <th>\r\n                                    <select value.bind=\"activeFilterValue\" change.delegate=\"filterActive()\" class=\"form-control \" id=\"personStatus\">\r\n                                        <option value=\"\"></option>\r\n                                        <option repeat.for='status of is4ua.personStatusArray' model.bind='status.code'>${status.description}</option>\r\n                                    </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr repeat.for=\"person of dataTable.displayArray\">\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Name\">${person.firstName} ${person.lastName}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Nickname\">${person.nickName}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Insitution\">${person.institutionId.name}</d> \r\n                                <td click.trigger=\"edit($index, $event)\" data-tile=\"Phone\">${person.phone | phoneNumber:config.PHONE_MASKS:person.country}</td>\r\n                                <td class=\"dropbtn\" data-title=\"Email\" click.delegate=\"sendAnEmail(person._id)\">${person.email}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Role\">${person.roles}</td>\r\n                                <td class=\"dropbtn\" click.trigger=\"toggleStatus(person._id, person.personStatus)\" data-title=\"Status\">${person.personStatus | lookupValue:is4ua.personStatusArray:\"code\":\"description\"}\r\n                                  <span  click.delegate=\"toggleStatus(person._id, person.personStatus)\" innerhtml=\"${person.personStatus | activateButton}\"></span>\r\n                                </td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/admin/Customers/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr colspan='7'>\r\n                                 <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                                 </tr>\r\n                            <tr>                            \r\n                            <tr>\r\n                                <td colspan='7'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"downloadInstExcel()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Export to Excel\"><i class=\"fa fa-download\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"_clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\r\n                                    <!--\r\n                                    <span  click.delegate=\"archiveInactivePeople()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Archive Inactive\"><i class=\"fa fa-archive\" aria-hidden=\"true\"></i></span> \r\n                                    \r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                    -->\r\n      \r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:20rem;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'fullName'})\">Name </span><i class=\"fa fa-sort\"></i></th>\r\n                                <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'nickName'})\">Nickname </span><i class=\"fa fa-sort\"></i></th>                                \r\n                                <th style=\"width:30rem;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customInstitutionSorter, propertyName: 'intitutionId'})\">Institution </span><i class=\"fa fa-sort\"></i></th>\r\n                                <th style=\"width:15rem;\">Phone</th>\r\n                                <th style=\"width:20rem;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'email'})\">Email </span><i class=\"fa fa-sort\"></i></th>\r\n                                <th>Role</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilter', collectionProperty: 'fullName', displayProperty: 'fullName',  compare:'match'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                                <th>\r\n                                    <input value.bind=\"nickNameFilterValue\" input.delegate=\"dataTable.filterList(nickNameFilterValue, { type: 'text',  filter: 'nickNameFilter',  collectionProperty: 'nickName', displayProperty: 'nickName',  compare:'match'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                                <th>\r\n                                    <input value.bind=\"institutionFilterValue\" input.delegate=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                                <th></th>\r\n                                <th>\r\n                                    <input value.bind=\"emailFilterValue\" input.delegate=\"dataTable.filterList(emailFilterValue, { type: 'text',  filter: 'emailFilter',  collectionProperty: 'email', displayProperty: 'email',  compare:'match'} )\"  class=\"form-control\" /> \r\n                                </th>\r\n                                <th>\r\n                                    <input value.bind=\"roleFilter\" input.delegate=\"dataTable.filterList($event, { type: 'custom',  filter: customRoleFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n\r\n                                </th>\r\n                                <th>\r\n                                    <select value.bind=\"activeFilterValue\" change.delegate=\"filterActive()\" class=\"form-control \" id=\"personStatus\">\r\n                                        <option value=\"\"></option>\r\n                                        <option repeat.for='status of is4ua.personStatusArray' model.bind='status.code'>${status.description}</option>\r\n                                    </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr repeat.for=\"person of dataTable.displayArray\">\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Name\">${person.firstName} ${person.lastName}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Nickname\">${person.nickName}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Insitution\">${person.institutionId.name}</d> \r\n                                <td click.trigger=\"edit($index, $event)\" data-tile=\"Phone\">${person.phone | phoneNumber:config.PHONE_MASKS:person.country}</td>\r\n                                <td class=\"dropbtn\" data-title=\"Email\" click.delegate=\"sendAnEmail(person._id)\">${person.email}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Role\">${person.roles}</td>\r\n                                <td class=\"dropbtn\" click.trigger=\"toggleStatus(person._id, person.personStatus)\" data-title=\"Status\">${person.personStatus | lookupValue:is4ua.personStatusArray:\"code\":\"description\"}\r\n                                  <span  click.delegate=\"toggleStatus(person._id, person.personStatus)\" innerhtml=\"${person.personStatus | activateButton}\"></span>\r\n                                </td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/Customers/components/Roles.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"topMargin\">\r\n         <form>\r\n      <div class=\"col-md-5 topMargin\">\r\n        <label>Roles</label>\r\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n            <ul class=\"list-group\">\r\n              <button click.trigger=\"selectRole($event, role)\" type=\"button\" repeat.for=\"role of filteredArray\" id=\"${role.role}\"\r\n                      class=\"list-group-item\">${role.label}</button>\r\n            </ul>\r\n        </div>\r\n      </div>\r\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\r\n        <label>Assigned Roles</label>\r\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n          <ul class=\"list-group\">\r\n            <button click.trigger=\"removeRole($index, role)\" type=\"button\" repeat.for=\"role of people.selectedPerson.roles\" id=\"${role}\"\r\n                    class=\"list-group-item\">${role | lookupValue:config.ROLES:'role':'label'}</button>\r\n          </ul>\r\n        </div>\r\n      </div>\r\n    </form>\r\n</template"; });
 define('text!modules/admin/Customers/components/selectionForm.html', ['module'], function(module) { module.exports = "<template>\r\n <div class=\"col-lg-12\">\r\n\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"_clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n\t\t \ttitle=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"composeEmail()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n\t\t\ttitle=\"\" data-original-title=\"Send\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t</div>\r\n\r\n\t<div show.bind=\"composeEmailPanel\" class=\"panel panel-info leftMargin rightMargin topMargin bottomMargin\">\r\n      <div class=\"panel-body\">\r\n\t   <div class=\"list-group-item col-md-12 topMargin\">\r\n\t\t\t<span click.delegate=\"sendTheBulkEmail()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\" ></i></span>\r\n\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t</div>\r\n\t\t<div class=\"col-lg-10 col-lg-offset-1 topMargin\">\r\n\t\t\t<input value.bind=\"email.subject\" class=\"form-control\" placeholder=\"Subject\"/>\r\n\t\t\t<div class=\"topMargin\">\r\n\t\t\t\t<editor value.bind=\"email.MESSAGE\" height=\"250\" toolbar.bind=\"toolbar\" ></editor>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t  </div>\r\n\t</div>\r\n\r\n\t<div class=\"panel panel-info leftMargin rightMargin\">\r\n      <div class=\"panel-body\">\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-lg-2\">\r\n\t\t\t\t<label class=\"control-label hideOnPhone\">Customer</label>\r\n\t\t\t\t<input value.bind=\"CustomerFilter\" input.delegate=\"dataTable.filterList(CustomerFilter, { type: 'custom',  filter: customerCustomFilter, compare:'custom'} )\"  class=\"form-control\" ref=\"nameFilter\"/>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-2\">\r\n\t\t\t\t<label class=\"control-labelhideOnPhone\">Status</label>\r\n\t\t\t\t<select value.bind=\"activeFilterValue\" change.delegate=\"filterActive()\" class=\"form-control \" id=\"personStatus\">\r\n\t\t\t\t\t<option value=\"\"></option>\r\n\t\t\t\t\t<option repeat.for='item of is4ua.personStatusArray' value='${item.code}'>${item.description}</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-2\">\r\n\t\t\t\t<multiselect label=\"Include Roles\" options.bind=\"roleSelect\" value.bind=\"roleFilterValue\"\r\n\t\t\t\tchange.trigger =\"filterRoles()\"></multiselect>\r\n\t\t\t</div>\r\n\t\t\t<!--\r\n\t\t\t\tdataTable.filterList($event, { type: 'custom',  filter: roleCustomFilter, compare:'custom'} )\r\n\t\t\t-->\r\n\t\t\t<div class=\"col-lg-2\">\r\n\t\t\t\t\t<multiselect label=\"Exclude Roles\" options.bind=\"roleSelect\" value.bind=\"roleExcludeFilterValue\"\r\n\t\t\t\t\tchange.trigger =\"excludeRoles()\"></multiselect>\r\n\t\t\t</div>\r\n\t\t\t<!--\r\n\t\t\t\tdataTable.filterList($event, { type: 'custom',  filter: roleExcludeCustomFilter, compare:'custom'} )\r\n\t\t\t-->\r\n\t\t</div>\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-lg-2\">\r\n\t\t\t\t\t<label class=\"control-label hideOnPhone\">Institution</label>\r\n\t\t\t\t\t<input value.bind=\"institutionFilterValue\" input.delegate=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-2\">\r\n\t\t\t\t\t<label class=\"control-labelhideOnPhone\">Status</label>\r\n\t\t\t\t\t<select value.bind=\"institutionStatusValue\"  input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'institutionStatusFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'institutionId.institutionStatus', displayProperty: 'institutionId.institutionStatus', matchProperty:'', compare:'match'} )\" class=\"form-control \" id=\"personStatus\">\r\n\t\t\t\t\t\t<option value=\"\"></option>\r\n\t\t\t\t\t\t<option repeat.for='item of is4ua.institutonStatusArray' value='${item.code}'>${item.description}</option>\r\n\t\t\t\t\t</select>\r\n\t\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-2\">\r\n\t\t\t\t<label class=\"control-label hideOnPhone\">Institution Type</label>\r\n\t\t\t\t\t<select value.bind=\"institutionTypeFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'institutionTypeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'institutionId.institutionType', displayProperty: 'institutionId.institutionType', matchProperty:'', compare:'match'} )\" class=\"form-control\">\r\n\t\t\t\t\t<option value=\"\"></option>\r\n\t\t\t\t\t<option repeat.for=\"institution of is4ua.institutionTypes\" value=\"${institution.code}\">${institution.description}</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-2\">\r\n\t\t\t\t\t<multiselect label=\"Member Type\" options.bind=\"is4ua.memberTypes\" value.bind=\"memberTypeFilterValue\"\r\n\t\t\t\t\tchange.trigger =\"dataTable.filterList($event, { type: 'custom',  filter: memberTypeCustomFilter, compare:'custom'} )\"></multiselect>\r\n<!--\r\n\t\t\t\t<label class=\"control-label hideOnPhone\">Member Type</label>\r\n\t\t\t\t<select value.bind=\"memberTypeFilterValue\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'memberTypesFilter', lookupArray: people.institutionsArray, lookupProperty: 'memberType', collectionProperty: 'institutionId.memberType', displayProperty: 'institutionId.name', matchProperty:'memberType', compare:'lookup'} )\" class=\"form-control \" ref=\"memberTypeFilter\">\r\n\t\t\t\t\t<option value=\"\"></option>\r\n\t\t\t\t\t<option repeat.for='item of is4ua.memberTypes' value='${item.code}'>${item.description}</option>\r\n\t\t\t\t</select>\r\n\t\t\t-->\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-2\">\r\n\t\t\t\t<label class=\"control-label hideOnPhone\">Region</label>\r\n\t\t\t\t<input value.bind=\"regionFilterValue\" input.delegate=\"dataTable.filterList(regionFilterValue, { type: 'custom',  filter: regionCustomFilter, collectionProperty: 'institutionId.region', compare:'custom'} )\"   class=\"form-control\" ref=\"regionFilter\"/>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-2\">\r\n\t\t\t\t<label class=\"control-label hideOnPhone\">Country</label>\r\n\t\t\t\t<input value.bind=\"countryFilterValue\" input.delegate=\"dataTable.filterList(countryFilterValue, { type: 'custom',  filter: countryCustomFilter, compare:'custom'} )\"   class=\"form-control\" ref=\"countryFilter\"/>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t  </div>\r\n\t</div>\r\n\r\n</div>\r\n</template>\r\n"; });
 define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                    data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                    data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                    title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                    title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>\r\n\r\n            <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                <div class=\"panel-body\">\r\n                    <form class=\"form-horizontal topMargin\">\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <div class=\"checkbox\">\r\n                                            <label class=\"pull-left\">\r\n                                                            <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                                        </label>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\"\r\n                                            type=\"text\" />\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-lg-2 col-lg-offset-2\">\r\n                                <label class=\"btn btn-primary\">\r\n                                            Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\" files.bind=\"files\">\r\n                                </label>\r\n                            </div>\r\n                            <div class=\"col-lg-6\">\r\n                                <ul show.bind=\"!uploading\" >\r\n                                    <li repeat.for=\"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\r\n                                </ul>\r\n                                <div show.bind=\"uploading\" class=\"progress progress-striped active\">\r\n                                    <div id=\"progressBar\" class=\"progress-bar\" style=\"width: 0%\"></div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-6 col-lg-offset-2\">\r\n                            <div id=\"editFiles\"></div>\r\n                        </div>\r\n                    </form>\r\n                </div>\r\n            </div>\r\n            <div class=\"row topMargin\">\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <th>Name</th>\r\n                                <th>Version</th>\r\n                                <th>Date Uploaded</th>\r\n                                <th>Uploaded By</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                                <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedCat.code}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                                <td data-title=\"Version\">${item.version}</td>\r\n                                <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                                <td data-title=\"Person\">${item.personId | lookupValue:people.peopleArray:\"_id\":\"fullName\"}</td>\r\n                                <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                                <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n    </div>\r\n\r\n</template>"; });
@@ -62126,13 +62205,13 @@ define('text!modules/admin/system/components/edit-client-form.html', ['module'],
 define('text!modules/admin/system/components/is4ua.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-6\">\r\n        <div class=\"form-group\">\r\n            <label for=\"editSapName\" class=\"control-label\">SAP Name</label>\r\n            <select value.two-way=\"products.selectedProduct.sapProduct\" id=\"editSapName\" class=\"form-control \" placeholder=\"SAP Name\">\r\n                <option value=\"\">Select an option</option>\r\n                <option repeat.for=\"name of is4ua.sapProductsArray\" value=\"${name.code}\">${name.description}</option>\r\n            </select>\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <label for=\"editHostedWhere\" class=\"control-label\">Hosted</label>\r\n            <select value.bind=\"products.selectedProduct.hostWhere\" id=\"editHostedWhere\" class=\"form-control \">\r\n                <option value=\"\">Select an option</option>\r\n                <option value=\"UCC\">UCC</option>\r\n                <option value=\"Other\">Other</option>\r\n            </select>\r\n        </div>\r\n    \r\n        <div class=\"form-group\">\r\n            <label for=\"editUaCurriculum\" class=\"control-label\">UA Curriculum</label>\r\n            <select value.bind=\"products.selectedProduct.uaCurriculum\" id=editUaCurriculum \" class=\"form-control  \">\r\n                <option value=\" \">Select an option</option>\r\n                <option repeat.for=\"name of is4ua.uaCurriculumArray \" value=\"${name.code} \">${name.description}</option>\r\n            </select>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/system/components/Notes.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\">\r\n        <div class=\"form-group \">\r\n            <label>Internal Comments</label>\r\n             <editor value.bind=\"products.selectedProduct.clientInfo\" toolbar.bind=\"toolbar\" height=\"250\"></editor>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/system/components/productForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <style>\r\n        .menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\r\n        }\r\n    </style>\r\n    <div class=\"col-lg-12\">\r\n\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"!newProduct\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>  \r\n\r\n        <div class=\" topMargin blackText\">\r\n            <form class=\"form-horizontal topMargin\">\r\n                <!-- Row 1 -->\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-6\">\r\n                        <div class=\"col-lg-12\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editName\" class=\"col-sm-3 control-label hideOnPhone\">Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"products.selectedProduct.name\" id=\"editName\" class=\"form-control \" placeholder=\"Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-12\">\r\n                            <div class=\"form-group\">\r\n                                <label class=\"control-label col-sm-3 hideOnPhone\">Status</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <div class=\"checkbox\">\r\n                                        <label class=\"pull-left\">\r\n                                            <input id=\"activeProduct\" checked.bind=\"products.selectedProduct.active\" type=\"checkbox\"> Active\r\n                                        </label>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-6\">\r\n                        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\r\n                            <thead>\r\n                                <tr>\r\n                                    <th>Document </th>\r\n                                    <th>Default</th>\r\n                                    <th></th>\r\n                                </tr>\r\n                            </thead>\r\n                            <tbody>\r\n                                <tr repeat.for=\"document of products.selectedProduct.documents\">\r\n                                    <td data-title=\"name\">${document.fileName} </td>\r\n                                    <td data-title=\"default\" click.trigger=\"toggleDefault($index)\" innerhtml.bind='document.default | checkBox'></td>\r\n                                    <td  click.trigger=\"removeDocument($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                                </tr>\r\n                            </tbody>\r\n                        </table>\r\n                    </div>             \r\n                </div>\r\n\r\n                <div class=\"row topMargin\">\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"row\">\r\n                            <div class=\"panel panel-default\">\r\n                                <div class=\"panel-body\">\r\n                                    <div class=\"col-lg-2\">\r\n                                        <div id=\"productListGroup\" class=\"list-group\">\r\n                                            <a  class=\"${ $first ? 'menuButtons' : ''} list-group-item\"  repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\r\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\r\n                                            </a>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                    <div class=\"col-lg-10\">\r\n                                        <div class=\"tab-content\">\r\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\r\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </form>\r\n        </div>\r\n    </div>\r\n</template>"; });
-define('text!modules/admin/system/components/productTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\" style='padding:15px;'>\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <div id=\"no-more-tables\">\r\n                    <table id=\"productsTable\" class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr colspan='5'>\r\n                                 <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                                 </tr>\r\n                            <tr>                            \r\n                            <tr>\r\n                                <td colspan='5'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\" class=\"smallMarginRight\"  bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"_cleanUpFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:75px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'clientKey'})\">Key </span><i class=\"fa fa-sort\"></i></th>\r\n                                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'name'})\">Name </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">SAP Product</th>\r\n                                <th>Status </th>\r\n                                <th>Systems</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th></th>\r\n                                <th>\r\n\t\t\t\t\t\t\t\t\t<input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilterValue', collectionProperty: 'name', displayProperty: 'name',  compare:'match'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                                <th>\r\n                                    <select value.bind=\"sapNameFilterValue\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'sapNameFilter', collectionProperty: 'sapProduct', displayProperty: 'sapProduct',  compare:'match'} )\" class=\"form-control \" >\r\n                                        <option value=\"\"></option>\r\n                                        <option repeat.for=\"product of is4ua.sapProductsArray\" value=\"${product.code}\">${product.description}</option>\r\n                                    </select>\r\n                                </th>\r\n                                <th>\r\n                                    <select value.bind=\"activeFilter\" input.delegate=\"dataTable.filterList($event, { type: 'boolean',  filter: 'activeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'active', displayProperty: 'active', matchProperty:'', compare:'boolean'} )\" class=\"form-control\">\r\n                                        <option value=\"\"></option>\r\n                                        <option value=\"true\">Active</option>\r\n                                        <option value=\"false\">Inactive</option>\r\n                                    </select>\r\n                                </th>\r\n                                <th>\r\n\t\t\t\t\t\t\t\t\t<input value.bind=\"systemFilterValue\" input.delegate=\"dataTable.filterList(systemFilterValue, { type: 'custom',  filter: systemCustomFilter, collectionProperty: 'systems.sid', compare:'custom'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                            </tr>\r\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"system of dataTable.displayArray\">\r\n                                <td data-title=\"Client Key\">${system.clientKey}</td>\r\n                                <td data-title=\"Name\">${system.name}</td>\r\n                                <td data-title=\"SAP Product\">${system.sapProduct | lookupValue:is4ua.sapProductsArray:\"code\":\"description\"}</td>\r\n                                <td class=\"centerText\" data-title=\"Status\">${system.active | translateStatus}</td>\r\n                                <td data-title=\"Systems\">${system.systems | systemList}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/admin/system/components/productTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\" style='padding:15px;'>\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <div id=\"no-more-tables\">\r\n                    <table id=\"productsTable\" class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr colspan='5'>\r\n                                 <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                                 </tr>\r\n                            <tr>                            \r\n                            <tr>\r\n                                <td colspan='5'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\" class=\"smallMarginRight\"  bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"_cleanUpFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\r\n                                  <!--  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span> -->\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:75px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'clientKey'})\">Key </span><i class=\"fa fa-sort\"></i></th>\r\n                                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'name'})\">Name </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">SAP Product</th>\r\n                                <th>Status </th>\r\n                                <th>Systems</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th></th>\r\n                                <th>\r\n\t\t\t\t\t\t\t\t\t<input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilterValue', collectionProperty: 'name', displayProperty: 'name',  compare:'match'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                                <th>\r\n                                    <select value.bind=\"sapNameFilterValue\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'sapNameFilter', collectionProperty: 'sapProduct', displayProperty: 'sapProduct',  compare:'match'} )\" class=\"form-control \" >\r\n                                        <option value=\"\"></option>\r\n                                        <option repeat.for=\"product of is4ua.sapProductsArray\" value=\"${product.code}\">${product.description}</option>\r\n                                    </select>\r\n                                </th>\r\n                                <th>\r\n                                    <select value.bind=\"activeFilter\" input.delegate=\"dataTable.filterList($event, { type: 'boolean',  filter: 'activeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'active', displayProperty: 'active', matchProperty:'', compare:'boolean'} )\" class=\"form-control\">\r\n                                        <option value=\"\"></option>\r\n                                        <option value=\"true\">Active</option>\r\n                                        <option value=\"false\">Inactive</option>\r\n                                    </select>\r\n                                </th>\r\n                                <th>\r\n\t\t\t\t\t\t\t\t\t<input value.bind=\"systemFilterValue\" input.delegate=\"dataTable.filterList(systemFilterValue, { type: 'custom',  filter: systemCustomFilter, collectionProperty: 'systems.sid', compare:'custom'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                            </tr>\r\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"system of dataTable.displayArray\">\r\n                                <td data-title=\"Client Key\">${system.clientKey}</td>\r\n                                <td data-title=\"Name\">${system.name}</td>\r\n                                <td data-title=\"SAP Product\">${system.sapProduct | lookupValue:is4ua.sapProductsArray:\"code\":\"description\"}</td>\r\n                                <td class=\"centerText\" data-title=\"Status\">${system.active | translateStatus}</td>\r\n                                <td data-title=\"Systems\">${system.systems | systemList}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/system/components/sessionConfigTable.html', ['module'], function(module) { module.exports = "<template>\r\n   <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\r\n        <div class='row'>\r\n\t\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                <span click.delegate=\"backConfig()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<span click.delegate=\"saveConfig()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<span click.delegate=\"cancelConfig()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t</div>   \r\n            <div class='col-lg-12 bottomMargin'>\r\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                <div id=\"no-more-tables\">\r\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <td colspan='5'>\r\n                                    <span click.delegate=\"refreshConfig()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                        title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th>Session</th>\r\n                                <th>Start Day</th>\r\n                                <th>Start Month</th>\r\n\t\t\t\t\t\t\t\t<th>End Day</th>\r\n\t\t\t\t\t\t\t\t<th>End Month</th>\r\n\t\t\t\t\t\t\t\t<th>Open Day</th>\r\n\t\t\t\t\t\t\t\t<th>Open Month</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr  repeat.for=\"item of editSessionConfigArray\">\r\n                                <td><input value.bind=\"item.session\" class=\"form-control\" type=\"text\" /></td>\r\n                                <td><input value.bind=\"item.startDay\" class=\"form-control\" type=\"text\" /></td>\r\n\t\t\t\t\t\t\t\t<td><input value.bind=\"item.startMonth\" class=\"form-control\" type=\"text\" /></td>\r\n\t\t\t\t\t\t\t\t<td><input value.bind=\"item.endDay\" class=\"form-control\" type=\"text\" /></td>\r\n\t\t\t\t\t\t\t\t<td><input value.bind=\"item.endMonth\" class=\"form-control\" type=\"text\" /></td>\r\n\t\t\t\t\t\t\t\t<td><input value.bind=\"item.openDay\" class=\"form-control\" type=\"text\" /></td>\r\n\t\t\t\t\t\t\t\t<td><input value.bind=\"item.openMonth\" class=\"form-control\" type=\"text\" /></td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/system/components/sessionForm.html', ['module'], function(module) { module.exports = "<template>\r\n <div class=\"container\">\r\n    <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n      <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n      <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n      <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n    </div> \r\n\r\n    <div class=\"topMargin\">\r\n\t    <div class=\"col-lg-5 topMargin\">\r\n\t      <label for=\"editSession\" class=\"form-control-label\">Session</label>\r\n\t      <select value.bind=\"sessions.selectedSession.session\" class=\"form-control\" id=\"editSession\">\r\n\t        <option></option>\r\n\t        <option repeat.for=\"session of config.SESSION_PARAMS\">${session.session}</option>\r\n\t      </select>\r\n\t    </div>\r\n\t    <div class=\"col-lg-5 col-lg-offset-1 topMargin\">\r\n\t     \t<label for=\"editYear\" class=\"form-control-label \">Year</label>\r\n\t    \t<input value.bind=\"sessions.selectedSession.year\" id=\"editYear\" class=\" form-control\" placeholder=\"Year\" type=\"text\" />\r\n\t    </div>\r\n\t    <div class=\"col-lg-5 topMargin\">\r\n\t    \t<label class=\"form-control-label \">Start Date</label>\r\n        \t<flat-picker controlid=\"startDate\" config.bind=\"config\" value.bind=\"sessions.selectedSession.startDate\"></flat-picker>\r\n\t    </div>\r\n\t    <div class=\"col-lg-5 col-lg-offset-1 topMargin\">\r\n\t    \t<label class=\"form-control-label \">End Date</label>\r\n        \t<flat-picker controlid=\"endDate\" config.bind=\"config\" value.bind=\"sessions.selectedSession.endDate\"></flat-picker>\r\n\t    </div>\r\n\t    <div class=\"col-lg-5 topMargin\">\r\n\t    \t<label class=\"form-control-label \">Requests Open</label>\r\n            <flat-picker controlid=\"requestsOpenDate\" config.bind=\"config\" value.bind=\"sessions.selectedSession.requestsOpenDate\"></flat-picker>\r\n\t    </div>\r\n\t     <div class=\"col-lg-5 col-lg-offset-1 topMargin\">\r\n\t     \t<label for=\"editStatus\" class=\"form-control-label\">Status</label>\r\n            <select value.bind=\"sessions.selectedSession.sessionStatus\" id=\"editStatus\" class=\"form-control\" id=\"editStatus\">\r\n              <option repeat.for=\"session of config.SESSION_STATUSES\" value.bind=\"session\">${session}</option>\r\n            </select>\r\n\t     </div>\r\n    </div>\r\n </div>\t\r\n</template>"; });
 define('text!modules/admin/system/components/sessionTable.html', ['module'], function(module) { module.exports = "sessionTable.html\r\n<template>\r\n\t<div class='row'>\r\n\t        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n\t            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n\t            <div id=\"no-more-tables\">\r\n\t                <table id=\"sessionsTable\" class=\"table table-striped table-hover cf\">\r\n\t                    <thead class=\"cf\">\r\n\t                        <tr>\r\n\t                            <td colspan='6'>\r\n\t                                <div class=\"checkbox\">\r\n\t                                    <label>\r\n\t                                        <input checked.bind=\"isChecked\" change.trigger=\"filterOutClosed()\" type=\"checkbox\"> Hide inactive sessions\r\n\t                                    </label>\r\n\t                                </div>\r\n\t                            </td>\r\n\t                            <tr>\r\n\t                                <td colspan='7'>\r\n\t                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n\t                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"smallMarginRight fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n\t                                    <span click.delegate=\"editSessionConfig()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Config\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\r\n\t                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n\t                                </td>\r\n\t                            </tr>\r\n\t                            <tr>\r\n\t                                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'session'})\">Session </span> <span><i class=\"fa fa-sort\"></i></span></th>\r\n\t                                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'startDate'})\">Start Date </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n\t                                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'endDate'})\">End Date </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n\t\t\t\t\t\t\t\t\t<th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requestsOpenDate'})\">Requests Open </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n\t\t\t\t\t\t\t\t\t<th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'sortOrder'})\">Sort Order </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n\t                                <th>Status</th>\r\n\t                                <th></th>\r\n\t                            </tr>\r\n\t                    </thead>\r\n\t                    <tbody>\r\n\t                        <tr repeat.for=\"session of dataTable.displayArray\">\r\n\t                            <td data-title=\"Session\" click.trigger=\"edit($index, $event)\">${session.session} - ${session.year}</td>\r\n\t                            <td data-title=\"StartDate\" click.trigger=\"edit($index, $event)\">\r\n\t                                <div style=\"width: 100px\">${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</div>\r\n\t                            </td>\r\n\t                            <td data-title=\"EndDate\" click.trigger=\"edit($index, $event)\">\r\n\t                                <div style=\"width: 100px\">${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</div>\r\n\t                            </td>\r\n\t                            <td data-title=\"RequestsOpen\" click.trigger=\"edit($index, $event)\">\r\n\t                                <div style=\"width: 100px\">${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</div>\r\n\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t\t<td> <Input change.trigger=\"saveSortOrder(session)\" type=\"number\" value.bind=\"session.sortOrder\" /> </td>\r\n\t                            <td data-title=\"createdDate\" click.trigger=\"edit($index, $event)\">${session.sessionStatus}</td>\r\n\t                            <td data-title=\"Update\" style=\"width: 100px\" click.trigger=\"updateStatus($index, session, $event)\" innerhtml.bind=\"session.sessionStatus | sessionStatusButton\">\r\n\t                            </td>\r\n\t                        </tr>\r\n\t                    </tbody>\r\n\t                </table>\r\n\t            </div>\r\n\t        </div>\r\n\t    </div>\r\n\t</div>\r\n</template>\t"; });
 define('text!modules/admin/system/components/systemForm.html', ['module'], function(module) { module.exports = "<template>\t\r\n<div show.bind=\"systemDetails\" class=\"col-lg-12\">\r\n\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t<span show.bind=\"!newSystem\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"editClientsButton()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Client List\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t</div>  \r\n\r\n\t\t <!-- Edit Form -->\r\n\t<div class=\"col-lg-6\">\r\n\t\t<div class=\"col-lg-6\">\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"editSid\" class=\"form-control-label\">SID</label>\r\n\t\t\t\t<input value.bind=\"systems.selectedSystem.sid | toUppercase\" id=\"editSid\" class=\"form-control\" placeholder=\"SID\" type=\"text\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-10\">\r\n\t\t\t\t<div class=\"checkbox\">\r\n\t\t\t\t<label>\r\n\t\t\t\t\t<input checked.bind=\"systems.selectedSystem.active\" type=\"checkbox\"> Active\r\n\t\t\t\t</label>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"editDesc\" class=\"form-control-label\">Description</label>\r\n\t\t\t\t<input value.bind=\"systems.selectedSystem.description\" id=\"editDesc\" class=\"form-control\" placeholder=\"Description\" type=\"text\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"editServer\" class=\"form-control-label\">Server</label>\r\n\t\t\t\t<input value.bind=\"systems.selectedSystem.server | toUppercase\" id=\"editServer\" class=\"form-control\" placeholder=\"Server\" type=\"text\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"editPort\" class=\"form-control-label\">Port</label>\r\n\t\t\t\t<input value.bind=\"systems.selectedSystem.port\" id=\"editPort\" class=\"form-control\" placeholder=\"Port\" type=\"number\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"editInst\" class=\"form-control-label\">Instance</label>\r\n\t\t\t\t<input value.bind=\"systems.selectedSystem.instance\" id=\"editInst\" class=\"form-control\" placeholder=\"Instance\" type=\"text\" maxLength=\"2\"/>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"editIpAddress\" class=\"form-control-label\">IP Address</label>\r\n\t\t\t\t<input value.bind=\"systems.selectedSystem.ipAddress\" id=\"editIpAddress\" class=\"form-control\" placeholder=\"IP Address\" type=\"text\"/>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"edittype\" class=\"control-label\">System Type</label>\r\n\t\t\t\t<select value.bind=\"systems.selectedSystem.type\" id=\"edittype\" class=\"form-control \">\r\n\t\t\t\t\t<option model.bind=\"type\" repeat.for=\"type of config.SYSTEM_TYPES\">${type}</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t</div>\r\n\t\t<div class=\"col-lg-6\">\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"editOs\" class=\"form-control-label\">OS</label>\r\n\t\t\t\t<input value.bind=\"systems.selectedSystem.os\" id=\"editOs\" class=\"form-control\" placeholder=\"Operating System\" type=\"text\"/>\r\n\t\t\t</div>\r\n\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"editOsVersion\" class=\"form-control-label\">OS Version</label>\r\n\t\t\t\t<input value.bind=\"systems.selectedSystem.osVersion\" id=\"editOsVersion\" class=\"form-control\" placeholder=\"OS Version\" type=\"text\"/>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"editDB\" class=\"form-control-label\">Database</label>\r\n\t\t\t\t<input value.bind=\"systems.selectedSystem.dbType\" id=\"editDB\" class=\"form-control\" placeholder=\"Database\" type=\"text\"/>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"editDBVersion\" class=\"form-control-label\">Dataabase Version</label>\r\n\t\t\t\t<input value.bind=\"systems.selectedSystem.dbVersion\" id=\"editDBVersion\" class=\"form-control\" placeholder=\"Database Version\" type=\"text\"/>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"editIts\" class=\"form-control-label\">URL</label>\r\n\t\t\t\t<input value.bind=\"systems.selectedSystem.its\" id=\"editIts\" class=\"form-control\" placeholder=\"URL\" type=\"text\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<label for=\"editTerms\" class=\"form-control-label\">Sessions</label>\r\n\t\t\t\t<select multiple value.bind=\"systems.selectedSystem.sessions\" class=\"form-control\">\r\n\t\t\t\t\t<option value=\"${session.session}\"  repeat.for=\"session of config.SESSION_PARAMS\">${session.session}</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-6\">\r\n\t\t\t\t<div class=\"checkbox\">\r\n\t\t\t\t\t<label class=\"form-control-label topMargin\">\r\n\t\t\t\t\t\t<input  checked.bind=\"systems.selectedSystem.goldBackup\" type=\"checkbox\"> Gold Backup\r\n\t\t\t\t\t</label>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-6\">\r\n\t\t\t\t<div class=\"checkbox\">\r\n\t\t\t\t\t<label class=\"form-control-label topMargin\">\r\n\t\t\t\t\t\t<input checked.bind=\"systems.selectedSystem.snapShot\" type=\"checkbox\"> Snapshot\r\n\t\t\t\t\t</label>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t<label class=\"form-control-label\">Gold Backup Date</label>\r\n\t\t\t\t\t<flat-picker controlid=\"goldBackupDate\" config.bind=\"dateConfig\" value.bind=\"systems.selectedSystem.goldBackupDate\"></flat-picker>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t</div>\r\n\t\t<div class=\"col-lg-12 bottomMargin\">\r\n\t\t\t\t<label for=\"editNotes\" class=\"form-control-label\">Notes</label>\r\n\t\t\t\t<textarea value.bind=\"systems.selectedSystem.notes\" id=\"editNotes\" rows=\"8\" class=\"form-control\"></textarea>\r\n\t\t</div>\r\n\t</div>\r\n\t <div class=\"col-lg-6\">\r\n\t\t<div class=\"row\">\r\n\t\t\t<div show.bind=\"editClients\" class=\"panel panel-default editPanel col-sm-9\" >\r\n\t\t\t\t<div class=\"panel-body\">\r\n\t\t\t\t\t<div class=\"topMargin leftmargin\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n\t\t\t\t\t\t\t\t<span click.delegate=\"generateClients()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Add Clients\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t\t\t\t\t<span click.delegate=\"refreshClients()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh Clients\"><i class=\"fa fa-refresh fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t\t\t\t\t<span click.delegate=\"deleteClients()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Clients\"><i class=\"fa fa-trash-o fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t\t\t\t\t<span click.delegate=\"editClientsButton()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t\t\t\t\t<span click.trigger=\"updateAllProducts()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Update Products\"><i class=\"fa fa-product-hunt fa-lg fa-border\" aria-hidden=\"true\"></i></span>                                            \r\n\t\t\t\t\t\t\t\t<span click.delegate=\"assignmentDetails()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Details\"><i class=\"fa fa-eye fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t\t\t\t</div>  \r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\r\n\t\t\t\t\t\t<div class=\"leftMargin bottomMargin topMargin\">\r\n\t\t\t\t\t\t\t<div class=\"col-sm-2\">\r\n\t\t\t\t\t\t\t\t<input value.bind=\"editFirstClient\" id=\"editFirstClient\" placeholder=\"Start\" class=\"form-control input-sm\" type=\"number\" />\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"col-sm-2 \">\r\n\t\t\t\t\t\t\t\t<input value.bind=\"editLastClient\" id=\"editLastClient\" placeholder=\"End\" class=\"form-control input-sm\" type=\"number\" />\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"col-sm-2 \">\r\n\t\t\t\t\t\t\t\t<input value.bind=\"idsAvailable\" id=\"editClientIdsAvailable\" placeholder=\"IDS Available\" class=\"form-control input-sm\" type=\"number\" />\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"col-sm-4\">\r\n\t\t\t\t\t\t\t\t<select value.bind=\"editClientStatus\" class=\"form-control\" data-title=\"Single Select\" data-style=\"btn-default btn-block\" data-menu-style=\"dropdown-blue\">\r\n\t\t\t\t\t\t\t\t\t<option repeat.for=\"status of config.CLIENT_STATUSES\" value=\"${status.code}\">${status.description}</option>\r\n\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t\t<div class=\"col-lg-3\">\r\n\t\t\t\t\t\t\t\t\t<label  class=\"form-control-label topMargin\">Client Interval</label>\r\n\t\t\t\t\t\t\t\t\t<input value.bind=\"clientInterval\" id=\"clientInterval\" placeholder=\"Interval\" class=\"form-control input-sm\" type=\"number\" />\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"col-lg-8\">\r\n\t\t\t\t\t\t\t\t<label  class=\"form-control-label topMargin\">Product</label>\r\n\t\t\t\t\t\t\t\t<select class=\"form-control col-lg-8\"  value.bind=\"selectedProduct\" click.delegate=\"selectProduct()\">\r\n\t\t\t\t\t\t\t\t\t<option value=\"\">Choose a product</option>\r\n\t\t\t\t\t\t\t\t\t<option repeat.for=\"product of products.productsArray\" model.bind=\"product._id\">${product.name}</option>\r\n\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n               \r\n\t\t<div show.bind=\"systems.selectedSystem.clients.length > 0 && !clientSelected\" class=\"col-sm-9\">\r\n\t\t\t<div class=\"panel panel-default\" >\r\n\t\t\t\t<div class=\"panel-body\">\r\n\t\t\t\t\t<div style=\"overflow:auto;height:800px;\">\r\n\t\t\t\t\t\t<ul>\r\n\t\t\t\t\t\t\t<li class=\"list-group-item\" repeat.for=\"client of systems.selectedSystem.clients | sortArray:'client':'ASC'\">\r\n\t\t\t\t\t\t\t\t<div  class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<span class=\"col-sm-7\">\r\n\t\t\t\t\t\t\t\t\t\t<h5>Client ${client.client} <span class=\"leftMargin\">IDs: ${client.idsAvailable}</span></h5>\r\n\t\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t\t<span class=\"col-sm-5\">\r\n\t\t\t\t\t\t\t\t\t\t<span click.delegate=\"refreshClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh Client\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t\t\t\t\t\t\t<span click.delegate=\"toggleSandBox($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Toggle Sandbox\"><i class=\"fa fa-users\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t\t\t\t\t\t\t<span click.delegate=\"deleteClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Client\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t\t\t\t\t\t\t<span click.trigger=\"selectClient(client, $index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Client\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>                                            \r\n\t\t\t\t\t\t\t\t\t\t<span click.trigger=\"updateProduct(client, $index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Update Product\"><i class=\"fa fa-product-hunt\" aria-hidden=\"true\"></i></span>                                            \r\n\t\t\t\t\t\t\t\t\t</span>\t\t\r\n\t\t\t\t\t\t\t\t\t<span class=\"col-sm-12\">\r\n\t\t\t\t\t\t\t\t\t\t<h7>Product: ${client.productId | lookupValue:products.productsArray:\"_id\":\"name\"}</h7></br>\r\n\t\t\t\t\t\t\t\t\t\t<h7> <span>Assignments: ${client.assignments.length}</span></h7>\r\n\t\t\t\t\t\t\t\t\t\t<h6>Status: ${client.clientStatus | lookupValue:config.CLIENT_STATUSES:\"code\":\"description\"}</h6>\r\n\t\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div show.bind=\"clientSelected\">\r\n\t\t\t<compose view=\"./edit-client-form.html\"></compose>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n<div show.bind=\"!systemDetails\" class=\"col-lg-12\">\r\n\t<h3>System: ${systems.selectedSystem.sid}</h3>\r\n\t <div class='col-lg-10 col-lg-offset-1'>\r\n\t\t<div class=\"bottomMargin list-group-item\">\r\n\t\t\t<span click.delegate=\"backAssignmentDetails()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t</div>  \r\n\t<div id=\"no-more-tables2\">\r\n        <table class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr>\r\n                    <td colspan='5'>\r\n                       <span click.delegate=\"downloadExcel()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Export to Excel\"><i class=\"fa fa-download\" aria-hidden=\"true\"></i></span>\r\n                    </td>\r\n                </tr>\r\n                <tr>\r\n                    <th><span  class=\"sortable\"  click.delegate=\"sortOnFaculty($event)\">Faculty</span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.delegate=\"sortOnInst($event)\">Institution</span><span><i class=\"fa fa-sort\"></i></span></th>\r\n\t\t\t\t\t<th class=\"col-sm-1\"><span  class=\"sortable\" click.delegate=\"sortOnClient($event)\">Client </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n\t\t\t\t\t<th>Student IDs</th>\r\n\t\t\t\t\t<th>Faculty IDs</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"assign of systems.assignmentDetailsArray\">\r\n                    <td data-title=\"Faculty\">${assign.firstName} ${assign.lastName}</td>\r\n                    <td data-title=\"Institution\">${assign.institution}</td>\r\n\t\t\t\t\t<td data-title=\"Client\">${assign.client}</td>\r\n\t\t\t\t\t<td data-title=\"StudentIDs\">${assign.studentIds}</td>\r\n\t\t\t\t\t<td data-title=\"FacultyIDs\">${assign.facultyIds}</td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n        </div>\r\n    </div> \r\n</div>\r\n</template>"; });
 define('text!modules/admin/system/components/Systems.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class=\"col-lg-12\">\r\n         <h5 class=\"bottomMargin\">To assign systems to products, you should use the Systems client generation process.</h5>\r\n        <add-systems systemstring.two-way=\"editSystemsString\" systemchanges.two-way=\"systemChanges\" systemsarray.bind=\"systems.systemsArray\"  filteredsystemsarray.bind=\"systems.systemsArray\" selectedproduct.two-way=\"products.selectedProduct\"></add-systems>\r\n    </div>\r\n</template>"; });
-define('text!modules/admin/system/components/systemTable.html', ['module'], function(module) { module.exports = "<template>\r\n <div class='col-lg-10 col-lg-offset-1'>\r\n\t<div id=\"no-more-tables\">\r\n        <table id=\"systemsTable\" class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr colspan='5'>\r\n                    <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                </tr>\r\n                <tr>\r\n                    <td colspan='5'>\r\n                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"new()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"_cleanUpFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\r\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                    </td>\r\n                </tr>\r\n                <tr>\r\n                    <th style=\"width:100px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'sid'})\">SID </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'description'})\">Description </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'server'})\">Server </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th class=\"hidden-xs hidden-sm\">Instance</th>\r\n                    <th class=\"hidden-xs hidden-sm\">Status</th>\r\n                    <th>Gold Backup</th>\r\n                    <th>Gold Backup Date</th>\r\n                    <th>Snapshot </th>\r\n                </tr>\r\n\r\n                <tr>\r\n                    <th>\r\n                        <input value.bind=\"sidFilterValue\" placeholder=\"SID\" input.delegate=\"dataTable.filterList(sidFilterValue, { type: 'text',  filter: 'sidFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'sid', displayProperty: 'sid', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\r\n                    </th>\r\n                    <th>\r\n                        <input value.bind=\"descriptionFilterValue\" placeholder=\"Description\" input.delegate=\"dataTable.filterList(descriptionFilterValue, { type: 'text',  filter: 'descriptionFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'description', displayProperty: 'description', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\r\n                    </th>\r\n                    <th class=\"hidden-xs hidden-sm\">\r\n                        <input value.bind=\"serverFilterValue\" input.delegate=\"dataTable.filterList(serverFilterValue, { type: 'text',  filter: 'serverFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'server', displayProperty: 'server', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\r\n                    </th>\r\n                    <th class=\"hidden-xs hidden-sm\"></th>\r\n                    <th class=\"hidden-xs hidden-sm\">\r\n                        <select value.bind=\"activeFilter\" input.delegate=\"dataTable.filterList($event, { type: 'boolean',  filter: 'activeFilter', collectionProperty: 'active', displayProperty: 'active', compare:'boolean'} )\" class=\"form-control\">\r\n                            <option value=\"\"></option>\r\n                            <option value=true>Active</option>\r\n                            <option value=false>Inactive</option>\r\n                        </select>\r\n                    </th>\r\n                    <th>\r\n                        <select value.bind=\"goldBackupFilter\" input.delegate=\"dataTable.filterList($event, { type: 'boolean',  filter: 'goldBackup', collectionProperty: 'goldBackup', displayProperty: 'goldBackup', compare:'boolean'} )\" class=\"form-control\">\r\n                            <option value=\"\"></option>\r\n                            <option value=true>Backup</option>\r\n                            <option value=false>No Backup</option>\r\n                        </select>\r\n                    </th>\r\n                    <th>\r\n                            <input type=\"date\" value.bind=\"goldBackupDateFilterValue\" input.delegate=\"dataTable.filterList(goldBackupDateFilterValue, {type: 'date', filter: 'goldBackupDate',  collectionProperty: 'goldBackupDate', compare: 'after'} )\"  class=\"form-control hidden-sm\" />\r\n                    </th>\r\n                    <th>\r\n                        <select value.bind=\"snapShotFilter\" input.delegate=\"dataTable.filterList($event, { type: 'boolean',  filter: '', collectionProperty: 'snapShot', displayProperty: 'snapShot', compare:'boolean'} )\" class=\"form-control\">\r\n                            <option value=\"\"></option>\r\n                            <option value=true>Snapshot</option>\r\n                            <option value=false>No Snapshot</option>\r\n                        </select>                        \r\n                    </th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"system of dataTable.displayArray\">\r\n                    <td click.trigger=\"edit($index, $event)\" data-title=\"SID\">${system.sid}</td>\r\n                    <td click.trigger=\"edit($index, $event)\" data-title=\"Description\">${system.description}</td>\r\n                    <td click.trigger=\"edit($index, $event)\"  class=\"hidden-xs hidden-sm\" data-title=\"Server\">${system.server}</td>\r\n                    <td click.trigger=\"edit($index, $event)\"  class=\"hidden-xs hidden-sm\" data-title=\"Instance\">${system.instance}</td>\r\n                    <td click.trigger=\"edit($index, $event)\"  class=\"hidden-xs hidden-sm\" data-title=\"Status\">${system.active | translateStatus}</td>\r\n                    <td  data-title=\"Gold\">\r\n                        <div class=\"checkbox\">\r\n                            <label>\r\n                                <input change.delegate=\"saveBackups(system)\" checked.bind=\"system.goldBackup\" type=\"checkbox\">\r\n                            </label>\r\n                        </div>\r\n                    </td>\r\n                    <td click.trigger=\"edit($index, $event)\" class=\"hidden-xs hidden-sm\" data-title=\"Gold Date\">${system.goldBackupDate | dateFormat}</td>\r\n                    <td  data-title=\"Snapshot\">\r\n                        <div class=\"checkbox\">\r\n                            <label>\r\n                                <input change.delegate=\"saveBackups(system)\" checked.bind=\"system.snapShot\" type=\"checkbox\">\r\n                            </label>\r\n                        </div>\r\n                    </td>\r\n\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n        </div>\r\n    </div>  \r\n</template>"; });
+define('text!modules/admin/system/components/systemTable.html', ['module'], function(module) { module.exports = "<template>\r\n <div class='col-lg-10 col-lg-offset-1'>\r\n\t<div id=\"no-more-tables\">\r\n        <table id=\"systemsTable\" class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr colspan='5'>\r\n                    <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                </tr>\r\n                <tr>\r\n                    <td colspan='5'>\r\n                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"new()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"_cleanUpFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\r\n                      <!--  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span> -->\r\n                    </td>\r\n                </tr>\r\n                <tr>\r\n                    <th style=\"width:100px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'sid'})\">SID </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'description'})\">Description </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'server'})\">Server </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                    <th class=\"hidden-xs hidden-sm\">Instance</th>\r\n                    <th class=\"hidden-xs hidden-sm\">Status</th>\r\n                    <th>Gold Backup</th>\r\n                    <th>Gold Backup Date</th>\r\n                    <th>Snapshot </th>\r\n                </tr>\r\n\r\n                <tr>\r\n                    <th>\r\n                        <input value.bind=\"sidFilterValue\" placeholder=\"SID\" input.delegate=\"dataTable.filterList(sidFilterValue, { type: 'text',  filter: 'sidFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'sid', displayProperty: 'sid', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\r\n                    </th>\r\n                    <th>\r\n                        <input value.bind=\"descriptionFilterValue\" placeholder=\"Description\" input.delegate=\"dataTable.filterList(descriptionFilterValue, { type: 'text',  filter: 'descriptionFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'description', displayProperty: 'description', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\r\n                    </th>\r\n                    <th class=\"hidden-xs hidden-sm\">\r\n                        <input value.bind=\"serverFilterValue\" input.delegate=\"dataTable.filterList(serverFilterValue, { type: 'text',  filter: 'serverFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'server', displayProperty: 'server', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\r\n                    </th>\r\n                    <th class=\"hidden-xs hidden-sm\"></th>\r\n                    <th class=\"hidden-xs hidden-sm\">\r\n                        <select value.bind=\"activeFilter\" input.delegate=\"dataTable.filterList($event, { type: 'boolean',  filter: 'activeFilter', collectionProperty: 'active', displayProperty: 'active', compare:'boolean'} )\" class=\"form-control\">\r\n                            <option value=\"\"></option>\r\n                            <option value=true>Active</option>\r\n                            <option value=false>Inactive</option>\r\n                        </select>\r\n                    </th>\r\n                    <th>\r\n                        <select value.bind=\"goldBackupFilter\" input.delegate=\"dataTable.filterList($event, { type: 'boolean',  filter: 'goldBackup', collectionProperty: 'goldBackup', displayProperty: 'goldBackup', compare:'boolean'} )\" class=\"form-control\">\r\n                            <option value=\"\"></option>\r\n                            <option value=true>Backup</option>\r\n                            <option value=false>No Backup</option>\r\n                        </select>\r\n                    </th>\r\n                    <th>\r\n                            <input type=\"date\" value.bind=\"goldBackupDateFilterValue\" input.delegate=\"dataTable.filterList(goldBackupDateFilterValue, {type: 'date', filter: 'goldBackupDate',  collectionProperty: 'goldBackupDate', compare: 'after'} )\"  class=\"form-control hidden-sm\" />\r\n                    </th>\r\n                    <th>\r\n                        <select value.bind=\"snapShotFilter\" input.delegate=\"dataTable.filterList($event, { type: 'boolean',  filter: '', collectionProperty: 'snapShot', displayProperty: 'snapShot', compare:'boolean'} )\" class=\"form-control\">\r\n                            <option value=\"\"></option>\r\n                            <option value=true>Snapshot</option>\r\n                            <option value=false>No Snapshot</option>\r\n                        </select>                        \r\n                    </th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"system of dataTable.displayArray\">\r\n                    <td click.trigger=\"edit($index, $event)\" data-title=\"SID\">${system.sid}</td>\r\n                    <td click.trigger=\"edit($index, $event)\" data-title=\"Description\">${system.description}</td>\r\n                    <td click.trigger=\"edit($index, $event)\"  class=\"hidden-xs hidden-sm\" data-title=\"Server\">${system.server}</td>\r\n                    <td click.trigger=\"edit($index, $event)\"  class=\"hidden-xs hidden-sm\" data-title=\"Instance\">${system.instance}</td>\r\n                    <td click.trigger=\"edit($index, $event)\"  class=\"hidden-xs hidden-sm\" data-title=\"Status\">${system.active | translateStatus}</td>\r\n                    <td  data-title=\"Gold\">\r\n                        <div class=\"checkbox\">\r\n                            <label>\r\n                                <input change.delegate=\"saveBackups(system)\" checked.bind=\"system.goldBackup\" type=\"checkbox\">\r\n                            </label>\r\n                        </div>\r\n                    </td>\r\n                    <td click.trigger=\"edit($index, $event)\" class=\"hidden-xs hidden-sm\" data-title=\"Gold Date\">${system.goldBackupDate | dateFormat}</td>\r\n                    <td  data-title=\"Snapshot\">\r\n                        <div class=\"checkbox\">\r\n                            <label>\r\n                                <input change.delegate=\"saveBackups(system)\" checked.bind=\"system.snapShot\" type=\"checkbox\">\r\n                            </label>\r\n                        </div>\r\n                    </td>\r\n\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n        </div>\r\n    </div>  \r\n</template>"; });
 define('text!modules/tech/requests/components/ArchiveRequestsForm.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>   \r\n    <span click.delegate=\"openFacultyDetails()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Details\"><i class=\"fa fa-user fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n    <span click.delegate=\"openSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Settings\"><i class=\"fa fa-cog fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n    <span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n  </div>\r\n  <div class=\"row leftMargin rightMargin\">\r\n    <div show.bind=\"!facultyDetails\" class=\"well col-lg-12\">\r\n       <div class=\"col-lg-4\">\r\n          <div class=\"col-lg-12\">\r\n            <h5>Request No: ${selectedRequestDetail.requestNo}</h5>\r\n          </div>\r\n          <div class=\"col-lg-12\">\r\n            <h5>Required Date: ${selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\r\n          </div>\r\n          <div class=\"col-lg-12\">\r\n              <h5>Product: ${selectedRequestDetail.productId.name}</h5>\r\n          </div>\r\n          <div class=\"col-lg-12\">\r\n            <h5>Course: ${selectedRequestDetail.requestId.courseId.name}</h5>\r\n          </div>\r\n        </div>\r\n         <div class=\"col-lg-4\">\r\n            <div class=\"col-lg-12\">\r\n              <h5>Faculty: ${selectedRequestDetail.requestId.personId.fullName}</h5>\r\n            </div>\r\n            <div class=\"col-lg-12\">\r\n              <h5>Email: ${selectedRequestDetail.requestId.personId.email}</h5>\r\n            </div>\r\n            <div class=\"col-lg-12\">\r\n              <h5>Institution: ${selectedRequestDetail.requestId.institutionId.name}</h5>\r\n            </div>\r\n            <div class=\"col-lg-12\">\r\n              <h5>Phone: ${selectedRequestDetail.requestId.personId.phone | phoneNumber} Mobile: ${selectedRequestDetail.requestId.personId.mobile | phoneNumber}</h5>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-lg-4\">\r\n          <div class=\"col-lg-12\">\r\n              <h5><strong>IDs Required: ${idsRequired}</strong></h5>\r\n          </div>\r\n            <div class=\"col-lg-12\">\r\n              <h5><strong>IDs Assigned: ${totalIdsAssigned}</strong></h5>\r\n          </div>\r\n            <div class=\"col-lg-12\">\r\n              <h5><strong>IDs Remaining: ${idsRemaining}</strong></h5>\r\n          </div>\r\n        </div>\r\n    </div>\r\n    \r\n  </div>\r\n  <div show.bind=\"showAudit\">\r\n    <table class=\"table table-striped table-hover\">\r\n      <thead>\r\n        <tr>\r\n          <th>Date</th>\r\n          <th>Property</th>\r\n          <th>Old Value</th>\r\n          <th>New Value</th>\r\n          <th>Person</th>\r\n        </tr>\r\n      </thead>\r\n      <tbody>\r\n        <tr  repeat.for=\"item of selectedRequestDetail.requestId.audit\">\r\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n          <td>${item.property}</td>\r\n          <td>${item.oldValue}</td>\r\n          <td>${item.newValue}</td>\r\n          <td>${item.personId | lookupValue:people.uccPeople:\"_id\":\"fullName\"}</td>\r\n        </tr>\r\n      </tbody>\r\n    </table>\r\n  </div>\r\n    \r\n  <div show.bind=\"!showAudit\" class=\"row\">\r\n    <div class=\"row leftMargin rightMargin\">\r\n      <table id=\"assignmentTable\" class=\"table table-striped table-hover\">\r\n        <thead>\r\n          <tr>\r\n            <th class=\"col-sm-1\">System</th>\r\n            <th class=\"col-sm-1\">Client</th>\r\n            <th class=\"col-sm-1\">Assigned IDs</th>\r\n            <th>Student IDs</th>\r\n            <th>Student Password</th>\r\n            <th>Faculty IDs</th>\r\n            <th>Faculty Password</th>\r\n            <th>Assigned Date</th>\r\n            <th>Status</th>\r\n            <th></th>\r\n          </tr>\r\n        </thead>\r\n        <tbody>\r\n          <tr class=\"dropbtn\" click.trigger=\"selectProposedClient($index, $event)\" repeat.for=\"client of assignmentDetails\" class=\"${client.notValid}\">\r\n            <td>${client.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</td>\r\n            <td>${client.client}</td>\r\n            <td>${client.idsAssigned}</td>\r\n            <td>${client.studentUserIds}</td>\r\n            <td>${client.studentPassword}</td>\r\n            <td>${client.facultyUserIds}</td>\r\n            <td>${client.facultyPassword}</td>\r\n            <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n            <td>${client.notValid | overlap}\r\n            <td><span click.delegate=\"deleteProposedClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></span></td>\r\n          </tr>\r\n        </tbody>\r\n      </table>\r\n    </div>\r\n  </div>\r\n  \r\n  <div show.bind=\"!showAudit\" class=\"row leftMargin\">\r\n    <div class=\"panel panel-default col-lg-5 leftMargin\">\r\n      <div class=\"panel-body\">\r\n        <h3>Request Details</h3>\r\n          <h5 class=\"topMargin\">Product: ${selectedRequestDetail.productId.name}</h5>\r\n          <h5 class=\"topMargin\">Required Date: ${selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\r\n          <h5 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Undergraduates: ${selectedRequestDetail.requestId.undergradIds}</h5>\r\n          <h5 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Graduates: ${selectedRequestDetail.requestId.graduateIds}</h5>\r\n          <h5 class=\"topMargin\">Begin Date: ${selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\r\n          <h5 class=\"topMargin\">End Date: ${selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\r\n          <div if.bind=\"selectedRequestDetail.requestId.comments.length > 0\" class=\"row topMargin\">\r\n            <div class=\"col-sm-12\">\r\n              <div class=\"form-group\">\r\n                <h5 >Comments:</h5>\r\n                <div class=\"topMargin\"  innerhtml.bind=\"selectedRequestDetail.requestId.comments\" ></div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n      </div>\r\n    </div>\r\n<!-- show.bind=\"requests.selectedRequestDetail.assignments.length > 0\" -->\r\n \r\n    <div  class=\"panel panel-default col-lg-6 rightMargin leftMargin\">\r\n      <div class=\"panel-body\">\r\n\t\t  <!-- show.bind=\"requests.selectedRequestDetail.requestStatus == config.ASSIGNED_REQUEST_CODE\" -->\r\n      <div  class=\"panel panel-primary topMargin\">\r\n        <div class=\"panel-body\">  \r\n\r\n          <table class=\"table table-striped table-hover\">\r\n            <thead>\r\n              <tr>\r\n                <th>System</th>\r\n                <th>Client</th>\r\n                <th>Student IDs</th>\r\n                <th>Student Password</th>\r\n              </tr>\r\n            </thead>\r\n            <tbody>\r\n              <tr repeat.for=\"assign of selectedRequestDetail.assignments\" click.trigger=\"selectAssignment(assign, $index)\">\r\n                <td>${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</td>\r\n                <td>${assign.client}</td>\r\n                <td>${assign.studentUserIds}</td>\r\n                <td>${assign.studentPassword}</td>\r\n              </tr>\r\n            </tbody>\r\n          </table>\r\n         \r\n          <h4 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\"><strong>Faculty IDs</strong></h4>\r\n          <div class=\"form-group\">\r\n            <h5 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"panel-title\">Faculty IDs: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</h3>\r\n          </div>\r\n          <div class=\"form-group\">\r\n            <h5 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"panel-title\">Faculty Password: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</h5>\r\n          </div>\r\n       \r\n          <h4 class=\"bigTopMargin\"><strong>System Details</strong></h4>\r\n          <div class=\"form-group\">\r\n            <h5 class=\"panel-title\">SID: ${systems.selectedSystem.sid}</h3>\r\n          </div>\r\n          <div class=\"form-group\">\r\n            <h5 class=\"panel-title\">Server: ${systems.selectedSystem.server}</h3>\r\n          </div>\r\n          <div class=\"form-group\">\r\n            <h5 class=\"panel-title\">System Number: ${systems.selectedSystem.instance}</h3>\r\n          </div>\r\n          <div class=\"form-group\">\r\n            <h5 class=\"panel-title\">ITS: ${systems.selectedSystem.its}</h3>\r\n          </div>\r\n          <label show.bind=\"products.selectedProduct.documents && products.selectedProduct.documents.length > 0\" class=\"topMargin\">Helpful Documents</label>\r\n          <div class=\"list-group\">\r\n            <a repeat.for=\"document of products.selectedProduct.documents\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}\"  target=\"_blank\">${document.fileName}</a>\r\n          </div>\r\n          <label show.bind=\"requests.selectedRequestDetail.techComments && requests.selectedRequestDetail.techComments.length > 0\" class=\"topMargin\">Assignment Comments</label>\r\n          <div show.bind=\"requests.selectedRequestDetail.techComments && requests.selectedRequestDetail.techComments.length > 0\" class=\"col-lg-12 topMargin well overFlow\" innerhtml.bind=\"requests.selectedRequestDetail.techComments\"></div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n    </div>\r\n  </div>\r\n  </div>\r\n</template>"; });
 define('text!modules/tech/requests/components/ArchiveRequestsTable.html', ['module'], function(module) { module.exports = "<template>\r\n\t  <div class=\"row\">\r\n      <!-- Session Select -->\r\n      <div class=\"col-lg-4\">\r\n        <div class=\"form-group topMargin leftMargin\">\r\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\r\n              <option repeat.for=\"session of sessions.sessionsArray\"\r\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\r\n            </select>\r\n        </div>\r\n      </div>\r\n    </div>\r\n\r\n      <div show.bind=\"selectedSession\">\r\n        <div class=\"row\">\r\n          <div class=\"col-lg-12\">\r\n            <compose view=\"./archiveTable.html\"></compose>\r\n          </div>\r\n      </div>\r\n  </div>\r\n</template>"; });
 define('text!modules/tech/requests/components/archiveTable.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"col-lg-12 letMargin rightMargin\">\r\n      <table id=\"requestsTable\" class=\"table table-striped table-hover\">\r\n        <thead>\r\n          <tr>\r\n            <td colspan='9'>\r\n              <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n            </td>\r\n          </tr>\r\n          <tr>\r\n            <td colspan='9'>\r\n              <span click.delegate=\"refresh()\"class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n              <span click.delegate=\"clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\r\n              <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n            </td>\r\n            <td></td>\r\n          </tr>\r\n          <tr>\r\n           <!-- <th class=\"col-xs-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requestNo'})\">No </span><span><i class=\"fa fa-sort\"></i></span></th> -->\r\n            <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requiredDate'})\">Due </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n            <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\">Created </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n            <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customRequestStatusSorter, propertyName: 'requestStatus'})\">Status </span><i class=\"fa fa-sort\"></i></th>   \r\n            <th class=\"col-sm-1\">IDS Requestd</th>\r\n            <th class=\"col-lg-2\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'productId.name'})\">Product </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n            <th class=\"col-lg-2\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customCourseSorter, propertyName: 'requestId.courseId.name'})\">Course </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n            <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customPersonSorter, propertyName: 'requestId.personId.lastName'})\">Faculty </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n            <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customInstitutionsSorter, propertyName: 'requestId.institutionId'})\">Institution </span><i class=\"fa fa-sort\"></i></th>\r\n            \r\n          </tr>\r\n        </thead>\r\n        <tbody>\r\n          <tr>\r\n            <th>\r\n              <input type=\"date\" value.bind=\"requiredDateFilterValue\" input.delegate=\"dataTable.filterList(requiredDateFilterValue, {type: 'date', filter: 'requiredDate',  collectionProperty: 'requiredDate', compare: 'after'} )\"  class=\"form-control\" />\r\n            </th>\r\n            <th>\r\n              <input type=\"date\" value.bind=\"createdDateFilterValue\" input.delegate=\"dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )\"  class=\"form-control\" />\r\n            </th>\r\n            <th>\r\n              <select value.bind=\"requestStatusFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'requestStatusFilter',  collectionProperty: 'requestStatus', displayProperty: 'requestStatus',  compare:'match'} )\" class=\"form-control\">\r\n                <option value=\"\"></option>\r\n                <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\r\n              </select>\r\n            </th>\r\n            <th></th>\r\n            <th>\r\n              <input value.bind=\"productFilterValue\" input.delegate=\"dataTable.filterList(productFilterValue, { type: 'custom',  filter: customProductNameFilter,  compare:'custom'} )\"  class=\"form-control\" />\r\n            </th>\r\n            <th>\r\n              <input value.bind=\"courseFilterValue\" input.delegate=\"dataTable.filterList(courseFilterValue, { type: 'custom',  filter: courseCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n            </th>\r\n            <th>\r\n              <input value.bind=\"helpTicketTypeFilterValue\" input.delegate=\"dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )\"  class=\"form-control\" />\r\n            </th>\r\n            <th>\r\n              <input value.bind=\"institutionFilterValue\" input.delegate=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n            </th>\r\n           \r\n          </tr>\r\n          <tr click.delegate=\"selectARequest($index, $event, request)\" repeat.for=\"request of dataTable.displayArray\" class=\"${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}\">\r\n            <td  data-title=\"requiredDate\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n            <td  data-title=\"dateCreated\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n            <td  data-title=\"status\">${request.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</td>\r\n            <td  data-title=\"ids-requested\">${request.requestId | idsRequested}\r\n            <td  data-title=\"product\">${request.productId.name}</td>\r\n            <td data-title=\"Course\">${request.requestId.courseId.name}</td>\r\n            <td  data-title=\"Name\">${request.requestId.personId.fullName} </td>\r\n            <td data-title=\"Name\">${request.requestId.institutionId.name}</td>\r\n          </tr>\r\n        </tbody>\r\n      </table>\r\n    </div>\r\n  </div>\r\n</template>"; });

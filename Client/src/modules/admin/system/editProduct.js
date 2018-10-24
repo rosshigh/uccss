@@ -18,7 +18,7 @@ export class EditProducts {
     showDocuments = false;
     selectedFiles;
     removedFiles = new Array();
-    spinnerHTML = "";
+    // spinnerHTML = "";
 
     tabs = [{id: 'Assignments'}, {id: 'Systems'}, {id: 'is4ua'}, {id: 'Documents'}, {id: 'Notes'}, {id: 'Description'}];
     tabPath = './';
@@ -50,11 +50,9 @@ export class EditProducts {
         this.systemChanges = new Array();
     }
 
-    attached(){
+    async attached(){
         $('[data-toggle="tooltip"]').tooltip();
-    }
-
-    async activate() {
+        $('#loading').show();
         let responses = await Promise.all([
             this.products.getProductsArray('?order=name', true),
             this.systems.getSystemsArray('?order=sid', true),
@@ -65,13 +63,20 @@ export class EditProducts {
         this.dataTable.updateArray(this.products.productsArray);
         this.filteredDocumentArray = this.documents.docCatsArray;
         this.dataTable.createPageButtons(1);
+        $('#loading').hide();
+    }
+
+    async activate() {
+
     }
 
     async refresh() {
-        this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+        // this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+        $('#loading').show();
         await this.products.getProductsArray('?order=name', true);
         this.dataTable.updateArray(this.products.productsArray);
-        this.spinnerHTML = "";
+        // this.spinnerHTML = "";
+        $('#loading').hide();
     }
 
     async new() {

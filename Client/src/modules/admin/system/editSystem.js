@@ -14,7 +14,7 @@ import moment from 'moment';
 export class EditSystem {
     systemSelected = false;
     editClients = false;
-    spinnerHTML = "";
+    // spinnerHTML = "";
     selectedProduct = "";
 
     dateConfig = {wrap: true};
@@ -33,11 +33,8 @@ export class EditSystem {
         this._setupValidation();
     }
 
-    attached(){
-        $('[data-toggle="tooltip"]').tooltip();
-    }
-
-    async activate() {
+    async attached(){
+        $('#loading').show();
         let responses = await Promise.all([
             this.systems.getSystemsArray('?order=sid'),
             this.products.getProductsArray('?filter=active|eq|true&order=name'),
@@ -47,13 +44,21 @@ export class EditSystem {
         ]);
         this.dataTable.updateArray(this.systems.systemsArray);
         this.clientInterval = this.config.CLIENT_INTERVAL
+        $('#loading').hide();
+        $('[data-toggle="tooltip"]').tooltip();
+    }
+
+    async activate() {
+
     }
 
     async refresh() {
-        this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+        // this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+        $('#loading').show();
         await this.systems.getSystemsArray('?order=sid', true);
         this.dataTable.updateArray(this.systems.systemsArray);
-        this.spinnerHTML = "";
+        // this.spinnerHTML = "";
+        $('#loading').hide();
         this. _cleanUpFilters();
     }
 

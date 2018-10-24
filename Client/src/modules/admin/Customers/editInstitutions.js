@@ -11,7 +11,7 @@ import $ from 'jquery';
 @inject(DataTable, AppConfig, People, Utils, is4ua, CommonDialogs, Validation) 
 export class EditInstitutions {
     institutionSelected = false;
-    spinnerHTML = "";
+    // spinnerHTML = "";
 
     tabs = [ {id: 'instAddress', title: 'Address'}, {id: 'instPeople', title: 'People'}, {id: 'instIs4ua', title: "IS4UA"}];
     tabPath = './';
@@ -33,11 +33,9 @@ export class EditInstitutions {
 		this.userObj = JSON.parse(sessionStorage.getItem('user'));
     }
 
-    attached(){
+    async attached(){
         $('[data-toggle="tooltip"]').tooltip();
-    }
-
-    async activate() {
+        $('#loading').show();
         let responses = await Promise.all([
             this.people.getPeopleArray('?order=lastName'),
             this.people.getInstitutionsArray('?order=name'),
@@ -45,13 +43,20 @@ export class EditInstitutions {
         ]);
 
         this.dataTable.updateArray(this.people.institutionsArray);
+        $('#loading').hide();
+    }
+
+    async activate() {
+      
     }
 
     async refresh(){
-        this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+        // this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+        $('#loading').show();
         await this.people.getInstitutionsArray('?order=name', true);
         this.dataTable.updateArray(this.people.institutionArray);
-        this.spinnerHTML = "";
+        // this.spinnerHTML = "";
+        $('#loading').hide();
     }
 
     edit(index, el){

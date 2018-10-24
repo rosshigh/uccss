@@ -18,7 +18,7 @@ export class EditPeople {
     youSelectedAnEmail = false;
     emailSubject = "";
     emailMessage = "";
-    spinnerHTML = "";
+    // spinnerHTML = "";
     phoneMask = "";
 
     tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'Audit' },{id: "Email"},{id: "Log"}];
@@ -48,38 +48,57 @@ export class EditPeople {
     }
 
     async activate() {
-        let responses = await Promise.all([
-            this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01'),
-            this.people.getInstitutionsArray('?order=name', true),
-            this.is4ua.loadIs4ua(),
-            this.config.getConfig()
-        ]);
-        this.activeFilterValue = "01";
-        this.filteredArray = this.config.ROLES;
-        this.dataTable.updateArray(this.people.peopleArray);
-		this._setupValidation();
+        // $('#loading').show();
+        // let responses = await Promise.all([
+        //     this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01'),
+        //     this.people.getInstitutionsArray('?order=name', true),
+        //     this.is4ua.loadIs4ua(),
+        //     this.config.getConfig()
+        // ]);
+        
+        // this.activeFilterValue = "01";
+        // this.filteredArray = this.config.ROLES;
+        // this.dataTable.updateArray(this.people.peopleArray);
+		// this._setupValidation();
     }
 
     async filterActive(){
         this._clearFilters()
+        $('#loading').show();
 		if( this.activeFilterValue == "") {
 			await this.people.getPeopleArray('?order=lastName', true);
 		} else {
 			await this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|' + this.activeFilterValue, true); 
 		}
         this.dataTable.updateArray(this.people.peopleArray);
+        $('#loading').hide();
     }
 
-    attached() {
+    async attached() {
         $('[data-toggle="tooltip"]').tooltip();
+        $('#loading').show();
+        let responses = await Promise.all([
+            this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01'),
+            this.people.getInstitutionsArray('?order=name', true),
+            this.is4ua.loadIs4ua(),
+            this.config.getConfig()
+        ]);
+        
+        this.activeFilterValue = "01";
+        this.filteredArray = this.config.ROLES;
+        this.dataTable.updateArray(this.people.peopleArray);
+		this._setupValidation();
+        $('#loading').hide();
     }
 
     async refresh() {
         this._cleanUpFilters();
-        this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+        // this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+        $('#loading').show();
         await this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01', true),
         this.dataTable.updateArray(this.people.peopleArray);
-        this.spinnerHTML = "";
+        // this.spinnerHTML = "";
+        $('#loading').hide();
     }
 
 	edit(index, el) {
