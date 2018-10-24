@@ -1101,12 +1101,18 @@ export class Assignments {
         this._cleanUp();
     }
 
-    viewAssignment(index, request) {
+    async viewAssignment(index, request) {
         this.editIndex = index;
-        this.selectedRequestDetail = this.utils.copyObject(request);
-        this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
-        if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
-        this.requestSelected = 'view';
+        // this.selectedRequestDetail = this.utils.copyObject(request);
+        let response = await this.clientRequests.getRequestDetail(request._id);
+        if (!response.error) {
+            this.selectedRequestDetail = response;
+            if (this.selectedRequestDetail.requestId && this.selectedRequestDetail.requestId.courseId === null) this.selectedRequestDetail.requestId.courseId = { _id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME };
+            this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
+            if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
+            this.requestSelected = 'view';
+        }
+
     }
 
     backView() {
