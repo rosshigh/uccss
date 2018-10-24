@@ -69,6 +69,7 @@ export class Assignments {
 
     async getRequests() {
         if (this.selectedSession) {
+            this.isCheckedAssigned = true;
             this.sessions.selectSessionById(this.selectedSession);
             await this.filterInAssigned();
         } else {

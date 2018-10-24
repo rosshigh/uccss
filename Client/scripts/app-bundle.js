@@ -30768,25 +30768,26 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                         switch (_context3.prev = _context3.next) {
                             case 0:
                                 if (!this.selectedSession) {
-                                    _context3.next = 6;
+                                    _context3.next = 7;
                                     break;
                                 }
 
+                                this.isCheckedAssigned = true;
                                 this.sessions.selectSessionById(this.selectedSession);
-                                _context3.next = 4;
+                                _context3.next = 5;
                                 return this.filterInAssigned();
 
-                            case 4:
-                                _context3.next = 7;
+                            case 5:
+                                _context3.next = 8;
                                 break;
 
-                            case 6:
+                            case 7:
                                 this.displayArray = new Array();
 
-                            case 7:
+                            case 8:
                                 this.clearFilters();
 
-                            case 8:
+                            case 9:
                             case 'end':
                                 return _context3.stop();
                         }
