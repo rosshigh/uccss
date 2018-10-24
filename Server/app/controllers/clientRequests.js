@@ -468,7 +468,7 @@ module.exports = function (app) {
     console.log('is this it')
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
-      .select('requestStatus requiredDate createdDate requestId productId assignments')
+      .select('requestStatus requiredDate createdDate requestId productId assignments.systemId assignments.client')
       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country'}})
       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
