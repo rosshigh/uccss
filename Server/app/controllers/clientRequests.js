@@ -522,7 +522,7 @@ module.exports = function (app) {
             if(item.requestId){
               if(item.requestId && item.requestId.personId){
                 result.push({
-                  requestId: {clientRequestsDetails: {fullName: item.requestId.personId.fullName}, institutionId: item.requestId.institutionId, undergradIds: item.requestId.undergradIds, undergradIds: item.requestId.undergradIds},
+                  requestId: {clientRequestsDetails: {fullName: item.requestId.personId.fullName}, institutionId: item.requestId.institutionId, graduateIds: item.requestId.graduateIds, undergradIds: item.requestId.undergradIds},
                   requestStatus: item.requestStatus,
                   productId: item.productId
                 });

@@ -459,7 +459,7 @@ export class ClientRequests {
                 return result;
             });
 
-        this.analyticsInstitutionCountryResultArray = new Array();
+        this.analyticsInstitutionCountryResultArray = new Array(); 
         var instID = "";
         var templateObj = new Object();
         var that = this;
@@ -474,10 +474,12 @@ export class ClientRequests {
                     obj.productName = item.productId.name;
                     obj.country = item.requestId.institutionId.country;
                     obj.total = 0;
+                    obj.students = 0;
                     that.analyticsInstitutionCountryResultArray.push(obj);
                 }
                 // if(item.requestStatus != skip){
                     that.analyticsInstitutionCountryResultArray[that.analyticsInstitutionCountryResultArray.length-1]['total'] += 1;
+                    that.analyticsInstitutionCountryResultArray[that.analyticsInstitutionCountryResultArray.length-1]['students'] += parseInt(item.requestId.undergradIds) + parseInt(item.requestId.graduateIds);
                     // var gradIds = item.requestId.graduateIds != null ? parseInt(item.requestId.graduateIds) : 0;
                     // var underIds = item.requestId.undergradIds != null ? parseInt(item.requestId.undergradIds) : 0;
                     // that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['studentIds'] += gradIds + underIds;

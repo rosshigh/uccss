@@ -13,7 +13,8 @@
                     <th>Person</th>
                     <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'country'})">Country </span><i class="fa fa-sort"></i></th>
 					<th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'productName'})">Product </span><i class="fa fa-sort"></i></th>
-                    <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'total'})">Total  </span><span><i class="fa fa-sort"></i></span></th>
+                    <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'total'})">Clients  </span><span><i class="fa fa-sort"></i></span></th>
+                    <th>Student IDs</th>
                 </tr>
                  <tr>
                     <th>
@@ -27,6 +28,7 @@
                             <input value.bind="productNameFilterValue" input.delegate="dataTable.filterList(productNameFilterValue, { type: 'text',  filter: 'productNameFilter', collectionProperty: 'productName', displayProperty: 'productName',  compare:'match'} )"  class="form-control" />
                     </th>
                     <th></th> 
+                    <th></th> 
                 </tr>
             </thead>
             <tbody>
@@ -36,6 +38,7 @@
 					<td data-title="Country" style="width:100px;">${stat.country}</td>
 					<td data-title="Product">${stat.productName}</td>
                     <td data-title="Total">${stat.total | formatNumber}</td>
+                    <td data-title="IDs">${stat.students}</td>
                 </tr>
             </tbody>
         </table>

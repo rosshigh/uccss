@@ -731,10 +731,10 @@ export class ClientRequestAnalytics {
     }
 
     downloadAllInstitutionCountriesExcel(){
-        let csvContent = "data:text/csv;charset=utf-8;,Institution,Country,Product,Total";
+        let csvContent = "data:text/csv;charset=utf-8;,Institution,Faculty,Country,Product,Clients,Students";
         csvContent +=  "\r\n";
         this.dataTable.baseArray.forEach(item => { 
-            csvContent +=  item.name + "," + item.country+ "," + item.productName + "," + item.total;
+            csvContent +=  item.name.replace(","," ") + "," + item.person.replace(","," ") + "," + item.country + "," + item.productName.replace(","," ") + "," + item.total + "," + item.students;
             csvContent +=  "\r\n";
         });
 
