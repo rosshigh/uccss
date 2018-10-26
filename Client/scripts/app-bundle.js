@@ -23957,9 +23957,10 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.downloadInstExcel = function downloadInstExcel() {
-            var csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,Phone,Institution\r\n";
+            var csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,Phone,Institution,Country,Region,Status,Roles\r\n";
             this.dataTable.baseArray.forEach(function (item) {
-                csvContent += item.firstName + "," + item.lastName.replace(',', ' ') + "," + item.email + "," + item.phone + "," + item.institutionId.name;
+                var isActive = item.personStatus == '01' ? 'Active' : 'Inactive';
+                csvContent += item.firstName + "," + item.lastName.replace(',', ' ') + "," + item.email + "," + item.phone + "," + item.institutionId.name.replace(",", " ") + "," + item.country + "," + item.region + "," + isActive + "," + item.roles.join(":");
                 csvContent += "\r\n";
             });
             var encodedUri = encodeURI(csvContent);

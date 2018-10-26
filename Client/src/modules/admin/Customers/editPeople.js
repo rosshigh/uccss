@@ -549,9 +549,18 @@ export class EditPeople {
     }
 
     downloadInstExcel(){
-        let csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,Phone,Institution\r\n";
+        let csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,Phone,Institution,Country,Region,Status,Roles\r\n";
         this.dataTable.baseArray.forEach(item => {
-            csvContent += item.firstName + "," + item.lastName.replace(',',' ') + "," + item.email + "," + item.phone + "," + item.institutionId.name ;
+            let isActive = item.personStatus == '01' ? 'Active' : 'Inactive';
+            csvContent += item.firstName + "," 
+                + item.lastName.replace(',',' ') + "," 
+                + item.email + "," 
+                + item.phone + "," 
+                + item.institutionId.name.replace(","," ") + ","
+                + item.country + ","
+                + item.region + ","
+                + isActive + ","
+                + item.roles.join(":") ;
             csvContent +=  "\r\n";
         })
         var encodedUri = encodeURI(csvContent);
