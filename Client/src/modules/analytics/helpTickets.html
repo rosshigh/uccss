@@ -5,33 +5,40 @@
 			background-color:${config.SUBMENU_BACKGROUND}
         }
     </style>
-    <div class="col-lg-2">
-		<h4>Categories</h4>
-		<div>
-			<ul class="list-group">
-				<button click.trigger="typeChanged(category, $event)" type="button"  repeat.for="category of categories"
-					id="${category.code}" class="${$first ? 'list-group-item menuButtons categoryButtons' : 'list-group-item categoryButtons'}">${category.description}</button>
-			</ul>
-		</div>
-	</div>
+    <span id="loading">
+        <ul class="bokeh">
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </span>
+    <div show.bind="dataTable.displayArray && dataTable.displayArray.length" class="col-lg-2">
+        <h4>Categories</h4>
+        <div>
+            <ul class="list-group">
+                <button click.trigger="typeChanged(category, $event)" type="button" repeat.for="category of categories"
+                    id="${category.code}" class="${$first ? 'list-group-item menuButtons categoryButtons' : 'list-group-item categoryButtons'}">${category.description}</button>
+            </ul>
+        </div>
+    </div>
 
-    <div class="panel panel-default rightMargin leftMargin col-lg-9">
-      <div class="panel-body">
-        <div show.bind="selectedTab === 'types'" >
-            <compose view="./components/helpTicketsByType.html"></compose>
+    <div show.bind="dataTable.displayArray && dataTable.displayArray.length" class="panel panel-default rightMargin leftMargin col-lg-9">
+        <div class="panel-body">
+            <div show.bind="selectedTab === 'types'">
+                <compose view="./components/helpTicketsByType.html"></compose>
+            </div>
+            <div show.bind="selectedTab === 'curriculum'">
+                <compose view="./components/helpTicketsByCurriculum.html"></compose>
+            </div>
+            <div show.bind="selectedTab === 'institutions'">
+                <compose view="./components/helpTicketsByInstitution.html"></compose>
+            </div>
+            <div show.bind="selectedTab === 'people'">
+                <compose view="./components/helpTicketsByPeople.html"></compose>
+            </div>
+            <div show.bind="selectedTab === 'status'">
+                <compose view="./components/helpTicketsByStatus.html"></compose>
+            </div>
         </div>
-        <div show.bind="selectedTab === 'curriculum'">
-            <compose view="./components/helpTicketsByCurriculum.html"></compose>
-        </div>
-        <div show.bind="selectedTab === 'institutions'">
-            <compose view="./components/helpTicketsByInstitution.html"></compose>
-        </div>
-         <div show.bind="selectedTab === 'people'">
-            <compose view="./components/helpTicketsByPeople.html"></compose>
-        </div>
-        <div show.bind="selectedTab === 'status'">
-            <compose view="./components/helpTicketsByStatus.html"></compose>
-        </div>
-      </div> 
     </div>
 </template>

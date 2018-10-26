@@ -520,11 +520,13 @@ module.exports = function (app) {
           var result = [];
           object.forEach(item => {
             if(item.requestId){
-              result.push({
-                requestId: {clientRequestsDetails: {fullName: item.requestId.personId.fullName}, institutionId: item.requestId.institutionId, undergradIds: item.requestId.undergradIds, undergradIds: item.requestId.undergradIds},
-                requestStatus: item.requestStatus,
-                productId: item.productId
-              });
+              if(item.requestId && item.requestId.personId){
+                result.push({
+                  requestId: {clientRequestsDetails: {fullName: item.requestId.personId.fullName}, institutionId: item.requestId.institutionId, undergradIds: item.requestId.undergradIds, undergradIds: item.requestId.undergradIds},
+                  requestStatus: item.requestStatus,
+                  productId: item.productId
+                });
+              }
             }
           });
           res.status(200).json(result);

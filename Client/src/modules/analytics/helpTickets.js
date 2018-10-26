@@ -55,11 +55,9 @@ export class HelpTicketAnalytics {
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
     };
 
-    attached() {
+    async attached() {
         $('[data-toggle="tooltip"]').tooltip();
-    }
-
-    async activate() {
+        $('#loading').show();
         let responses = await Promise.all([
             this.helpTickets.getHelpTicketTypes(),
             this.config.getConfig(),
@@ -68,13 +66,19 @@ export class HelpTicketAnalytics {
         this.selectedCategory = this.categories[0];
         this.getTypeHelpTickets();
         this.selectedTab = "types";
+        $('#loading').hide();
+    }
+
+    async activate() {
+
 		// this.getInstitutionHelpTickets();
         // this.getCurriculumHelpTickets();
         // this.getPeopleHelpTickets();
 		// this.getStatusHelpTickets();
     }
 
-    typeChanged(category, el){
+    async typeChanged(category, el){
+        $('#loading').show();
        this.selectedCategory = category;
         $('.categoryButtons').css("background-color","");
         $('.categoryButtons').css("color","");
@@ -109,6 +113,7 @@ export class HelpTicketAnalytics {
 				this.selectedTab = 'status'
 				break;
         }
+        $('#loading').hide();
     }
 
     async getTypeHelpTickets(){

@@ -470,6 +470,7 @@ export class ClientRequests {
                     var obj = that.utils.copyObject(templateObj);
                     obj.name = item.requestId.institutionId.name;
                     obj.institutionId = item.requestId.institutionId._id;
+                    obj.person = item.requestId.clientRequestsDetails.fullName;
                     obj.productName = item.productId.name;
                     obj.country = item.requestId.institutionId.country;
                     obj.total = 0;

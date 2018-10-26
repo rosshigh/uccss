@@ -59,11 +59,9 @@ export class ClientRequestAnalytics {
         this.chartCount = 10;
     };
 
-    attached() {
+    async attached() {
         $('[data-toggle="tooltip"]').tooltip();
-    }
-
-    async activate() {
+        $('#loading').show();
         let responses = await Promise.all([
             this.sessions.getSessionsArray('?order=startDate', true),
             this.people.getInstitutionsArray('?order=name'),
@@ -77,9 +75,15 @@ export class ClientRequestAnalytics {
         await this.getInstitutionRequests();
         this.dataTable.updateArray(this.requests.analyticsInstitutionResultArray);
         this.institutionChartDataFunction();
+        $('#loading').hide();
+    }
+
+    async activate() {
+
     }
 
     async typeChanged(category, el){
+        $('#loading').show();
         this.selectedCategory = category;
         $('.categoryButtons').css("background-color","");
          $('.categoryButtons').css("color","");
@@ -117,6 +121,7 @@ export class ClientRequestAnalytics {
                 this.getInstitutionsProductsCountryRequests();             
                 this.dataTable.updateArray(this.requests.analyticsInstitutionCountryResultArray);
         }
+        $('#loading').hide();
     }
 
 

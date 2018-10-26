@@ -5,41 +5,48 @@
 			background-color:${config.BUTTONS_BACKGROUND}
         }
     </style>
-    <div class="col-lg-2">
-		<div>
-			<ul class="list-group">
-				<button click.trigger="typeChanged(category, $event)" type="button"  repeat.for="category of categories"
-					id="${category.code}" class="${$first ? 'list-group-item menuButtons categoryButtons' : 'list-group-item categoryButtons'}">${category.description}</button>
-			</ul>
-		</div>
-	</div>
-
-    <div class="panel panel-default rightMargin leftMargin col-lg-9">
-      <div class="panel-body">
-            <div class="row">
-      <!-- Session Select -->
-      <div class="col-lg-4">
-        <div class="form-group topMargin leftMargin">
-            <select value.bind="selectedSession" change.delegate="getSessionData()" id="session" class="form-control">
-              <option repeat.for="session of sessions.sessionsArray"
-                      value.bind="session._id">Session ${session.session} - ${session.year}</option>
-            </select>
+    <span id="loading">
+        <ul class="bokeh">
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </span>
+    <div show.bind="dataTable.displayArray && dataTable.displayArray.length" class="col-lg-2">
+        <div>
+            <ul class="list-group">
+                <button click.trigger="typeChanged(category, $event)" type="button" repeat.for="category of categories"
+                    id="${category.code}" class="${$first ? 'list-group-item menuButtons categoryButtons' : 'list-group-item categoryButtons'}">${category.description}</button>
+            </ul>
         </div>
-      </div>
     </div>
-        <div class="row">
-            <div show.bind="selectedCategory.code === 0">
-                <compose view="./components/requestsByInstitution.html"></compose>
+
+    <div show.bind="dataTable.displayArray && dataTable.displayArray.length" class="panel panel-default rightMargin leftMargin col-lg-9">
+        <div class="panel-body">
+            <div class="row">
+                <!-- Session Select -->
+                <div class="col-lg-4">
+                    <div class="form-group topMargin leftMargin">
+                        <select value.bind="selectedSession" change.delegate="getSessionData()" id="session" class="form-control">
+                            <option repeat.for="session of sessions.sessionsArray" value.bind="session._id">Session
+                                ${session.session} - ${session.year}</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-             <div show.bind="selectedCategory.code === 1">
-                <compose view="./components/requestsByProducts.html"></compose>
+            <div class="row">
+                <div show.bind="selectedCategory.code === 0">
+                    <compose view="./components/requestsByInstitution.html"></compose>
+                </div>
+                <div show.bind="selectedCategory.code === 1">
+                    <compose view="./components/requestsByProducts.html"></compose>
+                </div>
+                <div show.bind="selectedCategory.code === 2">
+                    <compose view="./components/requestsByCountry.html"></compose>
+                </div>
+                <div show.bind="selectedCategory.code === 3">
+                    <compose view="./components/requestsByInstitutionCountry.html"></compose>
+                </div>
             </div>
-            <div show.bind="selectedCategory.code === 2">
-                <compose view="./components/requestsByCountry.html"></compose>
-            </div>
-            <div show.bind="selectedCategory.code === 3">
-                <compose view="./components/requestsByInstitutionCountry.html"></compose>
-            </div>
-        </div> 
-      </div> 
+        </div>
 </template>
