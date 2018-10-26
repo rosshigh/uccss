@@ -132,29 +132,10 @@ export class ViewHelpTickets {
     this.helpTickets.selectHelpTicket(this.editIndex);
 
     await this.getDetails();
-
-    // var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-    // if(!response.error){
-    //   if(response.helpTicketId === 0){
-    //         //Lock help ticket
-    //       this.helpTickets.lockHelpTicket({
-    //         helpTicketId: this.helpTickets.selectedHelpTicket._id,
-    //         personId: this.userObj._id
-    //       });
-    //       this.responseMessage = "";
-    //       this.showLockMessage = false;
-    //       this.lockObject = {}; 
-    //   } else {
-    //     if(response[0].personId !== this.userObj._id){
-    //       this.lockObject = response[0];
-    //       this.responseMessage = "Help Ticket is currently locked by " + this.getName();
-    //       this.showLockMessage = true;  
-    //     }
-    //   }
-    // }
-
-    let subTypeIndex = this.getIndex(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
-    this.createOutputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[subTypeIndex].outputForm)
+    this.categoryIndex = this.getCatIndex();
+//this.helpTickets.selectedHelpTicket.helpTicketCategory
+    // let subTypeIndex = this.getIndex(this.helpTickets.helpTicketTypesArray[this.categoryIndex.categoryIndex].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
+    this.createOutputForm(this.helpTickets.helpTicketTypesArray[this.categoryIndex.categoryIndex].subtypes[this.categoryIndex.subTypeIndex].outputForm)
 
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
     this.selectedRow = $(el.target).closest('tr');
@@ -171,6 +152,24 @@ export class ViewHelpTickets {
       }
     }
     return null;
+  }
+
+  getCatIndex(){
+    for(var j = 0; j < this.helpTickets.helpTicketTypesArray.length; j++){
+      for(var i = 0; i < this.helpTickets.helpTicketTypesArray[j].subtypes.length; i++){
+        if( this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type){
+          return { subTypeIndex: i, categoryIndex: j};
+        }
+      }
+    }
+  }
+
+  getCategoryIndex(){
+    for(var i = 0; i < this.helpTickets.helpTicketTypesArray.length; i++){
+      if(this.helpTickets.helpTicketTypesArray[i] == this.helpTickets.selectedHelpTicket.helpTicketCategory){
+        return i;
+      }
+    }
   }
 
   createOutputForm(html){

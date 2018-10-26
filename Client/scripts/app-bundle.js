@@ -38118,24 +38118,25 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                         switch (_context2.prev = _context2.next) {
                             case 0:
                                 this.showAdditionalInfo = false;
+                                this.showDetails = false;
                                 this.catIndex = this.getCategoryIndex();
 
                                 if (!(this.helpTickets.selectedHelpTicket.helpTicketCategory > -1)) {
-                                    _context2.next = 11;
+                                    _context2.next = 12;
                                     break;
                                 }
 
                                 this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired;
 
                                 if (!this.requestsRequired) {
-                                    _context2.next = 7;
+                                    _context2.next = 8;
                                     break;
                                 }
 
-                                _context2.next = 7;
+                                _context2.next = 8;
                                 return this.getActiveRequests();
 
-                            case 7:
+                            case 8:
                                 this.showTypes = this.helpTickets.helpTicketTypesArray[this.catIndex].showSubtypes && this.clientRequestsArray.length;
                                 if (!this.showTypes) {
                                     this.selectedHelpTicketType = 0;
@@ -38151,19 +38152,20 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                     this.inputForm = null;
                                     this.showAdditionalInfo = false;
                                 }
-                                _context2.next = 15;
+                                _context2.next = 16;
                                 break;
 
-                            case 11:
+                            case 12:
                                 this.inputForm = null;
                                 this.showTypes = false;
                                 this.showAdditionalInfo = false;
                                 this.helpTicketTypeMessage = undefined;
 
-                            case 15:
+                            case 16:
+                                this.showDetails = this.showAdditionalInfo && this.helpTicketType != null;
                                 $("#helpTicketPurpose").addClass('focus');
 
-                            case 16:
+                            case 18:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -38271,6 +38273,9 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                 this.showAdditionalInfo = false;
 
                             case 17:
+                                this.showDetails = this.showAdditionalInfo && this.helpTicketType != null;
+
+                            case 18:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -38379,8 +38384,7 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                     while (1) {
                         switch (_context5.prev = _context5.next) {
                             case 0:
-
-                                this.showAdditionalInfo = true;
+                                this.showDetails = true;
                                 this.SelectedClientRequest = this.clientRequestsArray[index];
                                 this.selectedSessionId = this.clientRequestsArray[index].sessionId;
 
@@ -38527,12 +38531,12 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
         CreateHelpTickets.prototype._cleanUp = function _cleanUp() {
             this.showTypes = false;
             this.helpTicketTypeMessage = undefined;
-
             this.showAdditionalInfo = false;
             this.helpTickets.selectHelpTicket();
             this.helpTickets.selectHelpTicketContent();
             this.clearTables();
             this.filesToUpload = new Array();
+            this.showDetails = false;
         };
 
         CreateHelpTickets.prototype.clearTables = function clearTables() {
@@ -39354,7 +39358,6 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.selectHelpTicket = function () {
       var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(el, index) {
-        var subTypeIndex;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
@@ -39366,9 +39369,9 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 return this.getDetails();
 
               case 4:
-                subTypeIndex = this.getIndex(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
+                this.categoryIndex = this.getCatIndex();
 
-                this.createOutputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[subTypeIndex].outputForm);
+                this.createOutputForm(this.helpTickets.helpTicketTypesArray[this.categoryIndex.categoryIndex].subtypes[this.categoryIndex.subTypeIndex].outputForm);
 
                 if (this.selectedRow) this.selectedRow.children().removeClass('info');
                 this.selectedRow = $(el.target).closest('tr');
@@ -39399,6 +39402,24 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
         }
       }
       return null;
+    };
+
+    ViewHelpTickets.prototype.getCatIndex = function getCatIndex() {
+      for (var j = 0; j < this.helpTickets.helpTicketTypesArray.length; j++) {
+        for (var i = 0; i < this.helpTickets.helpTicketTypesArray[j].subtypes.length; i++) {
+          if (this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type) {
+            return { subTypeIndex: i, categoryIndex: j };
+          }
+        }
+      }
+    };
+
+    ViewHelpTickets.prototype.getCategoryIndex = function getCategoryIndex() {
+      for (var i = 0; i < this.helpTickets.helpTicketTypesArray.length; i++) {
+        if (this.helpTickets.helpTicketTypesArray[i] == this.helpTickets.selectedHelpTicket.helpTicketCategory) {
+          return i;
+        }
+      }
     };
 
     ViewHelpTickets.prototype.createOutputForm = function createOutputForm(html) {
@@ -62101,6 +62122,595 @@ module.exports = function(Chart) {
 
 },{"1":1,"25":25,"45":45}]},{},[7])(7)
 });
+define('modules/user/support/createHelpTickets.1',['exports', 'aurelia-framework', '../../../resources/utils/utils', '../../../resources/data/sessions', '../../../resources/data/downloads', '../../../resources/data/products', '../../../resources/data/systems', '../../../resources/data/helpTickets', '../../../resources/data/clientRequests', '../../../resources/data/people', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/data/siteInfo'], function (exports, _aureliaFramework, _utils, _sessions, _downloads, _products, _systems, _helpTickets, _clientRequests, _people, _validation, _dataTable, _appConfig, _siteInfo) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.CreateHelpTickets = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var CreateHelpTickets = exports.CreateHelpTickets = (_dec = (0, _aureliaFramework.inject)(_sessions.Sessions, _downloads.Downloads, _helpTickets.HelpTickets, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _people.People, _clientRequests.ClientRequests, _products.Products, _systems.Systems, _siteInfo.SiteInfo, _aureliaFramework.TemplatingEngine), _dec(_class = function () {
+        function CreateHelpTickets(sessions, apps, helpTickets, validation, utils, datatable, config, people, clientRequests, products, systems, site, templatingEngine) {
+            _classCallCheck(this, CreateHelpTickets);
+
+            this.showInfoBox = false;
+            this.courseSelected = false;
+            this.showHelpTicketDescription = false;
+            this.showInputForm = false;
+            this.showRequests = false;
+            this.inputForm = null;
+            this.showTypes = false;
+            this.inputHTML = "";
+            this.spinnerHTML = "";
+            this.removedFiles = new Array();
+            this.showAdditionalInfo = false;
+
+            this.sessions = sessions;
+            this.apps = apps;
+            this.helpTickets = helpTickets;
+            this.people = people;
+            this.utils = utils;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.config = config;
+            this.clientRequests = clientRequests;
+            this.products = products;
+            this.systems = systems;
+            this.site = site;
+            this.templatingEngine = templatingEngine;
+
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        }
+
+        CreateHelpTickets.prototype.canActivate = function canActivate() {
+            if (!this.userObj) {
+                this.userObj = this.config.user;
+                this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
+                if (!this.userObj) {
+                    this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+                    this.router.navigate("home");
+                }
+            }
+        };
+
+        CreateHelpTickets.prototype.attached = function attached() {
+            $('[data-toggle="tooltip"]').tooltip();
+        };
+
+        CreateHelpTickets.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.helpTickets.getHelpTicketTypes('?order=category'), this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true), this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id + '&order=number'), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true&order=name'), this.systems.getSystemsArray(), this.config.getConfig(), this.site.getMessageArray('?filter=category|eq|HELP_TICKETS', true)]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.helpTickets.selectHelpTicket();
+                                this.sendEmail = this.config.SEND_EMAILS;
+                                this.appsArray = this.apps.appDownloadsArray.filter(function (item) {
+                                    return item.helpTicketRelevant;
+                                });
+                                this.editorMessage = this.getMessage('EDITOR_DESCRIPTION_MESSAGE');
+                                this.fileUploadMessage = this.getMessage('FILE_UPLOAD_DESCRIPTION');
+                                this.stepsMessage = this.getMessage('RECREATE_STEPS');
+
+                            case 9:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        CreateHelpTickets.prototype.categoryChanged = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.showAdditionalInfo = false;
+                                this.catIndex = this.getCategoryIndex();
+
+                                if (!(this.helpTickets.selectedHelpTicket.helpTicketCategory > -1)) {
+                                    _context2.next = 11;
+                                    break;
+                                }
+
+                                this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired;
+
+                                if (!this.requestsRequired) {
+                                    _context2.next = 7;
+                                    break;
+                                }
+
+                                _context2.next = 7;
+                                return this.getActiveRequests();
+
+                            case 7:
+                                this.showTypes = this.helpTickets.helpTicketTypesArray[this.catIndex].showSubtypes && this.clientRequestsArray.length;
+                                if (!this.showTypes) {
+                                    this.selectedHelpTicketType = 0;
+                                    this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[0].type);
+                                    this.resources = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[0].documents;
+                                    this.helpTicketType = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[0].type;
+                                    this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTicketType;
+                                    if (this.requestsRequired && clientRequestsArray.length > 0 || !this.requestsRequired) this.showAdditionalInfo = true;
+                                    this.createInputForm(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[0].inputForm);
+                                    this.setupValidation(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[0].validation);
+                                } else {
+                                    this.helpTicketTypeMessage = this.clientRequestsArray.length ? this.getMessage('SELECT_TYPE') : undefined;
+                                    this.inputForm = null;
+                                    this.showAdditionalInfo = false;
+                                }
+                                _context2.next = 15;
+                                break;
+
+                            case 11:
+                                this.inputForm = null;
+                                this.showTypes = false;
+                                this.showAdditionalInfo = false;
+                                this.helpTicketTypeMessage = undefined;
+
+                            case 15:
+                                $("#helpTicketPurpose").addClass('focus');
+
+                            case 16:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function categoryChanged() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return categoryChanged;
+        }();
+
+        CreateHelpTickets.prototype.getCategoryIndex = function getCategoryIndex() {
+            var _this = this;
+
+            var index = 0;
+            this.helpTickets.helpTicketTypesArray.forEach(function (item, categoryIndex) {
+                if (_this.helpTickets.selectedHelpTicket.helpTicketCategory == item.category) {
+                    index = categoryIndex;
+                }
+            });
+            return index;
+        };
+
+        CreateHelpTickets.prototype.getMessage = function getMessage(messageKey) {
+            for (var i = 0; i < this.site.messageArray.length; i++) {
+                if (this.site.messageArray[i].key === messageKey) return this.site.messageArray[i].content;
+            }
+            return "";
+        };
+
+        CreateHelpTickets.prototype.createInputForm = function createInputForm(html) {
+            $('#container').html(html);
+            var extendedInput = $('.extend');
+            for (var i = 0; i < extendedInput.length; i++) {
+                this.helpTickets.selectedHelpTicketContent.content[$(extendedInput[i]).attr('id')] = "";
+            }
+
+            var el = document.getElementById('container');
+
+            if (el) {
+                if (!el.querySelectorAll('.au-target').length) {
+                    this.templatingEngine.enhance({ element: el, bindingContext: this });
+                }
+            }
+        };
+
+        CreateHelpTickets.prototype.typeChanged = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(el) {
+                var _this2 = this;
+
+                var keyWords, refreshProductArray;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.clearTables();
+
+                                if (!(this.helpTicketType !== "NULL")) {
+                                    _context3.next = 14;
+                                    break;
+                                }
+
+                                this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTicketType;
+                                this.selectedHelpTicketType = this.getIndex();
+                                this.createInputForm(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].inputForm);
+                                this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].type);
+                                this.inputForm = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].inputForm;
+                                this.setupValidation(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].validation);
+
+                                _context3.next = 10;
+                                return this.products.getProductsArray('?fields=_id name');
+
+                            case 10:
+                                this.showAdditionalInfo = false;
+
+                                if (this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].requestKeywords) {
+                                    keyWords = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].requestKeywords;
+                                    refreshProductArray = new Array();
+
+                                    this.products.productsArray.forEach(function (item) {
+                                        var foo = item.name.toUpperCase();
+                                        if (foo.indexOf(keyWords) > -1) {
+                                            refreshProductArray.push(item._id);
+                                        }
+                                    });
+                                    this.clientRequestsArray = this.originalClientRequestsArray.filter(function (item) {
+                                        return refreshProductArray.indexOf(item.productId) > -1 && item.systemId;
+                                    });
+                                } else {
+                                    if (this.originalClientRequestsArray && this.originalClientRequestsArray.length !== this.clientRequestsArray.length) {
+                                        this.originalClientRequestsArray.forEach(function (item) {
+                                            _this2.clientRequestsArray.push(item);
+                                        });
+                                    }
+                                }
+                                _context3.next = 17;
+                                break;
+
+                            case 14:
+                                this.helpTicketTypeMessage = this.getMessage('SELECT_TYPE');
+                                this.inputForm = null;
+                                this.showAdditionalInfo = false;
+
+                            case 17:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function typeChanged(_x) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return typeChanged;
+        }();
+
+        CreateHelpTickets.prototype.setupValidation = function setupValidation(rules) {
+            var _this3 = this;
+
+            this.validation.clearRules();
+            rules.forEach(function (item) {
+                _this3.validation.addRule(1, item.control, [{ "rule": item.rule, "message": item.message, "value": item.value }]);
+            });
+        };
+
+        CreateHelpTickets.prototype.getIndex = function getIndex() {
+            var _this4 = this;
+
+            var returnIndex;
+            this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes.forEach(function (item, index) {
+                if (item.type === _this4.helpTickets.selectedHelpTicket.helpTicketType) {
+                    returnIndex = index;
+                }
+            });
+            return returnIndex;
+        };
+
+        CreateHelpTickets.prototype.getActiveRequests = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                var _this5 = this;
+
+                var sessions;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                sessions = "";
+
+                                this.sessions.sessionsArray.forEach(function (item) {
+                                    sessions += item._id + ":";
+                                });
+                                sessions = sessions.substring(0, sessions.length - 1);
+                                _context4.next = 5;
+                                return this.clientRequests.getActiveClientRequestsArray(this.userObj._id, sessions);
+
+                            case 5:
+                                this.originalClientRequestsArray = new Array();
+                                this.clientRequestsArray = new Array();
+
+                                this.clientRequests.requestsArray.forEach(function (item) {
+                                    item.requestDetails.forEach(function (item2) {
+                                        if (item2.assignments && item2.assignments.length > 0) {
+                                            item2.assignments.forEach(function (assign) {
+                                                _this5.originalClientRequestsArray.push({
+                                                    productId: item2.productId,
+                                                    sessionId: item.sessionId,
+                                                    requestStatus: item2.requestStatus,
+                                                    systemId: assign.systemId,
+                                                    courseId: item.courseId,
+                                                    client: assign.client,
+                                                    clientId: assign.clientId,
+                                                    _id: item2._id
+                                                });
+                                            });
+                                        } else {
+                                            _this5.originalClientRequestsArray.push({
+                                                productId: item2.productId,
+                                                sessionId: item.sessionId,
+                                                requestStatus: item2.requestStatus,
+                                                courseId: item.courseId,
+                                                _id: item2._id
+                                            });
+                                        }
+                                    });
+                                });
+                                this.originalClientRequestsArray.forEach(function (item) {
+                                    _this5.clientRequestsArray.push(item);
+                                });
+
+                            case 9:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function getActiveRequests() {
+                return _ref4.apply(this, arguments);
+            }
+
+            return getActiveRequests;
+        }();
+
+        CreateHelpTickets.prototype.requestChosen = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(el, index) {
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+
+                                this.showAdditionalInfo = true;
+                                this.SelectedClientRequest = this.clientRequestsArray[index];
+                                this.selectedSessionId = this.clientRequestsArray[index].sessionId;
+
+                                if (this.selectedProductRow) this.selectedProductRow.children().removeClass('info');
+                                this.selectedProductRow = $(el.target).closest('tr');
+                                this.selectedProductRow.children().addClass('info');
+
+                            case 6:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function requestChosen(_x2, _x3) {
+                return _ref5.apply(this, arguments);
+            }
+
+            return requestChosen;
+        }();
+
+        CreateHelpTickets.prototype.cancel = function cancel() {
+            this.helpTickets.selectHelpTicket();
+            this.helpTickets.selectHelpTicketContent();
+            this.helpTicketTypeMessage = undefined;
+
+            this.courseSelected = false;
+            this.showAdditionalInfo = false;
+
+            this.filesToUpload = new Array();
+            this.clientRequests = new Array();
+        };
+
+        CreateHelpTickets.prototype.buldHelpTicket = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                this.helpTickets.selectedHelpTicket.owner = [{ "personId": "b1b1b1b1b1b1b1b1b1b1b1b1", "date": new Date() }];
+                                this.helpTickets.selectedHelpTicket.personId = this.userObj._id;
+                                this.helpTickets.selectedHelpTicket.institutionId = this.userObj.institutionId._id;
+                                this.helpTickets.selectedHelpTicket.sessionId = this.selectedSessionId;
+
+
+                                if (!this.showTypes) {
+                                    this.helpTickets.selectedHelpTicket.courseId = 'b1b1b1b1b1b1b1b1b1b1b1b1';
+                                } else {
+                                    this.helpTickets.selectedHelpTicket.requestId = this.SelectedClientRequest._id;
+                                    this.helpTickets.selectedHelpTicket.systemId = this.SelectedClientRequest.systemId;
+                                    this.helpTickets.selectedHelpTicket.client = this.SelectedClientRequest.client;
+                                    this.helpTickets.selectedHelpTicket.productId = this.SelectedClientRequest.productId;
+                                    this.helpTickets.selectedHelpTicket.courseId = this.SelectedClientRequest.courseId;
+                                }
+
+                                this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
+                                this.helpTickets.selectedHelpTicketContent.type = this.helpTickets.selectedHelpTicket.helpTicketType;
+                                this.helpTickets.selectedHelpTicketContent.displayForm = this.inputForm;
+                                this.helpTickets.selectedHelpTicket.content.push(this.helpTickets.selectedHelpTicketContent);
+
+                            case 9:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function buldHelpTicket() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return buldHelpTicket;
+        }();
+
+        CreateHelpTickets.prototype.save = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                var email, serverResponse;
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                if (!this.validation.validate(1)) {
+                                    _context7.next = 10;
+                                    break;
+                                }
+
+                                _context7.next = 3;
+                                return this.buldHelpTicket();
+
+                            case 3:
+                                email = new Object();
+
+                                if (this.sendEmail) {
+                                    email.MESSAGE = this.config.HELP_TICKET_CREATED_MESSAGE;
+                                    email.INSTRUCTIONS = this.config.HELP_TICKET_INSTRUCTIONS;
+                                    email.subject = this.config.HELP_TICKET_CREATED_SUBJECT.replace('[[faculty name]]', this.userObj.fullName);
+
+                                    email.email = this.userObj.email;
+                                    email.helpTicketNo = 0;
+
+                                    email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+                                }
+
+                                _context7.next = 7;
+                                return this.helpTickets.saveHelpTicket(email);
+
+                            case 7:
+                                serverResponse = _context7.sent;
+
+                                if (!serverResponse.status) {
+                                    this.utils.showNotification("The help ticket was created");
+                                    if (this.filesToUpload && this.filesToUpload.length > 0) {
+                                        this.helpTickets.uploadFile(this.filesToUpload, serverResponse.content[0]._id, this.helpTickets.selectedHelpTicket);
+                                    }
+                                }
+                                this._cleanUp();
+
+                            case 10:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this);
+            }));
+
+            function save() {
+                return _ref7.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        CreateHelpTickets.prototype.buildHelpTicketContext = function buildHelpTicketContext() {
+            var obj = new Object();
+            this.selectedHelpTicketType = this.selectedHelpTicketType ? this.selectedHelpTicketType : 0;
+            obj.type = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].description;
+            obj.subtype = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].description;
+
+            return obj;
+        };
+
+        CreateHelpTickets.prototype._cleanUp = function _cleanUp() {
+            this.showTypes = false;
+            this.helpTicketTypeMessage = undefined;
+
+            this.showAdditionalInfo = false;
+            this.helpTickets.selectHelpTicket();
+            this.helpTickets.selectHelpTicketContent();
+            this.clearTables();
+            this.filesToUpload = new Array();
+        };
+
+        CreateHelpTickets.prototype.clearTables = function clearTables() {
+            if (this.selectedCourseRow) this.selectedCourseRow.children().removeClass('rowSelected');
+            if (this.selectedProductRow) this.selectedProductRow.children().removeClass('rowSelected');
+        };
+
+        CreateHelpTickets.prototype.changeFiles = function changeFiles() {
+            var _this6 = this;
+
+            this.filesToUpload = this.filesToUpload ? this.filesToUpload : new Array();
+            for (var i = 0; i < this.files.length; i++) {
+                var addFile = true;
+                this.filesToUpload.forEach(function (item) {
+                    if (item.name === _this6.files[i].name) addFile = false;
+                });
+                if (addFile) this.filesToUpload.push(this.files[i]);
+            }
+        };
+
+        CreateHelpTickets.prototype.removeFile = function removeFile(index) {
+            this.filesToUpload.splice(index, 1);
+        };
+
+        return CreateHelpTickets;
+    }()) || _class);
+});
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"resources/css/styles.css\"></require>\r\n  <require from=\"humane-js/themes/jackedup.css\"></require>\r\n  <require from=\"bootstrap-select/css/bootstrap-select.css\"></require>\r\n  <nav-bar></nav-bar>\r\n  <div class=\"page-host\">\r\n    <loading-indicator progress.bind=\"data.progress\" loading.bind=\"router.isNavigating || data.isRequesting\"></loading-indicator>\r\n    <router-view></router-view>\r\n  </div>\r\n</template>"; });
 define('text!resources/css/fullcalendar.css', ['module'], function(module) { module.exports = "/*!\r\n * FullCalendar v3.4.0 Stylesheet\r\n * Docs & License: https://fullcalendar.io/\r\n * (c) 2017 Adam Shaw\r\n */\r\n\r\n\r\n.fc {\r\n\tdirection: ltr;\r\n\ttext-align: left;\r\n}\r\n\r\n.fc-rtl {\r\n\ttext-align: right;\r\n}\r\n\r\nbody .fc { /* extra precedence to overcome jqui */\r\n\tfont-size: 1em;\r\n}\r\n\r\n\r\n/* Colors\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-unthemed th,\r\n.fc-unthemed td,\r\n.fc-unthemed thead,\r\n.fc-unthemed tbody,\r\n.fc-unthemed .fc-divider,\r\n.fc-unthemed .fc-row,\r\n.fc-unthemed .fc-content, /* for gutter border */\r\n.fc-unthemed .fc-popover,\r\n.fc-unthemed .fc-list-view,\r\n.fc-unthemed .fc-list-heading td {\r\n\tborder-color: #ddd;\r\n}\r\n\r\n.fc-unthemed .fc-popover {\r\n\tbackground-color: #fff;\r\n}\r\n\r\n.fc-unthemed .fc-divider,\r\n.fc-unthemed .fc-popover .fc-header,\r\n.fc-unthemed .fc-list-heading td {\r\n\tbackground: #eee;\r\n}\r\n\r\n.fc-unthemed .fc-popover .fc-header .fc-close {\r\n\tcolor: #666;\r\n}\r\n\r\n.fc-unthemed td.fc-today {\r\n\tbackground: #fcf8e3;\r\n}\r\n\r\n.fc-highlight { /* when user is selecting cells */\r\n\tbackground: #bce8f1;\r\n\topacity: .3;\r\n}\r\n\r\n.fc-bgevent { /* default look for background events */\r\n\tbackground: rgb(143, 223, 130);\r\n\topacity: .3;\r\n}\r\n\r\n.fc-nonbusiness { /* default look for non-business-hours areas */\r\n\t/* will inherit .fc-bgevent's styles */\r\n\tbackground: #d7d7d7;\r\n}\r\n\r\n.fc-unthemed .fc-disabled-day {\r\n\tbackground: #d7d7d7;\r\n\topacity: .3;\r\n}\r\n\r\n.ui-widget .fc-disabled-day { /* themed */\r\n\tbackground-image: none;\r\n}\r\n\r\n\r\n/* Icons (inline elements with styled text that mock arrow icons)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-icon {\r\n\tdisplay: inline-block;\r\n\theight: 1em;\r\n\tline-height: 1em;\r\n\tfont-size: 1em;\r\n\ttext-align: center;\r\n\toverflow: hidden;\r\n\tfont-family: \"Courier New\", Courier, monospace;\r\n\r\n\t/* don't allow browser text-selection */\r\n\t-webkit-touch-callout: none;\r\n\t-webkit-user-select: none;\r\n\t-khtml-user-select: none;\r\n\t-moz-user-select: none;\r\n\t-ms-user-select: none;\r\n\tuser-select: none;\r\n\t}\r\n\r\n/*\r\nAcceptable font-family overrides for individual icons:\r\n\t\"Arial\", sans-serif\r\n\t\"Times New Roman\", serif\r\n\r\nNOTE: use percentage font sizes or else old IE chokes\r\n*/\r\n\r\n.fc-icon:after {\r\n\tposition: relative;\r\n}\r\n\r\n.fc-icon-left-single-arrow:after {\r\n\tcontent: \"\\02039\";\r\n\tfont-weight: bold;\r\n\tfont-size: 200%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-right-single-arrow:after {\r\n\tcontent: \"\\0203A\";\r\n\tfont-weight: bold;\r\n\tfont-size: 200%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-left-double-arrow:after {\r\n\tcontent: \"\\000AB\";\r\n\tfont-size: 160%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-right-double-arrow:after {\r\n\tcontent: \"\\000BB\";\r\n\tfont-size: 160%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-left-triangle:after {\r\n\tcontent: \"\\25C4\";\r\n\tfont-size: 125%;\r\n\ttop: 3%;\r\n}\r\n\r\n.fc-icon-right-triangle:after {\r\n\tcontent: \"\\25BA\";\r\n\tfont-size: 125%;\r\n\ttop: 3%;\r\n}\r\n\r\n.fc-icon-down-triangle:after {\r\n\tcontent: \"\\25BC\";\r\n\tfont-size: 125%;\r\n\ttop: 2%;\r\n}\r\n\r\n.fc-icon-x:after {\r\n\tcontent: \"\\000D7\";\r\n\tfont-size: 200%;\r\n\ttop: 6%;\r\n}\r\n\r\n\r\n/* Buttons (styled <button> tags, normalized to work cross-browser)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc button {\r\n\t/* force height to include the border and padding */\r\n\t-moz-box-sizing: border-box;\r\n\t-webkit-box-sizing: border-box;\r\n\tbox-sizing: border-box;\r\n\r\n\t/* dimensions */\r\n\tmargin: 0;\r\n\theight: 2.1em;\r\n\tpadding: 0 .6em;\r\n\r\n\t/* text & cursor */\r\n\tfont-size: 1em; /* normalize */\r\n\twhite-space: nowrap;\r\n\tcursor: pointer;\r\n}\r\n\r\n/* Firefox has an annoying inner border */\r\n.fc button::-moz-focus-inner { margin: 0; padding: 0; }\r\n\t\r\n.fc-state-default { /* non-theme */\r\n\tborder: 1px solid;\r\n}\r\n\r\n.fc-state-default.fc-corner-left { /* non-theme */\r\n\tborder-top-left-radius: 4px;\r\n\tborder-bottom-left-radius: 4px;\r\n}\r\n\r\n.fc-state-default.fc-corner-right { /* non-theme */\r\n\tborder-top-right-radius: 4px;\r\n\tborder-bottom-right-radius: 4px;\r\n}\r\n\r\n/* icons in buttons */\r\n\r\n.fc button .fc-icon { /* non-theme */\r\n\tposition: relative;\r\n\ttop: -0.05em; /* seems to be a good adjustment across browsers */\r\n\tmargin: 0 .2em;\r\n\tvertical-align: middle;\r\n}\r\n\t\r\n/*\r\n  button states\r\n  borrowed from twitter bootstrap (http://twitter.github.com/bootstrap/)\r\n*/\r\n\r\n.fc-state-default {\r\n\tbackground-color: #f5f5f5;\r\n\tbackground-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);\r\n\tbackground-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));\r\n\tbackground-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);\r\n\tbackground-image: -o-linear-gradient(top, #ffffff, #e6e6e6);\r\n\tbackground-image: linear-gradient(to bottom, #ffffff, #e6e6e6);\r\n\tbackground-repeat: repeat-x;\r\n\tborder-color: #e6e6e6 #e6e6e6 #bfbfbf;\r\n\tborder-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);\r\n\tcolor: #333;\r\n\ttext-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);\r\n\tbox-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);\r\n}\r\n\r\n.fc-state-hover,\r\n.fc-state-down,\r\n.fc-state-active,\r\n.fc-state-disabled {\r\n\tcolor: #333333;\r\n\tbackground-color: #e6e6e6;\r\n}\r\n\r\n.fc-state-hover {\r\n\tcolor: #333333;\r\n\ttext-decoration: none;\r\n\tbackground-position: 0 -15px;\r\n\t-webkit-transition: background-position 0.1s linear;\r\n\t   -moz-transition: background-position 0.1s linear;\r\n\t     -o-transition: background-position 0.1s linear;\r\n\t        transition: background-position 0.1s linear;\r\n}\r\n\r\n.fc-state-down,\r\n.fc-state-active {\r\n\tbackground-color: #cccccc;\r\n\tbackground-image: none;\r\n\tbox-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);\r\n}\r\n\r\n.fc-state-disabled {\r\n\tcursor: default;\r\n\tbackground-image: none;\r\n\topacity: 0.65;\r\n\tbox-shadow: none;\r\n}\r\n\r\n\r\n/* Buttons Groups\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-button-group {\r\n\tdisplay: inline-block;\r\n}\r\n\r\n/*\r\nevery button that is not first in a button group should scootch over one pixel and cover the\r\nprevious button's border...\r\n*/\r\n\r\n.fc .fc-button-group > * { /* extra precedence b/c buttons have margin set to zero */\r\n\tfloat: left;\r\n\tmargin: 0 0 0 -1px;\r\n}\r\n\r\n.fc .fc-button-group > :first-child { /* same */\r\n\tmargin-left: 0;\r\n}\r\n\r\n\r\n/* Popover\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-popover {\r\n\tposition: absolute;\r\n\tbox-shadow: 0 2px 6px rgba(0,0,0,.15);\r\n}\r\n\r\n.fc-popover .fc-header { /* TODO: be more consistent with fc-head/fc-body */\r\n\tpadding: 2px 4px;\r\n}\r\n\r\n.fc-popover .fc-header .fc-title {\r\n\tmargin: 0 2px;\r\n}\r\n\r\n.fc-popover .fc-header .fc-close {\r\n\tcursor: pointer;\r\n}\r\n\r\n.fc-ltr .fc-popover .fc-header .fc-title,\r\n.fc-rtl .fc-popover .fc-header .fc-close {\r\n\tfloat: left;\r\n}\r\n\r\n.fc-rtl .fc-popover .fc-header .fc-title,\r\n.fc-ltr .fc-popover .fc-header .fc-close {\r\n\tfloat: right;\r\n}\r\n\r\n/* unthemed */\r\n\r\n.fc-unthemed .fc-popover {\r\n\tborder-width: 1px;\r\n\tborder-style: solid;\r\n}\r\n\r\n.fc-unthemed .fc-popover .fc-header .fc-close {\r\n\tfont-size: .9em;\r\n\tmargin-top: 2px;\r\n}\r\n\r\n/* jqui themed */\r\n\r\n.fc-popover > .ui-widget-header + .ui-widget-content {\r\n\tborder-top: 0; /* where they meet, let the header have the border */\r\n}\r\n\r\n\r\n/* Misc Reusable Components\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-divider {\r\n\tborder-style: solid;\r\n\tborder-width: 1px;\r\n}\r\n\r\nhr.fc-divider {\r\n\theight: 0;\r\n\tmargin: 0;\r\n\tpadding: 0 0 2px; /* height is unreliable across browsers, so use padding */\r\n\tborder-width: 1px 0;\r\n}\r\n\r\n.fc-clear {\r\n\tclear: both;\r\n}\r\n\r\n.fc-bg,\r\n.fc-bgevent-skeleton,\r\n.fc-highlight-skeleton,\r\n.fc-helper-skeleton {\r\n\t/* these element should always cling to top-left/right corners */\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n.fc-bg {\r\n\tbottom: 0; /* strech bg to bottom edge */\r\n}\r\n\r\n.fc-bg table {\r\n\theight: 100%; /* strech bg to bottom edge */\r\n}\r\n\r\n\r\n/* Tables\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc table {\r\n\twidth: 100%;\r\n\tbox-sizing: border-box; /* fix scrollbar issue in firefox */\r\n\ttable-layout: fixed;\r\n\tborder-collapse: collapse;\r\n\tborder-spacing: 0;\r\n\tfont-size: 1em; /* normalize cross-browser */\r\n}\r\n\r\n.fc th {\r\n\ttext-align: center;\r\n}\r\n\r\n.fc th,\r\n.fc td {\r\n\tborder-style: solid;\r\n\tborder-width: 1px;\r\n\tpadding: 0;\r\n\tvertical-align: top;\r\n}\r\n\r\n.fc td.fc-today {\r\n\tborder-style: double; /* overcome neighboring borders */\r\n}\r\n\r\n\r\n/* Internal Nav Links\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\na[data-goto] {\r\n\tcursor: pointer;\r\n}\r\n\r\na[data-goto]:hover {\r\n\ttext-decoration: underline;\r\n}\r\n\r\n\r\n/* Fake Table Rows\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc .fc-row { /* extra precedence to overcome themes w/ .ui-widget-content forcing a 1px border */\r\n\t/* no visible border by default. but make available if need be (scrollbar width compensation) */\r\n\tborder-style: solid;\r\n\tborder-width: 0;\r\n}\r\n\r\n.fc-row table {\r\n\t/* don't put left/right border on anything within a fake row.\r\n\t   the outer tbody will worry about this */\r\n\tborder-left: 0 hidden transparent;\r\n\tborder-right: 0 hidden transparent;\r\n\r\n\t/* no bottom borders on rows */\r\n\tborder-bottom: 0 hidden transparent; \r\n}\r\n\r\n.fc-row:first-child table {\r\n\tborder-top: 0 hidden transparent; /* no top border on first row */\r\n}\r\n\r\n\r\n/* Day Row (used within the header and the DayGrid)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-row {\r\n\tposition: relative;\r\n}\r\n\r\n.fc-row .fc-bg {\r\n\tz-index: 1;\r\n}\r\n\r\n/* highlighting cells & background event skeleton */\r\n\r\n.fc-row .fc-bgevent-skeleton,\r\n.fc-row .fc-highlight-skeleton {\r\n\tbottom: 0; /* stretch skeleton to bottom of row */\r\n}\r\n\r\n.fc-row .fc-bgevent-skeleton table,\r\n.fc-row .fc-highlight-skeleton table {\r\n\theight: 100%; /* stretch skeleton to bottom of row */\r\n}\r\n\r\n.fc-row .fc-highlight-skeleton td,\r\n.fc-row .fc-bgevent-skeleton td {\r\n\tborder-color: transparent;\r\n}\r\n\r\n.fc-row .fc-bgevent-skeleton {\r\n\tz-index: 2;\r\n\r\n}\r\n\r\n.fc-row .fc-highlight-skeleton {\r\n\tz-index: 3;\r\n}\r\n\r\n/*\r\nrow content (which contains day/week numbers and events) as well as \"helper\" (which contains\r\ntemporary rendered events).\r\n*/\r\n\r\n.fc-row .fc-content-skeleton {\r\n\tposition: relative;\r\n\tz-index: 4;\r\n\tpadding-bottom: 2px; /* matches the space above the events */\r\n}\r\n\r\n.fc-row .fc-helper-skeleton {\r\n\tz-index: 5;\r\n}\r\n\r\n.fc-row .fc-content-skeleton td,\r\n.fc-row .fc-helper-skeleton td {\r\n\t/* see-through to the background below */\r\n\tbackground: none; /* in case <td>s are globally styled */\r\n\tborder-color: transparent;\r\n\r\n\t/* don't put a border between events and/or the day number */\r\n\tborder-bottom: 0;\r\n}\r\n\r\n.fc-row .fc-content-skeleton tbody td, /* cells with events inside (so NOT the day number cell) */\r\n.fc-row .fc-helper-skeleton tbody td {\r\n\t/* don't put a border between event cells */\r\n\tborder-top: 0;\r\n}\r\n\r\n\r\n/* Scrolling Container\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-scroller {\r\n\t-webkit-overflow-scrolling: touch;\r\n}\r\n\r\n/* TODO: move to agenda/basic */\r\n.fc-scroller > .fc-day-grid,\r\n.fc-scroller > .fc-time-grid {\r\n\tposition: relative; /* re-scope all positions */\r\n\twidth: 100%; /* hack to force re-sizing this inner element when scrollbars appear/disappear */\r\n}\r\n\r\n\r\n/* Global Event Styles\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-event {\r\n\tposition: relative; /* for resize handle and other inner positioning */\r\n\tdisplay: block; /* make the <a> tag block */\r\n\tfont-size: .85em;\r\n\tline-height: 1.3;\r\n\tborder-radius: 3px;\r\n\tborder: 1px solid #3a87ad; /* default BORDER color */\r\n\tfont-weight: normal; /* undo jqui's ui-widget-header bold */\r\n}\r\n\r\n.fc-event,\r\n.fc-event-dot {\r\n\tbackground-color: #3a87ad; /* default BACKGROUND color */\r\n}\r\n\r\n/* overpower some of bootstrap's and jqui's styles on <a> tags */\r\n.fc-event,\r\n.fc-event:hover,\r\n.ui-widget .fc-event {\r\n\tcolor: #fff; /* default TEXT color */\r\n\ttext-decoration: none; /* if <a> has an href */\r\n}\r\n\r\n.fc-event[href],\r\n.fc-event.fc-draggable {\r\n\tcursor: pointer; /* give events with links and draggable events a hand mouse pointer */\r\n}\r\n\r\n.fc-not-allowed, /* causes a \"warning\" cursor. applied on body */\r\n.fc-not-allowed .fc-event { /* to override an event's custom cursor */\r\n\tcursor: not-allowed;\r\n}\r\n\r\n.fc-event .fc-bg { /* the generic .fc-bg already does position */\r\n\tz-index: 1;\r\n\tbackground: #fff;\r\n\topacity: .25;\r\n}\r\n\r\n.fc-event .fc-content {\r\n\tposition: relative;\r\n\tz-index: 2;\r\n}\r\n\r\n/* resizer (cursor AND touch devices) */\r\n\r\n.fc-event .fc-resizer {\r\n\tposition: absolute;\r\n\tz-index: 4;\r\n}\r\n\r\n/* resizer (touch devices) */\r\n\r\n.fc-event .fc-resizer {\r\n\tdisplay: none;\r\n}\r\n\r\n.fc-event.fc-allow-mouse-resize .fc-resizer,\r\n.fc-event.fc-selected .fc-resizer {\r\n\t/* only show when hovering or selected (with touch) */\r\n\tdisplay: block;\r\n}\r\n\r\n/* hit area */\r\n\r\n.fc-event.fc-selected .fc-resizer:before {\r\n\t/* 40x40 touch area */\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tz-index: 9999; /* user of this util can scope within a lower z-index */\r\n\ttop: 50%;\r\n\tleft: 50%;\r\n\twidth: 40px;\r\n\theight: 40px;\r\n\tmargin-left: -20px;\r\n\tmargin-top: -20px;\r\n}\r\n\r\n\r\n/* Event Selection (only for touch devices)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-event.fc-selected {\r\n\tz-index: 9999 !important; /* overcomes inline z-index */\r\n\tbox-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);\r\n}\r\n\r\n.fc-event.fc-selected.fc-dragging {\r\n\tbox-shadow: 0 2px 7px rgba(0, 0, 0, 0.3);\r\n}\r\n\r\n\r\n/* Horizontal Events\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* bigger touch area when selected */\r\n.fc-h-event.fc-selected:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tz-index: 3; /* below resizers */\r\n\ttop: -10px;\r\n\tbottom: -10px;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* events that are continuing to/from another week. kill rounded corners and butt up against edge */\r\n\r\n.fc-ltr .fc-h-event.fc-not-start,\r\n.fc-rtl .fc-h-event.fc-not-end {\r\n\tmargin-left: 0;\r\n\tborder-left-width: 0;\r\n\tpadding-left: 1px; /* replace the border with padding */\r\n\tborder-top-left-radius: 0;\r\n\tborder-bottom-left-radius: 0;\r\n}\r\n\r\n.fc-ltr .fc-h-event.fc-not-end,\r\n.fc-rtl .fc-h-event.fc-not-start {\r\n\tmargin-right: 0;\r\n\tborder-right-width: 0;\r\n\tpadding-right: 1px; /* replace the border with padding */\r\n\tborder-top-right-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n/* resizer (cursor AND touch devices) */\r\n\r\n/* left resizer  */\r\n.fc-ltr .fc-h-event .fc-start-resizer,\r\n.fc-rtl .fc-h-event .fc-end-resizer {\r\n\tcursor: w-resize;\r\n\tleft: -1px; /* overcome border */\r\n}\r\n\r\n/* right resizer */\r\n.fc-ltr .fc-h-event .fc-end-resizer,\r\n.fc-rtl .fc-h-event .fc-start-resizer {\r\n\tcursor: e-resize;\r\n\tright: -1px; /* overcome border */\r\n}\r\n\r\n/* resizer (mouse devices) */\r\n\r\n.fc-h-event.fc-allow-mouse-resize .fc-resizer {\r\n\twidth: 7px;\r\n\ttop: -1px; /* overcome top border */\r\n\tbottom: -1px; /* overcome bottom border */\r\n}\r\n\r\n/* resizer (touch devices) */\r\n\r\n.fc-h-event.fc-selected .fc-resizer {\r\n\t/* 8x8 little dot */\r\n\tborder-radius: 4px;\r\n\tborder-width: 1px;\r\n\twidth: 6px;\r\n\theight: 6px;\r\n\tborder-style: solid;\r\n\tborder-color: inherit;\r\n\tbackground: #fff;\r\n\t/* vertically center */\r\n\ttop: 50%;\r\n\tmargin-top: -4px;\r\n}\r\n\r\n/* left resizer  */\r\n.fc-ltr .fc-h-event.fc-selected .fc-start-resizer,\r\n.fc-rtl .fc-h-event.fc-selected .fc-end-resizer {\r\n\tmargin-left: -4px; /* centers the 8x8 dot on the left edge */\r\n}\r\n\r\n/* right resizer */\r\n.fc-ltr .fc-h-event.fc-selected .fc-end-resizer,\r\n.fc-rtl .fc-h-event.fc-selected .fc-start-resizer {\r\n\tmargin-right: -4px; /* centers the 8x8 dot on the right edge */\r\n}\r\n\r\n\r\n/* DayGrid events\r\n----------------------------------------------------------------------------------------------------\r\nWe use the full \"fc-day-grid-event\" class instead of using descendants because the event won't\r\nbe a descendant of the grid when it is being dragged.\r\n*/\r\n\r\n.fc-day-grid-event {\r\n\tmargin: 1px 2px 0; /* spacing between events and edges */\r\n\tpadding: 0 1px;\r\n}\r\n\r\ntr:first-child > td > .fc-day-grid-event {\r\n\tmargin-top: 2px; /* a little bit more space before the first event */\r\n}\r\n\r\n.fc-day-grid-event.fc-selected:after {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tz-index: 1; /* same z-index as fc-bg, behind text */\r\n\t/* overcome the borders */\r\n\ttop: -1px;\r\n\tright: -1px;\r\n\tbottom: -1px;\r\n\tleft: -1px;\r\n\t/* darkening effect */\r\n\tbackground: #000;\r\n\topacity: .25;\r\n}\r\n\r\n.fc-day-grid-event .fc-content { /* force events to be one-line tall */\r\n\twhite-space: nowrap;\r\n\toverflow: hidden;\r\n}\r\n\r\n.fc-day-grid-event .fc-time {\r\n\tfont-weight: bold;\r\n}\r\n\r\n/* resizer (cursor devices) */\r\n\r\n/* left resizer  */\r\n.fc-ltr .fc-day-grid-event.fc-allow-mouse-resize .fc-start-resizer,\r\n.fc-rtl .fc-day-grid-event.fc-allow-mouse-resize .fc-end-resizer {\r\n\tmargin-left: -2px; /* to the day cell's edge */\r\n}\r\n\r\n/* right resizer */\r\n.fc-ltr .fc-day-grid-event.fc-allow-mouse-resize .fc-end-resizer,\r\n.fc-rtl .fc-day-grid-event.fc-allow-mouse-resize .fc-start-resizer {\r\n\tmargin-right: -2px; /* to the day cell's edge */\r\n}\r\n\r\n\r\n/* Event Limiting\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* \"more\" link that represents hidden events */\r\n\r\na.fc-more {\r\n\tmargin: 1px 3px;\r\n\tfont-size: .85em;\r\n\tcursor: pointer;\r\n\ttext-decoration: none;\r\n}\r\n\r\na.fc-more:hover {\r\n\ttext-decoration: underline;\r\n}\r\n\r\n.fc-limited { /* rows and cells that are hidden because of a \"more\" link */\r\n\tdisplay: none;\r\n}\r\n\r\n/* popover that appears when \"more\" link is clicked */\r\n\r\n.fc-day-grid .fc-row {\r\n\tz-index: 1; /* make the \"more\" popover one higher than this */\r\n}\r\n\r\n.fc-more-popover {\r\n\tz-index: 2;\r\n\twidth: 220px;\r\n}\r\n\r\n.fc-more-popover .fc-event-container {\r\n\tpadding: 10px;\r\n}\r\n\r\n\r\n/* Now Indicator\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-now-indicator {\r\n\tposition: absolute;\r\n\tborder: 0 solid red;\r\n}\r\n\r\n\r\n/* Utilities\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-unselectable {\r\n\t-webkit-user-select: none;\r\n\t -khtml-user-select: none;\r\n\t   -moz-user-select: none;\r\n\t    -ms-user-select: none;\r\n\t        user-select: none;\r\n\t-webkit-touch-callout: none;\r\n\t-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\r\n}\r\n\r\n\r\n\r\n/* Toolbar\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-toolbar {\r\n\ttext-align: center;\r\n}\r\n\r\n.fc-toolbar.fc-header-toolbar {\r\n\tmargin-bottom: 1em;\r\n}\r\n\r\n.fc-toolbar.fc-footer-toolbar {\r\n\tmargin-top: 1em;\r\n}\r\n\r\n.fc-toolbar .fc-left {\r\n\tfloat: left;\r\n}\r\n\r\n.fc-toolbar .fc-right {\r\n\tfloat: right;\r\n}\r\n\r\n.fc-toolbar .fc-center {\r\n\tdisplay: inline-block;\r\n}\r\n\r\n/* the things within each left/right/center section */\r\n.fc .fc-toolbar > * > * { /* extra precedence to override button border margins */\r\n\tfloat: left;\r\n\tmargin-left: .75em;\r\n}\r\n\r\n/* the first thing within each left/center/right section */\r\n.fc .fc-toolbar > * > :first-child { /* extra precedence to override button border margins */\r\n\tmargin-left: 0;\r\n}\r\n\t\r\n/* title text */\r\n\r\n.fc-toolbar h2 {\r\n\tmargin: 0;\r\n}\r\n\r\n/* button layering (for border precedence) */\r\n\r\n.fc-toolbar button {\r\n\tposition: relative;\r\n}\r\n\r\n.fc-toolbar .fc-state-hover,\r\n.fc-toolbar .ui-state-hover {\r\n\tz-index: 2;\r\n}\r\n\t\r\n.fc-toolbar .fc-state-down {\r\n\tz-index: 3;\r\n}\r\n\r\n.fc-toolbar .fc-state-active,\r\n.fc-toolbar .ui-state-active {\r\n\tz-index: 4;\r\n}\r\n\r\n.fc-toolbar button:focus {\r\n\tz-index: 5;\r\n}\r\n\r\n\r\n/* View Structure\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* undo twitter bootstrap's box-sizing rules. normalizes positioning techniques */\r\n/* don't do this for the toolbar because we'll want bootstrap to style those buttons as some pt */\r\n.fc-view-container *,\r\n.fc-view-container *:before,\r\n.fc-view-container *:after {\r\n\t-webkit-box-sizing: content-box;\r\n\t   -moz-box-sizing: content-box;\r\n\t        box-sizing: content-box;\r\n}\r\n\r\n.fc-view, /* scope positioning and z-index's for everything within the view */\r\n.fc-view > table { /* so dragged elements can be above the view's main element */\r\n\tposition: relative;\r\n\tz-index: 1;\r\n}\r\n\r\n\r\n\r\n/* BasicView\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* day row structure */\r\n\r\n.fc-basicWeek-view .fc-content-skeleton,\r\n.fc-basicDay-view .fc-content-skeleton {\r\n\t/* there may be week numbers in these views, so no padding-top */\r\n\tpadding-bottom: 1em; /* ensure a space at bottom of cell for user selecting/clicking */\r\n}\r\n\r\n.fc-basic-view .fc-body .fc-row {\r\n\tmin-height: 4em; /* ensure that all rows are at least this tall */\r\n}\r\n\r\n/* a \"rigid\" row will take up a constant amount of height because content-skeleton is absolute */\r\n\r\n.fc-row.fc-rigid {\r\n\toverflow: hidden;\r\n}\r\n\r\n.fc-row.fc-rigid .fc-content-skeleton {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* week and day number styling */\r\n\r\n.fc-day-top.fc-other-month {\r\n\topacity: 0.3;\r\n}\r\n\r\n.fc-basic-view .fc-week-number,\r\n.fc-basic-view .fc-day-number {\r\n\tpadding: 2px;\r\n}\r\n\r\n.fc-basic-view th.fc-week-number,\r\n.fc-basic-view th.fc-day-number {\r\n\tpadding: 0 2px; /* column headers can't have as much v space */\r\n}\r\n\r\n.fc-ltr .fc-basic-view .fc-day-top .fc-day-number { float: right; }\r\n.fc-rtl .fc-basic-view .fc-day-top .fc-day-number { float: left; }\r\n\r\n.fc-ltr .fc-basic-view .fc-day-top .fc-week-number { float: left; border-radius: 0 0 3px 0; }\r\n.fc-rtl .fc-basic-view .fc-day-top .fc-week-number { float: right; border-radius: 0 0 0 3px; }\r\n\r\n.fc-basic-view .fc-day-top .fc-week-number {\r\n\tmin-width: 1.5em;\r\n\ttext-align: center;\r\n\tbackground-color: #f2f2f2;\r\n\tcolor: #808080;\r\n}\r\n\r\n/* when week/day number have own column */\r\n\r\n.fc-basic-view td.fc-week-number {\r\n\ttext-align: center;\r\n}\r\n\r\n.fc-basic-view td.fc-week-number > * {\r\n\t/* work around the way we do column resizing and ensure a minimum width */\r\n\tdisplay: inline-block;\r\n\tmin-width: 1.25em;\r\n}\r\n\r\n\r\n/* AgendaView all-day area\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-agenda-view .fc-day-grid {\r\n\tposition: relative;\r\n\tz-index: 2; /* so the \"more..\" popover will be over the time grid */\r\n}\r\n\r\n.fc-agenda-view .fc-day-grid .fc-row {\r\n\tmin-height: 3em; /* all-day section will never get shorter than this */\r\n}\r\n\r\n.fc-agenda-view .fc-day-grid .fc-row .fc-content-skeleton {\r\n\tpadding-bottom: 1em; /* give space underneath events for clicking/selecting days */\r\n}\r\n\r\n\r\n/* TimeGrid axis running down the side (for both the all-day area and the slot area)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc .fc-axis { /* .fc to overcome default cell styles */\r\n\tvertical-align: middle;\r\n\tpadding: 0 4px;\r\n\twhite-space: nowrap;\r\n}\r\n\r\n.fc-ltr .fc-axis {\r\n\ttext-align: right;\r\n}\r\n\r\n.fc-rtl .fc-axis {\r\n\ttext-align: left;\r\n}\r\n\r\n.ui-widget td.fc-axis {\r\n\tfont-weight: normal; /* overcome jqui theme making it bold */\r\n}\r\n\r\n\r\n/* TimeGrid Structure\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid-container, /* so scroll container's z-index is below all-day */\r\n.fc-time-grid { /* so slats/bg/content/etc positions get scoped within here */\r\n\tposition: relative;\r\n\tz-index: 1;\r\n}\r\n\r\n.fc-time-grid {\r\n\tmin-height: 100%; /* so if height setting is 'auto', .fc-bg stretches to fill height */\r\n}\r\n\r\n.fc-time-grid table { /* don't put outer borders on slats/bg/content/etc */\r\n\tborder: 0 hidden transparent;\r\n}\r\n\r\n.fc-time-grid > .fc-bg {\r\n\tz-index: 1;\r\n}\r\n\r\n.fc-time-grid .fc-slats,\r\n.fc-time-grid > hr { /* the <hr> AgendaView injects when grid is shorter than scroller */\r\n\tposition: relative;\r\n\tz-index: 2;\r\n}\r\n\r\n.fc-time-grid .fc-content-col {\r\n\tposition: relative; /* because now-indicator lives directly inside */\r\n}\r\n\r\n.fc-time-grid .fc-content-skeleton {\r\n\tposition: absolute;\r\n\tz-index: 3;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* divs within a cell within the fc-content-skeleton */\r\n\r\n.fc-time-grid .fc-business-container {\r\n\tposition: relative;\r\n\tz-index: 1;\r\n}\r\n\r\n.fc-time-grid .fc-bgevent-container {\r\n\tposition: relative;\r\n\tz-index: 2;\r\n}\r\n\r\n.fc-time-grid .fc-highlight-container {\r\n\tposition: relative;\r\n\tz-index: 3;\r\n}\r\n\r\n.fc-time-grid .fc-event-container {\r\n\tposition: relative;\r\n\tz-index: 4;\r\n}\r\n\r\n.fc-time-grid .fc-now-indicator-line {\r\n\tz-index: 5;\r\n}\r\n\r\n.fc-time-grid .fc-helper-container { /* also is fc-event-container */\r\n\tposition: relative;\r\n\tz-index: 6;\r\n}\r\n\r\n\r\n/* TimeGrid Slats (lines that run horizontally)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid .fc-slats td {\r\n\theight: 1.5em;\r\n\tborder-bottom: 0; /* each cell is responsible for its top border */\r\n}\r\n\r\n.fc-time-grid .fc-slats .fc-minor td {\r\n\tborder-top-style: dotted;\r\n}\r\n\r\n.fc-time-grid .fc-slats .ui-widget-content { /* for jqui theme */\r\n\tbackground: none; /* see through to fc-bg */\r\n}\r\n\r\n\r\n/* TimeGrid Highlighting Slots\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid .fc-highlight-container { /* a div within a cell within the fc-highlight-skeleton */\r\n\tposition: relative; /* scopes the left/right of the fc-highlight to be in the column */\r\n}\r\n\r\n.fc-time-grid .fc-highlight {\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\tright: 0;\r\n\t/* top and bottom will be in by JS */\r\n}\r\n\r\n\r\n/* TimeGrid Event Containment\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-ltr .fc-time-grid .fc-event-container { /* space on the sides of events for LTR (default) */\r\n\tmargin: 0 2.5% 0 2px;\r\n}\r\n\r\n.fc-rtl .fc-time-grid .fc-event-container { /* space on the sides of events for RTL */\r\n\tmargin: 0 2px 0 2.5%;\r\n}\r\n\r\n.fc-time-grid .fc-event,\r\n.fc-time-grid .fc-bgevent {\r\n\tposition: absolute;\r\n\tz-index: 1; /* scope inner z-index's */\r\n}\r\n\r\n.fc-time-grid .fc-bgevent {\r\n\t/* background events always span full width */\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n\r\n/* Generic Vertical Event\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-v-event.fc-not-start { /* events that are continuing from another day */\r\n\t/* replace space made by the top border with padding */\r\n\tborder-top-width: 0;\r\n\tpadding-top: 1px;\r\n\r\n\t/* remove top rounded corners */\r\n\tborder-top-left-radius: 0;\r\n\tborder-top-right-radius: 0;\r\n}\r\n\r\n.fc-v-event.fc-not-end {\r\n\t/* replace space made by the top border with padding */\r\n\tborder-bottom-width: 0;\r\n\tpadding-bottom: 1px;\r\n\r\n\t/* remove bottom rounded corners */\r\n\tborder-bottom-left-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n\r\n/* TimeGrid Event Styling\r\n----------------------------------------------------------------------------------------------------\r\nWe use the full \"fc-time-grid-event\" class instead of using descendants because the event won't\r\nbe a descendant of the grid when it is being dragged.\r\n*/\r\n\r\n.fc-time-grid-event {\r\n\toverflow: hidden; /* don't let the bg flow over rounded corners */\r\n}\r\n\r\n.fc-time-grid-event.fc-selected {\r\n\t/* need to allow touch resizers to extend outside event's bounding box */\r\n\t/* common fc-selected styles hide the fc-bg, so don't need this anyway */\r\n\toverflow: visible;\r\n}\r\n\r\n.fc-time-grid-event.fc-selected .fc-bg {\r\n\tdisplay: none; /* hide semi-white background, to appear darker */\r\n}\r\n\r\n.fc-time-grid-event .fc-content {\r\n\toverflow: hidden; /* for when .fc-selected */\r\n}\r\n\r\n.fc-time-grid-event .fc-time,\r\n.fc-time-grid-event .fc-title {\r\n\tpadding: 0 1px;\r\n}\r\n\r\n.fc-time-grid-event .fc-time {\r\n\tfont-size: .85em;\r\n\twhite-space: nowrap;\r\n}\r\n\r\n/* short mode, where time and title are on the same line */\r\n\r\n.fc-time-grid-event.fc-short .fc-content {\r\n\t/* don't wrap to second line (now that contents will be inline) */\r\n\twhite-space: nowrap;\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time,\r\n.fc-time-grid-event.fc-short .fc-title {\r\n\t/* put the time and title on the same line */\r\n\tdisplay: inline-block;\r\n\tvertical-align: top;\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time span {\r\n\tdisplay: none; /* don't display the full time text... */\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time:before {\r\n\tcontent: attr(data-start); /* ...instead, display only the start time */\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time:after {\r\n\tcontent: \"\\000A0-\\000A0\"; /* seperate with a dash, wrapped in nbsp's */\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-title {\r\n\tfont-size: .85em; /* make the title text the same size as the time */\r\n\tpadding: 0; /* undo padding from above */\r\n}\r\n\r\n/* resizer (cursor device) */\r\n\r\n.fc-time-grid-event.fc-allow-mouse-resize .fc-resizer {\r\n\tleft: 0;\r\n\tright: 0;\r\n\tbottom: 0;\r\n\theight: 8px;\r\n\toverflow: hidden;\r\n\tline-height: 8px;\r\n\tfont-size: 11px;\r\n\tfont-family: monospace;\r\n\ttext-align: center;\r\n\tcursor: s-resize;\r\n}\r\n\r\n.fc-time-grid-event.fc-allow-mouse-resize .fc-resizer:after {\r\n\tcontent: \"=\";\r\n}\r\n\r\n/* resizer (touch device) */\r\n\r\n.fc-time-grid-event.fc-selected .fc-resizer {\r\n\t/* 10x10 dot */\r\n\tborder-radius: 5px;\r\n\tborder-width: 1px;\r\n\twidth: 8px;\r\n\theight: 8px;\r\n\tborder-style: solid;\r\n\tborder-color: inherit;\r\n\tbackground: #fff;\r\n\t/* horizontally center */\r\n\tleft: 50%;\r\n\tmargin-left: -5px;\r\n\t/* center on the bottom edge */\r\n\tbottom: -5px;\r\n}\r\n\r\n\r\n/* Now Indicator\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid .fc-now-indicator-line {\r\n\tborder-top-width: 1px;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* arrow on axis */\r\n\r\n.fc-time-grid .fc-now-indicator-arrow {\r\n\tmargin-top: -5px; /* vertically center on top coordinate */\r\n}\r\n\r\n.fc-ltr .fc-time-grid .fc-now-indicator-arrow {\r\n\tleft: 0;\r\n\t/* triangle pointing right... */\r\n\tborder-width: 5px 0 5px 6px;\r\n\tborder-top-color: transparent;\r\n\tborder-bottom-color: transparent;\r\n}\r\n\r\n.fc-rtl .fc-time-grid .fc-now-indicator-arrow {\r\n\tright: 0;\r\n\t/* triangle pointing left... */\r\n\tborder-width: 5px 6px 5px 0;\r\n\tborder-top-color: transparent;\r\n\tborder-bottom-color: transparent;\r\n}\r\n\r\n\r\n\r\n/* List View\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* possibly reusable */\r\n\r\n.fc-event-dot {\r\n\tdisplay: inline-block;\r\n\twidth: 10px;\r\n\theight: 10px;\r\n\tborder-radius: 5px;\r\n}\r\n\r\n/* view wrapper */\r\n\r\n.fc-rtl .fc-list-view {\r\n\tdirection: rtl; /* unlike core views, leverage browser RTL */\r\n}\r\n\r\n.fc-list-view {\r\n\tborder-width: 1px;\r\n\tborder-style: solid;\r\n}\r\n\r\n/* table resets */\r\n\r\n.fc .fc-list-table {\r\n\ttable-layout: auto; /* for shrinkwrapping cell content */\r\n}\r\n\r\n.fc-list-table td {\r\n\tborder-width: 1px 0 0;\r\n\tpadding: 8px 14px;\r\n}\r\n\r\n.fc-list-table tr:first-child td {\r\n\tborder-top-width: 0;\r\n}\r\n\r\n/* day headings with the list */\r\n\r\n.fc-list-heading {\r\n\tborder-bottom-width: 1px;\r\n}\r\n\r\n.fc-list-heading td {\r\n\tfont-weight: bold;\r\n}\r\n\r\n.fc-ltr .fc-list-heading-main { float: left; }\r\n.fc-ltr .fc-list-heading-alt { float: right; }\r\n\r\n.fc-rtl .fc-list-heading-main { float: right; }\r\n.fc-rtl .fc-list-heading-alt { float: left; }\r\n\r\n/* event list items */\r\n\r\n.fc-list-item.fc-has-url {\r\n\tcursor: pointer; /* whole row will be clickable */\r\n}\r\n\r\n.fc-list-item:hover td {\r\n\tbackground-color: #f5f5f5;\r\n}\r\n\r\n.fc-list-item-marker,\r\n.fc-list-item-time {\r\n\twhite-space: nowrap;\r\n\twidth: 1px;\r\n}\r\n\r\n/* make the dot closer to the event title */\r\n.fc-ltr .fc-list-item-marker { padding-right: 0; }\r\n.fc-rtl .fc-list-item-marker { padding-left: 0; }\r\n\r\n.fc-list-item-title a {\r\n\t/* every event title cell has an <a> tag */\r\n\ttext-decoration: none;\r\n\tcolor: inherit;\r\n}\r\n\r\n.fc-list-item-title a[href]:hover {\r\n\t/* hover effect only on titles with hrefs */\r\n\ttext-decoration: underline;\r\n}\r\n\r\n/* message when no events */\r\n\r\n.fc-list-empty-wrap2 {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n\tbottom: 0;\r\n}\r\n\r\n.fc-list-empty-wrap1 {\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tdisplay: table;\r\n}\r\n\r\n.fc-list-empty {\r\n\tdisplay: table-cell;\r\n\tvertical-align: middle;\r\n\ttext-align: center;\r\n}\r\n\r\n.fc-unthemed .fc-list-empty { /* theme will provide own background */\r\n\tbackground-color: #eee;\r\n}\r\n"; });
 define('text!modules/analytics/analytics.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../resources/elements/submenu.html'></compose>\r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template>"; });
@@ -62259,7 +62869,7 @@ define('text!modules/user/requests/clientRequests.html', ['module'], function(mo
 define('text!modules/user/requests/createRequests.html', ['module'], function(module) { module.exports = "<template>\r\n<require from=\"fuelux/css/fuelux.min.css\"></require>\r\n<require from=\"flatpickr/flatpickr.css\"></require>\r\n<div class=\"row\">\r\n <span  show.bind=\"showLockMessage\" class=\"leftMargin bottomMargin\" >Request is currently locked by ${lockObject.personId | lookupValue:people.peopleArray:\"_id\":'fullName'}</span>\r\n \r\n</div>\r\n  <div class=\"fuelux col-lg-7 blackText\" style=\"height:1000px;\">\r\n    <div class=\"wizard\" data-initialize=\"wizard\" id=\"myWizard\">\r\n      <div class=\"steps-container\">\r\n        <ul class=\"steps\">\r\n          <li data-step=\"1\"  data-target=\"#step1\" class=\"active\">\r\n            <span class=\"badge badge-info\">1</span>Step 1<span class=\"chevron\"></span>\r\n          </li>\r\n          <li data-step=\"2\" data-target=\"#step2\">\r\n            <span class=\"badge\">2</span>Step 2<span class=\"chevron\"></span>\r\n          </li>\r\n          <li data-step=\"3\" data-target=\"#step3\">\r\n            <span class=\"badge\">3</span>Step 3<span class=\"chevron\"></span>\r\n          </li>\r\n          <li data-step=\"4\" data-target=\"#step4\">\r\n            <span class=\"badge\">4</span>Step 4<span class=\"chevron\"></span>\r\n          </li>\r\n        </ul>\r\n      </div>\r\n      <div class=\"actions\">\r\n        <button type=\"button\" class=\"btn btn-default btn-prev btn-md\">\r\n           <span><i class=\"fa fa-chevron-left\" aria-hidden=\"true\"></i></span>Prev</button>\r\n        <button type=\"button\" class=\"btn btn-primary btn-next btn-md\" data-last=\"Complete\">Next\r\n          <span><i class=\"fa fa-chevron-right\" aria-hidden=\"true\"></i></span>\r\n        </button>\r\n      </div>\r\n      <div class=\"step-content\">\r\n\r\n        <div class=\"step-pane active\" id=\"step1\" data-step=\"1\">\r\n          <h3><strong>Step 1 </strong> - Course Information</h3>\r\n          <compose view=\"./components/client-request-step1.html\"></compose>\r\n        </div>\r\n\r\n        <div class=\"step-pane\" id=\"step2\"  data-step=\"2\">\r\n          <h3><strong>Step 2 </strong> - Products</h3>\r\n\r\n          <compose view=\"./components/client-request-step2.html\"></compose>\r\n\r\n        </div>\r\n\r\n        <div class=\"step-pane\" id=\"step3\"  data-step=\"3\">\r\n          <h3><strong>Step 3 </strong> - Additional Comments</h3>\r\n          <compose view=\"./components/client-request-step3.html\"></compose>\r\n        </div>\r\n\r\n        <div class=\"step-pane\" id=\"step4\"  data-step=\"4\">\r\n          <h3><strong>Step 4 </strong> - Requested Dates</h3>\r\n          <compose view=\"./components/client-request-step4.html\"></compose>\r\n        </div>\r\n\r\n      </div>\r\n    </div>\r\n  </div>\r\n  <div class=\"col-lg-4 leftMargin\" id=\"SessionInfo\">\r\n\t\t\t<h2 class=\"underline\">Current Sessions</h2>\r\n\t\t\t<div class=\"list-group\">\r\n\t\t\t\t<a class=\"list-group-item\" repeat.for=\"session of sessions.sessionsArray\">\r\n\t\t\t\t\t<h4 class=\"list-group-item-heading\">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>\r\n\t\t\t\t\t<p class=\"list-group-item-text\">Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\r\n\t\t\t\t\t<p class=\"list-group-item-text\">Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\r\n\t\t\t\t\t<p class=\"list-group-item-text\">Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\r\n\t\t\t\t</a>\r\n    </div>\r\n  </div>\r\n  <div show.bind=\"sessionSelected\" class=\"topMargin col-lg-4 leftMargin\"><h4>Session: ${sessions.selectedSession.session} - ${sessions.selectedSession.year}</h4></div> \r\n  <div show.bind=\"sandBoxClient\" class=\"topMargin col-lg-4 leftMargin\"><h4>Course: ${config.SANDBOX_NAME}</h4></div> \r\n  <div show.bind=\"courseSelected\" class=\"topMargin col-lg-4 leftMargin\"><h4>Course: ${people.selectedCourse.number} - ${people.selectedCourse.name}</h4></div> \r\n  <div class=\"topMargin col-lg-4 leftMargin\" style=\"display: none;\" id=\"existingRequestInfo\"></div>\r\n\r\n  <div id=\"curriculumInfo\" class=\"topMargin col-lg-4 leftMargin\" >\r\n    <div class=\"panel panel-default\" >\r\n      <div class=\"panel-heading\">${productInfoObject.header}</div>\r\n      <div class=\"panel-body\" innerhtml.bind=\"productInfoObject.info\"></div>\r\n    </div>\r\n  </div>\r\n</div>\r\n  \r\n</template>\r\n"; });
 define('text!modules/user/requests/viewProducts.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"container\">\r\n   <div class=\"col-lg-5 topMargin\">\r\n        <label id=\"productList\">Available Products</label>\r\n        <div class=\"well well2 overFlow\">\r\n          <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter products\"/>\r\n          <ul class=\"list-group\">\r\n            <a  click.trigger=\"selectProduct($event)\" type=\"button\" repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\"\r\n                    mouseover.delegate=\"showCurriculum(product, $event)\" mouseout.delegate=\"hideCurriculum()\"\r\n                    class=\"list-group-item dropbtn\">${product.name}</a>\r\n          </ul>\r\n        </div>\r\n\t</div>\r\n\t <div id=\"curriculumInfo\" class=\"topMargin col-lg-6 leftMargin\">\r\n\t\t<div class=\"col-lg-6\" style=\"position:fixed;\">\r\n\t\t\t<h2>${productInfoObject.header}</h2>\r\n\t\t\t<div class=\"panel-body\" innerhtml.bind=\"productInfoObject.info\"></div>\r\n\t\t</div>\r\n\t</div>\r\n  </div>\r\n</template>"; });
 define('text!modules/user/requests/viewRequests.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"col-lg-4\">\r\n            <div class=\"form-group topMargin leftMargin\">\r\n                <select show.bind=\"!requestSelected\" value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\r\n                <option repeat.for=\"session of sessions.sessionsArray\"\r\n                        value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\r\n                </select>\r\n            </div>\r\n        </div>\r\n\r\n        <div show.bind=\"!requestSelected\" class=\"col-lg-12\">\r\n            <div show.bind=\"noRequests\" class=\"bottomMargin leftMargin\">\r\n                <h4>You have no existing requests for this session</h4>\r\n            </div>\r\n            <compose  show.bind=\"!noRequests\"view=\"./components/viewRequestsTable.html\"></compose>\r\n        </div> \r\n        <div show.bind=\"requestSelected\" class=\"col-lg-12\">\r\n            <compose view=\"./components/viewRequestsForm.html\"></compose>\r\n        </div>\r\n      </div>\r\n    </div> \r\n</template>"; });
-define('text!modules/user/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"col-lg-4\">\r\n            <compose view='./components/helpTicketType.html'></compose>\r\n\r\n            <compose show.bind=\"helpTicketType != 'NULL' && requestsRequired\" view='./components/Requests.html'></compose>\r\n           \r\n        </div>\r\n        <div class=\"col-lg-8\">\r\n            <compose show.bind=\"showAdditionalInfo && helpTicketType != 'NULL'\" view='./components/helpTicketDetails.html'></compose>\r\n        </div>\r\n      </div>\r\n    </div> <!-- Panel Body -->\r\n</template>"; });
+define('text!modules/user/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"col-lg-4\">\r\n            <compose view='./components/helpTicketType.html'></compose>\r\n\r\n            <compose show.bind=\"helpTicketType != 'NULL' && requestsRequired\" view='./components/Requests.html'></compose>\r\n           \r\n        </div>\r\n        <div class=\"col-lg-8\">\r\n            <compose show.bind=\"showDetails\" view='./components/helpTicketDetails.html'></compose>\r\n            <!-- show.bind=\"showAdditionalInfo && helpTicketType != 'NULL'\" -->\r\n        </div>\r\n      </div>\r\n    </div> <!-- Panel Body -->\r\n</template>"; });
 define('text!modules/user/support/curriculum.html', ['module'], function(module) { module.exports = "<template>\r\n\t<style>\r\n        .menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\r\n        }\r\n    </style>\r\n\t<div class=\"col-lg-3\">\r\n\t\t<h4>Curriculum Categories</h4>\r\n\t\t<div>\r\n\t\t\t<ul id=\"buttonGroup\" class=\"list-group\">\r\n\t\t\t\t<button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"category of curriculum.curriculumCatArray\"\r\n\t\t\t\t\tid=\"${category.name}\" class=\"${ $first ? 'list-group-item menuButtons' : 'list-group-item'}\">${category.name}</button>\r\n\t\t\t</ul>\r\n\t\t</div>\r\n\t</div>\r\n\t<div class=\"col-lg-9\">\r\n\t\t<div show.bind=\"typeSelected != '' && !curriculumSelected\" style='padding:15px;'>\r\n\t\t\t<div class='row'>\r\n\t\t\t\t<div class='col-lg-12 bottomMargin'>\r\n\t\t\t\t\t<table id=\"newsTable\" class=\"table table-striped table-hover\">\r\n\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t<td colspan='4'>\r\n\t\t\t\t\t\t\t\t\t<compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t<th>Title </th>\r\n\t\t\t\t\t\t\t\t<th>Rating</th>\r\n\t\t\t\t\t\t\t\t<th>Rate It</th>\r\n\t\t\t\t\t\t\t\t<th>Products</th>\r\n\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t<tr repeat.for=\"curriculum of curriculumArray\">\r\n\t\t\t\t\t\t\t\t<td click.delegate=\"selectCurriculum(curriculum)\" data-title=\"Title\" class=\"col-lg-6\">${curriculum.title}</td>\r\n\t\t\t\t\t\t\t\t<td data-title=\"Rating\">${curriculum.rating | formatDigits:2}</td>\r\n\t\t\t\t\t\t\t\t<td data-title=\"Rating\" class=\"col-lg-2\">\r\n\t\t\t\t\t\t\t\t\t<rate-it id=\"${curriculum._id}\" change.delegate=\"rateCurriculum($event)\" rating.two-way=\"curriculum.rating\" raters.bind=\"curriculum.raters\"></rate-it>\r\n\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t\t<td data-title=\"Products\" class=\"col-lg-4\">\r\n\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\r\n\t\t\t\t\t\t\t\t\t\t<li repeat.for=\"product of curriculum.products\" class=\"list-group-item\">${product | lookupValue:products.productsArray:\"_id\":\"name\"}</li>\r\n\t\t\t\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t</table>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div show.bind=\"curriculumSelected\">\r\n\t\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n\t\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<span click.delegate=\"add()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\t\tdata-original-title=\"Add Comment\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<span show.bind=\"addComment\" click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<span show.bind=\"addComment\" click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n\t\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"panel panel-default leftMargin rightMargin\">\r\n\t\t\t\t <div class=\"panel-heading\">\r\n\t\t\t\t\t<h3 class=\"panel-title\">${curriculum.selectedCurriculum.title}</h3>\r\n\t\t\t\t</div>\r\n\t\t\t\t\t<div show.bind=\"curriculum.selectedCurriculum.description.length > 0\" class=\"panel-body\" innerhtml.bind=\"curriculum.selectedCurriculum.description\">\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"topMargin bigLeftMargin\" show.bind=\"curriculum.selectedCurriculum.file.fileName != undefined\">\r\n\t\t\t\t\t<a href=\"${config.DOWNLOAD_URL}/curriculum/${curriculum.selectedCurriculum.category}/${curriculum.selectedCurriculum.file.fileName}\" innerhtml.bind='curriculum.selectedCurriculum.file.fileName' target='_blank'></a>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div show.bind=\"addComment\">\r\n\t\t\t\t<h3>Comments are not anonymous</h3>\r\n\t\t\t\t <editor value.bind=\"comment\" height=\"250\"></editor>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"well well-sm topMargin leftMargin rightMargin\" show.bind=\"curriculum.selectedCurriculum.customerComments.length > 0\">\r\n\t\t\t\t<!-- Timeline Content -->\r\n\t\t\t\t<div class=\"smart-timeline\">\r\n\t\t\t\t\t<ul class=\"smart-timeline-list\">\r\n\t\t\t\t\t\t<li  repeat.for=\"comment of curriculum.selectedCurriculum.customerComments\">\r\n\t\t\t\t\t\t\t<compose view=\"./components/comment.html\"></compose>\r\n\t\t\t\t\t\t</li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n</template>"; });
 define('text!modules/user/support/downloads.html', ['module'], function(module) { module.exports = "<template>\r\n    <style>\r\n        .menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\r\n        }\r\n    </style>\r\n    <div class=\"panel panel-default\">\r\n      <div class=\"panel-body\">\r\n          <div class=\"col-lg-3\">\r\n\t\t<h4>Download Categories</h4>\r\n\t\t<div>\r\n\t\t\t<ul class=\"list-group\" id=\"buttonGroup\">\r\n\t\t\t\t<button click.trigger=\"typeChanged($event, $index)\" type=\"button\" repeat.for=\"type of downloads.appCatsArray\" id=\"${type.downCatcode}\"\r\n\t\t\t\t\tclass=\"${ $first ? 'menuButtons list-group-item' : 'list-group-item'}\">${type.description}</button>\r\n\t\t\t</ul>\r\n\t\t</div>\r\n\t</div>\r\n       \r\n\r\n        <div show.bind=\"typeSelected != ''\" class=\"col-lg-9\" style='padding:15px;'>\r\n            <div class='row'>\r\n                <div class='col-lg-12 bottomMargin'>\r\n                    <table id=\"newsTable\" class=\"table table-striped table-hover\">\r\n                        <thead>\r\n                            <tr>\r\n                                <td colspan='4'>\r\n                                    <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th>Name </th>\r\n                                <th>File</th>\r\n                                <th>Decription</th>\r\n                                <th>Date</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr repeat.for=\"item of dataTable.displayArray\">\r\n                                <td data-title=\"name\" class=\"col-md-2\">${item.name}</td>\r\n                                <td data-title=\"originalFilename\" class=\"col-md-2\">\r\n                                    <a href=\"${config.DOWNLOAD_URL}/downloads/${typeSelected}/${item.file.originalFilename}\" target=\"_blank\">${item.file.originalFilename}</a>\r\n                                </td>\r\n                                <td data-title=\"description\" class=\"col-md-6\">\r\n                                    <div>${item.description}</div>\r\n                                </td>\r\n                                <td class=\"col-md-2\">${item.file.dateUploaded | dateFormat}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n   </div>\r\n</template>"; });
 define('text!modules/user/support/links.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"row\">\r\n      <div repeat.for=\"category of linkArray\" class=\"col-lg-3\">\r\n        <h2>${category.category}</h2>\r\n        <div>\r\n          <a repeat.for=\"link of category.links\" href=\"${link.url}\" class=\"list-group-item link-shadow topMargin\" target=\"_blank\">\r\n            <h4 class=\"list-group-item-heading\">${link.title}</h4>\r\n            <p class=\"list-group-item-text\">${link.content}</p>\r\n          </a>\r\n        </div>\r\n      </div>\r\n  </div>\r\n</template>"; });

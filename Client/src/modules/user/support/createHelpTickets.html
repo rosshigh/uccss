@@ -8,7 +8,8 @@
            
         </div>
         <div class="col-lg-8">
-            <compose show.bind="showAdditionalInfo && helpTicketType != 'NULL'" view='./components/helpTicketDetails.html'></compose>
+            <compose show.bind="showDetails" view='./components/helpTicketDetails.html'></compose>
+            <!-- show.bind="showAdditionalInfo && helpTicketType != 'NULL'" -->
         </div>
       </div>
     </div> <!-- Panel Body -->
