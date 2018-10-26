@@ -22278,29 +22278,10 @@ define('modules/admin/Customers/bulkEmails',['exports', 'aurelia-framework', '..
 
         BulkEmails.prototype.activate = function () {
             var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var _this = this;
-
-                var responses;
                 return regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                _context.next = 2;
-                                return Promise.all([this.people.getPeopleBulkEmailArray('?order=lastName&filter=personStatus|eq|01'), this.people.getInstitutionsArray('?order=name', true), this.is4ua.loadIs4ua(), this.config.getConfig()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.activeFilterValue = "01";
-                                this.filteredArray = this.config.ROLES;
-                                this.dataTable.updateArray(this.people.peopleBulkEmailArray);
-
-                                this.roleSelect = new Array();
-                                this.config.ROLES.forEach(function (item) {
-                                    _this.roleSelect.push({ code: item.role, description: item.role });
-                                });
-
-                            case 8:
                             case 'end':
                                 return _context.stop();
                         }
@@ -22343,29 +22324,36 @@ define('modules/admin/Customers/bulkEmails',['exports', 'aurelia-framework', '..
             return filterActive;
         }();
 
-        BulkEmails.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-            this.institutionStatusValue = '01';
-            this.dataTable.filterList(this.institutionStatusValue, { type: 'value', filter: 'institutionStatusFilter', collectionProperty: 'institutionId.institutionStatus', displayProperty: 'institutionId.institutionStatus', matchProperty: '', compare: 'match' });
-        };
-
-        BulkEmails.prototype.refresh = function () {
+        BulkEmails.prototype.attached = function () {
             var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var _this = this;
+
+                var responses;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
-                                this._cleanUpFilters();
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+                                (0, _jquery2.default)('#loading').show();
                                 _context3.next = 4;
-                                return this.people.getPeopleBulkEmailArray('?order=lastName&filter=personStatus|eq|01', true);
+                                return Promise.all([this.people.getPeopleBulkEmailArray('?order=lastName&filter=personStatus|eq|01'), this.people.getInstitutionsArray('?order=name', true), this.is4ua.loadIs4ua(), this.config.getConfig()]);
 
                             case 4:
+                                responses = _context3.sent;
+
+                                this.activeFilterValue = "01";
+                                this.filteredArray = this.config.ROLES;
                                 this.dataTable.updateArray(this.people.peopleBulkEmailArray);
 
-                                this.spinnerHTML = "";
+                                this.roleSelect = new Array();
+                                this.config.ROLES.forEach(function (item) {
+                                    _this.roleSelect.push({ code: item.role, description: item.role });
+                                });
+                                (0, _jquery2.default)('#loading').hide();
+                                this.institutionStatusValue = '01';
+                                this.dataTable.filterList(this.institutionStatusValue, { type: 'value', filter: 'institutionStatusFilter', collectionProperty: 'institutionId.institutionStatus', displayProperty: 'institutionId.institutionStatus', matchProperty: '', compare: 'match' });
 
-                            case 6:
+                            case 13:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -22373,8 +22361,40 @@ define('modules/admin/Customers/bulkEmails',['exports', 'aurelia-framework', '..
                 }, _callee3, this);
             }));
 
-            function refresh() {
+            function attached() {
                 return _ref3.apply(this, arguments);
+            }
+
+            return attached;
+        }();
+
+        BulkEmails.prototype.refresh = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                this._cleanUpFilters();
+
+                                (0, _jquery2.default)('#loading').show();
+                                _context4.next = 4;
+                                return this.people.getPeopleBulkEmailArray('?order=lastName&filter=personStatus|eq|01', true);
+
+                            case 4:
+                                this.dataTable.updateArray(this.people.peopleBulkEmailArray);
+
+                                (0, _jquery2.default)('#loading').hide();
+
+                            case 6:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function refresh() {
+                return _ref4.apply(this, arguments);
             }
 
             return refresh;
@@ -22437,9 +22457,9 @@ define('modules/admin/Customers/bulkEmails',['exports', 'aurelia-framework', '..
         };
 
         BulkEmails.prototype.downloadInstExcel = function downloadInstExcel() {
-            var csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,City,Region,Roles,Institution\r\n";
+            var csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,City,Region,Country,Roles,Institution\r\n";
             this.dataTable.baseArray.forEach(function (item) {
-                csvContent += item.firstName + "," + item.lastName.replace(',', ' ') + "," + item.email + "," + item.institutionId.city + "," + item.institutionId.region + "," + item.roles.join(':') + "," + item.institutionId.name;
+                csvContent += item.firstName + "," + item.lastName.replace(',', ' ') + "," + item.email + "," + item.institutionId.city + "," + item.institutionId.region + "," + item.institutionId.country + "," + item.roles.join(':') + "," + item.institutionId.name;
                 csvContent += "\r\n";
             });
             var encodedUri = encodeURI(csvContent);
@@ -62779,10 +62799,10 @@ define('text!resources/elements/table-navigation-bar.html', ['module'], function
 define('text!resources/elements/tree-node.html', ['module'], function(module) { module.exports = "<template>\r\n\t<style>\r\n\t\t.menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\r\n\t\t}\r\n\t</style>\r\n\t<require from=\"./tree-node.css\"></require>\r\n\t<li if.bind=\"visible\" class=\"list-group-item treeview ${selectedNode == data?'menuButtons':''}\" click.delegate=\"clickMe(data)\">\r\n\t\t<span class=\"indent\" repeat.for=\"i of level\"></span>\r\n\t\t<span if.bind=\"data.children\" class=\"icon glyphicon ${childrenVisible?'glyphicon-triangle-bottom':'glyphicon-triangle-right'}\" click.delegate=\"toggleExpand(data)\"></span>\r\n\t\t<span if.bind=\"!data.children\" class=\"icon glyphicon\"></span>\r\n\t\t${data.name}<span if.bind=\"!childrenVisible && itemCount != 0\" class=\"badge\" click.delegate=\"toggleExpand()\">${itemCount}</span>\r\n\t\t <span if.bind=\"!data.children\" class=\"icon glyphicon glyphicon-trash pull-right\" click.delegate=\"callback(data)\"></span>\r\n\t</li>\r\n\t<tree-node if.bind=\"visible\"  callback.call=\"deleteFile2(node)\" selected-file.bind=\"selectedFile\" repeat.for=\"node of data.children\" data.bind=\"node\" level.bind=\"level + 1\" visible.bind=\"childrenVisible\" max-level.bind=\"maxLevel\" selected-node.bind=\"selectedNode\"></tree-node>\r\n</template>"; });
 define('text!resources/htTimeline/response.html', ['module'], function(module) { module.exports = "<template>\r\n\t <div class=\"topMargin\">\r\n\t\t<img if.bind=\"helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.personId.file.fileName}\" height=\"100\">\r\n\t</div>\r\n\r\n    <div if.bind=\"!helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"helpTickets.selectedHelpTicket.personId.email | gravatarUrl:100:1\"></div>\r\n\t<div class=\"smart-timeline-time\">\r\n\t\t<small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\r\n\t\t<p><span if.bind=\"event.emailSent\"  ><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></span></p>\r\n    \t<span if.bind=\"event.confidential\"  ><i class=\"fa fa-user-secret\" aria-hidden=\"true\"></i></i></span> \r\n\t</div>\r\n\t<div class=\"smart-timeline-content borderTop leftJustify\">\r\n\t\t<div class=\"form-group\">\r\n\t\t\t<p>${event.personId.fullName}</p>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div class=\"form-group\">\r\n\t\t\t<div class=\"hover_img\" repeat.for=\"file of event.files\">\r\n\t\t\t\t<a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\" target=\"_blank\"\r\n\t\t\t\t\tinnerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div class=\"form-group\">\r\n\t\t\t<div class=\"hover_img\" repeat.for=\"document of event.documents\">\r\n\t\t\t\t<a href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}\" target=\"_blank\">${document.fileName}</a>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>"; });
 define('text!resources/htTimeline/timeline.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"well well-sm topMargin\">\r\n      <div class=\"smart-timeline\">\r\n        <ul class=\"smart-timeline-list\">\r\n          <li>\r\n            <div class=\"topMargin\">\r\n                <img if.bind=\"helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.personId.file.fileName}\" height=\"100\">\r\n            </div>\r\n\r\n            <div if.bind=\"!helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"helpTickets.selectedHelpTicket.personId.email | gravatarUrl:100:1\"></div>\r\n              <div class=\"smart-timeline-time\">\r\n                <small>${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\r\n              </div>\r\n              <div class=\"smart-timeline-content borderTop leftJustify\">\r\n                <div class=\"form-group\">\r\n                  <p>${helpTickets.selectedHelpTicket.personId.fullName}</p>\r\n                  <div class=\"row\">\r\n                    <div class=\"col-lg-4\">\r\n                      <span class=\"col-sm-11 col-sm-offset-1\" id=\"container\"></span>\r\n                      <h4 show.bind=\"showCourse\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Course: ${course}</h4>\r\n                      <div show.bind=\"showRequestDetails\">\r\n                        <h4  class=\"col-sm-11 col-sm-offset-1 topMargin\">Request: ${helpTickets.selectedHelpTicket.requestId.requestNo}</h4>\r\n                        <h4  class=\"col-sm-11 col-sm-offset-1\">Product: ${helpTickets.selectedHelpTicket.productId | lookupValue:products.productsArray:\"_id\":\"name\"}</h4>\r\n                                                  \r\n                        <table class=\"col-sm-11 col-sm-offset-1\">\r\n                          <tr>\r\n                            <th class=\"col-lg-1\">System</th>\r\n                            <th class=\"col-lg-1\">Client</th>\r\n                          </tr>\r\n                          <tr repeat.for=\"assign of helpTickets.selectedHelpTicket.requestId.assignments\">\r\n                            <td class=\"${assign.client == helpTickets.selectedHelpTicket.client ? 'col-lg-1 redText' : 'col-lg-1'}\"><h4>${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h4></td>\r\n                            <td class=\"${assign.client == helpTickets.selectedHelpTicket.client ? 'col-lg-1 redText' : 'col-lg-1'}\"><h4>${assign.client}</h4></td>\r\n                            <td innerhtml=\"${assign.client | arrow:helpTickets.selectedHelpTicket.client:helpTickets.selectedHelpTicket.systemId:assign.systemId}\"></td>\r\n                          </tr>\r\n                      \r\n                        </table>\r\n                      </div>\r\n                      <h4 show.bind=\"!showRequestDetails && clientRequired\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\r\n                   \r\n                      <div class=\"form-group topMargin\">\r\n                          <div class=\"hover_img\" repeat.for=\"file of helpTickets.selectedHelpTicket.content[0].files\">\r\n                            <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\r\n                              target=\"_blank\"\r\n                              innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\r\n                          </div>\r\n                      </div>\r\n                     </div>\r\n                    <div class=\"col-lg-7\">\r\n                      <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.comments ? helpTickets.selectedHelpTicket.content[0].content.comments : ' ' \"></div>\r\n                      <div show.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps\">\r\n                        <hr/>\r\n                        <h4 >Steps to reproduce the problem</h4>\r\n                        <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps ? helpTickets.selectedHelpTicket.content[0].content.steps : ' ' \"></div>\r\n                      </div>\r\n                    </div>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </li>\r\n          <li repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC:true\">\r\n            <compose view=\"./response.html\"></compose>\r\n          </li>\r\n        </ul>\r\n      </div>\r\n    </div>\r\n</template>"; });
-define('text!modules/admin/Customers/bulkEmails.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n\t\t<compose view=\"./components/selectionForm.html\"></compose>\r\n\t\t<compose view=\"./components/emailTable.html\"></compose>\r\n        </div> \r\n      </div> \r\n</template>"; });
+define('text!modules/admin/Customers/bulkEmails.html', ['module'], function(module) { module.exports = "<template>\r\n  <span id=\"loading\">\r\n    <ul class=\"bokeh\">\r\n      <li></li>\r\n      <li></li>\r\n      <li></li>\r\n    </ul>\r\n  </span>\r\n  <div show.bind=\"dataTable.displayArray && dataTable.displayArray.length\" class=\"panel panel-info\">\r\n    <div class=\"panel-body\">\r\n      <compose view=\"./components/selectionForm.html\"></compose>\r\n      <compose view=\"./components/emailTable.html\"></compose>\r\n    </div>\r\n  </div>\r\n</template>"; });
 define('text!modules/admin/Customers/customers.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../../resources/elements/submenu.html'></compose>\r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template"; });
 define('text!modules/admin/Customers/editInstitutions.html', ['module'], function(module) { module.exports = "<template>\r\n    <span id=\"loading\">\r\n        <ul class=\"bokeh\">\r\n            <li></li>\r\n            <li></li>\r\n            <li></li>\r\n        </ul>\r\n    </span>\r\n    <div show.bind=\"dataTable.displayArray && dataTable.displayArray.length\" class=\"panel panel-info\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div show.bind=\"!institutionSelected\" class=\"col-lg-12\">\r\n                    <compose view=\"./components/institutionsTable.html\"></compose>\r\n                </div> <!-- Table Div -->\r\n                <div show.bind=\"institutionSelected\" class=\"col-lg-12\">\r\n                    <compose view=\"./components/institutionsForm.html\"></compose>\r\n                </div> <!-- Form Div -->\r\n            </div> <!-- Row -->\r\n        </div> <!-- Panel Body -->\r\n</template>"; });
-define('text!modules/admin/Customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\r\n        <span id=\"loading\">\r\n                <ul  class=\"bokeh\">\r\n                    <li></li>\r\n                    <li></li>\r\n                    <li></li>\r\n                </ul>\r\n            </span>\r\n    <div show.bind=\"dataTable.displayArray && dataTable.displayArray.length\" class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"!personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/peopleTable.html\"></compose>\r\n            </div> \r\n            <div show.bind=\"personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/peopleForm.html\"></compose>\r\n            </div>\r\n        </div> \r\n      </div> \r\n</template>"; });
+define('text!modules/admin/Customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\r\n    <span id=\"loading\">\r\n        <ul class=\"bokeh\">\r\n            <li></li>\r\n            <li></li>\r\n            <li></li>\r\n        </ul>\r\n    </span>\r\n    <div show.bind=\"dataTable.displayArray && dataTable.displayArray.length\" class=\"panel panel-info\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div show.bind=\"!personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\r\n                    <compose view=\"./components/peopleTable.html\"></compose>\r\n                </div>\r\n                <div show.bind=\"personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\r\n                    <compose view=\"./components/peopleForm.html\"></compose>\r\n                </div>\r\n            </div>\r\n        </div>\r\n</template>"; });
 define('text!modules/admin/documents/documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <style>\r\n        .menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\r\n        }\r\n    </style>\r\n    <compose view='../../../resources/elements/submenu.html'></compose>\r\n\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-3\">\r\n                    <div class=\"bottomMargin list-group-item\">\r\n                        <span click.delegate=\"newCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"New Category\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span disabled.bind=\"showDocuments\" click.delegate=\"editCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span> \r\n                    </div>\r\n                    <div show.bind=\"categoryForm\">\r\n                        <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                            <div class=\"panel-body\">\r\n                                <div class=\"bottomMargin\">\r\n                                    <div class=\"bottomMargin list-group-item\">\r\n                                        <span click.delegate=\"backCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \r\n                                            title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                                                                    \r\n                                    </div>\r\n                                </div>\r\n                                <div class=\"form-group\">\r\n                                    <input id=\"name\" value.bind=\"documents.selectedCat.description\" type=\"text\" placeholder=\"Category Name\" class=\"form-control\"/>\r\n                                </div>\r\n                            </div>\r\n\r\n                        </div>\r\n                    </div>\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:600px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul id=\"categoryList\" class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"${ $first ? 'menuButtons' : ''} list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-9\" >\r\n                    <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                        <h3>${documents.selectedCat.description}</h3>\r\n                        <h5>${displayTitle}</h5>\r\n                    </div>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./components/documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./components/documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n</template>"; });
 define('text!modules/admin/inventory/editInventory.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../../resources/elements/submenu.html'></compose>\r\n   \r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/inventoryTable.html\"></compose>\r\n            </div> \r\n            <div show.bind=\"systemSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/inventoryForm.html\"></compose>\r\n            </div>\r\n        </div> \r\n      </div> \r\n</template>"; });
 define('text!modules/admin/notes/editCalendar.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n  <div class=\"col-lg-9\">\r\n    <calendar events.bind=\"events\" view=\"month\" weekends.bind=\"true\" day-click.bind=\"dayClicked\" \r\n    event-click.bind=\"eventClicked\" options.bind=\"{ eventLimit: true, header: {left: 'My title', right:  'today month,agendaWeek,agendaDay,list prev,next'} }\" \r\n    change.delegate=\"eventDialog($event)\" click.delegate=\"selectEvent($event)\"></calendar>\r\n\t</div>\r\n\t<div show.bind=\"eventLayer.selectedEvent.title\" class=\"panel panel-default col-lg-3 bigTopMargin\">\r\n\t\t <div class=\"bottomMargin list-group-item topMargin\">\r\n\t\t\t\t\t\t<span click.delegate=\"edit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"eventLayer.selectedEvent._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n\t\t\t</div>\r\n      <div class=\"panel-body\">\r\n\t\t\t<h4>${eventLayer.selectedEvent.title}</h4>\r\n\t\t\t\t<br/>\r\n\t\t\t<h4>Start: ${eventLayer.selectedEvent.start | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>\r\n\t\t\t\t<br/>\r\n\t\t\t<h4 show.bind=\"eventLayer.selectedEvent.allDay\">All Day</h4>\r\n\t\t\t<br/>\r\n\t\t\t<div show.bind=\"!eventLayer.selectedEvent.allDay\">\r\n\t\t\t\t<h4>End: ${eventLayer.selectedEvent.end | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>\r\n\t\t\t</div>\r\n\t\t\t\t<br/>\r\n\t\t\t<div class=\"col-lg-12 topMargin\" show.bind=\"eventLayer.selectedEvent.notes && eventLayer.selectedEvent.notes.length > 0\" innerhtml.bind=\"eventLayer.selectedEvent.notes\" ></div>\r\n\t\t</div>\r\n  </div>\r\n</template>"; });
