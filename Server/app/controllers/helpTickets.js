@@ -613,6 +613,7 @@ module.exports = function (app, config) {
     var query = buildQuery(req.query, HelpTicketTypes.find())
       query.exec()
       .then(object => {
+console.log(object)        
         res.status(200).json(object);
       })
       .catch(error => {
