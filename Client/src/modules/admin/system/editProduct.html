@@ -6,7 +6,7 @@
                     <li></li>
                 </ul>
             </span>
-    <div show.bind="dataTable.displayArray && dataTable.displayArray.length" class="panel panel-info">
+    <div show.bind="dataTable.displayArray && dataTable.displayArray.length || initialLoaded" class="panel panel-info">
       <div class="panel-body">
         <div class="row">
             <div show.bind="!productSelected" class="col-lg-12">

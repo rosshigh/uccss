@@ -101,12 +101,14 @@ export class ViewHelpTickets {
       this.mobile = true;
       this.toolbar = [['style', ['style', 'bold', 'clear']]];
     }
+    this.initialLoaded = false;
   }
 
   attached() {
     this.refresh(false);
     if(!this.mobile) this.toolTips();
     // $("#loading").hide();
+    this.initialLoaded = true;
   }
 
   toolTips(){

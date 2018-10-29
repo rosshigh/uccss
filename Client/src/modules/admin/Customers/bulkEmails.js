@@ -42,7 +42,7 @@ export class BulkEmails {
     }
 
     async activate() {
-       
+        this.initialLoaded = false;
     }
 
     async filterActive(){
@@ -71,6 +71,7 @@ export class BulkEmails {
         $('#loading').hide();
         this.institutionStatusValue = '01';
         this.dataTable.filterList(this.institutionStatusValue, { type: 'value',  filter: 'institutionStatusFilter',  collectionProperty: 'institutionId.institutionStatus', displayProperty: 'institutionId.institutionStatus', matchProperty:'', compare:'match'} );
+        this.initialLoaded = true;
     }
     
 

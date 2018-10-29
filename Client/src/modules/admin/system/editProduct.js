@@ -64,10 +64,11 @@ export class EditProducts {
         this.filteredDocumentArray = this.documents.docCatsArray;
         this.dataTable.createPageButtons(1);
         $('#loading').hide();
+        this.initialLoaded = true;
     }
 
     async activate() {
-
+        this.initialLoaded = false;
     }
 
     async refresh() {

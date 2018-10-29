@@ -44,10 +44,11 @@ export class EditInstitutions {
 
         this.dataTable.updateArray(this.people.institutionsArray);
         $('#loading').hide();
+        this.initialLoaded = true;
     }
 
     async activate() {
-      
+        this.initialLoaded = false;
     }
 
     async refresh(){

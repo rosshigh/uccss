@@ -6,7 +6,7 @@
             <li></li>
         </ul>
     </span>
-    <div show.bind="dataTable.displayArray && dataTable.displayArray.length" class="panel panel-default rightMargin leftMargin">
+    <div show.bind="dataTable.displayArray && dataTable.displayArray.length || initialLoaded" class="panel panel-default rightMargin leftMargin">
         <div class="panel-body">
             <div class="row">
                 <div show.bind="requestSelected == 'table'">

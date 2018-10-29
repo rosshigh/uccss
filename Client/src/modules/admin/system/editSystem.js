@@ -46,10 +46,11 @@ export class EditSystem {
         this.clientInterval = this.config.CLIENT_INTERVAL
         $('#loading').hide();
         $('[data-toggle="tooltip"]').tooltip();
+        this.initialLoaded = true;
     }
 
     async activate() {
-
+        this.initialLoaded = false;
     }
 
     async refresh() {

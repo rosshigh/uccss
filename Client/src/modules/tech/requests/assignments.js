@@ -42,6 +42,7 @@ export class Assignments {
 
     async attached() {
         $('[data-toggle="tooltip"]').tooltip();
+        this.initialLoaded = true;
 
         await this.getRequests();
         $('#loading').hide();
@@ -64,7 +65,7 @@ export class Assignments {
         this.facultyDetails = localStorage.getItem("facultyDetails") ? localStorage.getItem("facultyDetails") == "true" : false;;
         this.numFacultyIDs = this.config.DEFAULT_FACULTY_IDS;
         this.selectedSession = this.sessions.sessionsArray[0]._id;
-
+        this.initialLoaded = false;
     }
 
     async getRequests() {

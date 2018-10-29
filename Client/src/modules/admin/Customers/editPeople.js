@@ -48,18 +48,7 @@ export class EditPeople {
     }
 
     async activate() {
-        // $('#loading').show();
-        // let responses = await Promise.all([
-        //     this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01'),
-        //     this.people.getInstitutionsArray('?order=name', true),
-        //     this.is4ua.loadIs4ua(),
-        //     this.config.getConfig()
-        // ]);
-        
-        // this.activeFilterValue = "01";
-        // this.filteredArray = this.config.ROLES;
-        // this.dataTable.updateArray(this.people.peopleArray);
-		// this._setupValidation();
+        this.initialLoaded = false;
     }
 
     async filterActive(){
@@ -89,6 +78,7 @@ export class EditPeople {
         this.dataTable.updateArray(this.people.peopleArray);
 		this._setupValidation();
         $('#loading').hide();
+        this.initialLoaded = true;
     }
 
     async refresh() {
