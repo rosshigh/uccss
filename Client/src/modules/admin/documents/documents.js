@@ -139,7 +139,7 @@ export class Documents {
 
     async delete(){
         return this.dialog.showMessage(
-            "This will delete the document from the database and remove all the files.  <br>Are you sure you want to delete the document?", 
+            "This will delete the document from the database and remove all the files.  Are you sure you want to delete the document?", 
             "Delete Document", 
             ['Yes', 'No']
             ).whenClosed(response => {
@@ -153,6 +153,7 @@ export class Documents {
         let serverResponse = await this.documents.deleteDocument();
         if (!serverResponse.error) {
                 this.utils.showNotification("The document was deleted");
+                this.refresh();
                 this.showDocumentForm = false;
         }
         this. _cleanUp();

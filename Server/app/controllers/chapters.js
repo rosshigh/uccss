@@ -11,7 +11,7 @@ module.exports = function (app) {
   app.use('/', router);
 
   router.get('/api/chapters',  function(req, res, next){
-    logger.log('Get chapters',"verbose");
+    logger.log('info','Get chapters',"verbose");
     
     var query = buildQuery(req.query, Model.find());
     query.exec(function(err, object){
@@ -24,7 +24,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/chapters/:id',  function(req, res, next){
-    logger.log('Get chapters ' + req.params.id,"verbose");
+    logger.log('info','Get chapters ' + req.params.id,"verbose");
     Model.findById(req.params.id, function(err, object){
       if (err) {
         return next(err);
@@ -35,7 +35,7 @@ module.exports = function (app) {
   });
 
   router.post('/api/chapters',  function(req, res, next){
-     logger.log('Create a chapter',"verbose");
+     logger.log('info','Create a chapter',"verbose");
 
     var chapter =  new Model(req.body);
     chapter.save( function ( err, object ){
@@ -48,7 +48,7 @@ module.exports = function (app) {
   });
 
   router.put('/api/chapters',  function(req, res, next){
-    logger.log('Update chapters ' + req.body._id,"verbose");
+    logger.log('info','Update chapters ' + req.body._id,"verbose");
 
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, result){
       if (err) {
@@ -60,7 +60,7 @@ module.exports = function (app) {
   });
 
   router.delete('/api/chapters/:id',  function(req, res, next){
-    logger.log('Delete chapter ' + req.body._id,"verbose");
+    logger.log('info','Delete chapter ' + req.body._id,"verbose");
     Model.find({_id: req.params.id}).remove().exec(function(err, object){
         if (err) {
             return next(err);

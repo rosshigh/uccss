@@ -8,7 +8,9 @@ import { observable } from 'aurelia-framework';
 @inject(DataServices, Utils, AppConfig)
 export class Systems{
 
-	SYSTEMS_SERVICE = "systems";
+    SYSTEMS_SERVICE = "systems";
+    CHANGE_SERVICE = "change";
+    CHANGE_CATEGORY_SERVICE = "changeCategory";
 
     constructor(data, utils, config){
         this.data = data;
@@ -336,8 +338,6 @@ export class Systems{
         
     }
 
-
-
     async getAssignmentDetails(id){
         var url = "/serverAssignments/" + id;
         let serverResponse = await this.data.get(url);
@@ -349,4 +349,194 @@ export class Systems{
             this.data.processError(serverResponse);
         }
     }
+
+    //Change
+    async getChangeArray(options, refresh){
+        if(!this.changeArray || refresh) {
+            var url = this.CHANGE_SERVICE;
+            url += options ? options : "";
+             try{
+                let serverResponse = await this.data.get(url);
+                if(!serverResponse.error){
+                    this.changeArray = serverResponse;
+                } 
+            } catch(error){
+                console.log(error);
+                this.changeArray = undefined;
+            }
+        }
+    }
+
+    async getChange(index){
+        if(index >= 0){
+            let id = this.changeArray[index]._id;
+            let serverResponse = await this.data.get(this.CHANGE_SERVICE + "/" + id);
+            if(!serverResponse.error){
+                this.selectedChange = serverResponse;
+                this.changeArray[index] = this.utils.copyObject(this.selectedChange);
+            }
+            return serverResponse;
+        }
+    }
+
+    selectChange(index){
+        if(!index && index != 0) {
+            this.selectedChange = this.emptyChange();
+        } else {
+            try{
+                this.selectedChange = this.utils.copyObject(this.changeArray[index]);
+                this.changeIndex = index;
+            } catch (error){
+                console.log(error);
+                this.selectedChange = this.emptyChange();
+            }
+        }
+    }
+
+    emptyChange(){
+        var newObj = {};
+        newObj.category = "";
+        newObj.content = "";
+        return newObj;
+    }
+
+    async saveChange(){
+        if(!this.selectedChange){
+            return;
+        }
+
+        if(!this.selectedChange._id){
+            let serverResponse = await this.data.saveObject(this.selectedChange, this.CHANGE_SERVICE, "post");
+            if(!serverResponse.error){
+                 this.changeArray.push(serverResponse);
+            } else {
+                this.data.processError(serverResponse,"Error updating the change.<br>")
+            }
+            return serverResponse;
+        } else {
+            var serverResponse = await this.data.saveObject(this.selectedChange, this.CHANGE_SERVICE, "put");
+            if(!serverResponse.error){
+                this.selectedChange = serverResponse;
+                this.changeArray[this.changeIndex] = this.utils.copyObject(this.selectedChange);
+            } else {
+                this.data.processError(serverResponse,"Error updating the change .<br>")
+            }
+            return serverResponse;
+        }
+    }
+
+    async deleteChange(){
+        let serverResponse = await this.data.deleteObject(this.CHANGE_SERVICE + '/' + this.selectedChange._id);
+        if (!serverResponse.error) {
+            this.changeArray.splice(this.editIndex, 1);
+            this.editIndex = - 1;
+        } else {
+            this.data.processError(serverResponse,"Error deleting the change.<br>")
+        }
+        return serverResponse;
+    }
+
+    //Change Category
+    async getChangeCategoryArray(options, refresh){
+        if(!this.changeCategoryArray || refresh) {
+            var url = this.CHANGE_CATEGORY_SERVICE;
+            url += options ? options : "";
+             try{
+                let serverResponse = await this.data.get(url);
+                if(!serverResponse.error){
+                    this.changeCategoryArray = serverResponse;
+                } 
+            } catch(error){
+                console.log(error);
+                this.changeCategoryArray = undefined;
+            }
+        }
+    }
+
+    async getChangeCategory(index){
+        if(index >= 0){
+            let id = this.changeCategoryArray[index]._id;
+            let serverResponse = await this.data.get(this.CHANGE_CATEGORY_SERVICE + "/" + id);
+            if(!serverResponse.error){
+                this.selectedChangeCategory = serverResponse;
+                this.changeCategoryArray[index] = this.utils.copyObject(this.selectedChangeCategory);
+            }
+            return serverResponse;
+        }
+    }
+
+    selectChangeCategory(index){
+        if(!index && index != 0) {
+            this.selectedChangeCategory = this.emptyChangeCategory();
+        } else {
+            try{
+                this.selectedChangeCategory = this.utils.copyObject(this.changeCategoryArray[index]);
+                this.categoryIndex = index;
+            } catch (error){
+                console.log(error);
+                this.selectedChangeCategory = this.emptyChangeCategory();
+            }
+        }
+    }
+
+    selectChangeCategoryByCategory(category){
+        this.changeCategoryArray.forEach((item, index) => {
+            if(item.category == category) {
+                this.selectedChangeCategory = this.utils.copyObject(item);
+                this.categoryIndex = index;
+            }
+        });
+    }
+
+    emptyChangeCategory(){
+        var newCategoryObj = {};
+        newCategoryObj.category = "";
+        return newCategoryObj;
+    }
+
+    async categortInUse(){
+        let response = await this.data.get(this.CHANGE_CATEGORY_SERVICE + "?filter=category|eq|" + this.selectedChangeCategory.category);
+        if(!response.error) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    async saveChangeCategory(){
+        if(!this.selectedChangeCategory){
+            return;
+        }
+
+        if(!this.selectedChangeCategory._id){
+            let serverResponse = await this.data.saveObject(this.selectedChangeCategory, this.CHANGE_CATEGORY_SERVICE, "post");
+            if(!serverResponse.error){
+                 this.changeCategoryArray.push(serverResponse);
+            } else {
+                this.data.processError(serverResponse,"Error updating the change category.<br>")
+            }
+            return serverResponse;
+        } else {
+            var serverResponse = await this.data.saveObject(this.selectedChangeCategory, this.CHANGE_CATEGORY_SERVICE, "put");
+            if(!serverResponse.error){
+                this.selectedChangeCategory = serverResponse;
+                this.changeCategoryArray[this.categoryIndex] = this.utils.copyObject(this.selectedChangeCategory);
+            } else {
+                this.data.processError(serverResponse,"Error updating the change category.<br>")
+            }
+            return serverResponse;
+        }
+    }
+
+    async deleteChangeCategory(){
+        let serverResponse = await this.data.deleteObject(this.CHANGE_CATEGORY_SERVICE + '/' + this.selectedChangeCategory._id);
+        if (!serverResponse.error) {
+            this.changeCategoryArray.splice(this.editIndex, 1);
+            this.editIndex = - 1;
+        } else {
+            this.data.processError(serverResponse,"Error deleting the change category.<br>")
+        }
+        return serverResponse;
+    }
+    
 }

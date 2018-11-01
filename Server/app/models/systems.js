@@ -41,3 +41,22 @@ SystemSchema.pre('update', function() {
 });
 
 module.exports = Mongoose.model('System', SystemSchema);
+
+var ChangeSchema = new Schema({
+  systemId: { type: Schema.Types.ObjectId },
+  personId: { type: Schema.Types.ObjectId },
+  category: { type: String },
+  content: { type: String },
+  dateCreated: { type: Date, default: Date.now }
+});
+
+module.exports = Mongoose.model('Change', ChangeSchema);
+
+var ChangeCategorySchema = new Schema({
+  category: { type: String },
+  categoryDescription: { type: String },
+  dateCreated: { type: Date, default: Date.now },
+  personId: { type: Schema.Types.ObjectId }
+});
+
+module.exports = Mongoose.model('ChangeCategory', ChangeCategorySchema);

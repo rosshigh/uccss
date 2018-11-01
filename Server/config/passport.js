@@ -8,15 +8,13 @@ var passport = require('passport'),
     localStrategy = require('passport-local'),
     NotFoundError = require('./errors/NotFoundError'),
     UnauthorizedAccessError = require('./errors/UnauthorizedAccessError'),
-    logAuth = require('./log-authenticate');
+    logAuth = require('./logger');
 
 var localOptions = {
   usernameField: 'email'
 };
 
 var localLogin = new localStrategy(localOptions, function(email, password, next){
-  console.log(email)
-  console.log(password)
   var query = User.findOne({email: {$regex: new RegExp('^' + email.toLowerCase(), 'i')}});
   query
     .populate({ path: 'institutionId', model: 'Institution', select: 'name postalCode city institutionStatus'})
@@ -25,18 +23,18 @@ var localLogin = new localStrategy(localOptions, function(email, password, next)
         return next(err);
       } else {    
         if(!user){
-          logAuth.log('Wrong email logon-' + user.email, 'info');
+          logAuth.log('info','Wrong email logon-' + user.email);
           next(new NotFoundError("404",{ message: "Email not found."}));
         } else {       
           user.comparePassword(password, function (err, isMatch) {
             if (err) {
-              logAuth.log('wrong password logon-' + user.email, 'info');
+              logAuth.log('info','wrong password logon-' + user.email);
               return next(err);
             } else if(!isMatch){
-              logAuth.log('Unauthorized logon-' + user.email, 'info');
+              logAuth.log('info','Unauthorized logon-' + user.email);
               return next(new UnauthorizedAccessError("401", {message: 'Invalid username or password'}));
             } else {
-              logAuth.log('logon-' + user.email, 'info');
+              logAuth.log('info','logon-' + user.email);
               return next(null, user);
             }
           });

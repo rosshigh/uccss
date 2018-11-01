@@ -11,7 +11,6 @@
                         <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
                         <span click.delegate="new()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New"><i class="fa fa-plus" aria-hidden="true"></i></span>
                         <span click.delegate="_cleanUpFilters()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Clear Filters"><i class="fa fa-filter" aria-hidden="true"></i></span>
-                      <!--  <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span> -->
                     </td>
                 </tr>
                 <tr>
@@ -23,6 +22,7 @@
                     <th>Gold Backup</th>
                     <th>Gold Backup Date</th>
                     <th>Snapshot </th>
+                    <th>Changes</th>
                 </tr>
 
                 <tr>
@@ -60,6 +60,7 @@
                             <option value=false>No Snapshot</option>
                         </select>                        
                     </th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -84,7 +85,7 @@
                             </label>
                         </div>
                     </td>
-
+                    <td><button class="btn btn-primary btn-xs" click.trigger="openChangeMgt(system)">Changes</button></td>
                 </tr>
             </tbody>
         </table>

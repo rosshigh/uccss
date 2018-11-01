@@ -75,7 +75,7 @@ if(env === 'development'){
 
         sg.API(request)
           .then(response => {
-              logger.log(response, "verbose");
+              logger.log('info',response, "verbose");
               var emailLog = new EmailLog({
                 email: mailObject.email,
                 subject: mailObject.subject,
@@ -86,13 +86,13 @@ if(env === 'development'){
               emailLog.save();
           })
           .catch(error => {
-              logger.log(error, "verbose");
+              logger.log('info',error, "verbose");
           });
     }
   }
 
   // welcome = function(mailObject){
-  //   logger.log("Welcome email", "verbose");    
+  //   logger.log('info',"Welcome email", "verbose");    
   //   mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
   //   mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
   //   mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
@@ -106,7 +106,7 @@ if(env === 'development'){
   // }
 
   newCustomerActivate = function(mailObject){
-    logger.log("Activate email", "verbose");    
+    logger.log('info',"Activate email", "verbose");    
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
@@ -120,8 +120,8 @@ if(env === 'development'){
   }
 
   sendEmail = function(mailObject){
-    logger.log("Email Sent", "verbose");
-    logger.log(mailObject)
+    logger.log('info',"Email Sent", "verbose");
+    logger.log('info',mailObject)
     var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
     mailObject.logoExists = emailConfig.UCC_LOGO != "";
     mailObject.HOST = emailConfig.HOST;
@@ -153,7 +153,7 @@ if(env === 'development'){
   // mailObject.subject = mailObject.subject;  
 
   newCustomer = function(mailObject){
-    logger.log("Fac Dev new account email", "verbose");
+    logger.log('info',"Fac Dev new account email", "verbose");
 
     var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
@@ -174,7 +174,7 @@ if(env === 'development'){
   }
 
   requestCreated = function(mailObject){    
-     logger.log("Request Created email", "verbose");
+     logger.log('info',"Request Created email", "verbose");
       var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
       mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
@@ -196,7 +196,7 @@ if(env === 'development'){
   }
 
   requestUpdated = function(mailObject){
-    logger.log("Request Update email", "verbose");
+    logger.log('info',"Request Update email", "verbose");
     var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       
       mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
@@ -216,7 +216,7 @@ if(env === 'development'){
   }
 
   customerAction = function(mailObject){
-    logger.log("Customer Action email", "verbose");
+    logger.log('info',"Customer Action email", "verbose");
     var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
@@ -234,7 +234,7 @@ if(env === 'development'){
   }
 
   genericEmail = function(mailObject){
-    logger.log("Generic email", "verbose");    
+    logger.log('info',"Generic email", "verbose");    
       mailObject.body = GenericTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = mailObject.subject; 
@@ -242,11 +242,11 @@ if(env === 'development'){
   }
 
   annualUpdateContactInfo = function(mailObject){
-     logger.log("Update Contact Info email", "verbose");   
+     logger.log('info',"Update Contact Info email", "verbose");   
   }
 
   passwordReset = function(mailObject){
-    logger.log("Password reset request", "verbose");    
+    logger.log('info',"Password reset request", "verbose");    
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
@@ -258,7 +258,7 @@ if(env === 'development'){
   }
 
   sendBulkEmails = function(mailObject){  
-    logger.log("Email Sent", "verbose");       
+    logger.log('info',"Email Sent", "verbose");       
     mailObject.context = {};
     mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
     mailObject.context.HOST = emailConfig.HOST;
@@ -340,15 +340,15 @@ if(env === 'development'){
           topic: thisMailObject.topic ? thisMailObject.topic : ""
         });
         emailLog.save();
-        logger.log(result, 'verbose ');
+        logger.log('info',result, 'verbose ');
     })
     .catch(error => {         
-        logger.log(error, 'error');
+        logger.log('info',error, 'error');
     })
   };
 
   sendEmail = function(mailObject){
-    logger.log("Email Sent", "verbose");
+    logger.log('info',"Email Sent", "verbose");
     var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
     mailObject.context = {};
     mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
@@ -374,7 +374,7 @@ if(env === 'development'){
   }
 
   // passwordReset = function(mailObject){
-  //   logger.log("Password reset request", "verbose"); 
+  //   logger.log('info',"Password reset request", "verbose"); 
   //     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
   //     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
   //     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
@@ -393,7 +393,7 @@ if(env === 'development'){
   // }
 
   welcome = function(mailObject){
-    logger.log("Welcome to the UCCSS email", 'verbose');
+    logger.log('info',"Welcome to the UCCSS email", 'verbose');
     
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
@@ -414,7 +414,7 @@ if(env === 'development'){
   }
 
   newCustomerActivate = function(mailObject){
-    logger.log("Activate email", "verbose");    
+    logger.log('info',"Activate email", "verbose");    
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
@@ -433,7 +433,7 @@ if(env === 'development'){
   }
 
   newCustomer = function(mailObject){
-    logger.log("Fac Dev new account email", "verbose");
+    logger.log('info',"Fac Dev new account email", "verbose");
 
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
@@ -453,7 +453,7 @@ if(env === 'development'){
   }
 
   requestCreated = function(mailObject){
-     logger.log("Request Created email", "verbose");
+     logger.log('info',"Request Created email", "verbose");
       
       mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
       mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
@@ -480,7 +480,7 @@ if(env === 'development'){
   }
 
   requestUpdated = function(mailObject){
-    logger.log("Request Update email", "verbose");
+    logger.log('info',"Request Update email", "verbose");
      
     mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
     mailObject.context.HOST = emailConfig.HOST;
@@ -505,7 +505,7 @@ if(env === 'development'){
   }
 
   customerAction = function(mailObject){
-    logger.log("Customer Action email", "verbose");
+    logger.log('info',"Customer Action email", "verbose");
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
@@ -523,7 +523,7 @@ if(env === 'development'){
   }
 
   genericEmail = function(mailObject){
-    logger.log("Generic email", "verbose");  
+    logger.log('info',"Generic email", "verbose");  
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
@@ -540,11 +540,11 @@ if(env === 'development'){
   }
 
   annualUpdateContactInfo = function(mailObject){
-     logger.log("Update Contact Info email", "verbose");    
+     logger.log('info',"Update Contact Info email", "verbose");    
   }
 
   passwordReset = function(mailObject){
-    logger.log("Password reset request", "verbose"); 
+    logger.log('info',"Password reset request", "verbose"); 
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
@@ -563,7 +563,7 @@ if(env === 'development'){
   }
 
   sendBulkEmails = function(mailObject){
-    logger.log("Email Sent", "verbose");
+    logger.log('info',"Email Sent", "verbose");
     mailObject.context = {};
     mailObject.context.logoExists = emailConfig.UCC_LOGO != "";
     mailObject.context.HOST = emailConfig.HOST;

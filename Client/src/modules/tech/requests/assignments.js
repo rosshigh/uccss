@@ -80,8 +80,6 @@ export class Assignments {
     }
 
     async refresh() {
-        // this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        // this.spinnerHTML = '<span  id="loading translucent"><ul style="z-index:99;" class="bokeh"><li></li><li></li><li></li></ul></span>';
         $('#loading').show();
         await this.getRequests();
         $('#loading').hide();
@@ -255,7 +253,7 @@ export class Assignments {
         let response = await this.systems.getConfiguredProductSystems(productSystemsSIDs);
         if (!response.error) {
             response.forEach(item => {
-                if (item.sessions.indexOf(this.sessions.selectedSession.session) > -1) this.productSystems.push(item);
+                if (item.sessions.indexOf(this.sessions.selectedSession.session) > -1 && item.active) this.productSystems.push(item);
             });
         }
         if (this.productSystems != null && this.productSystems.length) this.systemConfigured = true;

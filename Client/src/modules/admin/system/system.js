@@ -47,6 +47,14 @@ export class EditSystem{
             nav: true,
             name: 'editProduct',
             title: 'Products'
+        },
+        {
+            route: 'changes',
+            moduleId: './editChanges',
+            settings: { auth: true, roles: [] },
+            nav: false,
+            name: 'editChanges',
+            title: 'Changes'
         }
         ]);
 

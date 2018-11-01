@@ -1,5 +1,5 @@
 var express = require('express'),
-    debug = require('debug')('uccss'),
+  logger = require('../../config/logger'),
   	router = express.Router(),
     mongoose = require('mongoose'),
     passport = require('passport'),
@@ -53,7 +53,7 @@ module.exports = function (app) {
   });
 
   router.delete('/api/institutions/:id', requireAuth, function(req, res, next){
-    debug('Delete institution [%s]', req.params.id);
+    logger.log('info','Delete institution [%s]', req.params.id);
     Model.remove({ _id: req.params.id }, function(err) {
       if (err) {
         return next(err);

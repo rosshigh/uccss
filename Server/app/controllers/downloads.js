@@ -1,5 +1,6 @@
 var express = require('express'),
-  debug = require('debug')('uccss'),
+  // logger.log = require('logger.log')('uccss'),
+  logger = require('../../config/logger'),
   fs = require('fs'),
   router = express.Router(),
   mongoose = require('mongoose'),
@@ -15,7 +16,7 @@ module.exports = function (app, config) {
   app.use('/', router);
 
   router.get('/api/apps', requireAuth, function(req, res, next){
-    debug('Get apps');
+    logger.log('info','Get apps');
     if(req.query.helpticket && req.query.helpticket === true){
       Model.find({helpTicketRelevant: true })
         .sort(req.query.order)
@@ -40,7 +41,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/apps/helpTickets', requireAuth, function(req, res, next){
-    debug('Get apps');
+    logger.log('info','Get apps');
     Model.find({})
       .where({ helpTicketRelevant: true })
       .sort(req.query.order)
@@ -54,7 +55,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/apps/active', requireAuth, function(req, res, next){
-    debug('Get apps');
+    logger.log('info','Get apps');
     Model.find({active: true})
       .sort(req.query.order)
       .exec(function(err, object){
@@ -67,7 +68,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/apps/:id', requireAuth, function(req, res, next){
-    debug('Get application [%s]', req.params.id);
+    logger.log('info','Get application [%s]', req.params.id);
     Model.findById(req.params.id, function(err, object){
       if (err) {
         return next(err);
@@ -78,7 +79,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/apps', requireAuth, function(req, res, next){
-    debug('Create Application');
+    logger.log('info','Create Application');
     var person =  new Model(req.body);
     person.save( function ( err, object ){
       if (err) {
@@ -90,7 +91,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/apps', requireAuth, function(req, res, next){
-    debug('Update Application [%s]', req.body._id);
+    logger.log('info','Update Application [%s]', req.body._id);
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
       if (err) {
         return next(err);
@@ -101,7 +102,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/apps/:id', requireAuth, function(req, res, next){
-    debug('Delete application [%s]', req.params.id);
+    logger.log('info','Delete application [%s]', req.params.id);
     Model.findById(req.params.id, function(err, object){
       if (err) {
         return next(err);
@@ -133,7 +134,7 @@ module.exports = function (app, config) {
 
   //Application Categories
   router.get('/api/appsCategory', requireAuth, function(req, res, next){
-    debug('Get appsCategory');
+    logger.log('info','Get appsCategory');
     AppCategory.find({})
       .sort(req.query.order)
       .exec(function(err, object){
@@ -146,7 +147,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/appsCategory/:id', requireAuth, function(req, res, next){
-    debug('Get application [%s]', req.params.id);
+    logger.log('info','Get application [%s]', req.params.id);
     AppCategory.findById(req.params.id, function(err, object){
       if (err) {
         return next(err);
@@ -157,7 +158,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/appsCategory', requireAuth, function(req, res, next){
-    debug('Create Application');
+    logger.log('info','Create Application');
     var appsCategory =  new AppCategory(req.body);
     appsCategory.save( function ( err, object ){
       if (err) {
@@ -169,7 +170,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/appsCategory', requireAuth, function(req, res, next){
-    debug('Update appsCategory [%s]', req.body._id);
+    logger.log('info','Update appsCategory [%s]', req.body._id);
     AppCategory.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
       if (err) {
         return next(err);
@@ -180,7 +181,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/appsCategory/:id', requireAuth, function(req, res, next){
-    debug('Delete appsCategory [%s]', req.params.id);
+    logger.log('info','Delete appsCategory [%s]', req.params.id);
     AppCategory.remove({ _id: req.params.id }, function(err) {
       if (err) {
         return next(err);
@@ -234,7 +235,7 @@ module.exports = function (app, config) {
   });
 
   function extendTimeout (req, res, next) {
-    res.setTimeout(512000, function () { /* Handle timeout */ logger.log('Timeout', 'error') });
+    res.setTimeout(512000, function () { /* Handle timeout */ logger.log('info','Timeout', 'error') });
     next();
   }
 };

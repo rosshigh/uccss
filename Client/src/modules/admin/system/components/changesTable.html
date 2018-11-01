@@ -1,0 +1,56 @@
+<template>
+    <div class="bottomMargin list-group-item leftMargin rightMargin">
+        <span click.delegate="backFromChangeTable()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+            data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border"
+                aria-hidden="true"></i></span>
+        <span click.delegate="showChangeForm()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+            data-placement="bottom" title="" data-original-title="New Change"><i class="fa fa-plus fa-lg fa-border"
+                aria-hidden="true"></i></span>
+    </div>
+    <div class="container">
+        <div>
+            <h2>System: ${systems.selectedSystem.sid}</h2>
+        </div>
+        <div show.bind="dataTable.displayArray && dataTable.displayArray.length" class='col-lg-10'>
+            <div id="no-more-tables">
+                <table id="changeTable" class="table table-striped table-hover cf">
+                    <thead class="cf">
+                        <tr colspan='5'>
+                            <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
+                        </tr>
+                        <tr>
+                            <td colspan='5'>
+                                <span click.delegate="refreshChanges()" class="smallMarginRight" bootstrap-tooltip
+                                    data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i
+                                        class="fa fa-refresh" aria-hidden="true"></i></span>
+                                <span click.delegate="showChangeForm()" class="smallMarginRight" bootstrap-tooltip
+                                    data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New"><i
+                                        class="fa fa-plus" aria-hidden="true"></i></span>
+                                <span click.delegate="_cleanUpChangeFilters()" class="smallMarginRight"
+                                    bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+                                    data-original-title="Clear Filters"><i class="fa fa-filter" aria-hidden="true"></i></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Person</th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr repeat.for="change of dataTable.displayArray">
+                            <td>${change.dateCreated | dateFormat}</td>
+                            <td>${change.category}</td>
+                            <td>${change.personId.fullName}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</template>

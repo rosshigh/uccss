@@ -21,7 +21,7 @@ module.exports = function (app, config) {
 
 
   	router.route('/adminLog').get(function(req, res, next){
-		logger.log('Get auth log files', 'verbose');
+		logger.log('info','Get auth log files', 'verbose');
 		const fs = require('fs');
 		fs.readdir(authFolder, (err, files) => {
 			if(err) {
@@ -33,7 +33,7 @@ module.exports = function (app, config) {
 	});
 
 	router.route('/adminLog/:fileName').get(function(req, res, next){
-		logger.log('Get auth log file' + req.params.fileName, 'verbose');
+		logger.log('info','Get auth log file' + req.params.fileName, 'verbose');
 		let filePath = authFolder + req.params.fileName;
 		fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data){
 			if (!err){
@@ -61,7 +61,7 @@ module.exports = function (app, config) {
 	});
 
 	router.route('/adminLog/').put(function(req, res, next){
-		logger.log('Deleting ' + req.body.files.length + ' auth log files', 'verbose');
+		logger.log('info','Deleting ' + req.body.files.length + ' auth log files', 'verbose');
 		if(req.body.files){
 			try {
 				req.body.files.forEach(file => {
@@ -77,7 +77,7 @@ module.exports = function (app, config) {
 	});
 
 	router.route('/log').get(function(req, res, next){
-		logger.log('Get log files', 'verbose');
+		logger.log('info','Get log files', 'verbose');
 		const fs = require('fs');
 		fs.readdir(logFolder, (err, files) => {
 			if(err) {
@@ -89,7 +89,7 @@ module.exports = function (app, config) {
 	});
 
 	router.route('/log/:fileName').get(function(req, res, next){
-		logger.log('Get log file' + req.params.fileName, 'verbose');
+		logger.log('info','Get log file' + req.params.fileName, 'verbose');
 		let filePath = logFolder + req.params.fileName;
 		fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data){
 			if (!err){
@@ -118,7 +118,7 @@ module.exports = function (app, config) {
 	});
 
 	router.route('/log/').put(function(req, res, next){
-		logger.log('Deleting ' + req.body.files.length + ' log files', 'verbose');
+		logger.log('info','Deleting ' + req.body.files.length + ' log files', 'verbose');
 		if(req.body.files){
 			try {
 				req.body.files.forEach(file => {
@@ -143,7 +143,7 @@ module.exports = function (app, config) {
 	});
 
 	router.route('/files/:file').delete(function(req, res, next){
-		logger.log("Delete file " + req.params.file);
+		logger.log('info',"Delete file " + req.params.file);
 		if(req.params.file){
 			req.params.file = req.params.file.split("$@").join('/');
 			fs.stat(req.params.file, function (err, stats) {
@@ -164,7 +164,7 @@ module.exports = function (app, config) {
 	})
 
 	router.route('/pm2Log/fileList/:type').get(function(req, res, next){
-		logger.log('Get forever log files', 'verbose');
+		logger.log('info','Get forever log files', 'verbose');
 		const fs = require('fs');
 		fs.readdir(pm2LogFolder, (err, files) => {
 			if(err) {
@@ -179,7 +179,7 @@ module.exports = function (app, config) {
 	});
 
 	router.route('/pm2Log/:fileName').get(function(req, res, next){
-		logger.log('Get forever log file' + req.params.fileName, 'verbose');
+		logger.log('info','Get forever log file' + req.params.fileName, 'verbose');
 		let filePath = pm2LogFolder + req.params.fileName;
 		fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data){
 			if (!err){
@@ -192,7 +192,7 @@ module.exports = function (app, config) {
 	});
 
 	router.route('/pm2Log/').put(function(req, res, next){
-		logger.log('Deleting ' + req.body.files.length + ' forever log files', 'verbose');
+		logger.log('info','Deleting ' + req.body.files.length + ' forever log files', 'verbose');
 		if(req.body.files){
 			try {
 				req.body.files.forEach(file => {
@@ -208,7 +208,7 @@ module.exports = function (app, config) {
 	});
 
 	router.route('/pm2Log/rename/:file/:newName').put(function(req, res, next){
-		logger.log('Renaming forever log file', 'verbose');
+		logger.log('info','Renaming forever log file', 'verbose');
 		try {
 			let fileName = pm2LogFolder + req.params.file + '.log';
 			let newFileName = pm2LogFolder + req.params.newName + '.log';
@@ -224,7 +224,7 @@ module.exports = function (app, config) {
 	});
 
 	router.route('/database/stats/:collection').get(function(req, res, next){
-		logger.log('Get stats for collection ' + req.params.collection);
+		logger.log('info','Get stats for collection ' + req.params.collection);
 		switch(req.params.collection){
 			case 'helptickets':
 				var collection = HelpTickets;

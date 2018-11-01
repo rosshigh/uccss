@@ -14,7 +14,8 @@ import moment from 'moment';
 export class EditSystem {
     systemSelected = false;
     editClients = false;
-    // spinnerHTML = "";
+    showChanges = false;
+    showChangesForm = false;
     selectedProduct = "";
 
     dateConfig = {wrap: true};
@@ -31,6 +32,8 @@ export class EditSystem {
         this.dialog = dialog;
         this.sessions = sessions;
         this._setupValidation();
+
+        this.userObj = JSON.parse(sessionStorage.getItem('user'));
     }
 
     async attached(){
@@ -54,11 +57,9 @@ export class EditSystem {
     }
 
     async refresh() {
-        // this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         $('#loading').show();
         await this.systems.getSystemsArray('?order=sid', true);
         this.dataTable.updateArray(this.systems.systemsArray);
-        // this.spinnerHTML = "";
         $('#loading').hide();
         this. _cleanUpFilters();
     }
@@ -506,25 +507,8 @@ export class EditSystem {
                 return true;
             }}],true);
         this.validation.addRule(1,"editDesc",[{"rule":"required","message":"Description is required", "value": "systems.selectedSystem.description"}]);
-        // this.validation.addRule(1,"editServer",[{"rule":"required","message":"Server is required", "value": "systems.selectedSystem.server"},
-        // {"rule":"custom", "message":"A system with that server already exists",
-        //     "valFunction":function(context){
-        //         if(!context.systems.selectedSystem._id){
-        //             var found = false;
-        //             for(var i = 0; i < context.systems.systemsArray.length; i++){
-        //                 if( context.systems.systemsArray[i].server.toUpperCase() === context.systems.selectedSystem.server.toUpperCase()){
-        //                     if(context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id){
-        //                         found = true;
-        //                     } else if (!context.systems.selectedSystem._id){
-        //                         found = true;
-        //                     }
-        //                 }
-        //             }
-        //             return !found;
-        //          }
-        //         return true;
-        //     }}]);
         this.validation.addRule(1,"editInst",[{"rule":"required","message":"Instance is required", "value": "systems.selectedSystem.instance"}]);
+        this.validation.addRule(2,"editCategoryName", [{"rule":"required","message":"Name is required", "value": "systems.selectedChangeCategory.category"}]);
     }
 
     selectProduct(){
@@ -603,5 +587,104 @@ export class EditSystem {
 			});
 			htmlContent += "</table>";
 			window.open('data:application/vnd.ms-excel,' + htmlContent);
+    }
+
+    async openChangeMgt(system){
+        this.systems.setSelectedSystem(system);
+        await this.systems.getChangeArray('?filter=systemId|eq|' + this.systems.selectedSystem._id + '&order=dateCreated:ASC', true);
+        this.dataTable.updateArray(this.systems.changeArray);
+        this.showChangesForm = false;
+        this.showChanges = true;
+    }
+
+    async showChangeForm(index){
+        await this.systems.getChangeCategoryArray();
+        this.systems.selectChange(index);    
+        this.showChangesForm = true;
+    }
+
+    openEditCatForm(newOrEdit){ 
+        if(newOrEdit === 'new'){
+            this.systems.selectChangeCategory();
+            this.categoryDescription = "";
+            this.showCategoryForm = true; 
+            this.editCategoryFlag = false;
+        } else {
+            this.systems.selectChangeCategoryByCategory(this.systems.selectedChange.category);
+            this.showCategoryForm = true;
+            this.editCategoryFlag = true;
+        }
+    }
+
+    async saveCategory(){
+        if(this.validation.validate(2)){
+            let serverResponse = await  this.systems.saveChangeCategory();
+            if (!serverResponse.error) {
+                this.utils.showNotification("The category was saved");
+            }
+            this.showCategoryForm = false;
+        }
+    }
+
+    cancelEditCategory(){
+         this.showCategoryForm = false;
+    }
+
+    deleteCat(){
+        if(this.systems.categortInUse()){
+            return this.dialog.showMessage(
+            "You can't delete that category because there are exisitng changes that use it.",
+            "Can't Delete Category",
+            ['OK']
+        ).then(response => {
+            
+        });
+        } else {
+            return this.dialog.showMessage(
+                "Are you sure you want to delete the category?",
+                "Delete Category",
+                ['Yes', 'No']
+            ).whenClosed(response => {
+                if (!response.wasCancelled) {
+                    this.deleteCategory();
+                }
+            });
+        }  
+    }
+
+    async deleteCategory(){
+        let serverResponse = await  this.systems.deleteChangeCategory();
+        if (!serverResponse.error) {
+            this.utils.showNotification("The category was deleted");
+        }
+    }
+
+    backFromChangeForm(){
+        this.showChangesForm = false;
+        this.showChanges = true;
+    }
+
+    backFromChangeTable(){
+        this.dataTable.updateArray(this.systems.systemsArray);
+        this.showChanges = false;
+        this.systemSelected = false;
+    }
+   
+    async saveChange(){
+        this.systems.selectedChange.systemId = this.systems.selectedSystem._id;
+        this.systems.selectedChange.personId = this.userObj._id;
+        await this.systems.saveChange();
+        this.showChangesForm = false;
+        this.showChanges = true;
+    }
+
+    cancelChange(){
+        this.systems.selectChange();
+    }
+
+    async deleteChange(){
+        await this.systems.deleteChange();
+        this.showChangesForm = false;
+        this.showChanges = true;
     }
 }

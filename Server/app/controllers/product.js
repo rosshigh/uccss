@@ -14,7 +14,7 @@ module.exports = function (app) {
   app.use('/', router);
 
   router.get('/api/products', function(req, res, next){
-    logger.log("Get products","verbose");
+    logger.log('info',"Get products","verbose");
     
     var query = buildQuery(req.query, Model.find())
     query.exec(function(err, object){
@@ -27,7 +27,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/products/:id', function(req, res, next){
-    logger.log('Get product ' + req.params.id,"verbose");
+    logger.log('info','Get product ' + req.params.id,"verbose");
     
     Model.findById(req.params.id, function(err, object){
       if (err) {
@@ -39,7 +39,7 @@ module.exports = function (app) {
   });
 
   router.post('/api/products', function(req, res, next){
-    logger.log('Create a product', "verbose");
+    logger.log('info','Create a product', "verbose");
     
     var product =  new Model(req.body);
     product.save( function ( err, object ){
@@ -52,7 +52,7 @@ module.exports = function (app) {
   });
 
   router.put('/api/products', function(req, res, next){
-    logger.log('Update Product ' + req.body._id, "verbose");
+    logger.log('info','Update Product ' + req.body._id, "verbose");
 
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, result){
       if (err) {
@@ -64,7 +64,7 @@ module.exports = function (app) {
   });
 
   router.delete('/api/products/:id', function(req, res, next){
-    logger.log('Delete Product ' + req.params._id, "verbose");
+    logger.log('info','Delete Product ' + req.params._id, "verbose");
 
     Model.findById(req.params.id, function(err, product){
       if(err){

@@ -4,28 +4,28 @@ var express = require('express'),
     config = require('./config/config'),
     http = require('http'),
     https = require('https'),
-    fs = require('fs'),
+    // fs = require('fs'),
     // path = require('path'),
     AsyncPolling = require('async-polling'),
-    logger = require('./config/logger'),
-    glob = require('glob'),
-    tls = require('tls');
+    logger = require('./config/logger');
+    // glob = require('glob'),
+    // tls = require('tls');
 
     // AsyncPolling(function (end) {
-    //     logger.log("Check for notifications...");
+    //     logger.log('info',"Check for notifications...");
 
     //     end();
     // }, 86400000).run();
 
   AsyncPolling(function (end) {
     // Do whatever you want.
-    logger.log("Polling...");
+    logger.log('info',"Polling...");
     var optionsget = {
         host : 'api.openweathermap.org', 
         path : '/data/2.5/weather?q=' + config.UCC_HOME + '&APPID=' + config.weatherAPI,
         method : 'GET'
     };
-    logger.log(optionsget.path);
+    logger.log('info',optionsget.path);
    
     var reqGet = http.request(optionsget, function(res) {
         console.log("statusCode: ", res.statusCode);
@@ -64,25 +64,25 @@ var app = express();
 
 require('./config/express')(app, config);
 
-// logger.log("Creating HTTPS server on port: " + config.https_port);
+// logger.log('info',"Creating HTTPS server on port: " + config.https_port);
 // require('https').createServer({
 //     key: fs.readFileSync("config/uccsstest.key"),
 //     cert: fs.readFileSync("config/uccsstest_ucc_uwm_edu.cer") 
 // }, app).listen(config.https_port, function () {
-//     logger.log("HTTPS Server listening on port: " + config.https_port + ", in " + app.get('env') + " mode");
+//     logger.log('info',"HTTPS Server listening on port: " + config.https_port + ", in " + app.get('env') + " mode");
 // });
 
 
 
-logger.log("Creating HTTP server on port: " + config.port);
+logger.log('info',"Creating HTTP server on port: " + config.port);
 require('http').createServer(app).listen(config.port, function () {
-    logger.log("HTTP Server listening on port: " + config.port + " in " + app.get('env') + " mode");
+    logger.log('info',"HTTP Server listening on port: " + config.port + " in " + app.get('env') + " mode");
 });
 
-// logger.log("Creating HTTP server on port: " + config.port);
+// logger.log('info',"Creating HTTP server on port: " + config.port);
 // require('http').createServer(function (req, res) {
 //     res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
 //     res.end();
 // }).listen(config.port, function () {
-//     logger.log("HTTP Server listening on port: " + config.port + " in " + app.get('env') + " mode");
+//     logger.log('info',"HTTP Server listening on port: " + config.port + " in " + app.get('env') + " mode");
 // });

@@ -6,140 +6,98 @@ var express = require('express'),
   CurriculumCategory = mongoose.model('CurriculumCategory'),
   logger = require('../../config/logger'),
   multer = require('multer'),
-  mkdirp = require('mkdirp');
-    // formidable = require('formidable');;
+  mkdirp = require('mkdirp'),
+  asyncHandler = require('express-async-handler');
 
   var requireAuth = passport.authenticate('jwt', { session: false });
 
 module.exports = function (app, config) {
   app.use('/', router);
 
-  router.get('/api/curriculum', function(req, res, next){
-    logger.log("Get curriculum","verbose");
+  router.get('/api/curriculum', asyncHandler(async (req, res) => {
+    logger.log('info',"Get curriculum");
     
     var query = buildQuery(req.query, Model.find())
-    query.exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
-  });
+    await query.exec().then(result => {
+      res.status(200).json(result);
+    })
+  }));
 
-  router.get('/api/curriculum/:id', function(req, res, next){
-    logger.log('Get curriculum ' + req.params.id,"verbose");
+  router.get('/api/curriculum/:id', asyncHandler(async (req, res) => {
+    logger.log('info','Get curriculum ' + req.params.id,"verbose");
     
-    Model.findById(req.params.id, function(err, object){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
-  });
+    await Model.findById(req.params.id).then(result => {
+      res.status(200).json(result);
+    })
+  }));
 
-  router.post('/api/curriculum', function(req, res, next){
-    logger.log('Create a curriculum', "verbose");
+  router.post('/api/curriculum', asyncHandler(async (req, res) => {
+    logger.log('info','Create a curriculum');
     
     var curriculum =  new Model(req.body);
-    curriculum.save( function ( err, object ){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
-  });
+    await curriculum.save().then(result => {
+      res.status(200).json(result);
+    })
+  }));
 
-  router.put('/api/curriculum', function(req, res, next){
-    logger.log('Update curriculum ' + req.body._id, "verbose");
+  router.put('/api/curriculum', asyncHandler(async (req, res) => {
+    logger.log('info','Update curriculum ' + req.body._id);
 	  req.body.dateModified = new Date();
-    Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, result){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(result);
-      }
+    await Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}).then(result => {
+      res.status(200).json(result);
     })
-  });
+  }));
 
-  router.delete('/api/curriculum/:id', function(req, res, next){
-    logger.log('Delete curriculum ' + req.params._id, "verbose");
+  router.delete('/api/curriculum/:id', asyncHandler(async (req, res) => {
+    logger.log('info','Delete curriculum ' + req.params._id);
 
-	  Model.remove({ _id: req.params.id }, function(err, result){
-      if (err) {
-         return next(err);
-      } else {
-        res.status(200).json({msg: "Curriculum Deleted"});
-      }
+	  await Model.remove({ _id: req.params.id }).then(result => {
+      res.status(200).json(result);
     })
-
-  });
+  }));
 
   //Curriculum Category routes
-  router.get('/api/curriculumcategory', function(req, res, next){
-    logger.log("Get curriculum category","verbose");
+  router.get('/api/curriculumcategory', asyncHandler(async (req, res) => {
+    logger.log('info',"Get curriculum category","verbose");
     
     var query = buildQuery(req.query, CurriculumCategory.find())
-    query.exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
-  });
+    await query.exec().then(result => {
+      res.status(200).json(result);
+    })
+  }));
 
-  router.get('/api/curriculumcategory/:id', function(req, res, next){
-    logger.log('Get curriculum category ' + req.params.id,"verbose");
+  router.get('/api/curriculumcategory/:id', asyncHandler(async (req, res) => {
+    logger.log('info','Get curriculum category ' + req.params.id,"verbose");
     
-    CurriculumCategory.findById(req.params.id, function(err, object){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
-  });
+    await CurriculumCategory.findById(req.params.id).then(result => {
+      res.status(200).json(result);
+    })
+  }));
 
-  router.post('/api/curriculumcategory', function(req, res, next){
-    logger.log('Create a curriculum category', "verbose");
+  router.post('/api/curriculumcategory', asyncHandler(async (req, res) => {
+    logger.log('info','Create a curriculum category');
     
     var curriculum =  new CurriculumCategory(req.body);
-    curriculum.save( function ( err, object ){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
-  });
+    await curriculum.save().then(result => {
+      res.status(200).json(result);
+    })
+  }));
 
-  router.put('/api/curriculumcategory', function(req, res, next){
-    logger.log('Update curriculum category ' + req.body._id, "verbose");
+  router.put('/api/curriculumcategory', asyncHandler(async (req, res) => {
+    logger.log('info','Update curriculum category ' + req.body._id);
 	  req.body.dateModified = new Date();
-    CurriculumCategory.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, result){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(result);
-      }
+    await CurriculumCategory.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}).then(result => {
+      res.status(200).json(result);
     })
-  });
+  }));
 
-  router.delete('/api/curriculumcategory/:id', function(req, res, next){
-    logger.log('Delete curriculum category ' + req.params._id, "verbose");
+  router.delete('/api/curriculumcategory/:id', asyncHandler(async (req, res) => {
+    logger.log('info','Delete curriculum category ' + req.params._id);
 
-	  CurriculumCategory.remove({ _id: req.params.id }, function(err, result){
-      if (err) {
-         return next(err);
-      } else {
-        res.status(200).json({msg: "Curriculum Category Deleted"});
-      }
+	  await CurriculumCategory.remove({ _id: req.params.id }).then(result => {
+      res.status(200).json(result);
     })
-
-  });
+  }));
 
   var storage = multer.diskStorage({
     destination: function (req, file, cb) {      
@@ -157,106 +115,31 @@ module.exports = function (app, config) {
     }
   });
 
-  var upload = multer({ storage: storage }).any();
+  var upload = multer({ storage: storage });
 
-  router.post('/api/curriculum/upload/:id/:container',  function(req, res, next){
+  router.post('/api/curriculum/upload/:id/:container', upload.any(), asyncHandler(async (req, res) => {
      req.socket.setTimeout(20 * 60 * 1000);
-    upload(req, res, function (err) {
-      if(err){
-        console.log(err);
-      }
-      Model.findById(req.params.id, function(err, download){
-        if(err){
-          return next(err);
-        } else {
-          for(var i = 0, x = req.files.length; i<x; i++){
-            var file =  {
-              originalFilename: req.files[i].originalname,
-              fileName: req.files[i].filename,
-              dateUploaded: new Date()
-            };
-            download.file = file;
-          }
-          download.save(function(err, download) {
-            if(err){
-              return next(err);
-            } else {
-              res.status(200).json(download);
-            }
-          });
+  
+     await Model.findById(req.params.id).then(result => {
+        for(var i = 0, x = req.files.length; i<x; i++){
+          var file =  {
+            originalFilename: req.files[i].originalname,
+            fileName: req.files[i].filename,
+            dateUploaded: new Date()
+          };
+          result.file = file;
         }
+        result.save().then(result => {
+            res.status(200).json(result);
+        });
       });
-    });
-  });
+  }));
 
-  //  router.post('/api/curriculum/uploadForm/:id/:container',  function(req, res, next){
-  //      logger.log('Upload file in ' + req.params.container, "verbose");
-  //   var oldPath, newPath, fileName;
-  //   req.socket.setTimeout(10 * 60 * 1000);
-  //   var form = new formidable.IncomingForm({uploadDir: "c://temp/", keepExtensions: true});
 
-  //   form
-  //     .on('error', function(err) {
-  //       console.log(err);
-          
-  //     })
-        
-  //     .on('field', function(field, value) {
-  //     })
-
-  //     /* this is where the renaming happens */
-  //     .on ('fileBegin', function(name, file){
-  //         //rename the incoming file to the file's name
-  //         file.path = form.uploadDir + "/" + file.name;
-  //         newPath =  config.uploads + '/curriculum/' + req.params.container + '/' + file.name;
-  //         oldPath = file.path;
-  //         fileName = file.name;
-  //     })
-
-  //     .on('file', function(field, file) {
-
-  //     })
-
-  //     .on('progress', function(bytesReceived, bytesExpected) {
-
-  //     })
-
-  //     .on('end', function() {
-  //       console.log('end')
-         
-  //       fs.rename(oldPath, newPath, function (err) { 
-  //         if (err) throw err;
-  //         Model.findById(req.params.id, function(err, download){
-  //           if(err){
-  //             return next(err);
-  //           } else {
-  //             var file =  {
-  //               originalFilename: fileName,
-  //               fileName: fileName,
-  //               dateUploaded: new Date()
-  //             };
-  //             download.file = file;
-  //             download.save(function(err, download) {
-  //               if(err){
-  //                 return next(err);
-  //               } else {
-  //                 res.status(200).json(download);
-  //               }
-  //             });
-  //           }
-  //         });
-  //       });
-
-  //     });
-
-  // form.parse(req);  
-
-  //  });
-
-  function extendTimeout (req, res, next) {
-     req.socket.setTimeout(10 * 60 * 1000);
-    res.setTimeout(512000, function () { /* Handle timeout */ logger.log('Timeout', 'error') });
-    next();
-  }
+  // function extendTimeout (req, res, next) {
+  //    req.socket.setTimeout(10 * 60 * 1000);
+  //   res.setTimeout(512000, function () { /* Handle timeout */ logger.log('info','Timeout', 'error') });
+  //   next();
+  // }
 
 };

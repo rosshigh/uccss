@@ -1,6 +1,6 @@
 var logger = require('./logger');
 var path = require('path');
-var fs = require("fs");
+// var fs = require("fs");
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
@@ -8,15 +8,15 @@ var glob = require('glob');
 var cors = require('cors');
 var url  = require('url');
 var onFinished = require('on-finished');
-var NotFoundError = require(path.join(__dirname, "errors", "NotFoundError.js"));
-var utils = require(path.join(__dirname, "utils.js"));
+// var NotFoundError = require(path.join(__dirname, "errors", "NotFoundError.js"));
+// var utils = require(path.join(__dirname, "utils.js"));
 var helmet = require('helmet');
 var compression = require('compression');
 var favicon = require('serve-favicon');
 
 module.exports = function(app, config) {
 
-  logger.log("Starting application");
+  logger.log('info',"Starting application");
 
   app.use(compression({threshold: 1}));
   app.use(helmet())
@@ -29,7 +29,7 @@ module.exports = function(app, config) {
   app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
   app.use(cors({origin: "http://localhost:9000"}));
 
-  logger.log("Loading Mongoose functionality");
+  logger.log('info',"Loading Mongoose functionality");
   mongoose.Promise = require('bluebird');
   mongoose.connect(config.db, {useMongoClient: true});
   var db = mongoose.connection;
@@ -37,16 +37,16 @@ module.exports = function(app, config) {
     throw new Error('unable to connect to database at ' + config.db);
   });
   mongoose.connection.once('open', function callback() {
-    logger.log("Mongoose connected to the database");
+    logger.log('info',"Mongoose connected to the database");
   });
 
-  logger.log("Attaching plugins");
+  logger.log('info',"Attaching plugins");
   app.use(bodyParser.json({limit: '1000mb'}));
   app.use(bodyParser.urlencoded({limit: '1000mb', extended: true}));
   app.use(require('compression')());
   app.use(require('response-time')());
 
-  logger.log("Loading models");
+  logger.log('info',"Loading models");
   var models = glob.sync(config.root + '/app/models/*.js');
     models.forEach(function (model) { 
       require(model);
@@ -54,12 +54,12 @@ module.exports = function(app, config) {
 
   app.use(function (req, res, next) {
       onFinished(res, function (err) {
-        logger.log(req.connection.remoteAddress + " finished request","verbose");
+        logger.log('info',req.connection.remoteAddress + " finished request","verbose");
       });
       next();
   });
 
-  logger.log("Loading controllers");
+  logger.log('info',"Loading controllers");
   var controllers = glob.sync(config.root + '/app/controllers/*.js');
     controllers.forEach(function (controller) {
       require(controller)(app, config);

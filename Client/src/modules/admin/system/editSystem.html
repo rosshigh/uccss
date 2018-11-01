@@ -9,12 +9,18 @@
     <div show.bind="dataTable.displayArray && dataTable.displayArray.length || initialLoaded" class="panel panel-info">
         <div class="panel-body">
             <div class="row">
-                <div show.bind="!systemSelected" class="col-lg-12">
+                <div show.bind="!systemSelected && !showChanges" class="col-lg-12">
                     <compose view="./components/systemTable.html"></compose>
-                </div> <!-- Table Div -->
+                </div> 
+                <div show.bind="!systemSelected && showChanges && !showChangesForm" class="col-lg-12">
+                    <compose view="./components/changesTable.html"></compose>
+                </div>
+                <div show.bind="!systemSelected && showChanges && showChangesForm" class="col-lg-12">
+                    <compose view="./components/changesForm.html"></compose>
+                </div>
                 <div show.bind="systemSelected" class="col-lg-12">
                     <compose view="./components/systemForm.html"></compose>
-                </div> <!-- Form Div -->
-            </div> <!-- Row -->
-        </div> <!-- Panel Body -->
+                </div> 
+            </div> 
+        </div> 
 </template>

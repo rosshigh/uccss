@@ -11,7 +11,7 @@ module.exports = function (app, config) {
   app.use('/', router);
 
   router.get('/api/inventory', requireAuth, function(req, res, next){
-    logger.log('Get inventory','verbose');
+    logger.log('info','Get inventory','verbose');
     var query = buildQuery(req.query, Model.find())
     query.exec()
     .then(object => {
@@ -23,7 +23,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/inventory/:id', requireAuth, function(req, res, next){
-    logger.log('Get help ticket '+ req.params.id, 'verbose');
+    logger.log('info','Get help ticket '+ req.params.id, 'verbose');
     Model.findById(req.params.id)
     .exec()
       .then(object => {
@@ -35,7 +35,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/inventory', requireAuth, function(req, res, next){
-    logger.log('Create inventory', "verbose");
+    logger.log('info','Create inventory', "verbose");
     var inventory =  new Model(req.body);
     inventory.save( function ( err, object ){
       if (err) {
@@ -47,7 +47,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/inventory', requireAuth, function(req, res, next){
-    logger.log('Update inventory '+ req.body._id, 'verbose');
+    logger.log('info','Update inventory '+ req.body._id, 'verbose');
 
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false})
     .exec()
@@ -60,7 +60,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/inventory/:id', requireAuth, function(req, res, next){
-    logger.log('Delete session ' + req.params.id, 'verbose');
+    logger.log('info','Delete session ' + req.params.id, 'verbose');
     Model.removeById(req.params.id)
     .exec()
     .then(result => {

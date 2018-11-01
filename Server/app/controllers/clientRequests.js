@@ -26,7 +26,7 @@ module.exports = function (app) {
   app.use('/', router);
 
   router.get('/api/clientRequests', requireAuth, function(req, res, next){
-    logger.log('Get clientRequests');
+    logger.log('info','Get clientRequests');
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate({path: 'requestDetails', model: 'ClientRequestDetail'} )
@@ -45,7 +45,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/clientRequestsP', requireAuth, function(req, res, next){
-    logger.log('Get clientRequests');
+    logger.log('info','Get clientRequests');
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate('requestDetails')
@@ -65,7 +65,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/clientRequests/current/count', requireAuth, function(req, res, next){
-    logger.log('Get helpTicket');
+    logger.log('info','Get helpTicket');
     var query = buildQuery(req.query, ClientRequestDetail.find({ $or:[ {'requestStatus':1}, {'requestStatus':3}, {'requestStatus':4} ]}))
       query.sort(req.query.order)
       .exec(function(err, object){
@@ -82,7 +82,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/clientRequests/:id/:sessions', requireAuth, function(req, res, next){
-    logger.log('Get customers active clientRequests');
+    logger.log('info','Get customers active clientRequests');
      var activeSessions = req.params.sessions.split(":");
      for(let i = 0; i < activeSessions.length; i++){
        activeSessions[i] = ObjectId(activeSessions[i]);
@@ -108,7 +108,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/clientRequests/:id', requireAuth, function(req, res, next){
-    logger.log('Get clientRequest' + req.params.id, 'verbose');
+    logger.log('info','Get clientRequest' + req.params.id, 'verbose');
     Model.findById(req.params.id)
      .populate({path: 'courseId', model: 'Course', select: 'number name'})
      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country'})
@@ -126,7 +126,7 @@ module.exports = function (app) {
   });
 
   router.post('/api/clientRequests', requireAuth, function(req, res, next){
-    logger.log('Create clientRequest','verbose');  
+    logger.log('info','Create clientRequest','verbose');  
 
     var clientRequest = new Model(req.body);
     var tasks = new Array();   
@@ -152,7 +152,7 @@ module.exports = function (app) {
   });
 
   router.post('/api/clientRequests/sendMail', requireAuth, function(req, res, next){
-    logger.log("Send email to " + req.body.email, 'verbose');
+    logger.log('info',"Send email to " + req.body.email, 'verbose');
 
     if(req.body){
        switch(req.body.reason){
@@ -216,7 +216,7 @@ module.exports = function (app) {
   })
 
   router.put('/api/clientRequests/assignBULK', requireAuth, function(req, res, next){
-    logger.log('Assign bulk');
+    logger.log('info','Assign bulk');
     if(req.body._id){
       var detailId;
       var query = Model.findById(req.body._id, function(err, clientRequest){
@@ -251,7 +251,7 @@ module.exports = function (app) {
   });
 
   router.put('/api/clientRequests/assign', requireAuth, function(req, res, next){
-    logger.log('Assign clientRequest ' + req.body._id);      
+    logger.log('info','Assign clientRequest ' + req.body._id);      
     if(req.body._id){
       var detailId;
       var query = Model.findById(req.body._id, function(err, clientRequest){     
@@ -353,7 +353,7 @@ module.exports = function (app) {
   });
 
   router.put('/api/clientRequests', requireAuth, function(req, res, next){
-    logger.log('Update clientRequest ' + req.body._id);     
+    logger.log('info','Update clientRequest ' + req.body._id);     
     
     var clientRequest = new Model(req.body);   
 
@@ -411,7 +411,7 @@ module.exports = function (app) {
   });
 
   router.put('/api/clientRequests/:id', requireAuth, function(req, res, next){
-    logger.log('Update clientRequest ' + req.params._id);       
+    logger.log('info','Update clientRequest ' + req.params._id);       
     let clientRequest = new Model(req.body); 
      Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
         if(error){
@@ -436,7 +436,7 @@ module.exports = function (app) {
   });
 
   router.delete('/api/clientRequests/:id', requireAuth, function(req, res, next){
-    logger.log('Delete clientRequest [%s]', req.params.id);
+    logger.log('info','Delete clientRequest [%s]', req.params.id);
     Model.remove(req.params.id, function(err, result){
       if (err) {
         return next(err);
@@ -446,7 +446,7 @@ module.exports = function (app) {
     })
   });
   router.get('/api/clientRequestsDetailsTest', requireAuth, function(req, res, next){ 
-    logger.log('Get clientRequests', 'verbose');
+    logger.log('info','Get clientRequests', 'verbose');
     console.log('is this it')
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
@@ -464,7 +464,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/clientRequestsDetails', requireAuth, function(req, res, next){ 
-    logger.log('Get clientRequests', 'verbose');
+    logger.log('info','Get clientRequests', 'verbose');
     console.log('is this it')
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
@@ -490,7 +490,7 @@ module.exports = function (app) {
   });
 
   // router.get('/api/clientRequestsDetailsOLD', requireAuth, function(req, res, next){
-  //   logger.log('Get clientRequests', 'verbose');
+  //   logger.log('info','Get clientRequests', 'verbose');
   //   var query = buildQuery(req.query, ClientRequestDetail.find());
   //   query.populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country'}})
   //   query.exec()
@@ -507,7 +507,7 @@ module.exports = function (app) {
   // });
 
   router.get('/api/clientRequestsDetails/analytics', requireAuth, function(req, res, next){
-    logger.log('Get clientRequests', 'verbose');
+    logger.log('info','Get clientRequests', 'verbose');
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
     .select('')
@@ -540,7 +540,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/clientRequestsDetails/:id', requireAuth, function(req, res, next){
-    logger.log('Get clientRequests', 'verbose');
+    logger.log('info','Get clientRequests', 'verbose');
     
     ClientRequestDetail.findById(req.params.id)
       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'}})
@@ -561,7 +561,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/clientRequestsDetails/:sessionId/:institutionId', requireAuth, function(req, res, next){
-    logger.log('Get clientRequests', 'verbose');  
+    logger.log('info','Get clientRequests', 'verbose');  
    
     ClientRequestDetail.find()    
       .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'}})
@@ -589,7 +589,7 @@ module.exports = function (app) {
   });
 
   router.put('/api/clientRequestsDetails', function(req, res, next){
-    logger.log('Update request detail', 'verbose');  
+    logger.log('info','Update request detail', 'verbose');  
     
     Model.findOneAndUpdate({_id: req.body.requestId._id}, req.body.requestId, function(err, request){
       if(err) return next(err);
@@ -616,7 +616,7 @@ module.exports = function (app) {
   });
 
   router.delete('/api/clientRequestsDetails/:id', requireAuth, function(req, res, next){
-    logger.log('Delete clientRequestsDetails ', req.params.id);
+    logger.log('info','Delete clientRequestsDetails ', req.params.id);
 
     ClientRequestDetail.findByIdAndRemove(req.params.id, function(err, result){
       if (err) {
@@ -628,7 +628,7 @@ module.exports = function (app) {
   });
 
   router.delete('/api/clientRequestsDetails/:id/:requestid', requireAuth, function(req, res, next){
-    logger.log('Delete clientRequestsDetails ', req.params.id); 
+    logger.log('info','Delete clientRequestsDetails ', req.params.id); 
     if(req.params.requestid){    
       Model.findById(req.params.requestid, function(err, request) {
         if(err){
@@ -669,7 +669,7 @@ module.exports = function (app) {
 
   //Courses Routes
   router.get('/api/courses', requireAuth, function(req, res, next){
-    logger.log('Get courses', 'verbose');
+    logger.log('info','Get courses', 'verbose');
     var query = buildQuery(req.query, Course.find());
     query.exec(function(err, object){
         if (err) {
@@ -685,7 +685,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/courses/person/:id', requireAuth, function(req, res, next){
-    logger.log('Get courses', 'verbose');
+    logger.log('info','Get courses', 'verbose');
     Course.find({personId: req.params.id})
       .sort(req.query.order)
       .exec(function(err, object){
@@ -702,7 +702,7 @@ module.exports = function (app) {
   });
 
   router.post('/api/courses', requireAuth, function(req, res, next){
-    logger.log('Create courses');
+    logger.log('info','Create courses');
     var clientRequest =  new Course(req.body);
     clientRequest.save( function ( err, object ){
       if (err) {
@@ -714,7 +714,7 @@ module.exports = function (app) {
   });
 
   router.put('/api/courses', requireAuth, function(req, res, next){
-    logger.log('Update courses ' + req.body._id, "verbose");
+    logger.log('info','Update courses ' + req.body._id, "verbose");
     Course.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
       if (err) {
         return next(err);
@@ -736,7 +736,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/clientRequestLocks', function(req, res, next){
-      logger.log('Get clientRequest Locks','verbose');
+      logger.log('info','Get clientRequest Locks','verbose');
       ClientRequestLock.find()
         .sort("-createdAt")
         .exec()
@@ -750,7 +750,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/clientRequestLocks/:id',  function(req, res, next){
-      logger.log('Get clientRequest Locks' + req.params.id,'verbose');
+      logger.log('info','Get clientRequest Locks' + req.params.id,'verbose');
       ClientRequestLock.find({requestId: req.params.id})
         .sort("-createdAt")
         .exec()
@@ -768,7 +768,7 @@ module.exports = function (app) {
   });
 
   router.post('/api/clientRequestLocks',  function(req, res, next){
-     logger.log('Create clientRequest Lock', 'verbose');
+     logger.log('info','Create clientRequest Lock', 'verbose');
       var clientRequestLock =  new ClientRequestLock(req.body);
       clientRequestLock.save()
 				.then(function (result) {
@@ -780,7 +780,7 @@ module.exports = function (app) {
   });
 
   router.delete('/api/clientRequestLocks/:id',  function(req, res, next){
-      logger.log('Delete Help Ticket Lock ' + req.params.id, 'verbose');
+      logger.log('info','Delete Help Ticket Lock ' + req.params.id, 'verbose');
 			var query = ClientRequestLock.remove({ requestId: req.params.id })
 				.exec()
 				.then(function (result) {

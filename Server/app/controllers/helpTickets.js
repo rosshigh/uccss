@@ -4,7 +4,6 @@ var express = require('express'),
     router = express.Router(),
     mongoose = require('mongoose'),
     Model = mongoose.model('HelpTicket'),
-    // Person = mongoose.model('Person'),
     HelpTicketArchive = mongoose.model('HelpTicketArchive'),
     Content = mongoose.model('HelpTicketContent'),
     multer = require('multer'),
@@ -12,7 +11,7 @@ var express = require('express'),
     passport = require('passport'),
     HelpTicketLock = mongoose.model('HelpTicketLock'),
     HelpTicketTypes = mongoose.model('HelpTicketTypes'),
-    writeLog = require('../../config/logger'),
+    logger = require('../../config/logger'),
     fs = require('fs');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
@@ -21,7 +20,7 @@ module.exports = function (app, config) {
   app.use('/', router);
 
   router.get('/api/helpTickets', requireAuth, function(req, res, next){
-    writeLog.log('Get helpTicket','verbose');
+    logger.log('info','Get helpTicket','verbose');
     var query = buildQuery(req.query, Model.find())
     .populate('courseId', 'name number')
     .populate('requestId')
@@ -39,7 +38,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/archived', requireAuth, function(req, res, next){
-    writeLog.log('Get helpTicket','verbose');
+    logger.log('info','Get helpTicket','verbose');
     var query = buildQuery(req.query, HelpTicketArchive.find())
     .populate('courseId', 'name number')
     .populate('requestId')
@@ -57,7 +56,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/users', requireAuth, function(req, res, next){
-    writeLog.log('Get user helpTicket','verbose');
+    logger.log('info','Get user helpTicket','verbose');
     var query1 =buildQuery(req.query, Model.find())
     .populate('courseId', 'name number')
     .populate('requestId')
@@ -91,7 +90,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/analytics', requireAuth, function(req, res, next){
-    writeLog.log('Get helpTicket','verbose');
+    logger.log('info','Get helpTicket','verbose');
     var query = buildQuery(req.query, Model.find())
     .populate('courseId', 'name number')
     .populate('requestId')
@@ -109,7 +108,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/current',requireAuth,  function(req, res, next){
-    writeLog.log('Get helpTicket', 'verbose');
+    logger.log('info','Get helpTicket', 'verbose');
     Model.find( { $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]})
       .sort(req.query.order)
       .exec()
@@ -122,7 +121,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/current/count', requireAuth, function(req, res, next){
-    writeLog.log('Get helpTicket');
+    logger.log('info','Get helpTicket');
     var query = buildQuery(req.query, Model.find( { $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]}))
       query.exec()
       .then(object => {
@@ -134,7 +133,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/current/count/:personId', requireAuth, function(req, res, next){
-    writeLog.log('Get helpTicket', 'verbose');
+    logger.log('info','Get helpTicket', 'verbose');
     Model.find( { 'personId': req.params.personId, $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]})
       .sort(req.query.order)
       .exec()
@@ -147,7 +146,7 @@ module.exports = function (app, config) {
   });
  
   router.get('/api/helpTickets/count', requireAuth, function(req, res, next){
-    writeLog.log('Get helpTicket', 'verbose');
+    logger.log('info','Get helpTicket', 'verbose');
     var query = buildQuery(req.query, Model.find())
     query.exec()
       .then(object => {
@@ -159,7 +158,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTickets/archive/:collection', requireAuth, function(req, res, next){
-    writeLog.log('Archive search', 'verbose');
+    logger.log('info','Archive search', 'verbose');
     if(req.params.collection && req.params.collection === 'current'){
       var query = Model.find();
     } else {
@@ -224,7 +223,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/:id', requireAuth, function(req, res, next){
-    writeLog.log('Get help ticket '+ req.params.id, 'verbose');
+    logger.log('info','Get help ticket '+ req.params.id, 'verbose');
     Model.findOne({_id: req.params.id})
     .populate('courseId', 'name number')
     .populate('requestId')
@@ -242,7 +241,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTickets/', requireAuth, function(req, res, next){
-    writeLog.log('Create HelpTicket', "verbose");   
+    logger.log('info','Create HelpTicket', "verbose");   
     var helpTicket =  new Model(req.body);
     helpTicket.save( function ( err, object ){
       if (err) {
@@ -254,7 +253,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/content/:id/:status', requireAuth, function(req, res, next){
-    writeLog.log('Update HelpTicket ' + req.params._id, 'verbose');
+    logger.log('info','Update HelpTicket ' + req.params._id, 'verbose');
     Model.findById(req.params.id).exec()
     .then(result => {
         var content = new Content(req.body);
@@ -275,7 +274,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/owner/:id', requireAuth, function(req, res, next){
-    writeLog.log('Update HelpTicket owner', 'verbose');
+    logger.log('info','Update HelpTicket owner', 'verbose');
 
     Model.findById(req.params.id).exec()
     .then(result => {  
@@ -317,7 +316,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/status/:id', requireAuth, function(req, res, next){
-    writeLog.log('Update HelpTicket '+ req.body._id, 'verbose');
+    logger.log('info','Update HelpTicket '+ req.body._id, 'verbose');
     Model.findById(req.params.id)
     .exec()
     .then(result => {
@@ -336,7 +335,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/keywords/:id', requireAuth, function(req, res, next){
-    writeLog.log('Update HelpTicket '+ req.body._id, 'verbose');
+    logger.log('info','Update HelpTicket '+ req.body._id, 'verbose');
     Model.findById(req.params.id)
     .exec()
     .then(result => {
@@ -355,7 +354,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets', requireAuth, function(req, res, next){
-    writeLog.log('Update HelpTicket '+ req.body._id, 'verbose');
+    logger.log('info','Update HelpTicket '+ req.body._id, 'verbose');
 
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false})
     .exec()
@@ -382,7 +381,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/sendMail/:id', requireAuth, function(req, res, next){
-    writeLog.log('Update HelpTicket ' + req.body._id, 'verbose');
+    logger.log('info','Update HelpTicket ' + req.body._id, 'verbose');
     if(req.body.audit){
       Model.findById(req.params.id, function(err, result){
         if (err) {
@@ -411,7 +410,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/helpTickets/:id', requireAuth, function(req, res, next){
-    writeLog.log('Delete session ' + req.params.id, 'verbose');
+    logger.log('info','Delete session ' + req.params.id, 'verbose');
     Model.removeById(req.params.id)
     .exec()
     .then(result => {
@@ -423,7 +422,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/count/:status', function(req, res, next){
-    writeLog.log('Count tickets with status ' + req.params.status, 'verbose');
+    logger.log('info','Count tickets with status ' + req.params.status, 'verbose');
 
     Model.find({helpTicketStatus: req.params.status}, function(err, results){
       if(err) return next(err);
@@ -433,7 +432,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTickets/sendMail', requireAuth, function(req, res, next){
-    writeLog.log("Send email to " + req.body.email, 'verbose');
+    logger.log('info',"Send email to " + req.body.email, 'verbose');
     if(req.body){
       sendEmail(req.body);
 
@@ -506,7 +505,7 @@ module.exports = function (app, config) {
   var upload = multer({ storage: storage});
 
   router.post('/api/helpTickets/upload/:id/:container/:contentId',  upload.any(), function(req, res, next){
-     writeLog.log('Upload File ', 'verbose');    
+     logger.log('info','Upload File ', 'verbose');    
       Model.findById(req.params.id, function(err, helpticket){   
         if(err){
           return next(err);
@@ -542,7 +541,7 @@ module.exports = function (app, config) {
   });
   
   router.get('/api/helpTicketLocks', function(req, res, next){
-      writeLog.log('Get helpTicket Locks','verbose');
+      logger.log('info','Get helpTicket Locks','verbose');
       HelpTicketLock.find()
         .sort("-createdAt")
         .exec()
@@ -556,7 +555,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTicketLocks/:id',  function(req, res, next){
-    writeLog.log('Get helpTicket Locks' + req.params.id,'verbose');
+    logger.log('info','Get helpTicket Locks' + req.params.id,'verbose');
     HelpTicketLock.find({helpTicketId: req.params.id})
       .sort("-createdAt")
       .exec()
@@ -574,7 +573,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTicketLocks',  function(req, res, next){
-     writeLog.log('Create helpTicket Lock','verbose');
+     logger.log('info','Create helpTicket Lock','verbose');
       var helpTicketLock =  new HelpTicketLock(req.body);
       helpTicketLock.save()
 				.then(function (result) {
@@ -586,7 +585,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/helpTicketLocks/:id',  function(req, res, next){
-    writeLog.log('Delete Help Ticket Lock ' + req.params.id, 'verbose');
+    logger.log('info','Delete Help Ticket Lock ' + req.params.id, 'verbose');
     var query = HelpTicketLock.remove({ helpTicketId: req.params.id })
       .exec()
       .then(function (result) {
@@ -609,11 +608,11 @@ module.exports = function (app, config) {
   })
 
   router.get('/api/helpTicketsTypes', requireAuth, function(req, res, next){
-    writeLog.log('Get helpTicketypes Frick','verbose');
+    logger.log('info','Get helpTicketypes Frick','verbose');
     var query = buildQuery(req.query, HelpTicketTypes.find())
       query.exec()
       .then(object => {
-console.log(object)        
+      
         res.status(200).json(object);
       })
       .catch(error => {
@@ -622,7 +621,7 @@ console.log(object)
   });
 
   router.post('/api/helpTicketsTypes', requireAuth, function(req, res, next){
-    writeLog.log('Create HelpTicketTypes', "verbose");
+    logger.log('info','Create HelpTicketTypes', "verbose");
     var helpTicketType =  new HelpTicketTypes(req.body);
     helpTicketType.save( function ( err, object ){
       if (err) {
@@ -634,7 +633,7 @@ console.log(object)
   });
 
   router.put('/api/helpTicketsTypes', requireAuth, function(req, res, next){
-    writeLog.log('Update HelpTicket Type '+ req.body._id, 'verbose');
+    logger.log('info','Update HelpTicket Type '+ req.body._id, 'verbose');
 
     HelpTicketTypes.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false})
     .exec()
@@ -647,7 +646,7 @@ console.log(object)
   });
 
   router.post('/api/helpTickets/archiveClosed', function(req, res, next){
-    writeLog.log('Archiving closed help tickets', 'verbose');
+    logger.log('info','Archiving closed help tickets', 'verbose');
     Model.find({helpTicketStatus: 6}, function(err, result){
       if(err){
         return next(err);
@@ -685,7 +684,7 @@ console.log(object)
   });
 
   router.get('/api/helpTicketsArchive', function(req, res, next){
-    writeLog.log('Get helpTicket','verbose');
+    logger.log('info','Get helpTicket','verbose');
     var query = buildQuery(req.query, HelpTicketArchive.find())
     .populate('courseId', 'name number')
     .populate('requestId')

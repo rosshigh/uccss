@@ -1,5 +1,4 @@
 var express = require('express'),
-  debug = require('debug')('uccss'),
   router = express.Router(),
   mongoose = require('mongoose'),
   Message = mongoose.model('Message'),
@@ -7,152 +6,93 @@ var express = require('express'),
   multer = require('multer'),
   mkdirp = require('mkdirp'),
   logger = require('../../config/logger'),
-  Model = mongoose.model('Site');
+  Model = mongoose.model('Site'),
+  asyncHandler = require('express-async-handler');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
 module.exports = function (app) {
   app.use('/', router);
 
-  router.get('/api/site', function(req, res, next){
-    debug('Get site');
+  router.get('/api/site', asyncHandler(async (req, res) => {
     var query = buildQuery(req.query, Model.find())
-    query.exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
-  });
-
-  router.get('/api/site/current', requireAuth, function(req, res, next){
-    debug('Get site');
-    var query = buildQuery(req.query, Model.find())
-    query.exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
-  });
-
-  router.get('/api/site/:id', requireAuth, function(req, res, next){
-    debug('Get site [%s]', req.params.id);
-    Model.findById(req.params.id, function(err, object){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
-  });
-
-  router.post('/api/site', requireAuth, function(req, res, next){
-    logger.log('Create Site Info', 'verbose');
-
-    var item =  new Model(req.body);
-    item.save( function ( err, object ){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
-  });
-
-  router.put('/api/site', requireAuth, function(req, res, next){
-    debug('Update Site [%s]', req.body._id);
-    Model.findOneAndUpdate({_id: req.body._id}, req.body, {new: true, safe:true, multi:false}, function(err, result){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(result);
-      }
+    await query.exec().then(result => {
+      res.status(200).json(result);
     })
-  });
+  }));
 
-  router.delete('/api/site/:id', requireAuth, function(req, res, next){
-    debug('Delete site [%s]', req.params.id);
-    Model.remove({ _id: req.params.id }, function(err) {
-      if (err) {
-        return next(err);
-      }else {
-        res.status(204).json({message: 'Record deleted'});
-      }
-    });
-  });
+  router.get('/api/site/current', requireAuth, asyncHandler(async (req, res) => {
+    var query = buildQuery(req.query, Model.find())
+    await query.exec().then(result => {
+      res.status(200).json(result);
+    })
+  }));
+
+  router.get('/api/site/:id', requireAuth, asyncHandler(async (req, res) => {
+    await Model.findById(req.params.id).then(result => {
+      res.status(200).json(result);
+    })
+  }));
+
+  router.post('/api/site', requireAuth, asyncHandler(async (req, res) => {
+    logger.log('info','Create Site Info');
+    var item =  new Model(req.body);
+    await item.save().then(result => {
+      res.status(200).json(result);
+    })
+  }));
+
+  router.put('/api/site', requireAuth, asyncHandler(async (req, res) => {
+    await Model.findOneAndUpdate({_id: req.body._id}, req.body, {new: true, safe:true, multi:false}).then(result => {
+      res.status(200).json(result);
+    })
+  }));
+
+  router.delete('/api/site/:id', requireAuth, asyncHandler(async (req, res) => {
+    await Model.remove({ _id: req.params.id }).then(result => {
+      res.status(200).json(result);
+    })
+  }));
 
   //Message services
-  router.get('/api/messages', requireAuth, function(req, res, next){
-    debug('Get message');
+  router.get('/api/messages', requireAuth, asyncHandler(async (req, res) => {
     var query = buildQuery(req.query, Message.find())
-    query.exec(function(err, object){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
-  });
-
-  router.get('/api/messages/current', requireAuth, function(req, res, next){
-    debug('Get message');
-    var query = buildQuery(req.query, Message.find())
-    query.exec(function(err, object){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
-  });
-
-  router.get('/api/messages/:id', requireAuth, function(req, res, next){
-    debug('Get message [%s]', req.params.id);
-    Message.findById(req.params.id, function(err, object){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
-  });
-
-  router.post('/api/messages', requireAuth, function(req, res, next){
-    debug('Create message');
-    var item =  new Message(req.body);
-    item.save( function ( err, object ){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
-  });
-
-  router.put('/api/messages', requireAuth, function(req, res, next){
-    debug('Update message [%s]', req.body._id);
-    Message.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(result);
-      }
+    await query.exec().then(result => {
+      res.status(200).json(result);
     })
-  });
+  }));
 
-  router.delete('/api/messages/:id', requireAuth, function(req, res, next){
-    debug('Delete message [%s]', req.params.id);
-    Message.remove({ _id: req.params.id }, function(err) {
-      if (err) {
-        return next(err);
-      }else {
-        res.status(204).json({message: 'Record deleted'});
-      }
-    });
-  });
+  router.get('/api/messages/current', requireAuth, asyncHandler(async (req, res) => {
+    var query = buildQuery(req.query, Message.find())
+    await query.exec().then(result => {
+      res.status(200).json(result);
+    })
+  }));
+
+  router.get('/api/messages/:id', requireAuth, asyncHandler(async (req, res) => {
+    await Message.findById(req.params.id).then(result => {
+      res.status(200).json(result);
+    })
+  }));
+
+  router.post('/api/messages', requireAuth, asyncHandler(async (req, res) => {
+    var item =  new Message(req.body);
+    await item.save().then(result => {
+      res.status(200).json(result);
+    })
+  }));
+
+  router.put('/api/messages', requireAuth, asyncHandler(async (req, res) => {
+    await Message.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}).then(result => {
+      res.status(200).json(result);
+    })
+  }));
+
+  router.delete('/api/messages/:id', requireAuth, asyncHandler(async (req, res) => {
+    await Message.remove({ _id: req.params.id }).then(result => {
+      res.status(200).json(result);
+    })
+  }));
 
   var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -173,27 +113,19 @@ module.exports = function (app) {
 
   var upload = multer({ storage: storage });
 
-  router.post('/api/site/upload/:id', upload.any(), function(req, res, next){
-      Model.findById(req.params.id, function(err, site){
-        if(err){
-          return next(err);
-        } else {
-          for(var i = 0, x = req.files.length; i<x; i++){
-            var file =  {
-              originalFilename: req.files[i].originalname,
-              fileName: req.files[i].filename,
-              dateUploaded: new Date()
-            };
-            site.file = file;
-          }
-          site.save(function(err, site) {
-            if(err){
-              return next(err);
-            } else {
-              res.status(200).json(site);
-            }
-          });
+  router.post('/api/site/upload/:id', upload.any(), asyncHandler(async (req, res) => {
+      await Model.findById(req.params.id).then(result => {
+        for(var i = 0, x = req.files.length; i<x; i++){
+          var file =  {
+            originalFilename: req.files[i].originalname,
+            fileName: req.files[i].filename,
+            dateUploaded: new Date()
+          };
+          result.file = file;
         }
-      });
-  });
+        result.save().then(result => {
+            res.status(200).json(result);
+        });
+      })
+  }));
 };

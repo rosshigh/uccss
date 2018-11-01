@@ -32,11 +32,11 @@ module.exports = function (app, config) {
   app.use('/', router);
 
   AsyncPolling(function (end) {
-    logger.log("Check for notifications...");
+    logger.log('info',"Check for notifications...");
     var query = Event.find({scope: 'u', eventActive: true});
     query.exec( function(err, object){    
       if(!object || object.length === 0){          
-        logger.log('No events for ' + new Date())
+        logger.log('info','No events for ' + new Date())
       } else {
         let today = new Date();
         let todayYear = today.getFullYear();
@@ -46,7 +46,7 @@ module.exports = function (app, config) {
           let year = startDate.getFullYear();
           let day = startDate.getDate() + 1;
           if(todayYear === year && todayDay === day){
-            logger.log('This event occurs today');
+            logger.log('info','This event occurs today');
             var mailObj = {
               email: config.emailNotification,  
               MESSAGE: item.notes,
@@ -58,7 +58,7 @@ module.exports = function (app, config) {
               if(err){
                 console.log(err);
               } else {
-                logger.log('Event updated'); 
+                logger.log('info','Event updated'); 
               }
             });
           }
@@ -69,7 +69,7 @@ module.exports = function (app, config) {
   }, 86400000).run();
   
   router.get('/api/people',   function(req, res, next){
-    logger.log('Get people','verbose');
+    logger.log('info','Get people','verbose');
     var query = buildQuery(req.query, Model.find())
 
     query
@@ -84,7 +84,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/people/bulkEmail', function(req, res, next){
-    logger.log('Get people builkEmail', 'verbose');
+    logger.log('info','Get people builkEmail', 'verbose');
     var query = buildQuery(req.query, Model.find());
     query.select('lastName firstName institutionId fullName personStatus email roles')
     query.populate('institutionId',{institutionStatus: 1, institutionType: 1, memberType: 1, name: 1, region: 1, city: 1, country: 1})
@@ -98,7 +98,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/people/institution/:id', requireAuth, function(req, res, next){
-    logger.log('Get people','verbose');
+    logger.log('info','Get people','verbose');
     Model.find()
       .sort(req.query.order)
       .where('institutionId').eq(req.params.id)
@@ -112,7 +112,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/people/checkEmail',  function(req, res, next){
-    logger.log('Get person for email =' + req.params.email,'verbose');
+    logger.log('info','Get person for email =' + req.params.email,'verbose');
     var value = req.query.email;
   
     var query = Model.findOne({email: {$regex: new RegExp('^' + value.toLowerCase(), 'i')}});
@@ -147,7 +147,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/people/emailLog', requireAuth,  function(req, res, next){
-    logger.log('Get people email log','verbose');
+    logger.log('info','Get people email log','verbose');
   
     var query = buildQuery(req.query, EmailLog.find())
     query
@@ -161,7 +161,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/people/:id', requireAuth, function(req, res, next){
-    logger.log('Get person [%s]', req.params.id,'verbose');
+    logger.log('info','Get person [%s]', req.params.id,'verbose');
     Model.findById(req.params.id, function(err, object){
         if (err) {
          return next(err);
@@ -172,7 +172,7 @@ module.exports = function (app, config) {
   });
  
   router.post('/api/people', requireAuth, function(req, res, next){ 
-    logger.log('Create Person', 'verbose');
+    logger.log('info','Create Person', 'verbose');
     var person =  new Model(req.body);  
       person.save(function ( err, object ){
         if (err) {
@@ -195,7 +195,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/people/register',  function(req, res, next){
-    logger.log('Register Person','verbose');
+    logger.log('info','Register Person','verbose');
     Model.find({ email : req.body.email}, function(err, person){
       if(err) {
         return next(err);
@@ -271,7 +271,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/people', requireAuth, function(req, res, next){
-    logger.log('Update Person ' + req.body._id, 'verbose');       
+    logger.log('info','Update Person ' + req.body._id, 'verbose');       
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, person){
       if (err) {
         return next(err);
@@ -282,7 +282,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/people/password/:id',  function(req, res, next){
-    logger.log('Update Person password [%s]', req.params.id,'verbose');
+    logger.log('info','Update Person password [%s]', req.params.id,'verbose');
     Model.findById(req.params.id, function(err, result){
       if (err) {
          return next(err);
@@ -300,7 +300,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/people/:id', requireAuth, function(req, res, next){
-    logger.log('Delete person [%s]', req.params.id,'verbose');
+    logger.log('info','Delete person [%s]', req.params.id,'verbose');
     Model.remove({ _id: req.params.id }, function(err, result){
       if (err) {
          return next(err);
@@ -311,7 +311,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/people/sendMail', requireAuth, function(req, res, next){
-    logger.log("Sending email to " + req.body.id, "verbose");
+    logger.log('info',"Sending email to " + req.body.id, "verbose");
     Model.findById(req.body.id).exec()
     .then(person => {
         var obj = {
@@ -349,14 +349,14 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/people/sendBulkEmail', requireAuth, function(req, res, next){
-    logger.log('Sending bulk email', 'verbose');
+    logger.log('info','Sending bulk email', 'verbose');
 
     sendBulkEmails(req.body);
     res.status(201).json({message: "Emails sent"});
   });
 
   router.get('/api/people/count/:status', function(req, res, next){
-    logger.log('Count people with status ' + req.params.status, 'verbose');
+    logger.log('info','Count people with status ' + req.params.status, 'verbose');
 
     Model.find({personStatus: req.params.status}, function(err, results){
       if(err) return next(err);
@@ -366,7 +366,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/people/archive', function(req, res, next){
-    logger.log('Archive people', 'verbose'); 
+    logger.log('info','Archive people', 'verbose'); 
     Model.find({personStatus: '02'}, function(err, result){
       if(err){
         return next(err);
@@ -405,7 +405,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/passwordReset',  function(req, res, next){
-    logger.log('Password Reset for ' + req.body.email, 'verbose');
+    logger.log('info','Password Reset for ' + req.body.email, 'verbose');
      Model.find({ email : req.body.email}).exec()
      .then(person => {      
        if(person){
@@ -438,7 +438,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/passwordReset/:id',  function(req, res, next){
-    logger.log('Password Reset', 'verbose');  
+    logger.log('info','Password Reset', 'verbose');  
     PasswordReset.findById(req.params.id).exec()
     .then(result => {
        if(result){
@@ -460,7 +460,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/getWeather/:city', function(req, res, next){
-    logger.log("Getting weather for " + req.params.city, 'verbose')
+    logger.log('info',"Getting weather for " + req.params.city, 'verbose')
     var city = req.params.city.split(' ').join('%20');
     return http.get({
         host: 'api.openweathermap.org',
@@ -488,7 +488,7 @@ module.exports = function (app, config) {
   })
 
   router.get('/api/uccStaff/:uccRoles', function(req, res, next){
-    logger.log('Getting UCC Staff', 'verbose');  
+    logger.log('info','Getting UCC Staff', 'verbose');  
     let roles = req.params.uccRoles.split(':');
     Model.find({roles: {$in: roles}}).exec()
     .then(people => {    
@@ -514,7 +514,7 @@ module.exports = function (app, config) {
   })
 
   router.get('/api/notes', requireAuth,  function(req, res, next){
-    logger.log('Get note','verbose');
+    logger.log('info','Get note','verbose');
     var query = buildQuery(req.query, Note.find())
     query.exec( function(err, object){
         if (err) {
@@ -530,7 +530,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/notes', requireAuth, function(req, res, next){
-    logger.log('Create Note', 'verbose');
+    logger.log('info','Create Note', 'verbose');
     var note =  new Note(req.body);  
       note.save(function ( err, object ){
         if (err) {
@@ -542,7 +542,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/notes', requireAuth, function(req, res, next){
-    logger.log('Update note ' + req.body._id, 'verbose');  
+    logger.log('info','Update note ' + req.body._id, 'verbose');  
     Note.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, person){
       if (err) {
         return next(err);
@@ -553,7 +553,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/notes/:id', requireAuth, function(req, res, next){
-    logger.log('Delete note ' + req.params.id,'verbose');
+    logger.log('info','Delete note ' + req.params.id,'verbose');
     Note.remove({ _id: req.params.id }, function(err, result){
       if (err) {
          return next(err);
@@ -564,7 +564,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/technotes', requireAuth,  function(req, res, next){
-    logger.log('Get technotes','verbose');
+    logger.log('info','Get technotes','verbose');
     var query = buildQuery(req.query, TechNote.find())
     .populate({ path: 'personId', model: 'Person', select: 'firstName lastName fullName'})
     .populate({ path: 'productId', model: 'Product', select: 'name'})
@@ -584,7 +584,7 @@ module.exports = function (app, config) {
   });
         
   router.post('/api/technotes', requireAuth, function(req, res, next){
-    logger.log('Create technotes', 'verbose');
+    logger.log('info','Create technotes', 'verbose');
     var note =  new TechNote(req.body);  
       note.save(function ( err, object ){
         if (err) {
@@ -596,7 +596,7 @@ module.exports = function (app, config) {
   });
         
   router.put('/api/technotes', requireAuth, function(req, res, next){
-    logger.log('Update technotes ' + req.body._id, 'verbose');  
+    logger.log('info','Update technotes ' + req.body._id, 'verbose');  
     TechNote.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, person){
       if (err) {
         return next(err);
@@ -607,7 +607,7 @@ module.exports = function (app, config) {
   });
         
   router.delete('/api/technotes/:id', requireAuth, function(req, res, next){
-    logger.log('Delete technotes ' + req.params.id,'verbose');
+    logger.log('info','Delete technotes ' + req.params.id,'verbose');
     TechNote.remove({ _id: req.params.id }, function(err, result){
       if (err) {
           return next(err);
@@ -638,7 +638,7 @@ module.exports = function (app, config) {
   var uploadTechnotes = multer({ storage: storageTech});
 
   router.post('/api/technotes/upload/:id',  uploadTechnotes.any(), function(req, res, next){
-     logger.log('Upload File ', 'verbose');    
+     logger.log('info','Upload File ', 'verbose');    
      TechNote.findById(req.params.id, function(err, techNote){   
         if(err){
           return next(err);
@@ -660,7 +660,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/technotecats', requireAuth,  function(req, res, next){
-    logger.log('Get technotescat','verbose');
+    logger.log('info','Get technotescat','verbose');
     var query = buildQuery(req.query, TechNoteCategory.find())
     query.exec( function(err, object){
         if (err) {
@@ -676,7 +676,7 @@ module.exports = function (app, config) {
   });
         
   router.post('/api/technotecats', requireAuth, function(req, res, next){
-    logger.log('Create technotecats', 'verbose');
+    logger.log('info','Create technotecats', 'verbose');
     var note =  new TechNoteCategory(req.body);  
       note.save(function ( err, object ){
         if (err) {
@@ -688,7 +688,7 @@ module.exports = function (app, config) {
   });
         
   router.put('/api/technotecats', requireAuth, function(req, res, next){
-    logger.log('Update technotecats ' + req.body._id, 'verbose');  
+    logger.log('info','Update technotecats ' + req.body._id, 'verbose');  
     TechNoteCategory.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, person){
       if (err) {
         return next(err);
@@ -699,7 +699,7 @@ module.exports = function (app, config) {
   });
         
   router.delete('/api/technotecats/:id', requireAuth, function(req, res, next){
-    logger.log('Delete technotecats ' + req.params.id,'verbose');
+    logger.log('info','Delete technotecats ' + req.params.id,'verbose');
     TechNoteCategory.remove({ _id: req.params.id }, function(err, result){
       if (err) {
           return next(err);
@@ -710,7 +710,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/events', requireAuth,  function(req, res, next){
-    logger.log('Get events','verbose');
+    logger.log('info','Get events','verbose');
     var query = buildQuery(req.query, Event.find())
     query.exec( function(err, object){
         if (err) {
@@ -726,7 +726,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/events/:personId', requireAuth, function(req, res, next){
-    logger.log('Get person and ucc events', 'verbose');
+    logger.log('info','Get person and ucc events', 'verbose');
     var query = Event.find()
       .where({personId: req.params.personId})
       .where({scope: "u"})
@@ -744,7 +744,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/events', requireAuth, function(req, res, next){
-    logger.log('Create Event', 'verbose');
+    logger.log('info','Create Event', 'verbose');
     var event =  new Event(req.body);  
       event.save(function ( err, object ){
         if (err) {
@@ -756,7 +756,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/events', requireAuth, function(req, res, next){
-    logger.log('Update event ' + req.body._id, 'verbose');  
+    logger.log('info','Update event ' + req.body._id, 'verbose');  
     Event.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, event){
       if (err) {
         return next(err);
@@ -767,7 +767,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/events/:id', requireAuth, function(req, res, next){
-    logger.log('Delete event ' + req.params.id,'verbose');
+    logger.log('info','Delete event ' + req.params.id,'verbose');
     Event.remove({ _id: req.params.id }, function(err, result){
       if (err) {
          return next(err);
@@ -798,7 +798,7 @@ module.exports = function (app, config) {
   var upload = multer({ storage: storage});
 
   router.post('/api/people/upload/:id',  upload.any(), function(req, res, next){
-     logger.log('Upload File ', 'verbose');    
+     logger.log('info','Upload File ', 'verbose');    
       Model.findById(req.params.id, function(err, person){   
         if(err){
           return next(err);

@@ -15,7 +15,7 @@ module.exports = function (app) {
   app.use('/', router);
 
 	router.get('/api/blogs', function(req, res, next){
-		logger.log('Get Blogs', 'verbose');
+		logger.log('info','Get Blogs', 'verbose');
 		var query = buildQuery(req.query, Blog.find())
 		.populate('personId', 'firstName lastName email file')
 		query.exec(function(err, object){
@@ -28,7 +28,7 @@ module.exports = function (app) {
 	});
 
 	router.get('/api/blogs/:id', requireAuth, function(req, res, next){
-		logger.log('Get blog '+ req.params.id, 'verbose');
+		logger.log('info','Get blog '+ req.params.id, 'verbose');
 		Blog.findById(req.params.id)
 		.populate('personId', 'firstName, lastName, fullName, email')
 		.exec()
@@ -41,7 +41,7 @@ module.exports = function (app) {
 	});
 
 	router.post('/api/blogs', requireAuth, function(req, res, next){
-		logger.log('Create blog', "verbose");
+		logger.log('info','Create blog', "verbose");
 		var blog =  new Blog(req.body);
 		blog.save( function ( err, object ){
 		if (err) {
@@ -53,7 +53,7 @@ module.exports = function (app) {
 	});
 
 	router.put('/api/blogs', requireAuth, function(req, res, next){
-		logger.log('Update blog '+ req.body._id, 'verbose');
+		logger.log('info','Update blog '+ req.body._id, 'verbose');
 
 		Blog.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false})
 		.exec()
@@ -78,7 +78,7 @@ module.exports = function (app) {
 	});
 
 	router.get('/api/forums', function(req, res, next){
-		logger.log('Get Blogs', 'verbose');
+		logger.log('info','Get Blogs', 'verbose');
 		var query = buildQuery(req.query, Forum.find())
 		query
 			.sort('dateCreated')
@@ -94,7 +94,7 @@ module.exports = function (app) {
 	});
 
 	router.get('/api/forums/:id', requireAuth, function(req, res, next){
-		logger.log('Get blog '+ req.params.id, 'verbose');
+		logger.log('info','Get blog '+ req.params.id, 'verbose');
 		Forum.findById(req.params.id)
 		.exec()
 		.then(object => {
@@ -106,7 +106,7 @@ module.exports = function (app) {
 	});
 
 	router.post('/api/forums', requireAuth, function(req, res, next){
-		logger.log('Create forum', "verbose");
+		logger.log('info','Create forum', "verbose");
 		var forum =  new Forum(req.body);
 		forum.save()
 			.then(item => {	
@@ -118,7 +118,7 @@ module.exports = function (app) {
 	});
 
 	router.put('/api/forums', requireAuth, function(req, res, next){
-		logger.log('Update forum '+ req.body._id, 'verbose');
+		logger.log('info','Update forum '+ req.body._id, 'verbose');
 
 		Forum.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false})
 		.exec()
@@ -131,7 +131,7 @@ module.exports = function (app) {
 	});
 
 	router.get('/api/forumMessages', function(req, res, next){
-		logger.log('Get Blogs', 'verbose');
+		logger.log('info','Get Blogs', 'verbose');
 		var query = buildQuery(req.query, ForumMessage.find())
 		query
 			.sort('dateCreated')
@@ -146,7 +146,7 @@ module.exports = function (app) {
 	});
 
 	router.get('/api/forumMessages/:id', requireAuth, function(req, res, next){
-		logger.log('Get blog '+ req.params.id, 'verbose');
+		logger.log('info','Get blog '+ req.params.id, 'verbose');
 		ForumMessage.findById(req.params.id)
 		.exec()
 		.then(object => {
@@ -158,7 +158,7 @@ module.exports = function (app) {
 	});
 
 	router.post('/api/forumMessages', requireAuth, function(req, res, next){
-		logger.log('Create forum message', "verbose");
+		logger.log('info','Create forum message', "verbose");
 		var forum =  new ForumMessage(req.body); 
 		forum.save()
 			.then(item => {		
@@ -179,7 +179,7 @@ module.exports = function (app) {
 	});
 
 	router.put('/api/forumMessages', requireAuth, function(req, res, next){
-		logger.log('Update forum '+ req.body._id, 'verbose');
+		logger.log('info','Update forum '+ req.body._id, 'verbose');
 
 		ForumMessage.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false})
 		.exec()

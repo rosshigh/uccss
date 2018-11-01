@@ -1,5 +1,4 @@
 var express = require('express'),
-  debug = require('debug')('tests'),
   router = express.Router(),
   mongoose = require('mongoose'),
   Model = mongoose.model('Test'),
@@ -12,7 +11,6 @@ module.exports = function (app) {
   app.use('/', router);
 
   router.get('/api/tests', function(req, res, next){
-    debug('Get tests');
     Model.find()
       .populate('details')
       .exec(function(err, object){
@@ -25,7 +23,6 @@ module.exports = function (app) {
   });
 
   router.get('/api/tests/:id', function(req, res, next){
-    debug('Get session [%s]', req.params.id);
     Model.findById(req.params.id, function(err, object){
       if (err) {
         return next(err);
@@ -79,7 +76,6 @@ module.exports = function (app) {
   });
 
   router.post('/api/tests', function(req, res, next){
-    debug('Create Session');
     var test =  new Model(req.body);
     console.log('this is body')
     console.log(req.body)
@@ -117,7 +113,6 @@ module.exports = function (app) {
   });
 
   router.put('/api/tests', function(req, res, next){
-    debug('Update Session [%s]', req.body._id);
     var test = new Model(req.body);
     var newDetails = new Array();
     var details = new Array();
@@ -154,7 +149,6 @@ module.exports = function (app) {
   });
 
   router.delete('/api/tests/:id', function(req, res, next){
-    debug('Delete session [%s]', req.params.id);
     Model.removeById(req.params.id, function(err, result){
       if (err) {
         return next(err);
