@@ -12,12 +12,12 @@
             <th>Status</th>
             <th show.bind="viewHelpTickets">User IDS</th>
             <th show.bind="viewHelpTickets">Faculty IDs</th>
+            <th></th>
           </tr>
           </thead>
           <tbody>
             <tr id="${product.id}" productId="${product.productId}" 
-                repeat.for="product of clientRequestsArray"
-                click.trigger="requestChosen($event, $index)">
+                repeat.for="product of clientRequestsArray">
               <td>${product.courseId | courseName:people.coursesArray}</td>
               <td>${product.sessionId | sessionName:sessions.sessionsArray}</td>
               <td>${product.productId | lookupValue:products.productsArray:"_id":"name"}</td>
@@ -26,6 +26,11 @@
               <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
               <td show.bind="viewHelpTickets">${product.studentIds}<br>${product.studentPassword}</td>
               <td show.bind="viewHelpTickets">${product.facultyIds}<br>${product.facultyPassword}</td>
+              <td>
+                <span class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="View Assignment">
+                  <i class="fa fa-eye fa-lg fa-border" click.delegate="viewAssignment($index, product)" aria-hidden="true"></i>
+                </span>
+              </td>
             </tr>
           </tbody>
         </table>

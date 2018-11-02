@@ -1,0 +1,22 @@
+<template>
+  <div class="row" style="word-wrap: break-word;">
+      <span class="col-lg-4">
+        <h5 class="leftMargin">System: <span class="bold">${assign.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</span></h5>
+        <h5 class="leftMargin">Client: <span class="bold"> ${assign.client} </span></h5>
+        <h5 class="leftMargin">Server: <span class="bold"> ${assign.systemId | lookupValue:systems.systemsArray:"_id":"server"} </span></h5>
+        <h5 class="leftMargin">System Number: <span class="bold"> ${assign.systemId | lookupValue:systems.systemsArray:"_id":"instance"} </span></h5>
+      </span>
+      <span class="col-lg-6">
+        <h5>Student IDs: <span class="bold"> ${assign.studentUserIds ? assign.studentUserIds : 'N/A'}</span></h5>
+        <h5>Student Password: <span class="bold"> ${assign.studentPassword ? assign.studentPassword : 'N/A'}</span></h5>
+        <span>
+          <h5 class="topMargin">Faculty IDs <span class="bold">: ${assign.facultyUserIds ? assign.facultyUserIds : 'N/A'}</span></h5>
+          <h5>Faculty Password: <span class="bold"> ${assign.facultyPassword ? assign.facultyPassword : 'N/A'}</span></h5>
+        </span>
+      </span>
+      <span class="col-lg-12">
+          <h5 show.bind="systems.selectedSystem.its && systems.selectedSystem.its.length > 0" class="leftMargin bigTopMargin">ITS:</h5>
+          <h5 show.bind="systems.selectedSystem.its && systems.selectedSystem.its.length > 0"><span class="bold"> <a href="${systems.selectedSystem.its}" target="_blank">${systems.selectedSystem.its}</a> </span></h5>                       
+      </span>
+  </div>
+</template>

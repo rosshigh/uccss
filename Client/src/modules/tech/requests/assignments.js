@@ -1240,7 +1240,7 @@ export class Assignments {
     showProfile(request, el) {
         this.profileRequest = request;
         $(".hoverProfile").css("top", window.pageYOffset + el.clientY - 175);
-        $(".hoverProfile").css("left", el.clientX - 500);
+        $(".hoverProfile").css("left", el.clientX - 200);
         $(".hoverProfile").css("display", "block");
     }
 

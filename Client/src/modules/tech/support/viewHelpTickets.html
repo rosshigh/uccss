@@ -16,8 +16,12 @@
                     <compose show.bind="helpTickets.helpTicketsArray && helpTickets.helpTicketsArray.length > 0" view="./components/viewHTTable.html"></compose>
                 </div>
 
-                <div show.bind="helpTicketSelected" class="col-lg-12">
+                <div show.bind="helpTicketSelected && !showAssignment" class="col-lg-12">
                     <compose view="./components/viewHTForm.html"></compose>
+                </div>
+
+                <div show.bind="helpTicketSelected && showAssignment" class="col-lg-12">
+                        <compose view="./components/viewAssignmentForm.html"></compose>
                 </div>
 
             </div>

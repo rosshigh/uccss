@@ -1,0 +1,20 @@
+<template>
+		 <div class="row leftMargin">
+			<h4>SAP HANA Launchpad URL</h4>
+			<h5 class="leftMargin"><a href="${systems.selectedSystem.its}" target="_blank">${systems.selectedSystem.its}</a></h5>
+
+			<h4 class="topMargin">Users</h4>
+			<h5 class="leftMargin">Student IDs: <span class="bold"> ${assign.studentUserIds}</span></h5>
+			<h5 class="leftMargin">Student Password: <span class="bold"> ${assign.studentPassword}</span></h5>
+			<span show.bind="requests.selectedRequest.courseId !== null">
+				<h5 class="leftMargin" class="topMargin">Faculty IDs <span class="bold">: ${selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</span></h5>
+				<h5 class="leftMargin">Faculty Password: <span class="bold"> ${selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</span></h5>
+			</span>
+
+			<h4 class="topMargin">Lumira / Predictive Analytics Connection</h4>
+			<h5 class="leftMargin">System: <span class="bold">${assign.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</span></h5>
+			<h5 class="leftMargin">Server: <span class="bold"> ${systems.selectedSystem.server} </span></h5>
+			<h5 class="leftMargin">Port: <span class="bold"> ${systems.selectedSystem.port} </span></h5>
+			<h5 class="leftMargin">System Number: <span class="bold"> ${systems.selectedSystem.instance} </span></h5> 
+		</div>
+</template>

@@ -66,7 +66,7 @@
               <th style="width:8em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'modifiedDate'})">Date Modified </span><span><i class="fa fa-sort"></i></span></th>
               <th style="width:15em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'personId.lastName'})">Faculty </span><span><i class="fa fa-sort"></i></span></th>
               <th style="width:20em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'institutionId.name'})">Institution </span><span><i class="fa fa-sort"></i></span></th>
-              <th>Email</th>
+              <th style="width:15em">Email</th>
             </tr>
             <tr>
               <th>
@@ -109,7 +109,8 @@
               </td>
               <td data-title="Owner">
                 <span show.bind="helpTicket.owner[0].personId === null" click.trigger="ownHelpTicket(helpTicket)" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Take Ownership"><i class="fa fa-child fa-lg" aria-hidden="true"></i></span>
-                <span click.trigger="selectHelpTicket($event, $index)" show.bind="helpTicket.owner[0].personId !== null"> ${helpTicket.owner[0].personId.fullName}</span>
+                <span click.trigger="ownHelpTicket(helpTicket)" show.bind="helpTicket.owner[0].personId !== null" class="sortable"> ${helpTicket.owner[0].personId.fullName}</span>
+                <!-- click.trigger="selectHelpTicket($event, $index)" -->
               </td>
               <td 
               <td class="dropbtn" data-title="Status">
