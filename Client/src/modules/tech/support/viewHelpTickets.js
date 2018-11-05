@@ -150,17 +150,17 @@ export class ViewHelpTickets {
     this.editIndex = index;
     let response = await this.requests.getRequestDetail(request._id);
     if (!response.error) {
-        this.selectedRequestDetail = response;
-        if (this.selectedRequestDetail.requestId && this.selectedRequestDetail.requestId.courseId === null) this.selectedRequestDetail.requestId.courseId = { _id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME };
-        this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
-        if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
-        this.showAssignment = true;;
+      this.selectedRequestDetail = response;
+      if (this.selectedRequestDetail.requestId && this.selectedRequestDetail.requestId.courseId === null) this.selectedRequestDetail.requestId.courseId = { _id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME };
+      this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
+      if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
+      this.showAssignment = true;;
     }
-}
+  }
 
-backView() {
-  this.showAssignment = false;
-}
+  backView() {
+    this.showAssignment = false;
+  }
 
   sendAnEmail(person) {
     if (person) {
@@ -216,15 +216,14 @@ backView() {
   * Refresh the helpticket collection
   *****************************************************************************************/
   async refresh(clickRefresh) {
-    // this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
     if (!clickRefresh) $("#loading").show();
     await this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
       this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
     this.helpTickets.calcHelpTicketAges();
-    // this.spinnerHTML = "";
     $("#loading").hide();
     this._cleanUpFilters()
   }
+
 
   /*****************************************************************************************
   * User selected a help ticket
@@ -237,14 +236,9 @@ backView() {
     this.helpTickets.selectHelpTicket(this.editIndex);
     this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
     this.openHelpTicket();
-
-    // let categoryIndex = this.helpTickets.selectedHelpTicket.helpTicketCategory;
-    // let subTypeIndex =  getIndex(this.getIndex[categoryIndex].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
     let indices = this.getIndex();
     let subTypeIndex = indices.subTypeIndex;
     let categoryIndex = indices.categoryIndex;
-    // this.clientRequired = this.getCategoryIndex();
-    //  this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].clientRequired;
     this.createOutputForm(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].outputForm);
 
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -446,7 +440,11 @@ backView() {
     }
   }
 
-  async changeStatus(helpTicket, status, description) {
+  async changeStatus(helpTicket, status) {
+    if (status == this.config.MY_HELPTICKET_STATUS && this.userObj._id != helpTicket.owner[0].personId._id) {
+      this.utils.showNotification('You must own this ticket before you can make it yours');
+      return;
+    }
     this.helpTickets.selectHelpTicketByID(helpTicket._id);
     var obj = {
       property: "helpTicketStatus",
@@ -456,11 +454,27 @@ backView() {
       date: new Date
     }
     this.helpTickets.selectedHelpTicket.audit.push(obj);
-    this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
-    let serverResponse = await this.helpTickets.saveHelpTicket();
-    if (!serverResponse.error) {
-      this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-      this.utils.showNotification("The help ticket was updated");
+    if(status == this.config.MY_HELPTICKET_STATUS){
+      this.helpTickets.selectedHelpTicket.helpTicketStatus = this.helpTickets.selectedHelpTicket.helpTicketStatus.toString() + status;
+    } else {
+      this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
+    }
+    
+    if (status == this.config.CLOSED_HELPTICKET_STATUS) {
+      this.helpTickets.selectHelpTicketContent();
+      this.responseMessage = "Help Ticket closed by " + this.userObj.fullName
+      this._createResponse();
+      let serverResponse = await this.helpTickets.closeHelpTicket();
+      if (!serverResponse.error) {
+        this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+        this.utils.showNotification("The help ticket was updated");
+      }
+    } else {
+      let serverResponse = await this.helpTickets.saveHelpTicket();
+      if (!serverResponse.error) {
+        this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+        this.utils.showNotification("The help ticket was updated");
+      }
     }
     this._cleanUp();
   }
@@ -666,12 +680,29 @@ backView() {
   showProfile(request, el) {
     this.profileRequest = request;
     $(".hoverProfile").css("top", window.pageYOffset + el.clientY - 175);
-    $(".hoverProfile").css("left", el.clientX + 200);
+    $(".hoverProfile").css("left", el.clientX + 100);
     $(".hoverProfile").css("display", "block");
   }
 
   hideProfile() {
     $(".hoverProfile").css("display", "none");
+  }
+
+  async customHelpTicketStatusFilter() {
+    if (this.helpTicketStatusFilter > this.config.CLOSED_HELPTICKET_STATUS) {
+      await this.helpTickets.getMyHelpTickets(this.userObj._id);
+      this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+    } else {
+      if (this.oldHelpTicketStatus == this.config.MY_HELPTICKET_STATUS) {
+        $("#loading").show();
+        await this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
+          this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+        this.helpTickets.calcHelpTicketAges();
+        $("#loading").hide();
+      }
+      this.dataTable.filterList({ target: { value: this.helpTicketStatusFilter } }, { type: 'value', filter: 'helpTicketStatusFilter', collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus', compare: 'match' })
+    }
+    this.oldHelpTicketStatus = this.helpTicketStatusFilter;
   }
 
   customHelpTicketTypeFilter(value, item, context) {

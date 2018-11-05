@@ -58,7 +58,7 @@
               </td>
             </tr>
             <tr>
-              <th><span class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketNo'})">No </span><span><i class="fa fa-sort"></i></span></th>
+              <th style="width:10em"><span class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketNo'})">No </span><span><i class="fa fa-sort"></i></span></th>
               <th style="width:20em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketType'})">Type </span><span><i class="fa fa-sort"></i></span></th>
               <th style="width:15em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customOwnerSorter, propertyName: 'ownder'})">Owner </span><i class="fa fa-sort"></i></th>                   
               <th style="width:10em;"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})">Status </span><span><i class="fa fa-sort"></i></span></th>
@@ -79,7 +79,8 @@
                 <input value.bind="ownerFilterValue" input.trigger="dataTable.filterList(ownerFilterValue, { type: 'custom',  filter: customOwnerFilter, collectionProperty: 'owner', displayProperty: 'helpTicketType',  compare:'custom'} )"  class="form-control" />
               </th>
               <th>
-                <select value.bind="helpTicketStatusFilter" input.trigger="dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )" class="form-control">
+                <select value.bind="helpTicketStatusFilter" change.trigger="customHelpTicketStatusFilter()" class="form-control">
+                <!--input.trigger="dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )" --> 
                   <option value=""></option>
                   <option repeat.for="status of helpTicketTypes"
                           value.bind="status.code">${status.description}</option>
@@ -115,13 +116,13 @@
               <td 
               <td class="dropbtn" data-title="Status">
                 <div class="dropdown hidden-xs hidden-sm hidden-md">
-                  <span class="dropbtn"> ${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:"code":"description"}
+                  <span class="dropbtn"> ${helpTicket.helpTicketStatus | lookupHTStatus:config.HELP_TICKET_STATUSES}
                     <div show.bind="helpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS && helpTicket.helpTicketStatus !== config.NEW_HELPTICKET_STATUS" class="dropdown-content">
                       <a href="#" click.trigger="changeStatus(helpTicket, status.code, status.description)" repeat.for="status of config.HELP_TICKET_STATUSES | helpTicketStatuses:removeHTStatus">${status.description}</a>
                     </div>
                   </span>
                 </div>
-                <div class="hidden-lg">${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:"code":"description"}</div>
+                <div class="hidden-lg">${helpTicket.helpTicketStatus | lookupHTStatus:config.HELP_TICKET_STATUSES}</div>
 
               </td>
               <td  data-title="Created Date" click.trigger="selectHelpTicket($event, $index)">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>

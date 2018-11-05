@@ -9,7 +9,7 @@ import { AppConfig } from '../../../config/appConfig';
 import { Utils } from '../../../resources/utils/utils';
 import { People } from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
-import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
+import { CommonDialogs } from '../../../resources/dialogs/common-dialogs';
 
 import moment from 'moment';
 
@@ -127,7 +127,6 @@ export class ArchiveHelpTickets {
     let searchCollection = this.isCheckedCurrent ? 'current' : 'archive';
     this.buildSearchCriteria();
     this.resultArray = await this.helpTickets.archiveSearch(this.searchObj, searchCollection);
-    // this.resultArray = this.helpTickets.advancedSearch(this.searchObj);
     this.helpTicketSelected = true;
     this.dataTable.updateArray(this.resultArray);
     setTimeout(this.toolTips(), 3000);
@@ -143,7 +142,6 @@ export class ArchiveHelpTickets {
   }
 
   async typeChanged(type) {
-    // this._hideTypes();
     this.helpTickets.helpTicketTypesArray.forEach(item => {
       item.subtypes.forEach(item2 => {
         if (item2.type === this.selectedType) {
@@ -324,39 +322,52 @@ export class ArchiveHelpTickets {
       date: new Date
     }
     this.helpTickets.selectedHelpTicket.audit.push(obj);
+    this.helpTickets.selectHelpTicketContent();
+    this.responseMessage = "Help Ticket reopened by " + this.userObj.fullName
+    this._createResponse();
     this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.REVIEW_HELPTICKET_STATUS;
-    let serverResponse = await this.helpTickets.saveHelpTicket();
+    let serverResponse = await this.helpTickets.reopenHelpTicket();
     if (!serverResponse.error) {
-      this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
       this.utils.showNotification("The help ticket was updated");
     }
     $("#loading").hide();
   }
 
-  async archiveClosedTickets(){
+  /*****************************************************************************************
+* Create the response object
+*****************************************************************************************/
+  _createResponse() {
+    this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
+    this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
+    this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
+    this.helpTickets.selectedHelpTicketContent.content.comments = this.responseMessage;
+    this.helpTickets.selectedHelpTicketContent.displayForm = this.config.HELP_TICKET_OTHER_TYPE;
+  }
+
+  async archiveClosedTickets() {
     $("#loading").show();
     var closedHelpTickets = 0;
     let response = await this.helpTickets.countHelpTicketsStatus(this.config.CLOSED_HELPTICKET_STATUS);
-    if(!response.error) closedHelpTickets = response.count;
-    if(closedHelpTickets){
+    if (!response.error) closedHelpTickets = response.count;
+    if (closedHelpTickets) {
       return this.dialogs.showMessage(
-        "This will archive " + closedHelpTickets + " closed help tickets.  Are you sure you want to do that?", 
-        "Archive Help Tickets", 
+        "This will archive " + closedHelpTickets + " closed help tickets.  Are you sure you want to do that?",
+        "Archive Help Tickets",
         ['Yes', 'No']
-        ).whenClosed(response => {
-            if(!response.wasCancelled){
-             this.archiveTickets();  
-            }
-        });
+      ).whenClosed(response => {
+        if (!response.wasCancelled) {
+          this.archiveTickets();
+        }
+      });
     } else {
       this.utils.showNotification('There are currently no closed help tickets in the active help ticket collection.');
     }
     $("#loading").hide();
   }
 
-  async archiveTickets(){
+  async archiveTickets() {
     let response = await this.helpTickets.archiveHelpTickets();
-    if(!response.error){
+    if (!response.error) {
       this.utils.showNotification(response.number + ' Help Tickets were archived successfully')
     }
   }
@@ -397,7 +408,7 @@ export class ArchiveHelpTickets {
     })
   }
 
-  changeMe(){
+  changeMe() {
     console.log(this.selectedStatus);
   }
 }

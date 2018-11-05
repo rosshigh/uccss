@@ -1,0 +1,39 @@
+<template>
+    <style>
+        ux-dialog-header {
+            color: $ {
+                config.SUBMENU_COLOR
+            }
+
+            ;
+
+            background-color:$ {
+                config.SUBMENU_BACKGROUND
+            }
+        }
+    </style>
+    <ux-dialog style="width:800px;">
+        <ux-dialog-header>${model.title}</ux-dialog-header>
+
+        <ux-dialog-body>
+            <label>Please provide the reason for closing the help ticket</label>
+            <select class="form-control" change.delegate="reasonSelected()" value.bind="model.selectedReason">
+                <option value="">Please select a reason</option>
+                <option repeat.for="option of config.HELP_TICKET_CLOSE_REASONS" model.bind="$index">${option.reason}</option>
+            </select>
+            <div show.bind="model.selectedReason == config.HELP_TICKET_CLOSE_REASON_OTHER" class="topMargin">
+                <label>Please provide the reason</label>
+                <textarea  class="form-control" id="otherReason" value.bind="model.otherReason" rows="5"></textarea>
+            </div>
+            <div class="topMargin">
+                <label>One of our goals is to learn from each other and share the knowledge</label>
+                <label>Please let us know how you resolved the issue</label>
+                <textarea  class="form-control" id="method" value.bind="model.method" rows="5"></textarea>
+            </div>
+        </ux-dialog-body>
+
+        <ux-dialog-footer>
+            <button class="btn btn-primary smallMarginRight" repeat.for="option of model.options" click.trigger="selectOption(option)">${option}</button>
+        </ux-dialog-footer>
+    </ux-dialog>
+</template>

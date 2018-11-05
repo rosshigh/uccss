@@ -64,7 +64,7 @@
                 <td style="width:2rem;"  class="hidden-xs hidden-sm" data-title="Close">
                   <span click.trigger="closeHelpTicket(helpTicket)" show.bind="helpTicket.helpTicketStatus != config.CLOSED_HELPTICKET_STATUS" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Close Help Ticket"><i class="fa fa-window-close-o fa-lg" aria-hidden="true"></i></span>
                 </td>  
-                <td click.trigger="selectHelpTicket($event, $index)" data-title="Status">${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:"code":"description"}</td>             
+                <td click.trigger="selectHelpTicket($event, $index)" data-title="Status">${helpTicket.helpTicketStatus | lookupHTStatus:config.HELP_TICKET_STATUSES}</td>             
                 <td click.trigger="selectHelpTicket($event, $index)" data-title="Created Date">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
                 <td data-title="Modified Date" click.delegate="selectHelpTicket($event, $index)">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
               </tr>

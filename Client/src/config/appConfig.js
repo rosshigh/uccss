@@ -264,6 +264,7 @@ export class AppConfig {
     CUSTOMER_ACTION_HELPTICKET_STATUS = 4;
     REPLIED_HELPTICKET_STATUS = 5;
     CLOSED_HELPTICKET_STATUS = 6;
+    MY_HELPTICKET_STATUS = 7;
 
     HELP_TICKET_EMAIL_CREATE = 1;
     HELP_TICKET_EMAIL_STATUS_CHANGE = 9;
@@ -292,9 +293,29 @@ export class AppConfig {
         {
             "code": this.CLOSED_HELPTICKET_STATUS,
             "description": "Closed"
+        },
+        {
+            "code": this.MY_HELPTICKET_STATUS,
+            "description": "My Help Tickets"
         }
     ]; 
     
+    HELP_TICKET_CLOSE_REASON_OTHER = 3;
+    HELP_TICKET_CLOSE_REASONS = [
+        {
+            "reason": "Help ticket was submitted in error"
+        },
+        {
+            "reason": "I was able to resolve the issue"
+        },
+        {
+            "reason": "The issue is no longer relevant"
+        },
+        {
+            "reason": "Other"
+        }
+    ]
+
     SITE_INFO_TYPES = [
         {
             'type': 'INFO',

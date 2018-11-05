@@ -43,19 +43,6 @@
                 <div class="row">
                     <div class="col-sm-12 col-lg-12">
                         <div class="form-group">
-                            <label for="system" class="col-lg-2 control-label hideOnPhone">System</label>
-                            <div class="col-lg-8">
-                                <select value.bind="people.selectedTechNote.systemId._id" id="system" class="form-control">
-                                    <option model.bind="-1">Select a system</opton>
-                                    <option repeat.for="system of systems.systemsArray" model.bind="system._id">${system.sid}</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-12 col-lg-12">
-                        <div class="form-group">
                             <label for="category" class="col-lg-2 control-label hideOnPhone">Category *</label>
                             <div class="col-lg-8">
                                 <select value.bind="people.selectedTechNote.categoryId._id" id="category" class="form-control">
@@ -151,15 +138,14 @@
                 </div>
             </div>
             <div class="col-lg-7">
-                <div>
-                    <span id="noteError"></span>
-                    <div>
-                        <span id="noteError"></span>
-                        <editor value.bind="people.selectedTechNote.note" toolbar.bind="toolbar" height="500"></editor>
-                    </div>
-                </div>
+                <compose view="./Systems.html"></compose>
             </div>
-
         </form>
+        <div class="row">
+                <div class="col-lg-8  col-lg-offset-2 topMargin">
+                <span id="noteError"></span>
+                <editor value.bind="people.selectedTechNote.note" toolbar.bind="toolbar" height="500"></editor>
+            </div>
+        </div>
     </div>
 </template>

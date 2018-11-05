@@ -1,4 +1,4 @@
-import {inject, TemplatingEngine} from 'aurelia-framework';
+import { inject, TemplatingEngine } from 'aurelia-framework';
 import { DataTable } from '../../../resources/utils/dataTable';
 import { HelpTickets } from '../../../resources/data/helpTickets';
 import { Sessions } from '../../../resources/data/sessions';
@@ -13,11 +13,10 @@ import { People } from '../../../resources/data/people';
 
 import Validation from '../../../resources/utils/validation';
 
-@inject( AppConfig, Validation, People, DataTable, Utils, HelpTickets, Sessions, Systems, Downloads, Products, ClientRequests, CommonDialogs, TemplatingEngine)
+@inject(AppConfig, Validation, People, DataTable, Utils, HelpTickets, Sessions, Systems, Downloads, Products, ClientRequests, CommonDialogs, TemplatingEngine)
 export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
-  // showLockMessage = false; 
   responseMessage = "";
   isChecked = false;
   nohelpTickets = true;
@@ -25,9 +24,8 @@ export class ViewHelpTickets {
 
   spinnerHTML = "";
   filterValues = new Array();
-  // lockObject = new Object();
 
-  constructor( config, validation, people, datatable, utils, helpTickets, sessions, systems, apps, products, requests, dialog, templatingEngine) {
+  constructor(config, validation, people, datatable, utils, helpTickets, sessions, systems, apps, products, requests, dialog, templatingEngine) {
     this.config = config;
     this.validation = validation;
     this.validation.initialize(this);
@@ -48,43 +46,43 @@ export class ViewHelpTickets {
     this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
   };
 
-  canActivate(){
-    if(!this.userObj) {
-        this.userObj = this.config.user;
-        this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
-        if(!this.userObj) {
-            this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
-            this.router.navigate("home");
-        }
+  canActivate() {
+    if (!this.userObj) {
+      this.userObj = this.config.user;
+      this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
+      if (!this.userObj) {
+        this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+        this.router.navigate("home");
+      }
     }
-  }   
-
-  attached() {
-    if(!this.mobile) this.toolTips();
   }
 
-  deactivate(){
+  attached() {
+    if (!this.mobile) this.toolTips();
+  }
+
+  deactivate() {
     // this._unLock();
   }
 
   async activate() {
     let uccRoles = "";
-		this.config.ROLES.forEach(item => {
-			if(item.UCConly) uccRoles += item.role + ":";
-		});
+    this.config.ROLES.forEach(item => {
+      if (item.UCConly) uccRoles += item.role + ":";
+    });
 
     let responses = await Promise.all([
       this.helpTickets.getUserHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true),
       this.people.getUCCStaff(uccRoles),
       this.helpTickets.getHelpTicketTypes('?order=category'),
-      this.products.getProductsArray('',true),
+      this.products.getProductsArray('', true),
       this.sessions.getSessionsArray('?order=startDate', true),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
       this.systems.getSystemsArray(),
       this.config.getConfig()
     ]);
 
-    if(this.helpTickets.helpTicketsArray && this.helpTickets.helpTicketsArray.length > 0){
+    if (this.helpTickets.helpTicketsArray && this.helpTickets.helpTicketsArray.length > 0) {
       this.nohelpTickets = false;
     }
 
@@ -99,25 +97,25 @@ export class ViewHelpTickets {
     this.helpTicketTypeLookupArray = new Array();
     this.helpTickets.helpTicketTypesArray.forEach(item => {
       item.subtypes.forEach(item2 => {
-        this.helpTicketTypeLookupArray.push({helpTicketType: item2.type, description: item2.description});
+        this.helpTicketTypeLookupArray.push({ helpTicketType: item2.type, description: item2.description });
       })
     })
 
     this._setUpValidation();
 
-    if(this.utils.isMobile()){
+    if (this.utils.isMobile()) {
       this.mobile = true;
       this.toolbar = [['style', ['style', 'bold', 'clear']]];
     }
   }
 
-  async retrieveClosedHelpTickets(){
+  async retrieveClosedHelpTickets() {
     await this.helpTickets.getArchivedHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true)
   }
 
   async refresh() {
     this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-    await this.helpTickets.getHelpTicketArray('?filter=personId|eq|' + this.userObj._id, true);
+    await  this.helpTickets.getUserHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true);
     this.updateArray();
     this.spinnerHTML = "";
   }
@@ -133,8 +131,6 @@ export class ViewHelpTickets {
 
     await this.getDetails();
     this.categoryIndex = this.getCatIndex();
-//this.helpTickets.selectedHelpTicket.helpTicketCategory
-    // let subTypeIndex = this.getIndex(this.helpTickets.helpTicketTypesArray[this.categoryIndex.categoryIndex].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
     this.createOutputForm(this.helpTickets.helpTicketTypesArray[this.categoryIndex.categoryIndex].subtypes[this.categoryIndex.subTypeIndex].outputForm)
 
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -145,74 +141,72 @@ export class ViewHelpTickets {
     this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
   }
 
-  getIndex(subtypes, type){
-    for(let i = 0; i < subtypes.length; i++){
-      if(subtypes[i].type === type){
+  getIndex(subtypes, type) {
+    for (let i = 0; i < subtypes.length; i++) {
+      if (subtypes[i].type === type) {
         return i;
       }
     }
     return null;
   }
 
-  getCatIndex(){
-    for(var j = 0; j < this.helpTickets.helpTicketTypesArray.length; j++){
-      for(var i = 0; i < this.helpTickets.helpTicketTypesArray[j].subtypes.length; i++){
-        if( this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type){
-          return { subTypeIndex: i, categoryIndex: j};
+  getCatIndex() {
+    for (var j = 0; j < this.helpTickets.helpTicketTypesArray.length; j++) {
+      for (var i = 0; i < this.helpTickets.helpTicketTypesArray[j].subtypes.length; i++) {
+        if (this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type) {
+          return { subTypeIndex: i, categoryIndex: j };
         }
       }
     }
   }
 
-  getCategoryIndex(){
-    for(var i = 0; i < this.helpTickets.helpTicketTypesArray.length; i++){
-      if(this.helpTickets.helpTicketTypesArray[i] == this.helpTickets.selectedHelpTicket.helpTicketCategory){
+  getCategoryIndex() {
+    for (var i = 0; i < this.helpTickets.helpTicketTypesArray.length; i++) {
+      if (this.helpTickets.helpTicketTypesArray[i] == this.helpTickets.selectedHelpTicket.helpTicketCategory) {
         return i;
       }
     }
   }
 
-  createOutputForm(html){
+  createOutputForm(html) {
     let el = document.getElementById('container');
     el.innerHTML = html;
 
     if (el) {
-        if (!el.querySelectorAll('.au-target').length) {
-            this.templatingEngine.enhance({element: el, bindingContext: this});
-        }
+      if (!el.querySelectorAll('.au-target').length) {
+        this.templatingEngine.enhance({ element: el, bindingContext: this });
+      }
     }
   }
 
-  async getDetails(){
+  async getDetails() {
     this.showRequestDetails = false;
-    if(this.helpTickets.selectedHelpTicket.requestId){
-      if(this.helpTickets.selectedHelpTicket.requestId.assignments && this.helpTickets.selectedHelpTicket.requestId.assignments.length > 0) this.showRequestDetails = true;
+    if (this.helpTickets.selectedHelpTicket.requestId) {
+      if (this.helpTickets.selectedHelpTicket.requestId.assignments && this.helpTickets.selectedHelpTicket.requestId.assignments.length > 0) this.showRequestDetails = true;
       this.showCourse = false;
       this.course = "";
       this.showCourse = true;
-      if(this.helpTickets.selectedHelpTicket.courseId) {
+      if (this.helpTickets.selectedHelpTicket.courseId) {
         this.course = this.helpTickets.selectedHelpTicket.courseId.number + " - " + this.helpTickets.selectedHelpTicket.courseId.name;
       } else {
         this.course = this.config.SANDBOX_NAME
       }
-    } 
+    }
   }
 
-  getName(){
-    for(var i = 0; i < this.people.uccPeople.length; i++){
-      // if(this.people.uccPeople[i]._id == this.lockObject.personId) 
+  getName() {
+    for (var i = 0; i < this.people.uccPeople.length; i++) {
       return this.people.uccPeople[i].fullName;
     }
     return "someone";
   }
 
   respond() {
-    //!this.showLockMessage && 
-     if(!this.enterResponse){
-        this.helpTickets.selectHelpTicketContent();
-        this.enterResponse = true;
-        this.enableButton = true;
-     }
+    if (!this.enterResponse) {
+      this.helpTickets.selectHelpTicketContent();
+      this.enterResponse = true;
+      this.enableButton = true;
+    }
   }
 
   cancelResponse() {
@@ -220,27 +214,24 @@ export class ViewHelpTickets {
     this.isUnchanged = true;
     this.enterResponse = false;
   }
- 
+
   _createResponse() {
     this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.REPLIED_HELPTICKET_STATUS;
     this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
     this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
     this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
+    this.helpTickets.selectedHelpTicketContent.content.comments = this.responseMessage;
     this.helpTickets.selectedHelpTicketContent.displayForm = this.config.HELP_TICKET_OTHER_TYPE;
   }
 
   async saveResponse() {
     this._createResponse();
-     var email = new Object();
-    if(this.sendEmail){
-        // email.reason = 2;
-        // email.fullName = this.userObj.fullName;
-        email.MESSAGE = this.config.HELP_TICKET_USER_UPDATE_MESSAGE.replace('[[No]]',this.helpTickets.selectedHelpTicket.helpTicketNo);
-        email.subject = this.config.HELP_TICKET_USER_UPDATE_SUBJECT.replace('[[No]]',this.helpTickets.selectedHelpTicket.helpTicketNo);
-        email.email = this.userObj.email;
-        // email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
-        email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
-        // email.message = this.userObj.fullName + " has responded to the help ticket."
+    var email = new Object();
+    if (this.sendEmail) {
+      email.MESSAGE = this.config.HELP_TICKET_USER_UPDATE_MESSAGE.replace('[[No]]', this.helpTickets.selectedHelpTicket.helpTicketNo);
+      email.subject = this.config.HELP_TICKET_USER_UPDATE_SUBJECT.replace('[[No]]', this.helpTickets.selectedHelpTicket.helpTicketNo);
+      email.email = this.userObj.email;
+      email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
     }
     let serverResponse = await this.helpTickets.saveHelpTicketResponse(email);
     if (!serverResponse.error) {
@@ -252,71 +243,77 @@ export class ViewHelpTickets {
     this._cleanUp();
   }
 
-  closeHelpTicket(helpTicket){
-     return this.dialog.showMessage(
-          "Are you sure you want to close the help ticket?",
-          "Close Help Ticket",
-          ['Yes', 'No']
-      ).whenClosed(response => {
-          if (!response.wasCancelled) {
-              this.closeTicket(helpTicket);
+  closeHelpTicket(helpTicket) {
+    return this.dialog.showCloseHelpTicket(
+      "You have chosen to close this help ticket?",
+      "Close Help Ticket",
+      ['Submit', 'Cancel']
+    ).whenClosed(response => {
+      if (!response.wasCancelled) {
+        this.helpTickets.selectHelpTicketByID(helpTicket._id);
+        this.helpTickets.selectHelpTicketContent();
+        this.responseMessage = "Help Ticket closed by " + this.userObj.fullName + "<p>Reason: " + this.config.HELP_TICKET_CLOSE_REASONS[response.output.selectedReason].reason +"</p>";
+        if(response.output.selectedReason == this.config.HELP_TICKET_CLOSE_REASON_OTHER) {
+          if(response.output.otherReason){
+            this.responseMessage += "<p>Other reason:  " + response.output.otherReason + "</p>";
           } else {
-              this._cleanUp();
+            this.responseMessage += "<p>No elboration provide for other reason for closing ticket.</p>";
           }
-      });
+        }
+        if(response.output.method) {
+          this.responseMessage += this.responseMessage = "<p>Method for resolving: " + response.output.method + "</p>";
+        } else {
+          this.responseMessage += "<p>No method was provided for resolving the issue.</p>"
+        }
+        this._createResponse();
+        this.closeTicket(helpTicket);
+      } else {
+        this._cleanUp();
+      }
+    });
   }
 
-  async closeTicket(helpTicket){
-    this.helpTickets.selectHelpTicketByID(helpTicket._id);
-      // var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-      // if (!response.error) {
-      //   if (response.helpTicketId === 0) {
-          var email = new Object();
-          if(this.sendEmail){
-              email.reason = this.config.CLOSED_HELPTICKET_STATUS;
-              email.fullName = this.userObj.fullName;
-              email.email = this.userObj.email;
-              email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
-              email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
-              email.message = "The help ticket was closed by " + this.userObj.fullName;
-          }
-          this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.CLOSED_HELPTICKET_STATUS;
-          let serverResponse = await this.helpTickets.updateStatus(email);
-          if (!serverResponse.error) {
-            this.updateArray();
-            this.filterOutClosed();
-            this.utils.showNotification("The help ticket was updated");
-          }
-          if(this.isChecked) this.filterOutClosed();
-          this._cleanUp();
-    //     }
-    // }
+  async closeTicket(helpTicket) {
+   
+    var email = new Object();
+    if (this.sendEmail) {
+      email.reason = this.config.CLOSED_HELPTICKET_STATUS;
+      email.fullName = this.userObj.fullName;
+      email.email = this.userObj.email;
+      email.helpTicketNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
+      email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+      email.message = "The help ticket was closed by " + this.userObj.fullName
+    }
+    this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.CLOSED_HELPTICKET_STATUS;
+
+    let serverResponse = await this.helpTickets.closeHelpTicket();
+    if (!serverResponse.error) {
+      this.refresh()
+      this.utils.showNotification("The help ticket was updated");
+    }
+    if (this.isChecked) this.filterOutClosed();
+    this._cleanUp();
   }
 
-  async openHelpTicket(helpTicket){
+  async openHelpTicket(helpTicket) {
     this.helpTickets.selectHelpTicketByID(helpTicket._id);
-      // var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-      // if (!response.error) {
-      //   if (response.helpTicketId === 0) {
-           var email = new Object();
-          if(this.sendEmail){
-              email.reason = 2;
-              email.fullName = this.userObj.fullName;
-              email.email = this.userObj.email;
-              email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
-              email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
-              email.message = "The help ticket was reopened by " + this.userObj.fullName;
-          }
-          this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.REVIEW_HELPTICKET_STATUS;
-          let serverResponse = await this.helpTickets.updateStatus(email);
-          if (!serverResponse.error) {
-            this.updateArray();
-            this.filterOutClosed();
-            this.utils.showNotification("The help ticket was updated");
-          }
-          this._cleanUp();
-    //     }
-    // }
+    var email = new Object();
+    if (this.sendEmail) {
+      email.reason = 2;
+      email.fullName = this.userObj.fullName;
+      email.email = this.userObj.email;
+      email.helpTicketNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
+      email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+      email.message = "The help ticket was reopened by " + this.userObj.fullName;
+    }
+    this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.REVIEW_HELPTICKET_STATUS;
+    let serverResponse = await this.helpTickets.updateStatus(email);
+    if (!serverResponse.error) {
+      this.updateArray();
+      this.filterOutClosed();
+      this.utils.showNotification("The help ticket was updated");
+    }
+    this._cleanUp();
   }
 
   /*****************************************************************************************
@@ -354,12 +351,12 @@ export class ViewHelpTickets {
   }
 
   filterOutClosed() {
-        if (this.isChecked) {
-            this.dataTable.filterList(this.config.CLOSED_HELPTICKET_STATUS, {type: 'value', filter: "expiredFilter",  collectionProperty: 'helpTicketStatus', compare: 'not-match'});
-        } else {
-            this.updateArray();
-        }
-        this.toolTips();
+    if (this.isChecked) {
+      this.dataTable.filterList(this.config.CLOSED_HELPTICKET_STATUS, { type: 'value', filter: "expiredFilter", collectionProperty: 'helpTicketStatus', compare: 'not-match' });
+    } else {
+      this.updateArray();
+    }
+    this.toolTips();
   }
 
   async _cleanUpResponse() {
@@ -373,22 +370,22 @@ export class ViewHelpTickets {
   }
 
   changeFiles() {
-        this.filesToUpload = this.filesToUpload ? this.filesToUpload : new Array(); 
-        for(var i = 0; i < this.files.length; i++){
-            let addFile = true;
-            this.filesToUpload.forEach(item => {
-                if(item.name === this.files[i].name) addFile = false;
-            })
-            if(addFile) this.filesToUpload.push(this.files[i]);
-        }
+    this.filesToUpload = this.filesToUpload ? this.filesToUpload : new Array();
+    for (var i = 0; i < this.files.length; i++) {
+      let addFile = true;
+      this.filesToUpload.forEach(item => {
+        if (item.name === this.files[i].name) addFile = false;
+      })
+      if (addFile) this.filesToUpload.push(this.files[i]);
+    }
   }
 
-  removeFile(index){
-      this.filesToUpload.splice(index,1);
+  removeFile(index) {
+    this.filesToUpload.splice(index, 1);
   }
 
-  toolTips(){
-      $('[data-toggle="tooltip"]').tooltip();
+  toolTips() {
+    $('[data-toggle="tooltip"]').tooltip();
   }
 
   showComment(helpTicket, el) {
@@ -401,13 +398,13 @@ export class ViewHelpTickets {
   hideComment() {
     $(".hover").css("display", "none");
   }
-  
-  customHelpTicketTypeFilter(value, item, context){
+
+  customHelpTicketTypeFilter(value, item, context) {
     var foo = value.toUpperCase();
-    for(let i = 0; i < context.helpTickets.helpTicketTypesArray.length; i++){
-      for(let j = 0; j < context.helpTickets.helpTicketTypesArray[i].subtypes.length; j++){
-        if(context.helpTickets.helpTicketTypesArray[i].subtypes[j].type == item.helpTicketType) {
-          return  context.helpTickets.helpTicketTypesArray[i].subtypes[j].description.toUpperCase().indexOf(foo) > -1;
+    for (let i = 0; i < context.helpTickets.helpTicketTypesArray.length; i++) {
+      for (let j = 0; j < context.helpTickets.helpTicketTypesArray[i].subtypes.length; j++) {
+        if (context.helpTickets.helpTicketTypesArray[i].subtypes[j].type == item.helpTicketType) {
+          return context.helpTickets.helpTicketTypesArray[i].subtypes[j].description.toUpperCase().indexOf(foo) > -1;
         }
       }
     }
@@ -429,7 +426,7 @@ export class ViewHelpTickets {
         return (context.helpTicket.clientId !== undefined);
       }
     }]);
-    this.validation.addRule("02", "application",[ {
+    this.validation.addRule("02", "application", [{
       "rule": "custom", "message": "You must select the application",
       "valFunction": function (context) {
         return (context.content.application !== undefined);

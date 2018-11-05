@@ -31,7 +31,7 @@ var HelpTicketContentSchema = new Schema({
 		fileName: { type: String },
 		default: { type: Boolean, default: true } 
 	}]
-});
+}, { versionKey: false });
 
 module.exports = Mongoose.model('HelpTicketContent', HelpTicketContentSchema);
 
@@ -63,11 +63,11 @@ var HelpTicketSchema = new Schema({
     oldValue: { type: Schema.Types.Mixed },
     personId: { type: Schema.Types.ObjectId }
   }]
-});
+}, { versionKey: false });
 
 // HelpTicketSchema.index( {createdDate: -1} );
 
-HelpTicketSchema.plugin(AutoIncrement, {inc_field: 'helpTicketNo'});
+HelpTicketSchema.plugin(AutoIncrement, {inc_field: 'helpTicketNo', disable_hooks: true});
 
 HelpTicketSchema.pre('update', function() {
   this.update({},{ $set: { modifiedDate: new Date() } });
@@ -75,3 +75,17 @@ HelpTicketSchema.pre('update', function() {
 
 module.exports = Mongoose.model('HelpTicket', HelpTicketSchema);
 module.exports = Mongoose.model('HelpTicketArchive', HelpTicketSchema);
+
+var KnoweledgeBaseSchema = new Schema({
+  dateCreated: { type: Date, default: Date.now },
+  personId: { type: Schema.Types.ObjectId },
+  category: { type: String },
+  subCategory: { type: String },
+  title: { type: String },
+  keywords: { type: String },
+  content: [HelpTicketContentSchema]
+});
+
+KnoweledgeBaseSchema.plugin(AutoIncrement, {inc_field: 'knowledgeBaseNo'});
+
+module.exports = Mongoose.model('KnowledgeBase', KnoweledgeBaseSchema);

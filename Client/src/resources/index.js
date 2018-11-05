@@ -12,6 +12,7 @@ export function configure(config) {
     './elements/flat-picker',
     './elements/add-systems',
     './value-converters/info-filter',
+    './value-converters/lookup-ht-status',
     './value-converters/arrow',
     './value-converters/request-status-class',
     './value-converters/course-name',

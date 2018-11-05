@@ -1,6 +1,5 @@
 import {inject} from 'aurelia-framework';
 import {DialogService} from 'aurelia-dialog';
-import {ConfirmDialog} from './confirm-dialog';
 import {MessageDialog} from './message-dialog';
 import {NoteDialog} from './note-dialog';
 import {EmailDialog} from './email-dialog';
@@ -8,6 +7,7 @@ import {DocumentDialog} from './document-dialog';
 import {PasswordDialog} from './password-dialog';
 import {EventDialog} from './event-dialog';
 import {InputDialog} from './input-dialog';
+import {HelpTicketDialog} from './helpTicket-dialog';
 
 @inject(DialogService)
 export class CommonDialogs {
@@ -43,6 +43,10 @@ export class CommonDialogs {
 
   input( title = 'Enter Value', value, options){
     return this.dialogService.open({ viewModel: InputDialog, model: { title, value, options } })
+  }
+
+  showCloseHelpTicket( title="Close Help Ticket", helpTicket, options){
+    return this.dialogService.open({ viewModel: HelpTicketDialog, model: { title, helpTicket, options } });
   }
 
 }

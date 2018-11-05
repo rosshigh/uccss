@@ -223,6 +223,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.CUSTOMER_ACTION_HELPTICKET_STATUS = 4;
             this.REPLIED_HELPTICKET_STATUS = 5;
             this.CLOSED_HELPTICKET_STATUS = 6;
+            this.MY_HELPTICKET_STATUS = 7;
             this.HELP_TICKET_EMAIL_CREATE = 1;
             this.HELP_TICKET_EMAIL_STATUS_CHANGE = 9;
             this.HELP_TICKET_STATUSES = [{
@@ -243,6 +244,19 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             }, {
                 "code": this.CLOSED_HELPTICKET_STATUS,
                 "description": "Closed"
+            }, {
+                "code": this.MY_HELPTICKET_STATUS,
+                "description": "My Help Tickets"
+            }];
+            this.HELP_TICKET_CLOSE_REASON_OTHER = 3;
+            this.HELP_TICKET_CLOSE_REASONS = [{
+                "reason": "Help ticket was submitted in error"
+            }, {
+                "reason": "I was able to resolve the issue"
+            }, {
+                "reason": "The issue is no longer relevant"
+            }, {
+                "reason": "Other"
             }];
             this.SITE_INFO_TYPES = [{
                 'type': 'INFO',
@@ -620,7 +634,7 @@ define('resources/index',['exports'], function (exports) {
   });
   exports.configure = configure;
   function configure(config) {
-    config.globalResources(['./editor/editor', './elements/calendar', './elements/multiselect', './elements/tree-node', './elements/submenu', './elements/nav-bar', './elements/rate-it', './elements/loading-indicator', './elements/table-navigation-bar', './elements/flat-picker', './elements/add-systems', './value-converters/info-filter', './value-converters/arrow', './value-converters/request-status-class', './value-converters/course-name', './value-converters/parse-assignments', './value-converters/format-number', './value-converters/session-name', './value-converters/session-type', './value-converters/date-format', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/ucc-title', './value-converters/phone-number', './value-converters/lookup-value', './value-converters/sandbox', './value-converters/idsRequested', './value-converters/person-status-button', './value-converters/session-status-button', './value-converters/translate-status', './value-converters/to-uppercase', './value-converters/sort-array', './value-converters/system-list', './value-converters/check-box', './value-converters/activate-button', './value-converters/help-ticket-type', './value-converters/help-ticket-subtypes', './value-converters/session', './value-converters/sort-date-time', './value-converters/file-type', './value-converters/format-digits', './value-converters/format-phone', './value-converters/onoff-switch', './value-converters/get-array-value', './value-converters/help-ticket-statuses', './value-converters/stat-value', './value-converters/filter-clients', './value-converters/overlap', './value-converters/filter-array', './value-converters/filter-sessions', './value-converters/session-systems', './value-converters/ucc-staff']);
+    config.globalResources(['./editor/editor', './elements/calendar', './elements/multiselect', './elements/tree-node', './elements/submenu', './elements/nav-bar', './elements/rate-it', './elements/loading-indicator', './elements/table-navigation-bar', './elements/flat-picker', './elements/add-systems', './value-converters/info-filter', './value-converters/lookup-ht-status', './value-converters/arrow', './value-converters/request-status-class', './value-converters/course-name', './value-converters/parse-assignments', './value-converters/format-number', './value-converters/session-name', './value-converters/session-type', './value-converters/date-format', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/ucc-title', './value-converters/phone-number', './value-converters/lookup-value', './value-converters/sandbox', './value-converters/idsRequested', './value-converters/person-status-button', './value-converters/session-status-button', './value-converters/translate-status', './value-converters/to-uppercase', './value-converters/sort-array', './value-converters/system-list', './value-converters/check-box', './value-converters/activate-button', './value-converters/help-ticket-type', './value-converters/help-ticket-subtypes', './value-converters/session', './value-converters/sort-date-time', './value-converters/file-type', './value-converters/format-digits', './value-converters/format-phone', './value-converters/onoff-switch', './value-converters/get-array-value', './value-converters/help-ticket-statuses', './value-converters/stat-value', './value-converters/filter-clients', './value-converters/overlap', './value-converters/filter-array', './value-converters/filter-sessions', './value-converters/session-systems', './value-converters/ucc-staff']);
   }
 });
 define('modules/analytics/analytics',['exports', 'aurelia-framework', 'aurelia-router', '../../config/appConfig'], function (exports, _aureliaFramework, _aureliaRouter, _appConfig) {
@@ -5763,8 +5777,9 @@ define('modules/techNotes/editTechNotes',['exports', 'aurelia-framework', '../..
 
                                 this.dataTable.updateArray(this.people.techNotesArray);
                                 this.dataTable.createPageButtons(1);
+                                this.filterList();
 
-                            case 5:
+                            case 6:
                             case 'end':
                                 return _context.stop();
                         }
@@ -6044,6 +6059,45 @@ define('modules/techNotes/editTechNotes',['exports', 'aurelia-framework', '../..
                 var result = a.systemId.sid < b.systemId.sid ? -1 : a.systemId.sid > b.systemId.sid ? 1 : 0;
                 return result * context.sortDirection;
             });
+        };
+
+        EditProducts.prototype.enableEdit = function enableEdit() {
+            this.enable = true;
+        };
+
+        EditProducts.prototype.filterList = function filterList() {
+            if (this.filter) {
+                var thisFilter = this.filter;
+                this.filteredsystemsarray = this.systems.systemsArray.filter(function (item) {
+                    return item.sid.substring(0, thisFilter.length).toUpperCase() === thisFilter.toUpperCase();
+                });
+            } else {
+                this.filteredsystemsarray = this.systems.systemsArray;
+            }
+        };
+
+        EditProducts.prototype.selectSystem = function selectSystem(el, system) {
+
+            if (!this._systemAlreadySelected(system.sid)) {
+                this.people.selectedTechNote.systems.push({ sid: system.sid, systemId: system._id });
+            }
+        };
+
+        EditProducts.prototype._systemAlreadySelected = function _systemAlreadySelected(sid) {
+            for (var i = 0; i < this.people.selectedTechNote.systems.length; i++) {
+                if (this.people.selectedTechNote.systems[i].sid === sid) return true;
+            }
+            return false;
+        };
+
+        EditProducts.prototype.removeSystem = function removeSystem(el, system) {
+
+            for (var i = 0; i < this.people.selectedTechNote.systems.length; i++) {
+                if (system.systemId === this.people.selectedTechNote.systems[i].systemId) {
+                    this.people.selectedTechNote.systems.splice(i, 1);
+                    break;
+                }
+            }
         };
 
         return EditProducts;
@@ -11595,56 +11649,39 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
             return getHelpTicketArray;
         }();
 
-        HelpTickets.prototype.getUserHelpTicketArray = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(options, refresh) {
-                var url, serverResponse;
+        HelpTickets.prototype.getMyHelpTickets = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(id) {
+                var serverResponse;
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
-                                if (!(!this.helpTicketsArray || refresh)) {
-                                    _context2.next = 13;
-                                    break;
-                                }
+                                _context2.next = 2;
+                                return this.data.get(this.HELP_TICKET_SERVICES + '/mine/' + id);
 
-                                url = this.HELP_TICKET_SERVICES + '/users';
-
-                                url += options ? options : "";
-                                _context2.prev = 3;
-                                _context2.next = 6;
-                                return this.data.get(url);
-
-                            case 6:
+                            case 2:
                                 serverResponse = _context2.sent;
 
                                 if (!serverResponse.error) {
                                     this.helpTicketsArray = serverResponse;
                                 }
-                                _context2.next = 13;
-                                break;
 
-                            case 10:
-                                _context2.prev = 10;
-                                _context2.t0 = _context2['catch'](3);
-
-                                console.log(_context2.t0);
-
-                            case 13:
+                            case 4:
                             case 'end':
                                 return _context2.stop();
                         }
                     }
-                }, _callee2, this, [[3, 10]]);
+                }, _callee2, this);
             }));
 
-            function getUserHelpTicketArray(_x3, _x4) {
+            function getMyHelpTickets(_x3) {
                 return _ref2.apply(this, arguments);
             }
 
-            return getUserHelpTicketArray;
+            return getMyHelpTickets;
         }();
 
-        HelpTickets.prototype.getArchivedHelpTicketArray = function () {
+        HelpTickets.prototype.getUserHelpTicketArray = function () {
             var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(options, refresh) {
                 var url, serverResponse;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
@@ -11656,7 +11693,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                     break;
                                 }
 
-                                url = this.HELP_TICKET_SERVICES + '/archived';
+                                url = this.HELP_TICKET_SERVICES + '/users';
 
                                 url += options ? options : "";
                                 _context3.prev = 3;
@@ -11686,26 +11723,26 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee3, this, [[3, 10]]);
             }));
 
-            function getArchivedHelpTicketArray(_x5, _x6) {
+            function getUserHelpTicketArray(_x4, _x5) {
                 return _ref3.apply(this, arguments);
             }
 
-            return getArchivedHelpTicketArray;
+            return getUserHelpTicketArray;
         }();
 
-        HelpTickets.prototype.getHelpTicketsArrayAnalytics = function () {
+        HelpTickets.prototype.getArchivedHelpTicketArray = function () {
             var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(options, refresh) {
                 var url, serverResponse;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
-                                if (!(!this.requestsArray || refresh)) {
+                                if (!(!this.helpTicketsArray || refresh)) {
                                     _context4.next = 13;
                                     break;
                                 }
 
-                                url = this.HELP_TICKET_SERVICES + "/analytics";
+                                url = this.HELP_TICKET_SERVICES + '/archived';
 
                                 url += options ? options : "";
                                 _context4.prev = 3;
@@ -11716,7 +11753,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 serverResponse = _context4.sent;
 
                                 if (!serverResponse.error) {
-                                    this.helpTicketArrayAnalytics = serverResponse;
+                                    this.helpTicketsArray = serverResponse;
                                 }
                                 _context4.next = 13;
                                 break;
@@ -11735,54 +11772,103 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee4, this, [[3, 10]]);
             }));
 
-            function getHelpTicketsArrayAnalytics(_x7, _x8) {
+            function getArchivedHelpTicketArray(_x6, _x7) {
                 return _ref4.apply(this, arguments);
             }
 
-            return getHelpTicketsArrayAnalytics;
+            return getArchivedHelpTicketArray;
         }();
 
-        HelpTickets.prototype.getHelpTicket = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(id) {
-                var serverResponse;
+        HelpTickets.prototype.getHelpTicketsArrayAnalytics = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(options, refresh) {
+                var url, serverResponse;
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
                         switch (_context5.prev = _context5.next) {
                             case 0:
-                                if (!id) {
+                                if (!(!this.requestsArray || refresh)) {
                                     _context5.next = 13;
                                     break;
                                 }
 
-                                _context5.prev = 1;
-                                _context5.next = 4;
-                                return this.data.get(this.HELP_TICKET_SERVICES + "/" + id);
+                                url = this.HELP_TICKET_SERVICES + "/analytics";
 
-                            case 4:
+                                url += options ? options : "";
+                                _context5.prev = 3;
+                                _context5.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
                                 serverResponse = _context5.sent;
 
                                 if (!serverResponse.error) {
-                                    this.selectedHelpTicket = serverResponse;
+                                    this.helpTicketArrayAnalytics = serverResponse;
                                 }
-                                return _context5.abrupt('return', serverResponse);
+                                _context5.next = 13;
+                                break;
 
-                            case 9:
-                                _context5.prev = 9;
-                                _context5.t0 = _context5['catch'](1);
+                            case 10:
+                                _context5.prev = 10;
+                                _context5.t0 = _context5['catch'](3);
 
                                 console.log(_context5.t0);
-                                return _context5.abrupt('return', undefined);
 
                             case 13:
                             case 'end':
                                 return _context5.stop();
                         }
                     }
-                }, _callee5, this, [[1, 9]]);
+                }, _callee5, this, [[3, 10]]);
             }));
 
-            function getHelpTicket(_x9) {
+            function getHelpTicketsArrayAnalytics(_x8, _x9) {
                 return _ref5.apply(this, arguments);
+            }
+
+            return getHelpTicketsArrayAnalytics;
+        }();
+
+        HelpTickets.prototype.getHelpTicket = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(id) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                if (!id) {
+                                    _context6.next = 13;
+                                    break;
+                                }
+
+                                _context6.prev = 1;
+                                _context6.next = 4;
+                                return this.data.get(this.HELP_TICKET_SERVICES + "/" + id);
+
+                            case 4:
+                                serverResponse = _context6.sent;
+
+                                if (!serverResponse.error) {
+                                    this.selectedHelpTicket = serverResponse;
+                                }
+                                return _context6.abrupt('return', serverResponse);
+
+                            case 9:
+                                _context6.prev = 9;
+                                _context6.t0 = _context6['catch'](1);
+
+                                console.log(_context6.t0);
+                                return _context6.abrupt('return', undefined);
+
+                            case 13:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this, [[1, 9]]);
+            }));
+
+            function getHelpTicket(_x10) {
+                return _ref6.apply(this, arguments);
             }
 
             return getHelpTicket;
@@ -11797,23 +11883,23 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.getCurrentCount = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(options) {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(options) {
                 var url, response;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
                                 url = this.HELP_TICKET_SERVICES + '/current/count';
 
                                 url += options ? "/" + options : "";
-                                _context6.next = 4;
+                                _context7.next = 4;
                                 return this.data.get(url);
 
                             case 4:
-                                response = _context6.sent;
+                                response = _context7.sent;
 
                                 if (response.status) {
-                                    _context6.next = 13;
+                                    _context7.next = 13;
                                     break;
                                 }
 
@@ -11821,21 +11907,21 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 this.inProcessHelpTickets = this.utils.countItems(this.config.IN_PROCESS_HELPTICKET_STATUS, 'helpTicketStatus', response);
                                 this.underReviewHelpTickets = this.utils.countItems(this.config.UNDER_REVIEW_HELPTICKET_STATUS, 'helpTicketStatus', response);
                                 this.customerActionHelpTickets = this.utils.countItems(this.config.CUSTOMER_ACTION_HELPTICKET_STATUS, 'helpTicketStatus', response);
-                                return _context6.abrupt('return', response.count);
+                                return _context7.abrupt('return', response.count);
 
                             case 13:
-                                return _context6.abrupt('return', null);
+                                return _context7.abrupt('return', null);
 
                             case 14:
                             case 'end':
-                                return _context6.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee6, this);
+                }, _callee7, this);
             }));
 
-            function getCurrentCount(_x10) {
-                return _ref6.apply(this, arguments);
+            function getCurrentCount(_x11) {
+                return _ref7.apply(this, arguments);
             }
 
             return getCurrentCount;
@@ -11917,51 +12003,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.updateOwner = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(obj) {
-                var response;
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
-                    while (1) {
-                        switch (_context7.prev = _context7.next) {
-                            case 0:
-                                if (this.selectedHelpTicket) {
-                                    _context7.next = 2;
-                                    break;
-                                }
-
-                                return _context7.abrupt('return');
-
-                            case 2:
-                                _context7.next = 4;
-                                return this.data.saveObject(obj, this.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
-
-                            case 4:
-                                response = _context7.sent;
-
-                                if (!response.error) {
-                                    this.selectedHelpTicket = response;
-                                    this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
-                                } else {
-                                    this.data.processError(response, "There was an error updating the help ticket.");
-                                }
-                                return _context7.abrupt('return', response);
-
-                            case 7:
-                            case 'end':
-                                return _context7.stop();
-                        }
-                    }
-                }, _callee7, this);
-            }));
-
-            function updateOwner(_x11) {
-                return _ref7.apply(this, arguments);
-            }
-
-            return updateOwner;
-        }();
-
-        HelpTickets.prototype.updateStatus = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(email) {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(obj) {
                 var response;
                 return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
@@ -11976,13 +12018,14 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
 
                             case 2:
                                 _context8.next = 4;
-                                return this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + "/status/" + this.selectedHelpTicket._id, "put");
+                                return this.data.saveObject(obj, this.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
 
                             case 4:
                                 response = _context8.sent;
 
                                 if (!response.error) {
-                                    this.helpTicketsArray[this.editIndex].helpTicketStatus = response.helpTicketStatus;
+                                    this.selectedHelpTicket = response;
+                                    this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
@@ -11996,15 +12039,15 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee8, this);
             }));
 
-            function updateStatus(_x12) {
+            function updateOwner(_x12) {
                 return _ref8.apply(this, arguments);
             }
 
-            return updateStatus;
+            return updateOwner;
         }();
 
-        HelpTickets.prototype.updateKeywords = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+        HelpTickets.prototype.updateStatus = function () {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(email) {
                 var response;
                 return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
@@ -12019,13 +12062,13 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
 
                             case 2:
                                 _context9.next = 4;
-                                return this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + "/keywords/" + this.selectedHelpTicket._id, "put");
+                                return this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + "/status/" + this.selectedHelpTicket._id, "put");
 
                             case 4:
                                 response = _context9.sent;
 
                                 if (!response.error) {
-                                    this.helpTicketsArray[this.editIndex].keyWords = response.keyWords;
+                                    this.helpTicketsArray[this.editIndex].helpTicketStatus = response.helpTicketStatus;
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
@@ -12039,16 +12082,16 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee9, this);
             }));
 
-            function updateKeywords() {
+            function updateStatus(_x13) {
                 return _ref9.apply(this, arguments);
             }
 
-            return updateKeywords;
+            return updateStatus;
         }();
 
-        HelpTickets.prototype.saveHelpTicket = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(email) {
-                var url, response, HTNo;
+        HelpTickets.prototype.updateKeywords = function () {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
+                var response;
                 return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
                         switch (_context10.prev = _context10.next) {
@@ -12061,18 +12104,148 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 return _context10.abrupt('return');
 
                             case 2:
-                                url = this.HELP_TICKET_SERVICES;
+                                _context10.next = 4;
+                                return this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + "/keywords/" + this.selectedHelpTicket._id, "put");
 
-                                if (this.selectedHelpTicket._id) {
-                                    _context10.next = 11;
+                            case 4:
+                                response = _context10.sent;
+
+                                if (!response.error) {
+                                    this.helpTicketsArray[this.editIndex].keyWords = response.keyWords;
+                                } else {
+                                    this.data.processError(response, "There was an error updating the help ticket.");
+                                }
+                                return _context10.abrupt('return', response);
+
+                            case 7:
+                            case 'end':
+                                return _context10.stop();
+                        }
+                    }
+                }, _callee10, this);
+            }));
+
+            function updateKeywords() {
+                return _ref10.apply(this, arguments);
+            }
+
+            return updateKeywords;
+        }();
+
+        HelpTickets.prototype.reopenHelpTicket = function () {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
+                var url, response;
+                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                    while (1) {
+                        switch (_context11.prev = _context11.next) {
+                            case 0:
+                                if (this.selectedHelpTicket) {
+                                    _context11.next = 2;
                                     break;
                                 }
 
-                                _context10.next = 6;
+                                return _context11.abrupt('return');
+
+                            case 2:
+                                if (this.selectedHelpTicketContent) this.selectedHelpTicket.content.push(this.selectedHelpTicketContent);
+                                url = this.HELP_TICKET_SERVICES + '/reopen';
+                                _context11.next = 6;
+                                return this.data.saveObject(this.selectedHelpTicket, url, "put");
+
+                            case 6:
+                                response = _context11.sent;
+
+                                if (!response.error) {} else {
+                                    this.data.processError(response, "There was an error updating the help ticket.");
+                                }
+                                return _context11.abrupt('return', response);
+
+                            case 9:
+                            case 'end':
+                                return _context11.stop();
+                        }
+                    }
+                }, _callee11, this);
+            }));
+
+            function reopenHelpTicket() {
+                return _ref11.apply(this, arguments);
+            }
+
+            return reopenHelpTicket;
+        }();
+
+        HelpTickets.prototype.closeHelpTicket = function () {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
+                var response;
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                    while (1) {
+                        switch (_context12.prev = _context12.next) {
+                            case 0:
+                                if (this.selectedHelpTicket) {
+                                    _context12.next = 2;
+                                    break;
+                                }
+
+                                return _context12.abrupt('return');
+
+                            case 2:
+                                if (this.selectedHelpTicketContent) this.selectedHelpTicket.content.push(this.selectedHelpTicketContent);
+                                _context12.next = 5;
+                                return this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + '/close', "put");
+
+                            case 5:
+                                response = _context12.sent;
+
+                                if (!response.error) {
+                                    this.helpTicketsArray.splice(this.editIndex, 1);
+                                } else {
+                                    this.data.processError(response, "There was an error updating the help ticket.");
+                                }
+                                return _context12.abrupt('return', response);
+
+                            case 8:
+                            case 'end':
+                                return _context12.stop();
+                        }
+                    }
+                }, _callee12, this);
+            }));
+
+            function closeHelpTicket() {
+                return _ref12.apply(this, arguments);
+            }
+
+            return closeHelpTicket;
+        }();
+
+        HelpTickets.prototype.saveHelpTicket = function () {
+            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(email) {
+                var url, response, HTNo, status;
+                return regeneratorRuntime.wrap(function _callee13$(_context13) {
+                    while (1) {
+                        switch (_context13.prev = _context13.next) {
+                            case 0:
+                                if (this.selectedHelpTicket) {
+                                    _context13.next = 2;
+                                    break;
+                                }
+
+                                return _context13.abrupt('return');
+
+                            case 2:
+                                url = this.HELP_TICKET_SERVICES;
+
+                                if (this.selectedHelpTicket._id) {
+                                    _context13.next = 11;
+                                    break;
+                                }
+
+                                _context13.next = 6;
                                 return this.data.saveObject(this.selectedHelpTicket, url, "post");
 
                             case 6:
-                                response = _context10.sent;
+                                response = _context13.sent;
 
                                 if (!response.error) {
                                     if (email && email.email) {
@@ -12087,59 +12260,64 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 } else {
                                     this.data.processError(response, "There was an error creating the help ticket.");
                                 }
-                                return _context10.abrupt('return', response);
+                                return _context13.abrupt('return', response);
 
                             case 11:
-                                _context10.next = 13;
+                                status = this.selectedHelpTicket.helpTicketStatus;
+                                _context13.next = 14;
                                 return this.data.saveObject(this.selectedHelpTicket, url, "put");
 
-                            case 13:
-                                response = _context10.sent;
+                            case 14:
+                                response = _context13.sent;
 
                                 if (!response.error) {
                                     if (email && email.email) {
                                         this.selectedHelpTicket = this.utils.copyObject(response);
                                         this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                                     }
-                                    this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+                                    if (status !== this.config.CLOSED_HELPTICKET_STATUS) {
+                                        this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+                                    } else {
+                                        this.helpTicketsArray.splice(this.editIndex);
+                                    }
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
-                                return _context10.abrupt('return', response);
+                                return _context13.abrupt('return', response);
 
-                            case 16:
+                            case 17:
                             case 'end':
-                                return _context10.stop();
+                                return _context13.stop();
                         }
                     }
-                }, _callee10, this);
+                }, _callee13, this);
             }));
 
-            function saveHelpTicket(_x13) {
-                return _ref10.apply(this, arguments);
+            function saveHelpTicket(_x14) {
+                return _ref13.apply(this, arguments);
             }
 
             return saveHelpTicket;
         }();
 
         HelpTickets.prototype.saveHelpTicketResponse = function () {
-            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(email) {
+            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(email) {
                 var url, response;
-                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                return regeneratorRuntime.wrap(function _callee14$(_context14) {
                     while (1) {
-                        switch (_context11.prev = _context11.next) {
+                        switch (_context14.prev = _context14.next) {
                             case 0:
                                 if (!this.selectedHelpTicket._id) {
-                                    _context11.next = 7;
+                                    _context14.next = 7;
                                     break;
                                 }
 
                                 url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
-                                _context11.next = 4;
+                                _context14.next = 4;
                                 return this.data.saveObject(this.selectedHelpTicketContent, url, "put");
 
                             case 4:
-                                response = _context11.sent;
+                                response = _context14.sent;
 
                                 if (!response.error) {
                                     if (!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
@@ -12148,18 +12326,18 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
-                                return _context11.abrupt('return', response);
+                                return _context14.abrupt('return', response);
 
                             case 7:
                             case 'end':
-                                return _context11.stop();
+                                return _context14.stop();
                         }
                     }
-                }, _callee11, this);
+                }, _callee14, this);
             }));
 
-            function saveHelpTicketResponse(_x14) {
-                return _ref11.apply(this, arguments);
+            function saveHelpTicketResponse(_x15) {
+                return _ref14.apply(this, arguments);
             }
 
             return saveHelpTicketResponse;
@@ -12178,17 +12356,17 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.uploadFile = function () {
-            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(files, content) {
+            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(files, content) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                return regeneratorRuntime.wrap(function _callee15$(_context15) {
                     while (1) {
-                        switch (_context12.prev = _context12.next) {
+                        switch (_context15.prev = _context15.next) {
                             case 0:
-                                _context12.next = 2;
+                                _context15.next = 2;
                                 return this.data.uploadFiles(files, this.HELP_TICKET_SERVICES + "/upload/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
 
                             case 2:
-                                response = _context12.sent;
+                                response = _context15.sent;
 
                                 if (!response.error) {
                                     this.selectedHelpTicket = this.utils.copyObject(response);
@@ -12197,14 +12375,14 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
 
                             case 4:
                             case 'end':
-                                return _context12.stop();
+                                return _context15.stop();
                         }
                     }
-                }, _callee12, this);
+                }, _callee15, this);
             }));
 
-            function uploadFile(_x15, _x16) {
-                return _ref12.apply(this, arguments);
+            function uploadFile(_x16, _x17) {
+                return _ref15.apply(this, arguments);
             }
 
             return uploadFile;
@@ -12251,51 +12429,51 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.getHelpTicketTypes = function () {
-            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(options, refresh) {
+            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(options, refresh) {
                 var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee13$(_context13) {
+                return regeneratorRuntime.wrap(function _callee16$(_context16) {
                     while (1) {
-                        switch (_context13.prev = _context13.next) {
+                        switch (_context16.prev = _context16.next) {
                             case 0:
                                 if (!(!this.helpTicketTypesArray || refresh)) {
-                                    _context13.next = 13;
+                                    _context16.next = 13;
                                     break;
                                 }
 
                                 url = this.HELP_TICKET_TYPES;
 
                                 url += options ? options : "";
-                                _context13.prev = 3;
-                                _context13.next = 6;
+                                _context16.prev = 3;
+                                _context16.next = 6;
                                 return this.data.get(url);
 
                             case 6:
-                                serverResponse = _context13.sent;
+                                serverResponse = _context16.sent;
 
                                 if (!serverResponse.error) {
                                     this.helpTicketTypesArray = serverResponse.sort(function (a, b) {
                                         return a.category < b.category ? 0 : -1;
                                     });
                                 }
-                                _context13.next = 13;
+                                _context16.next = 13;
                                 break;
 
                             case 10:
-                                _context13.prev = 10;
-                                _context13.t0 = _context13['catch'](3);
+                                _context16.prev = 10;
+                                _context16.t0 = _context16['catch'](3);
 
-                                console.log(_context13.t0);
+                                console.log(_context16.t0);
 
                             case 13:
                             case 'end':
-                                return _context13.stop();
+                                return _context16.stop();
                         }
                     }
-                }, _callee13, this, [[3, 10]]);
+                }, _callee16, this, [[3, 10]]);
             }));
 
-            function getHelpTicketTypes(_x17, _x18) {
-                return _ref13.apply(this, arguments);
+            function getHelpTicketTypes(_x18, _x19) {
+                return _ref16.apply(this, arguments);
             }
 
             return getHelpTicketTypes;
@@ -12320,32 +12498,32 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.saveHelpTicketType = function () {
-            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
+            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17() {
                 var url, response;
-                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                return regeneratorRuntime.wrap(function _callee17$(_context17) {
                     while (1) {
-                        switch (_context14.prev = _context14.next) {
+                        switch (_context17.prev = _context17.next) {
                             case 0:
                                 if (this.selectedHelpTicketType) {
-                                    _context14.next = 2;
+                                    _context17.next = 2;
                                     break;
                                 }
 
-                                return _context14.abrupt('return');
+                                return _context17.abrupt('return');
 
                             case 2:
                                 url = this.HELP_TICKET_TYPES;
 
                                 if (this.selectedHelpTicketType._id) {
-                                    _context14.next = 11;
+                                    _context17.next = 11;
                                     break;
                                 }
 
-                                _context14.next = 6;
+                                _context17.next = 6;
                                 return this.data.saveObject(this.selectedHelpTicket, url, "post");
 
                             case 6:
-                                response = _context14.sent;
+                                response = _context17.sent;
 
                                 if (!response.error) {
                                     this.selectedHelpTicketType = this.utils.copyObject(response);
@@ -12353,14 +12531,14 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 } else {
                                     this.data.processError(response, "There was an error creating the help ticket type.");
                                 }
-                                return _context14.abrupt('return', response);
+                                return _context17.abrupt('return', response);
 
                             case 11:
-                                _context14.next = 13;
+                                _context17.next = 13;
                                 return this.data.saveObject(this.selectedHelpTicketType, url, "put");
 
                             case 13:
-                                response = _context14.sent;
+                                response = _context17.sent;
 
                                 if (!response.error) {
                                     this.selectedHelpTicketType = this.utils.copyObject(response);
@@ -12368,47 +12546,47 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket type.");
                                 }
-                                return _context14.abrupt('return', response);
+                                return _context17.abrupt('return', response);
 
                             case 16:
                             case 'end':
-                                return _context14.stop();
+                                return _context17.stop();
                         }
                     }
-                }, _callee14, this);
+                }, _callee17, this);
             }));
 
             function saveHelpTicketType() {
-                return _ref14.apply(this, arguments);
+                return _ref17.apply(this, arguments);
             }
 
             return saveHelpTicketType;
         }();
 
         HelpTickets.prototype.countHelpTicketsStatus = function () {
-            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(status) {
+            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18(status) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee15$(_context15) {
+                return regeneratorRuntime.wrap(function _callee18$(_context18) {
                     while (1) {
-                        switch (_context15.prev = _context15.next) {
+                        switch (_context18.prev = _context18.next) {
                             case 0:
-                                _context15.next = 2;
+                                _context18.next = 2;
                                 return this.data.get(this.HELP_TICKET_SERVICES + '/count/' + status);
 
                             case 2:
-                                response = _context15.sent;
-                                return _context15.abrupt('return', response);
+                                response = _context18.sent;
+                                return _context18.abrupt('return', response);
 
                             case 4:
                             case 'end':
-                                return _context15.stop();
+                                return _context18.stop();
                         }
                     }
-                }, _callee15, this);
+                }, _callee18, this);
             }));
 
-            function countHelpTicketsStatus(_x19) {
-                return _ref15.apply(this, arguments);
+            function countHelpTicketsStatus(_x20) {
+                return _ref18.apply(this, arguments);
             }
 
             return countHelpTicketsStatus;
@@ -12556,46 +12734,46 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.archiveSearch = function () {
-            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(searchObj, collection) {
+            var _ref19 = _asyncToGenerator(regeneratorRuntime.mark(function _callee19(searchObj, collection) {
                 var url, resultArray, response;
-                return regeneratorRuntime.wrap(function _callee16$(_context16) {
+                return regeneratorRuntime.wrap(function _callee19$(_context19) {
                     while (1) {
-                        switch (_context16.prev = _context16.next) {
+                        switch (_context19.prev = _context19.next) {
                             case 0:
                                 if (!searchObj) {
-                                    _context16.next = 12;
+                                    _context19.next = 12;
                                     break;
                                 }
 
                                 url = this.HELP_TICKET_SERVICES + "/archive" + (collection ? '/' + collection : '');
                                 resultArray = new Array();
-                                _context16.next = 5;
+                                _context19.next = 5;
                                 return this.data.saveObject(searchObj, url, "post");
 
                             case 5:
-                                response = _context16.sent;
+                                response = _context19.sent;
 
                                 if (response.error) {
-                                    _context16.next = 11;
+                                    _context19.next = 11;
                                     break;
                                 }
 
                                 resultArray = response;
-                                return _context16.abrupt('return', resultArray);
+                                return _context19.abrupt('return', resultArray);
 
                             case 11:
-                                return _context16.abrupt('return', new Array());
+                                return _context19.abrupt('return', new Array());
 
                             case 12:
                             case 'end':
-                                return _context16.stop();
+                                return _context19.stop();
                         }
                     }
-                }, _callee16, this);
+                }, _callee19, this);
             }));
 
-            function archiveSearch(_x20, _x21) {
-                return _ref16.apply(this, arguments);
+            function archiveSearch(_x21, _x22) {
+                return _ref19.apply(this, arguments);
             }
 
             return archiveSearch;
@@ -12692,38 +12870,38 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.getHelpTicketLock = function () {
-            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17(id) {
+            var _ref20 = _asyncToGenerator(regeneratorRuntime.mark(function _callee20(id) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee17$(_context17) {
+                return regeneratorRuntime.wrap(function _callee20$(_context20) {
                     while (1) {
-                        switch (_context17.prev = _context17.next) {
+                        switch (_context20.prev = _context20.next) {
                             case 0:
-                                _context17.next = 2;
+                                _context20.next = 2;
                                 return this.data.get(this.HELP_TICKET_LOCK_SERVICES + "/" + id);
 
                             case 2:
-                                response = _context17.sent;
+                                response = _context20.sent;
 
                                 if (response.error) {
-                                    _context17.next = 7;
+                                    _context20.next = 7;
                                     break;
                                 }
 
-                                return _context17.abrupt('return', response);
+                                return _context20.abrupt('return', response);
 
                             case 7:
                                 this.data.processError(response, "There was an error retrieving the help ticket lock.");
 
                             case 8:
                             case 'end':
-                                return _context17.stop();
+                                return _context20.stop();
                         }
                     }
-                }, _callee17, this);
+                }, _callee20, this);
             }));
 
-            function getHelpTicketLock(_x22) {
-                return _ref17.apply(this, arguments);
+            function getHelpTicketLock(_x23) {
+                return _ref20.apply(this, arguments);
             }
 
             return getHelpTicketLock;
@@ -12734,29 +12912,29 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.archiveHelpTickets = function () {
-            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18() {
+            var _ref21 = _asyncToGenerator(regeneratorRuntime.mark(function _callee21() {
                 var response;
-                return regeneratorRuntime.wrap(function _callee18$(_context18) {
+                return regeneratorRuntime.wrap(function _callee21$(_context21) {
                     while (1) {
-                        switch (_context18.prev = _context18.next) {
+                        switch (_context21.prev = _context21.next) {
                             case 0:
-                                _context18.next = 2;
+                                _context21.next = 2;
                                 return this.data.saveObject({}, this.HELP_TICKET_SERVICES + '/archiveClosed', "post");
 
                             case 2:
-                                response = _context18.sent;
-                                return _context18.abrupt('return', response);
+                                response = _context21.sent;
+                                return _context21.abrupt('return', response);
 
                             case 4:
                             case 'end':
-                                return _context18.stop();
+                                return _context21.stop();
                         }
                     }
-                }, _callee18, this);
+                }, _callee21, this);
             }));
 
             function archiveHelpTickets() {
-                return _ref18.apply(this, arguments);
+                return _ref21.apply(this, arguments);
             }
 
             return archiveHelpTickets;
@@ -17905,7 +18083,7 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
         return Systems;
     }()) || _class);
 });
-define('resources/dialogs/common-dialogs',['exports', 'aurelia-framework', 'aurelia-dialog', './confirm-dialog', './message-dialog', './note-dialog', './email-dialog', './document-dialog', './password-dialog', './event-dialog', './input-dialog'], function (exports, _aureliaFramework, _aureliaDialog, _confirmDialog, _messageDialog, _noteDialog, _emailDialog, _documentDialog, _passwordDialog, _eventDialog, _inputDialog) {
+define('resources/dialogs/common-dialogs',['exports', 'aurelia-framework', 'aurelia-dialog', './message-dialog', './note-dialog', './email-dialog', './document-dialog', './password-dialog', './event-dialog', './input-dialog', './helpTicket-dialog'], function (exports, _aureliaFramework, _aureliaDialog, _messageDialog, _noteDialog, _emailDialog, _documentDialog, _passwordDialog, _eventDialog, _inputDialog, _helpTicketDialog) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -17983,6 +18161,14 @@ define('resources/dialogs/common-dialogs',['exports', 'aurelia-framework', 'aure
       var options = arguments[2];
 
       return this.dialogService.open({ viewModel: _inputDialog.InputDialog, model: { title: title, value: value, options: options } });
+    };
+
+    CommonDialogs.prototype.showCloseHelpTicket = function showCloseHelpTicket() {
+      var title = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "Close Help Ticket";
+      var helpTicket = arguments[1];
+      var options = arguments[2];
+
+      return this.dialogService.open({ viewModel: _helpTicketDialog.HelpTicketDialog, model: { title: title, helpTicket: helpTicket, options: options } });
     };
 
     return CommonDialogs;
@@ -35029,20 +35215,22 @@ define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework'
                 };
 
                 this.helpTickets.selectedHelpTicket.audit.push(obj);
+                this.helpTickets.selectHelpTicketContent();
+                this.responseMessage = "Help Ticket reopened by " + this.userObj.fullName;
+                this._createResponse();
                 this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.REVIEW_HELPTICKET_STATUS;
-                _context7.next = 7;
-                return this.helpTickets.saveHelpTicket();
+                _context7.next = 10;
+                return this.helpTickets.reopenHelpTicket();
 
-              case 7:
+              case 10:
                 serverResponse = _context7.sent;
 
                 if (!serverResponse.error) {
-                  this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
                   this.utils.showNotification("The help ticket was updated");
                 }
                 $("#loading").hide();
 
-              case 10:
+              case 13:
               case 'end':
                 return _context7.stop();
             }
@@ -35056,6 +35244,14 @@ define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework'
 
       return openHelpTicket;
     }();
+
+    ArchiveHelpTickets.prototype._createResponse = function _createResponse() {
+      this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
+      this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
+      this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
+      this.helpTickets.selectedHelpTicketContent.content.comments = this.responseMessage;
+      this.helpTickets.selectedHelpTicketContent.displayForm = this.config.HELP_TICKET_OTHER_TYPE;
+    };
 
     ArchiveHelpTickets.prototype.archiveClosedTickets = function () {
       var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
@@ -36133,7 +36329,6 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
 
                 this.helpTickets.calcHelpTicketAges();
-
                 $("#loading").hide();
                 this._cleanUpFilters();
 
@@ -36163,7 +36358,6 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 this.helpTickets.selectHelpTicket(this.editIndex);
                 this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
                 this.openHelpTicket();
-
                 indices = this.getIndex();
                 subTypeIndex = indices.subTypeIndex;
                 categoryIndex = indices.categoryIndex;
@@ -36528,12 +36722,22 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     }();
 
     ViewHelpTickets.prototype.changeStatus = function () {
-      var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(helpTicket, status, description) {
-        var obj, serverResponse;
+      var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(helpTicket, status) {
+        var obj, serverResponse, _serverResponse;
+
         return regeneratorRuntime.wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
+                if (!(status == this.config.MY_HELPTICKET_STATUS && this.userObj._id != helpTicket.owner[0].personId._id)) {
+                  _context12.next = 3;
+                  break;
+                }
+
+                this.utils.showNotification('You must own this ticket before you can make it yours');
+                return _context12.abrupt('return');
+
+              case 3:
                 this.helpTickets.selectHelpTicketByID(helpTicket._id);
                 obj = {
                   property: "helpTicketStatus",
@@ -36544,20 +36748,49 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 };
 
                 this.helpTickets.selectedHelpTicket.audit.push(obj);
-                this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
-                _context12.next = 6;
-                return this.helpTickets.saveHelpTicket();
+                if (status == this.config.MY_HELPTICKET_STATUS) {
+                  this.helpTickets.selectedHelpTicket.helpTicketStatus = this.helpTickets.selectedHelpTicket.helpTicketStatus.toString() + status;
+                } else {
+                  this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
+                }
 
-              case 6:
+                if (!(status == this.config.CLOSED_HELPTICKET_STATUS)) {
+                  _context12.next = 17;
+                  break;
+                }
+
+                this.helpTickets.selectHelpTicketContent();
+                this.responseMessage = "Help Ticket closed by " + this.userObj.fullName;
+                this._createResponse();
+                _context12.next = 13;
+                return this.helpTickets.closeHelpTicket();
+
+              case 13:
                 serverResponse = _context12.sent;
 
                 if (!serverResponse.error) {
                   this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
                   this.utils.showNotification("The help ticket was updated");
                 }
+                _context12.next = 21;
+                break;
+
+              case 17:
+                _context12.next = 19;
+                return this.helpTickets.saveHelpTicket();
+
+              case 19:
+                _serverResponse = _context12.sent;
+
+                if (!_serverResponse.error) {
+                  this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+                  this.utils.showNotification("The help ticket was updated");
+                }
+
+              case 21:
                 this._cleanUp();
 
-              case 9:
+              case 22:
               case 'end':
                 return _context12.stop();
             }
@@ -36565,7 +36798,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
         }, _callee12, this);
       }));
 
-      function changeStatus(_x12, _x13, _x14) {
+      function changeStatus(_x12, _x13) {
         return _ref12.apply(this, arguments);
       }
 
@@ -36626,7 +36859,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
         }, _callee13, this);
       }));
 
-      function saveNote(_x15) {
+      function saveNote(_x14) {
         return _ref13.apply(this, arguments);
       }
 
@@ -36818,13 +37051,69 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     ViewHelpTickets.prototype.showProfile = function showProfile(request, el) {
       this.profileRequest = request;
       $(".hoverProfile").css("top", window.pageYOffset + el.clientY - 175);
-      $(".hoverProfile").css("left", el.clientX + 200);
+      $(".hoverProfile").css("left", el.clientX + 100);
       $(".hoverProfile").css("display", "block");
     };
 
     ViewHelpTickets.prototype.hideProfile = function hideProfile() {
       $(".hoverProfile").css("display", "none");
     };
+
+    ViewHelpTickets.prototype.customHelpTicketStatusFilter = function () {
+      var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15() {
+        return regeneratorRuntime.wrap(function _callee15$(_context15) {
+          while (1) {
+            switch (_context15.prev = _context15.next) {
+              case 0:
+                if (!(this.helpTicketStatusFilter > this.config.CLOSED_HELPTICKET_STATUS)) {
+                  _context15.next = 6;
+                  break;
+                }
+
+                _context15.next = 3;
+                return this.helpTickets.getMyHelpTickets(this.userObj._id);
+
+              case 3:
+                this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+                _context15.next = 14;
+                break;
+
+              case 6:
+                if (!(this.oldHelpTicketStatus == this.config.MY_HELPTICKET_STATUS)) {
+                  _context15.next = 13;
+                  break;
+                }
+
+                $("#loading").show();
+                _context15.next = 10;
+                return this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true);
+
+              case 10:
+                this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+
+                this.helpTickets.calcHelpTicketAges();
+                $("#loading").hide();
+
+              case 13:
+                this.dataTable.filterList({ target: { value: this.helpTicketStatusFilter } }, { type: 'value', filter: 'helpTicketStatusFilter', collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus', compare: 'match' });
+
+              case 14:
+                this.oldHelpTicketStatus = this.helpTicketStatusFilter;
+
+              case 15:
+              case 'end':
+                return _context15.stop();
+            }
+          }
+        }, _callee15, this);
+      }));
+
+      function customHelpTicketStatusFilter() {
+        return _ref15.apply(this, arguments);
+      }
+
+      return customHelpTicketStatusFilter;
+    }();
 
     ViewHelpTickets.prototype.customHelpTicketTypeFilter = function customHelpTicketTypeFilter(value, item, context) {
       var foo = value.toUpperCase();
@@ -40754,7 +41043,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
               case 0:
                 this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
                 _context3.next = 3;
-                return this.helpTickets.getHelpTicketArray('?filter=personId|eq|' + this.userObj._id, true);
+                return this.helpTickets.getUserHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true);
 
               case 3:
                 this.updateArray();
@@ -40794,7 +41083,6 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
               case 4:
                 this.categoryIndex = this.getCatIndex();
-
                 this.createOutputForm(this.helpTickets.helpTicketTypesArray[this.categoryIndex.categoryIndex].subtypes[this.categoryIndex.subTypeIndex].outputForm);
 
                 if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -40917,6 +41205,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
       this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
       this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
       this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
+      this.helpTickets.selectedHelpTicketContent.content.comments = this.responseMessage;
       this.helpTickets.selectedHelpTicketContent.displayForm = this.config.HELP_TICKET_OTHER_TYPE;
     };
 
@@ -40934,7 +41223,6 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   email.MESSAGE = this.config.HELP_TICKET_USER_UPDATE_MESSAGE.replace('[[No]]', this.helpTickets.selectedHelpTicket.helpTicketNo);
                   email.subject = this.config.HELP_TICKET_USER_UPDATE_SUBJECT.replace('[[No]]', this.helpTickets.selectedHelpTicket.helpTicketNo);
                   email.email = this.userObj.email;
-
                   email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
                 }
                 _context6.next = 5;
@@ -40969,8 +41257,24 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
     ViewHelpTickets.prototype.closeHelpTicket = function closeHelpTicket(helpTicket) {
       var _this2 = this;
 
-      return this.dialog.showMessage("Are you sure you want to close the help ticket?", "Close Help Ticket", ['Yes', 'No']).whenClosed(function (response) {
+      return this.dialog.showCloseHelpTicket("You have chosen to close this help ticket?", "Close Help Ticket", ['Submit', 'Cancel']).whenClosed(function (response) {
         if (!response.wasCancelled) {
+          _this2.helpTickets.selectHelpTicketByID(helpTicket._id);
+          _this2.helpTickets.selectHelpTicketContent();
+          _this2.responseMessage = "Help Ticket closed by " + _this2.userObj.fullName + "<p>Reason: " + _this2.config.HELP_TICKET_CLOSE_REASONS[response.output.selectedReason].reason + "</p>";
+          if (response.output.selectedReason == _this2.config.HELP_TICKET_CLOSE_REASON_OTHER) {
+            if (response.output.otherReason) {
+              _this2.responseMessage += "<p>Other reason:  " + response.output.otherReason + "</p>";
+            } else {
+              _this2.responseMessage += "<p>No elboration provide for other reason for closing ticket.</p>";
+            }
+          }
+          if (response.output.method) {
+            _this2.responseMessage += _this2.responseMessage = "<p>Method for resolving: " + response.output.method + "</p>";
+          } else {
+            _this2.responseMessage += "<p>No method was provided for resolving the issue.</p>";
+          }
+          _this2._createResponse();
           _this2.closeTicket(helpTicket);
         } else {
           _this2._cleanUp();
@@ -40985,7 +41289,6 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                this.helpTickets.selectHelpTicketByID(helpTicket._id);
                 email = new Object();
 
                 if (this.sendEmail) {
@@ -40997,21 +41300,21 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   email.message = "The help ticket was closed by " + this.userObj.fullName;
                 }
                 this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.CLOSED_HELPTICKET_STATUS;
-                _context7.next = 6;
-                return this.helpTickets.updateStatus(email);
 
-              case 6:
+                _context7.next = 5;
+                return this.helpTickets.closeHelpTicket();
+
+              case 5:
                 serverResponse = _context7.sent;
 
                 if (!serverResponse.error) {
-                  this.updateArray();
-                  this.filterOutClosed();
+                  this.refresh();
                   this.utils.showNotification("The help ticket was updated");
                 }
                 if (this.isChecked) this.filterOutClosed();
                 this._cleanUp();
 
-              case 10:
+              case 9:
               case 'end':
                 return _context7.stop();
             }
@@ -63546,6 +63849,98 @@ module.exports = function(Chart) {
 
 },{"1":1,"25":25,"45":45}]},{},[7])(7)
 });
+define('resources/value-converters/lookup-ht-status',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var LookupHTStatusValueConverter = exports.LookupHTStatusValueConverter = function () {
+    function LookupHTStatusValueConverter() {
+      _classCallCheck(this, LookupHTStatusValueConverter);
+    }
+
+    LookupHTStatusValueConverter.prototype.toView = function toView(value, array) {
+      if (value && array) {
+        if (value > 6) {
+          value = parseInt(value / 10);
+        }
+        for (var i = 0; i < array.length; i++) {
+          if (value == array[i].code) {
+            return array[i].description;
+          }
+        }
+      }
+      return "";
+    };
+
+    return LookupHTStatusValueConverter;
+  }();
+});
+define('resources/dialogs/helpTicket-dialog',['exports', 'aurelia-dialog', 'aurelia-framework', '../../config/appConfig'], function (exports, _aureliaDialog, _aureliaFramework, _appConfig) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.HelpTicketDialog = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var HelpTicketDialog = exports.HelpTicketDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController, _appConfig.AppConfig), _dec(_class = function () {
+        function HelpTicketDialog(dialogController, config) {
+            _classCallCheck(this, HelpTicketDialog);
+
+            this.dialogController = dialogController;
+            this.config = config;
+            this.otherReason = "";
+            this.method = "";
+        }
+
+        HelpTicketDialog.prototype.activate = function activate(model) {
+            this.model = model;
+            this.model.selectedReason = "";
+        };
+
+        HelpTicketDialog.prototype.selectOption = function selectOption(option) {
+            if (isCancel(option)) {
+                this.dialogController.cancel(option);
+            } else {
+                this.dialogController.ok(this.model);
+            }
+        };
+
+        HelpTicketDialog.prototype.reasonSelected = function reasonSelected() {
+            if (this.model.selectedReason == this.config.HELP_TICKET_CLOSE_REASON_OTHER) {
+                setTimeout(function () {
+                    $("#otherReason").focus();
+                }, 200);
+            } else {
+                $("#method").focus();
+            }
+        };
+
+        return HelpTicketDialog;
+    }()) || _class);
+
+
+    function isCancel(option) {
+        return ['cancel', 'no'].indexOf(option.toLowerCase()) !== -1;
+    }
+});
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"resources/css/styles.css\"></require>\r\n  <require from=\"humane-js/themes/jackedup.css\"></require>\r\n  <require from=\"bootstrap-select/css/bootstrap-select.css\"></require>\r\n  <nav-bar></nav-bar>\r\n  <div class=\"page-host\">\r\n    <loading-indicator progress.bind=\"data.progress\" loading.bind=\"router.isNavigating || data.isRequesting\"></loading-indicator>\r\n    <router-view></router-view>\r\n  </div>\r\n</template>"; });
 define('text!modules/analytics/analytics.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../resources/elements/submenu.html'></compose>\r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template>"; });
 define('text!resources/css/fullcalendar.css', ['module'], function(module) { module.exports = "/*!\r\n * FullCalendar v3.4.0 Stylesheet\r\n * Docs & License: https://fullcalendar.io/\r\n * (c) 2017 Adam Shaw\r\n */\r\n\r\n\r\n.fc {\r\n\tdirection: ltr;\r\n\ttext-align: left;\r\n}\r\n\r\n.fc-rtl {\r\n\ttext-align: right;\r\n}\r\n\r\nbody .fc { /* extra precedence to overcome jqui */\r\n\tfont-size: 1em;\r\n}\r\n\r\n\r\n/* Colors\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-unthemed th,\r\n.fc-unthemed td,\r\n.fc-unthemed thead,\r\n.fc-unthemed tbody,\r\n.fc-unthemed .fc-divider,\r\n.fc-unthemed .fc-row,\r\n.fc-unthemed .fc-content, /* for gutter border */\r\n.fc-unthemed .fc-popover,\r\n.fc-unthemed .fc-list-view,\r\n.fc-unthemed .fc-list-heading td {\r\n\tborder-color: #ddd;\r\n}\r\n\r\n.fc-unthemed .fc-popover {\r\n\tbackground-color: #fff;\r\n}\r\n\r\n.fc-unthemed .fc-divider,\r\n.fc-unthemed .fc-popover .fc-header,\r\n.fc-unthemed .fc-list-heading td {\r\n\tbackground: #eee;\r\n}\r\n\r\n.fc-unthemed .fc-popover .fc-header .fc-close {\r\n\tcolor: #666;\r\n}\r\n\r\n.fc-unthemed td.fc-today {\r\n\tbackground: #fcf8e3;\r\n}\r\n\r\n.fc-highlight { /* when user is selecting cells */\r\n\tbackground: #bce8f1;\r\n\topacity: .3;\r\n}\r\n\r\n.fc-bgevent { /* default look for background events */\r\n\tbackground: rgb(143, 223, 130);\r\n\topacity: .3;\r\n}\r\n\r\n.fc-nonbusiness { /* default look for non-business-hours areas */\r\n\t/* will inherit .fc-bgevent's styles */\r\n\tbackground: #d7d7d7;\r\n}\r\n\r\n.fc-unthemed .fc-disabled-day {\r\n\tbackground: #d7d7d7;\r\n\topacity: .3;\r\n}\r\n\r\n.ui-widget .fc-disabled-day { /* themed */\r\n\tbackground-image: none;\r\n}\r\n\r\n\r\n/* Icons (inline elements with styled text that mock arrow icons)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-icon {\r\n\tdisplay: inline-block;\r\n\theight: 1em;\r\n\tline-height: 1em;\r\n\tfont-size: 1em;\r\n\ttext-align: center;\r\n\toverflow: hidden;\r\n\tfont-family: \"Courier New\", Courier, monospace;\r\n\r\n\t/* don't allow browser text-selection */\r\n\t-webkit-touch-callout: none;\r\n\t-webkit-user-select: none;\r\n\t-khtml-user-select: none;\r\n\t-moz-user-select: none;\r\n\t-ms-user-select: none;\r\n\tuser-select: none;\r\n\t}\r\n\r\n/*\r\nAcceptable font-family overrides for individual icons:\r\n\t\"Arial\", sans-serif\r\n\t\"Times New Roman\", serif\r\n\r\nNOTE: use percentage font sizes or else old IE chokes\r\n*/\r\n\r\n.fc-icon:after {\r\n\tposition: relative;\r\n}\r\n\r\n.fc-icon-left-single-arrow:after {\r\n\tcontent: \"\\02039\";\r\n\tfont-weight: bold;\r\n\tfont-size: 200%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-right-single-arrow:after {\r\n\tcontent: \"\\0203A\";\r\n\tfont-weight: bold;\r\n\tfont-size: 200%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-left-double-arrow:after {\r\n\tcontent: \"\\000AB\";\r\n\tfont-size: 160%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-right-double-arrow:after {\r\n\tcontent: \"\\000BB\";\r\n\tfont-size: 160%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-left-triangle:after {\r\n\tcontent: \"\\25C4\";\r\n\tfont-size: 125%;\r\n\ttop: 3%;\r\n}\r\n\r\n.fc-icon-right-triangle:after {\r\n\tcontent: \"\\25BA\";\r\n\tfont-size: 125%;\r\n\ttop: 3%;\r\n}\r\n\r\n.fc-icon-down-triangle:after {\r\n\tcontent: \"\\25BC\";\r\n\tfont-size: 125%;\r\n\ttop: 2%;\r\n}\r\n\r\n.fc-icon-x:after {\r\n\tcontent: \"\\000D7\";\r\n\tfont-size: 200%;\r\n\ttop: 6%;\r\n}\r\n\r\n\r\n/* Buttons (styled <button> tags, normalized to work cross-browser)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc button {\r\n\t/* force height to include the border and padding */\r\n\t-moz-box-sizing: border-box;\r\n\t-webkit-box-sizing: border-box;\r\n\tbox-sizing: border-box;\r\n\r\n\t/* dimensions */\r\n\tmargin: 0;\r\n\theight: 2.1em;\r\n\tpadding: 0 .6em;\r\n\r\n\t/* text & cursor */\r\n\tfont-size: 1em; /* normalize */\r\n\twhite-space: nowrap;\r\n\tcursor: pointer;\r\n}\r\n\r\n/* Firefox has an annoying inner border */\r\n.fc button::-moz-focus-inner { margin: 0; padding: 0; }\r\n\t\r\n.fc-state-default { /* non-theme */\r\n\tborder: 1px solid;\r\n}\r\n\r\n.fc-state-default.fc-corner-left { /* non-theme */\r\n\tborder-top-left-radius: 4px;\r\n\tborder-bottom-left-radius: 4px;\r\n}\r\n\r\n.fc-state-default.fc-corner-right { /* non-theme */\r\n\tborder-top-right-radius: 4px;\r\n\tborder-bottom-right-radius: 4px;\r\n}\r\n\r\n/* icons in buttons */\r\n\r\n.fc button .fc-icon { /* non-theme */\r\n\tposition: relative;\r\n\ttop: -0.05em; /* seems to be a good adjustment across browsers */\r\n\tmargin: 0 .2em;\r\n\tvertical-align: middle;\r\n}\r\n\t\r\n/*\r\n  button states\r\n  borrowed from twitter bootstrap (http://twitter.github.com/bootstrap/)\r\n*/\r\n\r\n.fc-state-default {\r\n\tbackground-color: #f5f5f5;\r\n\tbackground-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);\r\n\tbackground-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));\r\n\tbackground-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);\r\n\tbackground-image: -o-linear-gradient(top, #ffffff, #e6e6e6);\r\n\tbackground-image: linear-gradient(to bottom, #ffffff, #e6e6e6);\r\n\tbackground-repeat: repeat-x;\r\n\tborder-color: #e6e6e6 #e6e6e6 #bfbfbf;\r\n\tborder-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);\r\n\tcolor: #333;\r\n\ttext-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);\r\n\tbox-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);\r\n}\r\n\r\n.fc-state-hover,\r\n.fc-state-down,\r\n.fc-state-active,\r\n.fc-state-disabled {\r\n\tcolor: #333333;\r\n\tbackground-color: #e6e6e6;\r\n}\r\n\r\n.fc-state-hover {\r\n\tcolor: #333333;\r\n\ttext-decoration: none;\r\n\tbackground-position: 0 -15px;\r\n\t-webkit-transition: background-position 0.1s linear;\r\n\t   -moz-transition: background-position 0.1s linear;\r\n\t     -o-transition: background-position 0.1s linear;\r\n\t        transition: background-position 0.1s linear;\r\n}\r\n\r\n.fc-state-down,\r\n.fc-state-active {\r\n\tbackground-color: #cccccc;\r\n\tbackground-image: none;\r\n\tbox-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);\r\n}\r\n\r\n.fc-state-disabled {\r\n\tcursor: default;\r\n\tbackground-image: none;\r\n\topacity: 0.65;\r\n\tbox-shadow: none;\r\n}\r\n\r\n\r\n/* Buttons Groups\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-button-group {\r\n\tdisplay: inline-block;\r\n}\r\n\r\n/*\r\nevery button that is not first in a button group should scootch over one pixel and cover the\r\nprevious button's border...\r\n*/\r\n\r\n.fc .fc-button-group > * { /* extra precedence b/c buttons have margin set to zero */\r\n\tfloat: left;\r\n\tmargin: 0 0 0 -1px;\r\n}\r\n\r\n.fc .fc-button-group > :first-child { /* same */\r\n\tmargin-left: 0;\r\n}\r\n\r\n\r\n/* Popover\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-popover {\r\n\tposition: absolute;\r\n\tbox-shadow: 0 2px 6px rgba(0,0,0,.15);\r\n}\r\n\r\n.fc-popover .fc-header { /* TODO: be more consistent with fc-head/fc-body */\r\n\tpadding: 2px 4px;\r\n}\r\n\r\n.fc-popover .fc-header .fc-title {\r\n\tmargin: 0 2px;\r\n}\r\n\r\n.fc-popover .fc-header .fc-close {\r\n\tcursor: pointer;\r\n}\r\n\r\n.fc-ltr .fc-popover .fc-header .fc-title,\r\n.fc-rtl .fc-popover .fc-header .fc-close {\r\n\tfloat: left;\r\n}\r\n\r\n.fc-rtl .fc-popover .fc-header .fc-title,\r\n.fc-ltr .fc-popover .fc-header .fc-close {\r\n\tfloat: right;\r\n}\r\n\r\n/* unthemed */\r\n\r\n.fc-unthemed .fc-popover {\r\n\tborder-width: 1px;\r\n\tborder-style: solid;\r\n}\r\n\r\n.fc-unthemed .fc-popover .fc-header .fc-close {\r\n\tfont-size: .9em;\r\n\tmargin-top: 2px;\r\n}\r\n\r\n/* jqui themed */\r\n\r\n.fc-popover > .ui-widget-header + .ui-widget-content {\r\n\tborder-top: 0; /* where they meet, let the header have the border */\r\n}\r\n\r\n\r\n/* Misc Reusable Components\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-divider {\r\n\tborder-style: solid;\r\n\tborder-width: 1px;\r\n}\r\n\r\nhr.fc-divider {\r\n\theight: 0;\r\n\tmargin: 0;\r\n\tpadding: 0 0 2px; /* height is unreliable across browsers, so use padding */\r\n\tborder-width: 1px 0;\r\n}\r\n\r\n.fc-clear {\r\n\tclear: both;\r\n}\r\n\r\n.fc-bg,\r\n.fc-bgevent-skeleton,\r\n.fc-highlight-skeleton,\r\n.fc-helper-skeleton {\r\n\t/* these element should always cling to top-left/right corners */\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n.fc-bg {\r\n\tbottom: 0; /* strech bg to bottom edge */\r\n}\r\n\r\n.fc-bg table {\r\n\theight: 100%; /* strech bg to bottom edge */\r\n}\r\n\r\n\r\n/* Tables\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc table {\r\n\twidth: 100%;\r\n\tbox-sizing: border-box; /* fix scrollbar issue in firefox */\r\n\ttable-layout: fixed;\r\n\tborder-collapse: collapse;\r\n\tborder-spacing: 0;\r\n\tfont-size: 1em; /* normalize cross-browser */\r\n}\r\n\r\n.fc th {\r\n\ttext-align: center;\r\n}\r\n\r\n.fc th,\r\n.fc td {\r\n\tborder-style: solid;\r\n\tborder-width: 1px;\r\n\tpadding: 0;\r\n\tvertical-align: top;\r\n}\r\n\r\n.fc td.fc-today {\r\n\tborder-style: double; /* overcome neighboring borders */\r\n}\r\n\r\n\r\n/* Internal Nav Links\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\na[data-goto] {\r\n\tcursor: pointer;\r\n}\r\n\r\na[data-goto]:hover {\r\n\ttext-decoration: underline;\r\n}\r\n\r\n\r\n/* Fake Table Rows\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc .fc-row { /* extra precedence to overcome themes w/ .ui-widget-content forcing a 1px border */\r\n\t/* no visible border by default. but make available if need be (scrollbar width compensation) */\r\n\tborder-style: solid;\r\n\tborder-width: 0;\r\n}\r\n\r\n.fc-row table {\r\n\t/* don't put left/right border on anything within a fake row.\r\n\t   the outer tbody will worry about this */\r\n\tborder-left: 0 hidden transparent;\r\n\tborder-right: 0 hidden transparent;\r\n\r\n\t/* no bottom borders on rows */\r\n\tborder-bottom: 0 hidden transparent; \r\n}\r\n\r\n.fc-row:first-child table {\r\n\tborder-top: 0 hidden transparent; /* no top border on first row */\r\n}\r\n\r\n\r\n/* Day Row (used within the header and the DayGrid)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-row {\r\n\tposition: relative;\r\n}\r\n\r\n.fc-row .fc-bg {\r\n\tz-index: 1;\r\n}\r\n\r\n/* highlighting cells & background event skeleton */\r\n\r\n.fc-row .fc-bgevent-skeleton,\r\n.fc-row .fc-highlight-skeleton {\r\n\tbottom: 0; /* stretch skeleton to bottom of row */\r\n}\r\n\r\n.fc-row .fc-bgevent-skeleton table,\r\n.fc-row .fc-highlight-skeleton table {\r\n\theight: 100%; /* stretch skeleton to bottom of row */\r\n}\r\n\r\n.fc-row .fc-highlight-skeleton td,\r\n.fc-row .fc-bgevent-skeleton td {\r\n\tborder-color: transparent;\r\n}\r\n\r\n.fc-row .fc-bgevent-skeleton {\r\n\tz-index: 2;\r\n\r\n}\r\n\r\n.fc-row .fc-highlight-skeleton {\r\n\tz-index: 3;\r\n}\r\n\r\n/*\r\nrow content (which contains day/week numbers and events) as well as \"helper\" (which contains\r\ntemporary rendered events).\r\n*/\r\n\r\n.fc-row .fc-content-skeleton {\r\n\tposition: relative;\r\n\tz-index: 4;\r\n\tpadding-bottom: 2px; /* matches the space above the events */\r\n}\r\n\r\n.fc-row .fc-helper-skeleton {\r\n\tz-index: 5;\r\n}\r\n\r\n.fc-row .fc-content-skeleton td,\r\n.fc-row .fc-helper-skeleton td {\r\n\t/* see-through to the background below */\r\n\tbackground: none; /* in case <td>s are globally styled */\r\n\tborder-color: transparent;\r\n\r\n\t/* don't put a border between events and/or the day number */\r\n\tborder-bottom: 0;\r\n}\r\n\r\n.fc-row .fc-content-skeleton tbody td, /* cells with events inside (so NOT the day number cell) */\r\n.fc-row .fc-helper-skeleton tbody td {\r\n\t/* don't put a border between event cells */\r\n\tborder-top: 0;\r\n}\r\n\r\n\r\n/* Scrolling Container\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-scroller {\r\n\t-webkit-overflow-scrolling: touch;\r\n}\r\n\r\n/* TODO: move to agenda/basic */\r\n.fc-scroller > .fc-day-grid,\r\n.fc-scroller > .fc-time-grid {\r\n\tposition: relative; /* re-scope all positions */\r\n\twidth: 100%; /* hack to force re-sizing this inner element when scrollbars appear/disappear */\r\n}\r\n\r\n\r\n/* Global Event Styles\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-event {\r\n\tposition: relative; /* for resize handle and other inner positioning */\r\n\tdisplay: block; /* make the <a> tag block */\r\n\tfont-size: .85em;\r\n\tline-height: 1.3;\r\n\tborder-radius: 3px;\r\n\tborder: 1px solid #3a87ad; /* default BORDER color */\r\n\tfont-weight: normal; /* undo jqui's ui-widget-header bold */\r\n}\r\n\r\n.fc-event,\r\n.fc-event-dot {\r\n\tbackground-color: #3a87ad; /* default BACKGROUND color */\r\n}\r\n\r\n/* overpower some of bootstrap's and jqui's styles on <a> tags */\r\n.fc-event,\r\n.fc-event:hover,\r\n.ui-widget .fc-event {\r\n\tcolor: #fff; /* default TEXT color */\r\n\ttext-decoration: none; /* if <a> has an href */\r\n}\r\n\r\n.fc-event[href],\r\n.fc-event.fc-draggable {\r\n\tcursor: pointer; /* give events with links and draggable events a hand mouse pointer */\r\n}\r\n\r\n.fc-not-allowed, /* causes a \"warning\" cursor. applied on body */\r\n.fc-not-allowed .fc-event { /* to override an event's custom cursor */\r\n\tcursor: not-allowed;\r\n}\r\n\r\n.fc-event .fc-bg { /* the generic .fc-bg already does position */\r\n\tz-index: 1;\r\n\tbackground: #fff;\r\n\topacity: .25;\r\n}\r\n\r\n.fc-event .fc-content {\r\n\tposition: relative;\r\n\tz-index: 2;\r\n}\r\n\r\n/* resizer (cursor AND touch devices) */\r\n\r\n.fc-event .fc-resizer {\r\n\tposition: absolute;\r\n\tz-index: 4;\r\n}\r\n\r\n/* resizer (touch devices) */\r\n\r\n.fc-event .fc-resizer {\r\n\tdisplay: none;\r\n}\r\n\r\n.fc-event.fc-allow-mouse-resize .fc-resizer,\r\n.fc-event.fc-selected .fc-resizer {\r\n\t/* only show when hovering or selected (with touch) */\r\n\tdisplay: block;\r\n}\r\n\r\n/* hit area */\r\n\r\n.fc-event.fc-selected .fc-resizer:before {\r\n\t/* 40x40 touch area */\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tz-index: 9999; /* user of this util can scope within a lower z-index */\r\n\ttop: 50%;\r\n\tleft: 50%;\r\n\twidth: 40px;\r\n\theight: 40px;\r\n\tmargin-left: -20px;\r\n\tmargin-top: -20px;\r\n}\r\n\r\n\r\n/* Event Selection (only for touch devices)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-event.fc-selected {\r\n\tz-index: 9999 !important; /* overcomes inline z-index */\r\n\tbox-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);\r\n}\r\n\r\n.fc-event.fc-selected.fc-dragging {\r\n\tbox-shadow: 0 2px 7px rgba(0, 0, 0, 0.3);\r\n}\r\n\r\n\r\n/* Horizontal Events\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* bigger touch area when selected */\r\n.fc-h-event.fc-selected:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tz-index: 3; /* below resizers */\r\n\ttop: -10px;\r\n\tbottom: -10px;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* events that are continuing to/from another week. kill rounded corners and butt up against edge */\r\n\r\n.fc-ltr .fc-h-event.fc-not-start,\r\n.fc-rtl .fc-h-event.fc-not-end {\r\n\tmargin-left: 0;\r\n\tborder-left-width: 0;\r\n\tpadding-left: 1px; /* replace the border with padding */\r\n\tborder-top-left-radius: 0;\r\n\tborder-bottom-left-radius: 0;\r\n}\r\n\r\n.fc-ltr .fc-h-event.fc-not-end,\r\n.fc-rtl .fc-h-event.fc-not-start {\r\n\tmargin-right: 0;\r\n\tborder-right-width: 0;\r\n\tpadding-right: 1px; /* replace the border with padding */\r\n\tborder-top-right-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n/* resizer (cursor AND touch devices) */\r\n\r\n/* left resizer  */\r\n.fc-ltr .fc-h-event .fc-start-resizer,\r\n.fc-rtl .fc-h-event .fc-end-resizer {\r\n\tcursor: w-resize;\r\n\tleft: -1px; /* overcome border */\r\n}\r\n\r\n/* right resizer */\r\n.fc-ltr .fc-h-event .fc-end-resizer,\r\n.fc-rtl .fc-h-event .fc-start-resizer {\r\n\tcursor: e-resize;\r\n\tright: -1px; /* overcome border */\r\n}\r\n\r\n/* resizer (mouse devices) */\r\n\r\n.fc-h-event.fc-allow-mouse-resize .fc-resizer {\r\n\twidth: 7px;\r\n\ttop: -1px; /* overcome top border */\r\n\tbottom: -1px; /* overcome bottom border */\r\n}\r\n\r\n/* resizer (touch devices) */\r\n\r\n.fc-h-event.fc-selected .fc-resizer {\r\n\t/* 8x8 little dot */\r\n\tborder-radius: 4px;\r\n\tborder-width: 1px;\r\n\twidth: 6px;\r\n\theight: 6px;\r\n\tborder-style: solid;\r\n\tborder-color: inherit;\r\n\tbackground: #fff;\r\n\t/* vertically center */\r\n\ttop: 50%;\r\n\tmargin-top: -4px;\r\n}\r\n\r\n/* left resizer  */\r\n.fc-ltr .fc-h-event.fc-selected .fc-start-resizer,\r\n.fc-rtl .fc-h-event.fc-selected .fc-end-resizer {\r\n\tmargin-left: -4px; /* centers the 8x8 dot on the left edge */\r\n}\r\n\r\n/* right resizer */\r\n.fc-ltr .fc-h-event.fc-selected .fc-end-resizer,\r\n.fc-rtl .fc-h-event.fc-selected .fc-start-resizer {\r\n\tmargin-right: -4px; /* centers the 8x8 dot on the right edge */\r\n}\r\n\r\n\r\n/* DayGrid events\r\n----------------------------------------------------------------------------------------------------\r\nWe use the full \"fc-day-grid-event\" class instead of using descendants because the event won't\r\nbe a descendant of the grid when it is being dragged.\r\n*/\r\n\r\n.fc-day-grid-event {\r\n\tmargin: 1px 2px 0; /* spacing between events and edges */\r\n\tpadding: 0 1px;\r\n}\r\n\r\ntr:first-child > td > .fc-day-grid-event {\r\n\tmargin-top: 2px; /* a little bit more space before the first event */\r\n}\r\n\r\n.fc-day-grid-event.fc-selected:after {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tz-index: 1; /* same z-index as fc-bg, behind text */\r\n\t/* overcome the borders */\r\n\ttop: -1px;\r\n\tright: -1px;\r\n\tbottom: -1px;\r\n\tleft: -1px;\r\n\t/* darkening effect */\r\n\tbackground: #000;\r\n\topacity: .25;\r\n}\r\n\r\n.fc-day-grid-event .fc-content { /* force events to be one-line tall */\r\n\twhite-space: nowrap;\r\n\toverflow: hidden;\r\n}\r\n\r\n.fc-day-grid-event .fc-time {\r\n\tfont-weight: bold;\r\n}\r\n\r\n/* resizer (cursor devices) */\r\n\r\n/* left resizer  */\r\n.fc-ltr .fc-day-grid-event.fc-allow-mouse-resize .fc-start-resizer,\r\n.fc-rtl .fc-day-grid-event.fc-allow-mouse-resize .fc-end-resizer {\r\n\tmargin-left: -2px; /* to the day cell's edge */\r\n}\r\n\r\n/* right resizer */\r\n.fc-ltr .fc-day-grid-event.fc-allow-mouse-resize .fc-end-resizer,\r\n.fc-rtl .fc-day-grid-event.fc-allow-mouse-resize .fc-start-resizer {\r\n\tmargin-right: -2px; /* to the day cell's edge */\r\n}\r\n\r\n\r\n/* Event Limiting\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* \"more\" link that represents hidden events */\r\n\r\na.fc-more {\r\n\tmargin: 1px 3px;\r\n\tfont-size: .85em;\r\n\tcursor: pointer;\r\n\ttext-decoration: none;\r\n}\r\n\r\na.fc-more:hover {\r\n\ttext-decoration: underline;\r\n}\r\n\r\n.fc-limited { /* rows and cells that are hidden because of a \"more\" link */\r\n\tdisplay: none;\r\n}\r\n\r\n/* popover that appears when \"more\" link is clicked */\r\n\r\n.fc-day-grid .fc-row {\r\n\tz-index: 1; /* make the \"more\" popover one higher than this */\r\n}\r\n\r\n.fc-more-popover {\r\n\tz-index: 2;\r\n\twidth: 220px;\r\n}\r\n\r\n.fc-more-popover .fc-event-container {\r\n\tpadding: 10px;\r\n}\r\n\r\n\r\n/* Now Indicator\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-now-indicator {\r\n\tposition: absolute;\r\n\tborder: 0 solid red;\r\n}\r\n\r\n\r\n/* Utilities\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-unselectable {\r\n\t-webkit-user-select: none;\r\n\t -khtml-user-select: none;\r\n\t   -moz-user-select: none;\r\n\t    -ms-user-select: none;\r\n\t        user-select: none;\r\n\t-webkit-touch-callout: none;\r\n\t-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\r\n}\r\n\r\n\r\n\r\n/* Toolbar\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-toolbar {\r\n\ttext-align: center;\r\n}\r\n\r\n.fc-toolbar.fc-header-toolbar {\r\n\tmargin-bottom: 1em;\r\n}\r\n\r\n.fc-toolbar.fc-footer-toolbar {\r\n\tmargin-top: 1em;\r\n}\r\n\r\n.fc-toolbar .fc-left {\r\n\tfloat: left;\r\n}\r\n\r\n.fc-toolbar .fc-right {\r\n\tfloat: right;\r\n}\r\n\r\n.fc-toolbar .fc-center {\r\n\tdisplay: inline-block;\r\n}\r\n\r\n/* the things within each left/right/center section */\r\n.fc .fc-toolbar > * > * { /* extra precedence to override button border margins */\r\n\tfloat: left;\r\n\tmargin-left: .75em;\r\n}\r\n\r\n/* the first thing within each left/center/right section */\r\n.fc .fc-toolbar > * > :first-child { /* extra precedence to override button border margins */\r\n\tmargin-left: 0;\r\n}\r\n\t\r\n/* title text */\r\n\r\n.fc-toolbar h2 {\r\n\tmargin: 0;\r\n}\r\n\r\n/* button layering (for border precedence) */\r\n\r\n.fc-toolbar button {\r\n\tposition: relative;\r\n}\r\n\r\n.fc-toolbar .fc-state-hover,\r\n.fc-toolbar .ui-state-hover {\r\n\tz-index: 2;\r\n}\r\n\t\r\n.fc-toolbar .fc-state-down {\r\n\tz-index: 3;\r\n}\r\n\r\n.fc-toolbar .fc-state-active,\r\n.fc-toolbar .ui-state-active {\r\n\tz-index: 4;\r\n}\r\n\r\n.fc-toolbar button:focus {\r\n\tz-index: 5;\r\n}\r\n\r\n\r\n/* View Structure\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* undo twitter bootstrap's box-sizing rules. normalizes positioning techniques */\r\n/* don't do this for the toolbar because we'll want bootstrap to style those buttons as some pt */\r\n.fc-view-container *,\r\n.fc-view-container *:before,\r\n.fc-view-container *:after {\r\n\t-webkit-box-sizing: content-box;\r\n\t   -moz-box-sizing: content-box;\r\n\t        box-sizing: content-box;\r\n}\r\n\r\n.fc-view, /* scope positioning and z-index's for everything within the view */\r\n.fc-view > table { /* so dragged elements can be above the view's main element */\r\n\tposition: relative;\r\n\tz-index: 1;\r\n}\r\n\r\n\r\n\r\n/* BasicView\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* day row structure */\r\n\r\n.fc-basicWeek-view .fc-content-skeleton,\r\n.fc-basicDay-view .fc-content-skeleton {\r\n\t/* there may be week numbers in these views, so no padding-top */\r\n\tpadding-bottom: 1em; /* ensure a space at bottom of cell for user selecting/clicking */\r\n}\r\n\r\n.fc-basic-view .fc-body .fc-row {\r\n\tmin-height: 4em; /* ensure that all rows are at least this tall */\r\n}\r\n\r\n/* a \"rigid\" row will take up a constant amount of height because content-skeleton is absolute */\r\n\r\n.fc-row.fc-rigid {\r\n\toverflow: hidden;\r\n}\r\n\r\n.fc-row.fc-rigid .fc-content-skeleton {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* week and day number styling */\r\n\r\n.fc-day-top.fc-other-month {\r\n\topacity: 0.3;\r\n}\r\n\r\n.fc-basic-view .fc-week-number,\r\n.fc-basic-view .fc-day-number {\r\n\tpadding: 2px;\r\n}\r\n\r\n.fc-basic-view th.fc-week-number,\r\n.fc-basic-view th.fc-day-number {\r\n\tpadding: 0 2px; /* column headers can't have as much v space */\r\n}\r\n\r\n.fc-ltr .fc-basic-view .fc-day-top .fc-day-number { float: right; }\r\n.fc-rtl .fc-basic-view .fc-day-top .fc-day-number { float: left; }\r\n\r\n.fc-ltr .fc-basic-view .fc-day-top .fc-week-number { float: left; border-radius: 0 0 3px 0; }\r\n.fc-rtl .fc-basic-view .fc-day-top .fc-week-number { float: right; border-radius: 0 0 0 3px; }\r\n\r\n.fc-basic-view .fc-day-top .fc-week-number {\r\n\tmin-width: 1.5em;\r\n\ttext-align: center;\r\n\tbackground-color: #f2f2f2;\r\n\tcolor: #808080;\r\n}\r\n\r\n/* when week/day number have own column */\r\n\r\n.fc-basic-view td.fc-week-number {\r\n\ttext-align: center;\r\n}\r\n\r\n.fc-basic-view td.fc-week-number > * {\r\n\t/* work around the way we do column resizing and ensure a minimum width */\r\n\tdisplay: inline-block;\r\n\tmin-width: 1.25em;\r\n}\r\n\r\n\r\n/* AgendaView all-day area\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-agenda-view .fc-day-grid {\r\n\tposition: relative;\r\n\tz-index: 2; /* so the \"more..\" popover will be over the time grid */\r\n}\r\n\r\n.fc-agenda-view .fc-day-grid .fc-row {\r\n\tmin-height: 3em; /* all-day section will never get shorter than this */\r\n}\r\n\r\n.fc-agenda-view .fc-day-grid .fc-row .fc-content-skeleton {\r\n\tpadding-bottom: 1em; /* give space underneath events for clicking/selecting days */\r\n}\r\n\r\n\r\n/* TimeGrid axis running down the side (for both the all-day area and the slot area)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc .fc-axis { /* .fc to overcome default cell styles */\r\n\tvertical-align: middle;\r\n\tpadding: 0 4px;\r\n\twhite-space: nowrap;\r\n}\r\n\r\n.fc-ltr .fc-axis {\r\n\ttext-align: right;\r\n}\r\n\r\n.fc-rtl .fc-axis {\r\n\ttext-align: left;\r\n}\r\n\r\n.ui-widget td.fc-axis {\r\n\tfont-weight: normal; /* overcome jqui theme making it bold */\r\n}\r\n\r\n\r\n/* TimeGrid Structure\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid-container, /* so scroll container's z-index is below all-day */\r\n.fc-time-grid { /* so slats/bg/content/etc positions get scoped within here */\r\n\tposition: relative;\r\n\tz-index: 1;\r\n}\r\n\r\n.fc-time-grid {\r\n\tmin-height: 100%; /* so if height setting is 'auto', .fc-bg stretches to fill height */\r\n}\r\n\r\n.fc-time-grid table { /* don't put outer borders on slats/bg/content/etc */\r\n\tborder: 0 hidden transparent;\r\n}\r\n\r\n.fc-time-grid > .fc-bg {\r\n\tz-index: 1;\r\n}\r\n\r\n.fc-time-grid .fc-slats,\r\n.fc-time-grid > hr { /* the <hr> AgendaView injects when grid is shorter than scroller */\r\n\tposition: relative;\r\n\tz-index: 2;\r\n}\r\n\r\n.fc-time-grid .fc-content-col {\r\n\tposition: relative; /* because now-indicator lives directly inside */\r\n}\r\n\r\n.fc-time-grid .fc-content-skeleton {\r\n\tposition: absolute;\r\n\tz-index: 3;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* divs within a cell within the fc-content-skeleton */\r\n\r\n.fc-time-grid .fc-business-container {\r\n\tposition: relative;\r\n\tz-index: 1;\r\n}\r\n\r\n.fc-time-grid .fc-bgevent-container {\r\n\tposition: relative;\r\n\tz-index: 2;\r\n}\r\n\r\n.fc-time-grid .fc-highlight-container {\r\n\tposition: relative;\r\n\tz-index: 3;\r\n}\r\n\r\n.fc-time-grid .fc-event-container {\r\n\tposition: relative;\r\n\tz-index: 4;\r\n}\r\n\r\n.fc-time-grid .fc-now-indicator-line {\r\n\tz-index: 5;\r\n}\r\n\r\n.fc-time-grid .fc-helper-container { /* also is fc-event-container */\r\n\tposition: relative;\r\n\tz-index: 6;\r\n}\r\n\r\n\r\n/* TimeGrid Slats (lines that run horizontally)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid .fc-slats td {\r\n\theight: 1.5em;\r\n\tborder-bottom: 0; /* each cell is responsible for its top border */\r\n}\r\n\r\n.fc-time-grid .fc-slats .fc-minor td {\r\n\tborder-top-style: dotted;\r\n}\r\n\r\n.fc-time-grid .fc-slats .ui-widget-content { /* for jqui theme */\r\n\tbackground: none; /* see through to fc-bg */\r\n}\r\n\r\n\r\n/* TimeGrid Highlighting Slots\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid .fc-highlight-container { /* a div within a cell within the fc-highlight-skeleton */\r\n\tposition: relative; /* scopes the left/right of the fc-highlight to be in the column */\r\n}\r\n\r\n.fc-time-grid .fc-highlight {\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\tright: 0;\r\n\t/* top and bottom will be in by JS */\r\n}\r\n\r\n\r\n/* TimeGrid Event Containment\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-ltr .fc-time-grid .fc-event-container { /* space on the sides of events for LTR (default) */\r\n\tmargin: 0 2.5% 0 2px;\r\n}\r\n\r\n.fc-rtl .fc-time-grid .fc-event-container { /* space on the sides of events for RTL */\r\n\tmargin: 0 2px 0 2.5%;\r\n}\r\n\r\n.fc-time-grid .fc-event,\r\n.fc-time-grid .fc-bgevent {\r\n\tposition: absolute;\r\n\tz-index: 1; /* scope inner z-index's */\r\n}\r\n\r\n.fc-time-grid .fc-bgevent {\r\n\t/* background events always span full width */\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n\r\n/* Generic Vertical Event\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-v-event.fc-not-start { /* events that are continuing from another day */\r\n\t/* replace space made by the top border with padding */\r\n\tborder-top-width: 0;\r\n\tpadding-top: 1px;\r\n\r\n\t/* remove top rounded corners */\r\n\tborder-top-left-radius: 0;\r\n\tborder-top-right-radius: 0;\r\n}\r\n\r\n.fc-v-event.fc-not-end {\r\n\t/* replace space made by the top border with padding */\r\n\tborder-bottom-width: 0;\r\n\tpadding-bottom: 1px;\r\n\r\n\t/* remove bottom rounded corners */\r\n\tborder-bottom-left-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n\r\n/* TimeGrid Event Styling\r\n----------------------------------------------------------------------------------------------------\r\nWe use the full \"fc-time-grid-event\" class instead of using descendants because the event won't\r\nbe a descendant of the grid when it is being dragged.\r\n*/\r\n\r\n.fc-time-grid-event {\r\n\toverflow: hidden; /* don't let the bg flow over rounded corners */\r\n}\r\n\r\n.fc-time-grid-event.fc-selected {\r\n\t/* need to allow touch resizers to extend outside event's bounding box */\r\n\t/* common fc-selected styles hide the fc-bg, so don't need this anyway */\r\n\toverflow: visible;\r\n}\r\n\r\n.fc-time-grid-event.fc-selected .fc-bg {\r\n\tdisplay: none; /* hide semi-white background, to appear darker */\r\n}\r\n\r\n.fc-time-grid-event .fc-content {\r\n\toverflow: hidden; /* for when .fc-selected */\r\n}\r\n\r\n.fc-time-grid-event .fc-time,\r\n.fc-time-grid-event .fc-title {\r\n\tpadding: 0 1px;\r\n}\r\n\r\n.fc-time-grid-event .fc-time {\r\n\tfont-size: .85em;\r\n\twhite-space: nowrap;\r\n}\r\n\r\n/* short mode, where time and title are on the same line */\r\n\r\n.fc-time-grid-event.fc-short .fc-content {\r\n\t/* don't wrap to second line (now that contents will be inline) */\r\n\twhite-space: nowrap;\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time,\r\n.fc-time-grid-event.fc-short .fc-title {\r\n\t/* put the time and title on the same line */\r\n\tdisplay: inline-block;\r\n\tvertical-align: top;\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time span {\r\n\tdisplay: none; /* don't display the full time text... */\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time:before {\r\n\tcontent: attr(data-start); /* ...instead, display only the start time */\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time:after {\r\n\tcontent: \"\\000A0-\\000A0\"; /* seperate with a dash, wrapped in nbsp's */\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-title {\r\n\tfont-size: .85em; /* make the title text the same size as the time */\r\n\tpadding: 0; /* undo padding from above */\r\n}\r\n\r\n/* resizer (cursor device) */\r\n\r\n.fc-time-grid-event.fc-allow-mouse-resize .fc-resizer {\r\n\tleft: 0;\r\n\tright: 0;\r\n\tbottom: 0;\r\n\theight: 8px;\r\n\toverflow: hidden;\r\n\tline-height: 8px;\r\n\tfont-size: 11px;\r\n\tfont-family: monospace;\r\n\ttext-align: center;\r\n\tcursor: s-resize;\r\n}\r\n\r\n.fc-time-grid-event.fc-allow-mouse-resize .fc-resizer:after {\r\n\tcontent: \"=\";\r\n}\r\n\r\n/* resizer (touch device) */\r\n\r\n.fc-time-grid-event.fc-selected .fc-resizer {\r\n\t/* 10x10 dot */\r\n\tborder-radius: 5px;\r\n\tborder-width: 1px;\r\n\twidth: 8px;\r\n\theight: 8px;\r\n\tborder-style: solid;\r\n\tborder-color: inherit;\r\n\tbackground: #fff;\r\n\t/* horizontally center */\r\n\tleft: 50%;\r\n\tmargin-left: -5px;\r\n\t/* center on the bottom edge */\r\n\tbottom: -5px;\r\n}\r\n\r\n\r\n/* Now Indicator\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid .fc-now-indicator-line {\r\n\tborder-top-width: 1px;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* arrow on axis */\r\n\r\n.fc-time-grid .fc-now-indicator-arrow {\r\n\tmargin-top: -5px; /* vertically center on top coordinate */\r\n}\r\n\r\n.fc-ltr .fc-time-grid .fc-now-indicator-arrow {\r\n\tleft: 0;\r\n\t/* triangle pointing right... */\r\n\tborder-width: 5px 0 5px 6px;\r\n\tborder-top-color: transparent;\r\n\tborder-bottom-color: transparent;\r\n}\r\n\r\n.fc-rtl .fc-time-grid .fc-now-indicator-arrow {\r\n\tright: 0;\r\n\t/* triangle pointing left... */\r\n\tborder-width: 5px 6px 5px 0;\r\n\tborder-top-color: transparent;\r\n\tborder-bottom-color: transparent;\r\n}\r\n\r\n\r\n\r\n/* List View\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* possibly reusable */\r\n\r\n.fc-event-dot {\r\n\tdisplay: inline-block;\r\n\twidth: 10px;\r\n\theight: 10px;\r\n\tborder-radius: 5px;\r\n}\r\n\r\n/* view wrapper */\r\n\r\n.fc-rtl .fc-list-view {\r\n\tdirection: rtl; /* unlike core views, leverage browser RTL */\r\n}\r\n\r\n.fc-list-view {\r\n\tborder-width: 1px;\r\n\tborder-style: solid;\r\n}\r\n\r\n/* table resets */\r\n\r\n.fc .fc-list-table {\r\n\ttable-layout: auto; /* for shrinkwrapping cell content */\r\n}\r\n\r\n.fc-list-table td {\r\n\tborder-width: 1px 0 0;\r\n\tpadding: 8px 14px;\r\n}\r\n\r\n.fc-list-table tr:first-child td {\r\n\tborder-top-width: 0;\r\n}\r\n\r\n/* day headings with the list */\r\n\r\n.fc-list-heading {\r\n\tborder-bottom-width: 1px;\r\n}\r\n\r\n.fc-list-heading td {\r\n\tfont-weight: bold;\r\n}\r\n\r\n.fc-ltr .fc-list-heading-main { float: left; }\r\n.fc-ltr .fc-list-heading-alt { float: right; }\r\n\r\n.fc-rtl .fc-list-heading-main { float: right; }\r\n.fc-rtl .fc-list-heading-alt { float: left; }\r\n\r\n/* event list items */\r\n\r\n.fc-list-item.fc-has-url {\r\n\tcursor: pointer; /* whole row will be clickable */\r\n}\r\n\r\n.fc-list-item:hover td {\r\n\tbackground-color: #f5f5f5;\r\n}\r\n\r\n.fc-list-item-marker,\r\n.fc-list-item-time {\r\n\twhite-space: nowrap;\r\n\twidth: 1px;\r\n}\r\n\r\n/* make the dot closer to the event title */\r\n.fc-ltr .fc-list-item-marker { padding-right: 0; }\r\n.fc-rtl .fc-list-item-marker { padding-left: 0; }\r\n\r\n.fc-list-item-title a {\r\n\t/* every event title cell has an <a> tag */\r\n\ttext-decoration: none;\r\n\tcolor: inherit;\r\n}\r\n\r\n.fc-list-item-title a[href]:hover {\r\n\t/* hover effect only on titles with hrefs */\r\n\ttext-decoration: underline;\r\n}\r\n\r\n/* message when no events */\r\n\r\n.fc-list-empty-wrap2 {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n\tbottom: 0;\r\n}\r\n\r\n.fc-list-empty-wrap1 {\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tdisplay: table;\r\n}\r\n\r\n.fc-list-empty {\r\n\tdisplay: table-cell;\r\n\tvertical-align: middle;\r\n\ttext-align: center;\r\n}\r\n\r\n.fc-unthemed .fc-list-empty { /* theme will provide own background */\r\n\tbackground-color: #eee;\r\n}\r\n"; });
@@ -63683,7 +64078,7 @@ define('text!modules/tech/requests/viewUserRequests.html', ['module'], function(
 define('text!modules/tech/support/archiveHelpTickets.html', ['module'], function(module) { module.exports = "<template>\r\n    <span id=\"loading\">\r\n        <ul class=\"bokeh\">\r\n            <li></li>\r\n            <li></li>\r\n            <li></li>\r\n        </ul>\r\n    </span>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div show.bind=\"!helpTicketSelected\" class=\"col-lg-12\">\r\n                    <compose view=\"./components/searchHTForm.html\"></compose>\r\n                </div> <!-- Table Div -->\r\n                <div show.bind=\"helpTicketSelected\" class=\"col-lg-12\">\r\n                    <compose view=\"./components/viewHTSearchResults.html\"></compose>\r\n                </div> <!-- Form Div -->\r\n            </div> <!-- Row -->\r\n        </div> <!-- Panel Body -->\r\n</template>"; });
 define('text!modules/tech/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"col-lg-4\">\r\n            <compose view='./components/helpTicketType.html'></compose>\r\n            <compose view='./components/Requests.html' show.bind=\"showRequests\"></compose>\r\n        </div>\r\n        <div class=\"col-lg-8\">\r\n            <compose show.bind=\"showAdditionalInfo\" view='./components/helpTicketDetails.html'></compose>\r\n        </div>\r\n      </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/tech/support/support.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../../resources/elements/submenu.html'></compose>   \r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template>"; });
-define('text!modules/tech/support/viewHelpTickets.html', ['module'], function(module) { module.exports = "<template>\r\n    <span id=\"loading\">\r\n        <ul class=\"bokeh\">\r\n            <li></li>\r\n            <li></li>\r\n            <li></li>\r\n        </ul>\r\n    </span>\r\n    <div show.bind=\"dataTable.displayArray && dataTable.displayArray.length || initialLoaded\" class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div show.bind=\"!helpTicketSelected\" class=\"col-lg-12\">\r\n                    <div show.bind=\"helpTickets.helpTicketsArray && helpTickets.helpTicketsArray.length === 0\" class=\"bottomMargin leftMargin\">\r\n                        <h4>There are no open help tickets</h4>\r\n                    </div>\r\n                    <compose show.bind=\"helpTickets.helpTicketsArray && helpTickets.helpTicketsArray.length > 0\" view=\"./components/viewHTTable.html\"></compose>\r\n                </div>\r\n\r\n                <div show.bind=\"helpTicketSelected && !showAssignment\" class=\"col-lg-12\">\r\n                    <compose view=\"./components/viewHTForm.html\"></compose>\r\n                </div>\r\n\r\n                <div show.bind=\"helpTicketSelected && showAssignment\" class=\"col-lg-12\">\r\n                        <compose view=\"./components/viewAssignmentForm.html\"></compose>\r\n                </div>\r\n\r\n            </div>\r\n        </div>\r\n\r\n</template>"; });
+define('text!modules/tech/support/viewHelpTickets.html', ['module'], function(module) { module.exports = "<template>\r\n    <span id=\"loading\">\r\n        <ul class=\"bokeh\">\r\n            <li></li>\r\n            <li></li>\r\n            <li></li>\r\n        </ul>\r\n    </span>\r\n    <div show.bind=\"dataTable.displayArray && dataTable.displayArray.length || initialLoaded\" class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div show.bind=\"!helpTicketSelected\" class=\"col-lg-12\">\r\n                    <div show.bind=\"helpTickets.helpTicketsArray && helpTickets.helpTicketsArray.length === 0\" class=\"bottomMargin leftMargin\">\r\n                        <h4>There are no open help tickets <span click.trigger=\"refresh()\" class=\"marginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span></h4>\r\n                    </div>\r\n                    <compose show.bind=\"helpTickets.helpTicketsArray && helpTickets.helpTicketsArray.length > 0\" view=\"./components/viewHTTable.html\"></compose>\r\n                </div>\r\n\r\n                <div show.bind=\"helpTicketSelected && !showAssignment\" class=\"col-lg-12\">\r\n                    <compose view=\"./components/viewHTForm.html\"></compose>\r\n                </div>\r\n\r\n                <div show.bind=\"helpTicketSelected && showAssignment\" class=\"col-lg-12\">\r\n                        <compose view=\"./components/viewAssignmentForm.html\"></compose>\r\n                </div>\r\n\r\n            </div>\r\n        </div>\r\n\r\n</template>"; });
 define('text!modules/social/components/blogForm.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class=\"container\">\r\n\t\t<div class=\"bottomMargin list-group-item\">\r\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<span show.bind=\"!newItem\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n\t\t\t\ttitle=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n\t\t</div>\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\r\n\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t<label for=\"editTitle\" class=\"control-label hideOnPhone\">Title</label>\r\n\t\t\t\t\t\t<input value.bind=\"social.selectedBlog.title\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\r\n\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t<label for=\"editTeaser\" class=\"control-label hideOnPhone\">Teaser</label>\r\n\t\t\t\t\t\t<textarea value.bind=\"social.selectedBlog.teaser\" id=\"editTeaser\" rows=\"5\" class=\"form-control\" placeholder=\"Teaser\" type=\"text\" ></textarea>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"topMargin\">\r\n\t\t\t\t<editor id=\"blogContent\" value.bind=\"social.selectedBlog.text\" height=\"800\"></editor>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>"; });
 define('text!modules/social/components/blogList.html', ['module'], function(module) { module.exports = "<template>\r\n\t<ul>\r\n\t\t<li show.bind=\"blog.active\" class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"blog of social.blogArray\">\r\n\t\t<div class=\"media-left\">\r\n\t\t\t<img  if.bind=\"blog.personId.file.fileName\" class=\"circular--square leftMargin\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${blog.personId.file.fileName}\" height=\"100\">\r\n\t\t</div>\r\n\t\t<div  class=\"media-left\" if.bind=\"!blog.personId.file.fileName\" style=\"height:100px;width:100px;\" innerhtml.bind=\"blog.personId.email | gravatarUrl:100:6\"></div>\r\n\t\t\t<div class=\"media-body\">\r\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\r\n\t\t\t\t\t<h4>${blog.title}</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\r\n\t\t\t\t\t<span>${blog.teaser}</span>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\r\n\t\t\t\t\t<span>${blog.dateCreated | dateFormat}</span>\r\n\t\t\t\t\t<span class=\"leftMargin\">Likes: ${blog.likes}</span>\r\n\t\t\t\t\t<span click.trigger=\"like($index)\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\t\t\tdata-original-title=\"Like\"><i class=\"fa fa-thumbs-o-up fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t\t<span show.bind=\"blog.views > 0\" class=\"leftMargin\">Views: ${blog.views}</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</li>\r\n\t</ul>\r\n</template>"; });
 define('text!modules/social/components/blogListUCC.html', ['module'], function(module) { module.exports = "<template>\r\n\t<ul>\r\n\t\t<li class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"blog of social.blogArray\">\r\n\t\t\t<div class=\"media-left\">\r\n\t\t\t<img  if.bind=\"blog.personId.file.fileName\" class=\"circular--square leftMargin\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${blog.personId.file.fileName}\" height=\"100\">\r\n\t\t</div>\r\n          <div class=\"media-left\" if.bind=\"!blog.personId.file.fileName\" style=\"height:100px;width:100px;\" innerhtml.bind=\"blog.personId.email | gravatarUrl:100:6\"></div>\r\n\t\t<!--\t<div class=\"media-left\" innerhtml='${blog.personId.email | gravatarUrl:100:1}'></div> -->\r\n\t\t\t<div class=\"media-body\">\r\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\r\n\t\t\t\t\t<h4>${blog.title}</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\r\n\t\t\t\t\t<span>${blog.teaser}</span>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\r\n\t\t\t\t\t<span>${blog.dateCreated | dateFormat}</span>\r\n\t\t\t\t\t<span class=\"leftMargin\">Likes: ${blog.likes}</span>\r\n\t\t\t\t\t<span show.bind=\"blog.views > 0\" class=\"leftMargin\">Views: ${blog.views}</span>\r\n\t\t\t\t\t<span class=\"leftMargin\">Active: ${blog.active}</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</li>\r\n\t</ul>\r\n</template>"; });
@@ -63693,8 +64088,8 @@ define('text!modules/social/components/chapterList.html', ['module'], function(m
 define('text!modules/social/components/forumList.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div>\r\n\t\t<div class=\"bottomMargin list-group-item\">\r\n\t\t\t<span click.delegate=\"newForum()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n\t\t\t\ttitle=\"\" data-original-title=\"New Forum\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t</div>\r\n\t\t<div show.bind=\"openNewForumForm\">\r\n\t\t\t<div class=\"bottomMargin list-group-item\">\r\n\t\t\t\t<span click.delegate=\"saveForum()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n\t\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\r\n\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t<label for=\"editTitle\" class=\"control-label hideOnPhone\">Title</label>\r\n\t\t\t\t\t\t<input value.bind=\"title\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\r\n\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t<label for=\"editTeaser\" class=\"control-label hideOnPhone\">Description</label>\r\n\t\t\t\t\t\t<textarea value.bind=\"text\" id=\"editTeaser\" rows=\"5\" class=\"form-control\" placeholder=\"Description\" type=\"text\" ></textarea>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\t<ul>\r\n\t\t<li show.bind=\"forum.active\" class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"forum of social.forumArray\">\r\n\t\t\t<div class=\"media-body\">\r\n\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\r\n\t\t\t\t\t<h4>${forum.title}</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\r\n\t\t\t\t\t<span>${forum.text}</span>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\r\n\t\t\t\t\t<span>${forum.dateCreated | dateFormat}</span>\r\n\t\t\t\t\t<span class=\"leftMargin\">Topics: ${forum.topics}</span>\r\n\t\t\t\t\t<span class=\"leftMargin\">Posts: ${forum.posts}</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</li>\r\n\t</ul>\r\n</template>"; });
 define('text!modules/social/components/forumPage.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class=\"container\">\r\n\t\t<div class=\"bottomMargin list-group-item\">\r\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t</div>\r\n\t\t<div class=\"list-group-item\" style=\"margin-top:5px;\">\r\n\t\t\t<div class=\"media-body\">\r\n\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t<h4>${social.selectedForum.title}</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t<span>${social.selectedForum.text}</span>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\r\n\t\t\t\t\t<span>${social.selectedForum.dateCreated | dateFormat}</span>\r\n\t\t\t\t\t<span class=\"leftMargin\">Topics: ${social.selectedForum.topics}</span>\r\n\t\t\t\t\t<span class=\"leftMargin\">Posts: ${social.selectedForum.posts}</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div class=\"bottomMargin topMargin list-group-item\">\r\n\t\t\t<span click.delegate=\"newForumTopic()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n\t\t\t\ttitle=\"\" data-original-title=\"New Forum Topic\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t</div>\r\n\t\t<div show.bind=\"openNewTopicForm || openMessageForm\">\r\n\t\t\t<div class=\"bottomMargin list-group-item\">\r\n\t\t\t\t<span click.delegate=\"saveForumTopic()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n\t\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div show.bind=\"openNewTopicForm\" class=\"col-sm-12 col-lg-12\">\r\n\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t<label for=\"editTitle\" class=\"control-label hideOnPhone\">Title</label>\r\n\t\t\t\t\t\t<input value.bind=\"FormTopicTitle\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\r\n\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t<label for=\"editTeaser\" class=\"control-label hideOnPhone\">Description</label>\r\n\t\t\t\t\t\t<textarea value.bind=\"ForumTopicText\" id=\"editTeaser\" rows=\"5\" class=\"form-control\" placeholder=\"Description\" type=\"text\" ></textarea>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<ul>\r\n\t\t\t<li class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"message of social.selectedForum.messages\">\r\n\t\t\t\t<div class=\"media-left\" innerhtml='${message.personId | gravatarUrlId:people.peopleArray:100:1}'></div>\r\n\t\t\t\t<div class=\"media-body\">\r\n\t\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\r\n\t\t\t\t\t\t<h4>${message.title}</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\r\n\t\t\t\t\t\t<span>${message.text}</span>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\r\n\t\t\t\t\t\t<span>${message.dateCreated | dateFormat}</span>\r\n\t\t\t\t\t\t<span click.delegate=\"respond(message, $index)\" class=\"leftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\t\t\t\tdata-original-title=\"Respond\"><i class=\"fa fa-mail-reply fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</li>\r\n\t\t</ul>\r\n\t</div>\r\n</template>"; });
 define('text!modules/social/components/writeBlogList.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class=\"bottomMargin list-group-item\">\r\n\t\t\t<span click.delegate=\"new()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\tdata-original-title=\"New\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t</div>\r\n\t<ul>\r\n\t\t<li show.bind=\"blog.active\" class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"blog of social.blogArray\">\r\n\t\t\t<div class=\"media-left\" innerhtml='${blog.personId.email | gravatarUrl:100:1}'></div>\r\n\t\t\t<div class=\"media-body\">\r\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\r\n\t\t\t\t\t<h4>${blog.title}</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\r\n\t\t\t\t\t<span>${blog.teaser}</span>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\r\n\t\t\t\t\t<span>${blog.dateCreated | dateFormat}</span>\r\n\t\t\t\t\t<span class=\"leftMargin\">Likes: ${blog.likes}</span>\r\n\t\t\t\t\t<span show.bind=\"blog.views > 0\" class=\"leftMargin\">Views: ${blog.views}</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</li>\r\n\t</ul>\r\n</template>"; });
-define('text!modules/techNotes/components/notesForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\">\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"people.selectedNote._id\" click.delegate=\"delete()\" class=\"smallMarginRight\"\r\n                bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i\r\n                    class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>\r\n        <form class=\"form-horizontal topMargin\">\r\n            <div class=\"col-lg-4\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedTechNote.title\" id=\"editTitle\" class=\"form-control \"\r\n                                    placeholder=\"Title\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"product\" class=\"col-lg-2 control-label hideOnPhone\">Product</label>\r\n                            <div class=\"col-lg-8\">\r\n                                <select value.bind=\"people.selectedTechNote.productId._id\" id=\"product\" class=\"form-control\">\r\n                                    <option model.bind=\"-1\">Select a product</opton>\r\n                                    <option repeat.for=\"product of products.productsArray\" model.bind=\"product._id\">${product.name}</option>\r\n                                </select>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"system\" class=\"col-lg-2 control-label hideOnPhone\">System</label>\r\n                            <div class=\"col-lg-8\">\r\n                                <select value.bind=\"people.selectedTechNote.systemId._id\" id=\"system\" class=\"form-control\">\r\n                                    <option model.bind=\"-1\">Select a system</opton>\r\n                                    <option repeat.for=\"system of systems.systemsArray\" model.bind=\"system._id\">${system.sid}</option>\r\n                                </select>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"category\" class=\"col-lg-2 control-label hideOnPhone\">Category *</label>\r\n                            <div class=\"col-lg-8\">\r\n                                <select value.bind=\"people.selectedTechNote.categoryId._id\" id=\"category\" class=\"form-control\">\r\n                                    <option value=\"\">Select a category</opton>\r\n                                    <option repeat.for=\"category of people.techNotesCatArray\" value.bind=\"category._id\">${category.category}</option>\r\n                                </select>\r\n                                <a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add\r\n                                    a Category)</a>\r\n                                <a class=\"btn btn-link\" disable.bind=\"people.selectedTechNote.categoryId == '-1'\"\r\n                                    click.trigger=\"openEditCatForm('edit')\" aria-hidden=\"true\">(Edit this Category)</a>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showCategoryForm\" class=\"row col-lg-8 col-lg-offset-2\">\r\n                    <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                        <div class=\"panel-body\">\r\n                            <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\r\n                                <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip\r\n                                    data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Category\"><i\r\n                                        class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip\r\n                                    data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i\r\n                                        class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                <span show.bind=\" editCategoryFlag\" click.delegate=\"deleteCat()\" class=\"smallMarginRight\"\r\n                                    bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                                    data-original-title=\"Delete Category\"><i class=\"fa fa-trash fa-lg fa-border text-danger\"\r\n                                        aria-hidden=\"true\"></i></span>\r\n                            </div>\r\n                            <div class=\"row\">\r\n                                <div class=\"col-sm-12 col-lg-12\">\r\n                                    <div class=\"form-group\">\r\n                                        <label for=\"editTitle\" class=\"col-lg-2 control-label hideOnPhone\">Category</label>\r\n                                        <div class=\"col-sm-10\">\r\n                                            <input value.bind=\"people.selectedTechNoteCat.category\" id=\"editCategoryName\"\r\n                                                class=\"form-control \" placeholder=\"Category\" type=\"text\" />\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"reminderDate\" class=\"col-sm-2 control-label hideOnPhone\">Reminder Date</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <flat-picker controlid=\"reminderDate\" config.bind=\"config\" value.bind=\"people.selectedTechNote.dateRemind\"></flat-picker>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editFileReference\" class=\"col-sm-2 control-label hideOnPhone\">File Reference</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedTechNote.fileReference\" id=\"editFileReference\" class=\"form-control \"\r\n                                    placeholder=\"File reference\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label class=\"col-sm-2 control-label hideOnPhone\">File</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <a href=\"${config.TECHNOTE_FILE_DOWNLOAD_URL}/${people.selectedTechNote.file.fileName}\"\r\n                                    target=\"_blank\">${people.selectedTechNote.file.originalFilename}</a>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div>\r\n                        <div class=\"col-lg-5 col-sm-offset-2 topMargin\">\r\n                            <label class=\"btn btn-primary\">\r\n                                Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"\r\n                                    files.bind=\"files\">\r\n                            </label>\r\n                        </div>\r\n                        <div class=\"col-lg-10 topMargin\">\r\n                            <ul>\r\n                                <li repeat.for=\"file of filesToUpload\" class=\"list-group-item\">${file.name}<span\r\n                                        click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\"\r\n                                            aria-hidden=\"true\"></i></span></li>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-lg-7\">\r\n                <div>\r\n                    <span id=\"noteError\"></span>\r\n                    <div>\r\n                        <span id=\"noteError\"></span>\r\n                        <editor value.bind=\"people.selectedTechNote.note\" toolbar.bind=\"toolbar\" height=\"500\"></editor>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n        </form>\r\n    </div>\r\n</template>"; });
-define('text!modules/techNotes/components/notesTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\" style='padding:15px;'>\r\n        <div class='row'>\r\n            <div class='col-lg-12 bottomMargin'>\r\n                <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                <div id=\"no-more-tables\">\r\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <td colspan='5'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:250px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'NoteNo'})\">Note No </span><i class=\"fa fa-sort\"></i></th>\r\n                                <th style=\"width:250px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'title'})\">Title </span><i class=\"fa fa-sort\"></i></th>\r\n                                <th style=\"width:150px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customPersonSorter, propertyName: 'personId'})\">Person </span><i class=\"fa fa-sort\"></i></th>                   \r\n                                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customCategorySorter, propertyName: 'personId'})\">Category </span><i class=\"fa fa-sort\"></i></th>                   \r\n                                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customProductSorter, propertyName: 'personId'})\">Product </span><i class=\"fa fa-sort\"></i></th>                   \r\n                                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customSystemSorter, propertyName: 'personId'})\">System </span><i class=\"fa fa-sort\"></i></th>   \r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th></th>\r\n                            </tr>\r\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                                <td  data-title=\"Note No\">${item.NoteNo}</td>\r\n                                <td  data-title=\"Note No\">${item.title}</td>\r\n                                <td  data-title=\"Person\">${item.personId.fullName}</td>\r\n                                <td data-title=\"Catgory\">${item.categoryId.category}</td>\r\n                                <td data-title=\"Catgory\">${item.productId.name}</td>\r\n                                <td data-title=\"Catgory\">${item.systemId.sid}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/techNotes/components/notesForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\">\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"people.selectedNote._id\" click.delegate=\"delete()\" class=\"smallMarginRight\"\r\n                bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i\r\n                    class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>\r\n        <form class=\"form-horizontal topMargin\">\r\n            <div class=\"col-lg-4\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedTechNote.title\" id=\"editTitle\" class=\"form-control \"\r\n                                    placeholder=\"Title\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"product\" class=\"col-lg-2 control-label hideOnPhone\">Product</label>\r\n                            <div class=\"col-lg-8\">\r\n                                <select value.bind=\"people.selectedTechNote.productId._id\" id=\"product\" class=\"form-control\">\r\n                                    <option model.bind=\"-1\">Select a product</opton>\r\n                                    <option repeat.for=\"product of products.productsArray\" model.bind=\"product._id\">${product.name}</option>\r\n                                </select>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"category\" class=\"col-lg-2 control-label hideOnPhone\">Category *</label>\r\n                            <div class=\"col-lg-8\">\r\n                                <select value.bind=\"people.selectedTechNote.categoryId._id\" id=\"category\" class=\"form-control\">\r\n                                    <option value=\"\">Select a category</opton>\r\n                                    <option repeat.for=\"category of people.techNotesCatArray\" value.bind=\"category._id\">${category.category}</option>\r\n                                </select>\r\n                                <a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add\r\n                                    a Category)</a>\r\n                                <a class=\"btn btn-link\" disable.bind=\"people.selectedTechNote.categoryId == '-1'\"\r\n                                    click.trigger=\"openEditCatForm('edit')\" aria-hidden=\"true\">(Edit this Category)</a>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showCategoryForm\" class=\"row col-lg-8 col-lg-offset-2\">\r\n                    <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                        <div class=\"panel-body\">\r\n                            <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\r\n                                <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip\r\n                                    data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Category\"><i\r\n                                        class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip\r\n                                    data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i\r\n                                        class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                <span show.bind=\" editCategoryFlag\" click.delegate=\"deleteCat()\" class=\"smallMarginRight\"\r\n                                    bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                                    data-original-title=\"Delete Category\"><i class=\"fa fa-trash fa-lg fa-border text-danger\"\r\n                                        aria-hidden=\"true\"></i></span>\r\n                            </div>\r\n                            <div class=\"row\">\r\n                                <div class=\"col-sm-12 col-lg-12\">\r\n                                    <div class=\"form-group\">\r\n                                        <label for=\"editTitle\" class=\"col-lg-2 control-label hideOnPhone\">Category</label>\r\n                                        <div class=\"col-sm-10\">\r\n                                            <input value.bind=\"people.selectedTechNoteCat.category\" id=\"editCategoryName\"\r\n                                                class=\"form-control \" placeholder=\"Category\" type=\"text\" />\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"reminderDate\" class=\"col-sm-2 control-label hideOnPhone\">Reminder Date</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <flat-picker controlid=\"reminderDate\" config.bind=\"config\" value.bind=\"people.selectedTechNote.dateRemind\"></flat-picker>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editFileReference\" class=\"col-sm-2 control-label hideOnPhone\">File Reference</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedTechNote.fileReference\" id=\"editFileReference\" class=\"form-control \"\r\n                                    placeholder=\"File reference\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label class=\"col-sm-2 control-label hideOnPhone\">File</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <a href=\"${config.TECHNOTE_FILE_DOWNLOAD_URL}/${people.selectedTechNote.file.fileName}\"\r\n                                    target=\"_blank\">${people.selectedTechNote.file.originalFilename}</a>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div>\r\n                        <div class=\"col-lg-5 col-sm-offset-2 topMargin\">\r\n                            <label class=\"btn btn-primary\">\r\n                                Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"\r\n                                    files.bind=\"files\">\r\n                            </label>\r\n                        </div>\r\n                        <div class=\"col-lg-10 topMargin\">\r\n                            <ul>\r\n                                <li repeat.for=\"file of filesToUpload\" class=\"list-group-item\">${file.name}<span\r\n                                        click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\"\r\n                                            aria-hidden=\"true\"></i></span></li>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-lg-7\">\r\n                <compose view=\"./Systems.html\"></compose>\r\n            </div>\r\n        </form>\r\n        <div class=\"row\">\r\n                <div class=\"col-lg-8  col-lg-offset-2 topMargin\">\r\n                <span id=\"noteError\"></span>\r\n                <editor value.bind=\"people.selectedTechNote.note\" toolbar.bind=\"toolbar\" height=\"500\"></editor>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/techNotes/components/notesTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\" style='padding:15px;'>\r\n        <div class='row'>\r\n            <div class='col-lg-12 bottomMargin'>\r\n                <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                <div id=\"no-more-tables\">\r\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <td colspan='5'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:250px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'NoteNo'})\">Note No </span><i class=\"fa fa-sort\"></i></th>\r\n                                <th style=\"width:250px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'title'})\">Title </span><i class=\"fa fa-sort\"></i></th>\r\n                                <th style=\"width:150px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customPersonSorter, propertyName: 'personId'})\">Person </span><i class=\"fa fa-sort\"></i></th>                   \r\n                                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customCategorySorter, propertyName: 'personId'})\">Category </span><i class=\"fa fa-sort\"></i></th>                   \r\n                                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customProductSorter, propertyName: 'personId'})\">Product </span><i class=\"fa fa-sort\"></i></th>                   \r\n                                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customSystemSorter, propertyName: 'personId'})\">System </span><i class=\"fa fa-sort\"></i></th>   \r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th></th>\r\n                            </tr>\r\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                                <td  data-title=\"Note No\">${item.NoteNo}</td>\r\n                                <td  data-title=\"Note No\">${item.title}</td>\r\n                                <td  data-title=\"Person\">${item.personId.fullName}</td>\r\n                                <td data-title=\"Catgory\">${item.categoryId.category}</td>\r\n                                <td data-title=\"Catgory\">${item.productId.name}</td>\r\n                                <td data-title=\"Catgory\">${item.systems | systemList}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/techNotes/notes/techNotes.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"!noteSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/notesTable.html\"></compose>\r\n            </div> <!-- Table Div -->\r\n            <div show.bind=\"noteSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/notesForm.html\"></compose>\r\n            </div> <!-- Form Div -->\r\n        </div> <!-- Row -->\r\n      </div> <!-- Panel Body -->\r\n</template>"; });
 define('text!modules/user/components/banner.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"subMenu-container\">\r\n    <div class=\"textContainer banner subMenu\">\r\n      <span show.bind=\"temp\" class=\"leftMargin hidden-sm hidden-xs\">\r\n        <h4>${userObj.institutionId.city} weather: ${temp} </h4>\r\n        <img src=\"${weatherIcon}\" class=\"weatherIcon smallLeftMargin\">\r\n      </span>\r\n      <span show.bind=\"ucctemp\" class=\"leftMargin hidden-sm hidden-xs\">\r\n        <h4>UCC weather: ${ucctemp} </h4>\r\n        <img src=\"${uccweatherIcon}\" class=\"weatherIcon smallLeftMargin\">\r\n      </span>\r\n      <span id=\"notice\" repeat.for=\"site of siteinfo.siteArray | infoFilter:'BANN'\" innerhtml.bind=\"site.content\">\r\n       \r\n      </span>\r\n      <div class=\"pull-right\">\r\n        <span show.bind=\"userObj.userRole < config.UCC_ROLE\" class=\"hidden-sm hidden-xs\">\r\n\t\t\t\t\t<a href=\"#/clientRequests\" class=\"rightMargin\" if.bind=\"showRequests > 0\" style=\"text-decoration: none;\">Requests <span class=\"badge\">${showRequests}</span></a>            \r\n\t\t\t\t\t<a href=\"#/support\" class=\"rightMargin\" if.bind=\"showHelpTickets > 0\" style=\"text-decoration: none;\">Help Tickets <span class=\"badge\">${showHelpTickets}</span></a>\r\n\t\t\t\t</span>\r\n\t\t\t\t<span show.bind=\"userObj.userRole >= config.UCC_ROLE\" class=\"hidden-sm hidden-xs\">\r\n          <a href=\"#/notes/editCalendar\" class=\"rightMargin\" if.bind=\"eventArray.length > 0\" style=\"text-decoration: none;\">Events <span class=\"badge\">${eventArray.length}</span></a>  \r\n\t\t\t\t\t<a href=\"#/techRq\" class=\"rightMargin\" if.bind=\"showRequests > 0\" style=\"text-decoration: none;\">Requests <span class=\"badge\">${showRequests}</span></a>            \r\n\t\t\t\t\t<a href=\"#/techHt\" class=\"rightMargin\" if.bind=\"showHelpTickets > 0\" style=\"text-decoration: none;\">Help Tickets <span class=\"badge\">${showHelpTickets}</span></a>\r\n\t\t\t\t</span>\r\n        <span show.bind=\"alertIndex > -1\" click.delegate=\"openAlert(siteinfo.siteArray[alertIndex])\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n          title=\"\" data-original-title=\"Alerts\"><i class=\"fa fa-bell-o fa-border\" aria-hidden=\"true\"></i></span>\r\n        <span class=\"rightMargin\"><h4>Welcome ${userObj.fullName}</h4></span>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>\r\n"; });
 define('text!modules/user/components/carousel.html', ['module'], function(module) { module.exports = "<template>\r\n  <div show.bind=\"showCarousel\" id=\"carousel-example-generic\" class=\"carousel slide bigTopMargin carouselSize\" data-ride=\"carousel\">\r\n    <!-- Indicators -->\r\n    <ol class=\"carousel-indicators\">\r\n      <li data-target=\"#carousel-example-generic\" data-slide-to=\"${$index}\" class=\"$firts ? 'active' : '''\" repeat.for=\"item of siteinfo.siteArray | infoFilter:'CARO'\"></li>\r\n    </ol>\r\n\r\n    <!-- Wrapper for slides -->\r\n    <div class=\"carousel-inner\" role=\"listbox\">\r\n      <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'CARO'\" class=\"${$first ? 'item active' : 'item'}\">\r\n        <a href=\"${item.url}\" target=\"_blank\"><img src=\"${item.url}\" class=\"d-block img-fluid img-responsive\"  alt=\"${item.title}\"></a>\r\n        <div class=\"carousel-caption\">\r\n          <h3>${item.title}</h3>\r\n        </div>\r\n      </div>\r\n    </div>\r\n\r\n    <!-- Controls -->\r\n    <a class=\"left carousel-control\" href=\"#carousel-example-generic\" role=\"button\" data-slide=\"prev\">\r\n      <span class=\"glyphicon glyphicon-chevron-left\" aria-hidden=\"true\"></span>\r\n      <span class=\"sr-only\">Previous</span>\r\n    </a>\r\n    <a class=\"right carousel-control\" href=\"#carousel-example-generic\" role=\"button\" data-slide=\"next\">\r\n      <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span>\r\n      <span class=\"sr-only\">Next</span>\r\n    </a>\r\n  </div>\r\n  <div  class=\"carouselSize\" show.bind=\"!showCarousel\">\r\n    <img src=\"${config.IMG_DOWNLOAD_URL}${config.DEFAULT_HOME_IMAGE}\" height=\"600\" class=\"img-responsive\">\r\n  </div>\r\n"; });
@@ -63812,7 +64207,7 @@ define('text!modules/tech/support/components/viewArchiveHTForm.html', ['module']
 define('text!modules/tech/support/components/viewHelpTicketTableFilters.html', ['module'], function(module) { module.exports = "<template \"containerless\">\r\n\t<th></th>\r\n              <th class=\"col-md-1\">\r\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\r\n                        <option value=\"\"></option>\r\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\r\n                                value.bind=\"type.code\">${type.description}</option>\r\n                      </select>\r\n              </th>\r\n              <th>\r\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"owner.[0].personId\" compare=\"obj\">\r\n                  <option value=\"\"></option>\r\n                  <option repeat.for=\"person of people.peopleArray | uccStaff\"\r\n                          value.bind=\"person._id\">${person.fullName}</option>\r\n                </select>\r\n              </th>\r\n              <th></th>\r\n              <th>\r\n                <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\r\n                        <option value=\"\"></option>\r\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\r\n                                value.bind=\"status.code\">${status.description}</option>\r\n                      </select>\r\n              </th>\r\n              <th>\r\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\"\r\n                  class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\r\n              </th>\r\n              <th>\r\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\"\r\n                  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-nickName\" type=\"text\" compare=\"lookup\"\r\n                  class=\"form-control\" />\r\n              </th>\r\n              <th class=\"col-lg-1\">\r\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\r\n                    <option value=\"\"></option>\r\n                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                </select>\r\n              </th>\r\n</template>"; });
 define('text!modules/tech/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"hoverProfile\" >\r\n        <span  click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\r\n        <hr/>\r\n        <div class=\"col-md-4\">\r\n           <div class=\"topMargin\">\r\n              <img if.bind=\"personImage\" class=\"circular--square leftMargin\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${selectedRequestDetail.requestId.personId.file.fileName}\" height=\"100\">\r\n          </div>\r\n          <div if.bind=\"!personImage\" style=\"height:100px;width:100px;\" innerhtml.bind=\"selectedRequestDetail.requestId.personId.email | gravatarUrl:100:6\"></div>\r\n        </div>\r\n        <div class=\"col-md-8\">\r\n          <h5>Name: ${helpTickets.selectedHelpTicket.personId.fullName}</h5>\r\n          <h5>Phone: ${helpTickets.selectedHelpTicket.personId.phone | formatPhone}</h5>\r\n          <h5>Mobile: ${helpTickets.selectedHelpTicket.personId.mobile | formatPhone}</h5>\r\n          <h5>Email: ${helpTickets.selectedHelpTicket.personId.email}</h5>\r\n        </div>\r\n    </div>\r\n\r\n    <div class=\"col-lg-12\">\r\n      <div class=\"row\">\r\n        <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\r\n      </div>\r\n\r\n    <!-- Buttons -->\r\n    <div class=\"row\">\r\n      <div class=\"bottomMargin list-group-item leftMargin rightMargin\" id=\"toolbar\">\r\n          <span click.trigger=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n          <span click.trigger=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n          <span click.trigger=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n          <span click.trigger=\"ownHelpTicket()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n          <span click.trigger=\"flag()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Flag\"><i class=\"fa fa-flag fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n          <span click.trigger=\"showRequestsPanel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Requests\"><i class=\"fa fa-shopping-cart fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n          <span show.bind=\"showLockMessage\" click.trigger=\"unlockIt()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Unlock\"><i class=\"fa fa-unlock-alt fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n          <span class=\"pull-right\">${lockMessage}</span>\r\n      </div> \r\n    </div>\r\n\r\n    <div show.bind=\"showRequestPanel\">\r\n      <div class=\"row\">\r\n        <!-- Session Select -->\r\n        <div class=\"col-lg-4\">\r\n          <div class=\"form-group topMargin leftMargin\">\r\n              <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\r\n                <option repeat.for=\"session of sessions.sessionsArray\"\r\n                        value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\r\n              </select>\r\n          </div>\r\n        </div>\r\n        <div class=\"col-lg-6 topMargin\">\r\n          <compose view=\"./Requests.html\"></compose>\r\n        </div>\r\n      </div>\r\n    </div>\r\n    \r\n    <!-- Help Ticket Header -->\r\n    <div class=\"topMargin\">\r\n        <!-- Enter Response -->\r\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin \">\r\n\r\n          <div class=\"panel panel-default leftMargin rightMargin\" style=\"background-color:ghostwhite;\">\r\n            <div class=\"panel-body\">\r\n              <div class=\"list-group-item col-md-12 topMargin\">\r\n                <span  click.trigger=\"saveResponse(config.REVIEW_HELPTICKET_STATUS)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\" ></i></span>\r\n                <span  click.trigger=\"saveResponse(config.CUSTOMER_ACTION_HELPTICKET_STATUS)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save and Customer Action\"><i class=\"fa fa-users fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span  click.trigger=\"saveResponse(config.CLOSED_HELPTICKET_STATUS)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save and Close\"><i class=\"fa fa-window-close-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span  click.trigger=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n              </div>\r\n              <div class=\"row\">\r\n                  <div class=\"col-lg-1 topMargin\">\r\n                      <div class=\"checkbox \">\r\n                        <label>\r\n                          <input change.trigger=\"confidentialChecked()\" checked.bind=\"helpTickets.selectedHelpTicketContent.confidential\" id=\"confidentialCheckBox\" type=\"checkbox\"> Tech Staff\r\n                        </label>\r\n                      </div>\r\n                    </div>\r\n                    <div class=\"col-lg-2 topMargin\">\r\n                      <div class=\"checkbox\">\r\n                        <label>\r\n                          <input disabled.bind=\"sendMailDisable\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\r\n                        </label>\r\n                      </div>\r\n                    </div>\r\n                </div>\r\n               \r\n                <div class=\"leftMargin rightMargin\">\r\n                      <editor  value.bind=\"responseMessage\" toolbar.bind=\"toolbar\" height=\"250\"></editor>\r\n                      <p>&nbsp;</p>\r\n\r\n                      <div class=\"row hidden-xs hidden-sm\">\r\n                          <div class=\"col-lg-6\">\r\n                            <div class=\"col-lg-3\">\r\n                                <label id=\"fileControlLabel\" class=\"btn btn-primary\">\r\n                                    Browse for files <input  type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\" files.bind=\"files\" multiple>\r\n                                </label>\r\n                            </div>\r\n                          </div>\r\n                        \r\n                        <div class=\"col-lg-6\">\r\n                          <button click.delegate=\"insertDocument()\" class=\"btn btn-primary\">Insert Document</button>\r\n                        </div>\r\n                        <div class=\"col-lg-6 topMargin\">\r\n                          <div class=\"col-lg-10\">\r\n                              <ul>\r\n                                  <li repeat.for = \"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\r\n                              </ul>\r\n                          </div>\r\n                        </div>\r\n                        <div class='col-lg-6 topMargin'>\r\n                          <div class=\"col-lg-10\">\r\n                            <ul>\r\n                                <li repeat.for = \"file of helpTickets.selectedHelpTicketContent.documents\" class=\"list-group-item\">${file.fileName}<span click.delegate=\"removeDocument($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\r\n                            </ul>\r\n                          </div>\r\n                      </div>\r\n                </div>\r\n            </div>\r\n          </div>\r\n          </div>\r\n        </div>\r\n\r\n        <!-- widget content -->\r\n        <div class=\"row\">\r\n          <div class=\"panel panel-default  leftMargin rightMargin\">        \r\n            <div class=\"panel-body\">\r\n              <div class=\"row\">\r\n                 <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\" class=\"dropbtn\" click.delegate=\"showProfile(selectedRequestDetail, $event)\">Customer: ${helpTickets.selectedHelpTicket.personId.fullName} <i class=\"fa fa-info\" aria-hidden=\"true\"></i></h5>\r\n                  </div>\r\n                </div>\r\n                <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Institution: ${helpTickets.selectedHelpTicket.institutionId.name}</h5>\r\n                  </div>\r\n                </div>\r\n                <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Last modified: ${helpTickets.selectedHelpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</h5>\r\n                  </div>\r\n                </div>\r\n                 <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h5>\r\n                  </div>\r\n                </div>\r\n              </div>\r\n              <div class=\"row\">\r\n                 <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h5>\r\n                  </div>\r\n                </div>\r\n                 <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Keywords: ${helpTickets.selectedHelpTicket.keyWords}</h5>\r\n                  </div>\r\n                </div>\r\n                <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 if.bind=\"phoneMask\" class=\"col-md-offset-1\">Phone: ${helpTickets.selectedHelpTicket.personId.phone | phoneNumber:config.PHONE_MASKS:helpTickets.selectedHelpTicket.personId.country} Mobile: ${helpTickets.selectedHelpTicket.personId.mobile | phoneNumber:config.PHONE_MASKS:helpTickets.selectedHelpTicket.personId..country}</h5>\r\n                  </div>\r\n                </div>\r\n                <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId.fullName}</h5>\r\n                  </div>\r\n                </div>\r\n              </div>\r\n              <div class=\"row\">\r\n                  <div class=\"form-group col-lg-3\">\r\n                    <div class=\"input-group col-lg-11\">\r\n                      <label class=\" col-md-offset-1\">Type:</label>\r\n                      <select value.bind=\"helpTickets.selectedHelpTicket.helpTicketType\" class=\"form-control col-md-offset-1\" id=\"helpTicketType\">\r\n                          <option repeat.for=\"type of helpTickets.helpTicketTypesArray | helpTicketSubtypes\" model.bind=\"type.type\">${type.description}</option>\r\n                      </select>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"form-group col-lg-3\">\r\n                    <div class=\"input-group col-lg-11\">\r\n                      <label class=\"col-md-offset-1\">Status</label>\r\n                      <select id=\"helpTicketStatus\" value.bind=\"helpTickets.selectedHelpTicket.helpTicketStatus\" class=\"form-control col-md-offset-1\">\r\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\" model.bind=\"status.code\">${status.description}</option>\r\n                      </select>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"form-group col-lg-3\">\r\n                    <div class=\"input-group col-lg-11\">\r\n                      <label class=\"col-md-offset-1\">Priority</label>\r\n                      <select id=\"priority\" value.bind=\"helpTickets.selectedHelpTicket.priority\" class=\"form-control col-md-offset-1\">\r\n                        <option repeat.for=\"priority of config.HELP_TICKET_PRIORITIES\" model.bind=\"$index\">${priority.priority}</option>\r\n                      </select>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"form-group col-lg-3\">\r\n                    <div class=\"input-group col-lg-11\">\r\n                      <label class=\"col-md-offset-1\">Keywords</label>\r\n                      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicket.keyWords\" class=\"form-control col-md-offset-1\">\r\n                    </div>\r\n                  </div>\r\n                </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\r\n        <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\r\n  \r\n    </div>\r\n</template>"; });
 define('text!modules/tech/support/components/viewHTSearchResults.html', ['module'], function(module) { module.exports = "<template>\r\n  <div show.bind=\"!searchResults\">\r\n    <div class=\"row\">\r\n        <div class=\"bottomMargin leftMargin rightMargin list-group-item\">\r\n            <span click.delegate=\"backToSearch()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n        </div> \r\n    </div>\r\n\r\n    <div class=\"col-lg-12\">\r\n      <div class='row'>\r\n        <div id='no-more-tables'>\r\n          <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\r\n            <thead>\r\n              <tr>\r\n                <td colspan.bind='colSpan'><compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose></td>\r\n              </tr>\r\n              <tr>\r\n                <td colspan='colSpan'>\r\n                  <span click.trigger=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                  <span click.trigger=\"_cleanUpFilters()\" class=\"mousePointer\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter fa-ban\" aria-hidden=\"true\"></i></span>\r\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                </td>\r\n              </tr>\r\n              <tr>\r\n                <th><span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketNo'})\">No </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th style=\"width:20em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketType'})\">Type </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th style=\"width:15em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customOwnerSorter, propertyName: 'ownder'})\">Owner </span><i class=\"fa fa-sort\"></i></th>                   \r\n                <th style=\"width:10em;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})\">Status </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th style=\"width:8em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\">Date Created </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th style=\"width:8em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'modifiedDate'})\">Modified Created </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th style=\"width:15em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'personId.lastName'})\">Faculty </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th style=\"width:20em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'institutionId.name'})\">Institution </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th>Email</th>\r\n              </tr>\r\n              <tr>\r\n                <th></th>\r\n                <th>\r\n                  <input value.bind=\"helpTicketTypeFilterValue\" input.trigger=\"dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th>\r\n                  <input value.bind=\"ownerFilterValue\" input.trigger=\"dataTable.filterList(ownerFilterValue, { type: 'custom',  filter: customOwnerFilter, collectionProperty: 'owner', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th>\r\n                  <select value.bind=\"helpTicketStatusFilter\" input.trigger=\"dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )\" class=\"form-control\">\r\n                    <option value=\"\"></option>\r\n                    <option repeat.for=\"status of helpTicketTypes\"\r\n                            value.bind=\"status.code\">${status.description}</option>\r\n                  </select>\r\n                </th>\r\n                <th>\r\n                  <input type=\"date\" value.bind=\"createdDateFilterValue\" input.trigger=\"dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th>\r\n                  <input type=\"date\" value.bind=\"modifiedDateFilterValue\" input.trigger=\"dataTable.filterList(modifiedDateFilterValue, {type: 'date', filter: 'modifiedDate',  collectionProperty: 'modifiedDate', compare: 'after'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th>\r\n                  <input value.bind=\"personFilterValue\" input.trigger=\"dataTable.filterList(personFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th>\r\n                  <input value.bind=\"institutionFilterValue\" input.trigger=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th></th>\r\n              </tr>\r\n              \r\n            </thead>\r\n            <tbody>\r\n              <tr repeat.for=\"helpTicket of dataTable.displayArray\">\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Number\">${helpTicket.helpTicketNo}</td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Owner\">\r\n                  <span show.bind=\"helpTicket.owner[0].personId === null\"></span>\r\n                  <span show.bind=\"helpTicket.owner[0].personId !== null\"> ${helpTicket.owner[0].personId.fullName}</span>\r\n                </td>\r\n                <td data-title=\"Status\"> \r\n                  ${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:\"code\":\"description\"}\r\n                  <span show.bind=\"helpTicket.helpTicketStatus === config.CLOSED_HELPTICKET_STATUS\" click.delegate=\"openHelpTicket(helpTicket)\" class=\"marginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Open\"><i class=\"fa fa-folder-open-o\" aria-hidden=\"true\"></i></span>\r\n                </td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Created Date\" >${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Modified Date\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" class=\"hidden-xs hidden-sm hidden-md\" style=\"width:10rem;\" data-title=\"Customer\">${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Insitution\">${helpTicket.institutionId.name}</td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Email\" >${helpTicket.personId.email}</td>\r\n              </tr>\r\n            </tbody>\r\n          </table>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n  </div>\r\n  <div class=\"row\" show.bind=\"searchResults\">\r\n    <compose view=\"./viewArchiveHTForm.html\"></compose>\r\n  </div>\r\n\t\r\n</template>"; });
-define('text!modules/tech/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"col-lg-12\">\r\n    <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\r\n    <div class=\"hoverProfile\" >\r\n        <span  click.trigger=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\r\n        <span  click.trigger=\"sendAnEmail(profileHelpTicket.personId)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\r\n        <hr/>\r\n        <div class=\"col-md-4\">\r\n          <div  class=\"topMargin\">\r\n              <img if.bind=\"profileHelpTicket.personId.file.fileName\" class=\"circular--square leftMargin\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${profileHelpTicket.personId.file.fileName}\" height=\"100\">\r\n          </div>\r\n          <div if.bind=\"!profileHelpTicket.personId.file.fileName\" style=\"height:100px;width:100px;\" innerhtml.bind=\"profileHelpTicket.personId.email | gravatarUrl:100:6\"></div>\r\n        </div>\r\n        <div class=\"col-md-8\">\r\n          <h5>Nickname: ${profileHelpTicket.personId.nickName}</h5>\r\n          <h5>Phone: ${profileHelpTicket.personId.phone  | formatPhone}</h5>\r\n          <h5>Mobile: ${profileHelpTicket.personId.mobile | formatPhone}</h5>\r\n        </div>\r\n    </div>\r\n\r\n    <div class='row'>\r\n      <div id='no-more-tables'>\r\n        <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\r\n          <thead>\r\n            <tr>\r\n                <td colspan='${colSpan}'>\r\n                  <div class=\"checkbox\">\r\n                    <label>\r\n                      <input disabled.bind=\"sendMailDisable\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\r\n                    </label>\r\n                  </div>\r\n                  <div class=\"col-xs-2\">\r\n                    <h4>Today:</h4> <h7>Created: ${helpTickets.helpTickeAges.today[0]} Modified: ${helpTickets.helpTickeAges.today[1]}</h7>\r\n                  </div>\r\n                  <div class=\"col-xs-2\">\r\n                    <h4>Yesterday:</h4><h7>Created: ${helpTickets.helpTickeAges.yesterday[0]} Modified: ${helpTickets.helpTickeAges.yesterday[1]}</h7>\r\n                </div>\r\n                <div class=\"col-xs-2\">\r\n                  <h4>One Week:</h4> <h7>Created: ${helpTickets.helpTickeAges.oneWeek[0]} Modified: ${helpTickets.helpTickeAges.oneWeek[1]}</h7>\r\n                </div>\r\n                <div class=\"col-xs-2\">\r\n                  <h4>Two Weeks:</h4> <h7>Created: ${helpTickets.helpTickeAges.twoWeeks[0]} Modified: ${helpTickets.helpTickeAges.twoWeeks[1]}</h7>\r\n                </div>\r\n                <div class=\"col-xs-2\" style=\"color:red;\" show.bind=\"helpTickets.helpTickeAges.older[0]>0 || helpTickets.helpTickeAges.older[1] > 0\">\r\n                  <h4>Older:</h4> <h7>Created: ${helpTickets.helpTickeAges.older[0]} Modified: ${helpTickets.helpTickeAges.older[1]}</h7>\r\n                </div>\r\n                </td>\r\n            </tr>\r\n            <tr>\r\n              <td colspan.bind='colSpan'><compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose></td>\r\n            </tr>\r\n            <tr>\r\n              <td colspan='colSpan'>\r\n                <span click.trigger=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                <span click.trigger=\"_cleanUpFilters()\" class=\"mousePointer\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter fa-ban\" aria-hidden=\"true\"></i></span>\r\n \r\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n              </td>\r\n            </tr>\r\n            <tr>\r\n              <th><span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketNo'})\">No </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:20em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketType'})\">Type </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:15em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customOwnerSorter, propertyName: 'ownder'})\">Owner </span><i class=\"fa fa-sort\"></i></th>                   \r\n              <th style=\"width:10em;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})\">Status </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:8em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\">Date Created </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:8em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'modifiedDate'})\">Date Modified </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:15em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'personId.lastName'})\">Faculty </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:20em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'institutionId.name'})\">Institution </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:15em\">Email</th>\r\n            </tr>\r\n            <tr>\r\n              <th>\r\n                  <input value.bind=\"helpTicketNoFilterValue\" input.trigger=\"dataTable.filterList(helpTicketNoFilterValue, { type: 'value',  filter: 'helpTicketNoFilter', collectionProperty: 'helpTicketNo', displayProperty: 'helpTicketNo',  compare:'match'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"helpTicketTypeFilterValue\" input.trigger=\"dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"ownerFilterValue\" input.trigger=\"dataTable.filterList(ownerFilterValue, { type: 'custom',  filter: customOwnerFilter, collectionProperty: 'owner', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <select value.bind=\"helpTicketStatusFilter\" input.trigger=\"dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )\" class=\"form-control\">\r\n                  <option value=\"\"></option>\r\n                  <option repeat.for=\"status of helpTicketTypes\"\r\n                          value.bind=\"status.code\">${status.description}</option>\r\n                </select>\r\n              </th>\r\n              <th>\r\n                <input type=\"date\" value.bind=\"createdDateFilterValue\" input.trigger=\"dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )\"  class=\"form-control\" />\r\n              </th>\r\n               <th>\r\n                <input type=\"date\" value.bind=\"modifiedDateFilterValue\" input.trigger=\"dataTable.filterList(modifiedDateFilterValue, {type: 'date', filter: 'modifiedDate',  collectionProperty: 'modifiedDate', compare: 'after'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"personFilterValue\" input.trigger=\"dataTable.filterList(personFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"institutionFilterValue\" input.trigger=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th></th>\r\n            </tr>\r\n            \r\n          </thead>\r\n          <tbody>\r\n            <tr repeat.for=\"helpTicket of dataTable.displayArray\" class=\"${helpTicket.priority | getArrayValue:config.HELP_TICKET_PRIORITIES:'status'}\">\r\n              <td style=\"width:100px;\" data-title=\"Number\">${helpTicket.helpTicketNo}</td>\r\n              <td  mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" click.trigger=\"selectHelpTicket($event, $index)\"\r\n                data-title=\"Type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}\r\n              </td>\r\n              <td data-title=\"Owner\">\r\n                <span show.bind=\"helpTicket.owner[0].personId === null\" click.trigger=\"ownHelpTicket(helpTicket)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg\" aria-hidden=\"true\"></i></span>\r\n                <span click.trigger=\"ownHelpTicket(helpTicket)\" show.bind=\"helpTicket.owner[0].personId !== null\" class=\"sortable\"> ${helpTicket.owner[0].personId.fullName}</span>\r\n                <!-- click.trigger=\"selectHelpTicket($event, $index)\" -->\r\n              </td>\r\n              <td \r\n              <td class=\"dropbtn\" data-title=\"Status\">\r\n                <div class=\"dropdown hidden-xs hidden-sm hidden-md\">\r\n                  <span class=\"dropbtn\"> ${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:\"code\":\"description\"}\r\n                    <div show.bind=\"helpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS && helpTicket.helpTicketStatus !== config.NEW_HELPTICKET_STATUS\" class=\"dropdown-content\">\r\n                      <a href=\"#\" click.trigger=\"changeStatus(helpTicket, status.code, status.description)\" repeat.for=\"status of config.HELP_TICKET_STATUSES | helpTicketStatuses:removeHTStatus\">${status.description}</a>\r\n                    </div>\r\n                  </span>\r\n                </div>\r\n                <div class=\"hidden-lg\">${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:\"code\":\"description\"}</div>\r\n\r\n              </td>\r\n              <td  data-title=\"Created Date\" click.trigger=\"selectHelpTicket($event, $index)\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n              <td  data-title=\"Modified Date\" click.trigger=\"selectHelpTicket($event, $index)\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n              <td class=\"dropbtn hidden-xs hidden-sm hidden-md\" style=\"width:10rem;\" data-title=\"Customer\">${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>\r\n              <td class=\"hidden-lg\" style=\"width:10rem;\" data-title=\"Customer\" >${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>\r\n              <td  data-title=\"Insitution\">${helpTicket.institutionId.name}</td>\r\n              <td class=\"dropbtn\"  click.trigger=\"sendAnEmail(helpTicket.personId)\" data-title=\"Email\" >${helpTicket.personId.email}</td>\r\n            </tr>\r\n          </tbody>\r\n        </table>\r\n      </div>\r\n    </div>\r\n  </div>\r\n  </div>\r\n</template>"; });
+define('text!modules/tech/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"col-lg-12\">\r\n    <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\r\n    <div class=\"hoverProfile\" >\r\n        <span  click.trigger=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\r\n        <span  click.trigger=\"sendAnEmail(profileHelpTicket.personId)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\r\n        <hr/>\r\n        <div class=\"col-md-4\">\r\n          <div  class=\"topMargin\">\r\n              <img if.bind=\"profileHelpTicket.personId.file.fileName\" class=\"circular--square leftMargin\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${profileHelpTicket.personId.file.fileName}\" height=\"100\">\r\n          </div>\r\n          <div if.bind=\"!profileHelpTicket.personId.file.fileName\" style=\"height:100px;width:100px;\" innerhtml.bind=\"profileHelpTicket.personId.email | gravatarUrl:100:6\"></div>\r\n        </div>\r\n        <div class=\"col-md-8\">\r\n          <h5>Nickname: ${profileHelpTicket.personId.nickName}</h5>\r\n          <h5>Phone: ${profileHelpTicket.personId.phone  | formatPhone}</h5>\r\n          <h5>Mobile: ${profileHelpTicket.personId.mobile | formatPhone}</h5>\r\n        </div>\r\n    </div>\r\n\r\n    <div class='row'>\r\n      <div id='no-more-tables'>\r\n        <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\r\n          <thead>\r\n            <tr>\r\n                <td colspan='${colSpan}'>\r\n                  <div class=\"checkbox\">\r\n                    <label>\r\n                      <input disabled.bind=\"sendMailDisable\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\r\n                    </label>\r\n                  </div>\r\n                  <div class=\"col-xs-2\">\r\n                    <h4>Today:</h4> <h7>Created: ${helpTickets.helpTickeAges.today[0]} Modified: ${helpTickets.helpTickeAges.today[1]}</h7>\r\n                  </div>\r\n                  <div class=\"col-xs-2\">\r\n                    <h4>Yesterday:</h4><h7>Created: ${helpTickets.helpTickeAges.yesterday[0]} Modified: ${helpTickets.helpTickeAges.yesterday[1]}</h7>\r\n                </div>\r\n                <div class=\"col-xs-2\">\r\n                  <h4>One Week:</h4> <h7>Created: ${helpTickets.helpTickeAges.oneWeek[0]} Modified: ${helpTickets.helpTickeAges.oneWeek[1]}</h7>\r\n                </div>\r\n                <div class=\"col-xs-2\">\r\n                  <h4>Two Weeks:</h4> <h7>Created: ${helpTickets.helpTickeAges.twoWeeks[0]} Modified: ${helpTickets.helpTickeAges.twoWeeks[1]}</h7>\r\n                </div>\r\n                <div class=\"col-xs-2\" style=\"color:red;\" show.bind=\"helpTickets.helpTickeAges.older[0]>0 || helpTickets.helpTickeAges.older[1] > 0\">\r\n                  <h4>Older:</h4> <h7>Created: ${helpTickets.helpTickeAges.older[0]} Modified: ${helpTickets.helpTickeAges.older[1]}</h7>\r\n                </div>\r\n                </td>\r\n            </tr>\r\n            <tr>\r\n              <td colspan.bind='colSpan'><compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose></td>\r\n            </tr>\r\n            <tr>\r\n              <td colspan='colSpan'>\r\n                <span click.trigger=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                <span click.trigger=\"_cleanUpFilters()\" class=\"mousePointer\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter fa-ban\" aria-hidden=\"true\"></i></span>\r\n \r\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n              </td>\r\n            </tr>\r\n            <tr>\r\n              <th style=\"width:10em\"><span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketNo'})\">No </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:20em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketType'})\">Type </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:15em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customOwnerSorter, propertyName: 'ownder'})\">Owner </span><i class=\"fa fa-sort\"></i></th>                   \r\n              <th style=\"width:10em;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})\">Status </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:8em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\">Date Created </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:8em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'modifiedDate'})\">Date Modified </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:15em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'personId.lastName'})\">Faculty </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:20em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'institutionId.name'})\">Institution </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:15em\">Email</th>\r\n            </tr>\r\n            <tr>\r\n              <th>\r\n                  <input value.bind=\"helpTicketNoFilterValue\" input.trigger=\"dataTable.filterList(helpTicketNoFilterValue, { type: 'value',  filter: 'helpTicketNoFilter', collectionProperty: 'helpTicketNo', displayProperty: 'helpTicketNo',  compare:'match'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"helpTicketTypeFilterValue\" input.trigger=\"dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"ownerFilterValue\" input.trigger=\"dataTable.filterList(ownerFilterValue, { type: 'custom',  filter: customOwnerFilter, collectionProperty: 'owner', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <select value.bind=\"helpTicketStatusFilter\" change.trigger=\"customHelpTicketStatusFilter()\" class=\"form-control\">\r\n                <!--input.trigger=\"dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )\" --> \r\n                  <option value=\"\"></option>\r\n                  <option repeat.for=\"status of helpTicketTypes\"\r\n                          value.bind=\"status.code\">${status.description}</option>\r\n                </select>\r\n              </th>\r\n              <th>\r\n                <input type=\"date\" value.bind=\"createdDateFilterValue\" input.trigger=\"dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )\"  class=\"form-control\" />\r\n              </th>\r\n               <th>\r\n                <input type=\"date\" value.bind=\"modifiedDateFilterValue\" input.trigger=\"dataTable.filterList(modifiedDateFilterValue, {type: 'date', filter: 'modifiedDate',  collectionProperty: 'modifiedDate', compare: 'after'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"personFilterValue\" input.trigger=\"dataTable.filterList(personFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"institutionFilterValue\" input.trigger=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th></th>\r\n            </tr>\r\n            \r\n          </thead>\r\n          <tbody>\r\n            <tr repeat.for=\"helpTicket of dataTable.displayArray\" class=\"${helpTicket.priority | getArrayValue:config.HELP_TICKET_PRIORITIES:'status'}\">\r\n              <td style=\"width:100px;\" data-title=\"Number\">${helpTicket.helpTicketNo}</td>\r\n              <td  mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" click.trigger=\"selectHelpTicket($event, $index)\"\r\n                data-title=\"Type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}\r\n              </td>\r\n              <td data-title=\"Owner\">\r\n                <span show.bind=\"helpTicket.owner[0].personId === null\" click.trigger=\"ownHelpTicket(helpTicket)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg\" aria-hidden=\"true\"></i></span>\r\n                <span click.trigger=\"ownHelpTicket(helpTicket)\" show.bind=\"helpTicket.owner[0].personId !== null\" class=\"sortable\"> ${helpTicket.owner[0].personId.fullName}</span>\r\n                <!-- click.trigger=\"selectHelpTicket($event, $index)\" -->\r\n              </td>\r\n              <td \r\n              <td class=\"dropbtn\" data-title=\"Status\">\r\n                <div class=\"dropdown hidden-xs hidden-sm hidden-md\">\r\n                  <span class=\"dropbtn\"> ${helpTicket.helpTicketStatus | lookupHTStatus:config.HELP_TICKET_STATUSES}\r\n                    <div show.bind=\"helpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS && helpTicket.helpTicketStatus !== config.NEW_HELPTICKET_STATUS\" class=\"dropdown-content\">\r\n                      <a href=\"#\" click.trigger=\"changeStatus(helpTicket, status.code, status.description)\" repeat.for=\"status of config.HELP_TICKET_STATUSES | helpTicketStatuses:removeHTStatus\">${status.description}</a>\r\n                    </div>\r\n                  </span>\r\n                </div>\r\n                <div class=\"hidden-lg\">${helpTicket.helpTicketStatus | lookupHTStatus:config.HELP_TICKET_STATUSES}</div>\r\n\r\n              </td>\r\n              <td  data-title=\"Created Date\" click.trigger=\"selectHelpTicket($event, $index)\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n              <td  data-title=\"Modified Date\" click.trigger=\"selectHelpTicket($event, $index)\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n              <td class=\"dropbtn hidden-xs hidden-sm hidden-md\" style=\"width:10rem;\" data-title=\"Customer\">${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>\r\n              <td class=\"hidden-lg\" style=\"width:10rem;\" data-title=\"Customer\" >${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>\r\n              <td  data-title=\"Insitution\">${helpTicket.institutionId.name}</td>\r\n              <td class=\"dropbtn\"  click.trigger=\"sendAnEmail(helpTicket.personId)\" data-title=\"Email\" >${helpTicket.personId.email}</td>\r\n            </tr>\r\n          </tbody>\r\n        </table>\r\n      </div>\r\n    </div>\r\n  </div>\r\n  </div>\r\n</template>"; });
 define('text!modules/user/requests/components/assignmentDetails.html', ['module'], function(module) { module.exports = "<template>\r\n    <div show.bind=\"requests.selectedRequestDetail.assignments.length > 0\">\r\n      <h4 class=\"topMargin\"><strong>Assignments</strong></h4>\r\n      <div show.bind=\"requests.selectedRequestDetail.requestStatus == config.ASSIGNED_REQUEST_CODE\" class=\"panel panel-primary topMargin\">\r\n        <div class=\"panel-body\">  \r\n          <ul style=\"padding-left:10px;\">\r\n\t\t\t\t\t\t<li class=\"list-group-item\" repeat.for=\"assign of requests.selectedRequestDetail.assignments\">\r\n              <compose if.bind=\"systems.selectedSystem.type === 'ERP' || !systems.selectedSystem.type\" view=\"./erp.html\"></compose>\r\n              <compose if.bind=\"systems.selectedSystem.type === 'HANA'\" view=\"./hana.html\"></compose>\r\n              <compose if.bind=\"systems.selectedSystem.type === 'BO'\" view=\"./bo.html\"></compose>\r\n\t\t\t\t\t\t</li>\r\n          </ul>\r\n\r\n          <label show.bind=\"products.selectedProduct.documents && products.selectedProduct.documents.length > 0\" class=\"topMargin\">Helpful Documents</label>\r\n          <div class=\"list-group\">\r\n            <a repeat.for=\"document of products.selectedProduct.documents\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}\"  target=\"_blank\">${document.fileName}</a>\r\n          </div>\r\n          <label show.bind=\"requests.selectedRequestDetail.techComments && requests.selectedRequestDetail.techComments.length > 0\" class=\"topMargin\">Assignment Comments</label>\r\n          <div show.bind=\"requests.selectedRequestDetail.techComments && requests.selectedRequestDetail.techComments.length > 0\" class=\"col-lg-12 topMargin well overFlow\" innerhtml.bind=\"requests.selectedRequestDetail.techComments\"></div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>\r\n"; });
 define('text!modules/user/requests/components/bo.html', ['module'], function(module) { module.exports = "<template>\r\n\t\t <div class=\"row leftMargin\">\r\n\t\t\t<h4>URL</h4>\r\n\t\t\t<h5 class=\"leftMargin\"><a href=\"${systems.selectedSystem.its}\" target=\"_blank\">${systems.selectedSystem.its}</a></h5>\r\n\r\n\t\t\t<h4 class=\"topMargin\">Users</h4>\r\n\t\t\t<h5 class=\"leftMargin\">Student IDs: <span class=\"bold\"> ${assign.studentUserIds}</span></h5>\r\n\t\t\t<h5 class=\"leftMargin\">Student Password: <span class=\"bold\"> ${assign.studentPassword}</span></h5>\r\n\t\t\t<span show.bind=\"requests.selectedRequest.courseId !== null\">\r\n\t\t\t\t<h5 class=\"leftMargin\" class=\"topMargin\">Faculty IDs <span class=\"bold\">: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</span></h5>\r\n\t\t\t\t<h5 class=\"leftMargin\">Faculty Password: <span class=\"bold\"> ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</span></h5>\r\n\t\t\t</span>\r\n\t\t</div>\r\n</template>"; });
 define('text!modules/user/requests/components/client-request-step1.html', ['module'], function(module) { module.exports = "<template>\r\n  <!-- Term Select -->\r\n  <div class=\"row\">\r\n    <div class=\"col-sm-12\">\r\n      <div class=\"form-group leftJustify\">\r\n        <select value.bind=\"sessionId\" class=\"form-control\" change.trigger=\"changeSession($event)\" id=\"session\">\r\n          <option value=\"-1\">Select a session</option>\r\n          <option repeat.for=\"session of sessions.sessionsArray | filterSessions:config.ACTIVE_REQUEST_OVERLAP:'Requests':config.SESSION_SORT_ORDER\"\r\n                  value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\r\n        </select>\r\n      </div>\r\n    </div>\r\n  </div>\r\n  \r\n  <div class=\"row\">\r\n    <div show.bind=\"sessionSelected && useSandbox\" class=\"col-sm-12\">\r\n      <div class=\"form-group\">\r\n        <select value.bind=\"requestType\" change.trigger=\"changeRequestType($event)\" id=\"requestType\" class=\"form-control\">\r\n          <option value=\"-1\">Choose the Type of The Request</option>\r\n           <option value=\"sandboxCourse\">${config.SANDBOX_NAME}</option>\r\n           <option value=\"regularCourse\">Regular Course</option>\r\n        </select>\r\n      </div>\r\n    </div>\r\n  </div>\r\n\r\n  <compose show.bind=\"regularClient && sessionSelected && typeSelected\" view='./Courses.html'></compose>\r\n\r\n  <!-- Number of students -->\r\n  <div show.bind=\"requestReceived\">\r\n    <div class=\"row\"  id=\"numStudents\" show.bind=\"courseSelected\">\r\n      <div class=\"topMargin col-lg-10 leftMargin rightMargin\" innerhtml.bind=\"REGULAR_NUMBER_OF_STUDENTS.content\"></div>\r\n      <div class=\"topMargin col-lg-5\">\r\n        <div class=\"form-group\">\r\n          <div show.bind=\"!existingRequest\">\r\n            <label for=\"undergraduates\" class=\"col-sm-3 control-label\">Undergraduates</label>\r\n            <div class=\"col-sm-8\">\r\n              <input disabled.bind=\"existingRequest\" id=\"undergraduates\"  type=\"number\" placeholder=\"Number of Undergraduates\"\r\n                      class=\"form-control\" value.bind=\"requests.selectedRequest.undergradIds\"/>\r\n            </div>\r\n          </div>\r\n          <div show.bind=\"existingRequest\" class=\"col-lg-5\">\r\n            <h5>Undergrads: <b>${requests.selectedRequest.undergradIds}</b></h5>\r\n          </div>\r\n                \r\n        </div>\r\n      </div>\r\n      <div class=\"topMargin col-lg-5\">\r\n        <div class=\"form-group\">\r\n          <div show.bind=\"!existingRequest\">\r\n              <label for=\"graduates\" class=\"col-sm-3 control-label\">Graduates</label>\r\n              <div class=\"col-sm-8\">\r\n                <input disabled.bind=\"existingRequest\" id=\"graduates\" type=\"number\" placeholder=\"Number of Graduates\"\r\n                      class=\"form-control\" value.bind=\"requests.selectedRequest.graduateIds\"/>\r\n              </div>\r\n            </div>\r\n              <div show.bind=\"existingRequest\" class=\"col-lg-5\">\r\n                  <h5>Graduate: <b>${requests.selectedRequest.graduateIds}</b></h5>\r\n              </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n    <div class=\"row col-lg-offset-3\" show.bind=\"courseSelected\">\r\n        <span class=\"col-lg-8 \" id=\"numberOfStudentsError\"></span>\r\n    </div>\r\n\r\n    <!-- Begin and End Date -->\r\n    <div class=\"row\" show.bind=\"sandBoxClient || courseSelected\">\r\n      <div class=\"topMargin col-lg-10 leftMargin rightMargin\" innerhtml.bind=\"START_END_DATES.content\"></div>\r\n        <div class=\"col-lg-5\">\r\n          <div class=\"form-group topMargin\">\r\n            <div show.bind=\"!existingRequest\">\r\n            <label class=\"col-sm-3 form-control-label \">Start Date</label>\r\n            <div show.bind=\"!existingRequest\" class=\"col-sm-8\">\r\n                <flat-picker  controlid=\"startDate\" config.bind=\"configDate\" change.trigger=\"changeBeginDate($event)\"  \r\n                    value.bind=\"requests.selectedRequest.startDate\" startdate.bind=\"minStartDate\" enddate.bind=\"maxStartDate\"></flat-picker>\r\n              <span id='startDateError'></span>\r\n            </div>\r\n            </div>\r\n            <div show.bind=\"existingRequest\" class=\"col-sm-8\">\r\n              <h5>Start Date:  <b>${requests.selectedRequest.startDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>\r\n            </div>\r\n          </div>\r\n        </div>\r\n        <div class=\"col-lg-5\">\r\n          <div class=\"form-group topMargin\">\r\n            <div show.bind=\"!existingRequest\">\r\n              <label class=\"col-sm-3 form-control-label \">End Date</label>\r\n              <div  class=\"col-sm-8\">\r\n                <flat-picker controlid=\"endDate\" config.bind=\"configDate\" value.bind=\"requests.selectedRequest.endDate\" startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\"></flat-picker>\r\n              <span id='endDateError'></span>\r\n              </div>\r\n            </div>\r\n            <div show.bind=\"existingRequest\" class=\"col-sm-8\">\r\n              <h5>End Date:  <b>${requests.selectedRequest.endDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>\r\n            </div>\r\n          </div>\r\n        </div>\r\n        \r\n      </div>\r\n    </div>\r\n  <div show.bind=\"sessionId == -1 && requestType == -1\" innerhtml.bind=\"CLIENT_REQUEST_START.content\"></div>\r\n  <div show.bind=\"sessionId != -1 && requestType == -1 && useSandbox\" innerhtml.bind=\"SESSION_SELECTED.content\"></div>\r\n  \r\n  <div show.bind=\"showInfoBox\" class=\"topMargin leftMargin\" style=\"display: none;\" id=\"infoBox\"></div>\r\n</template>\r\n"; });
@@ -63829,12 +64224,14 @@ define('text!modules/user/support/components/comment.html', ['module'], function
 define('text!modules/user/support/components/helpTicketDetails.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n    <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n        <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Submit Help Ticket\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n        <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n    </div> \r\n    \r\n    <div class=\"topMargin bottomMargin leftMargin rightMargin list-group-item\" show.bind=\"resources && resources.length > 0\">\r\n        <h5>Here are some resources that may be of help.</h5>\r\n        <ul>\r\n            <li style=\"list-style-type: none\" repeat.for=\"file of resources\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${file.categoryCode}/${file.categoryName}/${file.fileName}\">${file.fileName}</a></li>\r\n        </ul>\r\n    </div>\r\n    <div class='col-lg-12'>\r\n        <div class='topMargin bottomMargin'>\r\n            <label for=\"prioritySelect\" class='control-label'>Priority</label>\r\n            <select class=\"bottomMargin form-control\" id=\"prioritySelect\" value.bind=\"helpTickets.selectedHelpTicket.priority\">\r\n                <option repeat.for = \"priority of config.HELP_TICKET_PRIORITIES\" value.bind=\"$index\">${priority.priority}</option>\r\n            </select>\r\n        </div>\r\n        <span>${config.HELP_TICKET_PRIORITIES[helpTickets.selectedHelpTicket.priority].message}</span>\r\n    </div>\r\n\r\n     <div class=\"col-lg-12 topMargin\">  \r\n         <div id=\"container\" ></div>\r\n        <!-- Additional Information Panel -->\r\n        <div class=\"col-lg-12 topMargin\" id=\"descriptionGroup\">\r\n            <div class=\"form-group\">\r\n                <div innerhtml.bind=\"editorMessage\"></div>\r\n                <p>&nbsp;</p>\r\n                <editor id=\"comments\" value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\r\n            </div>\r\n\r\n             <div class=\"form-group topMargin\">\r\n                <div innerhtml.bind=\"stepsMessage\"></div>\r\n                <p>&nbsp;</p>\r\n                <editor id=\"steps\" value.bind=\"helpTickets.selectedHelpTicketContent.content.steps\" height=\"250\"></editor>\r\n            </div>\r\n\r\n            <div innerhtml.bind=\"fileUploadMessage\"></div>\r\n\r\n            <div class=\"col-lg-2\">\r\n                <label class=\"btn btn-primary\">\r\n                    Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"files.bind=\"files\" multiple>\r\n                </label>\r\n            </div>\r\n            <div class=\"col-lg-6\">\r\n                <ul>\r\n                    <li repeat.for = \"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\r\n                </ul>\r\n            </div>\r\n\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/user/support/components/helpTicketType.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n   <!-- Category Select -->\r\n  <div class=\"form-group\">\r\n    <select value.bind=\"helpTickets.selectedHelpTicket.helpTicketCategory\" change.delegate=\"categoryChanged()\" id=\"helpTicketCategory\" class=\"form-control\">\r\n          <option value=\"-1\">Select the help ticket category</option>\r\n          <option repeat.for=\"types of helpTickets.helpTicketTypesArray | sortArray:'category':'ASC'\" \r\n                  model.bind=\"types.category\">${types.description}</option>\r\n        </select>\r\n  </div>\r\n\r\n   <!-- Type Select -->\r\n  <div class=\"form-group\">\r\n    <select show.bind=\"showTypes\" value.bind=\"helpTicketType\" change.delegate=\"typeChanged($event)\" id=\"helpTicketPurpose\"\r\n      class=\"form-control\">\r\n          <option value=\"NULL\">Select the help ticket type</option>\r\n          <option repeat.for=\"types of helpTickets.helpTicketTypesArray[catIndex].subtypes\"\r\n                  model.bind=\"types.type\">${types.description}</option>\r\n        </select>\r\n  </div>\r\n\r\n  <div show.bind=\"helpTicketTypeMessage\">\r\n    <div class=\"well well-sm\" innerhtml.bind=\"helpTicketTypeMessage\"></div>\r\n  </div>\r\n  \r\n</template>"; });
 define('text!modules/user/support/components/Requests.html', ['module'], function(module) { module.exports = "<template>\r\n      <div class=\"topMargin\">\r\n        <h5 show.bind=\"clientRequestsArray.length === 0\">You have no product requests that apply to this type of help ticket.</h5>\r\n        <table id=\"clientTable\" show.bind=\"clientRequestsArray.length > 0\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\r\n          <thead>\r\n          <tr class=\"header\">\r\n            <th>Course</th>\r\n            <th>Session</th>\r\n            <th>Product</th>\r\n            <th>System</th>\r\n            <th>Client</th>\r\n            <th>Status</th>\r\n          </tr>\r\n          </thead>\r\n          <tbody>\r\n            <tr id=\"${product.id}\" productId=\"${product.productId}\" \r\n                repeat.for=\"product of clientRequestsArray\"\r\n                click.trigger=\"requestChosen($event, $index)\">\r\n              <td>${product.courseId | lookupValue:people.coursesArray:\"_id\":\"name\"}</td>\r\n              <td>${product.sessionId | session:sessions.sessionsArray}</td>\r\n              <td>${product.productId | lookupValue:products.productsArray:\"_id\":\"name\"}</td> \r\n              <td>${product.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</td>\r\n              <td>${product.client}</td>\r\n              <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</td>\r\n            </tr>\r\n          </tbody>\r\n        </table>\r\n        <span id=\"client\"></span>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>"; });
-define('text!modules/user/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"fluid-container\">\r\n    <div class=\"row\">\r\n        <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\r\n      </div>\r\n\r\n    <!-- Buttons -->\r\n    <div class=\"bottomMargin list-group-item\">\r\n      <span click.trigger=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n        data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n      <span show.bind=\"helpTickets.selectedHelpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS\" click.trigger=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n        title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n      <span>${responseMessage}</span>\r\n    </div>\r\n\r\n    <!-- Help Ticket Header -->\r\n    <div class=\"topMargin\">\r\n      <!-- Enter Response -->\r\n      <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin\">\r\n\r\n        <div class=\"panel panel-default leftMargin rightMargin\" style=\"background-color:ghostwhite;\">\r\n          <div class=\"panel-body\">\r\n    \r\n \r\n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n              <span click.trigger=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Send Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n              <span click.trigger=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            </div>\r\n\r\n            <div class=\"row leftMargin rightMargin\">\r\n              <editor toolbar.bind=\"toolbar\" value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\r\n      \r\n              <p>&nbsp;</p>\r\n              <div class=\"row hidden-xs hidden-sm\">\r\n                <h4>Upload screenshots or other files that will help us solve you problem</h4>\r\n                  <div class=\"col-lg-2\">\r\n                      <label class=\"btn btn-primary\">\r\n                          Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"files.bind=\"files\" multiple>\r\n                      </label>\r\n                  </div>\r\n                  <div class=\"col-lg-6\">\r\n                      <ul>\r\n                          <li repeat.for = \"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\r\n                      </ul>\r\n                  </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n      <div class=\"row\">\r\n        <div class=\"list-group-item leftMargin rightMargin\">\r\n            <div class=\"row\">\r\n              <div class=\"col-md-6\">\r\n                <div class=\"form-group\">\r\n                  <h4 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate\r\n                    | dateFormat:'h:mm A'}</h4>\r\n                </div>\r\n              </div>\r\n              <div class=\"col-md-5\">\r\n                <div class=\"form-group col-md-10\">\r\n                  <h4>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupValue:config.HELP_TICKET_TYPES:\"code\":\"description\"}</h4>\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"row\">\r\n              <div class=\"col-md-6\">\r\n                <div class=\"form-group\">\r\n                  <h4 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h4>\r\n                </div>\r\n              </div>\r\n              <div class=\"col-md-5\">\r\n                <div class=\"form-group col-md-10\">\r\n                  <h4>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:\"code\":\"description\"}</h4>\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"row\">\r\n              <div class=\"col-md-6\">\r\n                <div class=\"form-group\">\r\n                  <label class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  lookupValue:people:\"_id\":'fullName'}</label>\r\n                </div>\r\n              </div>\r\n              <div class=\"col-md-5\">\r\n                <div class=\"form-group col-md-10\">\r\n                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\r\n                </div>\r\n              </div>\r\n            </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n    <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\r\n</div>\r\n</template>"; });
-define('text!modules/user/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\r\n\r\n  <div class=\"container\">\r\n      <div id='no-more-tables'>\r\n        <table class=\"table table-striped table-hover cf marginRight\">\r\n            <thead class=\"cf\">\r\n              <tr colspan=\"7\">\r\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose> \r\n              </tr>\r\n              <tr>\r\n                <td colspan='7'>\r\n                    <div class=\"checkbox\">\r\n                        <label>\r\n                            <input checked.bind=\"isChecked\" change.trigger=\"filterOutClosed()\" type=\"checkbox\"> Hide closed help tickets\r\n                        </label>\r\n                    </div>\r\n                </td>\r\n              </tr>\r\n              <tr>\r\n                <td colspan='7'>\r\n                  <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                    title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                </td>\r\n              </tr>\r\n              <tr> \r\n                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketNo'})\">Number </span><i class=\"fa fa-sort\"></i></th>\r\n                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketType'})\">Type </span><i class=\"fa fa-sort\"></i></th>\r\n                 <th>Owner</th>\r\n                <th  class=\"hidden-xs hidden-sm\"></th>\r\n                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})\">Status </span><i class=\"fa fa-sort\"></i></th>\r\n                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\">Date Created </span><i class=\"fa fa-sort\"></i></th>\r\n                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'modifiedDate'})\">Date Modified </span><i class=\"fa fa-sort\"></i></th>\r\n              </tr>\r\n               <tr>\r\n                <th></th>\r\n                <th>\r\n                  <input value.bind=\"helpTicketTypeFilterValue\" input.delegate=\"dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th></th>\r\n                <th class=\"hidden-xs hidden-sm\"></th>\r\n                <th> \r\n                  <select value.bind=\"helpTicketStatusFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )\" class=\"form-control\">\r\n                        <option value=\"\"></option>\r\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\" value.bind=\"status.code\">${status.description}</option>\r\n                  </select>\r\n                </th>\r\n                <th>\r\n                  <input type=\"date\" value.bind=\"createdDateFilterValue\" input.delegate=\"dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )\"  class=\"form-control\" />\r\n                </th>\r\n                 <th>\r\n                  <input type=\"date\" value.bind=\"modifiedDateFilterValue\" input.delegate=\"dataTable.filterList(modifiedDateFilterValue, {type: 'date', filter: 'modifiedDate',  collectionProperty: 'modifiedDate', compare: 'after'} )\"  class=\"form-control\" />\r\n                </th>\r\n              </tr>\r\n            </thead>\r\n            <tbody>\r\n              <tr repeat.for=\"helpTicket of dataTable.displayArray\">\r\n                <td click.trigger=\"selectHelpTicket($event, $index)\" data-title=\"Number\">${helpTicket.helpTicketNo}</td>\r\n                <td  mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" click.trigger=\"selectHelpTicket($event, $index)\"\r\n                data-title=\"Type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}\r\n              </td>\r\n                <td style=\"width:12rem;\" data-tile=\"Owner\">${helpTicket.owner[0].personId.fullName}</td> \r\n                <td style=\"width:2rem;\"  class=\"hidden-xs hidden-sm\" data-title=\"Close\">\r\n                  <span click.trigger=\"closeHelpTicket(helpTicket)\" show.bind=\"helpTicket.helpTicketStatus != config.CLOSED_HELPTICKET_STATUS\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close Help Ticket\"><i class=\"fa fa-window-close-o fa-lg\" aria-hidden=\"true\"></i></span>\r\n                </td>  \r\n                <td click.trigger=\"selectHelpTicket($event, $index)\" data-title=\"Status\">${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:\"code\":\"description\"}</td>             \r\n                <td click.trigger=\"selectHelpTicket($event, $index)\" data-title=\"Created Date\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n                <td data-title=\"Modified Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n              </tr>\r\n            </tbody>\r\n          </table>\r\n        </div>\r\n      </div>\r\n  </div>\r\n</template>"; });
+define('text!modules/user/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"fluid-container\">\r\n    <div class=\"row\">\r\n        <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\r\n      </div>\r\n\r\n    <!-- Buttons -->\r\n    <div class=\"bottomMargin list-group-item\">\r\n      <span click.trigger=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n        data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n      <span show.bind=\"helpTickets.selectedHelpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS\" click.trigger=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n        title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n    </div>\r\n\r\n    <!-- Help Ticket Header -->\r\n    <div class=\"topMargin\">\r\n      <!-- Enter Response -->\r\n      <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin\">\r\n\r\n        <div class=\"panel panel-default leftMargin rightMargin\" style=\"background-color:ghostwhite;\">\r\n          <div class=\"panel-body\">\r\n    \r\n \r\n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n              <span click.trigger=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Send Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n              <span click.trigger=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            </div>\r\n\r\n            <div class=\"row leftMargin rightMargin\">\r\n              <editor toolbar.bind=\"toolbar\" value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\r\n      \r\n              <p>&nbsp;</p>\r\n              <div class=\"row hidden-xs hidden-sm\">\r\n                <h4>Upload screenshots or other files that will help us solve you problem</h4>\r\n                  <div class=\"col-lg-2\">\r\n                      <label class=\"btn btn-primary\">\r\n                          Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"files.bind=\"files\" multiple>\r\n                      </label>\r\n                  </div>\r\n                  <div class=\"col-lg-6\">\r\n                      <ul>\r\n                          <li repeat.for = \"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\r\n                      </ul>\r\n                  </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n      <div class=\"row\">\r\n        <div class=\"list-group-item leftMargin rightMargin\">\r\n            <div class=\"row\">\r\n              <div class=\"col-md-6\">\r\n                <div class=\"form-group\">\r\n                  <h4 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate\r\n                    | dateFormat:'h:mm A'}</h4>\r\n                </div>\r\n              </div>\r\n              <div class=\"col-md-5\">\r\n                <div class=\"form-group col-md-10\">\r\n                  <h4>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupValue:config.HELP_TICKET_TYPES:\"code\":\"description\"}</h4>\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"row\">\r\n              <div class=\"col-md-6\">\r\n                <div class=\"form-group\">\r\n                  <h4 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h4>\r\n                </div>\r\n              </div>\r\n              <div class=\"col-md-5\">\r\n                <div class=\"form-group col-md-10\">\r\n                  <h4>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:\"code\":\"description\"}</h4>\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"row\">\r\n              <div class=\"col-md-6\">\r\n                <div class=\"form-group\">\r\n                  <label class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  lookupValue:people:\"_id\":'fullName'}</label>\r\n                </div>\r\n              </div>\r\n              <div class=\"col-md-5\">\r\n                <div class=\"form-group col-md-10\">\r\n                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\r\n                </div>\r\n              </div>\r\n            </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n    <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\r\n</div>\r\n</template>"; });
+define('text!modules/user/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\r\n\r\n  <div class=\"container\">\r\n      <div id='no-more-tables'>\r\n        <table class=\"table table-striped table-hover cf marginRight\">\r\n            <thead class=\"cf\">\r\n              <tr colspan=\"7\">\r\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose> \r\n              </tr>\r\n              <tr>\r\n                <td colspan='7'>\r\n                    <div class=\"checkbox\">\r\n                        <label>\r\n                            <input checked.bind=\"isChecked\" change.trigger=\"filterOutClosed()\" type=\"checkbox\"> Hide closed help tickets\r\n                        </label>\r\n                    </div>\r\n                </td>\r\n              </tr>\r\n              <tr>\r\n                <td colspan='7'>\r\n                  <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                    title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                </td>\r\n              </tr>\r\n              <tr> \r\n                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketNo'})\">Number </span><i class=\"fa fa-sort\"></i></th>\r\n                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketType'})\">Type </span><i class=\"fa fa-sort\"></i></th>\r\n                 <th>Owner</th>\r\n                <th  class=\"hidden-xs hidden-sm\"></th>\r\n                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})\">Status </span><i class=\"fa fa-sort\"></i></th>\r\n                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\">Date Created </span><i class=\"fa fa-sort\"></i></th>\r\n                <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'modifiedDate'})\">Date Modified </span><i class=\"fa fa-sort\"></i></th>\r\n              </tr>\r\n               <tr>\r\n                <th></th>\r\n                <th>\r\n                  <input value.bind=\"helpTicketTypeFilterValue\" input.delegate=\"dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th></th>\r\n                <th class=\"hidden-xs hidden-sm\"></th>\r\n                <th> \r\n                  <select value.bind=\"helpTicketStatusFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )\" class=\"form-control\">\r\n                        <option value=\"\"></option>\r\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\" value.bind=\"status.code\">${status.description}</option>\r\n                  </select>\r\n                </th>\r\n                <th>\r\n                  <input type=\"date\" value.bind=\"createdDateFilterValue\" input.delegate=\"dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )\"  class=\"form-control\" />\r\n                </th>\r\n                 <th>\r\n                  <input type=\"date\" value.bind=\"modifiedDateFilterValue\" input.delegate=\"dataTable.filterList(modifiedDateFilterValue, {type: 'date', filter: 'modifiedDate',  collectionProperty: 'modifiedDate', compare: 'after'} )\"  class=\"form-control\" />\r\n                </th>\r\n              </tr>\r\n            </thead>\r\n            <tbody>\r\n              <tr repeat.for=\"helpTicket of dataTable.displayArray\">\r\n                <td click.trigger=\"selectHelpTicket($event, $index)\" data-title=\"Number\">${helpTicket.helpTicketNo}</td>\r\n                <td  mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" click.trigger=\"selectHelpTicket($event, $index)\"\r\n                data-title=\"Type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}\r\n              </td>\r\n                <td style=\"width:12rem;\" data-tile=\"Owner\">${helpTicket.owner[0].personId.fullName}</td> \r\n                <td style=\"width:2rem;\"  class=\"hidden-xs hidden-sm\" data-title=\"Close\">\r\n                  <span click.trigger=\"closeHelpTicket(helpTicket)\" show.bind=\"helpTicket.helpTicketStatus != config.CLOSED_HELPTICKET_STATUS\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close Help Ticket\"><i class=\"fa fa-window-close-o fa-lg\" aria-hidden=\"true\"></i></span>\r\n                </td>  \r\n                <td click.trigger=\"selectHelpTicket($event, $index)\" data-title=\"Status\">${helpTicket.helpTicketStatus | lookupHTStatus:config.HELP_TICKET_STATUSES}</td>             \r\n                <td click.trigger=\"selectHelpTicket($event, $index)\" data-title=\"Created Date\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n                <td data-title=\"Modified Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n              </tr>\r\n            </tbody>\r\n          </table>\r\n        </div>\r\n      </div>\r\n  </div>\r\n</template>"; });
 define('text!modules/tech/support/components/viewAssignmentForm.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class=\"fluid-container\">\r\n\t\t<!-- Buttons -->\r\n\t\t<div class=\"bottomMargin leftMargin rightMargin list-group-item\">\r\n\t\t\t<span click.delegate=\"backView()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t</div>\r\n\t\t<div class=\"col-lg-6 col-md-12\">\r\n\t\t\t<compose view=\"./requestDetails.html\"></compose>\r\n\t\t</div>\r\n\t\t<div class=\"col-lg-6 col-md-12\">\r\n\t\t\t<compose view=\"./assignmentDetails.html\"></compose>\r\n\t\t</div>\r\n\t</div>\r\n</template>"; });
 define('text!modules/tech/support/components/requestDetails.html', ['module'], function(module) { module.exports = "<template>\r\n   <div class=\"row\">\r\n\t\t<div class=\"col-lg-12\">\r\n\t\t\t<h4 class=\"topMargin\"><strong>Request Details</strong></h4>\r\n\t\t\t<div class=\"panel panel-default topMargin\">\r\n\t\t\t\t<div class=\"panel-body leftJustify\">\r\n\t\t\t\t\t<div  class=\"form-horizontal topMargin\">\r\n\t\t\t\t\t\t<h4>Product: ${selectedRequestDetail.productId.name}</h4>\r\n\t\t\t\t\t\t<h5>Course: ${selectedRequestDetail.requestId.courseId.name}</h5>\r\n\t\t\t\t\t\t<div class=\"topMargin\" show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-lg-5 leftMargin\">\r\n\t\t\t\t\t\t\t\t\t<h5>Undergrads: <b>${selectedRequestDetail.requestId.undergradIds}</b></h5>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div class=\"col-lg-5\">\r\n\t\t\t\t\t\t\t\t\t<h5>Graduate: <b>${selectedRequestDetail.requestId.graduateIds}</b></h5>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div> \r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-lg-5 leftMargin\">\r\n\t\t\t\t\t\t\t\t<h5>Start Date:  <b>${selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"col-lg-5\">\r\n\t\t\t\t\t\t\t\t<h5>End Date: <b>${selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div show.bind=\"selectedRequestDetail.requestId.customerMessage && selectedRequestDetail.requestId.customerMessage.length > 0\">\r\n\t\t\t\t\t\t\t<label class=\"topMargin\">Requests from the UCC</label>\r\n\t\t\t\t\t\t\t<div class=\"well\" innerhtml.bind=\"selectedRequestDetail.requestId.customerMessage\"></div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div show.bind=\"selectedRequestDetail.requestId.comments && selectedRequestDetail.requestId.comments.length > 0\">\r\n\t\t\t\t\t\t\t<label class=\"topMargin\">Comments</label>\r\n\t\t\t\t\t\t\t<div innerhtml.bind=\"selectedRequestDetail.requestId.comments\"></div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\t<div show.bind=\"products.selectedProduct.productDescription\">\r\n\t\t<h4>Product Information</h4>\r\n\t\t<div innerhtml.bind=\"products.selectedProduct.productDescription\"></div>\r\n\t</div>\r\n</template>\r\n    "; });
 define('text!modules/tech/support/components/assignmentDetails.html', ['module'], function(module) { module.exports = "<template>\r\n    <div show.bind=\"selectedRequestDetail.assignments.length > 0\">\r\n      <h4 class=\"topMargin\"><strong>Assignments</strong></h4>\r\n      <div show.bind=\"selectedRequestDetail.requestStatus == config.ASSIGNED_REQUEST_CODE\" class=\"panel panel-primary topMargin\">\r\n        <div class=\"panel-body\">  \r\n          <ul style=\"padding-left:10px;\">\r\n\t\t\t\t\t\t<li class=\"list-group-item\" repeat.for=\"assign of selectedRequestDetail.assignments\">\r\n             <compose if.bind=\"systems.selectedSystem.type === 'ERP' || !systems.selectedSystem.type\" view=\"./erp.html\"></compose>\r\n             <compose if.bind=\"systems.selectedSystem.type === 'HANA'\" view=\"./hana.html\"></compose>\r\n              <compose if.bind=\"systems.selectedSystem.type === 'BO'\" view=\"./bo.html\"></compose>\r\n\t\t\t\t\t\t</li>\r\n          </ul>\r\n\r\n          <label show.bind=\"products.selectedProduct.documents && products.selectedProduct.documents.length > 0\" class=\"topMargin\">Helpful Documents</label>\r\n          <div class=\"list-group\">\r\n            <a repeat.for=\"document of products.selectedProduct.documents\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}\"  target=\"_blank\">${document.fileName}</a>\r\n          </div>\r\n          <label show.bind=\"selectedRequestDetail.techComments && selectedRequestDetail.techComments.length > 0\" class=\"topMargin\">Assignment Comments</label>\r\n          <div show.bind=\"selectedRequestDetail.techComments && selectedRequestDetail.techComments.length > 0\" class=\"col-lg-12 topMargin well overFlow\" innerhtml.bind=\"selectedRequestDetail.techComments\"></div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>\r\n"; });
 define('text!modules/tech/support/components/bo.html', ['module'], function(module) { module.exports = "<template>\r\n\t\t <div class=\"row leftMargin\">\r\n\t\t\t<h4>URL</h4>\r\n\t\t\t<h5 class=\"leftMargin\"><a href=\"${systems.selectedSystem.its}\" target=\"_blank\">${systems.selectedSystem.its}</a></h5>\r\n\r\n\t\t\t<h4 class=\"topMargin\">Users</h4>\r\n\t\t\t<h5 class=\"leftMargin\">Student IDs: <span class=\"bold\"> ${assign.studentUserIds}</span></h5>\r\n\t\t\t<h5 class=\"leftMargin\">Student Password: <span class=\"bold\"> ${assign.studentPassword}</span></h5>\r\n\t\t\t<span show.bind=\"requests.selectedRequest.courseId !== null\">\r\n\t\t\t\t<h5 class=\"leftMargin\" class=\"topMargin\">Faculty IDs <span class=\"bold\">: ${selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</span></h5>\r\n\t\t\t\t<h5 class=\"leftMargin\">Faculty Password: <span class=\"bold\"> ${selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</span></h5>\r\n\t\t\t</span>\r\n\t\t</div>\r\n</template>"; });
 define('text!modules/tech/support/components/erp.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"row\" style=\"word-wrap: break-word;\">\r\n      <span class=\"col-lg-4\">\r\n        <h5 class=\"leftMargin\">System: <span class=\"bold\">${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</span></h5>\r\n        <h5 class=\"leftMargin\">Client: <span class=\"bold\"> ${assign.client} </span></h5>\r\n        <h5 class=\"leftMargin\">Server: <span class=\"bold\"> ${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"server\"} </span></h5>\r\n        <h5 class=\"leftMargin\">System Number: <span class=\"bold\"> ${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"instance\"} </span></h5>\r\n      </span>\r\n      <span class=\"col-lg-6\">\r\n        <h5>Student IDs: <span class=\"bold\"> ${assign.studentUserIds ? assign.studentUserIds : 'N/A'}</span></h5>\r\n        <h5>Student Password: <span class=\"bold\"> ${assign.studentPassword ? assign.studentPassword : 'N/A'}</span></h5>\r\n        <span>\r\n          <h5 class=\"topMargin\">Faculty IDs <span class=\"bold\">: ${assign.facultyUserIds ? assign.facultyUserIds : 'N/A'}</span></h5>\r\n          <h5>Faculty Password: <span class=\"bold\"> ${assign.facultyPassword ? assign.facultyPassword : 'N/A'}</span></h5>\r\n        </span>\r\n      </span>\r\n      <span class=\"col-lg-12\">\r\n          <h5 show.bind=\"systems.selectedSystem.its && systems.selectedSystem.its.length > 0\" class=\"leftMargin bigTopMargin\">ITS:</h5>\r\n          <h5 show.bind=\"systems.selectedSystem.its && systems.selectedSystem.its.length > 0\"><span class=\"bold\"> <a href=\"${systems.selectedSystem.its}\" target=\"_blank\">${systems.selectedSystem.its}</a> </span></h5>                       \r\n      </span>\r\n  </div>\r\n</template>"; });
 define('text!modules/tech/support/components/hana.html', ['module'], function(module) { module.exports = "<template>\r\n\t\t <div class=\"row leftMargin\">\r\n\t\t\t<h4>SAP HANA Launchpad URL</h4>\r\n\t\t\t<h5 class=\"leftMargin\"><a href=\"${systems.selectedSystem.its}\" target=\"_blank\">${systems.selectedSystem.its}</a></h5>\r\n\r\n\t\t\t<h4 class=\"topMargin\">Users</h4>\r\n\t\t\t<h5 class=\"leftMargin\">Student IDs: <span class=\"bold\"> ${assign.studentUserIds}</span></h5>\r\n\t\t\t<h5 class=\"leftMargin\">Student Password: <span class=\"bold\"> ${assign.studentPassword}</span></h5>\r\n\t\t\t<span show.bind=\"requests.selectedRequest.courseId !== null\">\r\n\t\t\t\t<h5 class=\"leftMargin\" class=\"topMargin\">Faculty IDs <span class=\"bold\">: ${selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</span></h5>\r\n\t\t\t\t<h5 class=\"leftMargin\">Faculty Password: <span class=\"bold\"> ${selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</span></h5>\r\n\t\t\t</span>\r\n\r\n\t\t\t<h4 class=\"topMargin\">Lumira / Predictive Analytics Connection</h4>\r\n\t\t\t<h5 class=\"leftMargin\">System: <span class=\"bold\">${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</span></h5>\r\n\t\t\t<h5 class=\"leftMargin\">Server: <span class=\"bold\"> ${systems.selectedSystem.server} </span></h5>\r\n\t\t\t<h5 class=\"leftMargin\">Port: <span class=\"bold\"> ${systems.selectedSystem.port} </span></h5>\r\n\t\t\t<h5 class=\"leftMargin\">System Number: <span class=\"bold\"> ${systems.selectedSystem.instance} </span></h5> \r\n\t\t</div>\r\n</template>"; });
+define('text!resources/dialogs/helpTicket-dialog.html', ['module'], function(module) { module.exports = "<template>\r\n    <style>\r\n        ux-dialog-header {\r\n            color: $ {\r\n                config.SUBMENU_COLOR\r\n            }\r\n\r\n            ;\r\n\r\n            background-color:$ {\r\n                config.SUBMENU_BACKGROUND\r\n            }\r\n        }\r\n    </style>\r\n    <ux-dialog style=\"width:800px;\">\r\n        <ux-dialog-header>${model.title}</ux-dialog-header>\r\n\r\n        <ux-dialog-body>\r\n            <label>Please provide the reason for closing the help ticket</label>\r\n            <select class=\"form-control\" change.delegate=\"reasonSelected()\" value.bind=\"model.selectedReason\">\r\n                <option value=\"\">Please select a reason</option>\r\n                <option repeat.for=\"option of config.HELP_TICKET_CLOSE_REASONS\" model.bind=\"$index\">${option.reason}</option>\r\n            </select>\r\n            <div show.bind=\"model.selectedReason == config.HELP_TICKET_CLOSE_REASON_OTHER\" class=\"topMargin\">\r\n                <label>Please provide the reason</label>\r\n                <textarea  class=\"form-control\" id=\"otherReason\" value.bind=\"model.otherReason\" rows=\"5\"></textarea>\r\n            </div>\r\n            <div class=\"topMargin\">\r\n                <label>One of our goals is to learn from each other and share the knowledge</label>\r\n                <label>Please let us know how you resolved the issue</label>\r\n                <textarea  class=\"form-control\" id=\"method\" value.bind=\"model.method\" rows=\"5\"></textarea>\r\n            </div>\r\n        </ux-dialog-body>\r\n\r\n        <ux-dialog-footer>\r\n            <button class=\"btn btn-primary smallMarginRight\" repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\r\n        </ux-dialog-footer>\r\n    </ux-dialog>\r\n</template>"; });
+define('text!modules/techNotes/components/Systems.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\">\r\n        <form>\r\n            <div class=\"col-md-5\">\r\n                <label>Available Systems</label>\r\n                <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter systems\" />\r\n                <div class=\"well well2 overFlow\" style=\"height:375px;\">\r\n                  \r\n                    <ul class=\"list-group\">\r\n                        <button click.trigger=\"selectSystem($event, system)\" type=\"button\" repeat.for=\"system of filteredsystemsarray\"\r\n                            id=\"${system._id}\" class=\"list-group-item\">${system.sid}</button>\r\n                    </ul>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-md-5 col-md-offset-1\">\r\n                <label>Assigned Systems</label>\r\n                <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                    <ul class=\"list-group\">\r\n                        <button click.trigger=\"removeSystem($event, system)\" type=\"button\" repeat.for=\"system of people.selectedTechNote.systems\"\r\n                            id=\"${system._id}\" class=\"list-group-item\">${system.sid}</button>\r\n                    </ul>\r\n                </div>\r\n            </div>\r\n        </form>\r\n    </div>\r\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map

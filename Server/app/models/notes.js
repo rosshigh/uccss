@@ -32,6 +32,10 @@ var TechNoteSchema = new Schema({
   categoryId: { type: Schema.Types.ObjectId },
   productId: { type: Schema.Types.ObjectId },
   systemId: { type: Schema.Types.ObjectId },
+  systems: [{
+    sid: { type: String },
+    systemId: { type: Schema.Types.ObjectId }
+  }],
   url: { type: String },
   fileReference: { type: String },
   file: {
