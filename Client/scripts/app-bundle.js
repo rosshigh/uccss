@@ -31936,7 +31936,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                             case 4:
                                 $('#loading').hide();
                                 setInterval(function () {
-                                    _this.getRequests();
+                                    if (_this.requestSelected == 'table') _this.getRequests();
                                 }, this.refreshInterval * 60 * 1000);
 
                             case 6:

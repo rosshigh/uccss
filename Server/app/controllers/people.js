@@ -794,12 +794,13 @@ module.exports = function (app, config) {
 
   router.get('/api/notifications/:personId', requireAuth, function(req, res, next){
     logger.log('info','Get person notifications', 'verbose');
-    var query = Notifications.find()
+    var query = buildQuery(req.query, Notifications.find())
+    query
       .where({personId: req.params.personId})
       .exec()
       .then(object => {
          if(!object || object.length === 0){          
-            res.status(200).json({"message": "No Events Found"});
+            res.status(200).json({"message": "No notifications Found"});
           } else {
             res.status(200).json(object);
           }

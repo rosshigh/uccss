@@ -46,7 +46,9 @@ export class Assignments {
 
         await this.getRequests();
         $('#loading').hide();
-        setInterval(() => {this.getRequests();}, this.refreshInterval * 60 * 1000);
+        setInterval(() => {
+            if( this.requestSelected == 'table') this.getRequests();
+        }, this.refreshInterval * 60 * 1000);
     }
 
     async activate() {
