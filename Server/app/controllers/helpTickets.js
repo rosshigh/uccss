@@ -312,8 +312,22 @@ module.exports = function (app, config) {
           result.helpTicketStatus = req.params.status;
           result.modifiedDate = new Date();      
           result.save().then(result => {
-            res.status(200).json(result);
-          })
+            // res.status(200).json(result);
+            var query = Model.find()
+              .populate('courseId', 'name number')
+              .populate('requestId')
+              .populate('personId', 'email firstName lastName fullName phone mobile nickName file country')
+              .populate('content.personId', 'email firstName lastName phone mobile nickName')
+              .populate('institutionId', 'name')
+              .populate({ path: 'owner.personId', model: 'Person', select: 'firstName lastName fullName' })
+            query.exec()
+              .then(object => {
+                res.status(200).json(object);
+              })
+              .catch(error => {
+                return next(error);
+              })
+            })
             .catch(error => {
               return next(error);
             })

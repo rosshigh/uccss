@@ -23,6 +23,7 @@ export class ViewHelpTickets {
   showRequestPanel = false;
   viewHelpTickets = true;
   showAssignment = false;
+  refreshInterval = 10; //minutes
 
   toolbar;
 
@@ -103,6 +104,7 @@ export class ViewHelpTickets {
       this.toolbar = [['style', ['style', 'bold', 'clear']]];
     }
     this.initialLoaded = false;
+    this.refreshInterval = this.config.HELP_TICKET_REFRESH_INTERVAL;
   }
 
   attached() {
@@ -110,6 +112,8 @@ export class ViewHelpTickets {
     if (!this.mobile) this.toolTips();
     // $("#loading").hide();
     this.initialLoaded = true;
+
+    setInterval(() => {this.refresh(false);}, this.refreshInterval * 60 * 1000);
   }
 
   toolTips() {

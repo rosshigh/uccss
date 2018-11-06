@@ -46,6 +46,7 @@ export class Assignments {
 
         await this.getRequests();
         $('#loading').hide();
+        setInterval(() => {this.getRequests();}, this.refreshInterval * 60 * 1000);
     }
 
     async activate() {
@@ -66,6 +67,7 @@ export class Assignments {
         this.numFacultyIDs = this.config.DEFAULT_FACULTY_IDS;
         this.selectedSession = this.sessions.sessionsArray[0]._id;
         this.initialLoaded = false;
+        this.refreshInterval = this.config.CLIENT_REQUEST_REFRESH_INTERVAL;
     }
 
     async getRequests() {

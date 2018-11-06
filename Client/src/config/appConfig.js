@@ -474,6 +474,9 @@ export class AppConfig {
         this.CLIENT_REQUEST_ASSIGNED_MESSAGE = this.getParameter('CLIENT_REQUEST_ASSIGNED_MESSAGE');
         this.CLIENT_REQUEST_CREATED_TOP = this.getParameter('CLIENT_REQUEST_CREATED_TOP');
         this.CLIENT_REQUEST_CREATED_BOTTOM = this.getParameter('CLIENT_REQUEST_CREATED_BOTTOM');
+        this.HELP_TICKET_REFRESH_INTERVAL = this.getParameter('HELP_TICKET_REFRESH_INTERVAL');
+        this.CLIENT_REQUEST_REFRESH_INTERVAL = this.getParameter('CLIENT_REQUEST_REFRESH_INTERVAL');
+        
     }
 
     getParameter(parameter){

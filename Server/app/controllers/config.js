@@ -50,8 +50,10 @@ module.exports = function (app) {
 
   router.post('/api/config', requireAuth, function(req, res, next){
     logger.log('info','Create config','verbose');
-    var person =  new Model(req.body);
-    person.save( function ( err, object ){
+    console.log(req.body)
+    var config =  new Model(req.body);
+    console.log(config)
+    config.save( function ( err, object ){
       if (err) {
         return next(err);
       } else {

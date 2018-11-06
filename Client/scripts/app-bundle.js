@@ -443,6 +443,8 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.CLIENT_REQUEST_ASSIGNED_MESSAGE = this.getParameter('CLIENT_REQUEST_ASSIGNED_MESSAGE');
             this.CLIENT_REQUEST_CREATED_TOP = this.getParameter('CLIENT_REQUEST_CREATED_TOP');
             this.CLIENT_REQUEST_CREATED_BOTTOM = this.getParameter('CLIENT_REQUEST_CREATED_BOTTOM');
+            this.HELP_TICKET_REFRESH_INTERVAL = this.getParameter('HELP_TICKET_REFRESH_INTERVAL');
+            this.CLIENT_REQUEST_REFRESH_INTERVAL = this.getParameter('CLIENT_REQUEST_REFRESH_INTERVAL');
         };
 
         AppConfig.prototype.getParameter = function getParameter(parameter) {
@@ -31921,6 +31923,8 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.attached = function () {
             var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var _this = this;
+
                 return regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
@@ -31933,8 +31937,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 4:
                                 $('#loading').hide();
+                                setInterval(function () {
+                                    _this.getRequests();
+                                }, this.refreshInterval * 60 * 1000);
 
-                            case 5:
+                            case 6:
                             case 'end':
                                 return _context.stop();
                         }
@@ -31973,8 +31980,9 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 this.numFacultyIDs = this.config.DEFAULT_FACULTY_IDS;
                                 this.selectedSession = this.sessions.sessionsArray[0]._id;
                                 this.initialLoaded = false;
+                                this.refreshInterval = this.config.CLIENT_REQUEST_REFRESH_INTERVAL;
 
-                            case 13:
+                            case 14:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -32121,7 +32129,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.selectARequest = function () {
             var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(index, el, request) {
-                var _this = this;
+                var _this2 = this;
 
                 var response;
                 return regeneratorRuntime.wrap(function _callee6$(_context6) {
@@ -32174,7 +32182,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 if (this.systemConfigured) {
                                     this.selectedSystemIndex = 0;
                                     setTimeout(function () {
-                                        _this.systemSelected();
+                                        _this2.systemSelected();
                                     }, 100);
                                 }
 
@@ -32201,7 +32209,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.getProductSystems = function () {
             var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                var _this2 = this;
+                var _this3 = this;
 
                 var productSystemsSIDs, response;
                 return regeneratorRuntime.wrap(function _callee7$(_context7) {
@@ -32224,7 +32232,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                                 if (!response.error) {
                                     response.forEach(function (item) {
-                                        if (item.sessions.indexOf(_this2.sessions.selectedSession.session) > -1 && item.active) _this2.productSystems.push(item);
+                                        if (item.sessions.indexOf(_this3.sessions.selectedSession.session) > -1 && item.active) _this3.productSystems.push(item);
                                     });
                                 }
                                 if (this.productSystems != null && this.productSystems.length) this.systemConfigured = true;
@@ -32304,7 +32312,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.selectClient = function selectClient(index, client, el) {
-            var _this3 = this;
+            var _this4 = this;
 
             if (this.deleteClicked) {
                 this.deleteProposedClient(this.assignmentDetailIndex);
@@ -32331,7 +32339,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                     if (response.wasCancelled) {
                         okToProcess = false;
                     } else {
-                        _this3.processClient(index, client, el);
+                        _this4.processClient(index, client, el);
                     }
                 });
             } else {
@@ -32643,12 +32651,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.validateIDRange = function validateIDRange(client, assignment, id) {
-            var _this4 = this;
+            var _this5 = this;
 
             if (!client.assignments || client.assignments.length == 1) return true;
             client.assignments.forEach(function (item) {
                 if (item.firstID === null || item.firstID == "" || item.lastID === null || item.lastID === "") {
-                    return _this4.dialog.showMessage("You must enter the ID range manually with this client.", "Manual Assignment", ['OK']).whenClosed(function (response) {
+                    return _this5.dialog.showMessage("You must enter the ID range manually with this client.", "Manual Assignment", ['OK']).whenClosed(function (response) {
                         return true;
                     });
                 }
@@ -32715,7 +32723,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.deleteProposedClient = function () {
             var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-                var _this5 = this;
+                var _this6 = this;
 
                 return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
@@ -32728,7 +32736,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                                 return _context8.abrupt('return', this.dialog.showMessage("This will delete the assignment.  Are you sure you want to do that?", "Delete Assignment", ['Yes', 'No']).whenClosed(function (response) {
                                     if (!response.wasCancelled) {
-                                        _this5.deleteSaved(_this5.assignmentDetailIndex);
+                                        _this6.deleteSaved(_this6.assignmentDetailIndex);
                                     }
                                 }));
 
@@ -32863,7 +32871,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         }();
 
         Assignments.prototype.delete = function _delete() {
-            var _this6 = this;
+            var _this7 = this;
 
             if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) {
                 return this.dialog.showMessage("Please delete the assignments before deleting the request", "Delete Request", ['OK']).whenClosed(function (response) {
@@ -32874,7 +32882,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
             } else {
                 return this.dialog.showMessage("Are you sure you want to delete the request?", "Delete Request", ['Yes', 'No']).whenClosed(function (response) {
                     if (!response.wasCancelled) {
-                        _this6.deleteRequest();
+                        _this7.deleteRequest();
                     }
                 });
             }
@@ -32997,7 +33005,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype._buildRequest = function _buildRequest() {
-            var _this7 = this;
+            var _this8 = this;
 
             this.productSystems.forEach(function (system) {
                 system.clients.forEach(function (client) {
@@ -33009,10 +33017,10 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
             this.systemQueue = new Array();
             this.selectedRequestDetail.assignments.forEach(function (item, index) {
                 var saveSystem = true;
-                _this7.systemQueue.forEach(function (system) {
+                _this8.systemQueue.forEach(function (system) {
                     if (item.systemId === system._id) saveSystem = false;
                 });
-                if (saveSystem) _this7.systemQueue.push(_this7._getSystem(item.systemId));
+                if (saveSystem) _this8.systemQueue.push(_this8._getSystem(item.systemId));
                 delete item['provisional'];
 
                 item.assignedDate = item.assignedDate ? item.assignedDate : new Date();
@@ -33053,7 +33061,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.back = function back() {
-            var _this8 = this;
+            var _this9 = this;
 
             this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
             var changes = this.clientRequests.isRequestDetailDirty(this.originalRequestDetail, ['requestId', 'productId', 'techComments']);
@@ -33070,7 +33078,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                     if (response.wasCancelled) {
                         return;
                     } else {
-                        _this8._cleanUp();
+                        _this9._cleanUp();
                     }
                 });
             }
@@ -33126,13 +33134,13 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.selectProductSystem = function selectProductSystem(id) {
-            var _this9 = this;
+            var _this10 = this;
 
             this.selectedSystemId = id;
             this.productSystems.forEach(function (item, index) {
                 if (item._id === id) {
-                    _this9.selectedSystem = item;
-                    _this9.selectedSystemIndex = index;
+                    _this10.selectedSystem = item;
+                    _this10.selectedSystemIndex = index;
                 }
             });
             this.checkClientConfigured();
@@ -33150,7 +33158,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.customerActionDialog = function () {
             var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
-                var _this10 = this;
+                var _this11 = this;
 
                 var subject, email;
                 return regeneratorRuntime.wrap(function _callee13$(_context13) {
@@ -33189,7 +33197,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 email = { emailBody: "", emailSubject: subject, emailId: this.email, products: this.clientRequests.selectedRequest.requestDetails, productsSelected: this.productsSelected };
                                 return _context13.abrupt('return', this.dialog.showEmail("Enter Email", email, ['Submit', 'Cancel']).whenClosed(function (response) {
                                     if (!response.wasCancelled) {
-                                        _this10.sendTheEmail(response.output);
+                                        _this11.sendTheEmail(response.output);
                                     } else {
                                         console.log("Cancelled");
                                     }
@@ -33212,7 +33220,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.sendTheEmail = function () {
             var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(email) {
-                var _this11 = this;
+                var _this12 = this;
 
                 var updateIds, date, day, month, year, response, serverResponse;
                 return regeneratorRuntime.wrap(function _callee14$(_context14) {
@@ -33228,7 +33236,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 updateIds = new Array();
 
                                 this.productsSelected.forEach(function (item) {
-                                    _this11.clientRequests.selectedRequest.requestDetails[item.index].requestStatus = _this11.config.CUSTOMER_ACTION_REQUEST_CODE;
+                                    _this12.clientRequests.selectedRequest.requestDetails[item.index].requestStatus = _this12.config.CUSTOMER_ACTION_REQUEST_CODE;
                                     updateIds.push(item._id);
                                 });
 
@@ -33426,12 +33434,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.flag = function flag() {
-            var _this12 = this;
+            var _this13 = this;
 
             var note = { noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0 };
             return this.dialog.showNote("Save Changes", note, ['Submit', 'Cancel']).whenClosed(function (response) {
                 if (!response.wasCancelled) {
-                    _this12.saveNote(response.output);
+                    _this13.saveNote(response.output);
                 } else {
                     console.log("Cancelled");
                 }
@@ -33482,25 +33490,25 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.bulkEmail = function bulkEmail() {
-            var _this13 = this;
+            var _this14 = this;
 
             this.email = { MESSAGE: "", INSTRUCTIONS: this.config.HELP_TICKET_INSTRUCTIONS, subject: "" };
             this.emailArray = new Array();
             this.dataTable.baseArray.forEach(function (item) {
                 var keep = true;
-                for (var i = 0; i < _this13.emailArray.length; i++) {
-                    if (item.requestId.personId.email === _this13.emailArray[i].email) keep = false;
+                for (var i = 0; i < _this14.emailArray.length; i++) {
+                    if (item.requestId.personId.email === _this14.emailArray[i].email) keep = false;
                 }
                 if (keep) {
                     var systemsAssigned = "Unassigned";
                     if (item.assignments && item.assignments.length) {
                         systemsAssigned = "";
                         item.assignments.forEach(function (item) {
-                            _this13.systems.selectedSystemFromId(item.systemId);
-                            systemsAssigned += _this13.systems.selectedSystem.sid + "(" + item.client + ") ";
+                            _this14.systems.selectedSystemFromId(item.systemId);
+                            systemsAssigned += _this14.systems.selectedSystem.sid + "(" + item.client + ") ";
                         });
                     }
-                    _this13.emailArray.push({
+                    _this14.emailArray.push({
                         fullName: item.requestId.personId.fullName,
                         email: item.requestId.personId.email,
                         institution: item.requestId.institutionId.name,
@@ -33516,7 +33524,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.sendBulkEmail = function sendBulkEmail() {
-            var _this14 = this;
+            var _this15 = this;
 
             if (this.email.MESSAGE === "" || this.email.subject === "") {
                 this.utils.showNotification("Enter a subject and messsage");
@@ -33530,7 +33538,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                 if (response.wasCancelled) {
                     okToProcess = false;
                 } else {
-                    _this14.sendTheBulkEmail();
+                    _this15.sendTheBulkEmail();
                 }
             });
         };
@@ -33579,7 +33587,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.filterInAssigned = function () {
             var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18() {
-                var _this15 = this;
+                var _this16 = this;
 
                 return regeneratorRuntime.wrap(function _callee18$(_context18) {
                     while (1) {
@@ -33608,7 +33616,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 if (this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length) {
                                     this.noRequests = false;
                                     this.clientRequests.requestsDetailsArray.forEach(function (item) {
-                                        if (item.requestId && item.requestId.courseId === null) item.requestId.courseId = { _id: _this15.config.SANDBOX_ID, name: _this15.config.SANDBOX_NAME };
+                                        if (item.requestId && item.requestId.courseId === null) item.requestId.courseId = { _id: _this16.config.SANDBOX_ID, name: _this16.config.SANDBOX_NAME };
                                     });
                                     this.dataTable.updateArray(this.clientRequests.requestsDetailsArray, 'requiredDate', -1);
                                 } else {
@@ -33627,7 +33635,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                             case 18:
                                 $('#loading').hide();
                                 this.clientRequests.requestsDetailsArray.forEach(function (item) {
-                                    if (item.requestId && item.requestId.courseId === null) item.requestId.courseId = { _id: _this15.config.SANDBOX_ID, name: _this15.config.SANDBOX_NAME };
+                                    if (item.requestId && item.requestId.courseId === null) item.requestId.courseId = { _id: _this16.config.SANDBOX_ID, name: _this16.config.SANDBOX_NAME };
                                 });
                                 this.dataTable.updateArray(this.clientRequests.requestsDetailsArray, 'requiredDate', -1);
 
@@ -36168,6 +36176,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       this.showRequestPanel = false;
       this.viewHelpTickets = true;
       this.showAssignment = false;
+      this.refreshInterval = 10;
       this.colSpan = 10;
       this.spinnerHTML = "";
       this.filterValues = new Array();
@@ -36238,8 +36247,9 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   this.toolbar = [['style', ['style', 'bold', 'clear']]];
                 }
                 this.initialLoaded = false;
+                this.refreshInterval = this.config.HELP_TICKET_REFRESH_INTERVAL;
 
-              case 17:
+              case 18:
               case 'end':
                 return _context.stop();
             }
@@ -36255,10 +36265,16 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     }();
 
     ViewHelpTickets.prototype.attached = function attached() {
+      var _this2 = this;
+
       this.refresh(false);
       if (!this.mobile) this.toolTips();
 
       this.initialLoaded = true;
+
+      setInterval(function () {
+        _this2.refresh(false);
+      }, this.refreshInterval * 60 * 1000);
     };
 
     ViewHelpTickets.prototype.toolTips = function toolTips() {
@@ -36333,13 +36349,13 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.sendAnEmail = function sendAnEmail(person) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (person) {
         var email = { emailBody: "", emailSubject: "", person: person };
         return this.dialog.showEmail("Enter Email", email, ['Submit', 'Cancel']).whenClosed(function (response) {
           if (!response.wasCancelled) {
-            _this2.sendTheEmail(response.output);
+            _this3.sendTheEmail(response.output);
           } else {
             console.log("Cancelled");
           }
@@ -36580,7 +36596,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.save = function () {
       var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(changes) {
-        var _this3 = this;
+        var _this4 = this;
 
         var email, serverResponse;
         return regeneratorRuntime.wrap(function _callee8$(_context8) {
@@ -36590,12 +36606,12 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 changes = changes ? changes : this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket, ["requestId", "courseId", "personId", "institutionId"]);
                 if (changes && changes.length > 0) {
                   changes.forEach(function (item) {
-                    _this3.helpTickets.selectedHelpTicket.audit.push({
+                    _this4.helpTickets.selectedHelpTicket.audit.push({
                       property: item.property,
                       oldValue: item.oldValue,
                       newValue: item.newValue,
                       eventDate: new Date(),
-                      personId: _this3.userObj._id
+                      personId: _this4.userObj._id
                     });
                   });
                 }
@@ -36667,7 +36683,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.saveResponse = function () {
       var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(status) {
-        var _this4 = this;
+        var _this5 = this;
 
         return regeneratorRuntime.wrap(function _callee9$(_context9) {
           while (1) {
@@ -36676,7 +36692,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 if (status === this.config.CLOSED_HELPTICKET_STATUS) {
                   this.dialog.showMessage("Are you sure you want to close this help ticket", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
                     if (!response.wasCancelled) {
-                      _this4.saveIt(status);
+                      _this5.saveIt(status);
                     }
                   });
                 } else {
@@ -36908,12 +36924,12 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.flag = function flag() {
-      var _this5 = this;
+      var _this6 = this;
 
       var note = { noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0 };
       return this.dialog.showNote("Save Changes", note, ['Submit', 'Cancel']).whenClosed(function (response) {
         if (!response.wasCancelled) {
-          _this5.saveNote(response.output);
+          _this6.saveNote(response.output);
         } else {
           console.log("Cancelled");
         }
@@ -36960,7 +36976,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     }();
 
     ViewHelpTickets.prototype.back = function back() {
-      var _this6 = this;
+      var _this7 = this;
 
       var changes = this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket, ["requestId", "courseId", "personId", "institutionId"]);
       if (changes.length) {
@@ -36968,9 +36984,9 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
         this.message = "The help ticket has been changed. Do you want to save your changes?";
         return this.dialog.showMessage(that.message, "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
           if (!response.wasCancelled) {
-            _this6.save(changes);
+            _this7.save(changes);
           } else {
-            _this6._cleanUp();
+            _this7._cleanUp();
           }
         });
       } else {
@@ -37022,13 +37038,13 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.changeFiles = function changeFiles() {
-      var _this7 = this;
+      var _this8 = this;
 
       this.filesToUpload = this.filesToUpload ? this.filesToUpload : new Array();
       for (var i = 0; i < this.files.length; i++) {
         var addFile = true;
         this.filesToUpload.forEach(function (item) {
-          if (item.name === _this7.files[i].name) addFile = false;
+          if (item.name === _this8.files[i].name) addFile = false;
         });
         if (addFile) this.filesToUpload.push(this.files[i]);
       }
@@ -37039,14 +37055,14 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.insertDocument = function insertDocument() {
-      var _this8 = this;
+      var _this9 = this;
 
       var document = { documentURL: "", documentCats: this.documents.docCatsArray, documents: new Array(), selectedCategory: 0 };
       return this.dialog.showDocument("Select Document", document, ['Submit', 'Cancel']).whenClosed(function (response) {
         if (!response.wasCancelled) {
-          _this8.helpTickets.selectedHelpTicketContent.documents = _this8.helpTickets.selectedHelpTicketContent.documents ? _this8.helpTickets.selectedHelpTicketContent.documents : new Array();
+          _this9.helpTickets.selectedHelpTicketContent.documents = _this9.helpTickets.selectedHelpTicketContent.documents ? _this9.helpTickets.selectedHelpTicketContent.documents : new Array();
           response.output.documents.documents.forEach(function (item) {
-            _this8.helpTickets.selectedHelpTicketContent.documents.push({
+            _this9.helpTickets.selectedHelpTicketContent.documents.push({
               categoryCode: item.categoryCode,
               categoryName: item.categoryName,
               fileName: item.fileName
@@ -37069,7 +37085,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.getRequests = function () {
       var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
-        var _this9 = this;
+        var _this10 = this;
 
         return regeneratorRuntime.wrap(function _callee14$(_context14) {
           while (1) {
@@ -37096,7 +37112,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   item.requestDetails.forEach(function (item2) {
                     if (item2.assignments && item2.assignments.length > 0) {
                       item2.assignments.forEach(function (assign) {
-                        _this9.originalClientRequestsArray.push({
+                        _this10.originalClientRequestsArray.push({
                           productId: item2.productId,
                           sessionId: item.sessionId,
                           requestStatus: item2.requestStatus,
@@ -37112,7 +37128,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                         });
                       });
                     } else {
-                      _this9.originalClientRequestsArray.push({
+                      _this10.originalClientRequestsArray.push({
                         productId: item2.productId,
                         sessionId: item.sessionId,
                         requestStatus: item2.requestStatus,
@@ -37123,7 +37139,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   });
                 });
                 this.originalClientRequestsArray.forEach(function (item) {
-                  _this9.clientRequestsArray.push(item);
+                  _this10.clientRequestsArray.push(item);
                 });
 
               case 10:
