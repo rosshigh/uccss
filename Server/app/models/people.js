@@ -135,3 +135,14 @@ PersonSchema.virtual('fullName')
 
 module.exports = Mongoose.model('Person', PersonSchema);
 module.exports = Mongoose.model('PersonArchive', PersonSchema);
+
+
+var NotificationSchema = new Schema({
+    personId: { type: Schema.Types.ObjectId },
+    notice: { type: String },
+    additionalInfo: { type: String },
+    dateCreated: { type: Date, default: Date.now },
+    checked: { type: Boolean, default: false }
+});
+
+module.exports = Mongoose.model('Notification', NotificationSchema);

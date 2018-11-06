@@ -12348,9 +12348,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
 
         HelpTickets.prototype.isHelpTicketDirty = function isHelpTicketDirty(obj, skip) {
             if (this.selectedHelpTicket) {
-                if (this.selectedHelpTicket._id) {
-                    var obj = obj ? this.helpTicketsArray[this.editIndex] : obj;
-                } else {
+                if (!this.selectedHelpTicket._id) {
                     var obj = this.emptyHelpTicket();
                 }
                 return this.utils.objectsEqual(this.selectedHelpTicket, obj, skip);
@@ -36475,7 +36473,10 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
             switch (_context5.prev = _context5.next) {
               case 0:
                 this.editIndex = this.dataTable.getOriginalIndex(index);
-                this.helpTickets.selectHelpTicket(this.editIndex);
+                _context5.next = 3;
+                return this.helpTickets.getHelpTicket(this.helpTickets.helpTicketsArray[index]._id);
+
+              case 3:
                 this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
                 this.openHelpTicket();
                 indices = this.getIndex();
@@ -36491,7 +36492,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
                 this.helpTicketSelected = true;
 
-              case 13:
+              case 14:
               case 'end':
                 return _context5.stop();
             }

@@ -22,7 +22,7 @@ module.exports = function (app, config) {
   app.use('/', router);
 
   router.get('/api/helpTickets', requireAuth, function (req, res, next) {
-    logger.log('Get helpTicket', 'verbose');
+    logger.log('info','Get helpTicket');
     var query = buildQuery(req.query, Model.find())
       .populate('courseId', 'name number')
       .populate('requestId')
@@ -40,7 +40,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/mine/:personId', requireAuth, function (req, res, next) {
-    logger.log('Get helpTicket', 'verbose');
+    logger.log('info','Get helpTicket');
     var query = Model.find()
       .where('helpTicketStatus').gt(6)
       .where('owner[0].personId.id').equals(req.params.id)
@@ -60,7 +60,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/archived', requireAuth, function (req, res, next) {
-    logger.log('Get helpTicket', 'verbose');
+    logger.log('info','Get helpTicket');
     var query = buildQuery(req.query, HelpTicketArchive.find())
       .populate('courseId', 'name number')
       .populate('requestId')
@@ -78,7 +78,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/users', requireAuth, function (req, res, next) {
-    logger.log('Get user helpTicket', 'verbose');
+    logger.log('info','Get user helpTicket');
     var query1 = buildQuery(req.query, Model.find())
       .populate('courseId', 'name number')
       .populate('requestId')
@@ -112,7 +112,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/analytics', requireAuth, function (req, res, next) {
-    logger.log('Get helpTicket', 'verbose');
+    logger.log('info','Get helpTicket');
     var query = buildQuery(req.query, Model.find())
       .populate('courseId', 'name number')
       .populate('requestId')
@@ -130,7 +130,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/current', requireAuth, function (req, res, next) {
-    logger.log('Get helpTicket', 'verbose');
+    logger.log('info','Get helpTicket');
     Model.find({ $or: [{ 'helpTicketStatus': 1 }, { 'helpTicketStatus': 2 }, { 'helpTicketStatus': 3 }] })
       .sort(req.query.order)
       .exec()
@@ -143,7 +143,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/current/count', requireAuth, function (req, res, next) {
-    logger.log('Get helpTicket');
+    logger.log('info','Get helpTicket');
     var query = buildQuery(req.query, Model.find({ $or: [{ 'helpTicketStatus': 1 }, { 'helpTicketStatus': 2 }, { 'helpTicketStatus': 3 }] }))
     query.exec()
       .then(object => {
@@ -155,7 +155,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/current/count/:personId', requireAuth, function (req, res, next) {
-    logger.log('Get helpTicket', 'verbose');
+    logger.log('info','Get helpTicket');
     Model.find({ 'personId': req.params.personId, $or: [{ 'helpTicketStatus': 1 }, { 'helpTicketStatus': 2 }, { 'helpTicketStatus': 3 }] })
       .sort(req.query.order)
       .exec()
@@ -168,7 +168,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/count', requireAuth, function (req, res, next) {
-    logger.log('Get helpTicket', 'verbose');
+    logger.log('info','Get helpTicket');
     var query = buildQuery(req.query, Model.find())
     query.exec()
       .then(object => {
@@ -180,7 +180,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTickets/archive/:collection', requireAuth, function (req, res, next) {
-    logger.log('Archive search', 'verbose');
+    logger.log('info','Archive search');
     if (req.params.collection && req.params.collection === 'current') {
       var query = Model.find();
     } else {
@@ -245,7 +245,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/:id', requireAuth, function (req, res, next) {
-    logger.log('Get help ticket ' + req.params.id, 'verbose');
+    logger.log('info','Get help ticket ' + req.params.id);
     Model.findOne({ _id: req.params.id })
       .populate('courseId', 'name number')
       .populate('requestId')
@@ -263,7 +263,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTickets/', requireAuth, function (req, res, next) {
-    logger.log('Create HelpTicket', "verbose");
+    logger.log('info','Create HelpTicket', "verbose");
     var helpTicket = new Model(req.body);
     helpTicket.setNext('helpTicketNo', function (err, helpTicket) {
       if (err) {
@@ -280,7 +280,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/content/:id/:status', requireAuth, function (req, res, next) {
-    logger.log('Update HelpTicket ' + req.params.id, 'verbose');
+    logger.log('info','Update HelpTicket ' + req.params.id);
 
     if (req.params.status == 6) {
       Model.findById(req.params.id).exec()
@@ -312,21 +312,21 @@ module.exports = function (app, config) {
           result.helpTicketStatus = req.params.status; 
           result.modifiedDate = new Date();      
           result.save().then(result => {
-            // res.status(200).json(result);
-            var query = Model.find({_id: req.body._id})
-              .populate('courseId', 'name number')
-              .populate('requestId')
-              .populate('personId', 'email firstName lastName fullName phone mobile nickName file country')
-              .populate('content.personId', 'email firstName lastName phone mobile nickName')
-              .populate('institutionId', 'name')
-              .populate({ path: 'owner.personId', model: 'Person', select: 'firstName lastName fullName' })
-            query.exec()
-              .then(object => {
-                res.status(200).json(object);
-              })
-              .catch(error => {
-                return next(error);
-              })
+            res.status(200).json(result);
+            // var query = Model.find({_id: req.body._id})
+            //   .populate('courseId', 'name number')
+            //   .populate('requestId')
+            //   .populate('personId', 'email firstName lastName fullName phone mobile nickName file country')
+            //   .populate('content.personId', 'email firstName lastName phone mobile nickName')
+            //   .populate('institutionId', 'name')
+            //   .populate({ path: 'owner.personId', model: 'Person', select: 'firstName lastName fullName' })
+            // query.exec()
+            //   .then(object => {
+            //     res.status(200).json(object);
+            //   })
+            //   .catch(error => {
+            //     return next(error);
+            //   })
             })
             .catch(error => {
               return next(error);
@@ -340,7 +340,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/owner/:id', requireAuth, function (req, res, next) {
-    logger.log('Update HelpTicket owner', 'verbose');
+    logger.log('info','Update HelpTicket owner');
 
     Model.findById(req.params.id).exec()
       .then(result => {
@@ -382,7 +382,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/status/:id', requireAuth, function (req, res, next) {
-    logger.log('Update HelpTicket ' + req.body._id, 'verbose');
+    logger.log('info','Update HelpTicket ' + req.body._id);
     Model.findById(req.params.id)
       .exec()
       .then(result => {
@@ -401,7 +401,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/keywords/:id', requireAuth, function (req, res, next) {
-    logger.log('Update HelpTicket ' + req.body._id, 'verbose');
+    logger.log('info','Update HelpTicket ' + req.body._id);
     Model.findById(req.params.id)
       .exec()
       .then(result => {
@@ -420,7 +420,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/close', requireAuth, function (req, res, next) {
-    logger.log('Close HelpTicket ' + req.body._id, 'verbose');
+    logger.log('info','Close HelpTicket ' + req.body._id);
     var archiveHT = new HelpTicketArchive(req.body);
     archiveHT.modifiedDate = new Date();
     archiveHT.save(function (error, archivedHelpTicket) {
@@ -432,7 +432,7 @@ module.exports = function (app, config) {
   })
 
   router.put('/api/helpTickets', requireAuth, function (req, res, next) {
-    logger.log('Update HelpTicket ' + req.body._id, 'verbose');
+    logger.log('info','Update HelpTicket ' + req.body._id);
     Model.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true, safe: true, multi: false })
       .exec()
       .then(result => {
@@ -474,7 +474,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/sendMail/:id', requireAuth, function (req, res, next) {
-    logger.log('Update HelpTicket ' + req.body._id, 'verbose');
+    logger.log('info','Update HelpTicket ' + req.body._id);
     if (req.body.audit) {
       Model.findById(req.params.id, function (err, result) {
         if (err) {
@@ -503,7 +503,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/helpTickets/:id', requireAuth, function (req, res, next) {
-    logger.log('Delete session ' + req.params.id, 'verbose');
+    logger.log('info','Delete session ' + req.params.id);
     Model.remove({ _id: req.params.id })
       .exec()
       .then(result => {
@@ -515,7 +515,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/count/:status', function (req, res, next) {
-    logger.log('Count tickets with status ' + req.params.status, 'verbose');
+    logger.log('info','Count tickets with status ' + req.params.status);
 
     Model.find({ helpTicketStatus: req.params.status }, function (err, results) {
       if (err) return next(err);
@@ -525,7 +525,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTickets/sendMail', requireAuth, function (req, res, next) {
-    logger.log("Send email to " + req.body.email, 'verbose');
+    logger.log('info',"Send email to " + req.body.email);
     if (req.body) {
       sendEmail(req.body);
     }
@@ -552,10 +552,10 @@ module.exports = function (app, config) {
       while (fs.existsSync(path + "/" + file.originalname)) {
         file.originalname = fileParts[0] + "(" + version + ")." + fileParts[1];
         version += 1;
-        console.log(file.originalname)
+        console.log('info',file.originalname)
       }
 
-      console.log(file.originalname)
+      console.log('info',file.originalname)
       cb(null, file.originalname);
     }
   });
@@ -563,7 +563,7 @@ module.exports = function (app, config) {
   var upload = multer({ storage: storage });
 
   router.post('/api/helpTickets/upload/:id/:container/:contentId', upload.any(), function (req, res, next) {
-    logger.log('Upload File ', 'verbose');
+    logger.log('info','Upload File ');
     Model.findById(req.params.id, function (err, helpticket) {
       if (err) {
         return next(err);
@@ -599,7 +599,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTicketLocks', function (req, res, next) {
-    logger.log('Get helpTicket Locks', 'verbose');
+    logger.log('info','Get helpTicket Locks');
     HelpTicketLock.find()
       .sort("-createdAt")
       .exec()
@@ -613,7 +613,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTicketLocks/:id', function (req, res, next) {
-    logger.log('Get helpTicket Locks' + req.params.id, 'verbose');
+    logger.log('info','Get helpTicket Locks' + req.params.id);
     HelpTicketLock.find({ helpTicketId: req.params.id })
       .sort("-createdAt")
       .exec()
@@ -631,7 +631,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTicketLocks', function (req, res, next) {
-    logger.log('Create helpTicket Lock', 'verbose');
+    logger.log('info','Create helpTicket Lock');
     var helpTicketLock = new HelpTicketLock(req.body);
     helpTicketLock.save()
       .then(function (result) {
@@ -643,7 +643,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/helpTicketLocks/:id', function (req, res, next) {
-    logger.log('Delete Help Ticket Lock ' + req.params.id, 'verbose');
+    logger.log('info','Delete Help Ticket Lock ' + req.params.id);
     var query = HelpTicketLock.remove({ helpTicketId: req.params.id })
       .exec()
       .then(function (result) {
@@ -666,7 +666,7 @@ module.exports = function (app, config) {
   })
 
   router.get('/api/helpTicketsTypes', requireAuth, function (req, res, next) {
-    logger.log('Get helpTicketypes Frick', 'verbose');
+    logger.log('info','Get helpTicketypes Frick');
     var query = buildQuery(req.query, HelpTicketTypes.find())
     query.exec()
       .then(object => {
@@ -679,7 +679,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTicketsTypes', requireAuth, function (req, res, next) {
-    logger.log('Create HelpTicketTypes', "verbose");
+    logger.log('info','Create HelpTicketTypes', "verbose");
     var helpTicketType = new HelpTicketTypes(req.body);
     helpTicketType.save(function (err, object) {
       if (err) {
@@ -691,7 +691,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTicketsTypes', requireAuth, function (req, res, next) {
-    logger.log('Update HelpTicket Type ' + req.body._id, 'verbose');
+    logger.log('info','Update HelpTicket Type ' + req.body._id);
 
     HelpTicketTypes.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false })
       .exec()
@@ -704,7 +704,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTickets/archiveClosed', function (req, res, next) {
-    logger.log('Archiving closed help tickets', 'verbose');
+    logger.log('info','Archiving closed help tickets');
     Model.find({ helpTicketStatus: 6 }, function (err, result) {
       if (err) {
         return next(err);
@@ -742,7 +742,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTicketsArchive', function (req, res, next) {
-    logger.log('Get helpTicket', 'verbose');
+    logger.log('info','Get helpTicket');
     var query = buildQuery(req.query, HelpTicketArchive.find())
       .populate('courseId', 'name number')
       .populate('requestId')
@@ -760,7 +760,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/knowledgeBase', requireAuth, function (req, res, next) {
-    logger.log('Get knowledgeBase', 'verbose');
+    logger.log('info','Get knowledgeBase');
     var query = buildQuery(req.query, KnowledgeBase.find())
       .populate('personId', 'firstName lastName fullName')
     query.exec()
@@ -773,7 +773,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/knowledgeBase/:id', requireAuth, function (req, res, next) {
-    logger.log('Get knowledgeBase', 'verbose');
+    logger.log('info','Get knowledgeBase');
     var query = KnowledgeBase.findById(req.params.id)
       .populate('personId', 'firstName lastName fullName')
     query.exec()
@@ -786,7 +786,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/knowledgeBase/', requireAuth, function (req, res, next) {
-    logger.log('Create knowledgeBase', "verbose");
+    logger.log('info','Create knowledgeBase', "verbose");
     var knowledgeBase = new KnowledgeBase(req.body);
     knowledgeBase.save()
       .then(object => {
@@ -798,7 +798,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/knowledgeBase/', requireAuth, function (req, res, next) {
-    logger.log('Update knowledgeBase ' + req.body._id, 'verbose');
+    logger.log('info','Update knowledgeBase ' + req.body._id);
     KnowledgeBase.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true, safe: true, multi: false })
       .exec()
       .then(result => {
@@ -818,7 +818,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/knowledgeBase/:id', requireAuth, function (req, res, next) {
-    logger.log('Delete knowledgeBase ' + req.params.id, 'verbose');
+    logger.log('info','Delete knowledgeBase ' + req.params.id);
     KnowledgeBase.remove({ _id: req.params.id })
       .exec()
       .then(result => {

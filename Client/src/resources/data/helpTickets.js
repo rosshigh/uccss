@@ -333,9 +333,9 @@ export class HelpTickets {
 
     isHelpTicketDirty(obj, skip) {
         if (this.selectedHelpTicket) {
-            if (this.selectedHelpTicket._id) {
-                var obj = obj ? this.helpTicketsArray[this.editIndex] : obj;
-            } else {
+            if (!this.selectedHelpTicket._id) {
+            //     var obj = obj ? this.helpTicketsArray[this.editIndex] : obj;
+            // } else {
                 var obj = this.emptyHelpTicket();
             }
             return this.utils.objectsEqual(this.selectedHelpTicket, obj, skip);

@@ -233,7 +233,8 @@ export class ViewHelpTickets {
   async selectHelpTicket(el, index) {
     //Make the selected help ticket the selected help ticket
     this.editIndex = this.dataTable.getOriginalIndex(index);
-    this.helpTickets.selectHelpTicket(this.editIndex);
+    // this.helpTickets.selectHelpTicket(this.editIndex);
+    await this.helpTickets.getHelpTicket(this.helpTickets.helpTicketsArray[index]._id);
     this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
     this.openHelpTicket();
     let indices = this.getIndex();

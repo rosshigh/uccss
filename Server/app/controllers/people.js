@@ -15,8 +15,7 @@ var express = require('express'),
     logAuth = require('../../config/log-authenticate'),
     passportService = require('../../config/passport'),
     passport = require('passport'),
-    // Promise = require('bluebird'),
-    // config = require('../../config/config'),
+    Notifications =  mongoose.model('Notification'),
     Event = mongoose.model('Event'),
     EmailLog = mongoose.model('EmailLog'),
     multer = require('multer'),
@@ -56,7 +55,7 @@ module.exports = function (app, config) {
             item.eventActive = false;
             Event.findOneAndUpdate({_id: item._id}, item, {safe:true, multi:false}, function(err, event){
               if(err){
-                console.log(err);
+                console.log('info',err);
               } else {
                 logger.log('info','Event updated'); 
               }
@@ -329,7 +328,7 @@ module.exports = function (app, config) {
 
         // genericEmail(obj)
 
-        var LogEntry = new EmailLog({
+        var LogEntry = new Emaillog('info',{
           personId: req.body.id,
           email: req.body.email,
           body: req.body.message,
@@ -509,7 +508,7 @@ module.exports = function (app, config) {
     .post(requireLogin, login);
 
   router.route('/api/users/logout').post(function(req, res, next){
-    logAuth.log('logoff-' + req.body.email, 'info');
+    logAuth.log('info','logoff-' + req.body.email, 'info');
     res.status(201).json({message: "logout successful"});
   })
 
@@ -768,6 +767,73 @@ module.exports = function (app, config) {
 
   router.delete('/api/events/:id', requireAuth, function(req, res, next){
     logger.log('info','Delete event ' + req.params.id,'verbose');
+    Event.remove({ _id: req.params.id }, function(err, result){
+      if (err) {
+         return next(err);
+      } else {
+        res.status(200).json({msg: "Event Deleted"});
+      }
+    })
+  });
+
+  router.get('/api/notifications', requireAuth,  function(req, res, next){
+    logger.log('info','Get notifications','verbose');
+    var query = buildQuery(req.query, Notifications.find())
+    query.exec( function(err, object){
+        if (err) {
+          res.status(500).json(err);
+        } else {       
+          if(!object || object.length === 0){          
+            res.status(200).json({"message": "No notifications Found"});
+          } else {
+            res.status(200).json(object);
+          }
+        }
+      });
+  });
+
+  router.get('/api/notifications/:personId', requireAuth, function(req, res, next){
+    logger.log('info','Get person notifications', 'verbose');
+    var query = Notifications.find()
+      .where({personId: req.params.personId})
+      .exec()
+      .then(object => {
+         if(!object || object.length === 0){          
+            res.status(200).json({"message": "No Events Found"});
+          } else {
+            res.status(200).json(object);
+          }
+      })
+      .catch(err => {
+         res.status(500).json(err);
+      })
+  });
+
+  router.post('/api/notifications', requireAuth, function(req, res, next){
+    logger.log('info','Create notifications', 'verbose');
+    var event =  new Notifications(req.body);  
+      event.save(function ( err, object ){
+        if (err) {
+           return next(err);
+        } else {
+          res.status(201).json(object);
+        }
+      });
+  });
+
+  router.put('/api/notifications', requireAuth, function(req, res, next){
+    logger.log('info','Update notifications ' + req.body._id, 'verbose');  
+    Notifications.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, event){
+      if (err) {
+        return next(err);
+      } else {
+        res.status(200).json(event);
+      }
+    })
+  });
+
+  router.delete('/api/notifications/:id', requireAuth, function(req, res, next){
+    logger.log('info','Delete notifications ' + req.params.id,'verbose');
     Event.remove({ _id: req.params.id }, function(err, result){
       if (err) {
          return next(err);
