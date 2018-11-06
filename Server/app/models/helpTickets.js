@@ -63,7 +63,7 @@ var HelpTicketSchema = new Schema({
     oldValue: { type: Schema.Types.Mixed },
     personId: { type: Schema.Types.ObjectId }
   }]
-}, { versionKey: false });
+}, { versionKey: false, usePushEach: true } );
 
 // HelpTicketSchema.index( {createdDate: -1} );
 

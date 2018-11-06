@@ -220,7 +220,7 @@ export class ViewHelpTickets {
     this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
     this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
     this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
-    this.helpTickets.selectedHelpTicketContent.content.comments = this.responseMessage;
+    // this.helpTickets.selectedHelpTicketContent.content.comments = this.responseMessage;
     this.helpTickets.selectedHelpTicketContent.displayForm = this.config.HELP_TICKET_OTHER_TYPE;
   }
 
@@ -265,6 +265,7 @@ export class ViewHelpTickets {
         } else {
           this.responseMessage += "<p>No method was provided for resolving the issue.</p>"
         }
+        this.helpTickets.selectedHelpTicketContent.content.comments = this.responseMessage
         this._createResponse();
         this.closeTicket(helpTicket);
       } else {

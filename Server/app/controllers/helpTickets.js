@@ -280,7 +280,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/content/:id/:status', requireAuth, function (req, res, next) {
-    logger.log('Update HelpTicket ' + req.params._id, 'verbose');
+    logger.log('Update HelpTicket ' + req.params.id, 'verbose');
 
     if (req.params.status == 6) {
       Model.findById(req.params.id).exec()
@@ -304,12 +304,13 @@ module.exports = function (app, config) {
         })
 
     } else {
+
       Model.findById(req.params.id).exec()
         .then(result => {
           var content = new Content(req.body);
           result.content.push(content);
           result.helpTicketStatus = req.params.status;
-          result.modifiedDate = new Date();
+          result.modifiedDate = new Date();      
           result.save().then(result => {
             res.status(200).json(result);
           })
