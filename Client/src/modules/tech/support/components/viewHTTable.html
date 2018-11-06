@@ -127,9 +127,9 @@
               </td>
               <td  data-title="Created Date" click.trigger="selectHelpTicket($event, $index)">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
               <td  data-title="Modified Date" click.trigger="selectHelpTicket($event, $index)">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
-              <td class="dropbtn hidden-xs hidden-sm hidden-md" style="width:10rem;" data-title="Customer">${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>
-              <td class="hidden-lg" style="width:10rem;" data-title="Customer" >${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>
-              <td  data-title="Insitution">${helpTicket.institutionId.name}</td>
+              <td class="dropbtn hidden-xs hidden-sm hidden-md" style="width:10rem;" click.trigger="selectHelpTicket($event, $index)" data-title="Customer">${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>
+              <td class="hidden-lg" style="width:10rem;" click.trigger="selectHelpTicket($event, $index)" data-title="Customer" >${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>
+              <td  data-title="Insitution" click.trigger="selectHelpTicket($event, $index)">${helpTicket.institutionId.name}</td>
               <td class="dropbtn"  click.trigger="sendAnEmail(helpTicket.personId)" data-title="Email" >${helpTicket.personId.email}</td>
             </tr>
           </tbody>

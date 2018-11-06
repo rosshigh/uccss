@@ -309,11 +309,11 @@ module.exports = function (app, config) {
         .then(result => {
           var content = new Content(req.body);
           result.content.push(content);
-          result.helpTicketStatus = req.params.status;
+          result.helpTicketStatus = req.params.status; 
           result.modifiedDate = new Date();      
           result.save().then(result => {
             // res.status(200).json(result);
-            var query = Model.find()
+            var query = Model.find({_id: req.body._id})
               .populate('courseId', 'name number')
               .populate('requestId')
               .populate('personId', 'email firstName lastName fullName phone mobile nickName file country')

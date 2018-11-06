@@ -1,4 +1,5 @@
 <template>
+    <div class="hover" innerhtml.bind="commentShown"></div>
   <div show.bind="!searchResults">
     <div class="row">
         <div class="bottomMargin leftMargin rightMargin list-group-item">
@@ -66,7 +67,7 @@
             <tbody>
               <tr repeat.for="helpTicket of dataTable.displayArray">
                 <td click.trigger="selectHelpTicket(helpTicket, $event)" data-title="Number">${helpTicket.helpTicketNo}</td>
-                <td click.trigger="selectHelpTicket(helpTicket, $event)" data-title="Type">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>
+                <td mouseover.delegate="showComment(helpTicket, $event)" mouseout.delegate="hideComment()" click.trigger="selectHelpTicket(helpTicket, $event)" data-title="Type">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>
                 <td click.trigger="selectHelpTicket(helpTicket, $event)" data-title="Owner">
                   <span show.bind="helpTicket.owner[0].personId === null"></span>
                   <span show.bind="helpTicket.owner[0].personId !== null"> ${helpTicket.owner[0].personId.fullName}</span>

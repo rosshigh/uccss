@@ -72,7 +72,7 @@ export class ViewHelpTickets {
     });
 
     let responses = await Promise.all([
-      this.helpTickets.getUserHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true),
+      this.helpTickets.getUserHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=helpTicketNo:DSC", true),
       this.people.getUCCStaff(uccRoles),
       this.helpTickets.getHelpTicketTypes('?order=category'),
       this.products.getProductsArray('', true),

@@ -113,16 +113,12 @@ export class ViewHelpTickets {
     // $("#loading").hide();
     this.initialLoaded = true;
 
-    setInterval(() => {this.refresh(false);}, this.refreshInterval * 60 * 1000);
+    setInterval(() => {if(!this.helpTicketSelected) this.refresh(false);}, this.refreshInterval * 60 * 1000);
   }
 
   toolTips() {
     $('[data-toggle="tooltip"]').tooltip();
   }
-
-  // detached() {
-  //   this._unLock();
-  // }
 
   sendMailNow() {
     this.helpTickets.sendMail();
@@ -418,7 +414,6 @@ export class ViewHelpTickets {
       if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
     }
     this._cleanUp();
-    // this.unlockIt();
   }
 
   async ownHelpTicket(helpTicket) {
@@ -522,6 +517,7 @@ export class ViewHelpTickets {
   }
 
   back() {
+    this.helpTicketSelected = false;
     var changes = this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket, ["requestId", "courseId", "personId", "institutionId"]);
     if (changes.length) {
       let that = this;
