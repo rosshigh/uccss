@@ -239,6 +239,14 @@ export class ViewHelpTickets {
       this.filterOutClosed();
       this.utils.showNotification("The help ticket was updated");
       if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
+      if(this.helpTickets.selectedHelpTicket.owner[0].personId != null){
+        let notice = {
+          personId: this.userObj._id,
+          uccStaffId: this.helpTickets.selectedHelpTicket.owner[0].personId,
+          notice:  "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo + " updated"
+        }
+        this.helpTickets.saveNotification(notice);
+        }
     }
     this._cleanUp();
   }

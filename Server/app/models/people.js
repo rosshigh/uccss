@@ -139,6 +139,7 @@ module.exports = Mongoose.model('PersonArchive', PersonSchema);
 
 var NotificationSchema = new Schema({
     personId: { type: Schema.Types.ObjectId },
+    uccStaffId: { type: Schema.Types.ObjectId },
     notice: { type: String },
     additionalInfo: { type: String },
     dateCreated: { type: Date, default: Date.now },

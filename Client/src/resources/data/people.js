@@ -21,6 +21,7 @@ export class People {
     INSTITUTION_SERVICES = "institutions";
     COURSES_SERVICE = 'courses';
     PEOPLE_UPLOAD_SERVICE = '/people/upload/';
+    NOTIFICATION_SERVICE = 'notifications';
 
     constructor(data, utils) {
         this.data = data;
@@ -91,6 +92,10 @@ export class People {
                 console.log(error);
             }
         }
+    }
+
+    getNotifications(personId){
+        this.data.get(this.NOTIFICATION_SERVICE + "/" + personId + "?filter=checked|eq|false&order=dateCreated:DSC" + false );
     }
 
     async getPerson(id) {

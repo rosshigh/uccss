@@ -14,6 +14,7 @@ export class HelpTickets {
     HELP_TICKET_LOCK_SERVICES = "helpTicketLocks";
     HELP_TICKET_TYPES = "helpTicketsTypes";
     HELP_TICKET_EMAIL = "helpTickets/sendMail";
+    NOTIFICATION_SERVICES = "notifications";
 
     constructor(data, utils, config) {
         this.data = data;
@@ -329,6 +330,10 @@ export class HelpTickets {
             }
             return response;
         }
+    }
+
+    saveNotification(notice){
+        this.data.saveObject(notice, this.NOTIFICATION_SERVICES, "post");
     }
 
     isHelpTicketDirty(obj, skip) {

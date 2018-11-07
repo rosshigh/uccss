@@ -7559,59 +7559,6 @@ define('aurelia-framework',['exports', 'aurelia-dependency-injection', 'aurelia-
   exports.FrameworkConfiguration = FrameworkConfiguration;
   var LogManager = exports.LogManager = TheLogManager;
 });
-define('aurelia-history',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  
-
-  function mi(name) {
-    throw new Error('History must implement ' + name + '().');
-  }
-
-  var History = exports.History = function () {
-    function History() {
-      
-    }
-
-    History.prototype.activate = function activate(options) {
-      mi('activate');
-    };
-
-    History.prototype.deactivate = function deactivate() {
-      mi('deactivate');
-    };
-
-    History.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
-      mi('getAbsoluteRoot');
-    };
-
-    History.prototype.navigate = function navigate(fragment, options) {
-      mi('navigate');
-    };
-
-    History.prototype.navigateBack = function navigateBack() {
-      mi('navigateBack');
-    };
-
-    History.prototype.setTitle = function setTitle(title) {
-      mi('setTitle');
-    };
-
-    History.prototype.setState = function setState(key, value) {
-      mi('setState');
-    };
-
-    History.prototype.getState = function getState(key) {
-      mi('getState');
-    };
-
-    return History;
-  }();
-});
 define('aurelia-history-browser',['exports', 'aurelia-pal', 'aurelia-history'], function (exports, _aureliaPal, _aureliaHistory) {
   'use strict';
 
@@ -7953,6 +7900,59 @@ define('aurelia-history-browser',['exports', 'aurelia-pal', 'aurelia-history'], 
   function createOrigin(protocol, hostname, port) {
     return protocol + '//' + hostname + (port ? ':' + port : '');
   }
+});
+define('aurelia-history',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  function mi(name) {
+    throw new Error('History must implement ' + name + '().');
+  }
+
+  var History = exports.History = function () {
+    function History() {
+      
+    }
+
+    History.prototype.activate = function activate(options) {
+      mi('activate');
+    };
+
+    History.prototype.deactivate = function deactivate() {
+      mi('deactivate');
+    };
+
+    History.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
+      mi('getAbsoluteRoot');
+    };
+
+    History.prototype.navigate = function navigate(fragment, options) {
+      mi('navigate');
+    };
+
+    History.prototype.navigateBack = function navigateBack() {
+      mi('navigateBack');
+    };
+
+    History.prototype.setTitle = function setTitle(title) {
+      mi('setTitle');
+    };
+
+    History.prototype.setState = function setState(key, value) {
+      mi('setState');
+    };
+
+    History.prototype.getState = function getState(key) {
+      mi('getState');
+    };
+
+    return History;
+  }();
 });
 define('aurelia-loader',['exports', 'aurelia-path', 'aurelia-metadata'], function (exports, _aureliaPath, _aureliaMetadata) {
   'use strict';
@@ -8574,63 +8574,107 @@ define('aurelia-logging',['exports'], function (exports) {
     return Logger;
   }();
 });
-define('aurelia-logging-console',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
+define('aurelia-pal',['exports'], function (exports) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.ConsoleAppender = undefined;
+  exports.AggregateError = AggregateError;
+  exports.initializePAL = initializePAL;
+  exports.reset = reset;
+  function AggregateError(message, innerError, skipIfAlreadyAggregate) {
+    if (innerError) {
+      if (innerError.innerError && skipIfAlreadyAggregate) {
+        return innerError;
+      }
 
-  
+      var separator = '\n------------------------------------------------\n';
 
-  var ConsoleAppender = exports.ConsoleAppender = function () {
-    function ConsoleAppender() {
-      
+      message += separator + 'Inner Error:\n';
+
+      if (typeof innerError === 'string') {
+        message += 'Message: ' + innerError;
+      } else {
+        if (innerError.message) {
+          message += 'Message: ' + innerError.message;
+        } else {
+          message += 'Unknown Inner Error Type. Displaying Inner Error as JSON:\n ' + JSON.stringify(innerError, null, '  ');
+        }
+
+        if (innerError.stack) {
+          message += '\nInner Error Stack:\n' + innerError.stack;
+          message += '\nEnd Inner Error Stack';
+        }
+      }
+
+      message += separator;
     }
 
-    ConsoleAppender.prototype.debug = function debug(logger) {
-      var _console;
+    var e = new Error(message);
+    if (innerError) {
+      e.innerError = innerError;
+    }
 
-      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        rest[_key - 1] = arguments[_key];
+    return e;
+  }
+
+  var FEATURE = exports.FEATURE = {};
+
+  var PLATFORM = exports.PLATFORM = {
+    noop: function noop() {},
+    eachModule: function eachModule() {},
+    moduleName: function (_moduleName) {
+      function moduleName(_x) {
+        return _moduleName.apply(this, arguments);
       }
 
-      (_console = console).debug.apply(_console, ['DEBUG [' + logger.id + ']'].concat(rest));
-    };
+      moduleName.toString = function () {
+        return _moduleName.toString();
+      };
 
-    ConsoleAppender.prototype.info = function info(logger) {
-      var _console2;
+      return moduleName;
+    }(function (moduleName) {
+      return moduleName;
+    })
+  };
 
-      for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-        rest[_key2 - 1] = arguments[_key2];
-      }
+  PLATFORM.global = function () {
+    if (typeof self !== 'undefined') {
+      return self;
+    }
 
-      (_console2 = console).info.apply(_console2, ['INFO [' + logger.id + ']'].concat(rest));
-    };
+    if (typeof global !== 'undefined') {
+      return global;
+    }
 
-    ConsoleAppender.prototype.warn = function warn(logger) {
-      var _console3;
-
-      for (var _len3 = arguments.length, rest = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-        rest[_key3 - 1] = arguments[_key3];
-      }
-
-      (_console3 = console).warn.apply(_console3, ['WARN [' + logger.id + ']'].concat(rest));
-    };
-
-    ConsoleAppender.prototype.error = function error(logger) {
-      var _console4;
-
-      for (var _len4 = arguments.length, rest = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-        rest[_key4 - 1] = arguments[_key4];
-      }
-
-      (_console4 = console).error.apply(_console4, ['ERROR [' + logger.id + ']'].concat(rest));
-    };
-
-    return ConsoleAppender;
+    return new Function('return this')();
   }();
+
+  var DOM = exports.DOM = {};
+  var isInitialized = exports.isInitialized = false;
+  function initializePAL(callback) {
+    if (isInitialized) {
+      return;
+    }
+    exports.isInitialized = isInitialized = true;
+    if (typeof Object.getPropertyDescriptor !== 'function') {
+      Object.getPropertyDescriptor = function (subject, name) {
+        var pd = Object.getOwnPropertyDescriptor(subject, name);
+        var proto = Object.getPrototypeOf(subject);
+        while (typeof pd === 'undefined' && proto !== null) {
+          pd = Object.getOwnPropertyDescriptor(proto, name);
+          proto = Object.getPrototypeOf(proto);
+        }
+        return pd;
+      };
+    }
+
+    callback(PLATFORM, FEATURE, DOM);
+  }
+  function reset() {
+    exports.isInitialized = isInitialized = false;
+  }
 });
 define('aurelia-metadata',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
   'use strict';
@@ -8916,107 +8960,63 @@ define('aurelia-metadata',['exports', 'aurelia-pal'], function (exports, _aureli
     return result;
   };
 });
-define('aurelia-pal',['exports'], function (exports) {
+define('aurelia-logging-console',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.AggregateError = AggregateError;
-  exports.initializePAL = initializePAL;
-  exports.reset = reset;
-  function AggregateError(message, innerError, skipIfAlreadyAggregate) {
-    if (innerError) {
-      if (innerError.innerError && skipIfAlreadyAggregate) {
-        return innerError;
+  exports.ConsoleAppender = undefined;
+
+  
+
+  var ConsoleAppender = exports.ConsoleAppender = function () {
+    function ConsoleAppender() {
+      
+    }
+
+    ConsoleAppender.prototype.debug = function debug(logger) {
+      var _console;
+
+      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        rest[_key - 1] = arguments[_key];
       }
 
-      var separator = '\n------------------------------------------------\n';
+      (_console = console).debug.apply(_console, ['DEBUG [' + logger.id + ']'].concat(rest));
+    };
 
-      message += separator + 'Inner Error:\n';
+    ConsoleAppender.prototype.info = function info(logger) {
+      var _console2;
 
-      if (typeof innerError === 'string') {
-        message += 'Message: ' + innerError;
-      } else {
-        if (innerError.message) {
-          message += 'Message: ' + innerError.message;
-        } else {
-          message += 'Unknown Inner Error Type. Displaying Inner Error as JSON:\n ' + JSON.stringify(innerError, null, '  ');
-        }
-
-        if (innerError.stack) {
-          message += '\nInner Error Stack:\n' + innerError.stack;
-          message += '\nEnd Inner Error Stack';
-        }
+      for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        rest[_key2 - 1] = arguments[_key2];
       }
 
-      message += separator;
-    }
+      (_console2 = console).info.apply(_console2, ['INFO [' + logger.id + ']'].concat(rest));
+    };
 
-    var e = new Error(message);
-    if (innerError) {
-      e.innerError = innerError;
-    }
+    ConsoleAppender.prototype.warn = function warn(logger) {
+      var _console3;
 
-    return e;
-  }
-
-  var FEATURE = exports.FEATURE = {};
-
-  var PLATFORM = exports.PLATFORM = {
-    noop: function noop() {},
-    eachModule: function eachModule() {},
-    moduleName: function (_moduleName) {
-      function moduleName(_x) {
-        return _moduleName.apply(this, arguments);
+      for (var _len3 = arguments.length, rest = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+        rest[_key3 - 1] = arguments[_key3];
       }
 
-      moduleName.toString = function () {
-        return _moduleName.toString();
-      };
+      (_console3 = console).warn.apply(_console3, ['WARN [' + logger.id + ']'].concat(rest));
+    };
 
-      return moduleName;
-    }(function (moduleName) {
-      return moduleName;
-    })
-  };
+    ConsoleAppender.prototype.error = function error(logger) {
+      var _console4;
 
-  PLATFORM.global = function () {
-    if (typeof self !== 'undefined') {
-      return self;
-    }
+      for (var _len4 = arguments.length, rest = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+        rest[_key4 - 1] = arguments[_key4];
+      }
 
-    if (typeof global !== 'undefined') {
-      return global;
-    }
+      (_console4 = console).error.apply(_console4, ['ERROR [' + logger.id + ']'].concat(rest));
+    };
 
-    return new Function('return this')();
+    return ConsoleAppender;
   }();
-
-  var DOM = exports.DOM = {};
-  var isInitialized = exports.isInitialized = false;
-  function initializePAL(callback) {
-    if (isInitialized) {
-      return;
-    }
-    exports.isInitialized = isInitialized = true;
-    if (typeof Object.getPropertyDescriptor !== 'function') {
-      Object.getPropertyDescriptor = function (subject, name) {
-        var pd = Object.getOwnPropertyDescriptor(subject, name);
-        var proto = Object.getPrototypeOf(subject);
-        while (typeof pd === 'undefined' && proto !== null) {
-          pd = Object.getOwnPropertyDescriptor(proto, name);
-          proto = Object.getPrototypeOf(proto);
-        }
-        return pd;
-      };
-    }
-
-    callback(PLATFORM, FEATURE, DOM);
-  }
-  function reset() {
-    exports.isInitialized = isInitialized = false;
-  }
 });
 define('aurelia-pal-browser',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
   'use strict';
@@ -11190,6 +11190,203 @@ define('aurelia-route-recognizer',['exports', 'aurelia-path'], function (exports
     return state;
   }
 });
+define('aurelia-task-queue',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.TaskQueue = undefined;
+
+  
+
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  };
+
+  var stackSeparator = '\nEnqueued in TaskQueue by:\n';
+  var microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
+
+  function makeRequestFlushFromMutationObserver(flush) {
+    var toggle = 1;
+    var observer = _aureliaPal.DOM.createMutationObserver(flush);
+    var node = _aureliaPal.DOM.createTextNode('');
+    observer.observe(node, { characterData: true });
+    return function requestFlush() {
+      toggle = -toggle;
+      node.data = toggle;
+    };
+  }
+
+  function makeRequestFlushFromTimer(flush) {
+    return function requestFlush() {
+      var timeoutHandle = setTimeout(handleFlushTimer, 0);
+
+      var intervalHandle = setInterval(handleFlushTimer, 50);
+      function handleFlushTimer() {
+        clearTimeout(timeoutHandle);
+        clearInterval(intervalHandle);
+        flush();
+      }
+    };
+  }
+
+  function onError(error, task, longStacks) {
+    if (longStacks && task.stack && (typeof error === 'undefined' ? 'undefined' : _typeof(error)) === 'object' && error !== null) {
+      error.stack = filterFlushStack(error.stack) + task.stack;
+    }
+
+    if ('onError' in task) {
+      task.onError(error);
+    } else {
+      setTimeout(function () {
+        throw error;
+      }, 0);
+    }
+  }
+
+  var TaskQueue = exports.TaskQueue = function () {
+    function TaskQueue() {
+      var _this = this;
+
+      
+
+      this.flushing = false;
+      this.longStacks = false;
+
+      this.microTaskQueue = [];
+      this.microTaskQueueCapacity = 1024;
+      this.taskQueue = [];
+
+      if (_aureliaPal.FEATURE.mutationObserver) {
+        this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
+          return _this.flushMicroTaskQueue();
+        });
+      } else {
+        this.requestFlushMicroTaskQueue = makeRequestFlushFromTimer(function () {
+          return _this.flushMicroTaskQueue();
+        });
+      }
+
+      this.requestFlushTaskQueue = makeRequestFlushFromTimer(function () {
+        return _this.flushTaskQueue();
+      });
+    }
+
+    TaskQueue.prototype._flushQueue = function _flushQueue(queue, capacity) {
+      var index = 0;
+      var task = void 0;
+
+      try {
+        this.flushing = true;
+        while (index < queue.length) {
+          task = queue[index];
+          if (this.longStacks) {
+            this.stack = typeof task.stack === 'string' ? task.stack : undefined;
+          }
+          task.call();
+          index++;
+
+          if (index > capacity) {
+            for (var scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
+              queue[scan] = queue[scan + index];
+            }
+
+            queue.length -= index;
+            index = 0;
+          }
+        }
+      } catch (error) {
+        onError(error, task, this.longStacks);
+      } finally {
+        this.flushing = false;
+      }
+    };
+
+    TaskQueue.prototype.queueMicroTask = function queueMicroTask(task) {
+      if (this.microTaskQueue.length < 1) {
+        this.requestFlushMicroTaskQueue();
+      }
+
+      if (this.longStacks) {
+        task.stack = this.prepareQueueStack(microStackSeparator);
+      }
+
+      this.microTaskQueue.push(task);
+    };
+
+    TaskQueue.prototype.queueTask = function queueTask(task) {
+      if (this.taskQueue.length < 1) {
+        this.requestFlushTaskQueue();
+      }
+
+      if (this.longStacks) {
+        task.stack = this.prepareQueueStack(stackSeparator);
+      }
+
+      this.taskQueue.push(task);
+    };
+
+    TaskQueue.prototype.flushTaskQueue = function flushTaskQueue() {
+      var queue = this.taskQueue;
+      this.taskQueue = [];
+      this._flushQueue(queue, Number.MAX_VALUE);
+    };
+
+    TaskQueue.prototype.flushMicroTaskQueue = function flushMicroTaskQueue() {
+      var queue = this.microTaskQueue;
+      this._flushQueue(queue, this.microTaskQueueCapacity);
+      queue.length = 0;
+    };
+
+    TaskQueue.prototype.prepareQueueStack = function prepareQueueStack(separator) {
+      var stack = separator + filterQueueStack(captureStack());
+
+      if (typeof this.stack === 'string') {
+        stack = filterFlushStack(stack) + this.stack;
+      }
+
+      return stack;
+    };
+
+    return TaskQueue;
+  }();
+
+  function captureStack() {
+    var error = new Error();
+
+    if (error.stack) {
+      return error.stack;
+    }
+
+    try {
+      throw error;
+    } catch (e) {
+      return e.stack;
+    }
+  }
+
+  function filterQueueStack(stack) {
+    return stack.replace(/^[\s\S]*?\bqueue(Micro)?Task\b[^\n]*\n/, '');
+  }
+
+  function filterFlushStack(stack) {
+    var index = stack.lastIndexOf('flushMicroTaskQueue');
+
+    if (index < 0) {
+      index = stack.lastIndexOf('flushTaskQueue');
+      if (index < 0) {
+        return stack;
+      }
+    }
+
+    index = stack.lastIndexOf('\n', index);
+
+    return index < 0 ? stack : stack.substr(0, index);
+  }
+});
 define('aurelia-router',['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-dependency-injection', 'aurelia-history', 'aurelia-event-aggregator'], function (exports, _aureliaLogging, _aureliaRouteRecognizer, _aureliaDependencyInjection, _aureliaHistory, _aureliaEventAggregator) {
   'use strict';
 
@@ -13132,203 +13329,6 @@ define('aurelia-router',['exports', 'aurelia-logging', 'aurelia-route-recognizer
     } else {
       logger.error('Router navigation failed, and no previous location or fallbackRoute could be restored.');
     }
-  }
-});
-define('aurelia-task-queue',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.TaskQueue = undefined;
-
-  
-
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-  };
-
-  var stackSeparator = '\nEnqueued in TaskQueue by:\n';
-  var microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
-
-  function makeRequestFlushFromMutationObserver(flush) {
-    var toggle = 1;
-    var observer = _aureliaPal.DOM.createMutationObserver(flush);
-    var node = _aureliaPal.DOM.createTextNode('');
-    observer.observe(node, { characterData: true });
-    return function requestFlush() {
-      toggle = -toggle;
-      node.data = toggle;
-    };
-  }
-
-  function makeRequestFlushFromTimer(flush) {
-    return function requestFlush() {
-      var timeoutHandle = setTimeout(handleFlushTimer, 0);
-
-      var intervalHandle = setInterval(handleFlushTimer, 50);
-      function handleFlushTimer() {
-        clearTimeout(timeoutHandle);
-        clearInterval(intervalHandle);
-        flush();
-      }
-    };
-  }
-
-  function onError(error, task, longStacks) {
-    if (longStacks && task.stack && (typeof error === 'undefined' ? 'undefined' : _typeof(error)) === 'object' && error !== null) {
-      error.stack = filterFlushStack(error.stack) + task.stack;
-    }
-
-    if ('onError' in task) {
-      task.onError(error);
-    } else {
-      setTimeout(function () {
-        throw error;
-      }, 0);
-    }
-  }
-
-  var TaskQueue = exports.TaskQueue = function () {
-    function TaskQueue() {
-      var _this = this;
-
-      
-
-      this.flushing = false;
-      this.longStacks = false;
-
-      this.microTaskQueue = [];
-      this.microTaskQueueCapacity = 1024;
-      this.taskQueue = [];
-
-      if (_aureliaPal.FEATURE.mutationObserver) {
-        this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
-          return _this.flushMicroTaskQueue();
-        });
-      } else {
-        this.requestFlushMicroTaskQueue = makeRequestFlushFromTimer(function () {
-          return _this.flushMicroTaskQueue();
-        });
-      }
-
-      this.requestFlushTaskQueue = makeRequestFlushFromTimer(function () {
-        return _this.flushTaskQueue();
-      });
-    }
-
-    TaskQueue.prototype._flushQueue = function _flushQueue(queue, capacity) {
-      var index = 0;
-      var task = void 0;
-
-      try {
-        this.flushing = true;
-        while (index < queue.length) {
-          task = queue[index];
-          if (this.longStacks) {
-            this.stack = typeof task.stack === 'string' ? task.stack : undefined;
-          }
-          task.call();
-          index++;
-
-          if (index > capacity) {
-            for (var scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
-              queue[scan] = queue[scan + index];
-            }
-
-            queue.length -= index;
-            index = 0;
-          }
-        }
-      } catch (error) {
-        onError(error, task, this.longStacks);
-      } finally {
-        this.flushing = false;
-      }
-    };
-
-    TaskQueue.prototype.queueMicroTask = function queueMicroTask(task) {
-      if (this.microTaskQueue.length < 1) {
-        this.requestFlushMicroTaskQueue();
-      }
-
-      if (this.longStacks) {
-        task.stack = this.prepareQueueStack(microStackSeparator);
-      }
-
-      this.microTaskQueue.push(task);
-    };
-
-    TaskQueue.prototype.queueTask = function queueTask(task) {
-      if (this.taskQueue.length < 1) {
-        this.requestFlushTaskQueue();
-      }
-
-      if (this.longStacks) {
-        task.stack = this.prepareQueueStack(stackSeparator);
-      }
-
-      this.taskQueue.push(task);
-    };
-
-    TaskQueue.prototype.flushTaskQueue = function flushTaskQueue() {
-      var queue = this.taskQueue;
-      this.taskQueue = [];
-      this._flushQueue(queue, Number.MAX_VALUE);
-    };
-
-    TaskQueue.prototype.flushMicroTaskQueue = function flushMicroTaskQueue() {
-      var queue = this.microTaskQueue;
-      this._flushQueue(queue, this.microTaskQueueCapacity);
-      queue.length = 0;
-    };
-
-    TaskQueue.prototype.prepareQueueStack = function prepareQueueStack(separator) {
-      var stack = separator + filterQueueStack(captureStack());
-
-      if (typeof this.stack === 'string') {
-        stack = filterFlushStack(stack) + this.stack;
-      }
-
-      return stack;
-    };
-
-    return TaskQueue;
-  }();
-
-  function captureStack() {
-    var error = new Error();
-
-    if (error.stack) {
-      return error.stack;
-    }
-
-    try {
-      throw error;
-    } catch (e) {
-      return e.stack;
-    }
-  }
-
-  function filterQueueStack(stack) {
-    return stack.replace(/^[\s\S]*?\bqueue(Micro)?Task\b[^\n]*\n/, '');
-  }
-
-  function filterFlushStack(stack) {
-    var index = stack.lastIndexOf('flushMicroTaskQueue');
-
-    if (index < 0) {
-      index = stack.lastIndexOf('flushTaskQueue');
-      if (index < 0) {
-        return stack;
-      }
-    }
-
-    index = stack.lastIndexOf('\n', index);
-
-    return index < 0 ? stack : stack.substr(0, index);
   }
 });
 define('aurelia-templating',['exports', 'aurelia-logging', 'aurelia-metadata', 'aurelia-pal', 'aurelia-path', 'aurelia-loader', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-task-queue'], function (exports, _aureliaLogging, _aureliaMetadata, _aureliaPal, _aureliaPath, _aureliaLoader, _aureliaDependencyInjection, _aureliaBinding, _aureliaTaskQueue) {
@@ -71629,4 +71629,4 @@ define('aurelia-binding',['exports', 'aurelia-logging', 'aurelia-pal', 'aurelia-
   }
 });
 define('text',{});
-function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","jquery":"../node_modules\\jquery\\dist\\jquery","extend":"../node_modules\\extend\\index","moment":"../node_modules\\moment\\moment","deepmerge":"../node_modules\\deepmerge\\dist\\umd","aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","text":"../node_modules\\text\\text","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-notification","location":"../node_modules/aurelia-notification/dist/amd","main":"aurelia-notification"},{"name":"aurelia-http-client","location":"../node_modules/aurelia-http-client/dist/amd","main":"aurelia-http-client"},{"name":"humane-js","location":"../node_modules/humane-js","main":"humane"},{"name":"aurelia-i18n","location":"../node_modules/aurelia-i18n/dist/amd","main":"aurelia-i18n"},{"name":"i18next","location":"../node_modules/i18next/dist/commonjs","main":"index"},{"name":"regenerator-runtime","location":"../node_modules/regenerator-runtime","main":"runtime-module"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr"},{"name":"aurelia-dialog","location":"../node_modules/aurelia-dialog/dist/amd","main":"aurelia-dialog"},{"name":"nprogress","location":"../node_modules/nprogress","main":"nprogress"},{"name":"bootstrap","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min"},{"name":"aurelia-mask","location":"../node_modules/aurelia-mask/dist","main":"masked-input"},{"name":"flatpickr","location":"../node_modules/flatpickr/dist","main":"flatpickr"},{"name":"summernote","location":"../node_modules/summernote/dist/","main":"summernote"},{"name":"fuelux","location":"../node_modules/fuelux/dist","main":"js/fuelux.min"},{"name":"fullcalendar","location":"../node_modules/fullcalendar/dist","main":"fullcalendar"},{"name":"chart.js","location":"../node_modules/chart.js/dist","main":"Chart.min.js"},{"name":"aurelia-chart","location":"../node_modules/aurelia-chart/dist/amd","main":"index"},{"name":"bootstrap-select","location":"../node_modules/bootstrap-select/dist/","main":"js/bootstrap-select"},{"name":"aurelia-google-analytics","location":"../node_modules/aurelia-google-analytics/dist/amd","main":"index"}],"stubModules":["text"],"shim":{"bootstrap":{"deps":["jquery"],"exports":"$"},"aurelia-chart":{"deps":["chart.js"]}},"bundles":{"app-bundle":["app","environment","main","config/appConfig","config/routerConfig","resources/index","modules/analytics/analytics","modules/analytics/clientRequests","modules/analytics/helpTickets","modules/analytics/institutions","modules/facco/editPeople","modules/facco/facco","modules/facco/viewAssignments","modules/facco/viewRequests","modules/home/about","modules/home/contact","modules/home/home","modules/home/institutions","modules/home/products","modules/home/register","modules/social/chapterList","modules/social/chapters","modules/social/editBlog","modules/social/social","modules/social/viewBlogs","modules/social/viewForums","modules/social/writeBlog","modules/techNotes/editCheckLists","modules/techNotes/editSystemUpdates","modules/techNotes/editTechNotes","modules/techNotes/techNotes","modules/user/profile","modules/user/resetPassword","modules/user/user","resources/charts/bar-chart","resources/charts/chart-data","resources/charts/chart-element","resources/charts/doughnut-chart","resources/data/admin","resources/data/auth","resources/data/chapters","resources/data/clientRequests","resources/data/config","resources/data/curriculum","resources/data/dataServices","resources/data/documents","resources/data/downloads","resources/data/events","resources/data/helpTickets","resources/data/inventory","resources/data/is4ua","resources/data/people","resources/data/products","resources/data/sessionData","resources/data/sessions","resources/data/siteInfo","resources/data/social","resources/data/systems","resources/dialogs/common-dialogs","resources/dialogs/confirm-dialog","resources/dialogs/document-dialog","resources/dialogs/email-dialog","resources/dialogs/event-dialog","resources/dialogs/helpTicket-dialog","resources/dialogs/input-dialog","resources/dialogs/message-dialog","resources/dialogs/note-dialog","resources/dialogs/password-dialog","resources/editor/editor","resources/editor/styles","resources/elements/add-systems","resources/elements/calendar","resources/elements/flat-picker","resources/elements/loading-indicator","resources/elements/multiselect","resources/elements/nav-bar","resources/elements/rate-it","resources/elements/submenu","resources/elements/table-navigation-bar","resources/elements/tree-node","resources/utils/dataTable","resources/utils/utils","resources/utils/validation","resources/value-converters/activate-button","resources/value-converters/arrow","resources/value-converters/check-box","resources/value-converters/course-name","resources/value-converters/date-format","resources/value-converters/file-type","resources/value-converters/filter-array","resources/value-converters/filter-clients","resources/value-converters/filter-sessions","resources/value-converters/format-digits","resources/value-converters/format-number","resources/value-converters/format-phone","resources/value-converters/get-array-value","resources/value-converters/gravatar-url-id","resources/value-converters/gravatar-url","resources/value-converters/help-ticket-statuses","resources/value-converters/help-ticket-subtypes","resources/value-converters/help-ticket-type","resources/value-converters/idsRequested","resources/value-converters/info-filter","resources/value-converters/lookup-ht-status","resources/value-converters/lookup-value","resources/value-converters/onoff-switch","resources/value-converters/overlap","resources/value-converters/parse-assignments","resources/value-converters/person-status-button","resources/value-converters/phone-number","resources/value-converters/request-status-class","resources/value-converters/sandbox","resources/value-converters/session-name","resources/value-converters/session-status-button","resources/value-converters/session-systems","resources/value-converters/session-type","resources/value-converters/session","resources/value-converters/sort-array","resources/value-converters/sort-date-time","resources/value-converters/stat-value","resources/value-converters/system-list","resources/value-converters/to-uppercase","resources/value-converters/translate-status","resources/value-converters/ucc-staff","resources/value-converters/ucc-title","modules/admin/Customers/bulkEmails","modules/admin/Customers/customers","modules/admin/Customers/editInstitutions","modules/admin/Customers/editPeople","modules/admin/documents/documents","modules/admin/inventory/editInventory","modules/admin/notes/editCalendar","modules/admin/notes/editNotes","modules/admin/notes/notes","modules/admin/site/admin","modules/admin/site/editConfig","modules/admin/site/editCurriculum","modules/admin/site/editDownloads","modules/admin/site/editHelpTickets","modules/admin/site/editMessages","modules/admin/site/editNews","modules/admin/site/site","modules/admin/system/editChanges","modules/admin/system/editProduct","modules/admin/system/editSession","modules/admin/system/editSystem","modules/admin/system/system","modules/tech/requests/archiveClientRequests","modules/tech/requests/assignments","modules/tech/requests/createRequest","modules/tech/requests/techRequests","modules/tech/requests/viewUserRequests","modules/tech/support/archiveHelpTickets","modules/tech/support/createHelpTickets","modules/tech/support/support","modules/tech/support/viewHelpTickets","modules/techNotes/notes/techNotes","modules/user/requests/clientRequests","modules/user/requests/createRequests","modules/user/requests/viewProducts","modules/user/requests/viewRequests","modules/user/support/createHelpTickets.1","modules/user/support/createHelpTickets","modules/user/support/curriculum","modules/user/support/downloads","modules/user/support/links","modules/user/support/support","modules/user/support/viewHelpTickets","regenerator-runtime/runtime","aurelia-dialog/dialog-configuration","aurelia-dialog/renderer","aurelia-dialog/dialog-settings","aurelia-dialog/dialog-renderer","aurelia-dialog/ux-dialog","aurelia-dialog/ux-dialog-header","aurelia-dialog/dialog-controller","aurelia-dialog/lifecycle","aurelia-dialog/dialog-close-error","aurelia-dialog/dialog-cancel-error","aurelia-dialog/ux-dialog-body","aurelia-dialog/ux-dialog-footer","aurelia-dialog/attach-focus","aurelia-dialog/dialog-service","aurelia-templating-resources/compose","aurelia-templating-resources/if","aurelia-templating-resources/if-core","aurelia-templating-resources/else","aurelia-templating-resources/with","aurelia-templating-resources/repeat","aurelia-templating-resources/repeat-strategy-locator","aurelia-templating-resources/null-repeat-strategy","aurelia-templating-resources/array-repeat-strategy","aurelia-templating-resources/repeat-utilities","aurelia-templating-resources/map-repeat-strategy","aurelia-templating-resources/set-repeat-strategy","aurelia-templating-resources/number-repeat-strategy","aurelia-templating-resources/analyze-view-factory","aurelia-templating-resources/abstract-repeater","aurelia-templating-resources/show","aurelia-templating-resources/aurelia-hide-style","aurelia-templating-resources/hide","aurelia-templating-resources/sanitize-html","aurelia-templating-resources/html-sanitizer","aurelia-templating-resources/replaceable","aurelia-templating-resources/focus","aurelia-templating-resources/css-resource","aurelia-templating-resources/attr-binding-behavior","aurelia-templating-resources/binding-mode-behaviors","aurelia-templating-resources/throttle-binding-behavior","aurelia-templating-resources/debounce-binding-behavior","aurelia-templating-resources/self-binding-behavior","aurelia-templating-resources/signal-binding-behavior","aurelia-templating-resources/binding-signaler","aurelia-templating-resources/update-trigger-binding-behavior","aurelia-templating-resources/html-resource-plugin","aurelia-templating-resources/dynamic-element","aurelia-i18n/i18n","i18next/i18next","i18next/logger","i18next/EventEmitter","i18next/ResourceStore","i18next/utils","i18next/Translator","i18next/postProcessor","i18next/compatibility/v1","i18next/LanguageUtils","i18next/PluralResolver","i18next/Interpolator","i18next/BackendConnector","i18next/CacheConnector","i18next/defaults","aurelia-i18n/relativeTime","aurelia-i18n/defaultTranslations/relative.time","aurelia-i18n/df","aurelia-i18n/utils","aurelia-i18n/nf","aurelia-i18n/rt","aurelia-i18n/t","aurelia-i18n/base-i18n","aurelia-i18n/aurelia-i18n-loader","node_modules/chart.js/dist/Chart.js","resources/css/fullcalendar","resources/css/OLDsummernote","resources/css/styles","resources/css/summernote","resources/editor/skins/moono-lisa/dialog","resources/editor/skins/moono-lisa/dialog_ie","resources/editor/skins/moono-lisa/dialog_ie8","resources/editor/skins/moono-lisa/dialog_iequirks","resources/editor/skins/moono-lisa/editor","resources/editor/skins/moono-lisa/editor_gecko","resources/editor/skins/moono-lisa/editor_ie","resources/editor/skins/moono-lisa/editor_ie8","resources/editor/skins/moono-lisa/editor_iequirks","modules/user/user.1","resources/dialogs/documentForm","resources/dialogs/documentsTable","resources/htTimeline/response","resources/htTimeline/timeline","modules/admin/site/downloadForm","modules/admin/site/downloadTable","modules/analytics/components/countryInstitutionProductRequestsTable","modules/analytics/components/countryProductRequestsTable","modules/analytics/components/curriculumHTChart","modules/analytics/components/curriculumHTTable","modules/analytics/components/helpTicketsByCurriculum","modules/analytics/components/helpTicketsByInstitution","modules/analytics/components/helpTicketsByPeople","modules/analytics/components/helpTicketsByStatus","modules/analytics/components/helpTicketsByType","modules/analytics/components/institutionHTChart","modules/analytics/components/institutionHTTable","modules/analytics/components/institutionRequestsDetail","modules/analytics/components/institutionsCharts","modules/analytics/components/institutionsTable","modules/analytics/components/peopleHTChart","modules/analytics/components/peopleHTTable","modules/analytics/components/productRequestsDetail","modules/analytics/components/productRequestsTable","modules/analytics/components/requestsByCountry","modules/analytics/components/requestsByInstitution","modules/analytics/components/requestsByInstitutionCountry","modules/analytics/components/requestsByProducts","modules/analytics/components/requestsInstitutionChart","modules/analytics/components/requestsProductChart","modules/analytics/components/requestsSAPProductChart","modules/analytics/components/requestsTable","modules/analytics/components/statusHTChart","modules/analytics/components/statusHTTable","modules/analytics/components/typeHTChart","modules/analytics/components/typeHTTable","modules/facco/components/assignmentsTable","modules/facco/components/peopleTable","modules/facco/components/requestDetailDetails","modules/facco/components/requestsTable","modules/facco/components/viewAssignmentsTable","modules/facco/components/viewRequestsTable","modules/home/components/homeContent","modules/home/components/homePageLinks","modules/home/components/newsItem","modules/home/components/uccInformation","modules/social/components/blogForm","modules/social/components/blogList","modules/social/components/blogListUCC","modules/social/components/blogPage","modules/social/components/blogPageUCC","modules/social/components/chapterList","modules/social/components/forumList","modules/social/components/forumPage","modules/social/components/writeBlogList","modules/techNotes/components/notesForm","modules/techNotes/components/notesTable","modules/techNotes/components/Systems","modules/user/components/banner","modules/user/components/carousel","modules/user/components/homePageLinks","modules/user/components/newsItem","modules/user/components/uccInformation","modules/admin/Customers/components/Address","modules/admin/Customers/components/Audit","modules/admin/Customers/components/Courses","modules/admin/Customers/components/Email","modules/admin/Customers/components/emailTable","modules/admin/Customers/components/instAddress","modules/admin/Customers/components/instIs4ua","modules/admin/Customers/components/institutionsForm","modules/admin/Customers/components/institutionsTable","modules/admin/Customers/components/instPeople","modules/admin/Customers/components/is4ua","modules/admin/Customers/components/Log","modules/admin/Customers/components/Password","modules/admin/Customers/components/peopleForm","modules/admin/Customers/components/peopleTable","modules/admin/Customers/components/Roles","modules/admin/Customers/components/selectionForm","modules/admin/documents/components/documentForm","modules/admin/documents/components/documentsTable","modules/admin/inventory/components/documentForm","modules/admin/inventory/components/Documents","modules/admin/inventory/components/documentsTable","modules/admin/inventory/components/History","modules/admin/inventory/components/inventoryForm","modules/admin/inventory/components/inventoryTable","modules/admin/inventory/components/Maintenance","modules/admin/inventory/components/Purchase","modules/admin/inventory/components/Technical","modules/admin/notes/components/ArchiveRequestsForm","modules/admin/notes/components/helpTicket","modules/admin/notes/components/notesForm","modules/admin/notes/components/notesTable","modules/admin/site/components/configForm","modules/admin/site/components/configTable","modules/admin/site/components/curriculumForm","modules/admin/site/components/curriculumTable","modules/admin/site/components/document","modules/admin/site/components/documentForm","modules/admin/site/components/documentsTable","modules/admin/site/components/downloadForm","modules/admin/site/components/downloadTable","modules/admin/site/components/foreverLogs","modules/admin/site/components/htTypeForm","modules/admin/site/components/htTypeTable","modules/admin/site/components/logFileTable","modules/admin/site/components/messageForm","modules/admin/site/components/messageTable","modules/admin/site/components/newsForm","modules/admin/site/components/newsTable","modules/admin/site/components/uploadedFilesTable","modules/admin/system/components/Assignments","modules/admin/system/components/changesForm","modules/admin/system/components/changesTable","modules/admin/system/components/Description","modules/admin/system/components/documentForm","modules/admin/system/components/Documents","modules/admin/system/components/documentsTable","modules/admin/system/components/edit-client-form","modules/admin/system/components/is4ua","modules/admin/system/components/Notes","modules/admin/system/components/productForm","modules/admin/system/components/productTable","modules/admin/system/components/sessionConfigTable","modules/admin/system/components/sessionForm","modules/admin/system/components/sessionTable","modules/admin/system/components/systemForm","modules/admin/system/components/Systems","modules/admin/system/components/systemTable","modules/tech/requests/components/ArchiveRequestsForm","modules/tech/requests/components/ArchiveRequestsTable","modules/tech/requests/components/archiveTable","modules/tech/requests/components/assignmentDetails","modules/tech/requests/components/bo","modules/tech/requests/components/bulkEmailForm","modules/tech/requests/components/Courses","modules/tech/requests/components/editRequestsForm","modules/tech/requests/components/erp","modules/tech/requests/components/hana","modules/tech/requests/components/requestDetailDetails","modules/tech/requests/components/requestDetails","modules/tech/requests/components/requestsTable","modules/tech/requests/components/userAssignmentDetails","modules/tech/requests/components/userRequestDetails","modules/tech/requests/components/viewAssignmentForm","modules/tech/requests/components/viewRequestsForm","modules/tech/requests/components/viewRequestsTable","modules/tech/requests/components/viewUserRequestsForm","modules/tech/requests/components/viewUserRequestsTable","modules/tech/support/components/additiontalInfo","modules/tech/support/components/assignmentDetails","modules/tech/support/components/bo","modules/tech/support/components/documentForm","modules/tech/support/components/Documents","modules/tech/support/components/documentsTable","modules/tech/support/components/erp","modules/tech/support/components/hana","modules/tech/support/components/helpTicketDetails","modules/tech/support/components/helpTicketType","modules/tech/support/components/requestDetails","modules/tech/support/components/Requests","modules/tech/support/components/searchHTForm","modules/tech/support/components/selectProduct","modules/tech/support/components/viewArchiveHTForm","modules/tech/support/components/viewAssignmentForm","modules/tech/support/components/viewHelpTicketTableFilters","modules/tech/support/components/viewHTForm","modules/tech/support/components/viewHTSearchResults","modules/tech/support/components/viewHTTable","modules/user/requests/components/assignmentDetails","modules/user/requests/components/bo","modules/user/requests/components/client-request-step1","modules/user/requests/components/client-request-step2","modules/user/requests/components/client-request-step3","modules/user/requests/components/client-request-step4","modules/user/requests/components/Courses","modules/user/requests/components/erp","modules/user/requests/components/hana","modules/user/requests/components/requestDetails","modules/user/requests/components/viewRequestsForm","modules/user/requests/components/viewRequestsTable","modules/user/support/components/comment","modules/user/support/components/helpTicketDetails","modules/user/support/components/helpTicketType","modules/user/support/components/Requests","modules/user/support/components/viewHTForm","modules/user/support/components/viewHTTable"]}})}
+function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","jquery":"../node_modules\\jquery\\dist\\jquery","extend":"../node_modules\\extend\\index","moment":"../node_modules\\moment\\moment","deepmerge":"../node_modules\\deepmerge\\dist\\umd","aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","text":"../node_modules\\text\\text","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-notification","location":"../node_modules/aurelia-notification/dist/amd","main":"aurelia-notification"},{"name":"aurelia-http-client","location":"../node_modules/aurelia-http-client/dist/amd","main":"aurelia-http-client"},{"name":"humane-js","location":"../node_modules/humane-js","main":"humane"},{"name":"aurelia-i18n","location":"../node_modules/aurelia-i18n/dist/amd","main":"aurelia-i18n"},{"name":"i18next","location":"../node_modules/i18next/dist/commonjs","main":"index"},{"name":"regenerator-runtime","location":"../node_modules/regenerator-runtime","main":"runtime-module"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr"},{"name":"aurelia-dialog","location":"../node_modules/aurelia-dialog/dist/amd","main":"aurelia-dialog"},{"name":"nprogress","location":"../node_modules/nprogress","main":"nprogress"},{"name":"bootstrap","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min"},{"name":"aurelia-mask","location":"../node_modules/aurelia-mask/dist","main":"masked-input"},{"name":"flatpickr","location":"../node_modules/flatpickr/dist","main":"flatpickr"},{"name":"summernote","location":"../node_modules/summernote/dist/","main":"summernote"},{"name":"fuelux","location":"../node_modules/fuelux/dist","main":"js/fuelux.min"},{"name":"fullcalendar","location":"../node_modules/fullcalendar/dist","main":"fullcalendar"},{"name":"chart.js","location":"../node_modules/chart.js/dist","main":"Chart.min.js"},{"name":"aurelia-chart","location":"../node_modules/aurelia-chart/dist/amd","main":"index"},{"name":"bootstrap-select","location":"../node_modules/bootstrap-select/dist/","main":"js/bootstrap-select"},{"name":"aurelia-google-analytics","location":"../node_modules/aurelia-google-analytics/dist/amd","main":"index"}],"stubModules":["text"],"shim":{"bootstrap":{"deps":["jquery"],"exports":"$"},"aurelia-chart":{"deps":["chart.js"]}},"bundles":{"app-bundle":["app","environment","main","config/appConfig","config/routerConfig","resources/index","modules/analytics/analytics","modules/analytics/clientRequests","modules/analytics/helpTickets","modules/analytics/institutions","modules/facco/editPeople","modules/facco/facco","modules/facco/viewAssignments","modules/facco/viewRequests","modules/home/about","modules/home/contact","modules/home/home","modules/home/institutions","modules/home/products","modules/home/register","modules/social/chapterList","modules/social/chapters","modules/social/editBlog","modules/social/social","modules/social/viewBlogs","modules/social/viewForums","modules/social/writeBlog","modules/techNotes/editCheckLists","modules/techNotes/editSystemUpdates","modules/techNotes/editTechNotes","modules/techNotes/techNotes","modules/user/profile","modules/user/resetPassword","modules/user/user","resources/charts/bar-chart","resources/charts/chart-data","resources/charts/chart-element","resources/charts/doughnut-chart","resources/data/admin","resources/data/auth","resources/data/chapters","resources/data/clientRequests","resources/data/config","resources/data/curriculum","resources/data/dataServices","resources/data/documents","resources/data/downloads","resources/data/events","resources/data/helpTickets","resources/data/inventory","resources/data/is4ua","resources/data/people","resources/data/products","resources/data/sessionData","resources/data/sessions","resources/data/siteInfo","resources/data/social","resources/data/systems","resources/dialogs/common-dialogs","resources/dialogs/confirm-dialog","resources/dialogs/document-dialog","resources/dialogs/email-dialog","resources/dialogs/event-dialog","resources/dialogs/helpTicket-dialog","resources/dialogs/input-dialog","resources/dialogs/message-dialog","resources/dialogs/note-dialog","resources/dialogs/password-dialog","resources/editor/editor","resources/editor/styles","resources/elements/add-systems","resources/elements/calendar","resources/elements/flat-picker","resources/elements/loading-indicator","resources/elements/multiselect","resources/elements/nav-bar","resources/elements/rate-it","resources/elements/submenu","resources/elements/table-navigation-bar","resources/elements/tree-node","resources/utils/dataTable","resources/utils/utils","resources/utils/validation","resources/value-converters/activate-button","resources/value-converters/arrow","resources/value-converters/check-box","resources/value-converters/course-name","resources/value-converters/date-format","resources/value-converters/file-type","resources/value-converters/filter-array","resources/value-converters/filter-clients","resources/value-converters/filter-sessions","resources/value-converters/format-digits","resources/value-converters/format-number","resources/value-converters/format-phone","resources/value-converters/get-array-value","resources/value-converters/gravatar-url-id","resources/value-converters/gravatar-url","resources/value-converters/help-ticket-statuses","resources/value-converters/help-ticket-subtypes","resources/value-converters/help-ticket-type","resources/value-converters/idsRequested","resources/value-converters/info-filter","resources/value-converters/lookup-ht-status","resources/value-converters/lookup-value","resources/value-converters/onoff-switch","resources/value-converters/overlap","resources/value-converters/parse-assignments","resources/value-converters/person-status-button","resources/value-converters/phone-number","resources/value-converters/request-status-class","resources/value-converters/sandbox","resources/value-converters/session-name","resources/value-converters/session-status-button","resources/value-converters/session-systems","resources/value-converters/session-type","resources/value-converters/session","resources/value-converters/sort-array","resources/value-converters/sort-date-time","resources/value-converters/stat-value","resources/value-converters/system-list","resources/value-converters/to-uppercase","resources/value-converters/translate-status","resources/value-converters/ucc-staff","resources/value-converters/ucc-title","modules/admin/Customers/bulkEmails","modules/admin/Customers/customers","modules/admin/Customers/editInstitutions","modules/admin/Customers/editPeople","modules/admin/documents/documents","modules/admin/inventory/editInventory","modules/admin/notes/editCalendar","modules/admin/notes/editNotes","modules/admin/notes/notes","modules/admin/site/admin","modules/admin/site/editConfig","modules/admin/site/editCurriculum","modules/admin/site/editDownloads","modules/admin/site/editHelpTickets","modules/admin/site/editMessages","modules/admin/site/editNews","modules/admin/site/site","modules/admin/system/editChanges","modules/admin/system/editProduct","modules/admin/system/editSession","modules/admin/system/editSystem","modules/admin/system/system","modules/tech/requests/archiveClientRequests","modules/tech/requests/assignments","modules/tech/requests/createRequest","modules/tech/requests/techRequests","modules/tech/requests/viewUserRequests","modules/tech/support/archiveHelpTickets","modules/tech/support/createHelpTickets","modules/tech/support/support","modules/tech/support/viewHelpTickets","modules/techNotes/notes/techNotes","modules/user/requests/clientRequests","modules/user/requests/createRequests","modules/user/requests/viewProducts","modules/user/requests/viewRequests","modules/user/support/createHelpTickets.1","modules/user/support/createHelpTickets","modules/user/support/curriculum","modules/user/support/downloads","modules/user/support/links","modules/user/support/support","modules/user/support/viewHelpTickets","regenerator-runtime/runtime","aurelia-dialog/dialog-configuration","aurelia-dialog/renderer","aurelia-dialog/dialog-settings","aurelia-dialog/dialog-renderer","aurelia-dialog/ux-dialog","aurelia-dialog/ux-dialog-header","aurelia-dialog/dialog-controller","aurelia-dialog/lifecycle","aurelia-dialog/dialog-close-error","aurelia-dialog/dialog-cancel-error","aurelia-dialog/ux-dialog-body","aurelia-dialog/ux-dialog-footer","aurelia-dialog/attach-focus","aurelia-dialog/dialog-service","aurelia-templating-resources/compose","aurelia-templating-resources/if","aurelia-templating-resources/if-core","aurelia-templating-resources/else","aurelia-templating-resources/with","aurelia-templating-resources/repeat","aurelia-templating-resources/repeat-strategy-locator","aurelia-templating-resources/null-repeat-strategy","aurelia-templating-resources/array-repeat-strategy","aurelia-templating-resources/repeat-utilities","aurelia-templating-resources/map-repeat-strategy","aurelia-templating-resources/set-repeat-strategy","aurelia-templating-resources/number-repeat-strategy","aurelia-templating-resources/analyze-view-factory","aurelia-templating-resources/abstract-repeater","aurelia-templating-resources/show","aurelia-templating-resources/aurelia-hide-style","aurelia-templating-resources/hide","aurelia-templating-resources/sanitize-html","aurelia-templating-resources/html-sanitizer","aurelia-templating-resources/replaceable","aurelia-templating-resources/focus","aurelia-templating-resources/css-resource","aurelia-templating-resources/attr-binding-behavior","aurelia-templating-resources/binding-mode-behaviors","aurelia-templating-resources/throttle-binding-behavior","aurelia-templating-resources/debounce-binding-behavior","aurelia-templating-resources/self-binding-behavior","aurelia-templating-resources/signal-binding-behavior","aurelia-templating-resources/binding-signaler","aurelia-templating-resources/update-trigger-binding-behavior","aurelia-templating-resources/html-resource-plugin","aurelia-templating-resources/dynamic-element","aurelia-i18n/i18n","i18next/i18next","i18next/logger","i18next/EventEmitter","i18next/ResourceStore","i18next/utils","i18next/Translator","i18next/postProcessor","i18next/compatibility/v1","i18next/LanguageUtils","i18next/PluralResolver","i18next/Interpolator","i18next/BackendConnector","i18next/CacheConnector","i18next/defaults","aurelia-i18n/relativeTime","aurelia-i18n/defaultTranslations/relative.time","aurelia-i18n/df","aurelia-i18n/utils","aurelia-i18n/nf","aurelia-i18n/rt","aurelia-i18n/t","aurelia-i18n/base-i18n","aurelia-i18n/aurelia-i18n-loader","node_modules/chart.js/dist/Chart.js","resources/css/fullcalendar","resources/css/OLDsummernote","resources/css/styles","resources/css/summernote","resources/editor/skins/moono-lisa/dialog","resources/editor/skins/moono-lisa/dialog_ie","resources/editor/skins/moono-lisa/dialog_ie8","resources/editor/skins/moono-lisa/dialog_iequirks","resources/editor/skins/moono-lisa/editor","resources/editor/skins/moono-lisa/editor_gecko","resources/editor/skins/moono-lisa/editor_ie","resources/editor/skins/moono-lisa/editor_ie8","resources/editor/skins/moono-lisa/editor_iequirks","modules/user/user.1","resources/dialogs/documentForm","resources/dialogs/documentsTable","resources/htTimeline/response","resources/htTimeline/timeline","modules/admin/site/downloadForm","modules/admin/site/downloadTable","modules/analytics/components/countryInstitutionProductRequestsTable","modules/analytics/components/countryProductRequestsTable","modules/analytics/components/curriculumHTChart","modules/analytics/components/curriculumHTTable","modules/analytics/components/helpTicketsByCurriculum","modules/analytics/components/helpTicketsByInstitution","modules/analytics/components/helpTicketsByPeople","modules/analytics/components/helpTicketsByStatus","modules/analytics/components/helpTicketsByType","modules/analytics/components/institutionHTChart","modules/analytics/components/institutionHTTable","modules/analytics/components/institutionRequestsDetail","modules/analytics/components/institutionsCharts","modules/analytics/components/institutionsTable","modules/analytics/components/peopleHTChart","modules/analytics/components/peopleHTTable","modules/analytics/components/productRequestsDetail","modules/analytics/components/productRequestsTable","modules/analytics/components/requestsByCountry","modules/analytics/components/requestsByInstitution","modules/analytics/components/requestsByInstitutionCountry","modules/analytics/components/requestsByProducts","modules/analytics/components/requestsInstitutionChart","modules/analytics/components/requestsProductChart","modules/analytics/components/requestsSAPProductChart","modules/analytics/components/requestsTable","modules/analytics/components/statusHTChart","modules/analytics/components/statusHTTable","modules/analytics/components/typeHTChart","modules/analytics/components/typeHTTable","modules/facco/components/assignmentsTable","modules/facco/components/peopleTable","modules/facco/components/requestDetailDetails","modules/facco/components/requestsTable","modules/facco/components/viewAssignmentsTable","modules/facco/components/viewRequestsTable","modules/home/components/homeContent","modules/home/components/homePageLinks","modules/home/components/newsItem","modules/home/components/uccInformation","modules/social/components/blogForm","modules/social/components/blogList","modules/social/components/blogListUCC","modules/social/components/blogPage","modules/social/components/blogPageUCC","modules/social/components/chapterList","modules/social/components/forumList","modules/social/components/forumPage","modules/social/components/writeBlogList","modules/techNotes/components/notesForm","modules/techNotes/components/notesTable","modules/techNotes/components/Systems","modules/user/components/banner","modules/user/components/carousel","modules/user/components/homePageLinks","modules/user/components/newsItem","modules/user/components/uccInformation","modules/admin/Customers/components/Address","modules/admin/Customers/components/Audit","modules/admin/Customers/components/Courses","modules/admin/Customers/components/Email","modules/admin/Customers/components/emailTable","modules/admin/Customers/components/instAddress","modules/admin/Customers/components/instIs4ua","modules/admin/Customers/components/institutionsForm","modules/admin/Customers/components/institutionsTable","modules/admin/Customers/components/instPeople","modules/admin/Customers/components/is4ua","modules/admin/Customers/components/Log","modules/admin/Customers/components/Password","modules/admin/Customers/components/peopleForm","modules/admin/Customers/components/peopleTable","modules/admin/Customers/components/Roles","modules/admin/Customers/components/selectionForm","modules/admin/documents/components/documentForm","modules/admin/documents/components/documentsTable","modules/admin/inventory/components/documentForm","modules/admin/inventory/components/Documents","modules/admin/inventory/components/documentsTable","modules/admin/inventory/components/History","modules/admin/inventory/components/inventoryForm","modules/admin/inventory/components/inventoryTable","modules/admin/inventory/components/Maintenance","modules/admin/inventory/components/Purchase","modules/admin/inventory/components/Technical","modules/admin/notes/components/ArchiveRequestsForm","modules/admin/notes/components/helpTicket","modules/admin/notes/components/notesForm","modules/admin/notes/components/notesTable","modules/admin/site/components/configForm","modules/admin/site/components/configTable","modules/admin/site/components/curriculumForm","modules/admin/site/components/curriculumTable","modules/admin/site/components/document","modules/admin/site/components/documentForm","modules/admin/site/components/documentsTable","modules/admin/site/components/downloadForm","modules/admin/site/components/downloadTable","modules/admin/site/components/foreverLogs","modules/admin/site/components/htTypeForm","modules/admin/site/components/htTypeTable","modules/admin/site/components/logFileTable","modules/admin/site/components/messageForm","modules/admin/site/components/messageTable","modules/admin/site/components/newsForm","modules/admin/site/components/newsTable","modules/admin/site/components/uploadedFilesTable","modules/admin/system/components/Assignments","modules/admin/system/components/changesForm","modules/admin/system/components/changesTable","modules/admin/system/components/Description","modules/admin/system/components/documentForm","modules/admin/system/components/Documents","modules/admin/system/components/documentsTable","modules/admin/system/components/edit-client-form","modules/admin/system/components/is4ua","modules/admin/system/components/Notes","modules/admin/system/components/productForm","modules/admin/system/components/productTable","modules/admin/system/components/sessionConfigTable","modules/admin/system/components/sessionForm","modules/admin/system/components/sessionTable","modules/admin/system/components/systemForm","modules/admin/system/components/Systems","modules/admin/system/components/systemTable","modules/tech/requests/components/ArchiveRequestsForm","modules/tech/requests/components/ArchiveRequestsTable","modules/tech/requests/components/archiveTable","modules/tech/requests/components/assignmentDetails","modules/tech/requests/components/bo","modules/tech/requests/components/bulkEmailForm","modules/tech/requests/components/Courses","modules/tech/requests/components/editRequestsForm","modules/tech/requests/components/erp","modules/tech/requests/components/hana","modules/tech/requests/components/requestDetailDetails","modules/tech/requests/components/requestDetails","modules/tech/requests/components/requestsTable","modules/tech/requests/components/userAssignmentDetails","modules/tech/requests/components/userRequestDetails","modules/tech/requests/components/viewAssignmentForm","modules/tech/requests/components/viewRequestsForm","modules/tech/requests/components/viewRequestsTable","modules/tech/requests/components/viewUserRequestsForm","modules/tech/requests/components/viewUserRequestsTable","modules/tech/support/components/additiontalInfo","modules/tech/support/components/assignmentDetails","modules/tech/support/components/bo","modules/tech/support/components/documentForm","modules/tech/support/components/Documents","modules/tech/support/components/documentsTable","modules/tech/support/components/erp","modules/tech/support/components/hana","modules/tech/support/components/helpTicketDetails","modules/tech/support/components/helpTicketType","modules/tech/support/components/requestDetails","modules/tech/support/components/Requests","modules/tech/support/components/searchHTForm","modules/tech/support/components/selectProduct","modules/tech/support/components/viewArchiveHTForm","modules/tech/support/components/viewAssignmentForm","modules/tech/support/components/viewHelpTicketTableFilters","modules/tech/support/components/viewHTForm","modules/tech/support/components/viewHTSearchResults","modules/tech/support/components/viewHTTable","modules/user/requests/components/assignmentDetails","modules/user/requests/components/bo","modules/user/requests/components/client-request-step1","modules/user/requests/components/client-request-step2","modules/user/requests/components/client-request-step3","modules/user/requests/components/client-request-step4","modules/user/requests/components/Courses","modules/user/requests/components/erp","modules/user/requests/components/hana","modules/user/requests/components/requestDetails","modules/user/requests/components/viewRequestsForm","modules/user/requests/components/viewRequestsTable","modules/user/support/components/comment","modules/user/support/components/helpTicketDetails","modules/user/support/components/helpTicketType","modules/user/support/components/Requests","modules/user/support/components/viewHTForm","modules/user/support/components/viewHTTable"]}})}
