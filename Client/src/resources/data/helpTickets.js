@@ -304,10 +304,11 @@ export class HelpTickets {
                     this.selectedHelpTicket = this.utils.copyObject(response);
                     this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                 }
+                this.selectHelpTicketByID(this.selectedHelpTicket._id);
                 if (status !== this.config.CLOSED_HELPTICKET_STATUS) {
                     this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
                 } else {
-                    this.helpTicketsArray.splice(this.editIndex);
+                    this.helpTicketsArray.splice(this.editIndex,1);
                 }
             } else {
                 this.data.processError(response, "There was an error updating the help ticket.");

@@ -570,8 +570,7 @@ module.exports = function (app, config) {
       } else {
         if (req.params.contentId) {
           var id = req.params.contentId;
-
-          var content = helpticket.content.id(id);
+          var content = helpticket.content.id(id);          
           if (content) {
             for (var i = 0, x = req.files.length; i < x; i++) {
               var file = {
@@ -580,7 +579,8 @@ module.exports = function (app, config) {
                 dateUploaded: new Date()
               };
               content.files.push(file);
-            }
+              console.log(content)                
+            }                    
             helpticket.save(function (err, helpticket) {
               if (err) {
                 return next(err);
@@ -589,7 +589,7 @@ module.exports = function (app, config) {
               }
             });
           }
-
+          // res.status(404).json({message: 'Content now found'});
         } else {
           res.status(200).json({ message: 'file uploaded' });
         }

@@ -94,8 +94,11 @@ export class People {
         }
     }
 
-    getNotifications(personId){
-        this.data.get(this.NOTIFICATION_SERVICE + "/" + personId + "?filter=checked|eq|false&order=dateCreated:DSC" + false );
+    async getNotifications(personId){
+        response = await this.data.get(this.NOTIFICATION_SERVICE + "/" + personId + "?filter=checked|eq|false&order=dateCreated:DSC" + false );
+        if(!response.error){
+            this.notificationsArray = response;
+        }
     }
 
     async getPerson(id) {

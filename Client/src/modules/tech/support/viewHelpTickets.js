@@ -321,6 +321,7 @@ export class ViewHelpTickets {
     var email = new Object();
     let serverResponse = await this.helpTickets.saveHelpTicket(email);
     if (!serverResponse.error) {
+      // if (serverResponse.helpTicketStatus == this.config.CLOSED_HELPTICKET_STATUS) await this.refresh(false);
       this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
       this.utils.showNotification("The help ticket was updated");
     }
@@ -390,7 +391,7 @@ export class ViewHelpTickets {
 
   async saveIt(status) {
     this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
-    this._createResponse();
+    this._createResponse(); 
     var email = new Object();
     if (this.sendEmail) {
       if (status == this.config.CUSTOMER_ACTION_HELPTICKET_STATUS) {
@@ -412,7 +413,7 @@ export class ViewHelpTickets {
     if (!serverResponse.error) {
       if (status == this.config.CLOSED_HELPTICKET_STATUS) await this.refresh(false);
       this.utils.showNotification("The help ticket was updated");
-      if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
+      if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse.content[serverResponse.content.length - 1]._id);
     }
     this._cleanUp();
   }

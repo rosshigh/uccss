@@ -238,7 +238,7 @@ export class ViewHelpTickets {
       this.updateArray();
       this.filterOutClosed();
       this.utils.showNotification("The help ticket was updated");
-      if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
+      if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse.content[serverResponse.content.length - 1]._id);
       if(this.helpTickets.selectedHelpTicket.owner[0].personId != null){
         let notice = {
           personId: this.userObj._id,

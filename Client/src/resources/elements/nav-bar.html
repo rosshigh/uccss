@@ -71,6 +71,8 @@
                     <li class="hidden-sm hidden-md" if.bind="isAuthenticated && userObj.userRole >= config.UA_ROLE"><a href="#/analytics">Analytics</a></li>
                 </ul>
 
+                <a href="#/clientRequests" class="rightMargin" if.bind="people.notificationsArray.length" style="text-decoration: none;">Notifications <span class="badge">${people.notificationsArray.length}</span></a> 
+
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
                         <a if.bind="userObj.userRole >= config.UCC_ROLE" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Notes<span class="caret"></span></a>
