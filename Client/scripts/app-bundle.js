@@ -33676,7 +33676,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                     if (item.requestId && item.requestId.courseId === null) item.requestId.courseId = { _id: _this16.config.SANDBOX_ID, name: _this16.config.SANDBOX_NAME };
                                 });
                                 this.dataTable.updateArray(this.clientRequests.requestsDetailsArray, 'requiredDate', -1);
-                                console.log('asldjfl');
+                                if (this.clientRequests.requestsDetailsArray.length) this.noRequests = false;
 
                             case 22:
                             case 'end':
