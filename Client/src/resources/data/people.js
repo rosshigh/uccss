@@ -95,7 +95,7 @@ export class People {
     }
 
     async getNotifications(personId){
-        response = await this.data.get(this.NOTIFICATION_SERVICE + "/" + personId + "?filter=checked|eq|false&order=dateCreated:DSC" + false );
+        let response = await this.data.get(this.NOTIFICATION_SERVICE + "/" + personId + "?filter=checked|eq|false&order=dateCreated:DSC" + false );
         if(!response.error){
             this.notificationsArray = response;
         }

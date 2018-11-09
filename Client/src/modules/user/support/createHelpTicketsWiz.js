@@ -1,0 +1,244 @@
+import { inject, TemplatingEngine } from 'aurelia-framework';
+import { Utils } from '../../../resources/utils/utils';
+import { Sessions } from '../../../resources/data/sessions';
+import { Downloads } from '../../../resources/data/downloads';
+import { Products } from '../../../resources/data/products';
+import { Systems } from '../../../resources/data/systems';
+import { HelpTickets } from '../../../resources/data/helpTickets';
+import { ClientRequests } from '../../../resources/data/clientRequests';
+import { People } from '../../../resources/data/people';
+import Validation from '../../../resources/utils/validation';
+import { DataTable } from '../../../resources/utils/dataTable';
+import { AppConfig } from '../../../config/appConfig';
+import { SiteInfo } from '../../../resources/data/siteInfo';
+
+import fuelux from 'fuelux';
+
+@inject(Sessions, Downloads, HelpTickets, Validation, Utils, DataTable, AppConfig, People, ClientRequests, Products, Systems, SiteInfo, TemplatingEngine)
+export class CreateHelpTickets {
+    showInfoBox = false;
+    courseSelected = false;
+    showHelpTicketDescription = false;
+    showInputForm = false;
+    showRequests = false;
+    inputForm = null;
+    showTypes = false;
+    inputHTML = "";
+
+    spinnerHTML = "";
+    filesSelected;
+    selectedFiles;
+    removedFiles = new Array();
+
+    showAdditionalInfo = false;
+
+    constructor(sessions, apps, helpTickets, validation, utils, datatable, config, people, clientRequests, products, systems, site, templatingEngine) {
+        this.sessions = sessions;
+        this.apps = apps;
+        this.helpTickets = helpTickets;
+        this.people = people;
+        this.utils = utils;
+        this.validation = validation;
+        this.validation.initialize(this);
+        this.dataTable = datatable;
+        this.dataTable.initialize(this);
+        this.config = config;
+        this.clientRequests = clientRequests;
+        this.products = products;
+        this.systems = systems;
+        this.site = site;
+        this.templatingEngine = templatingEngine;
+
+        this.userObj = JSON.parse(sessionStorage.getItem('user'));
+    };
+
+    canActivate() {
+        if (!this.userObj) {
+            this.userObj = this.config.user;
+            this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
+            if (!this.userObj) {
+                this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+                this.router.navigate("home");
+            }
+        }
+    }
+
+    attached() {
+        $('[data-toggle="tooltip"]').tooltip();
+        var wizard = $('.wizard').wizard();
+        var that = this;
+
+        wizard.on('actionclicked.fu.wizard', function (e, data) {
+            that.step = data.step;
+            if (data.direction !== "previous") {
+                if (!that.validation.validate(data.step)) {
+                    e.preventDefault();
+                } else if (data.step === 4) {
+                    that.validation.makeValid($("#productListTable"));
+                    that.save();
+                }
+            }
+        })
+    }
+
+    async activate() {
+        let responses = await Promise.all([
+            this.helpTickets.getHelpTicketTypes('?order=category'),
+            this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true),
+            this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id + '&order=number'),
+            this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true&order=name'),
+            this.systems.getSystemsArray(),
+            this.config.getConfig(),
+            this.site.getMessageArray('?filter=category|eq|HELP_TICKETS', true)
+        ]);
+        this.helpTickets.selectHelpTicket();
+        this.sendEmail = this.config.SEND_EMAILS;
+        this.appsArray = this.apps.appDownloadsArray.filter(item => {
+            return item.helpTicketRelevant;
+        })
+        this.editorMessage = this.getMessage('EDITOR_DESCRIPTION_MESSAGE');
+        this.fileUploadMessage = this.getMessage('FILE_UPLOAD_DESCRIPTION');
+        this.stepsMessage = this.getMessage('RECREATE_STEPS');
+    }
+
+    async categoryChanged() {
+        this.catIndex = this.getCategoryIndex();
+        this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired;
+        await this.getActiveRequests();
+        this.showTypes = true;
+        this.helpTicketTypeMessage = this.clientRequestsArray.length ? this.getMessage('SELECT_TYPE') : undefined;
+    }
+
+    getCategoryIndex() {
+        var index = 0;
+        this.helpTickets.helpTicketTypesArray.forEach((item, categoryIndex) => {
+            if (this.helpTickets.selectedHelpTicket.helpTicketCategory == item.category) {
+                index = categoryIndex;
+            }
+        });
+        return index;
+    }
+
+    // /*****************************************************************************************
+    // * The user selected a request
+    // *****************************************************************************************/
+    async requestChosen(el, index) {
+        this.showAdditionalInfo = true;
+        this.SelectedClientRequest = this.clientRequestsArray[index];
+        this.selectedSessionId = this.clientRequestsArray[index].sessionId;
+
+        if (this.selectedProductRow) this.selectedProductRow.children().removeClass('info');
+        this.selectedProductRow = $(el.target).closest('tr');
+        this.selectedProductRow.children().addClass('info')
+    }
+
+
+    typeChanged() {
+        this.categoryIndices = this.getTypeIndex();
+    }
+
+    getTypeIndex(){
+        var typeIndex = 0;
+        this.helpTickets.helpTicketTypesArray[catIndex].subtypes.forEach((item, typIndex) => {
+            if(this.helpTickets.selectedHelpTicket.helpTicketType == item.type) {
+                typeIndex = typIndex;
+            }
+        });
+        return typeIndex;
+    }
+
+    async getActiveRequests() {
+        var sessions = "";
+        this.sessions.sessionsArray.forEach(item => {
+            sessions += item._id + ":";
+        });
+        sessions = sessions.substring(0, sessions.length - 1);
+        await this.clientRequests.getActiveClientRequestsArray(this.userObj._id, sessions);
+        this.originalClientRequestsArray = new Array();
+        this.clientRequestsArray = new Array();
+        //Cycle through request array
+        this.clientRequests.requestsArray.forEach(item => {
+            //Cycle through details of request
+            item.requestDetails.forEach(item2 => {
+                //If there are assignments
+                if (item2.assignments && item2.assignments.length > 0) {
+                    //Cycle through the assignments
+                    item2.assignments.forEach((assign) => {
+                        this.originalClientRequestsArray.push({
+                            productId: item2.productId,
+                            productName: item2.productId.name,
+                            sessionId: item.sessionId,
+                            requestStatus: item2.requestStatus,
+                            systemId: assign.systemId,
+                            courseName: item.courseId ? item.courseId.name : 'Trial Client',
+                            client: assign.client,
+                            clientId: assign.clientId,
+                            _id: item2._id
+                        })
+                    })
+                } else {
+                    this.originalClientRequestsArray.push({
+                        productId: item2.productId,
+                        sessionId: item.sessionId,
+                        requestStatus: item2.requestStatus,
+                        courseId: item.courseId,
+                        _id: item2._id
+                    })
+                }
+            })
+        });
+        this.originalClientRequestsArray.forEach(item => {
+            this.clientRequestsArray.push(item);
+        })
+    }
+
+    _setUpValidation() {
+        this.validation.addRule(1, "course", [{
+            "rule": "custom", "message": "Select a course",
+            "valFunction": function (context) {
+                if (context.requestType === "sandboxCourse") {
+                    return true
+                } else {
+                    return !(context.courseId == -1);
+                }
+            }
+        }]);
+        this.validation.addRule(2, "course", [{
+            "rule": "custom", "message": "Select a course",
+            "valFunction": function (context) {
+                if (context.requestType === "sandboxCourse") {
+                    return true
+                } else {
+                    return !(context.courseId == -1);
+                }
+            }
+        }]);
+        this.validation.addRule(3, "course", [{
+            "rule": "custom", "message": "Select a course",
+            "valFunction": function (context) {
+                if (context.requestType === "sandboxCourse") {
+                    return true
+                } else {
+                    return !(context.courseId == -1);
+                }
+            }
+        }]);
+        this.validation.addRule(4, "course", [{
+            "rule": "custom", "message": "Select a course",
+            "valFunction": function (context) {
+                if (context.requestType === "sandboxCourse") {
+                    return true
+                } else {
+                    return !(context.courseId == -1);
+                }
+            }
+        }]);
+    }
+
+    getMessage(messageKey) {
+        for (var i = 0; i < this.site.messageArray.length; i++) {
+            if (this.site.messageArray[i].key === messageKey) return this.site.messageArray[i].content
+        }
+        return "";
+    }
+}

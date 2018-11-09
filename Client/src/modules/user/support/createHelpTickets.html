@@ -1,16 +1,16 @@
 <template>
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <div class="col-lg-4">
-            <compose view='./components/helpTicketType.html'></compose>
-
-            <compose show.bind="helpTicketType != 'NULL' && requestsRequired" view='./components/Requests.html'></compose>
-           
-        </div>
-        <div class="col-lg-8">
-            <compose show.bind="showDetails" view='./components/helpTicketDetails.html'></compose>
-            <!-- show.bind="showAdditionalInfo && helpTicketType != 'NULL'" -->
-        </div>
-      </div>
-    </div> <!-- Panel Body -->
-</template>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="col-lg-4">
+                <compose view='./components/helpTicketType.html'></compose>
+    
+                <compose show.bind="helpTicketType != 'NULL' && requestsRequired" view='./components/Requests.html'></compose>
+               
+            </div>
+            <div class="col-lg-8">
+                <compose show.bind="showDetails" view='./components/helpTicketDetails.html'></compose>
+                <!-- show.bind="showAdditionalInfo && helpTicketType != 'NULL'" -->
+            </div>
+          </div>
+        </div> <!-- Panel Body -->
+    </template>

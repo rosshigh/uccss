@@ -1494,6 +1494,7 @@ export class Assignments {
                 if (item.requestId && item.requestId.courseId === null) item.requestId.courseId = { _id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME };
             })
             this.dataTable.updateArray(this.clientRequests.requestsDetailsArray, 'requiredDate', -1);
+            console.log('asldjfl')
         }
 
     }

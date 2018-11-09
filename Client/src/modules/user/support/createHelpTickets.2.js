@@ -87,6 +87,7 @@ export class CreateHelpTickets{
 
 	async categoryChanged(){ 
         this.showAdditionalInfo = false;
+        this.showDetails = false;
         this.catIndex = this.getCategoryIndex();
         if(this.helpTickets.selectedHelpTicket.helpTicketCategory > -1){
             this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired;
@@ -112,6 +113,7 @@ export class CreateHelpTickets{
             this.showAdditionalInfo = false;
             this.helpTicketTypeMessage = undefined;
         }
+        this.showDetails = this.showAdditionalInfo && this.helpTicketType != null;
          $("#helpTicketPurpose").addClass('focus');
     }
 
@@ -194,6 +196,7 @@ export class CreateHelpTickets{
             // this.requestsRequired = false;
             // this.showRequests = false;
         }
+        this.showDetails = this.showAdditionalInfo && this.helpTicketType != null;
     }
 
     setupValidation(rules){
@@ -263,7 +266,8 @@ export class CreateHelpTickets{
     // *****************************************************************************************/
     async requestChosen(el, index){
 
-        this.showAdditionalInfo = true;
+        // this.showAdditionalInfo = true;
+        this.showDetails = true;
         this.SelectedClientRequest = this.clientRequestsArray[index];
         this.selectedSessionId = this.clientRequestsArray[index].sessionId;
 
@@ -353,14 +357,12 @@ export class CreateHelpTickets{
     _cleanUp(){
         this.showTypes = false;
         this.helpTicketTypeMessage = undefined;
-        // this.showHelpTicketDescription = false;
-        // this.clientRequests = new Array();
-        // this.showRequests = false;
         this.showAdditionalInfo = false;
         this.helpTickets.selectHelpTicket();
         this.helpTickets.selectHelpTicketContent();
         this.clearTables();
         this.filesToUpload = new Array();
+        this.showDetails = false;
     }
 
     // /*****************************************************************************************

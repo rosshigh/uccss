@@ -32,6 +32,7 @@ export class NavBar {
 
     attached(){
         $(".dropdown-toggle").dropdown();
+        this.people.getNotifications(this.userObj._id);
         setInterval(() => {
             this.people.getNotifications(this.userObj._id);
         }, 10 * 60 * 1000);
@@ -126,17 +127,27 @@ export class NavBar {
             }
     }
 
-    openAlert(alert){
-        this.alert = alert;
-        $(".hoverProfile").css("top", 100);
-        $(".hoverProfile").css("left", 100);
-        $(".hoverProfile").css("display", "block");
-        sessionStorage.setItem('alert',true);
-    }
+    // openAlert(alert){
+    //     this.alert = alert;
+    //     $(".hoverProfile").css("top", 100);
+    //     $(".hoverProfile").css("left", 100);
+    //     $(".hoverProfile").css("display", "block");
+    //     sessionStorage.setItem('alert',true);
+    // }
 
-    hideAlert(){
+    // hideAlert(){
+    //     $(".hoverProfile").css("display", "none");
+    // }
+
+    showProfile(el) {
+        $(".hoverProfile").css("top", el.clientY - 175);
+        $(".hoverProfile").css("left", el.clientX - 200);
+        $(".hoverProfile").css("display", "block");
+      }
+    
+      hideProfile() {
         $(".hoverProfile").css("display", "none");
-    }
+      }
 
     async events(){
         await this.eventLayer.getEventsArray('', true);

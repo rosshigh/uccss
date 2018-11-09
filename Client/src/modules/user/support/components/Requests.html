@@ -1,4 +1,5 @@
 <template>
+      <h3>These are your current product requests.  If the issue you are having is related to a specific product, please select it.</h3>
       <div class="topMargin">
         <h5 show.bind="clientRequestsArray.length === 0">You have no product requests that apply to this type of help ticket.</h5>
         <table id="clientTable" show.bind="clientRequestsArray.length > 0" class="table table-bordered table-responsive" style="background:white;">
@@ -13,12 +14,12 @@
           </tr>
           </thead>
           <tbody>
-            <tr id="${product.id}" productId="${product.productId}" 
+            <tr class="sortable" id="${product.id}" productId="${product.productId}" 
                 repeat.for="product of clientRequestsArray"
                 click.trigger="requestChosen($event, $index)">
-              <td>${product.courseId | lookupValue:people.coursesArray:"_id":"name"}</td>
+              <td>${product.courseName}</td>
               <td>${product.sessionId | session:sessions.sessionsArray}</td>
-              <td>${product.productId | lookupValue:products.productsArray:"_id":"name"}</td> 
+              <td>${product.productName}</td> 
               <td>${product.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
               <td>${product.client}</td>
               <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
