@@ -395,15 +395,17 @@ export class DataTable{
       this.baseArray = new Array();
       this.active = true;
       this.filterValues = new Array();
-      sourceArray.forEach(item => {
+      sourceArray.forEach((item, index) => {
+        item.baseIndex = index;
+        item.originalIndex = index;
         this.sourceArray.push(item);
         this.baseArray.push(item);
       })
      
-      this.baseArray.forEach(function(item, index){
-        item.baseIndex = index;
-        item.originalIndex = index;
-      });
+      // this.baseArray.forEach(function(item, index){
+      //   item.baseIndex = index;
+      //   item.originalIndex = index;
+      // });
 
       if(sortProperty){
           this.baseArray.sort((a,b) => {

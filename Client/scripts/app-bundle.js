@@ -21086,14 +21086,11 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
         this.baseArray = new Array();
         this.active = true;
         this.filterValues = new Array();
-        sourceArray.forEach(function (item) {
-          _this2.sourceArray.push(item);
-          _this2.baseArray.push(item);
-        });
-
-        this.baseArray.forEach(function (item, index) {
+        sourceArray.forEach(function (item, index) {
           item.baseIndex = index;
           item.originalIndex = index;
+          _this2.sourceArray.push(item);
+          _this2.baseArray.push(item);
         });
 
         if (sortProperty) {
