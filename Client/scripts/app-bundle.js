@@ -19934,7 +19934,7 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
             var _this = this;
 
             (0, _jquery2.default)(".dropdown-toggle").dropdown();
-            this.people.getNotifications(this.userObj._id);
+            if (this.userObj) this.people.getNotifications(this.userObj._id);
             setInterval(function () {
                 _this.people.getNotifications(_this.userObj._id);
             }, 10 * 60 * 1000);

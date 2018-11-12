@@ -32,7 +32,7 @@ export class NavBar {
 
     attached(){
         $(".dropdown-toggle").dropdown();
-        this.people.getNotifications(this.userObj._id);
+        if(this.userObj) this.people.getNotifications(this.userObj._id);
         setInterval(() => {
             this.people.getNotifications(this.userObj._id);
         }, 10 * 60 * 1000);
