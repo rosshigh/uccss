@@ -24,11 +24,10 @@ export class CreateHelpTickets {
     inputForm = null;
     showTypes = false;
     inputHTML = "";
-
-    spinnerHTML = "";
     filesSelected;
     selectedFiles;
     removedFiles = new Array();
+    test = true;
 
     showAdditionalInfo = false;
 
@@ -68,13 +67,23 @@ export class CreateHelpTickets {
         var wizard = $('.wizard').wizard();
         var that = this;
 
-        wizard.on('actionclicked.fu.wizard', function (e, data) {
+        wizard.on('actionclicked.fu.wizard', (e, data) => {
             that.step = data.step;
             if (data.direction !== "previous") {
                 if (!that.validation.validate(data.step)) {
                     e.preventDefault();
+                } else if (data.step === 2) {
+                    that.createInputForm(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].inputForm);
+                    this.setupValidation(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].validation);
+                    // $("#comments").focus();
+                } else if (data.step === 3) {
+                    setTimeout(() => { 
+                        $(".note-editable:first").focus().scroll(); 
+                    }, 500);
                 } else if (data.step === 4) {
-                    that.validation.makeValid($("#productListTable"));
+                    this.outputForm = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].outputForm;
+                    this.createOutputForm(this.outputForm)
+                } else if (data.step === 5) {
                     that.save();
                 }
             }
@@ -91,6 +100,7 @@ export class CreateHelpTickets {
             this.config.getConfig(),
             this.site.getMessageArray('?filter=category|eq|HELP_TICKETS', true)
         ]);
+        this._setUpValidation();
         this.helpTickets.selectHelpTicket();
         this.sendEmail = this.config.SEND_EMAILS;
         this.appsArray = this.apps.appDownloadsArray.filter(item => {
@@ -106,7 +116,7 @@ export class CreateHelpTickets {
         this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired;
         await this.getActiveRequests();
         this.showTypes = true;
-        this.helpTicketTypeMessage = this.clientRequestsArray.length ? this.getMessage('SELECT_TYPE') : undefined;
+        // this.helpTicketTypeMessage = this.clientRequestsArray.length ? this.getMessage('SELECT_TYPE') : undefined;
     }
 
     getCategoryIndex() {
@@ -124,23 +134,31 @@ export class CreateHelpTickets {
     // *****************************************************************************************/
     async requestChosen(el, index) {
         this.showAdditionalInfo = true;
-        this.SelectedClientRequest = this.clientRequestsArray[index];
-        this.selectedSessionId = this.clientRequestsArray[index].sessionId;
+        if (this.SelectedClientRequest && this.SelectedClientRequest._id === this.clientRequestsArray[index]._id) {
+            this.SelectedClientRequest = undefined;
+            this.selectedSessionId = undefined;
+            if (this.selectedProductRow) this.selectedProductRow.children().removeClass('info');
+        } else {
+            this.SelectedClientRequest = this.clientRequestsArray[index];
+            this.selectedSessionId = this.clientRequestsArray[index].sessionId;
 
-        if (this.selectedProductRow) this.selectedProductRow.children().removeClass('info');
-        this.selectedProductRow = $(el.target).closest('tr');
-        this.selectedProductRow.children().addClass('info')
+            if (this.selectedProductRow) this.selectedProductRow.children().removeClass('info');
+            this.selectedProductRow = $(el.target).closest('tr');
+            this.selectedProductRow.children().addClass('info')
+        }
     }
-
 
     typeChanged() {
-        this.categoryIndices = this.getTypeIndex();
+        this.selectedHelpTicketType = this.getTypeIndex();
+        this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired;
+        this.descriptionRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].descriptionRequired;
+        this.showForm = true;
     }
 
-    getTypeIndex(){
+    getTypeIndex() {
         var typeIndex = 0;
-        this.helpTickets.helpTicketTypesArray[catIndex].subtypes.forEach((item, typIndex) => {
-            if(this.helpTickets.selectedHelpTicket.helpTicketType == item.type) {
+        this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes.forEach((item, typIndex) => {
+            if (this.helpTickets.selectedHelpTicket.helpTicketType == item.type) {
                 typeIndex = typIndex;
             }
         });
@@ -192,47 +210,115 @@ export class CreateHelpTickets {
         })
     }
 
+    // /*****************************************************************************************
+    // * Save the help ticket
+    // *****************************************************************************************/
+    async save() {
+        await this.buldHelpTicket();
+        var email = new Object();
+        if (this.sendEmail) {
+            email.MESSAGE = this.config.HELP_TICKET_CREATED_MESSAGE;
+            email.INSTRUCTIONS = this.config.HELP_TICKET_INSTRUCTIONS;
+            email.subject = this.config.HELP_TICKET_CREATED_SUBJECT.replace('[[faculty name]]', this.userObj.fullName);
+            email.email = this.userObj.email;
+            email.helpTicketNo = 0;
+            email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+        }
+
+        let serverResponse = await this.helpTickets.saveHelpTicket(email);
+        if (!serverResponse.status) {
+            this.utils.showNotification("Help ticket number " + serverResponse.helpTicketNo + " was created");
+            if (this.filesToUpload && this.filesToUpload.length > 0) {
+                this.helpTickets.uploadFile(this.filesToUpload, serverResponse.content[0]._id, this.helpTickets.selectedHelpTicket);
+            }
+        }
+        this._cleanUp();
+    }
+
+    // /*****************************************************************************************
+    // * Prepare the help ticket to submit to the server
+    // *****************************************************************************************/
+    async buldHelpTicket() {
+        this.helpTickets.selectedHelpTicket.owner = [{ "personId": "b1b1b1b1b1b1b1b1b1b1b1b1", "date": new Date() }];
+        this.helpTickets.selectedHelpTicket.personId = this.userObj._id;
+        this.helpTickets.selectedHelpTicket.institutionId = this.userObj.institutionId._id;
+        this.helpTickets.selectedHelpTicket.sessionId = this.selectedSessionId;
+
+        if (!this.SelectedClientRequest || !this.SelectedClientRequest._id) {
+            //If the help ticket type doesn't require a course, insert a dummy courseId
+            this.helpTickets.selectedHelpTicket.courseId = 'b1b1b1b1b1b1b1b1b1b1b1b1';
+        } else {
+            this.helpTickets.selectedHelpTicket.requestId = this.SelectedClientRequest._id;
+            this.helpTickets.selectedHelpTicket.systemId = this.SelectedClientRequest.systemId;
+            this.helpTickets.selectedHelpTicket.client = this.SelectedClientRequest.client;
+            this.helpTickets.selectedHelpTicket.productId = this.SelectedClientRequest.productId;
+            this.helpTickets.selectedHelpTicket.courseId = this.SelectedClientRequest.courseId;
+        }
+
+        this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
+        this.helpTickets.selectedHelpTicketContent.type = this.helpTickets.selectedHelpTicket.helpTicketType;
+        // this.helpTickets.selectedHelpTicketContent.displayForm = this.inputForm;
+        this.helpTickets.selectedHelpTicket.content.push(this.helpTickets.selectedHelpTicketContent);
+    }
+
+    _cleanUp() {
+        this.showTypes = false;
+        // this.helpTicketTypeMessage = undefined;
+        // this.showAdditionalInfo = false;
+        this.helpTickets.selectHelpTicket();
+        this.helpTickets.selectHelpTicketContent();
+        this.clearTables();
+        this.filesToUpload = new Array();
+        this.showDetails = false;
+        $('.wizard').wizard('selectedItem', {
+            step: 1
+          })
+    }
+
+    // /*****************************************************************************************
+    // * Remove styling from selected rows on tables
+    // *****************************************************************************************/
+    clearTables() {
+        if (this.selectedCourseRow) this.selectedCourseRow.children().removeClass('rowSelected');
+        if (this.selectedProductRow) this.selectedProductRow.children().removeClass('rowSelected');
+    }
+
     _setUpValidation() {
-        this.validation.addRule(1, "course", [{
-            "rule": "custom", "message": "Select a course",
+        this.validation.addRule(1, "helpTicketCategory", [{
+            "rule": "custom", "message": "Select a category",
             "valFunction": function (context) {
-                if (context.requestType === "sandboxCourse") {
-                    return true
+                return !(context.helpTickets.selectedHelpTicket.helpTicketCategory == -1);
+            }
+        }]);
+        this.validation.addRule(1, "helpTicketType", [{
+            "rule": "custom", "message": "Select a type",
+            "valFunction": function (context) {
+                return !(context.helpTicketType == -1);
+            }
+        }]);
+        this.validation.addRule(2, "selectProductRequestError", [{
+            "rule": "custom", "message": "Select a product request",
+            "valFunction": function (context) {
+                if (context.requestsRequired) {
+                    return context.SelectedClientRequest;
                 } else {
-                    return !(context.courseId == -1);
+                    return true;
                 }
             }
         }]);
-        this.validation.addRule(2, "course", [{
-            "rule": "custom", "message": "Select a course",
+        this.validation.addRule(4, "descriptionErrorMessage", [{
+            "rule": "custom", "message": "Enter a description of the problem",
             "valFunction": function (context) {
-                if (context.requestType === "sandboxCourse") {
-                    return true
-                } else {
-                    return !(context.courseId == -1);
-                }
+                return !context.descriptionRequired || context.helpTickets.selectedHelpTicketContent.content.comments;
             }
         }]);
-        this.validation.addRule(3, "course", [{
-            "rule": "custom", "message": "Select a course",
-            "valFunction": function (context) {
-                if (context.requestType === "sandboxCourse") {
-                    return true
-                } else {
-                    return !(context.courseId == -1);
-                }
-            }
-        }]);
-        this.validation.addRule(4, "course", [{
-            "rule": "custom", "message": "Select a course",
-            "valFunction": function (context) {
-                if (context.requestType === "sandboxCourse") {
-                    return true
-                } else {
-                    return !(context.courseId == -1);
-                }
-            }
-        }]);
+    }
+
+    setupValidation(rules) {
+        this.validation.clearRuleGroup(3);
+        rules.forEach(item => {
+            this.validation.addRule(3, item.control, [{ "rule": item.rule, "message": item.message, "value": item.value }]);
+        });
     }
 
     getMessage(messageKey) {
@@ -240,5 +326,57 @@ export class CreateHelpTickets {
             if (this.site.messageArray[i].key === messageKey) return this.site.messageArray[i].content
         }
         return "";
+    }
+
+    createInputForm(html) {
+        $('#container').html(html);
+        let extendedInput = $('.extend');
+        for (let i = 0; i < extendedInput.length; i++) {
+            this.helpTickets.selectedHelpTicketContent.content[$(extendedInput[i]).attr('id')] = "";
+        }
+
+        let el = document.getElementById('container');
+
+        if (el) {
+            if (!el.querySelectorAll('.au-target').length) {
+                this.templatingEngine.enhance({ element: el, bindingContext: this });
+            }
+        }
+    }
+
+    createOutputForm(html) {
+        html = html.split('selectedHelpTicket.content[0]').join('selectedHelpTicketContent');
+        // html = html.replace('selectedHelpTicket.content[0]','selectedHelpTicketContent');
+        let el = document.getElementById('outputContainer');
+        el.innerHTML = html;
+
+        if (el) {
+            if (!el.querySelectorAll('.au-target').length) {
+                this.templatingEngine.enhance({ element: el, bindingContext: this });
+            }
+        }
+    }
+
+    toggleField(el) {
+        this.helpTickets.selectedHelpTicketContent.content[$(el.target).parent().attr('id')] = !this.helpTickets.selectedHelpTicketContent.content[$(el.target).parent().attr('id')];
+    }
+
+
+    // /*****************************************************************************************
+    // * THe user selected files to upload to update the ineterface with the file names
+    // *****************************************************************************************/
+    changeFiles() {
+        this.filesToUpload = this.filesToUpload ? this.filesToUpload : new Array();
+        for (var i = 0; i < this.files.length; i++) {
+            let addFile = true;
+            this.filesToUpload.forEach(item => {
+                if (item.name === this.files[i].name) addFile = false;
+            })
+            if (addFile) this.filesToUpload.push(this.files[i]);
+        }
+    }
+
+    removeFile(index) {
+        this.filesToUpload.splice(index, 1);
     }
 }

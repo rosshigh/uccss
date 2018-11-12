@@ -1,8 +1,16 @@
 <template>
+    <div class='topMargin bottomMargin'>
+        <label for="prioritySelect" class='class="bigLabel topMargin'>Priority</label>
+        <select class="form-control"
+            id="prioritySelect" value.bind="helpTickets.selectedHelpTicket.priority">
+            <option repeat.for="priority of config.HELP_TICKET_PRIORITIES" value.bind="$index">${priority.priority}</option>
+        </select>
+        <span>${config.HELP_TICKET_PRIORITIES[helpTickets.selectedHelpTicket.priority].message}</span>
+    </div>
 
     <!-- Category Select -->
-    <div class="form-group">
-            <Label>To help us define your issue, select the category.</Label>
+    <div class="form-group" show.bind="helpTickets.selectedHelpTicket.priority">
+        <Label class="bigLabel topMargin">To help us define your issue, select the category.</Label>
         <select value.bind="helpTickets.selectedHelpTicket.helpTicketCategory" change.delegate="categoryChanged()" id="helpTicketCategory"
             class="form-control">
             <option value="-1">Select the help ticket category</option>
@@ -11,16 +19,12 @@
     </div>
 
     <!-- Type Select -->
-    <div class="form-group">
-        <Label>To help us further define your issue, select the type.</Label>
-        <select show.bind="showTypes" value.bind="helpTicketType" change.delegate="typeChanged($event)" id="helpTicketPurpose"
-            class="form-control">
-            <option value="NULL">Select the help ticket type</option>
+    <div show.bind="showTypes" class="form-group">
+        <Label class="bigLabel topMargin">To help us further define your issue, select the type.</Label>
+        <select value.bind="helpTickets.selectedHelpTicket.helpTicketType" change.delegate="typeChanged()" id="helpTicketType" class="form-control">
+            <option value="-1">Select the help ticket type</option>
             <option repeat.for="types of helpTickets.helpTicketTypesArray[catIndex].subtypes" model.bind="types.type">${types.description}</option>
         </select>
     </div>
 
-    <div show.bind="helpTicketTypeMessage">
-        <div class="well well-sm" innerhtml.bind="helpTicketTypeMessage"></div>
-    </div>
 </template>

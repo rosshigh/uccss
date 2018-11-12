@@ -175,4 +175,13 @@ export default class {
       this.rules = [];
     }
 
+    clearRuleGroup(group){
+      this.ruleGroups[group] = "";
+      this.rules.forEach((rule, index) => {
+        if(rule.ruleGroup == group) {
+          this.rules.splice(index, 1);
+        }
+      })
+    }
+
 }

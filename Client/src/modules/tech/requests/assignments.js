@@ -1389,7 +1389,7 @@ export class Assignments {
         this.dataTable.baseArray.forEach(item => {
             let keep = true;
             for (let i = 0; i < this.emailArray.length; i++) {
-                if (item.requestId.personId.email === this.emailArray[i].email) keep = false;
+                if (!item.requestId || !item.requestId.personId || item.requestId.personId.email === this.emailArray[i].email) keep = false;
             }
             if (keep) {
                 var systemsAssigned = "Unassigned";

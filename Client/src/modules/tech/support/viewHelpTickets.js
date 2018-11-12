@@ -24,6 +24,7 @@ export class ViewHelpTickets {
   viewHelpTickets = true;
   showAssignment = false;
   refreshInterval = 10; //minutes
+  tableMargin = "margin-top:0px;"
 
   toolbar;
 
@@ -231,6 +232,7 @@ export class ViewHelpTickets {
   * index - index of selected help ticket
   *****************************************************************************************/
   async selectHelpTicket(el, index, helpTicket) {
+    this.tableMargin = "margin-top:0px;"
     //Make the selected help ticket the selected help ticket
     this.editIndex = this.dataTable.getOriginalIndex(index);
     // this.helpTickets.selectHelpTicket(this.editIndex);
@@ -348,6 +350,7 @@ export class ViewHelpTickets {
       this.helpTickets.selectHelpTicketContent();
       this.enterResponse = true;
       this.enableButton = true;
+      window.scrollTo(0, 0);
       setTimeout(() => { $(".note-editable").focus().scroll(); }, 500);
     }
   }
@@ -630,6 +633,7 @@ export class ViewHelpTickets {
   showRequestsPanel() {
     this.showRequestPanel = !this.showRequestPanel;
     this.getRequests();
+    window.scrollTo(0, 0);
   }
 
   async getRequests() {

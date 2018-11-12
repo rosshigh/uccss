@@ -10,8 +10,14 @@ module.exports = function (app) {
   buildQuery = function(queryObject, reqQuery){
     if(queryObject.order) {
       var order = queryObject.order.split(':');  
-      if(order[1] && order[1] =='DSC')  order[0] = '-' + order[0];
-      reqQuery.sort(order[0]);
+      // if(order[1] && order[1] =='DSC')  order[0] = '-' + order[0];
+      let sortOrder = 'asc';
+      let sortField = order[0];
+      if(order[1] && order[1] =='DSC')  sortOrder = 'desc';
+        
+console.log(sortField)  
+console.log(sortOrder)    
+      reqQuery.sort({'modifiedDate': -1});
     }
     if(queryObject.fields) reqQuery.select(queryObject.fields);   
     if(queryObject.filter){

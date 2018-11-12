@@ -37,7 +37,7 @@ export class Support {
             },
             {
                 route: 'createHelpTickets',
-                moduleId: './createHelpTickets',
+                moduleId: './createHelpTicketsWiz',
                settings: { auth: true, roles: [] }, 
                 nav: true,
                 name: 'createHelpTickets',

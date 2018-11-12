@@ -1,5 +1,14 @@
 @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
+.toolbar {
+    position:fixed;
+    z-index:1000;
+    width:100%;
+    top:91px;
+    left:0;
+    background-color:ghostwhite;
+}
+
 .provisional {
     background-color: cyan;
 }
@@ -26,6 +35,10 @@
 .card-title {
     background-color: rgba(0, 0, 0, 0.03);
     border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.bigLabel{
+    font-size: 1.5rem;
 }
 
 .btn-default{

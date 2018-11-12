@@ -15,6 +15,7 @@ var helpTicketTypesSchema = new Schema({
       inputForm: { type: String },
       outputForm: { type: String },
       active: { type: Boolean, default: true },
+      descriptionRequired: { type: Boolean, default: true },
       clientRequired: { type: Boolean },
       appsRequired:{ type: Boolean },
       public: { type: Boolean },

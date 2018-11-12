@@ -1,0 +1,120 @@
+<template>
+    <div class='col-md-12' id='appHelp'>
+        <div class='col-lg-12'>
+            <div class='topMargin form-group'>
+                <label class='control-label'>Application</label>
+                <select value.bind='helpTickets.selectedHelpTicketContent.content.applicationId' id='applicationId'
+                    class='form-control'>
+                    <option value=''>Select an application</option>
+                    <option repeat.for='app of appsArray' value.bind='app._id'>${app.name}</option>
+                </select>
+            </div>
+        </div>
+        <div class='col-lg-12'>
+            <div class='topMargin form-group'>
+                <label class='control-label'>Describe the Operating System</label>
+                <div class='panel panel-default'>
+                    <div class='panel-body'>
+                        <div class='row'>
+                            <div class='col-lg-6'>
+                                <span id='osWindows'>
+                                    <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.osWindows'
+                                        class='fa fa-check-square-o'></i>
+                                    <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.osWindows'
+                                        class='fa fa-square-o'></i>
+                                </span> Windows
+
+                                <input show.bind='helpTickets.selectedHelpTicketContent.content.osWindows' value.bind='helpTickets.selectedHelpTicketContent.content.windowsVersion'
+                                    id='windowsVersion' class='form-control extend topMargin' placeholder='Windows 8, 8.1, 10, etc.'
+                                    type='text' />
+
+                                <div class='row topMargin' show.bind='helpTickets.selectedHelpTicketContent.content.osWindows'>
+                                    <span class='leftMargin ' id='osWindows32bit'>
+                                        <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.osWindows32bit'
+                                            class='fa fa-check-square-o'></i>
+                                        <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.osWindows32bit'
+                                            class='fa fa-square-o'></i>
+                                    </span> 32-bit
+                                    <span class='leftMargin ' id='osWindows64bit'>
+                                        <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.osWindows64bit'
+                                            class='fa fa-check-square-o'></i>
+                                        <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.osWindows64bit'
+                                            class='fa fa-square-o'></i>
+                                    </span> 64-bit
+
+                                </div>
+                            </div>
+                            <div class='col-lg-6'>
+                                <span class='leftMargin topMargin' id='osMac'>
+                                    <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.osMac'
+                                        class='fa fa-check-square-o'></i>
+                                    <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.osMac'
+                                        class='fa fa-square-o'></i>
+                                </span> Mac OS
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class='col-lg-12'>
+        <div class='topMargin col-lg-6 form-group '><label class='control-label'>Other Software Involved</label>
+            <div class='panel panel-default'>
+                <div class='panel-body'>
+                    <div class='col-lg-12'>
+                        <div class='col-lg-6'>
+                            <span class='topMargin' id='officeInvolved'>
+                                <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.officeInvolved'
+                                    class='fa fa-check-square-o'></i>
+                                <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.officeInvolved'
+                                    class='fa fa-square-o'></i>
+                            </span> Microsoft Office involved?
+                            <input show.bind='helpTickets.selectedHelpTicketContent.content.officeInvolved' value.bind='helpTickets.selectedHelpTicketContent.content.officeVersion'
+                                id='officeVersion' class='form-control extend topMargin' placeholder='2007, 2010, 2013, etc.'
+                                type='text' />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='topMargin col-lg-6 form-group'><label class='control-label'>Describe the Network
+                Connection</label>
+            <div class='panel panel-default'>
+                <div class='panel-body'>
+                    <div class='row'>
+                        <span class='leftMargin topMargin' id='wiredNetwork'>
+                            <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.wiredNetwork'
+                                class='fa fa-check-square-o'></i>
+                            <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.wiredNetwork'
+                                class='fa fa-square-o'></i>
+                        </span> Wired
+                        <span class='leftMargin topMargin' id='wirelessNetwork'>
+                            <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.wirelessNetwork'
+                                class='fa fa-check-square-o'></i>
+                            <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.wirelessNetwork'
+                                class='fa fa-square-o'></i>
+                        </span> Wired
+                    </div>
+                    <div class='row topMargin'>
+                        <span class='leftMargin topMargin' id='campusNetwork'>
+                            <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.campusNetwork'
+                                class='fa fa-check-square-o'></i>
+                            <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.campusNetwork'
+                                class='fa fa-square-o'></i>
+                        </span> Campus
+                        <span class='leftMargin topMargin' id='personalNetwork'>
+                            <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.personalNetwork'
+                                class='fa fa-check-square-o'></i>
+                            <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.personalNetwork'
+                                class='fa fa-square-o'></i>
+                        </span> Personal/Private Network
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+</template>

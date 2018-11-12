@@ -6,9 +6,11 @@
             <li></li>
         </ul>
     </span>
+    <!--
     <div show.bind="dataTable.displayArray && dataTable.displayArray.length || initialLoaded" class="panel panel-default rightMargin leftMargin">
         <div class="panel-body">
             <div class="row">
+            -->
                 <div show.bind="requestSelected == 'table'">
                     <compose view="./components/viewRequestsTable.html"></compose>
                 </div>
@@ -24,7 +26,8 @@
                 <div show.bind="requestSelected == 'email'">
                     <compose view="./components/bulkEmailForm.html"></compose>
                 </div>
+                <!--
             </div>
         </div>
-
+    -->
 </template>
