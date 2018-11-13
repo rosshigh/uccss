@@ -114,7 +114,7 @@ export class ViewHelpTickets {
     // $("#loading").hide();
     this.initialLoaded = true;
 
-    setInterval(() => {if(!this.helpTicketSelected) this.refresh(false);}, this.refreshInterval * 60 * 1000);
+    setInterval(() => { if (!this.helpTicketSelected) this.refresh(false); }, this.refreshInterval * 60 * 1000);
     $.summernote.dom.emptyPara = "<div><br/></div>"
   }
 
@@ -396,7 +396,7 @@ export class ViewHelpTickets {
 
   async saveIt(status) {
     this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
-    this._createResponse(); 
+    this._createResponse();
     var email = new Object();
     if (this.sendEmail) {
       if (status == this.config.CUSTOMER_ACTION_HELPTICKET_STATUS) {
@@ -427,6 +427,20 @@ export class ViewHelpTickets {
     if (helpTicket) {
       this.helpTickets.selectHelpTicketByID(helpTicket._id);
     }
+    this.dialog.showMessage(
+      "Are you sure you want to change ownership of this help ticket",
+      "Save Changes",
+      ['Yes', 'No']
+    ).whenClosed(response => {
+      if (!response.wasCancelled) {
+         this.ownIt();
+      }
+    });
+
+
+  }
+
+  async ownIt() {
     if (this.helpTickets.selectedHelpTicket.owner[0].personId === null) {
       var obj = { status: this.config.REVIEW_HELPTICKET_STATUS, personId: this.userObj._id };
     } else {
@@ -460,12 +474,12 @@ export class ViewHelpTickets {
       date: new Date
     }
     this.helpTickets.selectedHelpTicket.audit.push(obj);
-    if(status == this.config.MY_HELPTICKET_STATUS){
+    if (status == this.config.MY_HELPTICKET_STATUS) {
       this.helpTickets.selectedHelpTicket.helpTicketStatus = this.helpTickets.selectedHelpTicket.helpTicketStatus.toString() + status;
     } else {
       this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
     }
-    
+
     if (status == this.config.CLOSED_HELPTICKET_STATUS) {
       this.helpTickets.selectHelpTicketContent();
       this.responseMessage = "Help Ticket closed by " + this.userObj.fullName

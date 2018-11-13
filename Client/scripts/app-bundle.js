@@ -36856,7 +36856,8 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.ownHelpTicket = function () {
       var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(helpTicket) {
-        var obj, serverResponse;
+        var _this6 = this;
+
         return regeneratorRuntime.wrap(function _callee11$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
@@ -36864,30 +36865,13 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 if (helpTicket) {
                   this.helpTickets.selectHelpTicketByID(helpTicket._id);
                 }
-                if (this.helpTickets.selectedHelpTicket.owner[0].personId === null) {
-                  obj = { status: this.config.REVIEW_HELPTICKET_STATUS, personId: this.userObj._id };
-                } else {
-                  if (this.helpTickets.selectedHelpTicket.owner[0].personId._id != this.userObj._id) {
-                    obj = { status: this.config.REVIEW_HELPTICKET_STATUS, personId: this.userObj._id };
-                  } else {
-                    obj = { status: this.config.NEW_HELPTICKET_STATUS, personId: "b1b1b1b1b1b1b1b1b1b1b1b1" };
+                this.dialog.showMessage("Are you sure you want to change ownership of this help ticket", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
+                  if (!response.wasCancelled) {
+                    _this6.ownIt();
                   }
-                }
-                _context11.next = 4;
-                return this.helpTickets.updateOwner(obj);
+                });
 
-              case 4:
-                serverResponse = _context11.sent;
-
-                if (!serverResponse.error) {
-                  this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-                  this.utils.showNotification("The help ticket was updated");
-                }
-                if (helpTicket) {
-                  this._cleanUp();
-                }
-
-              case 7:
+              case 2:
               case 'end':
                 return _context11.stop();
             }
@@ -36902,21 +36886,66 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       return ownHelpTicket;
     }();
 
-    ViewHelpTickets.prototype.changeStatus = function () {
-      var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(helpTicket, status) {
-        var obj, serverResponse, _serverResponse;
-
+    ViewHelpTickets.prototype.ownIt = function () {
+      var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
+        var obj, serverResponse;
         return regeneratorRuntime.wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
+                if (this.helpTickets.selectedHelpTicket.owner[0].personId === null) {
+                  obj = { status: this.config.REVIEW_HELPTICKET_STATUS, personId: this.userObj._id };
+                } else {
+                  if (this.helpTickets.selectedHelpTicket.owner[0].personId._id != this.userObj._id) {
+                    obj = { status: this.config.REVIEW_HELPTICKET_STATUS, personId: this.userObj._id };
+                  } else {
+                    obj = { status: this.config.NEW_HELPTICKET_STATUS, personId: "b1b1b1b1b1b1b1b1b1b1b1b1" };
+                  }
+                }
+                _context12.next = 3;
+                return this.helpTickets.updateOwner(obj);
+
+              case 3:
+                serverResponse = _context12.sent;
+
+                if (!serverResponse.error) {
+                  this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+                  this.utils.showNotification("The help ticket was updated");
+                }
+                if (helpTicket) {
+                  this._cleanUp();
+                }
+
+              case 6:
+              case 'end':
+                return _context12.stop();
+            }
+          }
+        }, _callee12, this);
+      }));
+
+      function ownIt() {
+        return _ref12.apply(this, arguments);
+      }
+
+      return ownIt;
+    }();
+
+    ViewHelpTickets.prototype.changeStatus = function () {
+      var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(helpTicket, status) {
+        var obj, serverResponse, _serverResponse;
+
+        return regeneratorRuntime.wrap(function _callee13$(_context13) {
+          while (1) {
+            switch (_context13.prev = _context13.next) {
+              case 0:
                 if (!(status == this.config.MY_HELPTICKET_STATUS && this.userObj._id != helpTicket.owner[0].personId._id)) {
-                  _context12.next = 3;
+                  _context13.next = 3;
                   break;
                 }
 
                 this.utils.showNotification('You must own this ticket before you can make it yours');
-                return _context12.abrupt('return');
+                return _context13.abrupt('return');
 
               case 3:
                 this.helpTickets.selectHelpTicketByID(helpTicket._id);
@@ -36936,32 +36965,32 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 }
 
                 if (!(status == this.config.CLOSED_HELPTICKET_STATUS)) {
-                  _context12.next = 17;
+                  _context13.next = 17;
                   break;
                 }
 
                 this.helpTickets.selectHelpTicketContent();
                 this.responseMessage = "Help Ticket closed by " + this.userObj.fullName;
                 this._createResponse();
-                _context12.next = 13;
+                _context13.next = 13;
                 return this.helpTickets.closeHelpTicket();
 
               case 13:
-                serverResponse = _context12.sent;
+                serverResponse = _context13.sent;
 
                 if (!serverResponse.error) {
                   this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
                   this.utils.showNotification("The help ticket was updated");
                 }
-                _context12.next = 21;
+                _context13.next = 21;
                 break;
 
               case 17:
-                _context12.next = 19;
+                _context13.next = 19;
                 return this.helpTickets.saveHelpTicket();
 
               case 19:
-                _serverResponse = _context12.sent;
+                _serverResponse = _context13.sent;
 
                 if (!_serverResponse.error) {
                   this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -36973,14 +37002,14 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
               case 22:
               case 'end':
-                return _context12.stop();
+                return _context13.stop();
             }
           }
-        }, _callee12, this);
+        }, _callee13, this);
       }));
 
       function changeStatus(_x13, _x14) {
-        return _ref12.apply(this, arguments);
+        return _ref13.apply(this, arguments);
       }
 
       return changeStatus;
@@ -36996,12 +37025,12 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.flag = function flag() {
-      var _this6 = this;
+      var _this7 = this;
 
       var note = { noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0 };
       return this.dialog.showNote("Save Changes", note, ['Submit', 'Cancel']).whenClosed(function (response) {
         if (!response.wasCancelled) {
-          _this6.saveNote(response.output);
+          _this7.saveNote(response.output);
         } else {
           console.log("Cancelled");
         }
@@ -37009,11 +37038,11 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.saveNote = function () {
-      var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(note) {
+      var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(note) {
         var response;
-        return regeneratorRuntime.wrap(function _callee13$(_context13) {
+        return regeneratorRuntime.wrap(function _callee14$(_context14) {
           while (1) {
-            switch (_context13.prev = _context13.next) {
+            switch (_context14.prev = _context14.next) {
               case 0:
                 this.people.selectNote();
                 this.people.selectedNote.type = "h";
@@ -37022,11 +37051,11 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 this.people.selectedNote.note = note.note.noteBody;
                 this.people.selectedNote.reference = this.helpTickets.selectedHelpTicket._id;
                 this.people.selectedNote.referenceNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
-                _context13.next = 9;
+                _context14.next = 9;
                 return this.people.saveNote();
 
               case 9:
-                response = _context13.sent;
+                response = _context14.sent;
 
                 if (!response.error) {
                   this.utils.showNotification('The note was saved');
@@ -37034,21 +37063,21 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
               case 11:
               case 'end':
-                return _context13.stop();
+                return _context14.stop();
             }
           }
-        }, _callee13, this);
+        }, _callee14, this);
       }));
 
       function saveNote(_x15) {
-        return _ref13.apply(this, arguments);
+        return _ref14.apply(this, arguments);
       }
 
       return saveNote;
     }();
 
     ViewHelpTickets.prototype.back = function back() {
-      var _this7 = this;
+      var _this8 = this;
 
       this.helpTicketSelected = false;
       var changes = this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket, ["requestId", "courseId", "personId", "institutionId"]);
@@ -37057,9 +37086,9 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
         this.message = "The help ticket has been changed. Do you want to save your changes?";
         return this.dialog.showMessage(that.message, "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
           if (!response.wasCancelled) {
-            _this7.save(changes);
+            _this8.save(changes);
           } else {
-            _this7._cleanUp();
+            _this8._cleanUp();
           }
         });
       } else {
@@ -37111,13 +37140,13 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.changeFiles = function changeFiles() {
-      var _this8 = this;
+      var _this9 = this;
 
       this.filesToUpload = this.filesToUpload ? this.filesToUpload : new Array();
       for (var i = 0; i < this.files.length; i++) {
         var addFile = true;
         this.filesToUpload.forEach(function (item) {
-          if (item.name === _this8.files[i].name) addFile = false;
+          if (item.name === _this9.files[i].name) addFile = false;
         });
         if (addFile) this.filesToUpload.push(this.files[i]);
       }
@@ -37128,14 +37157,14 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.insertDocument = function insertDocument() {
-      var _this9 = this;
+      var _this10 = this;
 
       var document = { documentURL: "", documentCats: this.documents.docCatsArray, documents: new Array(), selectedCategory: 0 };
       return this.dialog.showDocument("Select Document", document, ['Submit', 'Cancel']).whenClosed(function (response) {
         if (!response.wasCancelled) {
-          _this9.helpTickets.selectedHelpTicketContent.documents = _this9.helpTickets.selectedHelpTicketContent.documents ? _this9.helpTickets.selectedHelpTicketContent.documents : new Array();
+          _this10.helpTickets.selectedHelpTicketContent.documents = _this10.helpTickets.selectedHelpTicketContent.documents ? _this10.helpTickets.selectedHelpTicketContent.documents : new Array();
           response.output.documents.documents.forEach(function (item) {
-            _this9.helpTickets.selectedHelpTicketContent.documents.push({
+            _this10.helpTickets.selectedHelpTicketContent.documents.push({
               categoryCode: item.categoryCode,
               categoryName: item.categoryName,
               fileName: item.fileName
@@ -37158,24 +37187,24 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.getRequests = function () {
-      var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
-        var _this10 = this;
+      var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15() {
+        var _this11 = this;
 
-        return regeneratorRuntime.wrap(function _callee14$(_context14) {
+        return regeneratorRuntime.wrap(function _callee15$(_context15) {
           while (1) {
-            switch (_context14.prev = _context14.next) {
+            switch (_context15.prev = _context15.next) {
               case 0:
                 if (!this.selectedSession) {
-                  _context14.next = 10;
+                  _context15.next = 10;
                   break;
                 }
 
                 this.sessions.selectSessionById(this.selectedSession);
-                _context14.next = 4;
+                _context15.next = 4;
                 return this.requests.getActiveClientRequestsArray(this.helpTickets.selectedHelpTicket.personId.id, this.selectedSession);
 
               case 4:
-                _context14.next = 6;
+                _context15.next = 6;
                 return this.people.getCoursesArray(true, '?filter=personId|eq|' + this.helpTickets.selectedHelpTicket.personId.id + '&order=number');
 
               case 6:
@@ -37186,7 +37215,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   item.requestDetails.forEach(function (item2) {
                     if (item2.assignments && item2.assignments.length > 0) {
                       item2.assignments.forEach(function (assign) {
-                        _this10.originalClientRequestsArray.push({
+                        _this11.originalClientRequestsArray.push({
                           productId: item2.productId,
                           sessionId: item.sessionId,
                           requestStatus: item2.requestStatus,
@@ -37202,7 +37231,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                         });
                       });
                     } else {
-                      _this10.originalClientRequestsArray.push({
+                      _this11.originalClientRequestsArray.push({
                         productId: item2.productId,
                         sessionId: item.sessionId,
                         requestStatus: item2.requestStatus,
@@ -37213,19 +37242,19 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   });
                 });
                 this.originalClientRequestsArray.forEach(function (item) {
-                  _this10.clientRequestsArray.push(item);
+                  _this11.clientRequestsArray.push(item);
                 });
 
               case 10:
               case 'end':
-                return _context14.stop();
+                return _context15.stop();
             }
           }
-        }, _callee14, this);
+        }, _callee15, this);
       }));
 
       function getRequests() {
-        return _ref14.apply(this, arguments);
+        return _ref15.apply(this, arguments);
       }
 
       return getRequests;
@@ -37243,32 +37272,32 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.customHelpTicketStatusFilter = function () {
-      var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15() {
-        return regeneratorRuntime.wrap(function _callee15$(_context15) {
+      var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16() {
+        return regeneratorRuntime.wrap(function _callee16$(_context16) {
           while (1) {
-            switch (_context15.prev = _context15.next) {
+            switch (_context16.prev = _context16.next) {
               case 0:
                 if (!(this.helpTicketStatusFilter > this.config.CLOSED_HELPTICKET_STATUS)) {
-                  _context15.next = 6;
+                  _context16.next = 6;
                   break;
                 }
 
-                _context15.next = 3;
+                _context16.next = 3;
                 return this.helpTickets.getMyHelpTickets(this.userObj._id);
 
               case 3:
                 this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-                _context15.next = 14;
+                _context16.next = 14;
                 break;
 
               case 6:
                 if (!(this.oldHelpTicketStatus == this.config.MY_HELPTICKET_STATUS)) {
-                  _context15.next = 13;
+                  _context16.next = 13;
                   break;
                 }
 
                 $("#loading").show();
-                _context15.next = 10;
+                _context16.next = 10;
                 return this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true);
 
               case 10:
@@ -37285,14 +37314,14 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
               case 15:
               case 'end':
-                return _context15.stop();
+                return _context16.stop();
             }
           }
-        }, _callee15, this);
+        }, _callee16, this);
       }));
 
       function customHelpTicketStatusFilter() {
-        return _ref15.apply(this, arguments);
+        return _ref16.apply(this, arguments);
       }
 
       return customHelpTicketStatusFilter;
