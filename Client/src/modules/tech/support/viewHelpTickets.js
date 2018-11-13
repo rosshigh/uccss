@@ -115,6 +115,7 @@ export class ViewHelpTickets {
     this.initialLoaded = true;
 
     setInterval(() => {if(!this.helpTicketSelected) this.refresh(false);}, this.refreshInterval * 60 * 1000);
+    $.summernote.dom.emptyPara = "<div><br/></div>"
   }
 
   toolTips() {
@@ -264,7 +265,8 @@ export class ViewHelpTickets {
   getIndex() {
     for (var j = 0; j < this.helpTickets.helpTicketTypesArray.length; j++) {
       for (var i = 0; i < this.helpTickets.helpTicketTypesArray[j].subtypes.length; i++) {
-        if (this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type) {
+        if (this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type ||
+          (this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === 'OTHER_OTHER' && this.helpTickets.selectedHelpTicket.content[0].type === 'OTHER')) {
           return { subTypeIndex: i, categoryIndex: j };
         }
       }
@@ -345,7 +347,7 @@ export class ViewHelpTickets {
   respond() {
     if (!this.enterResponse) {
       this.sendMailDisable = false;
-
+      // this.responseMessage = "<p></p>";
       this.responseMessage = "";
       this.helpTickets.selectHelpTicketContent();
       this.enterResponse = true;

@@ -838,4 +838,20 @@ module.exports = function (app, config) {
         return next(error);
       })
   });
+
+  router.put('/api/helpTicketOTHER', function(req, res, next ){
+    Model.find()
+    .then(results => {
+      results.forEach(item => {
+        // findOneAndUpdate({ _id: req.body._id }, req.body, { new: true, safe: true, multi: false })
+        item.content[0].type="OTHER_OTHER";
+        console.log(item.content[0].type)
+        Model.findOneAndUpdate({"_id": item._id}, item, {safe: true})
+        .then(result => {
+          console.log(result.helpTicketNo + ' updated')
+        });
+    });
+    res.status(204).json({message: results.length + ' update'});
+    })
+  })
 };

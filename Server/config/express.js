@@ -94,7 +94,7 @@ console.log(err.stack)
             var msg = {event: 'error', code: 500, message: url_parts.pathname, error: 500, ip: req.connection.remoteAddress, err: err.stack.toString()};
             break;
     }
-    logger.logError(msg);
+    logger.log(msg);
 
     return res.status(code).json(msg);
 

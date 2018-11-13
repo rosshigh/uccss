@@ -37,7 +37,7 @@ export class Editor {
 	}
 
 	attached() {
-    var that = this;
+		var that = this;
 		this.editor = $(`#${this.editorid}`);
 		this.editor.data('view-model', this);
 		this.editor.summernote({
@@ -47,7 +47,14 @@ export class Editor {
         onChange: function(contents) {
 					that.value = contents;
 					$("#" +  this.editorid).summernote('editor.saveRange');
-        }
+					console.log(contents)
+				},
+				// onPaste: function(e) {
+				// 	var node = document.createElement('p');
+				// 	// @param {Node} node
+				// 	$('#summernote').summernote('insertNode', node);
+				// 	console.log('Called event paste');
+				// }
       }
 		});
     this.editor.summernote('code', this.value);
