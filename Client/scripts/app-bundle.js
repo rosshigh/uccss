@@ -41532,7 +41532,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
     ViewHelpTickets.prototype.getCatIndex = function getCatIndex() {
       for (var j = 0; j < this.helpTickets.helpTicketTypesArray.length; j++) {
         for (var i = 0; i < this.helpTickets.helpTicketTypesArray[j].subtypes.length; i++) {
-          if (this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type) {
+          if (this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === this.helpTickets.selectedHelpTicket.content[0].type || this.helpTickets.helpTicketTypesArray[j].subtypes[i].type === 'OTHER_OTHER' && this.helpTickets.selectedHelpTicket.content[0].type === 'OTHER') {
             return { subTypeIndex: i, categoryIndex: j };
           }
         }
@@ -41542,6 +41542,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
     ViewHelpTickets.prototype.getCategoryIndex = function getCategoryIndex() {
       for (var i = 0; i < this.helpTickets.helpTicketTypesArray.length; i++) {
         if (this.helpTickets.helpTicketTypesArray[i] == this.helpTickets.selectedHelpTicket.helpTicketCategory) {
+
           return i;
         }
       }
