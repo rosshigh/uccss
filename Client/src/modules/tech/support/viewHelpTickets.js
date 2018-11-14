@@ -251,7 +251,7 @@ export class ViewHelpTickets {
 
     this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
     this.helpTicketSelected = true;
-
+    window.scrollTo(0, 0);
   }
 
   getCategoryIndex() {
