@@ -1,10 +1,10 @@
-import {inject, BindingEngine} from 'aurelia-framework';
-import {Router} from "aurelia-router";
-import {EventAggregator} from 'aurelia-event-aggregator';
-import {Auth} from '../data/auth';
-import {Utils} from '../../resources/utils/utils';
-import {People} from '../../resources/data/people';
-import {AppConfig} from "../../config/appConfig";
+import { inject, BindingEngine } from 'aurelia-framework';
+import { Router } from "aurelia-router";
+import { EventAggregator } from 'aurelia-event-aggregator';
+import { Auth } from '../data/auth';
+import { Utils } from '../../resources/utils/utils';
+import { People } from '../../resources/data/people';
+import { AppConfig } from "../../config/appConfig";
 import { CommonDialogs } from '../dialogs/common-dialogs';
 import moment from 'moment';
 import * as toastr from "toastr";
@@ -16,7 +16,7 @@ export class NavBar {
     isAuthenticated = false;
     subscription = {};
 
-    constructor(router, eventAggregator, bindingEngine, auth, utils, people, config, dialog){
+    constructor(router, eventAggregator, bindingEngine, auth, utils, people, config, dialog) {
         this.eventAggregator = eventAggregator;
         this.router = router;
         this.bindingEngine = bindingEngine;
@@ -30,18 +30,19 @@ export class NavBar {
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
     }
 
-    attached(){
+    attached() {
+        this.hideProfile();
         $(".dropdown-toggle").dropdown();
-        if(this.userObj) this.people.getNotifications(this.userObj._id);
+        if (this.userObj) this.people.getNotifications(this.userObj._id);
         setInterval(() => {
             this.people.getNotifications(this.userObj._id);
         }, 10 * 60 * 1000);
     }
 
-    async login(){
+    async login() {
         let response = await this.auth.login(this.email, this.password)
-        if(!response.error){
-            sessionStorage.setItem('uccweather', JSON.stringify({temp: response.temp, icon: response.icon}));
+        if (!response.error) {
+            sessionStorage.setItem('uccweather', JSON.stringify({ temp: response.temp, icon: response.icon }));
             this.loginError = "";
             this.loginSuccess();
             this.isAuthenticated = this.auth.isAuthenticated();
@@ -50,8 +51,8 @@ export class NavBar {
         }
     }
 
-    logout(){
-        if(this.userObj) this.auth.logout(this.userObj.email);
+    logout() {
+        if (this.userObj) this.auth.logout(this.userObj.email);
         this.userObj = new Object();
         this.isAuthenticated = this.auth.isAuthenticated();
         this.router.navigate("home");
@@ -65,16 +66,16 @@ export class NavBar {
                 this.logout();
             } else {
                 if (this.userObj.personStatus !== this.config.ACTIVE_PERSON) {
-                     return this.dialog.showMessage(
+                    return this.dialog.showMessage(
                         "You must have an active account to access the web site.  Contact your faculty coordinator to activate your account.",
                         "Account Not Active",
                         ['OK']
                     ).whenClosed(response => {
-                          this.logout();
+                        this.logout();
                     });
                 } else {
-                    if (!this.userObj.userRole)  this.logout();
-                    sessionStorage.setItem('role',this.userObj.userRole)
+                    if (!this.userObj.userRole) this.logout();
+                    sessionStorage.setItem('role', this.userObj.userRole)
                     // this.events();
                     this.router.navigate("user");
                 }
@@ -85,14 +86,14 @@ export class NavBar {
         }
     }
 
-    async requestPasswordReset(){
-        if(this.email){
-            let response = await this.people.requestPasswordReset({email: this.email});
-            if(response && !response.error){
+    async requestPasswordReset() {
+        if (this.email) {
+            let response = await this.people.requestPasswordReset({ email: this.email });
+            if (response && !response.error) {
                 this.utils.showNotification("An email has been sent to the provided email address with a link you can use to reset your password");
-            } else if(response.status = 404){
+            } else if (response.status = 404) {
                 this.utils.showNotification("There is no registered user with that email address");
-            } else if(response.status = 401){
+            } else if (response.status = 401) {
                 this.utils.showNotification("The account with the provided address has been deactivated.  Please contact your faculty coordinator.");
             }
         } else {
@@ -101,30 +102,30 @@ export class NavBar {
 
     }
 
-    enterNote(){
-        var note = {noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0};
-         return this.dialog.showNote(
-                "Enter Note",
-                note,
-                ['Submit', 'Cancel']
-            ).whenClosed(response => {
-                if (!response.wasCancelled) {
-                    this.saveNote(response.output);
-                } else {
-                    console.log("Cancelled");
-                }
-            });
+    enterNote() {
+        var note = { noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0 };
+        return this.dialog.showNote(
+            "Enter Note",
+            note,
+            ['Submit', 'Cancel']
+        ).whenClosed(response => {
+            if (!response.wasCancelled) {
+                this.saveNote(response.output);
+            } else {
+                console.log("Cancelled");
+            }
+        });
     }
 
-    async saveNote(note){
+    async saveNote(note) {
         this.people.selectNote();
         this.people.selectedNote.personId = this.userObj._id;
         this.people.selectedNote.category = this.userObj.noteCategories[note.selectedCategory];
         this.people.selectedNote.note = note.note.noteBody;
         let response = await this.people.saveNote();
-            if(!response.error){
-                this.utils.showNotification('The note was saved');
-            }
+        if (!response.error) {
+            this.utils.showNotification('The note was saved');
+        }
     }
 
     // openAlert(alert){
@@ -140,21 +141,33 @@ export class NavBar {
     // }
 
     showProfile(el) {
-        $(".hoverProfile").css("top", el.clientY - 175);
-        $(".hoverProfile").css("left", el.clientX - 200);
-        $(".hoverProfile").css("display", "block");
-      }
-    
-      hideProfile() {
-        $(".hoverProfile").css("display", "none");
-      }
+        this.toggleProfile = this.toggleProfile ? false : true;
+        if (this.toggleProfile) {
+            $(".noticeProfile").css("top", el.clientY + 25);
+            $(".noticeProfile").css("left", $("#noticeLabel")[0].offsetLeft);
+            $(".noticeProfile").css("display", "block");
+            $(".noticeProfile").css('position', 'fixed');
+        } else {
+            this.hideProfile();
+        }
+    }
 
-    async events(){
+    hideProfile() {
+        $(".noticeProfile").css("display", "none");
+    }
+
+    updateNotification(notice, index){
+        notice.checked = true;
+        this.people.saveNotification(notice);
+        this.people.notificationsArray.splice(index, 1);
+    }
+
+    async events() {
         await this.eventLayer.getEventsArray('', true);
         let today = new Date();
         this.eventLayer.eventArray.forEach(item => {
-            if(item.personId === this.userObj._id || item.scope === 'u') {
-                if(moment(today).isBetween(item.start, item.end));
+            if (item.personId === this.userObj._id || item.scope === 'u') {
+                if (moment(today).isBetween(item.start, item.end));
                 this.events.push(item);
             }
         })

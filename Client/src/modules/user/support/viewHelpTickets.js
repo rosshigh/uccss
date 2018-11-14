@@ -115,7 +115,7 @@ export class ViewHelpTickets {
 
   async refresh() {
     this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-    await  this.helpTickets.getUserHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true);
+    await this.helpTickets.getUserHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true);
     this.updateArray();
     this.spinnerHTML = "";
   }
@@ -164,7 +164,7 @@ export class ViewHelpTickets {
   getCategoryIndex() {
     for (var i = 0; i < this.helpTickets.helpTicketTypesArray.length; i++) {
       if (this.helpTickets.helpTicketTypesArray[i] == this.helpTickets.selectedHelpTicket.helpTicketCategory) {
-        
+
         return i;
       }
     }
@@ -241,36 +241,36 @@ export class ViewHelpTickets {
       this.filterOutClosed();
       this.utils.showNotification("The help ticket was updated");
       if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse.content[serverResponse.content.length - 1]._id);
-      if(this.helpTickets.selectedHelpTicket.owner[0].personId != null){
+      if (this.helpTickets.selectedHelpTicket.owner[0].personId != null) {
         let notice = {
           personId: this.userObj._id,
-          uccStaffId: this.helpTickets.selectedHelpTicket.owner[0].personId,
-          notice:  "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo + " updated"
+          uccStaffId: this.helpTickets.selectedHelpTicket.owner[0].personId._id,
+          notice: "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo + " was updated"
         }
         this.helpTickets.saveNotification(notice);
-        }
+      }
     }
     this._cleanUp();
   }
 
   closeHelpTicket(helpTicket) {
     return this.dialog.showCloseHelpTicket(
-      "You have chosen to close this help ticket?",
+      "You have chosen to close this help ticket.",
       "Close Help Ticket",
       ['Submit', 'Cancel']
     ).whenClosed(response => {
       if (!response.wasCancelled) {
         this.helpTickets.selectHelpTicketByID(helpTicket._id);
         this.helpTickets.selectHelpTicketContent();
-        this.responseMessage = "Help Ticket closed by " + this.userObj.fullName + "<p>Reason: " + this.config.HELP_TICKET_CLOSE_REASONS[response.output.selectedReason].reason +"</p>";
-        if(response.output.selectedReason == this.config.HELP_TICKET_CLOSE_REASON_OTHER) {
-          if(response.output.otherReason){
+        this.responseMessage = "Help Ticket closed by " + this.userObj.fullName + "<p>Reason: " + this.config.HELP_TICKET_CLOSE_REASONS[response.output.selectedReason].reason + "</p>";
+        if (response.output.selectedReason == this.config.HELP_TICKET_CLOSE_REASON_OTHER) {
+          if (response.output.otherReason) {
             this.responseMessage += "<p>Other reason:  " + response.output.otherReason + "</p>";
           } else {
             this.responseMessage += "<p>No elboration provide for other reason for closing ticket.</p>";
           }
         }
-        if(response.output.method) {
+        if (response.output.method) {
           this.responseMessage += this.responseMessage = "<p>Method for resolving: " + response.output.method + "</p>";
         } else {
           this.responseMessage += "<p>No method was provided for resolving the issue.</p>"
@@ -285,7 +285,7 @@ export class ViewHelpTickets {
   }
 
   async closeTicket(helpTicket) {
-   
+
     var email = new Object();
     if (this.sendEmail) {
       email.reason = this.config.CLOSED_HELPTICKET_STATUS;
@@ -301,6 +301,14 @@ export class ViewHelpTickets {
     if (!serverResponse.error) {
       this.refresh()
       this.utils.showNotification("The help ticket was updated");
+    }
+    if (this.helpTickets.selectedHelpTicket.owner[0].personId != null) {
+      let notice = {
+        personId: this.userObj._id,
+        uccStaffId: this.helpTickets.selectedHelpTicket.owner[0].personId._id,
+        notice: "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo + " was closed"
+      }
+      this.helpTickets.saveNotification(notice);
     }
     if (this.isChecked) this.filterOutClosed();
     this._cleanUp();

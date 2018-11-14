@@ -101,6 +101,10 @@ export class People {
         }
     }
 
+    saveNotification(notice){
+        this.data.saveObject(notice, this.NOTIFICATION_SERVICE,"put");
+    }
+
     async getPerson(id) {
         var url = this.PEOPLE_SERVICE + "/" + id;
         try {

@@ -13,10 +13,7 @@ module.exports = function (app) {
       // if(order[1] && order[1] =='DSC')  order[0] = '-' + order[0];
       let sortOrder = 'asc';
       let sortField = order[0];
-      if(order[1] && order[1] =='DSC')  sortOrder = 'desc';
-        
-console.log(sortField)  
-console.log(sortOrder)    
+      if(order[1] && order[1] =='DSC')  sortOrder = 'desc';   
       reqQuery.sort({'modifiedDate': -1});
     }
     if(queryObject.fields) reqQuery.select(queryObject.fields);   

@@ -427,15 +427,21 @@ export class ViewHelpTickets {
     if (helpTicket) {
       this.helpTickets.selectHelpTicketByID(helpTicket._id);
     }
-    this.dialog.showMessage(
-      "Are you sure you want to change ownership of this help ticket",
-      "Save Changes",
-      ['Yes', 'No']
-    ).whenClosed(response => {
-      if (!response.wasCancelled) {
-         this.ownIt();
-      }
-    });
+
+    if(helpTicket.owner[0].personId !== "b1b1b1b1b1b1b1b1b1b1b1b1" && helpTicket.owner[0].personId != null){
+      this.dialog.showMessage(
+        "Are you sure you want to change ownership of this help ticket",
+        "Save Changes",
+        ['Yes', 'No']
+      ).whenClosed(response => {
+        if (!response.wasCancelled) {
+           this.ownIt();
+        }
+      });
+    } else {
+      this.ownIt();
+    }
+
 
 
   }
@@ -455,7 +461,7 @@ export class ViewHelpTickets {
       this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
       this.utils.showNotification("The help ticket was updated");
     }
-    if (helpTicket) {
+    if (this.helpTickets.selectedHelpTicket) {
       this._cleanUp();
     }
   }
@@ -699,16 +705,16 @@ export class ViewHelpTickets {
     }
   }
 
-  showProfile(request, el) {
-    this.profileRequest = request;
-    $(".hoverProfile").css("top", window.pageYOffset + el.clientY - 175);
-    $(".hoverProfile").css("left", el.clientX + 100);
-    $(".hoverProfile").css("display", "block");
-  }
+  // showProfile(request, el) {
+  //   this.profileRequest = request;
+  //   $(".hoverProfile").css("top", window.pageYOffset + el.clientY - 175);
+  //   $(".hoverProfile").css("left", el.clientX + 100);
+  //   $(".hoverProfile").css("display", "block");
+  // }
 
-  hideProfile() {
-    $(".hoverProfile").css("display", "none");
-  }
+  // hideProfile() {
+  //   $(".hoverProfile").css("display", "none");
+  // }
 
   async customHelpTicketStatusFilter() {
     if (this.helpTicketStatusFilter > this.config.CLOSED_HELPTICKET_STATUS) {

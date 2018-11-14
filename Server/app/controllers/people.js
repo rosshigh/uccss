@@ -796,6 +796,7 @@ module.exports = function (app, config) {
     logger.log('info','Get person notifications', 'verbose');
     var query = buildQuery(req.query, Notifications.find())
     query
+      .populate({ path: 'personId', model: 'Person', select: 'lastName firstName fullName'})
       .where({uccStaffId: req.params.personId})
       .exec()
       .then(object => {

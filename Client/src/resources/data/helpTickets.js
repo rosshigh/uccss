@@ -306,7 +306,7 @@ export class HelpTickets {
                 }
                 this.selectHelpTicketByID(this.selectedHelpTicket._id);
                 if (status !== this.config.CLOSED_HELPTICKET_STATUS) {
-                    this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+                    this.helpTicketsArray[this.editIndex] = this.utils.copyObject(response, this.helpTicketsArray[this.editIndex]);
                 } else {
                     this.helpTicketsArray.splice(this.editIndex,1);
                 }
