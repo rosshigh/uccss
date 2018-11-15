@@ -20,7 +20,7 @@
                 repeat.for="product of clientRequestsArray">
               <td>${product.courseId | courseName:people.coursesArray}</td>
               <td>${product.sessionId | sessionName:sessions.sessionsArray}</td>
-              <td>${product.productId | lookupValue:products.productsArray:"_id":"name"}</td>
+              <td>${product.productId._id | lookupValue:products.productsArray:"_id":"name"}</td>
               <td>${product.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
               <td>${product.client}</td>
               <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
