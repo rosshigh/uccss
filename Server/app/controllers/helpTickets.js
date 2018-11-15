@@ -257,7 +257,8 @@ module.exports = function (app, config) {
   router.get('/api/helpTickets/:id', requireAuth, function (req, res, next) {
     logger.log('info', 'Get help ticket ' + req.params.id);
     Model.findOne({ _id: req.params.id })
-      .populate('courseId', 'name number')
+    // .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
+      .populate({path: 'requestId', model: 'ClientRequestDetails', populate: {path: 'requestId', model: 'ClientRequest', select: 'cousrseId'}})
       .populate('requestId')
       .populate('personId', 'email firstName lastName phone mobile nickName file country')
       .populate('content.personId', 'email firstName lastName phone mobile nickName')
@@ -839,19 +840,47 @@ module.exports = function (app, config) {
       })
   });
 
-  router.put('/api/helpTicketOTHER', function(req, res, next ){
-    Model.find()
-    .then(results => {
-      results.forEach(item => {
-        // findOneAndUpdate({ _id: req.body._id }, req.body, { new: true, safe: true, multi: false })
-        item.content[0].type="OTHER_OTHER";
-        console.log(item.content[0].type)
-        Model.findOneAndUpdate({"_id": item._id}, item, {safe: true})
-        .then(result => {
-          console.log(result.helpTicketNo + ' updated')
-        });
-    });
-    res.status(204).json({message: results.length + ' update'});
+  // router.put('/api/helpTicketOTHER', function(req, res, next ){
+  //   Model.find()
+  //   .then(results => {
+  //     results.forEach(item => {
+  //       item.content[0].type="OTHER_OTHER";
+  //       console.log(item.content[0].type)
+  //       Model.findOneAndUpdate({"_id": item._id}, item, {safe: true})
+  //       .then(result => {
+  //         console.log(result.helpTicketNo + ' updated')
+  //       });
+  //   });
+  //   res.status(204).json({message: results.length + ' update'});
+  //   })
+  // })
+
+  var bulkUpdateCallback = function (err, r) {
+    console.log(r.matchedCount);
+    console.log(r.modifiedCount);
+  }
+
+  router.put('/api/helpTicketOTHER', function (req, res, next) {
+    // Initialise the bulk operations array
+    var bulkUpdateOps = [],
+      counter = 0;
+
+    processedIds.forEach(function (id) {
+      bulkUpdateOps.push({
+        "updateOne": {
+          "filter": { "_id": id },
+          "update": { "$set": { "status": "processed" } }
+        }
+      });
+      counter++;
+
+      if (counter % 500 == 0) {
+        // Get the underlying collection via the native node.js driver collection object
+        Model.collection.bulkWrite(bulkOps, { "ordered": true, w: 1 }, bulkUpdateCallback);
+        bulkUpdateOps = []; // re-initialize
+      }
     })
+
+    if (counter % 500 != 0) { Model.collection.bulkWrite(bulkOps, { "ordered": true, w: 1 }, bulkUpdateCallback); }
   })
 };

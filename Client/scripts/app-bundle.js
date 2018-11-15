@@ -40801,6 +40801,7 @@ define('modules/user/support/createHelpTicketsWiz',['exports', 'aurelia-framewor
                                                     requestStatus: item2.requestStatus,
                                                     systemId: assign.systemId,
                                                     courseName: item.courseId ? item.courseId.name : 'Trial Client',
+                                                    courseId: item.courseId,
                                                     client: assign.client,
                                                     clientId: assign.clientId,
                                                     _id: item2._id
