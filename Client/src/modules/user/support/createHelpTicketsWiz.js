@@ -189,7 +189,7 @@ export class CreateHelpTickets {
                             requestStatus: item2.requestStatus,
                             systemId: assign.systemId,
                             courseName: item.courseId ? item.courseId.name : 'Trial Client',
-                            courseId: item.courseId,
+                            courseId: item.courseId ? item.courseId._id : null,
                             client: assign.client,
                             clientId: assign.clientId,
                             _id: item2._id
