@@ -32,7 +32,7 @@ export class User {
         interval: 10000
     });
 
-    this.updateTwitter(document,"script","twitter-wjs");
+    // this.updateTwitter(document,"script","twitter-wjs");
 
     this.alertIndex = this.utils.arrayContainsValue(this.siteinfo.siteArray, "itemType", "ALRT");
     if(!sessionStorage.getItem('alert')){
@@ -54,22 +54,22 @@ export class User {
     }
   }   
 
-  updateTwitter(d,s,id){
-    var js, fjs = d.getElementsByTagName(s)[0],
-        t = window.twttr || {};
-    if (d.getElementById(id)) return t;
-    js = d.createElement(s);
-    js.id = id;
-    js.src = "https://platform.twitter.com/widgets.js";
-    fjs.parentNode.insertBefore(js, fjs);
+//   updateTwitter(d,s,id){
+//     var js, fjs = d.getElementsByTagName(s)[0],
+//         t = window.twttr || {};
+//     if (d.getElementById(id)) return t;
+//     js = d.createElement(s);
+//     js.id = id;
+//     js.src = "https://platform.twitter.com/widgets.js";
+//     fjs.parentNode.insertBefore(js, fjs);
 
-    t._e = [];
-    t.ready = function(f) {
-        t._e.push(f);
-    };
+//     t._e = [];
+//     t.ready = function(f) {
+//         t._e.push(f);
+//     };
 
-  return t;
-  }
+//   return t;
+//   }
 
   async activate(){
     await this.getData();

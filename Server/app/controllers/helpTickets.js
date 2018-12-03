@@ -297,22 +297,27 @@ module.exports = function (app, config) {
     if (req.params.status == 6) {
       Model.findById(req.params.id).exec()
         .then(result => {
+          result = result.toObject();		
+          delete result['_id'];      
           var content = new Content(req.body);
           result.content.push(content);
           result.helpTicketStatus = req.params.status;
           result.modifiedDate = new Date();
+
           var archiveHT = new HelpTicketArchive(result);
-          archiveHT.save().then(result => {
+console.log("ARCHIVE")
+console.log(archiveHT)          
+          archiveHT.save(function(error){
+            if(error){
+              return next(error);
+            }
+console.log('RESULT')
+console.log(result)            
             Model.remove({ _id: req.params.id }).then(result => {
               res.status(200).json(result);
             })
           })
-            .catch(error => {
-              return next(error);
-            })
-        })
-        .catch(error => {
-          return next(error);
+
         })
 
     } else {
@@ -325,20 +330,6 @@ module.exports = function (app, config) {
           result.modifiedDate = new Date();
           result.save().then(result => {
             res.status(200).json(result);
-            // var query = Model.find({_id: req.body._id})
-            //   .populate('courseId', 'name number')
-            //   .populate('requestId')
-            //   .populate('personId', 'email firstName lastName fullName phone mobile nickName file country')
-            //   .populate('content.personId', 'email firstName lastName phone mobile nickName')
-            //   .populate('institutionId', 'name')
-            //   .populate({ path: 'owner.personId', model: 'Person', select: 'firstName lastName fullName' })
-            // query.exec()
-            //   .then(object => {
-            //     res.status(200).json(object);
-            //   })
-            //   .catch(error => {
-            //     return next(error);
-            //   })
           })
             .catch(error => {
               return next(error);
@@ -433,7 +424,7 @@ module.exports = function (app, config) {
 
   router.put('/api/helpTickets/close', requireAuth, function (req, res, next) {
     logger.log('info', 'Close HelpTicket ' + req.body._id);
-    var archiveHT = new HelpTicketArchive(req.body);
+    var archiveHT = new HelpTicketArchive(req.body);   
     archiveHT.modifiedDate = new Date();
     archiveHT.save(function (error, archivedHelpTicket) {
       if (error) return next(error);
@@ -441,10 +432,14 @@ module.exports = function (app, config) {
         res.status(200).json(result);
       })
     })
+    .catch(error => {
+      return next(error);
+    })
   })
 
   router.put('/api/helpTickets', requireAuth, function (req, res, next) {
     logger.log('info', 'Update HelpTicket ' + req.body._id);
+    console.log('LSJDFLSJD')
     Model.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true, safe: true, multi: false })
       .exec()
       .then(result => {

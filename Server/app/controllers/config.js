@@ -80,7 +80,7 @@ module.exports = function (app) {
       tasks.push(Model.findOneAndUpdate({_id: item._id}, item, {safe:true, new:true}));
     });
      Promise.all(tasks)
-     .then(function(results){
+     .then(function(results){     
         res.status(200).json(results);
      })
   });
