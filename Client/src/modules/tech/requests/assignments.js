@@ -393,6 +393,10 @@ export class Assignments {
         this.selectedSystem.clients[this.selectedClientIndex].assignments[this.clientSelectedIndex].studentIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentUserIds;
     }
 
+    updateClientFacultyAssignments() {
+        this.selectedSystem.clients[this.selectedClientIndex].assignments[this.clientSelectedIndex].facultyIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].facultyUserIds;
+    }
+
     processClient(index, client, el) {
         if (client.manual) {
             this.manualMode = true;
