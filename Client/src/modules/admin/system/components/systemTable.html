@@ -1,94 +1,121 @@
 <template>
- <div class='col-lg-10 col-lg-offset-1'>
-	<div id="no-more-tables">
-        <table id="systemsTable" class="table table-striped table-hover cf">
-            <thead class="cf">
-                <tr colspan='5'>
-                    <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
-                </tr>
-                <tr>
-                    <td colspan='5'>
-                        <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
-                        <span click.delegate="new()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                        <span click.delegate="_cleanUpFilters()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Clear Filters"><i class="fa fa-filter" aria-hidden="true"></i></span>
-                    </td>
-                </tr>
-                <tr>
-                    <th style="width:100px;"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'sid'})">SID </span><span><i class="fa fa-sort"></i></span></th>
-                    <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'description'})">Description </span><span><i class="fa fa-sort"></i></span></th>
-                    <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'server'})">Server </span><span><i class="fa fa-sort"></i></span></th>
-                    <th class="hidden-xs hidden-sm">Instance</th>
-                    <th class="hidden-xs hidden-sm">Status</th>
-                    <th>Gold Backup</th>
-                    <th>Gold Backup Date</th>
-                    <th>Snapshot </th>
-                    <th>Changes</th>
-                </tr>
+    <div class="panel panel-info">
+        <div class="panel-body">
+            <div class="row">
+                <div class='col-lg-10 col-lg-offset-1'>
+                    <div id="no-more-tables">
+                        <table id="systemsTable" class="table table-striped table-hover cf">
+                            <thead class="cf">
+                                <tr colspan='5'>
+                                    <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
+                                </tr>
+                                <tr>
+                                    <td colspan='5'>
+                                        <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip
+                                            data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i
+                                                class="fa fa-refresh" aria-hidden="true"></i></span>
+                                        <span click.delegate="new()" class="smallMarginRight" bootstrap-tooltip
+                                            data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New"><i
+                                                class="fa fa-plus" aria-hidden="true"></i></span>
+                                        <span click.delegate="_cleanUpFilters()" class="smallMarginRight"
+                                            bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+                                            data-original-title="Clear Filters"><i class="fa fa-filter" aria-hidden="true"></i></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="width:100px;"><span class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'sid'})">SID
+                                        </span><span><i class="fa fa-sort"></i></span></th>
+                                    <th><span class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'description'})">Description
+                                        </span><span><i class="fa fa-sort"></i></span></th>
+                                    <th><span class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'server'})">Server
+                                        </span><span><i class="fa fa-sort"></i></span></th>
+                                    <th class="hidden-xs hidden-sm">Instance</th>
+                                    <th class="hidden-xs hidden-sm">Status</th>
+                                    <th>Gold Backup</th>
+                                    <th>Gold Backup Date</th>
+                                    <th>Snapshot </th>
+                                    <th>Changes</th>
+                                </tr>
 
-                <tr>
-                    <th>
-                        <input value.bind="sidFilterValue" placeholder="SID" input.delegate="dataTable.filterList(sidFilterValue, { type: 'text',  filter: 'sidFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'sid', displayProperty: 'sid', matchProperty:'', compare:'match'} )"  class="form-control" />
-                    </th>
-                    <th>
-                        <input value.bind="descriptionFilterValue" placeholder="Description" input.delegate="dataTable.filterList(descriptionFilterValue, { type: 'text',  filter: 'descriptionFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'description', displayProperty: 'description', matchProperty:'', compare:'match'} )"  class="form-control" />
-                    </th>
-                    <th class="hidden-xs hidden-sm">
-                        <input value.bind="serverFilterValue" input.delegate="dataTable.filterList(serverFilterValue, { type: 'text',  filter: 'serverFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'server', displayProperty: 'server', matchProperty:'', compare:'match'} )"  class="form-control" />
-                    </th>
-                    <th class="hidden-xs hidden-sm"></th>
-                    <th class="hidden-xs hidden-sm">
-                        <select value.bind="activeFilter" input.delegate="dataTable.filterList($event, { type: 'boolean',  filter: 'activeFilter', collectionProperty: 'active', displayProperty: 'active', compare:'boolean'} )" class="form-control">
-                            <option value=""></option>
-                            <option value=true>Active</option>
-                            <option value=false>Inactive</option>
-                        </select>
-                    </th>
-                    <th>
-                        <select value.bind="goldBackupFilter" input.delegate="dataTable.filterList($event, { type: 'boolean',  filter: 'goldBackup', collectionProperty: 'goldBackup', displayProperty: 'goldBackup', compare:'boolean'} )" class="form-control">
-                            <option value=""></option>
-                            <option value=true>Backup</option>
-                            <option value=false>No Backup</option>
-                        </select>
-                    </th>
-                    <th>
-                            <input type="date" value.bind="goldBackupDateFilterValue" input.delegate="dataTable.filterList(goldBackupDateFilterValue, {type: 'date', filter: 'goldBackupDate',  collectionProperty: 'goldBackupDate', compare: 'after'} )"  class="form-control hidden-sm" />
-                    </th>
-                    <th>
-                        <select value.bind="snapShotFilter" input.delegate="dataTable.filterList($event, { type: 'boolean',  filter: '', collectionProperty: 'snapShot', displayProperty: 'snapShot', compare:'boolean'} )" class="form-control">
-                            <option value=""></option>
-                            <option value=true>Snapshot</option>
-                            <option value=false>No Snapshot</option>
-                        </select>                        
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr repeat.for="system of dataTable.displayArray">
-                    <td click.trigger="edit($index, $event)" data-title="SID">${system.sid}</td>
-                    <td click.trigger="edit($index, $event)" data-title="Description">${system.description}</td>
-                    <td click.trigger="edit($index, $event)"  class="hidden-xs hidden-sm" data-title="Server">${system.server}</td>
-                    <td click.trigger="edit($index, $event)"  class="hidden-xs hidden-sm" data-title="Instance">${system.instance}</td>
-                    <td click.trigger="edit($index, $event)"  class="hidden-xs hidden-sm" data-title="Status">${system.active | translateStatus}</td>
-                    <td  data-title="Gold">
-                        <div class="checkbox">
-                            <label>
-                                <input change.delegate="saveBackups(system)" checked.bind="system.goldBackup" type="checkbox">
-                            </label>
-                        </div>
-                    </td>
-                    <td click.trigger="edit($index, $event)" class="hidden-xs hidden-sm" data-title="Gold Date">${system.goldBackupDate | dateFormat}</td>
-                    <td  data-title="Snapshot">
-                        <div class="checkbox">
-                            <label>
-                                <input change.delegate="saveBackups(system)" checked.bind="system.snapShot" type="checkbox">
-                            </label>
-                        </div>
-                    </td>
-                    <td><button class="btn btn-primary btn-xs" click.trigger="openChangeMgt(system)">Changes</button></td>
-                </tr>
-            </tbody>
-        </table>
+                                <tr>
+                                    <th>
+                                        <input value.bind="sidFilterValue" placeholder="SID" input.delegate="dataTable.filterList(sidFilterValue, { type: 'text',  filter: 'sidFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'sid', displayProperty: 'sid', matchProperty:'', compare:'match'} )"
+                                            class="form-control" />
+                                    </th>
+                                    <th>
+                                        <input value.bind="descriptionFilterValue" placeholder="Description"
+                                            input.delegate="dataTable.filterList(descriptionFilterValue, { type: 'text',  filter: 'descriptionFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'description', displayProperty: 'description', matchProperty:'', compare:'match'} )"
+                                            class="form-control" />
+                                    </th>
+                                    <th class="hidden-xs hidden-sm">
+                                        <input value.bind="serverFilterValue" placeholder="Host name" input.delegate="dataTable.filterList(serverFilterValue, { type: 'text',  filter: 'serverFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'server', displayProperty: 'server', matchProperty:'', compare:'match'} )"
+                                            class="form-control" />
+                                    </th>
+                                    <th class="hidden-xs hidden-sm"></th>
+                                    <th class="hidden-xs hidden-sm">
+                                        <select value.bind="activeFilter" input.delegate="dataTable.filterList($event, { type: 'boolean',  filter: 'activeFilter', collectionProperty: 'active', displayProperty: 'active', compare:'boolean'} )"
+                                            class="form-control">
+                                            <option value=""></option>
+                                            <option value=true>Active</option>
+                                            <option value=false>Inactive</option>
+                                        </select>
+                                    </th>
+                                    <th>
+                                        <select value.bind="goldBackupFilter" input.delegate="dataTable.filterList($event, { type: 'boolean',  filter: 'goldBackup', collectionProperty: 'goldBackup', displayProperty: 'goldBackup', compare:'boolean'} )"
+                                            class="form-control">
+                                            <option value=""></option>
+                                            <option value=true>Backup</option>
+                                            <option value=false>No Backup</option>
+                                        </select>
+                                    </th>
+                                    <th>
+                                        <input type="date" value.bind="goldBackupDateFilterValue" input.delegate="dataTable.filterList(goldBackupDateFilterValue, {type: 'date', filter: 'goldBackupDate',  collectionProperty: 'goldBackupDate', compare: 'after'} )"
+                                            class="form-control hidden-sm" />
+                                    </th>
+                                    <th>
+                                        <select value.bind="snapShotFilter" input.delegate="dataTable.filterList($event, { type: 'boolean',  filter: '', collectionProperty: 'snapShot', displayProperty: 'snapShot', compare:'boolean'} )"
+                                            class="form-control">
+                                            <option value=""></option>
+                                            <option value=true>Snapshot</option>
+                                            <option value=false>No Snapshot</option>
+                                        </select>
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr repeat.for="system of dataTable.displayArray">
+                                    <td click.trigger="edit($index, $event)" data-title="SID">${system.sid}</td>
+                                    <td click.trigger="edit($index, $event)" data-title="Description">${system.description}</td>
+                                    <td click.trigger="edit($index, $event)" class="hidden-xs hidden-sm" data-title="Server">${system.server}</td>
+                                    <td click.trigger="edit($index, $event)" class="hidden-xs hidden-sm" data-title="Instance">${system.instance}</td>
+                                    <td click.trigger="edit($index, $event)" class="hidden-xs hidden-sm" data-title="Status">${system.active
+                                        | translateStatus}</td>
+                                    <td data-title="Gold">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input change.delegate="saveBackups(system)" checked.bind="system.goldBackup"
+                                                    type="checkbox">
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td click.trigger="edit($index, $event)" class="hidden-xs hidden-sm" data-title="Gold Date">${system.goldBackupDate
+                                        | dateFormat}</td>
+                                    <td data-title="Snapshot">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input change.delegate="saveBackups(system)" checked.bind="system.snapShot"
+                                                    type="checkbox">
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td><button class="btn btn-primary btn-xs" click.trigger="openChangeMgt(system)">Changes</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>  
+    </div>
 </template>

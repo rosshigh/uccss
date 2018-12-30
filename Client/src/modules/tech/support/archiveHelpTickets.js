@@ -76,6 +76,7 @@ export class ArchiveHelpTickets {
 
   toolTips() {
     $('[data-toggle="tooltip"]').tooltip();
+    document.body.scrollTop = document.documentElement.scrollTop = 0;
   }
 
   buildSearchCriteria() {

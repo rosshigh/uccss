@@ -1,0 +1,18 @@
+<template>
+    <div show.bind="showRequestPanel">
+        <div class="row">
+            <!-- Session Select -->
+            <div class="col-lg-4">
+                <div class="form-group topMargin leftMargin">
+                    <select value.bind="selectedSession" change.delegate="getRequests()" id="session" class="form-control">
+                        <option repeat.for="session of sessions.sessionsArray" value.bind="session._id">Session
+                            ${session.session} - ${session.year}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-6 topMargin">
+                <compose view="./Requests.html"></compose>
+            </div>
+        </div>
+    </div>
+</template>

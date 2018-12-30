@@ -72,6 +72,7 @@ export class EditNews {
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
         this.selectedRow = $(el.target).closest('tr');
         this.selectedRow.children().addClass('info')
+        document.body.scrollTop = document.documentElement.scrollTop = 0;
         this.newsItemSelected = true;
     }
 

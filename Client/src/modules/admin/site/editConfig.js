@@ -55,6 +55,7 @@ export class EditConfig {
         this.selectedIndex = index;
         this.originalParameter = this.utils.copyObject(this.siteConfig.configArray[index]);
         this.parameterSelected = true;
+        document.body.scrollTop = document.documentElement.scrollTop = 0;
     }
 
 	async save(){

@@ -9,6 +9,14 @@
     background-color:ghostwhite;
 }
 
+.panelContrastColor {
+    background-color:ghostwhite;
+}
+
+.positionUnderToolbar{
+    margin-top:50px;
+}
+
 .provisional {
     background-color: cyan;
 }

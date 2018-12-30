@@ -75,6 +75,7 @@ export class EditMessages {
         this.selectedRow = $(el.target).closest('tr');
         this.selectedRow.children().addClass('info')
         this.messageItemSelected = true;
+        document.body.scrollTop = document.documentElement.scrollTop = 0;
     }
 
     cancel() {

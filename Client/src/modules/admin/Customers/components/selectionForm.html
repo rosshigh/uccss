@@ -1,99 +1,19 @@
 <template>
- <div class="col-lg-12">
-	<div class="bottomMargin list-group-item leftMargin rightMargin">
-		<span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
-			data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
-		<span click.delegate="_clearFilters()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
-		 	title="" data-original-title="Clear Filters"><i class="fa fa-filter" aria-hidden="true"></i></span>
+	<div class=" list-group-item toolbar">
+		<span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+		 title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+		<span click.delegate="_clearFilters()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+		 data-placement="bottom" title="" data-original-title="Clear Filters"><i class="fa fa-filter" aria-hidden="true"></i></span>
 		<span click.delegate="composeEmail()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
-			title="" data-original-title="Send"><i class="fa fa-paper-plane fa-lg fa-border" aria-hidden="true"></i></span>
+		 title="" data-original-title="Send"><i class="fa fa-paper-plane fa-lg fa-border" aria-hidden="true"></i></span>
 	</div>
-
-	<div show.bind="composeEmailPanel" class="panel panel-info leftMargin rightMargin topMargin bottomMargin">
-      <div class="panel-body">
-	   <div class="list-group-item col-md-12 topMargin">
-			<span click.delegate="sendTheBulkEmail()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Send Email"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true" ></i></span>
-			<span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
-		</div>
-		<div class="col-lg-10 col-lg-offset-1 topMargin">
-			<input value.bind="email.subject" class="form-control" placeholder="Subject"/>
-			<div class="topMargin">
-				<editor value.bind="email.MESSAGE" height="250" toolbar.bind="toolbar" ></editor>
+	<div class="panel panel-info positionUnderToolbar">
+		<div class="panel-body">
+			<div class="row">
+				<compose view="./composeEmail.html"></compose>
+				<compose view="./selectionPanel.html"></compose>
+				<compose view="./emailTable.html"></compose>
 			</div>
 		</div>
-	  </div>
 	</div>
-
-	<div class="panel panel-info leftMargin rightMargin">
-      <div class="panel-body">
-		<div class="row">
-			<div class="col-lg-2">
-				<label class="control-label hideOnPhone">Customer</label>
-				<input value.bind="CustomerFilter" input.delegate="dataTable.filterList(CustomerFilter, { type: 'custom',  filter: customerCustomFilter, compare:'custom'} )"  class="form-control" ref="nameFilter"/>
-			</div>
-			<div class="col-lg-2">
-				<label class="control-labelhideOnPhone">Status</label>
-				<select value.bind="activeFilterValue" change.delegate="filterActive()" class="form-control " id="personStatus">
-					<option value=""></option>
-					<option repeat.for='item of is4ua.personStatusArray' value='${item.code}'>${item.description}</option>
-				</select>
-			</div>
-			<div class="col-lg-2">
-				<multiselect label="Include Roles" options.bind="roleSelect" value.bind="roleFilterValue"
-				change.trigger ="filterRoles()"></multiselect>
-			</div>
-			<!--
-				dataTable.filterList($event, { type: 'custom',  filter: roleCustomFilter, compare:'custom'} )
-			-->
-			<div class="col-lg-2">
-					<multiselect label="Exclude Roles" options.bind="roleSelect" value.bind="roleExcludeFilterValue"
-					change.trigger ="excludeRoles()"></multiselect>
-			</div>
-			<!--
-				dataTable.filterList($event, { type: 'custom',  filter: roleExcludeCustomFilter, compare:'custom'} )
-			-->
-		</div>
-		<div class="row">
-			<div class="col-lg-2">
-					<label class="control-label hideOnPhone">Institution</label>
-					<input value.bind="institutionFilterValue" input.delegate="dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )"  class="form-control" />
-			</div>
-			<div class="col-lg-2">
-					<label class="control-labelhideOnPhone">Status</label>
-					<select value.bind="institutionStatusValue"  input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'institutionStatusFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'institutionId.institutionStatus', displayProperty: 'institutionId.institutionStatus', matchProperty:'', compare:'match'} )" class="form-control " id="personStatus">
-						<option value=""></option>
-						<option repeat.for='item of is4ua.institutonStatusArray' value='${item.code}'>${item.description}</option>
-					</select>
-				</div>
-			<div class="col-lg-2">
-				<label class="control-label hideOnPhone">Institution Type</label>
-					<select value.bind="institutionTypeFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'institutionTypeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'institutionId.institutionType', displayProperty: 'institutionId.institutionType', matchProperty:'', compare:'match'} )" class="form-control">
-					<option value=""></option>
-					<option repeat.for="institution of is4ua.institutionTypes" value="${institution.code}">${institution.description}</option>
-				</select>
-			</div>
-			<div class="col-lg-2">
-					<multiselect label="Member Type" options.bind="is4ua.memberTypes" value.bind="memberTypeFilterValue"
-					change.trigger ="dataTable.filterList($event, { type: 'custom',  filter: memberTypeCustomFilter, compare:'custom'} )"></multiselect>
-<!--
-				<label class="control-label hideOnPhone">Member Type</label>
-				<select value.bind="memberTypeFilterValue" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'memberTypesFilter', lookupArray: people.institutionsArray, lookupProperty: 'memberType', collectionProperty: 'institutionId.memberType', displayProperty: 'institutionId.name', matchProperty:'memberType', compare:'lookup'} )" class="form-control " ref="memberTypeFilter">
-					<option value=""></option>
-					<option repeat.for='item of is4ua.memberTypes' value='${item.code}'>${item.description}</option>
-				</select>
-			-->
-			</div>
-			<div class="col-lg-2">
-				<label class="control-label hideOnPhone">Region</label>
-				<input value.bind="regionFilterValue" input.delegate="dataTable.filterList(regionFilterValue, { type: 'custom',  filter: regionCustomFilter, collectionProperty: 'institutionId.region', compare:'custom'} )"   class="form-control" ref="regionFilter"/>
-			</div>
-			<div class="col-lg-2">
-				<label class="control-label hideOnPhone">Country</label>
-				<input value.bind="countryFilterValue" input.delegate="dataTable.filterList(countryFilterValue, { type: 'custom',  filter: countryCustomFilter, compare:'custom'} )"   class="form-control" ref="countryFilter"/>
-			</div>
-		</div>
-	  </div>
-	</div>
-
-</div>
 </template>

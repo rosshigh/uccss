@@ -94,6 +94,7 @@ export class EditCurriculum {
         this.selectedRow = $(el.target).closest('tr');
         this.selectedRow.children().addClass('info')
         this.curriculumItemSelected = true;
+        document.body.scrollTop = document.documentElement.scrollTop = 0;
     }
 
     cancel() {

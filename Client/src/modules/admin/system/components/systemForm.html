@@ -1,226 +1,274 @@
-<template>	
-<div show.bind="systemDetails" class="col-lg-12">
-	<div class="bottomMargin list-group-item leftMargin rightMargin">
-		<span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
-		<span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
-		<span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
-		<span show.bind="!newSystem" click.delegate="delete()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>
-		<span click.delegate="editClientsButton()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Edit Client List"><i class="fa fa-pencil fa-lg fa-border" aria-hidden="true"></i></span>
-	</div>  
+<template>
+	<div show.bind="systemDetails" class="col-lg-12">
+		<div class="list-group-item toolbar">
+			<span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+			 title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
+			<span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+			 title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+			<span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+			 title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+			<span show.bind="!newSystem" click.delegate="delete()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+			 data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash fa-lg fa-border text-danger"
+				 aria-hidden="true"></i></span>
+			<span click.delegate="editClientsButton()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+			 data-placement="bottom" title="" data-original-title="Edit Client List"><i class="fa fa-pencil fa-lg fa-border"
+				 aria-hidden="true"></i></span>
+		</div>
+		<div class="panel panel-info positionUnderToolbar">
+			<div class="panel-body">
+				<div class="row">
+					<!-- Edit Form -->
+					<div class="col-lg-6 ">
+						<div class="col-lg-6">
+							<div class="col-lg-12">
+								<label for="editSid" class="form-control-label">SID</label>
+								<input value.bind="systems.selectedSystem.sid | toUppercase" id="editSid" class="form-control" placeholder="SID"
+								 type="text" />
+							</div>
+							<div class="col-lg-10">
+								<div class="checkbox">
+									<label>
+										<input checked.bind="systems.selectedSystem.active" type="checkbox"> Active
+									</label>
+								</div>
+							</div>
+							<div class="col-lg-12">
+								<label for="editDesc" class="form-control-label">Description</label>
+								<input value.bind="systems.selectedSystem.description" id="editDesc" class="form-control" placeholder="Description"
+								 type="text" />
+							</div>
+							<div class="col-lg-12">
+								<label for="editServer" class="form-control-label">Server</label>
+								<input value.bind="systems.selectedSystem.server | toUppercase" id="editServer" class="form-control"
+								 placeholder="Server" type="text" />
+							</div>
+							<div class="col-lg-12">
+								<label for="editPort" class="form-control-label">Port</label>
+								<input value.bind="systems.selectedSystem.port" id="editPort" class="form-control" placeholder="Port" type="number" />
+							</div>
+							<div class="col-lg-12">
+								<label for="editInst" class="form-control-label">Instance</label>
+								<input value.bind="systems.selectedSystem.instance" id="editInst" class="form-control" placeholder="Instance"
+								 type="text" maxLength="2" />
+							</div>
+							<div class="col-lg-12">
+								<label for="editIpAddress" class="form-control-label">IP Address</label>
+								<input value.bind="systems.selectedSystem.ipAddress" id="editIpAddress" class="form-control" placeholder="IP Address"
+								 type="text" />
+							</div>
+							<div class="col-lg-12">
+								<label for="edittype" class="control-label">System Type</label>
+								<select value.bind="systems.selectedSystem.type" id="edittype" class="form-control ">
+									<option model.bind="type" repeat.for="type of config.SYSTEM_TYPES">${type}</option>
+								</select>
+							</div>
 
-		 <!-- Edit Form -->
-	<div class="col-lg-6">
-		<div class="col-lg-6">
-			<div class="col-lg-12">
-				<label for="editSid" class="form-control-label">SID</label>
-				<input value.bind="systems.selectedSystem.sid | toUppercase" id="editSid" class="form-control" placeholder="SID" type="text" />
-			</div>
-			<div class="col-lg-10">
-				<div class="checkbox">
-				<label>
-					<input checked.bind="systems.selectedSystem.active" type="checkbox"> Active
-				</label>
-				</div>
-			</div>
-			<div class="col-lg-12">
-				<label for="editDesc" class="form-control-label">Description</label>
-				<input value.bind="systems.selectedSystem.description" id="editDesc" class="form-control" placeholder="Description" type="text" />
-			</div>
-			<div class="col-lg-12">
-				<label for="editServer" class="form-control-label">Server</label>
-				<input value.bind="systems.selectedSystem.server | toUppercase" id="editServer" class="form-control" placeholder="Server" type="text" />
-			</div>
-			<div class="col-lg-12">
-				<label for="editPort" class="form-control-label">Port</label>
-				<input value.bind="systems.selectedSystem.port" id="editPort" class="form-control" placeholder="Port" type="number" />
-			</div>
-			<div class="col-lg-12">
-				<label for="editInst" class="form-control-label">Instance</label>
-				<input value.bind="systems.selectedSystem.instance" id="editInst" class="form-control" placeholder="Instance" type="text" maxLength="2"/>
-			</div>
-			<div class="col-lg-12">
-				<label for="editIpAddress" class="form-control-label">IP Address</label>
-				<input value.bind="systems.selectedSystem.ipAddress" id="editIpAddress" class="form-control" placeholder="IP Address" type="text"/>
-			</div>
-			<div class="col-lg-12">
-				<label for="edittype" class="control-label">System Type</label>
-				<select value.bind="systems.selectedSystem.type" id="edittype" class="form-control ">
-					<option model.bind="type" repeat.for="type of config.SYSTEM_TYPES">${type}</option>
-				</select>
-			</div>
-			
-		</div>
-		<div class="col-lg-6">
-			<div class="col-lg-12">
-				<label for="editOs" class="form-control-label">OS</label>
-				<input value.bind="systems.selectedSystem.os" id="editOs" class="form-control" placeholder="Operating System" type="text"/>
-			</div>
-				<div class="col-lg-12">
-				<label for="editOsVersion" class="form-control-label">OS Version</label>
-				<input value.bind="systems.selectedSystem.osVersion" id="editOsVersion" class="form-control" placeholder="OS Version" type="text"/>
-			</div>
-			<div class="col-lg-12">
-				<label for="editDB" class="form-control-label">Database</label>
-				<input value.bind="systems.selectedSystem.dbType" id="editDB" class="form-control" placeholder="Database" type="text"/>
-			</div>
-			<div class="col-lg-12">
-				<label for="editDBVersion" class="form-control-label">Dataabase Version</label>
-				<input value.bind="systems.selectedSystem.dbVersion" id="editDBVersion" class="form-control" placeholder="Database Version" type="text"/>
-			</div>
-			<div class="col-lg-12">
-				<label for="editIts" class="form-control-label">URL</label>
-				<input value.bind="systems.selectedSystem.its" id="editIts" class="form-control" placeholder="URL" type="text" />
-			</div>
-			<div class="col-lg-12">
-				<label for="editTerms" class="form-control-label">Sessions</label>
-				<select multiple value.bind="systems.selectedSystem.sessions" class="form-control">
-					<option value="${session.session}"  repeat.for="session of config.SESSION_PARAMS">${session.session}</option>
-				</select>
-			</div>
-			<div class="col-lg-6">
-				<div class="checkbox">
-					<label class="form-control-label topMargin">
-						<input  checked.bind="systems.selectedSystem.goldBackup" type="checkbox"> Gold Backup
-					</label>
-				</div>
-			</div>
-			<div class="col-lg-6">
-				<div class="checkbox">
-					<label class="form-control-label topMargin">
-						<input checked.bind="systems.selectedSystem.snapShot" type="checkbox"> Snapshot
-					</label>
-				</div>
-			</div>
-			<div class="col-lg-12">
-				<div class="form-group">
-					<label class="form-control-label">Gold Backup Date</label>
-					<flat-picker controlid="goldBackupDate" config.bind="dateConfig" value.bind="systems.selectedSystem.goldBackupDate"></flat-picker>
-				</div>
-			</div>
-			
-		</div>
-		<div class="col-lg-12 bottomMargin">
-				<label for="editNotes" class="form-control-label">Notes</label>
-				<textarea value.bind="systems.selectedSystem.notes" id="editNotes" rows="8" class="form-control"></textarea>
-		</div>
-	</div>
-	 <div class="col-lg-6">
-		<div class="row">
-			<div show.bind="editClients" class="panel panel-default editPanel col-sm-9" >
-				<div class="panel-body">
-					<div class="topMargin leftmargin">
+						</div>
+						<div class="col-lg-6">
+							<div class="col-lg-12">
+								<label for="editOs" class="form-control-label">OS</label>
+								<input value.bind="systems.selectedSystem.os" id="editOs" class="form-control" placeholder="Operating System"
+								 type="text" />
+							</div>
+							<div class="col-lg-12">
+								<label for="editOsVersion" class="form-control-label">OS Version</label>
+								<input value.bind="systems.selectedSystem.osVersion" id="editOsVersion" class="form-control" placeholder="OS Version"
+								 type="text" />
+							</div>
+							<div class="col-lg-12">
+								<label for="editDB" class="form-control-label">Database</label>
+								<input value.bind="systems.selectedSystem.dbType" id="editDB" class="form-control" placeholder="Database" type="text" />
+							</div>
+							<div class="col-lg-12">
+								<label for="editDBVersion" class="form-control-label">Dataabase Version</label>
+								<input value.bind="systems.selectedSystem.dbVersion" id="editDBVersion" class="form-control" placeholder="Database Version"
+								 type="text" />
+							</div>
+							<div class="col-lg-12">
+								<label for="editIts" class="form-control-label">URL</label>
+								<input value.bind="systems.selectedSystem.its" id="editIts" class="form-control" placeholder="URL" type="text" />
+							</div>
+							<div class="col-lg-12">
+								<label for="editTerms" class="form-control-label">Sessions</label>
+								<select multiple value.bind="systems.selectedSystem.sessions" class="form-control">
+									<option value="${session.session}" repeat.for="session of config.SESSION_PARAMS">${session.session}</option>
+								</select>
+							</div>
+							<div class="col-lg-6">
+								<div class="checkbox">
+									<label class="form-control-label topMargin">
+										<input checked.bind="systems.selectedSystem.goldBackup" type="checkbox"> Gold Backup
+									</label>
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="checkbox">
+									<label class="form-control-label topMargin">
+										<input checked.bind="systems.selectedSystem.snapShot" type="checkbox"> Snapshot
+									</label>
+								</div>
+							</div>
+							<div class="col-lg-12">
+								<div class="form-group">
+									<label class="form-control-label">Gold Backup Date</label>
+									<flat-picker controlid="goldBackupDate" config.bind="dateConfig" value.bind="systems.selectedSystem.goldBackupDate"></flat-picker>
+								</div>
+							</div>
+
+						</div>
+						<div class="col-lg-12 bottomMargin">
+							<label for="editNotes" class="form-control-label">Notes</label>
+							<textarea value.bind="systems.selectedSystem.notes" id="editNotes" rows="8" class="form-control"></textarea>
+						</div>
+					</div>
+					<div class="col-lg-6">
 						<div class="row">
-							<div class="bottomMargin list-group-item leftMargin rightMargin">
-								<span click.delegate="generateClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Add Clients"><i class="fa fa-plus fa-lg fa-border" aria-hidden="true"></i></span>
-								<span click.delegate="refreshClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh Clients"><i class="fa fa-refresh fa-lg fa-border text-danger" aria-hidden="true"></i></span>
-								<span click.delegate="deleteClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete Clients"><i class="fa fa-trash-o fa-lg fa-border text-danger" aria-hidden="true"></i></span>
-								<span click.delegate="editClientsButton()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
-								<span click.trigger="updateAllProducts()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Update Products"><i class="fa fa-product-hunt fa-lg fa-border" aria-hidden="true"></i></span>                                            
-								<span click.delegate="assignmentDetails()"  class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Details"><i class="fa fa-eye fa-lg fa-border" aria-hidden="true"></i></span>
-							</div>  
-						</div>
-				
-						<div class="leftMargin bottomMargin topMargin">
-							<div class="col-sm-2">
-								<input value.bind="editFirstClient" id="editFirstClient" placeholder="Start" class="form-control input-sm" type="number" />
-							</div>
-							<div class="col-sm-2 ">
-								<input value.bind="editLastClient" id="editLastClient" placeholder="End" class="form-control input-sm" type="number" />
-							</div>
-							<div class="col-sm-2 ">
-								<input value.bind="idsAvailable" id="editClientIdsAvailable" placeholder="IDS Available" class="form-control input-sm" type="number" />
-							</div>
-							<div class="col-sm-4">
-								<select value.bind="editClientStatus" class="form-control" data-title="Single Select" data-style="btn-default btn-block" data-menu-style="dropdown-blue">
-									<option repeat.for="status of config.CLIENT_STATUSES" value="${status.code}">${status.description}</option>
-								</select>
-							</div>
-							
-								<div class="col-lg-3">
-									<label  class="form-control-label topMargin">Client Interval</label>
-									<input value.bind="clientInterval" id="clientInterval" placeholder="Interval" class="form-control input-sm" type="number" />
+							<div show.bind="editClients" class="panel panel-default editPanel col-sm-9">
+								<div class="panel-body">
+									<div class="topMargin leftmargin">
+										<div class="row">
+											<div class="bottomMargin list-group-item leftMargin rightMargin">
+												<span click.delegate="generateClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+												 data-placement="bottom" title="" data-original-title="Add Clients"><i class="fa fa-plus fa-lg fa-border"
+													 aria-hidden="true"></i></span>
+												<span click.delegate="refreshClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+												 data-placement="bottom" title="" data-original-title="Refresh Clients"><i class="fa fa-refresh fa-lg fa-border text-danger"
+													 aria-hidden="true"></i></span>
+												<span click.delegate="deleteClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+												 data-placement="bottom" title="" data-original-title="Delete Clients"><i class="fa fa-trash-o fa-lg fa-border text-danger"
+													 aria-hidden="true"></i></span>
+												<span click.delegate="editClientsButton()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+												 data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border"
+													 aria-hidden="true"></i></span>
+												<span click.trigger="updateAllProducts()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+												 data-placement="bottom" title="" data-original-title="Update Products"><i class="fa fa-product-hunt fa-lg fa-border"
+													 aria-hidden="true"></i></span>
+												<span click.delegate="assignmentDetails()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+												 data-placement="bottom" title="" data-original-title="Details"><i class="fa fa-eye fa-lg fa-border"
+													 aria-hidden="true"></i></span>
+											</div>
+										</div>
+
+										<div class="leftMargin bottomMargin topMargin">
+											<div class="col-sm-2">
+												<input value.bind="editFirstClient" id="editFirstClient" placeholder="Start" class="form-control input-sm"
+												 type="number" />
+											</div>
+											<div class="col-sm-2 ">
+												<input value.bind="editLastClient" id="editLastClient" placeholder="End" class="form-control input-sm" type="number" />
+											</div>
+											<div class="col-sm-2 ">
+												<input value.bind="idsAvailable" id="editClientIdsAvailable" placeholder="IDS Available" class="form-control input-sm"
+												 type="number" />
+											</div>
+											<div class="col-sm-4">
+												<select value.bind="editClientStatus" class="form-control" data-title="Single Select" data-style="btn-default btn-block"
+												 data-menu-style="dropdown-blue">
+													<option repeat.for="status of config.CLIENT_STATUSES" value="${status.code}">${status.description}</option>
+												</select>
+											</div>
+
+											<div class="col-lg-3">
+												<label class="form-control-label topMargin">Client Interval</label>
+												<input value.bind="clientInterval" id="clientInterval" placeholder="Interval" class="form-control input-sm"
+												 type="number" />
+											</div>
+											<div class="col-lg-8">
+												<label class="form-control-label topMargin">Product</label>
+												<select class="form-control col-lg-8" value.bind="selectedProduct" click.delegate="selectProduct()">
+													<option value="">Choose a product</option>
+													<option repeat.for="product of products.productsArray" model.bind="product._id">${product.name}</option>
+												</select>
+											</div>
+										</div>
+									</div>
 								</div>
-							<div class="col-lg-8">
-								<label  class="form-control-label topMargin">Product</label>
-								<select class="form-control col-lg-8"  value.bind="selectedProduct" click.delegate="selectProduct()">
-									<option value="">Choose a product</option>
-									<option repeat.for="product of products.productsArray" model.bind="product._id">${product.name}</option>
-								</select>
 							</div>
+						</div>
+
+						<div show.bind="systems.selectedSystem.clients.length > 0 && !clientSelected" class="col-sm-9">
+							<div class="panel panel-default">
+								<div class="panel-body">
+									<div style="overflow:auto;height:800px;">
+										<ul>
+											<li class="list-group-item" repeat.for="client of systems.selectedSystem.clients | sortArray:'client':'ASC'">
+												<div class="row">
+													<span class="col-sm-7">
+														<h5>Client ${client.client} <span class="leftMargin">IDs: ${client.idsAvailable}</span></h5>
+													</span>
+													<span class="col-sm-5">
+														<span click.delegate="refreshClient($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+														 data-placement="bottom" title="" data-original-title="Refresh Client"><i class="fa fa-refresh"
+															 aria-hidden="true"></i></span>
+														<span click.delegate="toggleSandBox($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+														 data-placement="bottom" title="" data-original-title="Toggle Sandbox"><i class="fa fa-users" aria-hidden="true"></i></span>
+														<span click.delegate="deleteClient($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+														 data-placement="bottom" title="" data-original-title="Delete Client"><i class="fa fa-trash" aria-hidden="true"></i></span>
+														<span click.trigger="selectClient(client, $index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+														 data-placement="bottom" title="" data-original-title="Edit Client"><i class="fa fa-pencil" aria-hidden="true"></i></span>
+														<span click.trigger="updateProduct(client, $index)" class="smallMarginRight" bootstrap-tooltip
+														 data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Update Product"><i class="fa fa-product-hunt"
+															 aria-hidden="true"></i></span>
+													</span>
+													<span class="col-sm-12">
+														<h7>Product: ${client.productId | lookupValue:products.productsArray:"_id":"name"}</h7></br>
+														<h7> <span>Assignments: ${client.assignments.length}</span></h7>
+														<h6>Status: ${client.clientStatus | lookupValue:config.CLIENT_STATUSES:"code":"description"}</h6>
+													</span>
+
+												</div>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div show.bind="clientSelected">
+							<compose view="./edit-client-form.html"></compose>
+						</div>
+					</div>
+				</div>
+				<div show.bind="!systemDetails" class="col-lg-12">
+					<h3>System: ${systems.selectedSystem.sid}</h3>
+					<div class='col-lg-10 col-lg-offset-1'>
+						<div class="bottomMargin list-group-item">
+							<span click.delegate="backAssignmentDetails()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+							 data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border"
+								 aria-hidden="true"></i></span>
+						</div>
+						<div id="no-more-tables2">
+							<table class="table table-striped table-hover cf">
+								<thead class="cf">
+									<tr>
+										<td colspan='5'>
+											<span click.delegate="downloadExcel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+											 data-placement="bottom" title="" data-original-title="Export to Excel"><i class="fa fa-download"
+												 aria-hidden="true"></i></span>
+										</td>
+									</tr>
+									<tr>
+										<th><span class="sortable" click.delegate="sortOnFaculty($event)">Faculty</span><span><i class="fa fa-sort"></i></span></th>
+										<th><span class="sortable" click.delegate="sortOnInst($event)">Institution</span><span><i class="fa fa-sort"></i></span></th>
+										<th class="col-sm-1"><span class="sortable" click.delegate="sortOnClient($event)">Client </span><span><i
+												 class="fa fa-sort"></i></span></th>
+										<th>Student IDs</th>
+										<th>Faculty IDs</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr repeat.for="assign of systems.assignmentDetailsArray">
+										<td data-title="Faculty">${assign.firstName} ${assign.lastName}</td>
+										<td data-title="Institution">${assign.institution}</td>
+										<td data-title="Client">${assign.client}</td>
+										<td data-title="StudentIDs">${assign.studentIds}</td>
+										<td data-title="FacultyIDs">${assign.facultyIds}</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-               
-		<div show.bind="systems.selectedSystem.clients.length > 0 && !clientSelected" class="col-sm-9">
-			<div class="panel panel-default" >
-				<div class="panel-body">
-					<div style="overflow:auto;height:800px;">
-						<ul>
-							<li class="list-group-item" repeat.for="client of systems.selectedSystem.clients | sortArray:'client':'ASC'">
-								<div  class="row">
-									<span class="col-sm-7">
-										<h5>Client ${client.client} <span class="leftMargin">IDs: ${client.idsAvailable}</span></h5>
-									</span>
-									<span class="col-sm-5">
-										<span click.delegate="refreshClient($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh Client"><i class="fa fa-refresh" aria-hidden="true"></i></span>
-										<span click.delegate="toggleSandBox($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Toggle Sandbox"><i class="fa fa-users" aria-hidden="true"></i></span>
-										<span click.delegate="deleteClient($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete Client"><i class="fa fa-trash" aria-hidden="true"></i></span>
-										<span click.trigger="selectClient(client, $index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Edit Client"><i class="fa fa-pencil" aria-hidden="true"></i></span>                                            
-										<span click.trigger="updateProduct(client, $index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Update Product"><i class="fa fa-product-hunt" aria-hidden="true"></i></span>                                            
-									</span>		
-									<span class="col-sm-12">
-										<h7>Product: ${client.productId | lookupValue:products.productsArray:"_id":"name"}</h7></br>
-										<h7> <span>Assignments: ${client.assignments.length}</span></h7>
-										<h6>Status: ${client.clientStatus | lookupValue:config.CLIENT_STATUSES:"code":"description"}</h6>
-									</span>
-									
-								</div>
-							</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div show.bind="clientSelected">
-			<compose view="./edit-client-form.html"></compose>
 		</div>
 	</div>
-</div>
-<div show.bind="!systemDetails" class="col-lg-12">
-	<h3>System: ${systems.selectedSystem.sid}</h3>
-	 <div class='col-lg-10 col-lg-offset-1'>
-		<div class="bottomMargin list-group-item">
-			<span click.delegate="backAssignmentDetails()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
-		</div>  
-	<div id="no-more-tables2">
-        <table class="table table-striped table-hover cf">
-            <thead class="cf">
-                <tr>
-                    <td colspan='5'>
-                       <span click.delegate="downloadExcel()"  class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Export to Excel"><i class="fa fa-download" aria-hidden="true"></i></span>
-                    </td>
-                </tr>
-                <tr>
-                    <th><span  class="sortable"  click.delegate="sortOnFaculty($event)">Faculty</span><span><i class="fa fa-sort"></i></span></th>
-                    <th><span  class="sortable" click.delegate="sortOnInst($event)">Institution</span><span><i class="fa fa-sort"></i></span></th>
-					<th class="col-sm-1"><span  class="sortable" click.delegate="sortOnClient($event)">Client </span><span><i class="fa fa-sort"></i></span></th>
-					<th>Student IDs</th>
-					<th>Faculty IDs</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr repeat.for="assign of systems.assignmentDetailsArray">
-                    <td data-title="Faculty">${assign.firstName} ${assign.lastName}</td>
-                    <td data-title="Institution">${assign.institution}</td>
-					<td data-title="Client">${assign.client}</td>
-					<td data-title="StudentIDs">${assign.studentIds}</td>
-					<td data-title="FacultyIDs">${assign.facultyIds}</td>
-                </tr>
-            </tbody>
-        </table>
-        </div>
-    </div> 
-</div>
 </template>

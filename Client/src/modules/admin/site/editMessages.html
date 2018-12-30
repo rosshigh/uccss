@@ -1,13 +1,8 @@
 <template>
-    <div class="panel panel-info">
-      <div class="panel-body">
-        <div class="row">
-            <div show.bind="!messageItemSelected" class="col-lg-12">
-                <compose view="./components/messageTable.html"></compose>
-            </div> <!-- Table Div -->
-            <div show.bind="messageItemSelected" class="col-lg-12">
-                <compose view="./components/messageForm.html"></compose>
-            </div> <!-- Form Div -->
-        </div> <!-- Row -->
-      </div> <!-- Panel Body -->
+    <div show.bind="!messageItemSelected" class="col-lg-12">
+        <compose view="./components/messageTable.html"></compose>
+    </div> <!-- Table Div -->
+    <div show.bind="messageItemSelected" class="col-lg-12">
+        <compose view="./components/messageForm.html"></compose>
+    </div> <!-- Form Div -->
 </template>

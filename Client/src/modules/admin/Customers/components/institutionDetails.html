@@ -1,0 +1,53 @@
+<template>
+    <form class="form-horizontal">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label>Name *</label>
+                        <input value.bind="people.selectedInstitution.name" id="editName" class="form-control"
+                            placeholder="Name" type="text" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label>Modifed Date</label>
+                        <flat-picker controlid="modifiedDate" config.bind="dateConfig" value.bind="people.selectedInstitution.dateModified"></flat-picker>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label>Date Joined</label>
+                        <flat-picker controlid="joinDate" config.bind="dateConfig" value.bind="people.selectedInstitution.joinDate"></flat-picker>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label>Date Dropped</label>
+                        <flat-picker controlid="dropDate" config.bind="dateConfig" value.bind="people.selectedInstitution.dropDate"></flat-picker>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label class="left">Status *</label>
+                        <select value.bind="people.selectedInstitution.institutionStatus" id="editInstitutonStatusArray"
+                            class="form-control">
+                            <option value="">Select an option</option>
+                            <option repeat.for="status of is4ua.institutonStatusArray" value="${status.code}">${status.description}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</template>
