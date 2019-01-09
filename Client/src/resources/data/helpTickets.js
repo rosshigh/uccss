@@ -142,6 +142,14 @@ export class HelpTickets {
         }
     }
 
+    updateHelpTicket(helpTicket){
+        for(let i = 0; i < this.helpTicketsArray.length; i++ ){
+            if(this.helpTicketsArray[i]._id === helpTicket._id){
+                this.helpTicketsArray[i] = this.utils.copyObject(helpTicket, this.helpTicketsArray[i]);
+            }
+        }
+    }
+
     selectHelpTicketByID(id) {
         this.helpTicketsArray.forEach((item, index) => {
             if (item._id === id) {
@@ -212,7 +220,7 @@ export class HelpTickets {
         var response = await this.data.saveObject(obj, this.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
         if (!response.error) {
             this.selectedHelpTicket = response;
-            this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+            this.updateHelpTicket(this.selectedHelpTicket);
         } else {
             this.data.processError(response, "There was an error updating the help ticket.");
         }
@@ -306,7 +314,8 @@ export class HelpTickets {
                 }
                 this.selectHelpTicketByID(this.selectedHelpTicket._id);
                 if (status !== this.config.CLOSED_HELPTICKET_STATUS) {
-                    this.helpTicketsArray[this.editIndex] = this.utils.copyObject(response, this.helpTicketsArray[this.editIndex]);
+                    this.updateHelpTicket(this.selectedHelpTicket);
+                    // this.helpTicketsArray[this.editIndex] = this.utils.copyObject(response, this.helpTicketsArray[this.editIndex]);
                 } else {
                     this.helpTicketsArray.splice(this.editIndex,1);
                 }
@@ -325,7 +334,8 @@ export class HelpTickets {
                 if (!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                 // this.selectedHelpTicket.content.push(response);
                 this.selectedHelpTicket = this.utils.copyObject(response);
-                this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+                this.updateHelpTicket(this.selectedHelpTicket);
+                // this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
             } else {
                 this.data.processError(response, "There was an error updating the help ticket.");
             }
@@ -353,7 +363,8 @@ export class HelpTickets {
         let response = await this.data.uploadFiles(files, this.HELP_TICKET_SERVICES + "/upload/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
         if (!response.error) {
             if(this.selectedHelpTicket) this.selectedHelpTicket = this.utils.copyObject(response);
-            if(this.helpTicketsArray && this.editIndex) this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+            if(this.helpTicketsArray && this.editIndex) this.updateHelpTicket(this.selectHelpTicket);
+            // this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
         }
     }
 

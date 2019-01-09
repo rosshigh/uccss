@@ -74,11 +74,8 @@ export class ViewHelpTickets {
   async activate(params) {
     let responses = await Promise.all([
       this.helpTickets.getHelpTicketTypes('?order=category'),
-      // this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + '&order=helpTicketNo:DSC', true),
-      //filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&
       this.config.getConfig()
     ]);
-    // this.helpTickets.calcHelpTicketAges();
     this.sessions.getSessionsArray('?order=startDate:DSC');
     this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name');
     this.systems.getSystemsArray();
@@ -236,7 +233,6 @@ export class ViewHelpTickets {
     this.tableMargin = "margin-top:0px;"
     //Make the selected help ticket the selected help ticket
     this.editIndex = this.dataTable.getOriginalIndex(index);
-    // this.helpTickets.selectHelpTicket(this.editIndex);
     await this.helpTickets.getHelpTicket(helpTicket._id);
     this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
     this.openHelpTicket();
@@ -428,7 +424,7 @@ export class ViewHelpTickets {
       this.helpTickets.selectHelpTicketByID(helpTicket._id);
     }
 
-    if(helpTicket.owner[0].personId !== "b1b1b1b1b1b1b1b1b1b1b1b1" && helpTicket.owner[0].personId != null){
+    if(this.helpTickets.selectedHelpTicket.owner[0].personId !== "b1b1b1b1b1b1b1b1b1b1b1b1" && this.helpTickets.selectedHelpTicket.owner[0].personId != null){
       this.dialog.showMessage(
         "Are you sure you want to change ownership of this help ticket",
         "Save Changes",
