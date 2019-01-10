@@ -13,37 +13,58 @@
             word-wrap: break-word;
             background-color: #fff;
             background-clip: border-box;
-            border: 1px solid rgba(0,0,0,.125);
+            border: 1px solid rgba(0, 0, 0, .125);
             border-radius: .25rem;
             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
             margin-left: 20px;
             margin-top: 20px;
         }
-        .card-img-top{
+
+        .card-img-top {
             height: 180px;
             width: 95%;
             display: block;
             vertical-align: middle;
             border-style: none;
-            margin:5px;
+            margin: 5px;
         }
-        .card-body{
+
+        .card-body {
             flex: 1 1 auto;
             padding: 1.25rem;
         }
 
+        .card-lower-body {}
+
         .card-titlech {
             margin-bottom: .75rem;
         }
+
+        .card-header {
+            padding: .75rem 1.25rem;
+            margin-bottom: 0;
+            color: inherit;
+            height:100px;
+            border-bottom: 1px solid rgba(0, 0, 0, .125)
+        }
+
+        .card-header:first-child {
+            border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0
+        }
     </style>
 
-    <div class="card col-lg-3" style="width:400px;" repeat.for="chapter of chapters.chaptersArray">
-       <!-- <img class="card-img-top" src="http://localhost/uploadedFiles/chapters/chapterLogos/${chapter.chapterLogo}" alt="Card image cap"> -->
+    <div class="card col-lg-3" style="width:400px;height:200px;" repeat.for="chapter of chapters.chaptersArray">
+        <!-- <img class="card-img-top" src="http://localhost/uploadedFiles/chapters/chapterLogos/${chapter.chapterLogo}" alt="Card image cap"> -->
+        <div class="card-header">
+                <h4 class="card-titlech">${chapter.chapterTopic}</h4>
+                <h5>${chapter.chapterUniversity}</h5>
+            </div>
         <div class="card-body">
-            <h4 class="card-titlech">${chapter.chapterTopic}</h4>
-            <h5>${chapter.chapterUniversity}</h5>
+
+
             <p class="card-text">${chapter.chapterShortDescription}</p>
             <a href="#">Visit the chapter web page</a>
+
         </div>
     </div>
 </template>
