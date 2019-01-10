@@ -90,10 +90,11 @@ export class Assignments {
         this.spinnerHTML = "";
     }
 
-    editRequest(index, request) {
+    async editRequest(index, request) {
         this.editIndex = index;
         this.selectedRequestDetail = this.utils.copyObject(request);
-        this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
+        await this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
+        await this.people.getCoursesArray(true, '?filter=personId|eq|' + this.selectedRequestDetail.requestId.personId._id);
         this.editStartDate = this.selectedRequestDetail.requestId.startDate;
         this.originalRequestDetail = this.utils.copyObject(this.selectedRequestDetail);
 

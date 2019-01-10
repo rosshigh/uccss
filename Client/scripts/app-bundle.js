@@ -156,8 +156,8 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.DOWNLOAD_URL = this.HOST + '/uploadedFiles';
             this.BASE_URL = "https://uccsstest.ucc.uwm.edu/api/";
             this.IMG_DOWNLOAD_URL = "https://uccsstest.ucc.uwm.edu/img/";
-            this.BASE_URL = "http://localhost/api/";
-            this.IMG_DOWNLOAD_URL = "http://localhost/img/";
+            this.BASE_URL = this.HOST + "/api/";
+            this.IMG_DOWNLOAD_URL = this.HOST + '/img/';
             this.isMobile = false;
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
@@ -32129,52 +32129,28 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
             return refresh;
         }();
 
-        Assignments.prototype.editRequest = function editRequest(index, request) {
-            this.editIndex = index;
-            this.selectedRequestDetail = this.utils.copyObject(request);
-            this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
-            this.editStartDate = this.selectedRequestDetail.requestId.startDate;
-            this.originalRequestDetail = this.utils.copyObject(this.selectedRequestDetail);
-
-            this.requestSelected = 'edit';
-        };
-
-        Assignments.prototype.backEdit = function backEdit() {
-            this.requestSelected = 'table';
-        };
-
-        Assignments.prototype.saveEdit = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var email, serverResponse;
+        Assignments.prototype.editRequest = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(index, request) {
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
                         switch (_context5.prev = _context5.next) {
                             case 0:
-                                email = {};
-
-                                this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
+                                this.editIndex = index;
+                                this.selectedRequestDetail = this.utils.copyObject(request);
                                 _context5.next = 4;
-                                return this.clientRequests.saveRequestDetail();
+                                return this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
 
                             case 4:
-                                serverResponse = _context5.sent;
+                                _context5.next = 6;
+                                return this.people.getCoursesArray(true, '?filter=personId|eq|' + this.selectedRequestDetail.requestId.personId._id);
 
-                                if (serverResponse.error) {
-                                    _context5.next = 13;
-                                    break;
-                                }
+                            case 6:
+                                this.editStartDate = this.selectedRequestDetail.requestId.startDate;
+                                this.originalRequestDetail = this.utils.copyObject(this.selectedRequestDetail);
 
-                                this.utils.showNotification("The request was updated");
-                                this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
-                                this.reSort();
-                                this.dataTable.applyFilters();
-                                _context5.next = 12;
-                                return this.filterInAssigned();
+                                this.requestSelected = 'edit';
 
-                            case 12:
-                                this._cleanUp();
-
-                            case 13:
+                            case 9:
                             case 'end':
                                 return _context5.stop();
                         }
@@ -32182,29 +32158,79 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                 }, _callee5, this);
             }));
 
-            function saveEdit() {
+            function editRequest(_x, _x2) {
                 return _ref5.apply(this, arguments);
+            }
+
+            return editRequest;
+        }();
+
+        Assignments.prototype.backEdit = function backEdit() {
+            this.requestSelected = 'table';
+        };
+
+        Assignments.prototype.saveEdit = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var email, serverResponse;
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                email = {};
+
+                                this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
+                                _context6.next = 4;
+                                return this.clientRequests.saveRequestDetail();
+
+                            case 4:
+                                serverResponse = _context6.sent;
+
+                                if (serverResponse.error) {
+                                    _context6.next = 13;
+                                    break;
+                                }
+
+                                this.utils.showNotification("The request was updated");
+                                this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
+                                this.reSort();
+                                this.dataTable.applyFilters();
+                                _context6.next = 12;
+                                return this.filterInAssigned();
+
+                            case 12:
+                                this._cleanUp();
+
+                            case 13:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function saveEdit() {
+                return _ref6.apply(this, arguments);
             }
 
             return saveEdit;
         }();
 
         Assignments.prototype.selectARequest = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(index, el, request) {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(index, el, request) {
                 var _this2 = this;
 
                 var response;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
                                 this.sendEmail = this.config.SEND_EMAILS;
                                 this.selectedRequestDetail = {};
-                                _context6.next = 4;
+                                _context7.next = 4;
                                 return this.clientRequests.getRequestDetail(request._id);
 
                             case 4:
-                                response = _context6.sent;
+                                response = _context7.sent;
 
                                 if (!response.error) {
                                     this.selectedRequestDetail = response;
@@ -32227,16 +32253,16 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
 
                                 if (this.products.selectedProduct.systems[0]) {
-                                    _context6.next = 20;
+                                    _context7.next = 20;
                                     break;
                                 }
 
                                 this.utils.showNotification("You need to assign a system to this product before you can assign this request");
-                                _context6.next = 22;
+                                _context7.next = 22;
                                 break;
 
                             case 20:
-                                _context6.next = 22;
+                                _context7.next = 22;
                                 return this.getProductSystems();
 
                             case 22:
@@ -32256,27 +32282,27 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 27:
                             case 'end':
-                                return _context6.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee6, this);
+                }, _callee7, this);
             }));
 
-            function selectARequest(_x, _x2, _x3) {
-                return _ref6.apply(this, arguments);
+            function selectARequest(_x3, _x4, _x5) {
+                return _ref7.apply(this, arguments);
             }
 
             return selectARequest;
         }();
 
         Assignments.prototype.getProductSystems = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
                 var _this3 = this;
 
                 var productSystemsSIDs, response;
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
-                        switch (_context7.prev = _context7.next) {
+                        switch (_context8.prev = _context8.next) {
                             case 0:
                                 this.systemConfigured = false;
                                 this.productSystems = new Array();
@@ -32286,11 +32312,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                     var delimiterChar = productSystemsSIDs.length ? ":" : "";
                                     productSystemsSIDs += delimiterChar + item.sid;
                                 });
-                                _context7.next = 6;
+                                _context8.next = 6;
                                 return this.systems.getConfiguredProductSystems(productSystemsSIDs);
 
                             case 6:
-                                response = _context7.sent;
+                                response = _context8.sent;
 
                                 if (!response.error) {
                                     response.forEach(function (item) {
@@ -32304,14 +32330,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 10:
                             case 'end':
-                                return _context7.stop();
+                                return _context8.stop();
                         }
                     }
-                }, _callee7, this);
+                }, _callee8, this);
             }));
 
             function getProductSystems() {
-                return _ref7.apply(this, arguments);
+                return _ref8.apply(this, arguments);
             }
 
             return getProductSystems;
@@ -32788,19 +32814,19 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.deleteProposedClient = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
                 var _this6 = this;
 
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
-                        switch (_context8.prev = _context8.next) {
+                        switch (_context9.prev = _context9.next) {
                             case 0:
                                 if (!this.selectedRequestDetail.assignments[this.assignmentDetailIndex].assignedDate) {
-                                    _context8.next = 4;
+                                    _context9.next = 4;
                                     break;
                                 }
 
-                                return _context8.abrupt('return', this.dialog.showMessage("This will delete the assignment.  Are you sure you want to do that?", "Delete Assignment", ['Yes', 'No']).whenClosed(function (response) {
+                                return _context9.abrupt('return', this.dialog.showMessage("This will delete the assignment.  Are you sure you want to do that?", "Delete Assignment", ['Yes', 'No']).whenClosed(function (response) {
                                     if (!response.wasCancelled) {
                                         _this6.deleteSaved(_this6.assignmentDetailIndex);
                                     }
@@ -32821,14 +32847,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 13:
                             case 'end':
-                                return _context8.stop();
+                                return _context9.stop();
                         }
                     }
-                }, _callee8, this);
+                }, _callee9, this);
             }));
 
             function deleteProposedClient() {
-                return _ref8.apply(this, arguments);
+                return _ref9.apply(this, arguments);
             }
 
             return deleteProposedClient;
@@ -32874,11 +32900,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.deleteSaved = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(index) {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(index) {
                 var request, serverResponse;
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
-                        switch (_context9.prev = _context9.next) {
+                        switch (_context10.prev = _context10.next) {
                             case 0:
                                 this.selectedSystem.clients[this.selectedClientIndex].idsAvailable = parseInt(this.selectedSystem.clients[this.selectedClientIndex].idsAvailable) + parseInt(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].idsAssigned);
                                 this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].idsAssigned);
@@ -32898,20 +32924,20 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 this.requestToSave.systemsToSave = [this.selectedSystem];
 
                                 this.clientRequests.setSelectedRequest(this.requestToSave);
-                                _context9.next = 16;
+                                _context10.next = 16;
                                 return this.clientRequests.assignRequest(this.editIndex);
 
                             case 16:
-                                serverResponse = _context9.sent;
+                                serverResponse = _context10.sent;
 
                                 if (serverResponse.status) {
-                                    _context9.next = 23;
+                                    _context10.next = 23;
                                     break;
                                 }
 
                                 this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
                                 this.reSort();
-                                _context9.next = 22;
+                                _context10.next = 22;
                                 return this.filterInAssigned();
 
                             case 22:
@@ -32923,14 +32949,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 24:
                             case 'end':
-                                return _context9.stop();
+                                return _context10.stop();
                         }
                     }
-                }, _callee9, this);
+                }, _callee10, this);
             }));
 
-            function deleteSaved(_x4) {
-                return _ref9.apply(this, arguments);
+            function deleteSaved(_x6) {
+                return _ref10.apply(this, arguments);
             }
 
             return deleteSaved;
@@ -32955,25 +32981,25 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.deleteRequest = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                return regeneratorRuntime.wrap(function _callee11$(_context11) {
                     while (1) {
-                        switch (_context10.prev = _context10.next) {
+                        switch (_context11.prev = _context11.next) {
                             case 0:
                                 this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
-                                _context10.next = 3;
+                                _context11.next = 3;
                                 return this.clientRequests.deleteRequest();
 
                             case 3:
-                                serverResponse = _context10.sent;
+                                serverResponse = _context11.sent;
 
                                 if (serverResponse.error) {
-                                    _context10.next = 9;
+                                    _context11.next = 9;
                                     break;
                                 }
 
-                                _context10.next = 7;
+                                _context11.next = 7;
                                 return this.filterInAssigned();
 
                             case 7:
@@ -32985,53 +33011,53 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 10:
                             case 'end':
-                                return _context10.stop();
+                                return _context11.stop();
                         }
                     }
-                }, _callee10, this);
+                }, _callee11, this);
             }));
 
             function deleteRequest() {
-                return _ref10.apply(this, arguments);
+                return _ref11.apply(this, arguments);
             }
 
             return deleteRequest;
         }();
 
         Assignments.prototype.save = function () {
-            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
                 var email, serverResponse;
-                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
                     while (1) {
-                        switch (_context11.prev = _context11.next) {
+                        switch (_context12.prev = _context12.next) {
                             case 0:
                                 if (!this.validation.validate(1)) {
-                                    _context11.next = 14;
+                                    _context12.next = 14;
                                     break;
                                 }
 
                                 if (!this._buildRequest()) {
-                                    _context11.next = 14;
+                                    _context12.next = 14;
                                     break;
                                 }
 
                                 this.clientRequests.setSelectedRequest(this.requestToSave);
                                 email = this._buildEmailObject();
-                                _context11.next = 6;
+                                _context12.next = 6;
                                 return this.clientRequests.assignRequest(this.editIndex, email);
 
                             case 6:
-                                serverResponse = _context11.sent;
+                                serverResponse = _context12.sent;
 
                                 if (serverResponse.status) {
-                                    _context11.next = 14;
+                                    _context12.next = 14;
                                     break;
                                 }
 
                                 this.utils.showNotification("The request was updated");
                                 this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
                                 this.reSort();
-                                _context11.next = 13;
+                                _context12.next = 13;
                                 return this.filterInAssigned();
 
                             case 13:
@@ -33039,14 +33065,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 14:
                             case 'end':
-                                return _context11.stop();
+                                return _context12.stop();
                         }
                     }
-                }, _callee11, this);
+                }, _callee12, this);
             }));
 
             function save() {
-                return _ref11.apply(this, arguments);
+                return _ref12.apply(this, arguments);
             }
 
             return save;
@@ -33152,18 +33178,18 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.viewAssignment = function () {
-            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(index, request) {
+            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(index, request) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                return regeneratorRuntime.wrap(function _callee13$(_context13) {
                     while (1) {
-                        switch (_context12.prev = _context12.next) {
+                        switch (_context13.prev = _context13.next) {
                             case 0:
                                 this.editIndex = index;
-                                _context12.next = 3;
+                                _context13.next = 3;
                                 return this.clientRequests.getRequestDetail(request._id);
 
                             case 3:
-                                response = _context12.sent;
+                                response = _context13.sent;
 
                                 if (!response.error) {
                                     this.selectedRequestDetail = response;
@@ -33175,14 +33201,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 5:
                             case 'end':
-                                return _context12.stop();
+                                return _context13.stop();
                         }
                     }
-                }, _callee12, this);
+                }, _callee13, this);
             }));
 
-            function viewAssignment(_x5, _x6) {
-                return _ref12.apply(this, arguments);
+            function viewAssignment(_x7, _x8) {
+                return _ref13.apply(this, arguments);
             }
 
             return viewAssignment;
@@ -33223,30 +33249,30 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.customerActionDialog = function () {
-            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
+            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
                 var _this11 = this;
 
                 var subject, email;
-                return regeneratorRuntime.wrap(function _callee13$(_context13) {
+                return regeneratorRuntime.wrap(function _callee14$(_context14) {
                     while (1) {
-                        switch (_context13.prev = _context13.next) {
+                        switch (_context14.prev = _context14.next) {
                             case 0:
                                 if (!this.profileRequest) {
-                                    _context13.next = 7;
+                                    _context14.next = 7;
                                     break;
                                 }
 
-                                _context13.next = 3;
+                                _context14.next = 3;
                                 return this.clientRequests.getRequest(this.profileRequest.requestId._id);
 
                             case 3:
                                 this.model = 'header';
                                 this.hideProfile();
-                                _context13.next = 9;
+                                _context14.next = 9;
                                 break;
 
                             case 7:
-                                _context13.next = 9;
+                                _context14.next = 9;
                                 return this.clientRequests.getRequest(this.selectedRequestDetail.requestId._id);
 
                             case 9:
@@ -33261,7 +33287,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                                 subject = "Question about product request " + this.selectedRequestNo;
                                 email = { emailBody: "", emailSubject: subject, emailId: this.email, products: this.clientRequests.selectedRequest.requestDetails, productsSelected: this.productsSelected };
-                                return _context13.abrupt('return', this.dialog.showEmail("Enter Email", email, ['Submit', 'Cancel']).whenClosed(function (response) {
+                                return _context14.abrupt('return', this.dialog.showEmail("Enter Email", email, ['Submit', 'Cancel']).whenClosed(function (response) {
                                     if (!response.wasCancelled) {
                                         _this11.sendTheEmail(response.output);
                                     } else {
@@ -33271,30 +33297,30 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 19:
                             case 'end':
-                                return _context13.stop();
+                                return _context14.stop();
                         }
                     }
-                }, _callee13, this);
+                }, _callee14, this);
             }));
 
             function customerActionDialog() {
-                return _ref13.apply(this, arguments);
+                return _ref14.apply(this, arguments);
             }
 
             return customerActionDialog;
         }();
 
         Assignments.prototype.sendTheEmail = function () {
-            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(email) {
+            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(email) {
                 var _this12 = this;
 
                 var updateIds, date, day, month, year, response, serverResponse;
-                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                return regeneratorRuntime.wrap(function _callee15$(_context15) {
                     while (1) {
-                        switch (_context14.prev = _context14.next) {
+                        switch (_context15.prev = _context15.next) {
                             case 0:
                                 if (!email) {
-                                    _context14.next = 24;
+                                    _context15.next = 24;
                                     break;
                                 }
 
@@ -33306,7 +33332,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                     updateIds.push(item._id);
                                 });
 
-                                _context14.next = 6;
+                                _context15.next = 6;
                                 return this.filterInAssigned();
 
                             case 6:
@@ -33332,41 +33358,41 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 };
 
                                 this.clientRequests.selectedRequest.customerMessage = email.email.emailBody;
-                                _context14.next = 14;
+                                _context15.next = 14;
                                 return this.clientRequests.saveRequestWithId();
 
                             case 14:
-                                response = _context14.sent;
+                                response = _context15.sent;
 
                                 if (response.error) {
-                                    _context14.next = 24;
+                                    _context15.next = 24;
                                     break;
                                 }
 
                                 this.clientRequests.updateStatuses(updateIds, this.config.CUSTOMER_ACTION_REQUEST_CODE);
                                 this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
-                                _context14.next = 20;
+                                _context15.next = 20;
                                 return this.clientRequests.sendCustomerMessage(this.message);
 
                             case 20:
-                                serverResponse = _context14.sent;
+                                serverResponse = _context15.sent;
 
                                 if (!serverResponse.error) {
                                     this.utils.showNotification("The message was sent");
                                 }
-                                _context14.next = 24;
+                                _context15.next = 24;
                                 return this.filterInAssigned();
 
                             case 24:
                             case 'end':
-                                return _context14.stop();
+                                return _context15.stop();
                         }
                     }
-                }, _callee14, this);
+                }, _callee15, this);
             }));
 
-            function sendTheEmail(_x7) {
-                return _ref14.apply(this, arguments);
+            function sendTheEmail(_x9) {
+                return _ref15.apply(this, arguments);
             }
 
             return sendTheEmail;
@@ -33409,12 +33435,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.saveStudentTemplate = function () {
-            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15() {
-                return regeneratorRuntime.wrap(function _callee15$(_context15) {
+            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16() {
+                return regeneratorRuntime.wrap(function _callee16$(_context16) {
                     while (1) {
-                        switch (_context15.prev = _context15.next) {
+                        switch (_context16.prev = _context16.next) {
                             case 0:
-                                _context15.next = 2;
+                                _context16.next = 2;
                                 return this.products.saveProduct();
 
                             case 2:
@@ -33427,14 +33453,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 5:
                             case 'end':
-                                return _context15.stop();
+                                return _context16.stop();
                         }
                     }
-                }, _callee15, this);
+                }, _callee16, this);
             }));
 
             function saveStudentTemplate() {
-                return _ref15.apply(this, arguments);
+                return _ref16.apply(this, arguments);
             }
 
             return saveStudentTemplate;
@@ -33513,11 +33539,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.saveNote = function () {
-            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(note) {
+            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17(note) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee16$(_context16) {
+                return regeneratorRuntime.wrap(function _callee17$(_context17) {
                     while (1) {
-                        switch (_context16.prev = _context16.next) {
+                        switch (_context17.prev = _context17.next) {
                             case 0:
                                 this.people.selectNote();
                                 this.people.selectedNote.type = "r";
@@ -33526,11 +33552,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 this.people.selectedNote.note = note.note.noteBody;
                                 this.people.selectedNote.reference = this.selectedRequestDetail._id;
                                 this.people.selectedNote.referenceNo = this.selectedRequestDetail.requestId.clientRequestNo;
-                                _context16.next = 9;
+                                _context17.next = 9;
                                 return this.people.saveNote();
 
                             case 9:
-                                response = _context16.sent;
+                                response = _context17.sent;
 
                                 if (!response.error) {
                                     this.utils.showNotification('The note was saved');
@@ -33538,14 +33564,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 11:
                             case 'end':
-                                return _context16.stop();
+                                return _context17.stop();
                         }
                     }
-                }, _callee16, this);
+                }, _callee17, this);
             }));
 
-            function saveNote(_x8) {
-                return _ref16.apply(this, arguments);
+            function saveNote(_x10) {
+                return _ref17.apply(this, arguments);
             }
 
             return saveNote;
@@ -33622,10 +33648,10 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.clearFilters = function () {
-            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17() {
-                return regeneratorRuntime.wrap(function _callee17$(_context17) {
+            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18() {
+                return regeneratorRuntime.wrap(function _callee18$(_context18) {
                     while (1) {
-                        switch (_context17.prev = _context17.next) {
+                        switch (_context18.prev = _context18.next) {
                             case 0:
                                 this.requiredDateFilterValue = "";
                                 this.createdDateFilterValue = "";
@@ -33638,26 +33664,26 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 8:
                             case 'end':
-                                return _context17.stop();
+                                return _context18.stop();
                         }
                     }
-                }, _callee17, this);
+                }, _callee18, this);
             }));
 
             function clearFilters() {
-                return _ref17.apply(this, arguments);
+                return _ref18.apply(this, arguments);
             }
 
             return clearFilters;
         }();
 
         Assignments.prototype.filterInAssigned = function () {
-            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18() {
+            var _ref19 = _asyncToGenerator(regeneratorRuntime.mark(function _callee19() {
                 var _this16 = this;
 
-                return regeneratorRuntime.wrap(function _callee18$(_context18) {
+                return regeneratorRuntime.wrap(function _callee19$(_context19) {
                     while (1) {
-                        switch (_context18.prev = _context18.next) {
+                        switch (_context19.prev = _context19.next) {
                             case 0:
 
                                 this.requiredDateFilterValue = "";
@@ -33669,12 +33695,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 this.institutionFilterValue = "";
 
                                 if (!this.isCheckedAssigned) {
-                                    _context18.next = 15;
+                                    _context19.next = 15;
                                     break;
                                 }
 
                                 $('#loading').show();
-                                _context18.next = 11;
+                                _context19.next = 11;
                                 return this.clientRequests.getClientRequestsDetailsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE + '$' + this.config.CUSTOMER_ACTION_REQUEST_CODE, true);
 
                             case 11:
@@ -33690,12 +33716,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                     this.displayArray = new Array();
                                 }
 
-                                _context18.next = 22;
+                                _context19.next = 22;
                                 break;
 
                             case 15:
                                 $('#loading').show();
-                                _context18.next = 18;
+                                _context19.next = 18;
                                 return this.clientRequests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
 
                             case 18:
@@ -33708,14 +33734,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 22:
                             case 'end':
-                                return _context18.stop();
+                                return _context19.stop();
                         }
                     }
-                }, _callee18, this);
+                }, _callee19, this);
             }));
 
             function filterInAssigned() {
-                return _ref18.apply(this, arguments);
+                return _ref19.apply(this, arguments);
             }
 
             return filterInAssigned;
@@ -64886,7 +64912,7 @@ define('text!modules/tech/requests/components/assignmentDetails.html', ['module'
 define('text!modules/tech/requests/components/bo.html', ['module'], function(module) { module.exports = "<template>\r\n\t\t <div class=\"row leftMargin\">\r\n\t\t\t<h4>URL</h4>\r\n\t\t\t<h5 class=\"leftMargin\"><a href=\"${systems.selectedSystem.its}\" target=\"_blank\">${systems.selectedSystem.its}</a></h5>\r\n\r\n\t\t\t<h4 class=\"topMargin\">Users</h4>\r\n\t\t\t<h5 class=\"leftMargin\">Student IDs: <span class=\"bold\"> ${assign.studentUserIds}</span></h5>\r\n\t\t\t<h5 class=\"leftMargin\">Student Password: <span class=\"bold\"> ${assign.studentPassword}</span></h5>\r\n\t\t\t<span show.bind=\"requests.selectedRequest.courseId !== null\">\r\n\t\t\t\t<h5 class=\"leftMargin\" class=\"topMargin\">Faculty IDs <span class=\"bold\">: ${selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</span></h5>\r\n\t\t\t\t<h5 class=\"leftMargin\">Faculty Password: <span class=\"bold\"> ${selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</span></h5>\r\n\t\t\t</span>\r\n\t\t</div>\r\n</template>"; });
 define('text!modules/tech/requests/components/bulkEmailForm.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class=\"panel panel-default rightMargin leftMargin\" style=\"margin-top:50px;\">\r\n\t\t<div class=\"panel-body\">\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"list-group-item toolbar\">\r\n\t\t\t\t\t<span click.delegate=\"backBulkEmail()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n\t\t\t\t\t data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\"\r\n\t\t\t\t\t\t aria-hidden=\"true\"></i></span>\r\n\t\t\t\t\t<span click.delegate=\"sendBulkEmail()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n\t\t\t\t\t data-placement=\"bottom\" title=\"\" data-original-title=\"Send\"><i class=\"fa fa-envelope fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div class=\"col-md-4 topMargin\">\r\n\t\t\t\t\t<label id=\"productList\">Recipients: ${emailArray.length}</label>\r\n\t\t\t\t\t<div class=\"well well2 overFlow\" style=\"height:800px;\">\r\n\t\t\t\t\t\t<ul>\r\n\t\t\t\t\t\t\t<li class=\"list-group-item\" repeat.for=\"person of emailArray\">\r\n\t\t\t\t\t\t\t\t<span class=\"col-lg-10\" style=\"padding-left:0px;\">\r\n\t\t\t\t\t\t\t\t\t<h5>${person.fullName}</h5>\r\n\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t<span class=\"col-lg-1\">\r\n\t\t\t\t\t\t\t\t\t<span class=\"col-lg-2 icon glyphicon glyphicon-trash pull-right smallMarginRight\" click.delegate=\"deleteRecipient($index)\"></span>\r\n\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t<h6>${person.email}</h6>\r\n\t\t\t\t\t\t\t\t<h6>${person.institution}</h6>\r\n\t\t\t\t\t\t\t\t<h7>${person.status}</h7>\r\n\t\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-md-8\">\r\n\t\t\t\t\t<input class=\"form-control topMargin bottomMargin\" value.bind=\"email.subject\" placeholder=\"Subject\" />\r\n\t\t\t\t\t<div class=\"topMargin\">\r\n\t\t\t\t\t\t<editor value.bind=\"email.MESSAGE\" height=\"600\" editorid=\"bulkEmail\"></editor>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>"; });
 define('text!modules/tech/requests/components/Courses.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"topMargin\">\r\n        <H4>Choose a Course</h4>\r\n        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\r\n            <thead>\r\n                <tr>\r\n                    <td colspan='6'>\r\n                        <span click.delegate=\"refreshCourses()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"newCourse()\" class=\"smallMarginRight\"  bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Course\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                        <span style=\"margin-left:5px;\"  class=\"smallMarginRight\"  bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\" click.delegate=\"editACourse()\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\r\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                    </td>\r\n                </tr>\r\n                <tr>\r\n                    <th style=\"width:20rem;\">Number </th>\r\n                    <th style=\"width:30rem;\">Name</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr id=\"selectCourse\" click.delegate=\"selectCourse($index, $event)\"  repeat.for=\"course of people.coursesArray\">\r\n                    <td data-title=\"nummber\">${course.number} </td>\r\n                    <td data-title=\"name\">${course.name}</td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n\r\n        <div class=\"row\" show.bind=\"editCourse\">\r\n            <div class=\"panel panel-default col-md-10 col-md-offset-1\" style=\"background-color:ghostwhite;\">\r\n                <div class=\"bottomMargin list-group-item leftMargin rightMargin topMargin\">\r\n                    <span click.trigger=\"saveCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Course\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                    <span click.trigger=\"cancelEditCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                </div>\r\n                <div class=\"panel-body\">\r\n                    <div class=\"form-group\">\r\n                        <input id=\"number\" value.bind=\"people.selectedCourse.number\" type=\"text\" placeholder=\"Course Number\"\r\n                            class=\"form-control\"/>\r\n                    </div>\r\n                    <div class=\"form-group\">\r\n                        <input id=\"name\" value.bind=\"people.selectedCourse.name\" type=\"text\" placeholder=\"Course Name\"\r\n                            class=\"form-control\"/>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n    <span id=\"course\"></span>\r\n</template>\r\n"; });
-define('text!modules/tech/requests/components/editRequestsForm.html', ['module'], function(module) { module.exports = "<template>\r\n\t\t<div  class=\"panel panel-default rightMargin leftMargin\" style=\"margin-top:50px;\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n  <div class=\"hoverProfile\" >\r\n      <span  click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\r\n      <span  click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\r\n      <hr/>\r\n      <div class=\"col-md-4\">\r\n\t\t\t\t <div class=\"topMargin\">\r\n            <img if.bind=\"personImage\" class=\"circular--square leftMargin\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${selectedRequestDetail.requestId.personId.file.fileName}\" height=\"100\">\r\n        </div>\r\n        <div if.bind=\"!personImage\" style=\"height:100px;width:100px;\" innerhtml.bind=\"selectedRequestDetail.requestId.personId.email | gravatarUrl:100:6\"></div>\r\n      </div>\r\n      <div class=\"col-md-8\">\r\n        <h5>Nickname: ${selectedRequestDetail.requestId.personId.nickName}</h5>\r\n        <h5>Phone: ${selectedRequestDetail.requestId.personId.phone | formatPhone}</h5>\r\n        <h5>Mobile: ${selectedRequestDetail.requestId.personId.mobile | formatPhone}</h5>\r\n        <h5>Email: ${selectedRequestDetail.requestId.personId.email}</h5>\r\n      </div>\r\n  </div>\r\n<div class=\"fluid-container\">\r\n\t<div class=\"list-group-item toolbar\">\r\n\t\t<span click.delegate=\"backEdit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"saveEdit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n\t</div>\r\n\r\n\t<div show.bind=\"showAudit\">\r\n    <table class=\"table table-striped table-hover\">\r\n      <thead>\r\n        <tr>\r\n          <th>Date</th>\r\n          <th>Property</th>\r\n          <th>Old Value</th>\r\n          <th>New Value</th>\r\n          <th>Person</th>\r\n        </tr>\r\n      </thead>\r\n      <tbody>\r\n        <tr  repeat.for=\"item of selectedRequestDetail.requestId.audit\">\r\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n          <td>${item.property}</td>\r\n          <td>${item.oldValue}</td>\r\n          <td>${item.newValue}</td>\r\n          <td>${item.personId.fullName}</td>\r\n        </tr>\r\n      </tbody>\r\n    </table>\r\n  </div>\r\n\r\n\t<div show.bind=\"!showAudit\" class=\"col-lg-10 col-lg-offset-1\">\r\n\t\t<h4>Request No. ${selectedRequestDetail.requestNo}</h4>\r\n\t\t<h5 class=\"dropbtn\" click.delegate=\"showProfile(selectedRequestDetail, $event)\">Faculty: ${selectedRequestDetail.requestId.personId.fullName} <i class=\"fa fa-info\" aria-hidden=\"true\"></i></h5>\r\n\t\t<h5>Institution: ${selectedRequestDetail.requestId.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</h5>\r\n\t\r\n\t<div class=\"col-lg-5\" >\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<label class=\"form-control-label \">Status</label>\r\n\t\t\t<select class=\"form-control\" value.bind=\"selectedRequestDetail.requestStatus\">\r\n\t\t\t\t<option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\r\n\t\t\t</select>\r\n\t\t</div>\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<label for=\"undergraduates\" class=\"control-label\">Undergraduates</label>\r\n\t\t\t<input  id=\"undergraduates\"  type=\"number\" placeholder=\"Number of Undergraduates\" class=\"form-control\" value.bind=\"selectedRequestDetail.requestId.undergradIds\"/>\r\n\t\t</div>\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<label for=\"graduates\" class=\"control-label\">Graduates</label>\r\n\t\t\t<input id=\"graduates\" type=\"number\" placeholder=\"Number of Graduates\" class=\"form-control\" value.bind=\"selectedRequestDetail.requestId.graduateIds\"/>\r\n\t\t</div>\r\n\t\t <div class=\"row col-lg-offset-3\">\r\n\t\t\t<span class=\"col-lg-8 \" id=\"numberOfStudentsError\"></span>\r\n\t\t</div>\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<label class=\"form-control-label \">Product</label>\r\n\t\t\t<select class=\"form-control\" value.bind=\"selectedRequestDetail.productId._id\">\r\n\t\t\t\t<option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\r\n\t\t\t</select>\r\n\t\t</div>\r\n  </div>\r\n\r\n\t<div class=\"col-lg-5\" >\r\n\t\t<div  show.bind=\"config.SANDBOX_USED\" class=\"topMargin\">\r\n\t\t\t<label class=\"form-control-label \">Request Type</label>\r\n\t\t\t<select class=\"form-control\" value.bind=\"selectedRequestDetail.requestId.courseId\">\r\n\t\t\t\t<option value=\"${config.SANDBOX_ID}\">${config.SANDBOX_NAME}</option>\r\n\t\t\t\t<option repeat.for=\"course of personCourses\" value=\"${course._id}\">${course.number} ${course.name}</option>\r\n\t\t\t</select>\r\n\t\t</div>\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<label class=\"form-control-label \">Start Date</label>\r\n\t\t\t<flat-picker controlid=\"startDate\" config.bind=\"dateConfig\"  \r\n\t\t\t\t\tvalue.bind=\"selectedRequestDetail.requestId.startDate\" startdate.bind=\"minStartDate\" enddate.bind=\"maxStartDate\"></flat-picker>\r\n\t\t\t<span id='startDateError'></span>\r\n\t\t</div>\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<label class=\"form-control-label \">End Date</label>\r\n\t\t\t\t<flat-picker controlid=\"endDate\" config.bind=\"dateConfig\" value.bind=\"selectedRequestDetail.requestId.endDate\" startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\"></flat-picker>\r\n\t\t\t\t<span id='endDateError'></span>\r\n\t\t</div>\r\n\t\t\t<div class=\"topMargin\">\r\n\t\t\t<label class=\"form-control-label \">Required Date</label>\r\n\t\t\t\t<flat-picker controlid=\"requiredDate\" config.bind=\"dateConfig\" value.bind=\"selectedRequestDetail.requiredDate\" startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\"></flat-picker>\r\n\t\t\t\t<span id='requiredDateError'></span>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t <div class=\"col-lg-12 topMargin\" innerhtml.bind=\"selectedRequestDetail.requestId.comments\"></div>\r\n\t \r\n</div>\r\n\r\n</div>\r\n</div>\r\n</div>\r\n</template>"; });
+define('text!modules/tech/requests/components/editRequestsForm.html', ['module'], function(module) { module.exports = "<template>\r\n\t\t<div  class=\"panel panel-default rightMargin leftMargin\" style=\"margin-top:50px;\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n  <div class=\"hoverProfile\" >\r\n      <span  click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\r\n      <span  click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\r\n      <hr/>\r\n      <div class=\"col-md-4\">\r\n\t\t\t\t <div class=\"topMargin\">\r\n            <img if.bind=\"personImage\" class=\"circular--square leftMargin\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${selectedRequestDetail.requestId.personId.file.fileName}\" height=\"100\">\r\n        </div>\r\n        <div if.bind=\"!personImage\" style=\"height:100px;width:100px;\" innerhtml.bind=\"selectedRequestDetail.requestId.personId.email | gravatarUrl:100:6\"></div>\r\n      </div>\r\n      <div class=\"col-md-8\">\r\n        <h5>Nickname: ${selectedRequestDetail.requestId.personId.nickName}</h5>\r\n        <h5>Phone: ${selectedRequestDetail.requestId.personId.phone | formatPhone}</h5>\r\n        <h5>Mobile: ${selectedRequestDetail.requestId.personId.mobile | formatPhone}</h5>\r\n        <h5>Email: ${selectedRequestDetail.requestId.personId.email}</h5>\r\n      </div>\r\n  </div>\r\n<div class=\"fluid-container\">\r\n\t<div class=\"list-group-item toolbar\">\r\n\t\t<span click.delegate=\"backEdit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"saveEdit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t<span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n\t</div>\r\n\r\n\t<div show.bind=\"showAudit\">\r\n    <table class=\"table table-striped table-hover\">\r\n      <thead>\r\n        <tr>\r\n          <th>Date</th>\r\n          <th>Property</th>\r\n          <th>Old Value</th>\r\n          <th>New Value</th>\r\n          <th>Person</th>\r\n        </tr>\r\n      </thead>\r\n      <tbody>\r\n        <tr  repeat.for=\"item of selectedRequestDetail.requestId.audit\">\r\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n          <td>${item.property}</td>\r\n          <td>${item.oldValue}</td>\r\n          <td>${item.newValue}</td>\r\n          <td>${item.personId.fullName}</td>\r\n        </tr>\r\n      </tbody>\r\n    </table>\r\n  </div>\r\n\r\n\t<div show.bind=\"!showAudit\" class=\"col-lg-10 col-lg-offset-1\">\r\n\t\t<h4>Request No. ${selectedRequestDetail.requestNo}</h4>\r\n\t\t<h5 class=\"dropbtn\" click.delegate=\"showProfile(selectedRequestDetail, $event)\">Faculty: ${selectedRequestDetail.requestId.personId.fullName} <i class=\"fa fa-info\" aria-hidden=\"true\"></i></h5>\r\n\t\t<h5>Institution: ${selectedRequestDetail.requestId.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</h5>\r\n\t\r\n\t<div class=\"col-lg-5\" >\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<label class=\"form-control-label \">Status</label>\r\n\t\t\t<select class=\"form-control\" value.bind=\"selectedRequestDetail.requestStatus\">\r\n\t\t\t\t<option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\r\n\t\t\t</select>\r\n\t\t</div>\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<label for=\"undergraduates\" class=\"control-label\">Undergraduates</label>\r\n\t\t\t<input  id=\"undergraduates\"  type=\"number\" placeholder=\"Number of Undergraduates\" class=\"form-control\" value.bind=\"selectedRequestDetail.requestId.undergradIds\"/>\r\n\t\t</div>\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<label for=\"graduates\" class=\"control-label\">Graduates</label>\r\n\t\t\t<input id=\"graduates\" type=\"number\" placeholder=\"Number of Graduates\" class=\"form-control\" value.bind=\"selectedRequestDetail.requestId.graduateIds\"/>\r\n\t\t</div>\r\n\t\t <div class=\"row col-lg-offset-3\">\r\n\t\t\t<span class=\"col-lg-8 \" id=\"numberOfStudentsError\"></span>\r\n\t\t</div>\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<label class=\"form-control-label \">Product</label>\r\n\t\t\t<select class=\"form-control\" value.bind=\"selectedRequestDetail.productId._id\">\r\n\t\t\t\t<option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\r\n\t\t\t</select>\r\n\t\t</div>\r\n  </div>\r\n\r\n\t<div class=\"col-lg-5\" >\r\n\t\t<div  show.bind=\"config.SANDBOX_USED\" class=\"topMargin\">\r\n\t\t\t<label class=\"form-control-label \">Request Type</label>\r\n\t\t\t<select class=\"form-control\" value.bind=\"selectedRequestDetail.requestId.courseId._id\">\r\n\t\t\t\t<option model.bind=\"config.SANDBOX_ID\">${config.SANDBOX_NAME}</option>\r\n\t\t\t\t<option repeat.for=\"course of people.coursesArray\" model.bind=\"course._id\">${course.number} ${course.name}</option>\r\n\t\t\t</select>\r\n\t\t</div>\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<label class=\"form-control-label \">Start Date</label>\r\n\t\t\t<flat-picker controlid=\"startDate\" config.bind=\"dateConfig\"  \r\n\t\t\t\t\tvalue.bind=\"selectedRequestDetail.requestId.startDate\" startdate.bind=\"minStartDate\" enddate.bind=\"maxStartDate\"></flat-picker>\r\n\t\t\t<span id='startDateError'></span>\r\n\t\t</div>\r\n\t\t<div class=\"topMargin\">\r\n\t\t\t<label class=\"form-control-label \">End Date</label>\r\n\t\t\t\t<flat-picker controlid=\"endDate\" config.bind=\"dateConfig\" value.bind=\"selectedRequestDetail.requestId.endDate\" startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\"></flat-picker>\r\n\t\t\t\t<span id='endDateError'></span>\r\n\t\t</div>\r\n\t\t\t<div class=\"topMargin\">\r\n\t\t\t<label class=\"form-control-label \">Required Date</label>\r\n\t\t\t\t<flat-picker controlid=\"requiredDate\" config.bind=\"dateConfig\" value.bind=\"selectedRequestDetail.requiredDate\" startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\"></flat-picker>\r\n\t\t\t\t<span id='requiredDateError'></span>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t <div class=\"col-lg-12 topMargin\" innerhtml.bind=\"selectedRequestDetail.requestId.comments\"></div>\r\n\t \r\n</div>\r\n\r\n</div>\r\n</div>\r\n</div>\r\n</template>"; });
 define('text!modules/tech/requests/components/erp.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"row\" style=\"word-wrap: break-word;\">\r\n      <span class=\"col-lg-4\">\r\n        <h5 class=\"leftMargin\">System: <span class=\"bold\">${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</span></h5>\r\n        <h5 class=\"leftMargin\">Client: <span class=\"bold\"> ${assign.client} </span></h5>\r\n        <h5 class=\"leftMargin\">Server: <span class=\"bold\"> ${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"server\"} </span></h5>\r\n        <h5 class=\"leftMargin\">System Number: <span class=\"bold\"> ${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"instance\"} </span></h5>\r\n      </span>\r\n      <span class=\"col-lg-6\">\r\n        <h5>Student IDs: <span class=\"bold\"> ${assign.studentUserIds ? assign.studentUserIds : 'N/A'}</span></h5>\r\n        <h5>Student Password: <span class=\"bold\"> ${assign.studentPassword ? assign.studentPassword : 'N/A'}</span></h5>\r\n        <span>\r\n          <h5 class=\"topMargin\">Faculty IDs <span class=\"bold\">: ${assign.facultyUserIds ? assign.facultyUserIds : 'N/A'}</span></h5>\r\n          <h5>Faculty Password: <span class=\"bold\"> ${assign.facultyPassword ? assign.facultyPassword : 'N/A'}</span></h5>\r\n        </span>\r\n      </span>\r\n      <span class=\"col-lg-12\">\r\n          <h5 show.bind=\"systems.selectedSystem.its && systems.selectedSystem.its.length > 0\" class=\"leftMargin bigTopMargin\">ITS:</h5>\r\n          <h5 show.bind=\"systems.selectedSystem.its && systems.selectedSystem.its.length > 0\"><span class=\"bold\"> <a href=\"${systems.selectedSystem.its}\" target=\"_blank\">${systems.selectedSystem.its}</a> </span></h5>                       \r\n      </span>\r\n  </div>\r\n</template>"; });
 define('text!modules/tech/requests/components/hana.html', ['module'], function(module) { module.exports = "<template>\r\n\t\t <div class=\"row leftMargin\">\r\n\t\t\t<h4>SAP HANA Launchpad URL</h4>\r\n\t\t\t<h5 class=\"leftMargin\"><a href=\"${systems.selectedSystem.its}\" target=\"_blank\">${systems.selectedSystem.its}</a></h5>\r\n\r\n\t\t\t<h4 class=\"topMargin\">Users</h4>\r\n\t\t\t<h5 class=\"leftMargin\">Student IDs: <span class=\"bold\"> ${assign.studentUserIds}</span></h5>\r\n\t\t\t<h5 class=\"leftMargin\">Student Password: <span class=\"bold\"> ${assign.studentPassword}</span></h5>\r\n\t\t\t<span show.bind=\"requests.selectedRequest.courseId !== null\">\r\n\t\t\t\t<h5 class=\"leftMargin\" class=\"topMargin\">Faculty IDs <span class=\"bold\">: ${assign.facultyUserIds}</span></h5>\r\n\t\t\t\t\t<!-- ${selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds} -->\r\n\t\t\t\t<h5 class=\"leftMargin\">Faculty Password: <span class=\"bold\"> ${assign.facultyPassword}</span></h5>\r\n\t\t\t</span>\r\n\r\n\t\t\t<h4 class=\"topMargin\">Lumira / Predictive Analytics Connection</h4>\r\n\t\t\t<h5 class=\"leftMargin\">System: <span class=\"bold\">${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</span></h5>\r\n\t\t\t<h5 class=\"leftMargin\">Server: <span class=\"bold\"> ${systems.selectedSystem.server} </span></h5>\r\n\t\t\t<h5 class=\"leftMargin\">Port: <span class=\"bold\"> ${systems.selectedSystem.port} </span></h5>\r\n\t\t\t<h5 class=\"leftMargin\">System Number: <span class=\"bold\"> ${systems.selectedSystem.instance} </span></h5> \r\n\t\t</div>\r\n</template>"; });
 define('text!modules/tech/requests/components/requestDetailDetails.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class=\"col-lg-5\" show.bind=\"showRequest\">\r\n    <div class=\"panel panel-primary topMargin\">\r\n      <div class=\"panel-heading\">\r\n        <h3 class=\"panel-title\">${selectedProductID | lookupValue:products.productsArray:\"_id\":\"name\"}</h3>\r\n      </div>\r\n      <div class=\"panel-body\">\r\n        <h5>Request status: ${selectedRequestDetail.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</h5>\r\n        <h5>Assigned system: ${selectedRequestDetail.assignment.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h5>\r\n        <h5>Assigned client: ${selectedRequestDetail.assignment.clientId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h5>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>"; });

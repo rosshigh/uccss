@@ -85,9 +85,9 @@
 	<div class="col-lg-5" >
 		<div  show.bind="config.SANDBOX_USED" class="topMargin">
 			<label class="form-control-label ">Request Type</label>
-			<select class="form-control" value.bind="selectedRequestDetail.requestId.courseId">
-				<option value="${config.SANDBOX_ID}">${config.SANDBOX_NAME}</option>
-				<option repeat.for="course of personCourses" value="${course._id}">${course.number} ${course.name}</option>
+			<select class="form-control" value.bind="selectedRequestDetail.requestId.courseId._id">
+				<option model.bind="config.SANDBOX_ID">${config.SANDBOX_NAME}</option>
+				<option repeat.for="course of people.coursesArray" model.bind="course._id">${course.number} ${course.name}</option>
 			</select>
 		</div>
 		<div class="topMargin">
