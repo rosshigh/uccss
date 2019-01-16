@@ -66,6 +66,7 @@ export class EditSystem {
 
     new() {
         this.editIndex = -1;
+        this.systemDetails = true;
         this.displayIndex = -1;
         this.systems.selectSystem();
         this.editStatus = true;
