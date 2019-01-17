@@ -156,7 +156,7 @@ export class Systems{
     isDirty(obj, skip){
         if(this.selectedSystem){
             if(!obj){
-                var obj = this.emptyRequest();
+                var obj = this.emptySystem();
             }
             return this.utils.objectsEqual(this.selectedSystem, obj, skip);
         }

@@ -17584,7 +17584,7 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
         Systems.prototype.isDirty = function isDirty(obj, skip) {
             if (this.selectedSystem) {
                 if (!obj) {
-                    var obj = this.emptyRequest();
+                    var obj = this.emptySystem();
                 }
                 return this.utils.objectsEqual(this.selectedSystem, obj, skip);
             }
