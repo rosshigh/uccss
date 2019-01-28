@@ -14,6 +14,7 @@ import { CommonDialogs } from '../../../resources/dialogs/common-dialogs';
 import { ClientRequests } from '../../../resources/data/clientRequests';
 import { DocumentsServices } from '../../../resources/data/documents';
 
+
 @inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, HelpTickets, Sessions, Systems, Downloads, Products, TemplatingEngine, ClientRequests, DocumentsServices, ClientRequests)
 export class ViewHelpTickets {
   helpTicketSelected = false;
