@@ -317,14 +317,30 @@ export class ViewHelpTickets {
         })
       })
     }
-
-    var email = new Object();
-    let serverResponse = await this.helpTickets.saveHelpTicket(email);
-    if (!serverResponse.error) {
-      // if (serverResponse.helpTicketStatus == this.config.CLOSED_HELPTICKET_STATUS) await this.refresh(false);
-      this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-      this.utils.showNotification("The help ticket was updated");
+    if (this.helpTickets.selectedHelpTicket.helpTicketStatus == this.config.CLOSED_HELPTICKET_STATUS) {
+      this.helpTickets.selectHelpTicketContent();
+      this.responseMessage = "Help Ticket closed by " + this.userObj.fullName
+      this._createResponse();
+      let serverResponse = await this.helpTickets.closeHelpTicket();
+      if (!serverResponse.error) {
+        this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+        this.utils.showNotification("The help ticket was updated");
+      }
+    } else {
+      let serverResponse = await this.helpTickets.saveHelpTicket();
+      if (!serverResponse.error) {
+        this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+        this.utils.showNotification("The help ticket was updated");
+      }
     }
+
+    // var email = new Object();
+    // let serverResponse = await this.helpTickets.saveHelpTicket(email);
+    // if (!serverResponse.error) {
+    //   // if (serverResponse.helpTicketStatus == this.config.CLOSED_HELPTICKET_STATUS) await this.refresh(false);
+    //   this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+    //   this.utils.showNotification("The help ticket was updated");
+    // }
     this._cleanUp();
   }
 
@@ -462,7 +478,7 @@ export class ViewHelpTickets {
     }
   }
 
-  async changeStatus(helpTicket, status) {
+  async changeStatus(helpTicket, status) { 
     if (status == this.config.MY_HELPTICKET_STATUS && this.userObj._id != helpTicket.owner[0].personId._id) {
       this.utils.showNotification('You must own this ticket before you can make it yours');
       return;
