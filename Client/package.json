@@ -42,7 +42,7 @@
     "nprogress": "^0.2.0",
     "regenerator-runtime": "^0.13.1",
     "requirejs": "^2.3.2",
-    "summernote": "^0.8.11",
+    "summernote": "^0.8.10",
     "text": "github:requirejs/text#latest",
     "toastr": "^2.1.4"
   },
