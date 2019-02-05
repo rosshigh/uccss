@@ -12279,6 +12279,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                     this.selectHelpTicketByID(this.selectedHelpTicket._id);
                                     if (status !== this.config.CLOSED_HELPTICKET_STATUS) {
                                         this.updateHelpTicket(this.selectedHelpTicket);
+                                        this.helpTicketsArray[this.editIndex] = this.utils.copyObject(response, this.helpTicketsArray[this.editIndex]);
                                     } else {
                                         this.helpTicketsArray.splice(this.editIndex, 1);
                                     }
@@ -18873,7 +18874,6 @@ define('resources/editor/editor',["exports", "aurelia-framework", "aurelia-bindi
 			this.editor = null;
 
 			this.element = element;
-
 			this.subscriptions = [observerLocator.getObserver(this, 'value').subscribe(function (newValue) {
 				if (_this.editor && newValue !== _this.editor.summernote('code')) {
 					_this.editor.summernote('code', newValue);

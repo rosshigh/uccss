@@ -24,7 +24,6 @@ export class Editor {
 
 	constructor(element, observerLocator) {
 		this.element = element;
-		// this.editorId = "summernote-" + this.guid();
 		this.subscriptions = [
 			observerLocator
 				.getObserver(this, 'value')
