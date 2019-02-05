@@ -135,6 +135,10 @@ export class ClientRequestAnalytics {
                 await this.getProductsRequests();
                 this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
                 break;
+            case 'sapProducts':
+                await this.getCountryProductsRequests();
+                this.dataTable.updateArray(this.requests.analyticsCountryProductsResultArray);
+                break;
         }
     }
 

@@ -168,7 +168,7 @@
           {
             "name": "regenerator-runtime",
             "path": "../node_modules/regenerator-runtime",
-            "main": "runtime-module"
+            "main": "runtime"
           },
           {
             "name": "toastr",
