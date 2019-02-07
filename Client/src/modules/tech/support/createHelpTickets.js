@@ -73,8 +73,7 @@ export class CreateHelpTickets{
          let responses = await Promise.all([
             this.helpTickets.getHelpTicketTypes('?order=category'),
             this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true),
-           this.people.getInstitutionsArray('?order=name',true),
-           // this.people.getPeopleArray('?order=lastName'),
+           this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name',true),
             this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true&order=name'),
             this.systems.getSystemsArray(),
             this.config.getConfig(),
@@ -91,7 +90,7 @@ export class CreateHelpTickets{
     }
 
     async changeInstitution(event){
-        await this.people.getPeopleArray('?filter=institutionId|eq|' + this.selectedInstitution + '&order=lastName', true);
+        await this.people.getPeopleArray('?filter=[and]institutionId|eq|' + this.selectedInstitution + ':personStatus|eq|01&order=lastName', true);
     }
 
     changePerson(){
@@ -99,32 +98,21 @@ export class CreateHelpTickets{
         this.people.selectedPersonFromId(this.selectedPerson);
     }
 
-    categoryChanged(){
-        if(this.helpTickets.selectedHelpTicket.helpTicketCategory > -1){
-            this.showTypes = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].showSubtypes;
-            if(!this.showTypes){
-                this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type);
-                this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
-                this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
-                this.showRequests = false; 
-                this.showHelpTicketDescription = true;
-                this.showAdditionalInfo = true;
-                this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm)
-                // this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm;
-                this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].validation);
-            } else {
-                this.inputForm = null;
-                this.showAdditionalInfo = false;
-                this.showHelpTicketDescription = false;
-                this.showRequests = false;
+    async categoryChanged(){
+        this.catIndex = this.getCategoryIndex();
+        this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired;
+        await this.getActiveRequests();
+        this.showTypes = true;
+    }
+
+    getCategoryIndex(){
+        var index = 0;
+        this.helpTickets.helpTicketTypesArray.forEach((item, categoryIndex) => {
+            if(this.helpTickets.selectedHelpTicket.helpTicketCategory == item.category) {
+                index = categoryIndex;
             }
-        } else {
-            this.inputForm = null;
-            this.showTypes = false;
-            this.showAdditionalInfo = false;
-            this.showHelpTicketDescription = false;
-            this.showRequests = false;
-        }
+        });
+        return index;
     }
 
     getMessage(messageKey){
@@ -155,41 +143,21 @@ export class CreateHelpTickets{
     // * el - event object
     // *****************************************************************************************/
     async typeChanged(el){
-        //Reset the interface
-        this.clearTables();
-        //Make sure the user selected a help ticket type
-        if(this.helpTicketType !== "NULL"){
-            this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTicketType;
-            this.selectedHelpTicketType = this.getIndex()
-            this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm)
-            this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].type);
-            this.showHelpTicketDescription = true;
-            this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm;
-            this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].validation);
-          
-            await this.products.getProductsArray('?fields=_id name');
-            if( this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].clientRequired) await this.getActiveRequests();
-            this.showAdditionalInfo = false;
+        this.selectedHelpTicketType = this.getTypeIndex();
+        this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired;
+        this.descriptionRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].descriptionRequired;
+        this.showForm = true;
+        if(this.clientRequestsArray.length > 0) this.showRequests = true;
+    }
 
-            if(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].requestKeywords){
-                let keyWords = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].requestKeywords;
-                let refreshProductArray = new Array();
-                this.products.productsArray.forEach(item => {
-                    var foo = item.name.toUpperCase();
-                    if(foo.indexOf(keyWords) > -1) {
-                        refreshProductArray.push(item._id);
-                    }
-                });
-                 this.clientRequestsArray = this.clientRequestsArray.filter(item => {
-                    return refreshProductArray.indexOf(item.productId) > -1 && item.systemId;
-                });
+    getTypeIndex() {
+        var typeIndex = 0;
+        this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes.forEach((item, typIndex) => {
+            if (this.helpTickets.selectedHelpTicket.helpTicketType == item.type) {
+                typeIndex = typIndex;
             }
-        } else {
-            this.inputForm = null;
-            this.showAdditionalInfo = false;
-            this.showHelpTicketDescription = false;
-            this.showRequests = false;
-        }
+        });
+        return typeIndex;
     }
 
     setupValidation(rules){
@@ -214,40 +182,45 @@ export class CreateHelpTickets{
         this.sessions.sessionsArray.forEach(item => {
             sessions += item._id + ":";
         });
-        sessions = sessions.substring(0, sessions.length-1);
+        sessions = sessions.substring(0, sessions.length - 1);
         await this.clientRequests.getActiveClientRequestsArray(this.selectedPerson, sessions);
+        this.originalClientRequestsArray = new Array();
         this.clientRequestsArray = new Array();
         //Cycle through request array
         this.clientRequests.requestsArray.forEach(item => {
             //Cycle through details of request
             item.requestDetails.forEach(item2 => {
                 //If there are assignments
-                if(item2.assignments && item2.assignments.length > 0){
+                if (item2.assignments && item2.assignments.length > 0) {
                     //Cycle through the assignments
                     item2.assignments.forEach((assign) => {
-                        this.clientRequestsArray.push({
+                        this.originalClientRequestsArray.push({
                             productId: item2.productId,
+                            productName: item2.productId.name,
                             sessionId: item.sessionId,
                             requestStatus: item2.requestStatus,
                             systemId: assign.systemId,
-                            courseId: item.courseId,
+                            courseName: item.courseId ? item.courseId.name : 'Trial Client',
+                            courseId: item.courseId ? item.courseId._id : null,
                             client: assign.client,
                             clientId: assign.clientId,
                             _id: item2._id
                         })
                     })
                 } else {
-                    this.clientRequestsArray.push({
-                        productId: item2.productId,
+                    this.originalClientRequestsArray.push({
+                        productName: item2.productId.name,
                         sessionId: item.sessionId,
                         requestStatus: item2.requestStatus,
-                        courseId: item.courseId,
+                        courseName: item.courseId.name,
                         _id: item2._id
                     })
                 }
-            }) 
+            })
         });
-        if(this.clientRequestsArray.length > 0) this.showRequests = true;
+        this.originalClientRequestsArray.forEach(item => {
+            this.clientRequestsArray.push(item);
+        })
     }
 
     // /*****************************************************************************************
@@ -311,9 +284,9 @@ export class CreateHelpTickets{
                 email.MESSAGE = this.config.TECH_STAFF_CREATED_HELP_TICKET_MESSAGE;
                 email.INSTRUCTIONS = this.config.HELP_TICKET_INSTRUCTIONS;
                 email.subject = this.config.TECH_STAFF_CREATED_HELP_TICKET_SUBJECT.replace('[[faculty name]]', this.people.selectedPerson.fullName);
-                email.email = this.userObj.email;
+                email.email = this.people.selectedPerson.email;
                 email.helpTicketNo = 0;
-                email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+                email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST + ";" + this.userObj.email : "";
             } 
             let serverResponse = await this.helpTickets.saveHelpTicket(email);
             if (!serverResponse.status) { 

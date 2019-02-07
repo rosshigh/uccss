@@ -197,10 +197,10 @@ export class CreateHelpTickets {
                     })
                 } else {
                     this.originalClientRequestsArray.push({
-                        productId: item2.productId,
+                        productName: item2.productId.name,
                         sessionId: item.sessionId,
                         requestStatus: item2.requestStatus,
-                        courseId: item.courseId,
+                        courseName: item.courseId.name,
                         _id: item2._id
                     })
                 }

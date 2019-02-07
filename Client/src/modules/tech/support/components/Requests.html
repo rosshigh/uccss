@@ -1,5 +1,37 @@
 <template>
-      <div>
+    <h5>These are your current product requests.  If the issue you are having is related to a specific product, please select it.</h5>
+    <div class="topMargin">
+      <span id="selectProductRequestError"></span>
+      <h5 show.bind="clientRequestsArray.length === 0">You have no product requests that apply to this type of help ticket.</h5>
+      <table id="clientTable" show.bind="clientRequestsArray.length > 0" class="table table-bordered table-responsive" style="background:white;">
+        <thead>
+        <tr class="header">
+          <th>Course</th>
+          <th>Session</th>
+          <th>Product</th>
+          <th>System</th>
+          <th>Client</th>
+          <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr class="sortable" id="${product.id}" productId="${product.productId}" 
+              repeat.for="product of clientRequestsArray"
+              click.trigger="requestChosen($event, $index)">
+            <td>${product.courseName}</td>
+            <td>${product.sessionId | session:sessions.sessionsArray}</td>
+            <td>${product.productName}</td> 
+            <td>${product.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
+            <td>${product.client}</td>
+            <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
+          </tr>
+        </tbody>
+      </table>
+      <span id="client"></span>
+    </div>
+  </div>
+</div>
+      <!-- <div>
         <h5 show.bind="clientRequestsArray.length === 0">You have no product requests that apply to this type of help ticket.</h5>
         <table id="clientTable" show.bind="clientRequestsArray.length > 0" class="table table-bordered table-responsive" style="background:white;">
           <thead>
@@ -37,5 +69,5 @@
         <span id="client"></span>
       </div>
     </div>
-  </div>
+  </div> -->
 </template>
