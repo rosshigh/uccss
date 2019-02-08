@@ -96,6 +96,8 @@ export class CreateHelpTickets{
     changePerson(){
         this.showCategories = this.selectedPerson != "";
         this.people.selectedPersonFromId(this.selectedPerson);
+        this.helpTickets.selectedHelpTicket.helpTicketCategory = -1;
+        this.helpTickets.selectedHelpTicket.helpTicketType = null;
     }
 
     async categoryChanged(){
@@ -148,6 +150,7 @@ export class CreateHelpTickets{
         this.descriptionRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].descriptionRequired;
         this.showForm = true;
         if(this.clientRequestsArray.length > 0) this.showRequests = true;
+        this.showAdditionalInfo = true;
     }
 
     getTypeIndex() {
@@ -228,7 +231,7 @@ export class CreateHelpTickets{
     // *****************************************************************************************/
     async requestChosen(el, index){
 
-        this.showAdditionalInfo = true;
+       
         this.SelectedClientRequest = this.clientRequestsArray[index];
         this.selectedSessionId = this.clientRequestsArray[index].sessionId;
 

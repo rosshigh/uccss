@@ -32471,6 +32471,8 @@ define('modules/tech/support/createHelpTickets',['exports', 'aurelia-framework',
         CreateHelpTickets.prototype.changePerson = function changePerson() {
             this.showCategories = this.selectedPerson != "";
             this.people.selectedPersonFromId(this.selectedPerson);
+            this.helpTickets.selectedHelpTicket.helpTicketCategory = -1;
+            this.helpTickets.selectedHelpTicket.helpTicketType = null;
         };
 
         CreateHelpTickets.prototype.categoryChanged = function () {
@@ -32548,8 +32550,9 @@ define('modules/tech/support/createHelpTickets',['exports', 'aurelia-framework',
                                 this.descriptionRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].descriptionRequired;
                                 this.showForm = true;
                                 if (this.clientRequestsArray.length > 0) this.showRequests = true;
+                                this.showAdditionalInfo = true;
 
-                            case 5:
+                            case 6:
                             case 'end':
                                 return _context4.stop();
                         }
@@ -32673,7 +32676,6 @@ define('modules/tech/support/createHelpTickets',['exports', 'aurelia-framework',
                         switch (_context6.prev = _context6.next) {
                             case 0:
 
-                                this.showAdditionalInfo = true;
                                 this.SelectedClientRequest = this.clientRequestsArray[index];
                                 this.selectedSessionId = this.clientRequestsArray[index].sessionId;
 
@@ -32681,7 +32683,7 @@ define('modules/tech/support/createHelpTickets',['exports', 'aurelia-framework',
                                 this.selectedProductRow = $(el.target).closest('tr');
                                 this.selectedProductRow.children().addClass('info');
 
-                            case 6:
+                            case 5:
                             case 'end':
                                 return _context6.stop();
                         }
