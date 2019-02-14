@@ -299,7 +299,7 @@ export class CreateHelpTickets {
         this.validation.addRule(1, "helpTicketType", [{
             "rule": "custom", "message": "Select a type",
             "valFunction": function (context) {
-                return !(context.helpTicketType == -1);
+                return !(context.helpTickets.selectedHelpTicket.helpTicketType == -1);
             }
         }]);
         this.validation.addRule(2, "selectProductRequestError", [{
