@@ -86,6 +86,8 @@ export class CreateHelpTickets {
                 } else if (data.step === 5) {
                     that.save();
                 }
+            } else {
+                that.validation.makeAllValid(data.step);
             }
         })
     }
@@ -101,7 +103,7 @@ export class CreateHelpTickets {
             this.site.getMessageArray('?filter=category|eq|HELP_TICKETS', true)
         ]);
         this._setUpValidation();
-        this.helpTickets.selectHelpTicket();
+        this.initialize();
         this.sendEmail = this.config.SEND_EMAILS;
         this.appsArray = this.apps.appDownloadsArray.filter(item => {
             return item.helpTicketRelevant;
@@ -111,12 +113,14 @@ export class CreateHelpTickets {
         this.stepsMessage = this.getMessage('RECREATE_STEPS');
     }
 
+    initialize(){
+        this.helpTickets.selectHelpTicket();
+    }
+
     async categoryChanged() {
         this.catIndex = this.getCategoryIndex();
-        this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired;
         await this.getActiveRequests();
         this.showTypes = true;
-        // this.helpTicketTypeMessage = this.clientRequestsArray.length ? this.getMessage('SELECT_TYPE') : undefined;
     }
 
     getCategoryIndex() {
@@ -200,7 +204,7 @@ export class CreateHelpTickets {
                         productName: item2.productId.name,
                         sessionId: item.sessionId,
                         requestStatus: item2.requestStatus,
-                        courseName: item.courseId.name,
+                        courseName: item.courseId ? item.courseId.name : 'Trial Client',
                         _id: item2._id
                     })
                 }
@@ -266,11 +270,12 @@ export class CreateHelpTickets {
         this.showTypes = false;
         // this.helpTicketTypeMessage = undefined;
         // this.showAdditionalInfo = false;
-        this.helpTickets.selectHelpTicket();
+        // this.helpTickets.selectHelpTicket();
         this.helpTickets.selectHelpTicketContent();
         this.clearTables();
         this.filesToUpload = new Array();
         this.showDetails = false;
+        this.initialize();
         $('.wizard').wizard('selectedItem', {
             step: 1
           })
