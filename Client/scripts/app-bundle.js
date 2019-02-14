@@ -12278,7 +12278,6 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                     }
                                     this.selectHelpTicketByID(this.selectedHelpTicket._id);
                                     if (status !== this.config.CLOSED_HELPTICKET_STATUS) {
-                                        this.updateHelpTicket(this.selectedHelpTicket);
                                         this.helpTicketsArray[this.editIndex] = this.utils.copyObject(response, this.helpTicketsArray[this.editIndex]);
                                     } else {
                                         this.helpTicketsArray.splice(this.editIndex, 1);
@@ -12324,9 +12323,8 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
 
                                 if (!response.error) {
                                     if (!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
-
                                     this.selectedHelpTicket = this.utils.copyObject(response);
-                                    this.updateHelpTicket(this.selectedHelpTicket);
+                                    this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }

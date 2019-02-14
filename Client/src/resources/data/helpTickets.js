@@ -314,7 +314,7 @@ export class HelpTickets {
                 }
                 this.selectHelpTicketByID(this.selectedHelpTicket._id);
                 if (status !== this.config.CLOSED_HELPTICKET_STATUS) {
-                    this.updateHelpTicket(this.selectedHelpTicket);
+                    // this.updateHelpTicket(this.selectedHelpTicket);
                     this.helpTicketsArray[this.editIndex] = this.utils.copyObject(response, this.helpTicketsArray[this.editIndex]);
                 } else {
                     this.helpTicketsArray.splice(this.editIndex,1);
@@ -332,10 +332,8 @@ export class HelpTickets {
             var response = await this.data.saveObject(this.selectedHelpTicketContent, url, "put");
             if (!response.error) {
                 if (!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
-                // this.selectedHelpTicket.content.push(response);
                 this.selectedHelpTicket = this.utils.copyObject(response);
-                this.updateHelpTicket(this.selectedHelpTicket);
-                // this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+                this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
             } else {
                 this.data.processError(response, "There was an error updating the help ticket.");
             }
