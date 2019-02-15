@@ -262,7 +262,7 @@ module.exports = function (app, config) {
       .populate('courseId','name number')
       .populate('requestId')
       .populate('personId', 'email firstName lastName phone mobile nickName file country')
-      .populate('content.personId', 'email firstName lastName phone mobile nickName')
+      .populate('content.personId', 'email firstName lastName phone mobile nickName file')
       .populate('institutionId', 'name')
       .populate('owner.personId', 'firstName lastName _id')
       .exec()
