@@ -1,6 +1,6 @@
 <template>
 	 <div class="topMargin">
-		<img if.bind="helpTickets.selectedHelpTicket.personId.file.fileName" class="smart-timeline-icon bottomMarginLg" src ="${config.PERSON_IMAGE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.personId.file.fileName}" height="100">
+		<img if.bind="helpTickets.selectedHelpTicket.personId.file.fileName" class="smart-timeline-icon bottomMarginLg" src ="${config.PERSON_IMAGE_DOWNLOAD_URL}/${event.personId.file.fileName}" height="100">
 	</div>
 
     <div if.bind="!helpTickets.selectedHelpTicket.personId.file.fileName" class="smart-timeline-icon bottomMarginLg" innerhtml.bind="event.personId.email | gravatarUrl:100:1"></div>
