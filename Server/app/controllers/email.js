@@ -140,7 +140,7 @@ if(env === 'development'){
     mailObject.body = emailTemplateCompiled(mailObject);
     mailObject.email = mailObject.email;
     mailObject.subject = mailObject.subject;    
-    console.log(mailObject)
+    // console.log(mailObject)
     // sendGrid(mailObject)
   }
 
@@ -596,7 +596,7 @@ if(env === 'development'){
         template: "generic",
         context: { name: 'name', message: 'message'}
       }
-      console.log(mail);
+      // console.log(mail);
       nodeMailerSendMail(mail);
   }
 

@@ -285,7 +285,22 @@ module.exports = function (app, config) {
         if (err) {
           return next(err);
         } else {
-          res.status(200).json(object);
+          Model.findOne({ _id: object._id })
+          .populate('courseId','name number')
+          .populate('requestId')
+          .populate('personId', 'email firstName lastName phone mobile nickName file country')
+          .populate('content.personId', 'email firstName lastName phone mobile nickName file')
+          .populate('institutionId', 'name')
+          .populate('owner.personId', 'firstName lastName _id')
+          .exec()
+          .then(object => {
+            res.status(200).json(object);
+          })
+          .catch(error => {
+            return next(error);
+          })
+
+          // res.status(200).json(object);
         }
       });
     });
@@ -305,14 +320,11 @@ module.exports = function (app, config) {
           result.modifiedDate = new Date();
 
           var archiveHT = new HelpTicketArchive(result);
-console.log("ARCHIVE")
-console.log(archiveHT)          
+        
           archiveHT.save(function(error){
             if(error){
               return next(error);
-            }
-console.log('RESULT')
-console.log(result)            
+            }        
             Model.remove({ _id: req.params.id }).then(result => {
               res.status(200).json(result);
             })

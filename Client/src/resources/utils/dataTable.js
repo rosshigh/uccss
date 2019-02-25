@@ -423,10 +423,12 @@ export class DataTable{
       this.sourceArray = new Array();
       this.baseArray = new Array();
       this.active = true;
+      
       sourceArray.forEach(item => {
         this.sourceArray.push(item);
-        this.baseArray.push(item);
+        // this.baseArray.push(item);
       })
+      this.baseArray = this.filter(this.filterValues);
      
       this.baseArray.forEach(function(item, index){
         item.baseIndex = index;
@@ -440,8 +442,9 @@ export class DataTable{
           })
       }
 
+      // this.filter(this.filterValues);
       this.buildDisplayArray();
-      this.filter(this.filterValues);
+     
     }
   }
 

@@ -324,13 +324,17 @@ export class ViewHelpTickets {
       this._createResponse();
       let serverResponse = await this.helpTickets.closeHelpTicket();
       if (!serverResponse.error) {
-        this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+        // this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+        this.dataTable.updateArrayMaintainFilters(this.helpTickets.helpTicketsArray);
+        this.reSort();
         this.utils.showNotification("The help ticket was updated");
       }
     } else {
       let serverResponse = await this.helpTickets.saveHelpTicket();
       if (!serverResponse.error) {
-        this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+        this.dataTable.updateArrayMaintainFilters(this.helpTickets.helpTicketsArray);
+        this.reSort();
+        // this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
         this.utils.showNotification("The help ticket was updated");
       }
     }
@@ -471,7 +475,9 @@ export class ViewHelpTickets {
     }
     let serverResponse = await this.helpTickets.updateOwner(obj);
     if (!serverResponse.error) {
-      this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+      this.dataTable.updateArrayMaintainFilters(this.helpTickets.helpTicketsArray);
+      this.reSort();
+      // this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
       this.utils.showNotification("The help ticket was updated");
     }
     if (this.helpTickets.selectedHelpTicket) {
@@ -505,13 +511,17 @@ export class ViewHelpTickets {
       this._createResponse();
       let serverResponse = await this.helpTickets.closeHelpTicket();
       if (!serverResponse.error) {
-        this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+        this.dataTable.updateArrayMaintainFilters(this.helpTickets.helpTicketsArray);
+        this.reSort();
+        // this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
         this.utils.showNotification("The help ticket was updated");
       }
     } else {
       let serverResponse = await this.helpTickets.saveHelpTicket();
       if (!serverResponse.error) {
-        this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+        this.dataTable.updateArrayMaintainFilters(this.helpTickets.helpTicketsArray);
+        this.reSort();
+        // this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
         this.utils.showNotification("The help ticket was updated");
       }
     }
@@ -781,4 +791,8 @@ export class ViewHelpTickets {
       return result * context.sortDirection;
     })
   }
+
+  reSort() {
+    this.dataTable.sortArray({}, {}, true);
+}
 }

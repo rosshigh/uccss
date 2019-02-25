@@ -114,8 +114,8 @@ export class Assignments {
             this.utils.showNotification("The request was updated");
             this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
             this.reSort();
-            this.dataTable.applyFilters();
-            await this.filterInAssigned();
+            // this.dataTable.applyFilters();
+            // await this.filterInAssigned();
             this._cleanUp();
         }
 

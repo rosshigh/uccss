@@ -20,7 +20,7 @@
         <div class="form-group">
           <select show.bind="showCategories" value.bind="helpTickets.selectedHelpTicket.helpTicketCategory" change.delegate="categoryChanged()" id="helpTicketCategory" class="form-control">
             <option value="-1">Select the category of help ticket</option>
-            <option repeat.for="types of helpTickets.helpTicketTypesArray" 
+            <option repeat.for="types of helpTickets.helpTicketTypesArray  | sortArray:'category':'ASC'"" 
                     model.bind="types.category">${types.description}</option>
           </select>
         </div>
