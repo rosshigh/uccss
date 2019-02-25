@@ -433,7 +433,12 @@ export class ViewHelpTickets {
     }
     let serverResponse = await this.helpTickets.saveHelpTicketResponse(email);
     if (!serverResponse.error) {
-      if (status == this.config.CLOSED_HELPTICKET_STATUS) await this.refresh(false);
+      if (status == this.config.CLOSED_HELPTICKET_STATUS) {
+        await this.refresh(false);
+      } else {
+        this.dataTable.updateArrayMaintainFilters(this.helpTickets.helpTicketsArray);
+        this.reSort();
+      }
       this.utils.showNotification("The help ticket was updated");
       if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse.content[serverResponse.content.length - 1]._id);
     }

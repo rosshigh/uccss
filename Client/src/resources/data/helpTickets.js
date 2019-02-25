@@ -333,7 +333,8 @@ export class HelpTickets {
             if (!response.error) {
                 if (!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                 this.selectedHelpTicket = this.utils.copyObject(response);
-                this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+                this.updateHelpTicket(this.selectedHelpTicket);
+                // this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
             } else {
                 this.data.processError(response, "There was an error updating the help ticket.");
             }

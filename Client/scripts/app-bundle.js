@@ -12324,7 +12324,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 if (!response.error) {
                                     if (!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                                     this.selectedHelpTicket = this.utils.copyObject(response);
-                                    this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+                                    this.updateHelpTicket(this.selectedHelpTicket);
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
@@ -36877,12 +36877,12 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 serverResponse = _context10.sent;
 
                 if (serverResponse.error) {
-                  _context10.next = 13;
+                  _context10.next = 17;
                   break;
                 }
 
                 if (!(status == this.config.CLOSED_HELPTICKET_STATUS)) {
-                  _context10.next = 11;
+                  _context10.next = 13;
                   break;
                 }
 
@@ -36890,13 +36890,21 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 return this.refresh(false);
 
               case 11:
+                _context10.next = 15;
+                break;
+
+              case 13:
+                this.dataTable.updateArrayMaintainFilters(this.helpTickets.helpTicketsArray);
+                this.reSort();
+
+              case 15:
                 this.utils.showNotification("The help ticket was updated");
                 if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse.content[serverResponse.content.length - 1]._id);
 
-              case 13:
+              case 17:
                 this._cleanUp();
 
-              case 14:
+              case 18:
               case 'end':
                 return _context10.stop();
             }
