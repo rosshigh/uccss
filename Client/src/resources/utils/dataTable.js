@@ -426,9 +426,9 @@ export class DataTable{
       
       sourceArray.forEach(item => {
         this.sourceArray.push(item);
-        // this.baseArray.push(item);
+        this.baseArray.push(item);
       })
-      this.baseArray = this.filter(this.filterValues);
+      if(this.filterValues.length) this.baseArray = this.filter(this.filterValues);
      
       this.baseArray.forEach(function(item, index){
         item.baseIndex = index;

@@ -21127,8 +21127,9 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
 
         sourceArray.forEach(function (item) {
           _this3.sourceArray.push(item);
+          _this3.baseArray.push(item);
         });
-        this.baseArray = this.filter(this.filterValues);
+        if (this.filterValues.length) this.baseArray = this.filter(this.filterValues);
 
         this.baseArray.forEach(function (item, index) {
           item.baseIndex = index;

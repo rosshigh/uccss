@@ -341,7 +341,21 @@ module.exports = function (app, config) {
           result.helpTicketStatus = req.params.status;
           result.modifiedDate = new Date();
           result.save().then(result => {
-            res.status(200).json(result);
+            Model.findOne({ _id: result._id })
+            .populate('courseId','name number')
+            .populate('requestId')
+            .populate('personId', 'email firstName lastName phone mobile nickName file country')
+            .populate('content.personId', 'email firstName lastName phone mobile nickName file')
+            .populate('institutionId', 'name')
+            .populate('owner.personId', 'firstName lastName _id')
+            .exec()
+            .then(object => {
+              res.status(200).json(object);
+            })
+            .catch(error => {
+              return next(error);
+            })
+            // res.status(200).json(result);
           })
             .catch(error => {
               return next(error);
