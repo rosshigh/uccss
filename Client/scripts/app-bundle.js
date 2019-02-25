@@ -36421,7 +36421,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   if (this.selectedRequestDetail.requestId && this.selectedRequestDetail.requestId.courseId === null) this.selectedRequestDetail.requestId.courseId = { _id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME };
                   this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
                   if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
-                  this.showAssignment = true;;
+                  this.showAssignment = true;
                 }
 
               case 5:
