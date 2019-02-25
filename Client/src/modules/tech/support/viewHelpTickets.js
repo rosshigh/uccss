@@ -702,11 +702,12 @@ export class ViewHelpTickets {
             //Cycle through the assignments
             item2.assignments.forEach((assign) => {
               this.originalClientRequestsArray.push({
-                productId: item2.productId,
+                productId: item2.productId._id,
                 sessionId: item.sessionId,
                 requestStatus: item2.requestStatus,
                 systemId: assign.systemId,
-                courseId: item.courseId,
+                courseName: item.courseId ? item.courseId.name : 'Trial Client',
+                productName: item2.productId.name,
                 client: assign.client,
                 clientId: assign.clientId,
                 studentIds: assign.studentUserIds,
@@ -718,10 +719,11 @@ export class ViewHelpTickets {
             })
           } else {
             this.originalClientRequestsArray.push({
-              productId: item2.productId,
+              productId: item2.productId._id,
+              productName: item2.productId.name,
               sessionId: item.sessionId,
               requestStatus: item2.requestStatus,
-              courseId: item.courseId,
+              courseName: item.courseId ? item.courseId.name : 'Trial Client',
               _id: item2._id
             })
           }
