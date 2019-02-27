@@ -31,6 +31,7 @@ module.exports = function (app) {
     query.sort(req.query.order)
       .populate({path: 'requestDetails', model: 'ClientRequestDetail'} )
       .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone ext mobile email institutionId file country'})
+      .populate({ path: 'courseId', model: 'Course', select: 'number name'})
       .exec()
       .then(object => {
         if(object){

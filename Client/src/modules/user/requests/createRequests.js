@@ -531,8 +531,8 @@ export class ViewHelpTickets {
     // }
     let serverResponse = await this.requests.saveRequest(email);
     if (!serverResponse.status) {
-        this.utils.showNotification("The product request was updated");
         this.systemSelected = false;
+        setTimeout(() => {this.utils.showNotification("The product request was updated")},500);
     }
     }
     this._cleanUp();

@@ -1,5 +1,6 @@
 import {inject} from 'aurelia-framework';
 import $ from 'jquery';
+import * as toastr from "toastr";
 import {Notification} from 'aurelia-notification';
 import moment from 'moment';
 import {AppConfig} from '../../config/appConfig';
@@ -11,12 +12,32 @@ export class Utils{
       this.config = config;
       this.notification = notification;
       this.notification.waitForMove = true
+      toastr.options.extendedTimeOut = "1000";
+      toastr.options.timeOut = "1000";
+
+      // toastr.options = {
+      //   "closeButton": false,
+      //   "debug": false,
+      //   "newestOnTop": false,
+      //   "progressBar": false,
+      //   "positionClass": "toast-top-right",
+      //   "preventDuplicates": false,
+      //   "onclick": null,
+      //   "showDuration": "100",
+      //   "hideDuration": "1000",
+      //   "timeOut": "1000",
+      //   "extendedTimeOut": "1000",
+      //   "showEasing": "swing",
+      //   "hideEasing": "linear",
+      //   "showMethod": "fadeIn",
+      //   "hideMethod": "fadeOut"
+      // }
   }
   
   guid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
+      return v.toString(16); 
     });
   }
 
@@ -26,8 +47,11 @@ export class Utils{
    * Display a notification
    * msg - the message to display
    ****************************************************************************/
-  showNotification(msg){
-      this.notification.note(msg);
+  showNotification(msg, type){
+    
+    type = type ? type : "success";
+    toastr[type](msg);
+      // this.notification.note(msg);
   }
 
    /*****************************************************************************

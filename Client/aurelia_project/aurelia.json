@@ -132,11 +132,7 @@
             "main": "aurelia-testing",
             "env": "dev"
           },
-          {
-            "name": "aurelia-notification",
-            "path": "../node_modules/aurelia-notification/dist/amd",
-            "main": "aurelia-notification"
-          },
+          "aurelia-notification",
           {
             "name": "aurelia-http-client",
             "path": "../node_modules/aurelia-http-client/dist/amd",
@@ -153,6 +149,14 @@
               "themes/jackedup.css",
               "themes/libnotify.css",
               "themes/original.css"
+            ]
+          },
+          {
+            "name": "toastr",
+            "main": "toastr.js",
+            "path": "../node_modules/toastr",
+            "resources": [
+              "build/toastr.min.css"
             ]
           },
           {
