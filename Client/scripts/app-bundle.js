@@ -4707,7 +4707,7 @@ define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router'
                 }));
 
               case 9:
-                this.utils.showNotification("An error occurred creating the account");
+                this.utils.showNotification("An error occurred creating the account", 'error');
 
               case 10:
               case 'end':
@@ -5901,7 +5901,7 @@ define('modules/techNotes/editTechNotes',['exports', 'aurelia-framework', '../..
                                 break;
 
                             case 16:
-                                this.utils.showNotification('There was an error saving the note');
+                                this.utils.showNotification('There was an error saving the note', 'error');
 
                             case 17:
                             case 'end':
@@ -6009,7 +6009,7 @@ define('modules/techNotes/editTechNotes',['exports', 'aurelia-framework', '../..
                                 response = _context5.sent;
 
                                 if (response.error) {
-                                    this.utils.showNotification('There was an error deleting the category');
+                                    this.utils.showNotification('There was an error deleting the category', 'error');
                                 } else {
                                     this.showCategoryForm = false;
                                 }
@@ -21213,7 +21213,7 @@ define('resources/utils/utils',['exports', 'aurelia-framework', 'jquery', 'toast
       this.notification = notification;
       this.notification.waitForMove = true;
       toastr.options.extendedTimeOut = "1000";
-      toastr.options.timeOut = "1000";
+      toastr.options.timeOut = "1500";
     }
 
     Utils.prototype.guid = function guid() {
@@ -23764,11 +23764,11 @@ define('modules/admin/Customers/bulkEmails',['exports', 'aurelia-framework', '..
             var _this2 = this;
 
             if (this.email.MESSAGE === "" || this.email.subject === "") {
-                this.utils.showNotification("Enter a subject and messsage");
+                this.utils.showNotification("Enter a subject and messsage", 'warning');
                 return;
             }
             if (this.dataTable.baseArray.length === 0) {
-                this.utils.showNotification("You must include some recipients");
+                this.utils.showNotification("You must include some recipients", 'warning');
                 return;
             }
             return this.dialog.showMessage("Are you sure you want to send the email to these recipients?", "Confirm Send", ['Yes', 'No']).whenClosed(function (response) {
@@ -24169,7 +24169,7 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
                                     this.dataTable.updateArray(this.people.institutionsArray);
                                     this.utils.showNotification(serverResponse.name + " was updated");
                                 } else {
-                                    this.utils.showNotification("There was a problem updating saving the institution");
+                                    this.utils.showNotification("There was a problem updating saving the institution", 'error');
                                 }
                                 this._cleanUp();
                                 _context5.next = 10;
@@ -24226,7 +24226,7 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
                                     this.dataTable.updateArray(this.people.institutionsArray);
                                     this.utils.showNotification(name + " was deleted");
                                 } else {
-                                    this.utils.showNotification("There was a problem deleting the user");
+                                    this.utils.showNotification("There was a problem deleting the user", 'error');
                                 }
                                 this._cleanUp();
 
@@ -24698,7 +24698,7 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
                                     this.dataTable.updateArray(this.people.peopleArray);
                                     this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
                                 } else {
-                                    this.utils.showNotification("There was a problem saving the person");
+                                    this.utils.showNotification("There was a problem saving the person", 'error');
                                 }
                                 this._cleanUp();
 
@@ -25189,7 +25189,7 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
                                 if (!serverResponse.error) {
                                     this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
                                 } else {
-                                    this.utils.showNotification("There was a problem saving the person");
+                                    this.utils.showNotification("There was a problem saving the person", 'error');
                                 }
 
                             case 8:
@@ -25368,7 +25368,7 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
                                 }));
 
                             case 9:
-                                this.utils.showNotification('There are currently no inactive people in the active person collection.');
+                                this.utils.showNotification('There are currently no inactive people in the active person collection.', 'warning');
 
                             case 10:
                             case 'end':
@@ -26478,7 +26478,7 @@ define('modules/admin/inventory/editInventory',['exports', 'aurelia-framework', 
                                     break;
                                 }
 
-                                this.utils.showNotification('You have to enter a number of days.');
+                                this.utils.showNotification('You have to enter a number of days.', 'warning');
                                 return _context4.abrupt('return');
 
                             case 3:
@@ -27097,7 +27097,7 @@ define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../res
 
 									this.utils.showNotification(this.filesToDelete + ' files were deleted');
 								} else {
-									this.utils.showNotification('There was problem deleting the files');
+									this.utils.showNotification('There was problem deleting the files', 'error');
 								}
 
 							case 11:
@@ -27126,7 +27126,7 @@ define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../res
 
 									this.utils.showNotification(this.filesToDelete + ' files were deleted');
 								} else {
-									this.utils.showNotification('There was problem deleting the files');
+									this.utils.showNotification('There was problem deleting the files', 'error');
 								}
 
 							case 20:
@@ -29358,7 +29358,7 @@ define('modules/admin/site/editNews',['exports', 'aurelia-framework', '../../../
                                         this.siteinfo.uploadFile(this.filesToUpload);
                                     }
                                 } else {
-                                    this.utils.showNotification("There was a problem saving the item");
+                                    this.utils.showNotification("There was a problem saving the item", 'error');
                                 }
                                 this._cleanUp();
 
@@ -29891,7 +29891,7 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
                                 break;
 
                             case 14:
-                                this.utils.showNotification("There was a problem updating the product");
+                                this.utils.showNotification("There was a problem updating the product", 'error');
 
                             case 15:
                                 this._cleanUp();
@@ -30714,7 +30714,7 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
                                     break;
                                 }
 
-                                this.utils.showNotification('There was an error retrieving the system');
+                                this.utils.showNotification('There was an error retrieving the system', 'error');
                                 return _context4.abrupt('return');
 
                             case 8:
@@ -30833,7 +30833,7 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
 
         EditSystem.prototype.toggleSandBox = function toggleSandBox(index) {
             if (this.systems.selectedSystem.clients[index].assignments.length > 0) {
-                this.utils.showNotification("The client has assignments. You must refresh it before changing it's status");
+                this.utils.showNotification("The client has assignments. You must refresh it before changing it's status", 'warning');
             } else {
                 this.systems.selectedSystem.clients[index].clientStatus = this.systems.selectedSystem.clients[index].clientStatus == this.config.SANDBOX_CLIENT_CODE ? this.config.UNASSIGNED_CLIENT_CODE : this.config.SANDBOX_CLIENT_CODE;
             }
@@ -30843,10 +30843,10 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
             var _this2 = this;
 
             if (client.assignments.length > 1) {
-                this.utils.showNotification("The client has assignments. You must refresh it before changing it's product");
+                this.utils.showNotification("The client has assignments. You must refresh it before changing it's product", 'warning');
             } else {
                 if (this.selectedProduct === "") {
-                    this.utils.showNotification("Select a product first");
+                    this.utils.showNotification("Select a product first", 'warning');
                 } else {
                     this.systems.selectedSystem.clients[index].productId = this.selectedProduct;
                     this.saveProduct = true;
@@ -30869,7 +30869,7 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
             var _this3 = this;
 
             if (this.selectedProduct === "") {
-                this.utils.showNotification("Select a product first");
+                this.utils.showNotification("Select a product first", 'warning');
             } else {
                 this.dialog.showMessage("This will only update the products for clients that have no assignments. Continue?", "Refresh Clients", ['Yes', 'No']).whenClosed(function (response) {
                     if (!response.wasCancelled) {
@@ -30985,7 +30985,7 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
             this.saveProduct = true;
             var result = this.systems.generateClients(start, end, this.editClientStatus, this.products.selectedProduct, parseInt(this.clientInterval), this.idsAvailable);
             if (result.error) {
-                this.utils.showNotification(result.error);
+                this.utils.showNotification(result.error, 'error');
             } else {
                 this.products.selectedProductFromId(this.selectedProduct);
                 if (this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
@@ -31055,7 +31055,7 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
             });
             this.systems.deleteAllClients();
 
-            this.utils.showNotification("You must save the system to complete the deletion");
+            this.utils.showNotification("You must save the system to complete the deletion", 'warning');
         };
 
         EditSystem.prototype.editAClient = function editAClient(client, index, el) {
@@ -31073,7 +31073,7 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
             var _this10 = this;
 
             if (!this._okToDeleteClient(this.systems.selectedSystem.clients[index])) {
-                this.utils.showNotification("The client either has assignments or the status doesn't allow deletion. You must refresh it before deleting it.");
+                this.utils.showNotification("The client either has assignments or the status doesn't allow deletion. You must refresh it before deleting it.", 'warning');
             } else {
                 this.dialog.showMessage("Are you sure about this, this action cannot be undone?", "Delete Clients", ['Yes', 'No']).whenClosed(function (response) {
                     if (!response.wasCancelled) {
@@ -31100,7 +31100,7 @@ define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../..
                             });
                         }
                     }
-                    _this10.utils.showNotification("You must save the system to complete the deletion");
+                    _this10.utils.showNotification("You must save the system to complete the deletion", 'warning');
                 });
             }
         };
@@ -32280,7 +32280,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                     break;
                                 }
 
-                                this.utils.showNotification("You need to assign a system to this product before you can assign this request");
+                                this.utils.showNotification("You need to assign a system to this product before you can assign this request", 'warning');
                                 _context7.next = 22;
                                 break;
 
@@ -33642,11 +33642,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
             var _this15 = this;
 
             if (this.email.MESSAGE === "" || this.email.subject === "") {
-                this.utils.showNotification("Enter a subject and messsage");
+                this.utils.showNotification("Enter a subject and messsage", 'warning');
                 return;
             }
             if (this.emailArray.length === 0) {
-                this.utils.showNotification("You must include some recipients");
+                this.utils.showNotification("You must include some recipients", 'warning');
                 return;
             }
             return this.dialog.showMessage("Are you sure you want to send the email to these recipients?", "Confirm Send", ['Yes', 'No']).whenClosed(function (response) {
@@ -33985,7 +33985,7 @@ define('modules/tech/requests/createRequest',['exports', 'aurelia-framework', 'a
 		CreateRequestTech.prototype.selectProduct = function selectProduct(el) {
 			if (!this.showLockMessage) {
 				if (this.alreadyOnList(el.target.id)) {
-					this.utils.showNotification("You can't add the same product more than once");
+					this.utils.showNotification("You can't add the same product more than once.", "warning");
 				} else {
 					$("#requestProductsLabel").html("Requested Products");
 					var newObj = this.requests.emptyRequestDetail();
@@ -37997,7 +37997,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
       if (!this.userObj) {
         this.userObj = this.config.user;
         if (!this.userObj) {
-          this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+          this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.", "warning");
           this.router.navigate("home");
         }
       }
@@ -38362,7 +38362,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
     ViewHelpTickets.prototype.selectProduct = function selectProduct(el) {
       if (this.requests.selectedRequest.requestDetails.length < this.config.REQUEST_LIMIT && !this.showLockMessage) {
         if (this.alreadyOnList(el.target.id)) {
-          this.utils.showNotification('If you need more than one client of a product, add a comment on the next step.');
+          this.utils.showNotification('If you need more than one client of a product, add a comment on the next step.', 'warning');
         } else {
           $("#requestProductsLabel").html("Requested Products");
           var newObj = this.requests.emptyRequestDetail();
@@ -38374,7 +38374,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
         }
       } else {
         if (this.requests.selectedRequest.requestDetails.length === this.config.REQUEST_LIMIT) {
-          this.utils.showNotification('Only ' + this.config.REQUEST_LIMIT + ' products per request are allowed.');
+          this.utils.showNotification('Only ' + this.config.REQUEST_LIMIT + ' products per request are allowed.', 'warning');
         }
       }
 
@@ -38540,8 +38540,6 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.save = function () {
       var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-        var _this3 = this;
-
         var email, serverResponse;
         return regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
@@ -38562,9 +38560,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
 
                 if (!serverResponse.status) {
                   this.systemSelected = false;
-                  setTimeout(function () {
-                    _this3.utils.showNotification("The product request was updated");
-                  }, 500);
+                  this.utils.showNotification("Product request " + serverResponse.clientRequestNo + " was updated");
                 }
 
               case 7:
@@ -38586,18 +38582,18 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
     }();
 
     ViewHelpTickets.prototype._buildEmailObject = function _buildEmailObject() {
-      var _this4 = this;
+      var _this3 = this;
 
       var mailObject = new Object();
       if (this.config.SEND_EMAILS) {
         mailObject.products = new Array();
         this.requests.selectedRequest.requestDetails.forEach(function (detail, index) {
-          _this4.products.selectedProductFromId(detail.productId);
+          _this3.products.selectedProductFromId(detail.productId);
           var date = new Date(detail.requiredDate);
           var day = date.getDate();
           var month = date.getMonth() + 1;
           var year = date.getFullYear();
-          mailObject.products.push({ id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: _this4.products.selectedProduct.name });
+          mailObject.products.push({ id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: _this3.products.selectedProduct.name });
         });
 
         var course = this.people.selectedCourse ? this.people.selectedCourse.name : 'Trial Client';
@@ -39008,7 +39004,7 @@ define('modules/user/requests/viewRequests',['exports', 'aurelia-framework', 'au
         this.userObj = this.config.user;
         this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
         if (!this.userObj) {
-          this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+          this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.", 'warning');
           this.router.navigate("home");
         }
       }
@@ -39220,7 +39216,7 @@ define('modules/user/requests/viewRequests',['exports', 'aurelia-framework', 'au
                 break;
 
               case 9:
-                this.utils.showNotification("The request is locked and can't be saved");
+                this.utils.showNotification("The request is locked and can't be saved", 'warning');
 
               case 10:
               case 'end':
@@ -40686,7 +40682,7 @@ define('modules/user/support/createHelpTicketsWiz',['exports', 'aurelia-framewor
                 this.userObj = this.config.user;
                 this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
                 if (!this.userObj) {
-                    this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+                    this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.", 'warning');
                     this.router.navigate("home");
                 }
             }
@@ -41211,7 +41207,7 @@ define('modules/user/support/curriculum',['exports', 'aurelia-framework', '../..
 				this.userObj = this.config.user;
 				this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
 				if (!this.userObj) {
-					this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+					this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.", 'warning');
 					this.router.navigate("home");
 				}
 			}
@@ -41797,7 +41793,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
         this.userObj = this.config.user;
         this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
         if (!this.userObj) {
-          this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+          this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.", 'warning');
           this.router.navigate("home");
         }
       }

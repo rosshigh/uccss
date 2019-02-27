@@ -108,7 +108,7 @@ export class EditProducts {
                 this.dataTable.updateArray(this.people.techNotesArray);
                 this._cleanUp();
             } else {
-                this.utils.showNotification('There was an error saving the note');
+                this.utils.showNotification('There was an error saving the note','error');
             }
         }
     }
@@ -160,7 +160,7 @@ export class EditProducts {
     async deleteCat() {
         let response = await this.people.deleteTechNoteCat();
         if (response.error) {
-            this.utils.showNotification('There was an error deleting the category');
+            this.utils.showNotification('There was an error deleting the category','error');
         } else {
             this.showCategoryForm = false;
         }

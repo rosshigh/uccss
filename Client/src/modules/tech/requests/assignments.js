@@ -230,7 +230,7 @@ export class Assignments {
         this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
 
         if (!this.products.selectedProduct.systems[0]) {
-            this.utils.showNotification("You need to assign a system to this product before you can assign this request");
+            this.utils.showNotification("You need to assign a system to this product before you can assign this request",'warning');
         } else {
             await this.getProductSystems();
         }
@@ -1422,11 +1422,11 @@ export class Assignments {
 
     sendBulkEmail() {
         if (this.email.MESSAGE === "" || this.email.subject === "") {
-            this.utils.showNotification("Enter a subject and messsage");
+            this.utils.showNotification("Enter a subject and messsage", 'warning');
             return;
         }
         if (this.emailArray.length === 0) {
-            this.utils.showNotification("You must include some recipients");
+            this.utils.showNotification("You must include some recipients", 'warning');
             return;
         }
         return this.dialog.showMessage(

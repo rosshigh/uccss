@@ -198,7 +198,7 @@ export class EditPeople {
                 this.dataTable.updateArray(this.people.peopleArray);
                 this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
             } else {
-                 this.utils.showNotification("There was a problem saving the person");
+                 this.utils.showNotification("There was a problem saving the person",'error');
             }
             this._cleanUp();
         }
@@ -443,7 +443,7 @@ export class EditPeople {
             if (!serverResponse.error) {
                 this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
             } else {
-                this.utils.showNotification("There was a problem saving the person");
+                this.utils.showNotification("There was a problem saving the person",'error');
             }
         } 
     }
@@ -588,7 +588,7 @@ export class EditPeople {
                 }
             });
         } else {
-          this.utils.showNotification('There are currently no inactive people in the active person collection.');
+          this.utils.showNotification('There are currently no inactive people in the active person collection.','warning');
         }
     }
 

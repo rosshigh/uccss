@@ -74,7 +74,7 @@ export class CreateRequestTech {
 	selectProduct(el){
     	if(!this.showLockMessage){
 			if(this.alreadyOnList(el.target.id)){
-				this.utils.showNotification("You can't add the same product more than once")
+				this.utils.showNotification("You can't add the same product more than once.", "warning")
 			} else {
 				$("#requestProductsLabel").html("Requested Products");
 					var newObj = this.requests.emptyRequestDetail();

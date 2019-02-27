@@ -82,7 +82,7 @@ export class EditSystem {
         let response = await this.systems.getSystem(this.editIndex)
         // this.systems.selectSystem(this.editIndex);
         if(response.error){
-            this.utils.showNotification('There was an error retrieving the system');
+            this.utils.showNotification('There was an error retrieving the system','error');
             return;
         }
         this.originalSystem = this.utils.copyObject(this.systems.selectedSystem);
@@ -129,7 +129,7 @@ export class EditSystem {
 
     toggleSandBox(index){
         if(this.systems.selectedSystem.clients[index].assignments.length > 0){
-            this.utils.showNotification("The client has assignments. You must refresh it before changing it's status");
+            this.utils.showNotification("The client has assignments. You must refresh it before changing it's status",'warning');
         } else {
             this.systems.selectedSystem.clients[index].clientStatus =   this.systems.selectedSystem.clients[index].clientStatus == this.config.SANDBOX_CLIENT_CODE ? this.config.UNASSIGNED_CLIENT_CODE : this.config.SANDBOX_CLIENT_CODE;
         }
@@ -138,10 +138,10 @@ export class EditSystem {
 
     updateProduct(client, index){
         if(client.assignments.length > 1) {
-             this.utils.showNotification("The client has assignments. You must refresh it before changing it's product");
+             this.utils.showNotification("The client has assignments. You must refresh it before changing it's product",'warning');
         } else {
              if(this.selectedProduct === ""){
-                  this.utils.showNotification("Select a product first");
+                  this.utils.showNotification("Select a product first",'warning');
              } else {
                 this.systems.selectedSystem.clients[index].productId = this.selectedProduct;
                 this.saveProduct = true;
@@ -163,7 +163,7 @@ export class EditSystem {
 
     updateAllProducts(){
         if(this.selectedProduct === "") {
-             this.utils.showNotification("Select a product first");
+             this.utils.showNotification("Select a product first",'warning');
         } else {
             this.dialog.showMessage(
                 "This will only update the products for clients that have no assignments. Continue?", 
@@ -276,7 +276,7 @@ export class EditSystem {
         this.saveProduct = true;
         var result = this.systems.generateClients(start, end, this.editClientStatus, this.products.selectedProduct, parseInt(this.clientInterval), this.idsAvailable);
         if (result.error) {
-            this.utils.showNotification(result.error);
+            this.utils.showNotification(result.error,'error');
         } else {
             this.products.selectedProductFromId(this.selectedProduct);
             if(this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
@@ -353,7 +353,7 @@ export class EditSystem {
         })
         this.systems.deleteAllClients();
 
-        this.utils.showNotification("You must save the system to complete the deletion");
+        this.utils.showNotification("You must save the system to complete the deletion",'warning');
     }
 
     editAClient(client, index, el) {
@@ -369,7 +369,7 @@ export class EditSystem {
 
     deleteClient(index){
         if(!this. _okToDeleteClient(this.systems.selectedSystem.clients[index])){
-            this.utils.showNotification("The client either has assignments or the status doesn't allow deletion. You must refresh it before deleting it.");
+            this.utils.showNotification("The client either has assignments or the status doesn't allow deletion. You must refresh it before deleting it.",'warning');
         } else {
             this.dialog.showMessage(
                 "Are you sure about this, this action cannot be undone?", 
@@ -400,7 +400,7 @@ export class EditSystem {
                             })
                         }
                     }
-                    this.utils.showNotification("You must save the system to complete the deletion");
+                    this.utils.showNotification("You must save the system to complete the deletion",'warning');
                 });
         }
     }

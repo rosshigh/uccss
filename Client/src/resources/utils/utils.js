@@ -13,7 +13,7 @@ export class Utils{
       this.notification = notification;
       this.notification.waitForMove = true
       toastr.options.extendedTimeOut = "1000";
-      toastr.options.timeOut = "1000";
+      toastr.options.timeOut = "1500";
 
       // toastr.options = {
       //   "closeButton": false,

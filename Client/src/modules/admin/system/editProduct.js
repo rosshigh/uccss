@@ -135,7 +135,7 @@ export class EditProducts {
                 this.dataTable.updateArray(this.products.productsArray);
                 this.utils.showNotification("Product " + serverResponse.name + " was updated");
             } else {
-                this.utils.showNotification("There was a problem updating the product");
+                this.utils.showNotification("There was a problem updating the product",'error');
             }
             this. _cleanUp();
         }

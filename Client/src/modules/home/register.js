@@ -129,7 +129,7 @@ export class Register {
                     this.sendFacDevEmail();
                   });
             } else {
-                this.utils.showNotification("An error occurred creating the account");
+                this.utils.showNotification("An error occurred creating the account",'error');
             }
     }
   };

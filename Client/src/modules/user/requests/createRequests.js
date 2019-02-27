@@ -100,7 +100,7 @@ export class ViewHelpTickets {
     if(!this.userObj) {
       this.userObj = this.config.user;
       if(!this.userObj) {
-        this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+        this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.","warning");
         this.router.navigate("home");
       }
     }
@@ -302,7 +302,7 @@ export class ViewHelpTickets {
   selectProduct(el){
     if(this.requests.selectedRequest.requestDetails.length < this.config.REQUEST_LIMIT && !this.showLockMessage){
       if(this.alreadyOnList(el.target.id)){
-        this.utils.showNotification('If you need more than one client of a product, add a comment on the next step.')
+        this.utils.showNotification('If you need more than one client of a product, add a comment on the next step.','warning')
       } else {
         $("#requestProductsLabel").html("Requested Products");
             var newObj = this.requests.emptyRequestDetail();
@@ -315,7 +315,7 @@ export class ViewHelpTickets {
           }
       } else {
          if(this.requests.selectedRequest.requestDetails.length === this.config.REQUEST_LIMIT) {
-            this.utils.showNotification('Only ' + this.config.REQUEST_LIMIT + ' products per request are allowed.')
+            this.utils.showNotification('Only ' + this.config.REQUEST_LIMIT + ' products per request are allowed.','warning')
          }
       }
     
@@ -511,28 +511,10 @@ export class ViewHelpTickets {
     if(this.validation.validate(1)){
       this._buildRequest();
       let email = this._buildEmailObject();
-    //   var mailObject = new Object();
-    //   if(this.config.SEND_EMAILS) {
-    //     mailObject.products = new Array();
-    //     this.requests.selectedRequest.requestDetails.forEach((detail, index) => {
-    //       this.products.selectedProductFromId(detail.productId);
-    //       var date = new Date(detail.requiredDate);
-    //       var day = date.getDate();
-    //       var month = date.getMonth() + 1;
-    //       var year = date.getFullYear();
-    //       mailObject.products.push({id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: this.products.selectedProduct.name})    
-    //     });
-
-    //     mailObject.comments = this.requests.selectedRequest.comments;
-    //     mailObject.name = this.userObj.fullName;
-    //     mailObject.numStudents =  parseInt(this.requests.selectedRequest.undergradIds) + parseInt(this.requests.selectedRequest.graduateIds);
-    //     mailObject.email = this.userObj.email
-    //     mailObject.cc = this.config.REQUESTS_EMAIL_LIST ? this.config.REQUESTS_EMAIL_LIST : "";
-    // }
     let serverResponse = await this.requests.saveRequest(email);
     if (!serverResponse.status) {
         this.systemSelected = false;
-        setTimeout(() => {this.utils.showNotification("The product request was updated")},500);
+        this.utils.showNotification("Product request " + serverResponse.clientRequestNo + " was updated");
     }
     }
     this._cleanUp();

@@ -91,7 +91,7 @@ export class EditInstitutions {
                 this.dataTable.updateArray(this.people.institutionsArray);
                 this.utils.showNotification(serverResponse.name + " was updated");
             } else {
-                 this.utils.showNotification("There was a problem updating saving the institution");
+                 this.utils.showNotification("There was a problem updating saving the institution",'error');
             }
             this._cleanUp();
         } else {
@@ -126,7 +126,7 @@ export class EditInstitutions {
                 this.dataTable.updateArray(this.people.institutionsArray);
                 this.utils.showNotification(name + " was deleted");
         } else {
-             this.utils.showNotification("There was a problem deleting the user");
+             this.utils.showNotification("There was a problem deleting the user",'error');
         }
         this._cleanUp();
     }

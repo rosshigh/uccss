@@ -286,7 +286,7 @@ export class Admin {
 
 						this.utils.showNotification(this.filesToDelete + ' files were deleted');
 					} else {
-						this.utils.showNotification('There was problem deleting the files');
+						this.utils.showNotification('There was problem deleting the files','error');
 					}
 				}
 				break;
@@ -302,7 +302,7 @@ export class Admin {
 
 						this.utils.showNotification(this.filesToDelete + ' files were deleted');
 					} else {
-						this.utils.showNotification('There was problem deleting the files');
+						this.utils.showNotification('There was problem deleting the files','error');
 					}
 				}
 				break;

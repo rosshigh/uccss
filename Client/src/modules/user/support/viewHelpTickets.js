@@ -51,7 +51,7 @@ export class ViewHelpTickets {
       this.userObj = this.config.user;
       this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
       if (!this.userObj) {
-        this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+        this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.",'warning');
         this.router.navigate("home");
       }
     }

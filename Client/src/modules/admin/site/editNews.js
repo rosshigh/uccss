@@ -94,7 +94,7 @@ export class EditNews {
                     this.siteinfo.uploadFile(this.filesToUpload);
                 }
             } else {
-                 this.utils.showNotification("There was a problem saving the item");
+                 this.utils.showNotification("There was a problem saving the item",'error');
             }
             this._cleanUp();
         }

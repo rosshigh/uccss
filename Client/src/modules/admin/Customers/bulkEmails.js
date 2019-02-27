@@ -114,11 +114,11 @@ export class BulkEmails {
 
     sendBulkEmail(){
         if(this.email.MESSAGE === "" || this.email.subject === ""){
-            this.utils.showNotification("Enter a subject and messsage");
+            this.utils.showNotification("Enter a subject and messsage",'warning');
             return;
         }
         if(this.dataTable.baseArray.length === 0){
-            this.utils.showNotification("You must include some recipients");
+            this.utils.showNotification("You must include some recipients",'warning');
             return;
         }
         return this.dialog.showMessage(

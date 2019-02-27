@@ -193,7 +193,7 @@ export class EditInventory {
 
     async scheduleEvent(){
         if(this.inventory.selectedInventory.maintenanceAlert === "0" || !this.inventory.selectedInventory.maintenanceAlert){
-            this.utils.showNotification('You have to enter a number of days.')
+            this.utils.showNotification('You have to enter a number of days.','warning')
             return;
         }
 
