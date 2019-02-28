@@ -22539,6 +22539,8 @@ define('resources/value-converters/phone-number',['exports'], function (exports)
 							returnValue += digit;
 						}
 					}
+				} else {
+					return value;
 				}
 				if (ext) returnValue += ' ext. ' + ext;
 				return returnValue;
@@ -24780,6 +24782,7 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
             } else {
                 this.personSelected = false;
             }
+            this.institutionId = "";
         };
 
         EditPeople.prototype.checkEmail = function () {
@@ -24833,6 +24836,9 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
                 return this.dialog.showMessage("Are you sure you want to change the institution? This should normally only be done if the account was created in the wrong institution.  If the user has changed institutions, create a new account.", "Change Institution", ['Yes', 'No']).whenClosed(function (response) {
                     if (!response.wasCancelled) {
                         _this6.people.selectedPerson.institutionId._id = _this6.institutionId;
+                        setTimeout(function () {
+                            _this6.copyInstAddress();
+                        }, 1000);
                     } else {
                         _this6.institutionId = _this6.people.selectedPerson.institutionId._id;
                     }
@@ -24840,7 +24846,7 @@ define('modules/admin/Customers/editPeople',['exports', 'aurelia-framework', '..
             } else {
                 setTimeout(function () {
                     _this6.copyInstAddress();
-                }, 500);
+                }, 1000);
             }
         };
 

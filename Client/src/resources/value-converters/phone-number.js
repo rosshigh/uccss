@@ -25,6 +25,8 @@ export class PhoneNumberValueConverter {
 						returnValue += digit;
 					}
 				}
+			} else {
+				return value;
 			}
 			if(ext) returnValue += ' ext. ' + ext
 			return returnValue;

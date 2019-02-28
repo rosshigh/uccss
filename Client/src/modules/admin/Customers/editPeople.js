@@ -246,6 +246,7 @@ export class EditPeople {
         } else {
              this.personSelected = false;
         }
+        this.institutionId = "";
     }
 
     async checkEmail() {
@@ -269,12 +270,13 @@ export class EditPeople {
             ).whenClosed(response => {
                 if (!response.wasCancelled) {
                     this.people.selectedPerson.institutionId._id = this.institutionId;
+                    setTimeout(()=> {this.copyInstAddress()}, 1000);
                 } else {
                     this.institutionId = this.people.selectedPerson.institutionId._id;
                 }
             });
         } else {
-            setTimeout(()=> {this.copyInstAddress()}, 500);
+            setTimeout(()=> {this.copyInstAddress()}, 1000);
         }
     }
 
