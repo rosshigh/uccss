@@ -35102,7 +35102,11 @@ define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework'
       }
 
       if (this.selectedStatus) {
-        this.searchObj.status = this.selectedStatus;
+        if (this.selectedStatus == this.config.MY_HELPTICKET_STATUS) {
+          this.searchObj.owner = this.userObj._id;
+        } else {
+          this.searchObj.status = this.selectedStatus;
+        }
       }
 
       if (this.keyWords) {

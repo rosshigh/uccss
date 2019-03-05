@@ -207,6 +207,10 @@ module.exports = function (app, config) {
     if (req.body.helpTicketNo) {
       query.where('helpTicketNo').equals(req.body.helpTicketNo);
     } else {
+      if(req.body.owner){
+        console.log(req.body.owner)
+        query.where('owner.personId').equals(req.body.owner);
+      }
       if (req.body.dateRange) {
         query.where('createdDate').gt(req.body.dateRange.dateFrom).lt(req.body.dateRange.dateTo);
       }
@@ -235,7 +239,7 @@ module.exports = function (app, config) {
     query.populate('personId', 'email firstName lastName phone mobile nickName file country')
     query.populate('content.personId', 'email firstName lastName phone mobile nickName')
     query.populate('institutionId', 'name')
-    query.populate({ path: 'owner.personId', model: 'Person', select: 'firstName lastName' })
+    query.populate({ path: 'owner.personId', model: 'Person', select: 'firstName lastName _id' })
     query.exec()
       .then(response => {
         if (response && response.length > 0) {
