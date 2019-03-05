@@ -42,17 +42,24 @@ module.exports = function (app, config) {
   router.get('/api/helpTickets/mine/:personId', requireAuth, function (req, res, next) {
     logger.log('info', 'Get helpTicket');
     var query = Model.find()
-      .where('helpTicketStatus').gt(6)
-      .where('owner[0].personId.id').equals(req.params.id)
+      .where('helpTicketStatus').lt(6)
+      .where('owner.personId').equals(req.params.personId)
       .populate('courseId', 'name number')
       .populate('requestId')
       .populate('personId', 'email firstName lastName fullName phone mobile nickName file country')
       .populate('content.personId', 'email firstName lastName phone mobile nickName')
       .populate('institutionId', 'name')
-      .populate({ path: 'owner.personId', model: 'Person', select: 'firstName lastName fullName' })
+      .populate({ path: 'owner.personId', model: 'Person', select: 'firstName lastName fullName _id' })
     query.exec()
       .then(object => {
-        res.status(200).json(object);
+        var myHT = [];
+        object.forEach(item => {
+          let id = item.owner[0].personId ? item.owner[0].personId._id : null;
+          if(id == req.params.personId){
+            myHT.push(item);
+          }
+        })
+        res.status(200).json(myHT);
       })
       .catch(error => {
         return next(error);

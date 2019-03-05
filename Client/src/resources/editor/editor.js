@@ -47,6 +47,9 @@ export class Editor {
 					that.value = contents;
 					$("#" +  this.editorid).summernote('editor.saveRange');
 				},
+				onFocus: function(contents){
+					console.log('');
+				}
 				// onPaste: function(e) {
 				// 	var node = document.createElement('p');
 				// 	// @param {Node} node
