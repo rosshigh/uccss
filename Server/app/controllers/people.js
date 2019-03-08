@@ -270,7 +270,10 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/people', requireAuth, function(req, res, next){
-    logger.log('info','Update Person ' + req.body._id, 'verbose');       
+    logger.log('info','Update Person ' + req.body._id, 'verbose');   
+    if(req.body.personStatus == "02") {
+      req.body.roles = ["USER"];
+    }  
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, person){
       if (err) {
         return next(err);

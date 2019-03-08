@@ -121,12 +121,13 @@ export class Register {
         this.people.selectedPerson.personStatus = this.config.INACTIVE_PERSON;
         let response = await this.people.savePerson('register')
             if(!response.error) {
+              this.sendFacDevEmail();
               return this.dialog.showMessage(
                   "Your account has been created.  Your faculty coordinator must activate the account before you can log on to the UCCSS.",
                   "Account Created",
                   ['OK']
                   ).whenClosed(response => {
-                    this.sendFacDevEmail();
+                    this.router.navigate("home");
                   });
             } else {
                 this.utils.showNotification("An error occurred creating the account",'error');
@@ -152,7 +153,6 @@ export class Register {
     email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
 
     this.people.sendNewRegisterEmail(email);
-    this.router.navigate("home");
   }
 
   back(){
