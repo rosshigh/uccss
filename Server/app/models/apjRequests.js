@@ -3,24 +3,6 @@ var Mongoose = require('mongoose'),
   Product = require('./products').Product,
   AutoIncrement = require('mongoose-sequence');
 
-var clientRequestLockSchema = new Schema({
-  requestId: { type: Schema.Types.ObjectId },
-  personId: { type: Schema.Types.ObjectId },
-  createdAt: { type: Date, expires: '1800s', default: Date.now }
-});
-
-module.exports = Mongoose.model('ClientRequestLock', clientRequestLockSchema);
-
-var CourseSchema = new Schema({
-  name: { type: String, required: true },
-  personId: { type: Schema.Types.ObjectId, required: true },
-  number: { type: String, required: true },
-  description: { type: String },
-  active: { type: Boolean, default: true }
-});
-
-module.exports = Mongoose.model('Course', CourseSchema);
-
 var AssignmentSchema = new Schema({
   systemId: { type: Schema.Types.ObjectId },
   client: { type: Number },
@@ -41,7 +23,7 @@ AssignmentSchema.pre('update', function() {
   this.update({},{ $set: { modifiedDate: new Date() } });
 });
 
-module.exports = Mongoose.model('Assignment', AssignmentSchema);
+module.exports = Mongoose.model('AssignmentAPJ', AssignmentSchema);
 
 var ClientRequestDetailsSchema = new Schema({
   requestNo: { type: Number },
@@ -50,7 +32,6 @@ var ClientRequestDetailsSchema = new Schema({
   modifiedDate: { type: Date, default: Date.now },
   productId: { type: Schema.Types.ObjectId, required: true, ref: 'product' },
   requestStatus: { type: String },
-  sessionId: { type: Schema.Types.ObjectId },
   requestId: { type: Schema.Types.ObjectId }, //, ref: 'ClientRequest'
   idsAssigned: { type: Number },
    documents: [{
@@ -68,19 +49,17 @@ var ClientRequestDetailsSchema = new Schema({
   }]
 }, { versionKey: false });
 
-ClientRequestDetailsSchema.plugin(AutoIncrement, {inc_field: 'requestNo'});
+ClientRequestDetailsSchema.plugin(AutoIncrement, {inc_field: 'requestNoAPJ'});
 
 ClientRequestDetailsSchema.pre('update', function() {
   this.update({},{ $set: { modifiedDate: new Date() } });
 });
 
-module.exports = Mongoose.model('ClientRequestDetail', ClientRequestDetailsSchema);
+module.exports = Mongoose.model('ClientRequestDetailAPJ', ClientRequestDetailsSchema);
 
 var ClientRequestSchema = new Schema({
   clientRequestNo: { type: Number },
-  courseId: { type: Schema.Types.ObjectId },
   personId: { type:  Schema.Types.ObjectId },
-  sessionId: { type: Schema.Types.ObjectId },
   studentIdsAssigned: { type: Number }, 
   graduateIds: { type: Number, default: 0, min : 0 },
   undergradIds: { type: Number, default: 0, min: 0 },
@@ -102,10 +81,10 @@ var ClientRequestSchema = new Schema({
   }]
 }, { versionKey: false });
 
-ClientRequestSchema.plugin(AutoIncrement, {inc_field: 'clientRequestNo'});
+ClientRequestSchema.plugin(AutoIncrement, {inc_field: 'clientRequestNoAPJ'});
 
 ClientRequestSchema.pre('update', function() {
   this.update({},{ $set: { modifiedDate: new Date() } });
 });
 
-module.exports = Mongoose.model('ClientRequest', ClientRequestSchema);
+module.exports = Mongoose.model('ClientRequestAPJ', ClientRequestSchema);

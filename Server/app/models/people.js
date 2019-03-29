@@ -32,6 +32,7 @@ var PersonSchema = new Schema({
   gender: { type: String },
   title: { type: String },
   salutation: { type: String },
+  apj: { type: Boolean, default: false },
 
   //Communication
   email: { type: String, unique: true, required: true },

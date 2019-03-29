@@ -139,6 +139,30 @@ export default class {
                   moduleId: './modules/techNotes/techNotes',         
                   name: 'techNotes',         
                   settings: { auth: true, roles: [] } 
+                },
+                { 
+                  route: 'accprodrequests',      
+                  moduleId: './modules/acc/accRequests',         
+                  name: 'accprodrequests',         
+                  settings: { auth: true, roles: [] } 
+                },
+                { 
+                  route: 'acchelptickets',      
+                  moduleId: './modules/acc/accHT',         
+                  name: 'acchelptickets',         
+                  settings: { auth: true, roles: [] } 
+                },
+                { 
+                  route: 'accinstitutions',      
+                  moduleId: './modules/acc/accInstitutions',         
+                  name: 'accinstitutions',         
+                  settings: { auth: true, roles: [] } 
+                },
+                { 
+                  route: 'accinvoices',      
+                  moduleId: './modules/acc/accInvoice',         
+                  name: 'accinvoices',         
+                  settings: { auth: true, roles: [] } 
                 }
             ]);
 

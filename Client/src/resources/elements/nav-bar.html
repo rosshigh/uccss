@@ -1,19 +1,37 @@
 <template>
     <style>
         .navbar-default {
-            color: ${config.MENU_COLOR}; 
-            background-color:${config.MENU_BACKGROUND}
+            color: $ {
+                config.MENU_COLOR
+            }
+
+            ;
+
+            background-color:$ {
+                config.MENU_BACKGROUND
+            }
         }
-        .navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:hover, .navbar-inverse .navbar-nav>.active>a:focus {
-            color: ${config.ACTIVE_MENU_COLOR};
-            background-color:${config.MENU_BACKGROUND}
+
+        .navbar-inverse .navbar-nav>.active>a,
+        .navbar-inverse .navbar-nav>.active>a:hover,
+        .navbar-inverse .navbar-nav>.active>a:focus {
+            color: $ {
+                config.ACTIVE_MENU_COLOR
+            }
+
+            ;
+
+            background-color:$ {
+                config.MENU_BACKGROUND
+            }
         }
     </style>
     <div class="noticeProfile" style="z-index:1001;" class="noticeProfile">
         <ul class="list-group">
-            <li class="list-group-item sortable" click.trigger="updateNotification(notice, $index)" style="background-color:Cyan;" repeat.for="notice of people.notificationsArray">
-                <span style="font-weight:bold;">${notice.notice}</span><br/>
-                by ${notice.personId.fullName}  on ${notice.dateCreated |  dateFormat:config.DATE_FORMAT_TABLE:false}
+            <li class="list-group-item sortable" click.trigger="updateNotification(notice, $index)"
+                style="background-color:Cyan;" repeat.for="notice of people.notificationsArray">
+                <span style="font-weight:bold;">${notice.notice}</span><br />
+                by ${notice.personId.fullName} on ${notice.dateCreated | dateFormat:config.DATE_FORMAT_TABLE:false}
             </li>
         </ul>
     </div>
@@ -21,8 +39,8 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
-                    aria-expanded="false">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -30,14 +48,14 @@
                 </button>
 
                 <span>
-                    <a if.bind="config.NAVBAR_LOGO && config.NAVBAR_LOGO.length>0 && isAuthenticated" class="navbar-brand"
-                        href="#/user"><img src="/img/${config.NAVBAR_LOGO}"></a>
-                    <a if.bind="config.NAVBAR_LOGO && config.NAVBAR_LOGO.length>0 && !isAuthenticated" class="navbar-brand"
-                        href="#/home"><img src="/img/${config.NAVBAR_LOGO}"></a>
+                    <a if.bind="config.NAVBAR_LOGO && config.NAVBAR_LOGO.length>0 && isAuthenticated"
+                        class="navbar-brand" href="#/user"><img src="/img/${config.NAVBAR_LOGO}"></a>
+                    <a if.bind="config.NAVBAR_LOGO && config.NAVBAR_LOGO.length>0 && !isAuthenticated"
+                        class="navbar-brand" href="#/home"><img src="/img/${config.NAVBAR_LOGO}"></a>
                 </span>
                 <span>
-                    <a if.bind="(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && isAuthenticated" class="navbar-brand"
-                        href="#/user"><i class="fa fa-home"></i> UCCSS</a>
+                    <a if.bind="(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && isAuthenticated"
+                        class="navbar-brand" href="#/user"><i class="fa fa-home"></i> UCCSS</a>
                     <a if.bind="(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && !isAuthenticated"
                         class="navbar-brand" href="#/home"><i class="fa fa-home"></i> UCCSS</a>
                 </span>
@@ -48,10 +66,12 @@
 
                 <form if.bind="!isAuthenticated && !passwordReset" class="navbar-form navbar-left" role="search">
                     <div class="form-group">
-                        <input value.bind="email" type="email" autofocus class="form-control" id="email" placeholder="Email"></input>
+                        <input value.bind="email" type="email" autofocus class="form-control" id="email"
+                            placeholder="Email"></input>
                     </div>
                     <div class="form-group">
-                        <input value.bind="password" type="password" class="form-control" id="password" placeholder="Password"></input>
+                        <input value.bind="password" type="password" class="form-control" id="password"
+                            placeholder="Password"></input>
                     </div>
                     <button class="btn btn-default" click.delegate='login()'>Login</button>
                     <button class="btn btn-link" click.delegate="requestPasswordReset()">Forgot password</button>
@@ -59,8 +79,9 @@
                 </form>
                 <ul class="nav navbar-nav">
                     <li class="dropdown">
-                        <a if.bind="userObj.userRole >= config.UCC_ROLE" href="#" class="dropdown-toggle" data-toggle="dropdown"
-                            role="button" aria-haspopup="true" aria-expanded="false">Administration <span class="caret"></span></a>
+                        <a if.bind="userObj.userRole >= config.UCC_ROLE" href="#" class="dropdown-toggle"
+                            data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">Administration <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="#/system">System Admin</a></li>
                             <li><a href="#/customers">Customers</a></li>
@@ -73,7 +94,7 @@
                         <a if.bind="userObj.userRole >= config.UCC_TECH_ROLE" href="#" class="dropdown-toggle"
                             data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Technical
                             <span class="caret"></span></a>
-                        <ul class="dropdown-menu"> 
+                        <ul class="dropdown-menu">
                             <li><a href="#/techRq">Product Requests</a></li>
                             <li><a href="#/techHt">Help Tickets</a></li>
                             <li><a href="#/techNotes">Tech Notes</a></li>
@@ -86,16 +107,28 @@
                     <li if.bind="isAuthenticated"><a href="#/clientRequests">Product Requests</a></li>
                     <li class="hidden-sm hidden-md" if.bind="isAuthenticated && userObj.userRole >= config.UA_ROLE"><a
                             href="#/analytics">Analytics</a></li>
+                    <li class="dropdown">
+                        <a if.bind="userObj.userRole >= config.UCC_ROLE" href="#" class="dropdown-toggle"
+                            data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">ACC <span
+                                class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#/accinstitutions">Customers</a></li>
+                            <li><a href="#/accprodrequests">Product Requests</a></li>
+                            <li><a href="#/acchelptickets">Help Tickets</a></li>
+                            <li><a href="#/accinvoices">Invoices</a></li>
+                        </ul>
+                    </li>
                 </ul>
 
-
-
                 <ul class="nav navbar-nav navbar-right">
-                    <li id="noticeLabel" class="sortable" click.trigger="showProfile($event)" if.bind="people.notificationsArray.length"><a class="rightMargin" style="text-decoration: none;">Notifications
+                    <li id="noticeLabel" class="sortable" click.trigger="showProfile($event)"
+                        if.bind="people.notificationsArray.length"><a class="rightMargin"
+                            style="text-decoration: none;">Notifications
                             <span class="badge">${people.notificationsArray.length}</span></a></li>
                     <li class="dropdown">
-                        <a if.bind="userObj.userRole >= config.UCC_ROLE" href="#" class="dropdown-toggle" data-toggle="dropdown"
-                            role="button" aria-haspopup="true" aria-expanded="false">Notes<span class="caret"></span></a>
+                        <a if.bind="userObj.userRole >= config.UCC_ROLE" href="#" class="dropdown-toggle"
+                            data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Notes<span
+                                class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a click.trigger="enterNote()" href="#">Enter Note</a></li>
                             <li><a href="#/notes">Notes</a></li>
@@ -107,10 +140,12 @@
                     <li class="hidden-sm hidden-md"><a href="#/about">About the UCC</a></li>
 
                     <li class="dropdown hidden-md">
-                        <a href="#" class="dropdown-toggle hidden-lg" data-toggle="dropdown">More <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle hidden-lg" data-toggle="dropdown">More <b
+                                class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li class="hidden-lg" if.bind="isAuthenticated"><a href="#/social">Social</a></li>
-                            <li class="hidden-lg" if.bind="userObj.userRole >= config.USER_ROLE"><a href="#/facco">Faculty
+                            <li class="hidden-lg" if.bind="userObj.userRole >= config.USER_ROLE"><a
+                                    href="#/facco">Faculty
                                     Coordinator</a></li>
                             <li class="hidden-lg" if.bind="isAuthenticated && userObj.userRole >= config.UA_ROLE"><a
                                     href="#/analytics">Analytics</a></li>

@@ -5,6 +5,7 @@ Person = require('./people').Person;
 var InstitutionSchema = new Schema({
     name: { type: String, required: true },
     abrCode: { type: String },
+    apj: { type: Boolean, default: false },
     memberType: { type: String, required: true, max: 2 },
     institutionType: { type: String, required: true, max: 2 },
     institutionStatus: { type: String, required: true, max: 2 },

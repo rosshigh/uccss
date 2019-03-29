@@ -1,0 +1,17 @@
+<template>
+        <span id="loading">
+            <ul class="bokeh">
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </span>
+        <div show.bind="dataTable.displayArray && dataTable.displayArray.length || initialLoaded">
+            <div show.bind="!institutionSelected" class="col-lg-12">
+                <compose view="./components/institutionsTable.html"></compose>
+            </div> <!-- Table Div -->
+            <div show.bind="institutionSelected" class="col-lg-12">
+                <compose view="./components/institutionsForm.html"></compose>
+            </div> <!-- Form Div -->
+        </div> <!-- Panel Body -->
+    </template>
