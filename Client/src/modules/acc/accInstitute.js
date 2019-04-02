@@ -38,7 +38,7 @@ export class accInstitute {
         $('#loading').show();
         let responses = await Promise.all([
             this.people.getPeopleArray('?order=lastName'),
-            this.people.getInstitutionsArray('?filter=apj|eq|true&order=name'),
+            this.people.getInstitutionsArray('?filter=apj|eq|true&order=name', true),
             this.is4ua.loadIs4ua()
         ]);
 

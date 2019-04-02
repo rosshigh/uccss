@@ -1314,7 +1314,7 @@ define('modules/acc/accInstitute',['exports', 'aurelia-framework', '../../resour
                                 (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
                                 (0, _jquery2.default)('#loading').show();
                                 _context.next = 4;
-                                return Promise.all([this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?filter=apj|eq|true&order=name'), this.is4ua.loadIs4ua()]);
+                                return Promise.all([this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?filter=apj|eq|true&order=name', true), this.is4ua.loadIs4ua()]);
 
                             case 4:
                                 responses = _context.sent;
