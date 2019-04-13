@@ -22,6 +22,7 @@ export class People {
     COURSES_SERVICE = 'courses';
     PEOPLE_UPLOAD_SERVICE = '/people/upload/';
     NOTIFICATION_SERVICE = 'notifications';
+    PACKAGES_SERVICES = 'packages';
 
     constructor(data, utils) {
         this.data = data;
@@ -346,6 +347,20 @@ export class People {
                 this.institutionsArray = response;
             } else {
                 this.institutionsArray = undefined;
+            }
+
+        }
+    }
+
+    async getPackages(options, refresh){
+        if (!this.packageArray || refresh) {
+            var url = this.PACKAGES_SERVICES;
+            url += options ? options : "";
+            let response = await this.data.get(url)
+            if (!response.error) {
+                this.packageArray = response;
+            } else {
+                this.packageArray = undefined;
             }
 
         }

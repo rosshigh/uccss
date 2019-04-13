@@ -337,7 +337,7 @@ module.exports = function (app, config) {
               return next(error);
             }        
             Model.remove({ _id: req.params.id }).then(result => {
-              res.status(200).json(result);
+              res.status(200).json(archiveHT);
             })
           })
 
@@ -611,29 +611,62 @@ module.exports = function (app, config) {
     Model.findById(req.params.id, function (err, helpticket) {
       if (err) {
         return next(err);
-      } else {
-        if (req.params.contentId) {
+      } else {          
+        if (req.params.contentId) {         
           var id = req.params.contentId;
           var content = helpticket.content.id(id);
           if (content) {
-            for (var i = 0, x = req.files.length; i < x; i++) {
+            for (var i = 0, x = req.files.length; i < x; i++) {        
               var file = {
                 originalFilename: req.files[i].originalname,
                 fileName: req.files[i].filename,
                 dateUploaded: new Date()
               };
-              content.files.push(file);
-              console.log(content)
-            }
+              content.files.push(file); 
+            }           
             helpticket.save(function (err, helpticket) {
               if (err) {
                 return next(err);
-              } else {
+              } else {             
                 res.status(200).json(helpticket);
               }
             });
           }
-          // res.status(404).json({message: 'Content now found'});
+        } else {
+          res.status(200).json({ message: 'file uploaded' });
+        }
+      }
+    });
+
+  });
+
+  router.post('/api/helpTickets/uploadArchive/:id/:container/:contentId', upload.any(), function (req, res, next) {
+    logger.log('info', 'Upload File ');  
+    HelpTicketArchive.findById(req.params.id, function (err, helpticket) {
+      if (err) {
+        return next(err);
+      } else {                    
+        if (req.params.contentId) {         
+          var id = req.params.contentId;       
+          var content = helpticket.content.pop();      
+          if (content) {  
+            for (var i = 0, x = req.files.length; i < x; i++) {        
+              var file = {
+                originalFilename: req.files[i].originalname,
+                fileName: req.files[i].filename,
+                dateUploaded: new Date()
+              };
+              content.files.push(file); 
+            }       
+            helpticket.content.push(content)            
+            helpticket.save(function (err, helpticket) {
+              if (err) {
+                return next(err);
+              } else {               
+                res.status(200).json(helpticket);
+              }
+            });
+          }
         } else {
           res.status(200).json({ message: 'file uploaded' });
         }

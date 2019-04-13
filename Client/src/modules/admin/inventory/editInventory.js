@@ -103,6 +103,24 @@ export class EditInventory {
         this._cleanUp();
     }
 
+    async delete(){
+        this.dialog.showMessage(
+            "Are you sure you want to delete this device?",
+            "Delete",
+            ['Yes', 'No']
+          ).whenClosed(response => {
+            if (!response.wasCancelled) {
+               this.deleteIt();
+            }
+          });
+    }
+    
+    async deleteIt(){
+        await this.inventory.deleteInventory();
+        this._cleanUp();
+        this.refresh();
+    }
+
     _cleanUp(){
          this.systemSelected = false;
     }

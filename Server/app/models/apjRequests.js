@@ -3,6 +3,21 @@ var Mongoose = require('mongoose'),
   Product = require('./products').Product,
   AutoIncrement = require('mongoose-sequence');
 
+var PackageSchema = new Schema({
+  name: { type: String },
+  price: { type: Number },
+  maxClients: { type: Number }
+});
+
+module.exports = Mongoose.model('Packages', PackageSchema);
+
+var CustomerPackageSchema = new Schema({
+  packageId: { type: Schema.Types.ObjectId }, 
+  institutionId: { type: Schema.Types.ObjectId },
+  dateCreated: { type: Date, default: Date.now },
+  requests: []
+});
+
 var AssignmentSchema = new Schema({
   systemId: { type: Schema.Types.ObjectId },
   client: { type: Number },

@@ -39,7 +39,8 @@ export class accInstitute {
         let responses = await Promise.all([
             this.people.getPeopleArray('?order=lastName'),
             this.people.getInstitutionsArray('?filter=apj|eq|true&order=name', true),
-            this.is4ua.loadIs4ua()
+            this.is4ua.loadIs4ua(),
+            this.people.getPackages('?order=price')
         ]);
 
         this.dataTable.updateArray(this.people.institutionsArray);

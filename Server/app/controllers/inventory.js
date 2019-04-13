@@ -61,9 +61,7 @@ module.exports = function (app, config) {
 
   router.delete('/api/inventory/:id', requireAuth, function(req, res, next){
     logger.log('info','Delete session ' + req.params.id, 'verbose');
-    Model.removeById(req.params.id)
-    .exec()
-    .then(result => {
+    Model.remove({ _id: req.params.id }).then(result => {
         res.status(204).json(result);
       })
       .catch(error => {

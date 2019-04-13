@@ -342,6 +342,22 @@ export class HelpTickets {
         }
     }
 
+    async saveHelpTicketResponseAndCLose(email) {
+        if (this.selectedHelpTicket._id) {
+            var url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
+            var response = await this.data.saveObject(this.selectedHelpTicketContent, url, "put");
+            if (!response.error) {
+                if (!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+                this.selectedHelpTicket = this.utils.copyObject(response);
+                this.updateHelpTicket(this.selectedHelpTicket);
+                this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+            } else {
+                this.data.processError(response, "There was an error updating the help ticket.");
+            }
+            return response;
+        }
+    }
+
     saveNotification(notice){
         this.data.saveObject(notice, this.NOTIFICATION_SERVICES, "post");
     }
@@ -360,6 +376,16 @@ export class HelpTickets {
 
     async uploadFile(files, content) {
         let response = await this.data.uploadFiles(files, this.HELP_TICKET_SERVICES + "/upload/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
+        if (!response.error) {
+            if(this.selectedHelpTicket) this.selectedHelpTicket = this.utils.copyObject(response);
+            if(this.helpTicketsArray && this.editIndex) this.updateHelpTicket(this.selectHelpTicket);
+            // this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+        }
+    }
+
+    
+    async uploadFileArchive(files, content) {
+        let response = await this.data.uploadFiles(files, this.HELP_TICKET_SERVICES + "/uploadArchive/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
         if (!response.error) {
             if(this.selectedHelpTicket) this.selectedHelpTicket = this.utils.copyObject(response);
             if(this.helpTicketsArray && this.editIndex) this.updateHelpTicket(this.selectHelpTicket);

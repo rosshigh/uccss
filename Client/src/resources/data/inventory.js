@@ -89,7 +89,11 @@ export class Inventory {
         return new Array();
      }
      
-
+     async deleteInventory(){
+        if (this.selectedInventory._id) {
+            var response = this.data.deleteObject(this.INVENTORY_SERVICE + "/" + this.selectedInventory._id);
+        }
+     }
    
    
 }

@@ -60,7 +60,7 @@ export class ViewRequests {
     let responses =  await Promise.all([
       this.sessions.getSessionsArray('?order=startDate:DSC',true ),
       this.people.getCoursesArray(true, "?filter=personId|eq|" + this.userObj._id),
-      this.products.getProductsArray('?filter=active|eq|true&order=Category'),
+      this.products.getProductsArray('?order=Category'),
       this.systems.getSystemsArray(),
       this.config.getConfig() 
     ]);

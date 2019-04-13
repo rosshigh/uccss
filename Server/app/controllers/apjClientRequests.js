@@ -8,6 +8,7 @@ var express = require('express'),
   System = mongoose.model('System'),
   Assignment = mongoose.model('Assignment'),
   Person = mongoose.model('Person'),
+  Package = mongoose.model('Packages'),
   Product = mongoose.model('Product'),
   passport = require('passport'),
   Promise = require('bluebird'),
@@ -23,7 +24,7 @@ var express = require('express'),
 module.exports = function (app) {
   app.use('/', router);
 
-  router.get('/api/apj/clientRequests', requireAuth, function(req, res, next){
+  router.get('/api/clientRequests', requireAuth, function(req, res, next){
     logger.log('info','Get clientRequests');
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
@@ -42,7 +43,7 @@ module.exports = function (app) {
       })
   });
 
-  router.post('/api/apj/clientRequests', requireAuth, function(req, res, next){
+  router.post('/api/clientRequests', requireAuth, function(req, res, next){
     logger.log('info','Create clientRequest','verbose');  
 
     var clientRequest = new Model(req.body);
@@ -68,7 +69,7 @@ module.exports = function (app) {
       })
   });
 
-  router.get('/api/apj/clientRequestsDetails', requireAuth, function(req, res, next){ 
+  router.get('/api/clientRequestsDetails', requireAuth, function(req, res, next){ 
     logger.log('info','Get clientRequests', 'verbose');
    
     var query = buildQuery(req.query, ClientRequestDetail.find());
@@ -93,7 +94,7 @@ module.exports = function (app) {
       })
   });
 
-  router.get('/api/apj/clientRequestsDetails/:id', requireAuth, function(req, res, next){
+  router.get('/api/clientRequestsDetails/:id', requireAuth, function(req, res, next){
     logger.log('info','Get clientRequests', 'verbose');
     
     ClientRequestDetail.findById(req.params.id)
@@ -113,7 +114,7 @@ module.exports = function (app) {
       })
   });
 
-  router.put('/api/apj/clientRequestsDetails', function(req, res, next){
+  router.put('/api/clientRequestsDetails', function(req, res, next){
     logger.log('info','Update request detail', 'verbose');  
     
     Model.findOneAndUpdate({_id: req.body.requestId._id}, req.body.requestId, function(err, request){
@@ -137,5 +138,47 @@ module.exports = function (app) {
             })
         });
     }); 
+  });
+
+  router.get('/api/packages', requireAuth, function(req, res, next){
+    logger.log('info','Get packages');
+    var query = buildQuery(req.query, Package.find());
+    query.sort(req.query.order)
+      .exec()
+      .then(object => {
+        if(object){
+          res.status(200).json(object);
+        } else {
+          res.status(200).json({message: "No Packages were found"});
+        }
+      })
+      .catch(err => {
+          return next(err);
+      })
+  });
+
+  router.post('/api/packages', requireAuth, function(req, res, next){
+    logger.log('info','Create packages', "verbose");
+    var packages =  new Package(req.body);
+    packages.save( function ( err, object ){
+      if (err) {
+        return next(err);
+      } else {          
+          res.status(200).json(object);
+      }
+    });
+  });
+
+  router.put('/api/packages', requireAuth, function(req, res, next){
+    logger.log('info','Update packages '+ req.body._id, 'verbose');
+
+    Package.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false})
+    .exec()
+    .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(error => {
+        return next(error);
+      })
   });
 }

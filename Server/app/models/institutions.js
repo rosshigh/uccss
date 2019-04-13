@@ -24,7 +24,8 @@ var InstitutionSchema = new Schema({
     timeZone: { type: String },
     url: { type: String },
     key: { type: String },
-    faculty: [ {type: Schema.Types.ObjectId, ref: 'person'} ]
+    faculty: [ {type: Schema.Types.ObjectId, ref: 'person'} ],
+    packageId: { type: Schema.Types.ObjectId }
 });
 
 InstitutionSchema.pre('update', function() {
