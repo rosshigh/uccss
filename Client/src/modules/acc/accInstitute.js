@@ -40,7 +40,7 @@ export class accInstitute {
             this.people.getPeopleArray('?order=lastName'),
             this.people.getInstitutionsArray('?filter=apj|eq|true&order=name', true),
             this.is4ua.loadIs4ua(),
-            this.people.getPackages('?order=price')
+            this.people.getAPJPackages('?order=price')
         ]);
 
         this.dataTable.updateArray(this.people.institutionsArray);

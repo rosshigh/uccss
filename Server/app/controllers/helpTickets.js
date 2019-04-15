@@ -607,23 +607,24 @@ module.exports = function (app, config) {
   var upload = multer({ storage: storage });
 
   router.post('/api/helpTickets/upload/:id/:container/:contentId', upload.any(), function (req, res, next) {
-    logger.log('info', 'Upload File ');
+    logger.log('info', 'Upload File ');   
     Model.findById(req.params.id, function (err, helpticket) {
       if (err) {
         return next(err);
-      } else {          
+      } else {                 
         if (req.params.contentId) {         
-          var id = req.params.contentId;
-          var content = helpticket.content.id(id);
+          var id = req.params.contentId;        
+          var content = helpticket.content.pop();           
           if (content) {
             for (var i = 0, x = req.files.length; i < x; i++) {        
               var file = {
                 originalFilename: req.files[i].originalname,
                 fileName: req.files[i].filename,
                 dateUploaded: new Date()
-              };
+              };            
               content.files.push(file); 
             }           
+            helpticket.content.push(content)      
             helpticket.save(function (err, helpticket) {
               if (err) {
                 return next(err);

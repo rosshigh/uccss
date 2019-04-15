@@ -352,7 +352,7 @@ export class People {
         }
     }
 
-    async getPackages(options, refresh){
+    async getAPJPackages(options, refresh){
         if (!this.packageArray || refresh) {
             var url = this.PACKAGES_SERVICES;
             url += options ? options : "";

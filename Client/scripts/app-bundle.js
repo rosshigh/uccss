@@ -752,7 +752,7 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
 						switch (_context.prev = _context.next) {
 							case 0:
 								_context.next = 2;
-								return Promise.all([this.products.getProductsArray('?filter=active|eq|true&order=name', true), this.people.getInstitutionsArray('?filter=[and]institutionStatus|eq|01:apj|eq|true&order=name'), this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS', true), this.config.getConfig()]);
+								return Promise.all([this.products.getProductsArray('?filter=active|eq|true&order=name', true), this.people.getInstitutionsArray('?filter=[and]institutionStatus|eq|01:apj|eq|true&order=name'), this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS', true), this.people.getAPJPackages(), this.config.getConfig()]);
 
 							case 2:
 								responses = _context.sent;
@@ -798,19 +798,17 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
 		};
 
 		ACCClientRequest.prototype.selectProduct = function selectProduct(el) {
-			if (!this.showLockMessage) {
-				if (this.alreadyOnList(el.target.id)) {
-					this.utils.showNotification("You can't add the same product more than once.", "warning");
-				} else {
-					$("#requestProductsLabel").html("Requested Products");
-					var newObj = this.requests.emptyRequestDetail();
-					newObj.productId = el.target.id;
-					newObj.sessionId = this.sessionId;
-					newObj.courseId = this.courseId;
-					this.requests.selectedRequest.requestDetails.push(newObj);
-					this.products.selectedProductFromId(newObj.productId);
-					this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = this.products.selectedProduct.name;
-				}
+
+			if (this.alreadyOnList(el.target.id)) {
+				this.utils.showNotification("You can't add the same product more than once.", "warning");
+			} else {
+				$("#requestProductsLabel").html("Requested Products");
+				var newObj = this.requests.emptyRequestDetail();
+				newObj.productId = el.target.id;
+
+				this.requests.selectedRequest.requestDetails.push(newObj);
+				this.products.selectedProductFromId(newObj.productId);
+				this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = this.products.selectedProduct.name;
 			}
 
 			this.validation.makeValid($("#productList"));
@@ -826,25 +824,23 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
 		ACCClientRequest.prototype.removeProduct = function removeProduct(el) {
 			var _this = this;
 
-			if (!this.showLockMessage) {
-				for (var i = 0; i < this.requests.selectedRequest.requestDetails.length; i++) {
-					if (el.target.id === this.requests.selectedRequest.requestDetails[i].productId) {
-						if (this.requests.selectedRequest.requestDetails[i]._id) {
-							if (this.requests.selectedRequest.requestDetails[i].requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
-								return this.dialog.showMessage("That request has already been assigned and cannot be deleted?", "Cannot Delete Request", ['Ok']).whenClosed(function (response) {});
-							} else {
-								return this.dialog.showMessage("Are you sure you want to delete that request?", "Delete Request", ['Yes', 'No']).whenClosed(function (response) {
-									if (!response.wasCancelled) {
-										_this.requests.selectedRequest.requestDetails[i].delete = true;
-									}
-								});
-							}
-							break;
+			for (var i = 0; i < this.requests.selectedRequest.requestDetails.length; i++) {
+				if (el.target.id === this.requests.selectedRequest.requestDetails[i].productId) {
+					if (this.requests.selectedRequest.requestDetails[i]._id) {
+						if (this.requests.selectedRequest.requestDetails[i].requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
+							return this.dialog.showMessage("That request has already been assigned and cannot be deleted?", "Cannot Delete Request", ['Ok']).whenClosed(function (response) {});
 						} else {
-							this.requests.selectedRequest.requestDetails.splice(i, 1);
-
-							break;
+							return this.dialog.showMessage("Are you sure you want to delete that request?", "Delete Request", ['Yes', 'No']).whenClosed(function (response) {
+								if (!response.wasCancelled) {
+									_this.requests.selectedRequest.requestDetails[i].delete = true;
+									_this.requests.selectedRequest.requestDetails.splice(i, 1);
+								}
+							});
 						}
+						break;
+					} else {
+						this.requests.selectedRequest.requestDetails.splice(i, 1);
+						break;
 					}
 				}
 			}
@@ -862,9 +858,7 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
 			} else {
 				this.requests.selectedRequest.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
 			}
-
 			this.requests.selectedRequest.institutionId = this.selectedInstitution;
-			this.requests.selectedRequest.personId = this.selectedPerson;
 		};
 
 		ACCClientRequest.prototype.save = function () {
@@ -923,20 +917,49 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
 			this.requestType = -1;
 		};
 
-		ACCClientRequest.prototype.changeInstitution = function changeInstitution(el) {
-			this.institutionSelected = true;
-			this.courseSelected = false;
-			this.personSelected = false;
-			if (!this.config.SANDBOX_USED) {
-				this.typeSelected = true;
-				this.regularClient = true;
-				this.requestType = "regularCourse";
+		ACCClientRequest.prototype.changeInstitution = function () {
+			var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(el) {
+				return regeneratorRuntime.wrap(function _callee3$(_context3) {
+					while (1) {
+						switch (_context3.prev = _context3.next) {
+							case 0:
+								_context3.next = 2;
+								return this.people.selectInstitutionByID(this.selectedInstitution);
+
+							case 2:
+								this.institutionSelected = true;
+								if (!this.config.SANDBOX_USED) {
+									this.typeSelected = true;
+									this.regularClient = true;
+									this.requestType = "regularCourse";
+								}
+								this.selectedPerson = "";
+								this.requestType = "";
+								$("#existingRequestInfo").empty().hide();
+								_context3.next = 9;
+								return this.requests.getAPJInstitutionRequests('?filter=institutionId|eq|' + this.selectedInstitution, true);
+
+							case 9:
+								if (!this.requests.apjInstitutionRequestArray.length) {
+									this.requests.selectRequest();
+								} else {
+									this.requests.selectRequest(0);
+								}
+
+							case 10:
+							case 'end':
+								return _context3.stop();
+						}
+					}
+				}, _callee3, this);
+			}));
+
+			function changeInstitution(_x) {
+				return _ref3.apply(this, arguments);
 			}
-			this.selectedPerson = "";
-			this.requestType = "";
-			$("#existingRequestInfo").empty().hide();
-			this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.selectedInstitution + '&order=lastName', true);
-		};
+
+			return changeInstitution;
+		}();
 
 		ACCClientRequest.prototype.changePerson = function changePerson(el) {
 			this.personSelected = true;
@@ -969,67 +992,6 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
 			}
 		};
 
-		ACCClientRequest.prototype.getRequests = function () {
-			var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-				var dateFoo, existingMsg;
-				return regeneratorRuntime.wrap(function _callee3$(_context3) {
-					while (1) {
-						switch (_context3.prev = _context3.next) {
-							case 0:
-								if (!(this.sessionId != -1 && this.courseId != -1)) {
-									_context3.next = 8;
-									break;
-								}
-
-								this.ILockedIt = false;
-								this.existingRequest = false;
-								_context3.next = 5;
-								return this.requests.getClientRequestsArray('?filter=[and]personId|eq|' + this.selectedPerson + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
-
-							case 5:
-								if (this.requests.requestsArray && this.requests.requestsArray.length > 0) {
-									this.requests.selectRequest(0);
-									this.setDates(false);
-
-									this.ILockedIt = true;
-									this.existingRequest = true;
-									if (this.requests.requestsArray && this.requests.requestsArray.length > 0) {
-										dateFoo = (0, _moment2.default)(new Date(this.requests.selectedRequest.requestDetails[0].createdDate)).format(this.config.DATE_FORMAT_TABLE);
-										existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
-
-										$("#existingRequestInfo").html('').append(existingMsg).fadeIn();
-									} else {
-										$("#existingRequestInfo").empty().hide();
-									}
-								} else {
-									$("#existingRequestInfo").empty().hide();
-									this.setDates(true);
-									this.existingRequest = false;
-									this.requests.selectRequest();
-									this.requests.selectedRequest.sessionId = this.sessionId;
-								}
-
-								_context3.next = 9;
-								break;
-
-							case 8:
-								this.existingRequest = false;
-
-							case 9:
-							case 'end':
-								return _context3.stop();
-						}
-					}
-				}, _callee3, this);
-			}));
-
-			function getRequests() {
-				return _ref3.apply(this, arguments);
-			}
-
-			return getRequests;
-		}();
-
 		ACCClientRequest.prototype.filterList = function filterList() {
 			if (this.filter) {
 				var thisFilter = this.filter;
@@ -1057,48 +1019,6 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
 			this.maxRequiredDate = this.sessions.selectedSession.endDate;
 		};
 
-		ACCClientRequest.prototype.changeCourse = function () {
-			var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(el) {
-				var courseId;
-				return regeneratorRuntime.wrap(function _callee4$(_context4) {
-					while (1) {
-						switch (_context4.prev = _context4.next) {
-							case 0:
-								courseId = el.target.options[el.target.selectedIndex].value;
-
-								this.selectedCourseIndex = el.target.selectedIndex;
-
-								if (!(courseId === "")) {
-									_context4.next = 6;
-									break;
-								}
-
-								this.courseSelected = false;
-								_context4.next = 11;
-								break;
-
-							case 6:
-								this.courseSelected = true;
-								this.courseName = this.courses[el.target.selectedIndex - 1].number + " - " + this.courses[el.target.selectedIndex - 1].name;
-								this.validation.makeValid($(el.target));
-								_context4.next = 11;
-								return this.getRequests();
-
-							case 11:
-							case 'end':
-								return _context4.stop();
-						}
-					}
-				}, _callee4, this);
-			}));
-
-			function changeCourse(_x) {
-				return _ref4.apply(this, arguments);
-			}
-
-			return changeCourse;
-		}();
-
 		ACCClientRequest.prototype._setUpValidation = function _setUpValidation() {
 			this.validation.addRule(1, "institution", [{
 				"rule": "custom", "message": "Select an institution",
@@ -1106,49 +1026,7 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
 					return !(context.selectedInstitution == "");
 				}
 			}]);
-			this.validation.addRule(1, "faculty", [{
-				"rule": "custom", "message": "Select a person",
-				"valFunction": function valFunction(context) {
-					return !(context.selectedPerson == "");
-				}
-			}]);
-			this.validation.addRule(1, "startDateError", [{
-				"rule": "required", "message": "Select a date",
-				"value": "requests.selectedRequest.startDate"
-			}]);
-			this.validation.addRule(1, "endDateError", [{
-				"rule": "required", "message": "Select a date",
-				"value": "requests.selectedRequest.endDate"
-			}]);
 
-			this.validation.addRule(1, "requestType", [{
-				"rule": "custom", "message": "Select a request type",
-				"valFunction": function valFunction(context) {
-					return !(context.requestType == "");
-				}
-			}]);
-			this.validation.addRule(1, "numberOfStudentsError", [{
-				"rule": "custom", "message": "Enter either the number of undergradate or graduate students",
-				"valFunction": function valFunction(context) {
-					if (context.requestType === "sandboxCourse" || context.requestType === "") {
-						return true;
-					} else if (context.requests.selectedRequest.undergradIds == 0 && context.requests.selectedRequest.graduateIds == 0) {
-						return false;
-					} else {
-						return true;
-					}
-				}
-			}]);
-			this.validation.addRule(1, "productList", [{
-				"rule": "custom", "message": "Select at least one product",
-				"valFunction": function valFunction(context) {
-					if (context.requests.selectedRequest.requestDetails.length === 0) {
-						return false;
-					} else {
-						return true;
-					}
-				}
-			}]);
 			this.validation.addRule(1, "productListTable", [{
 				"rule": "custom", "message": "Enter all required dates",
 				"valFunction": function valFunction(context) {
@@ -1160,7 +1038,6 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
 					return true;
 				}
 			}]);
-			this.validation.addRule(5, "number", [{ "rule": "required", "message": "Enter the course number", "value": "people.selectedCourse.number" }, { "rule": "required", "message": "Enter the course name", "value": "people.selectedCourse.name" }]);
 		};
 
 		return ACCClientRequest;
@@ -1314,7 +1191,7 @@ define('modules/acc/accInstitute',['exports', 'aurelia-framework', '../../resour
                                 (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
                                 (0, _jquery2.default)('#loading').show();
                                 _context.next = 4;
-                                return Promise.all([this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?filter=apj|eq|true&order=name', true), this.is4ua.loadIs4ua(), this.people.getPackages('?order=price')]);
+                                return Promise.all([this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?filter=apj|eq|true&order=name', true), this.is4ua.loadIs4ua(), this.people.getAPJPackages('?order=price')]);
 
                             case 4:
                                 responses = _context.sent;
@@ -10778,27 +10655,34 @@ define('resources/data/apjClientRequests',['exports', 'aurelia-framework', './da
             return getClientRequestsDetailsArray;
         }();
 
-        APJClientRequests.prototype.getRequestDetail = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(id) {
-                var serverResponse;
+        APJClientRequests.prototype.getAPJInstitutionRequests = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(options, refresh) {
+                var url, response;
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
-                                _context2.next = 2;
-                                return this.data.get(this.CLIENT_REQUEST_DETAILS + "/" + id);
-
-                            case 2:
-                                serverResponse = _context2.sent;
-
-                                if (!serverResponse.error) {
-                                    this.selectedRequestDetail = serverResponse;
-                                } else {
-                                    this.selectedRequestDetail = null;
+                                if (!(!this.apjInstitutionRequestArray || refresh)) {
+                                    _context2.next = 7;
+                                    break;
                                 }
-                                return _context2.abrupt('return', serverResponse);
+
+                                url = this.CLIENT_REQUESTS_SERVICES;
+
+                                url += options ? options : "";
+                                _context2.next = 5;
+                                return this.data.get(url);
 
                             case 5:
+                                response = _context2.sent;
+
+                                if (!response.error) {
+                                    this.apjInstitutionRequestArray = response;
+                                } else {
+                                    this.apjInstitutionRequestArray = undefined;
+                                }
+
+                            case 7:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -10806,8 +10690,43 @@ define('resources/data/apjClientRequests',['exports', 'aurelia-framework', './da
                 }, _callee2, this);
             }));
 
-            function getRequestDetail(_x3) {
+            function getAPJInstitutionRequests(_x3, _x4) {
                 return _ref2.apply(this, arguments);
+            }
+
+            return getAPJInstitutionRequests;
+        }();
+
+        APJClientRequests.prototype.getRequestDetail = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(id) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                _context3.next = 2;
+                                return this.data.get(this.CLIENT_REQUEST_DETAILS + "/" + id);
+
+                            case 2:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.error) {
+                                    this.selectedRequestDetail = serverResponse;
+                                } else {
+                                    this.selectedRequestDetail = null;
+                                }
+                                return _context3.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function getRequestDetail(_x5) {
+                return _ref3.apply(this, arguments);
             }
 
             return getRequestDetail;
@@ -10818,7 +10737,7 @@ define('resources/data/apjClientRequests',['exports', 'aurelia-framework', './da
                 this.selectedRequest = this.emptyRequest();
             } else {
                 try {
-                    this.selectedRequest = this.utils.copyObject(this.requestsArray[index]);
+                    this.selectedRequest = this.utils.copyObject(this.apjInstitutionRequestArray[index]);
                     this.editRequestIndex = index;
                 } catch (error) {
                     console.log(error);
@@ -10868,59 +10787,13 @@ define('resources/data/apjClientRequests',['exports', 'aurelia-framework', './da
         };
 
         APJClientRequests.prototype.saveRequestDetail = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var response;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                if (this.selectedRequestDetail) {
-                                    _context3.next = 2;
-                                    break;
-                                }
-
-                                return _context3.abrupt('return');
-
-                            case 2:
-                                _context3.next = 4;
-                                return this.data.saveObject(this.selectedRequestDetail, this.CLIENT_REQUEST_DETAILS, "put");
-
-                            case 4:
-                                response = _context3.sent;
-
-                                if (response.error) {
-                                    _context3.next = 9;
-                                    break;
-                                }
-
-                                this.selectedRequestDetail = response;
-                                this.requestsDetailsArray[this.requestDetailIndex] = this.utils.copyObject(this.selectedRequestDetail);
-                                return _context3.abrupt('return', response);
-
-                            case 9:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function saveRequestDetail() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return saveRequestDetail;
-        }();
-
-        APJClientRequests.prototype.saveRequest = function () {
             var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-                var url, _serverResponse, serverResponse;
-
+                var response;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
-                                if (this.selectedRequest) {
+                                if (this.selectedRequestDetail) {
                                     _context4.next = 2;
                                     break;
                                 }
@@ -10928,41 +10801,22 @@ define('resources/data/apjClientRequests',['exports', 'aurelia-framework', './da
                                 return _context4.abrupt('return');
 
                             case 2:
-                                url = this.CLIENT_REQUESTS_SERVICES;
+                                _context4.next = 4;
+                                return this.data.saveObject(this.selectedRequestDetail, this.CLIENT_REQUEST_DETAILS, "put");
 
-                                if (this.selectedRequest._id) {
-                                    _context4.next = 11;
+                            case 4:
+                                response = _context4.sent;
+
+                                if (response.error) {
+                                    _context4.next = 9;
                                     break;
                                 }
 
-                                _context4.next = 6;
-                                return this.data.saveObject(this.selectedRequest, url, "post");
+                                this.selectedRequestDetail = response;
+                                this.requestsDetailsArray[this.requestDetailIndex] = this.utils.copyObject(this.selectedRequestDetail);
+                                return _context4.abrupt('return', response);
 
-                            case 6:
-                                _serverResponse = _context4.sent;
-
-                                if (!_serverResponse.error) {
-                                    if (this.requestsArray) {
-                                        this.requestsArray.push(this.selectedRequest);
-                                    }
-                                }
-                                return _context4.abrupt('return', _serverResponse);
-
-                            case 11:
-                                _context4.next = 13;
-                                return this.data.saveObject(this.selectedRequest, url, "put");
-
-                            case 13:
-                                serverResponse = _context4.sent;
-
-                                if (!serverResponse.error) {
-                                    if (this.requestsArray && this.editRequestIndex) {
-                                        this.requestsArray[this.editRequestIndex] = this.utils.copyObject(this.selectedRequest);
-                                    }
-                                }
-                                return _context4.abrupt('return', serverResponse);
-
-                            case 16:
+                            case 9:
                             case 'end':
                                 return _context4.stop();
                         }
@@ -10970,8 +10824,73 @@ define('resources/data/apjClientRequests',['exports', 'aurelia-framework', './da
                 }, _callee4, this);
             }));
 
-            function saveRequest() {
+            function saveRequestDetail() {
                 return _ref4.apply(this, arguments);
+            }
+
+            return saveRequestDetail;
+        }();
+
+        APJClientRequests.prototype.saveRequest = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var url, _serverResponse, serverResponse;
+
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                if (this.selectedRequest) {
+                                    _context5.next = 2;
+                                    break;
+                                }
+
+                                return _context5.abrupt('return');
+
+                            case 2:
+                                url = this.CLIENT_REQUESTS_SERVICES;
+
+                                if (this.selectedRequest._id) {
+                                    _context5.next = 11;
+                                    break;
+                                }
+
+                                _context5.next = 6;
+                                return this.data.saveObject(this.selectedRequest, url, "post");
+
+                            case 6:
+                                _serverResponse = _context5.sent;
+
+                                if (!_serverResponse.error) {
+                                    if (this.requestsArray) {
+                                        this.requestsArray.push(this.selectedRequest);
+                                    }
+                                }
+                                return _context5.abrupt('return', _serverResponse);
+
+                            case 11:
+                                _context5.next = 13;
+                                return this.data.saveObject(this.selectedRequest, url, "put");
+
+                            case 13:
+                                serverResponse = _context5.sent;
+
+                                if (!serverResponse.error) {
+                                    if (this.requestsArray && this.editRequestIndex) {
+                                        this.requestsArray[this.editRequestIndex] = this.utils.copyObject(this.selectedRequest);
+                                    }
+                                }
+                                return _context5.abrupt('return', serverResponse);
+
+                            case 16:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function saveRequest() {
+                return _ref5.apply(this, arguments);
             }
 
             return saveRequest;
@@ -17686,7 +17605,7 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
             return getInstitutionsArray;
         }();
 
-        People.prototype.getPackages = function () {
+        People.prototype.getAPJPackages = function () {
             var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18(options, refresh) {
                 var url, _response4;
 
@@ -17722,11 +17641,11 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee18, this);
             }));
 
-            function getPackages(_x20, _x21) {
+            function getAPJPackages(_x20, _x21) {
                 return _ref18.apply(this, arguments);
             }
 
-            return getPackages;
+            return getAPJPackages;
         }();
 
         People.prototype.getInstitution = function () {
@@ -67570,7 +67489,7 @@ define('text!resources/elements/table-navigation-bar.html', ['module'], function
 define('text!resources/elements/tree-node.html', ['module'], function(module) { module.exports = "<template>\r\n\t<style>\r\n\t\t.menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\r\n\t\t}\r\n\t</style>\r\n\t<require from=\"./tree-node.css\"></require>\r\n\t<li if.bind=\"visible\" class=\"list-group-item treeview ${selectedNode == data?'menuButtons':''}\" click.delegate=\"clickMe(data)\">\r\n\t\t<span class=\"indent\" repeat.for=\"i of level\"></span>\r\n\t\t<span if.bind=\"data.children\" class=\"icon glyphicon ${childrenVisible?'glyphicon-triangle-bottom':'glyphicon-triangle-right'}\" click.delegate=\"toggleExpand(data)\"></span>\r\n\t\t<span if.bind=\"!data.children\" class=\"icon glyphicon\"></span>\r\n\t\t${data.name}<span if.bind=\"!childrenVisible && itemCount != 0\" class=\"badge\" click.delegate=\"toggleExpand()\">${itemCount}</span>\r\n\t\t <span if.bind=\"!data.children\" class=\"icon glyphicon glyphicon-trash pull-right\" click.delegate=\"callback(data)\"></span>\r\n\t</li>\r\n\t<tree-node if.bind=\"visible\"  callback.call=\"deleteFile2(node)\" selected-file.bind=\"selectedFile\" repeat.for=\"node of data.children\" data.bind=\"node\" level.bind=\"level + 1\" visible.bind=\"childrenVisible\" max-level.bind=\"maxLevel\" selected-node.bind=\"selectedNode\"></tree-node>\r\n</template>"; });
 define('text!resources/htTimeline/response.html', ['module'], function(module) { module.exports = "<template>\r\n\t <div class=\"topMargin\">\r\n\t\t<img if.bind=\"event.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${event.personId.file.fileName}\" height=\"100\">\r\n\t</div>\r\n\r\n    <div if.bind=\"!event.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId.email | gravatarUrl:100:1\"></div>\r\n\t<div class=\"smart-timeline-time\">\r\n\t\t<small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\r\n\t\t<p><span if.bind=\"event.emailSent\"  ><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></span></p>\r\n    \t<span if.bind=\"event.confidential\"  ><i class=\"fa fa-user-secret\" aria-hidden=\"true\"></i></i></span> \r\n\t</div>\r\n\t<div class=\"smart-timeline-content borderTop leftJustify\">\r\n\t\t<div class=\"form-group\">\r\n\t\t\t<p>${event.personId.fullName}</p>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div class=\"form-group\">\r\n\t\t\t<div class=\"hover_img\" repeat.for=\"file of event.files\">\r\n\t\t\t\t<a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\" target=\"_blank\"\r\n\t\t\t\t\tinnerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div class=\"form-group\">\r\n\t\t\t<div class=\"hover_img\" repeat.for=\"document of event.documents\">\r\n\t\t\t\t<a href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}\" target=\"_blank\">${document.fileName}</a>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>"; });
 define('text!resources/htTimeline/timeline.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"well well-sm topMargin\">\r\n      <div class=\"smart-timeline\">\r\n        <ul class=\"smart-timeline-list\">\r\n          <li>\r\n            <div class=\"topMargin\">\r\n                <img if.bind=\"helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.personId.file.fileName}\" height=\"100\">\r\n            </div>\r\n\r\n            <div if.bind=\"!helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"helpTickets.selectedHelpTicket.personId.email | gravatarUrl:100:1\"></div>\r\n              <div class=\"smart-timeline-time\">\r\n                <small>${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\r\n              </div>\r\n              <div class=\"smart-timeline-content borderTop leftJustify\">\r\n                <div class=\"form-group\">\r\n                  <p>${helpTickets.selectedHelpTicket.personId.fullName}</p>\r\n                  <div class=\"row\">\r\n                    <div class=\"col-lg-4\">\r\n                      <span class=\"col-sm-11 col-sm-offset-1\" id=\"container\"></span>\r\n                      <h4 show.bind=\"showCourse\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Course: ${course}</h4>\r\n                      <div show.bind=\"showRequestDetails\">\r\n                        <h4  class=\"col-sm-11 col-sm-offset-1 topMargin\">Request: ${helpTickets.selectedHelpTicket.requestId.requestNo}</h4>\r\n                        <h4  class=\"col-sm-11 col-sm-offset-1\">Product: ${helpTickets.selectedHelpTicket.productId | lookupValue:products.productsArray:\"_id\":\"name\"}</h4>\r\n                                                  \r\n                        <table class=\"col-sm-11 col-sm-offset-1\">\r\n                          <tr>\r\n                            <th class=\"col-lg-1\">System</th>\r\n                            <th class=\"col-lg-1\">Client</th>\r\n                          </tr>\r\n                          <tr repeat.for=\"assign of helpTickets.selectedHelpTicket.requestId.assignments\">\r\n                            <td class=\"${assign.client == helpTickets.selectedHelpTicket.client ? 'col-lg-1 redText' : 'col-lg-1'}\"><h4>${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h4></td>\r\n                            <td class=\"${assign.client == helpTickets.selectedHelpTicket.client ? 'col-lg-1 redText' : 'col-lg-1'}\"><h4>${assign.client}</h4></td>\r\n                            <td innerhtml=\"${assign.client | arrow:helpTickets.selectedHelpTicket.client:helpTickets.selectedHelpTicket.systemId:assign.systemId}\"></td>\r\n                          </tr>\r\n                      \r\n                        </table>\r\n                      </div>\r\n                      <h4 show.bind=\"!showRequestDetails && clientRequired\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\r\n                   \r\n                      <div class=\"form-group topMargin\">\r\n                          <div class=\"hover_img\" repeat.for=\"file of helpTickets.selectedHelpTicket.content[0].files\">\r\n                            <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\r\n                              target=\"_blank\"\r\n                              innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\r\n                          </div>\r\n                      </div>\r\n                     </div>\r\n                    <div class=\"col-lg-7\">\r\n                      <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.comments ? helpTickets.selectedHelpTicket.content[0].content.comments : ' ' \"></div>\r\n                      <div show.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps\">\r\n                        <hr/>\r\n                        <h4 >Steps to reproduce the problem</h4>\r\n                        <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps ? helpTickets.selectedHelpTicket.content[0].content.steps : ' ' \"></div>\r\n                      </div>\r\n                    </div>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </li>\r\n          <li repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC:true\">\r\n            <compose view=\"./response.html\"></compose>\r\n          </li>\r\n        </ul>\r\n      </div>\r\n    </div>\r\n</template>"; });
-define('text!modules/acc/accCreateRequest.html', ['module'], function(module) { module.exports = "<template>\r\n    <span id=\"loading\">\r\n        <ul class=\"bokeh\">\r\n            <li></li>\r\n            <li></li>\r\n            <li></li>\r\n        </ul>\r\n    </span>\r\n\r\n    <div class=\"fluid-container\">\r\n        <div class=\"panel panel-default\" style=\"margin-top:50px;\">\r\n            <div class=\"panel-body\">\r\n                <div class=\"row\">\r\n                    <div class=\"bottomMargin list-group-item  toolbar\">\r\n                        <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                            data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i\r\n                                class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-4\">\r\n\r\n                        <div class=\"topMargin\">\r\n                            <select id=\"institution\" value.bind=\"selectedInstitution\"\r\n                                change.delegate=\"changeInstitution($event)\" class=\"form-control\">\r\n                                <option value=\"\">Choose the Institution</option>\r\n                                <option repeat.for=\"item of people.institutionsArray\" value=\"${item._id}\">${item.name}\r\n                                </option>\r\n                            </select>\r\n                        </div>\r\n\r\n                        <div show.bind=\"institutionSelected\" class=\"topMargin\">\r\n                            <select id=\"faculty\" value.bind=\"selectedPerson\" change.delegate=\"changePerson($event)\"\r\n                                class=\"form-control\">\r\n                                <option value=\"\">Choose the Faculty</option>\r\n                                <option repeat.for=\"item of people.instutionPeopleArray\" value=\"${item._id}\">\r\n                                    ${item.fullName}\r\n                                </option>\r\n                            </select>\r\n                        </div>\r\n\r\n                        <div id=\"course\" show.bind=\"personSelected && useSandbox\" class=\"topMargin\">\r\n                            <select value.bind=\"requestType\" change.delegate=\"changeRequestType($event)\"\r\n                                id=\"requestType\" class=\"form-control\">\r\n                                <option value=\"-1\">Choose the Type of The Request</option>\r\n                                <option value=\"sandboxCourse\">${config.SANDBOX_NAME}</option>\r\n                                <option value=\"regularCourse\">Regular Course</option>\r\n                            </select>\r\n                        </div>\r\n\r\n                        <div id=\"existingRequestInfo\"></div>\r\n\r\n                        <div class=\"row\" id=\"numStudents\" show.bind=\"personSelected && regularClient\">\r\n                            <div class=\"topMargin col-lg-5\">\r\n                                <label for=\"undergraduates\" class=\"control-label\">Undergraduates</label>\r\n                                <input id=\"undergraduates\" type=\"number\" placeholder=\"Number of Undergraduates\"\r\n                                    class=\"form-control\" value.bind=\"requests.selectedRequest.undergradIds\" />\r\n                            </div>\r\n                            <div class=\"topMargin col-lg-5\">\r\n                                <label for=\"graduates\" class=\"control-label\">Graduates</label>\r\n                                <input id=\"graduates\" type=\"number\" placeholder=\"Number of Graduates\"\r\n                                    class=\"form-control\" value.bind=\"requests.selectedRequest.graduateIds\" />\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row col-lg-offset-3\" show.bind=\"personSelected\">\r\n                            <span class=\"col-lg-8 \" id=\"numberOfStudentsError\"></span>\r\n                        </div>\r\n\r\n                        <!-- Begin and End Date -->\r\n                        <div class=\"row\" show.bind=\"sandBoxClient || personSelected\">\r\n                            <div class=\"col-lg-5 topMargin\">\r\n                                <label class=\"form-control-label \">Start Date</label>\r\n                                <flat-picker disabled.bind=\"showLockMessage\" controlid=\"startDate\" config.bind=\"config\"\r\n                                    change.delegate=\"changeBeginDate($event)\"\r\n                                    value.bind=\"requests.selectedRequest.startDate\" startdate.bind=\"minStartDate\"\r\n                                    enddate.bind=\"maxStartDate\"></flat-picker>\r\n                                <span id='startDateError'></span>\r\n                            </div>\r\n                            <div class=\"col-lg-5 topMargin\">\r\n                                <label class=\"form-control-label \">End Date</label>\r\n                                <flat-picker disabled.bind=\"showLockMessage\" controlid=\"endDate\" config.bind=\"config\"\r\n                                    value.bind=\"requests.selectedRequest.endDate\" startdate.bind=\"minEndDate\"\r\n                                    enddate.bind=\"maxEndDate\"></flat-picker>\r\n                                <span id='endDateError'></span>\r\n                            </div>\r\n                        </div>\r\n\r\n                    </div>\r\n                    <div show.bind=\"sandBoxClient || personSelected\" class=\"col-lg-8\">\r\n                        <div class=\"row\">\r\n                            <div class=\"col-md-5 topMargin\">\r\n                                <label id=\"productList\">Available Products</label>\r\n                                <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                                    <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\"\r\n                                        placeholder=\"Filter products\" />\r\n                                    <ul class=\"list-group\">\r\n                                        <a click.trigger=\"selectProduct($event)\" type=\"button\"\r\n                                            repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\"\r\n                                            class=\"list-group-item dropbtn\">${product.name}</a>\r\n                                    </ul>\r\n                                </div>\r\n                            </div>\r\n                            <div class=\"col-md-5 col-md-offset-1 topMargin\">\r\n                                <label id=\"requestProductsLabel\">Requested Products</label>\r\n                                <div class=\"well well2 overflow\" style=\"height:400px;\">\r\n                                    <ul class=\"list-group\">\r\n                                        <a show.bind=\"!product.delete\" click.trigger=\"removeProduct($event)\"\r\n                                            type=\"button\"\r\n                                            repeat.for=\"product of requests.selectedRequest.requestDetails\"\r\n                                            id=\"${product.productId}\"\r\n                                            class=\"list-group-item dropbtn\">${product.productId |\r\n                                            lookupValue:products.productsArray:\"_id\":\"name\"}</a>\r\n                                    </ul>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\" id=\"productListTable\">\r\n                            <div show.bind=\"requests.selectedRequest.requestDetails.length > 0\">\r\n                                <table class=\"table table-striped table-bordered col-md-10 topMargin\">\r\n                                    <thead>\r\n                                        <tr>\r\n                                            <th>Requested Product</th>\r\n                                            <th>Date Required</th>\r\n                                        </tr>\r\n                                    <tbody id=\"requiredProductsTable\">\r\n                                        <tr repeat.for=\"request of requests.selectedRequest.requestDetails\">\r\n                                            <td>${request.productId | lookupValue:products.productsArray:\"_id\":\"name\"}\r\n                                            </td>\r\n                                            <td>\r\n                                                <div class=\"form-group  col-md-8\">\r\n                                                    <flat-picker controlid=\"requiredDate-${$index}\"\r\n                                                        config.bind=\"configDate\" value.bind=\"request.requiredDate\">\r\n                                                    </flat-picker>\r\n                                                </div>\r\n                                            </td>\r\n                                        </tr>\r\n                                    </tbody>\r\n                                </table>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n\r\n                            <div class=\"topMargin\" show.bind=\"sandBoxClient || personSelected\">\r\n                                <editor value.bind=\"requests.selectedRequest.comments\" height=\"250\"></editor>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/acc/accCreateRequest.html', ['module'], function(module) { module.exports = "<template>\r\n    <span id=\"loading\">\r\n        <ul class=\"bokeh\">\r\n            <li></li>\r\n            <li></li>\r\n            <li></li>\r\n        </ul>\r\n    </span>\r\n\r\n    <div class=\"fluid-container\">\r\n        <div class=\"panel panel-default\" style=\"margin-top:50px;\">\r\n            <div class=\"panel-body\">\r\n                <div class=\"row\">\r\n                    <div class=\"bottomMargin list-group-item  toolbar\">\r\n                        <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                            data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i\r\n                                class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-4\">\r\n\r\n                        <div class=\"topMargin\">\r\n                            <select id=\"institution\" value.bind=\"selectedInstitution\"\r\n                                change.delegate=\"changeInstitution($event)\" class=\"form-control\">\r\n                                <option value=\"\">Choose the Institution</option>\r\n                                <option repeat.for=\"item of people.institutionsArray\" value=\"${item._id}\">${item.name}\r\n                                </option>\r\n                            </select>\r\n                        </div>\r\n\r\n                        <span show.bind=\"people.selectedInstitution\">\r\n                            <h5>Package: <strong>${people.selectedInstitution.packageId |\r\n                                    lookupValue:people.packageArray:'_id':'name'}</strong> Max Clients:\r\n                                <strong>${people.selectedInstitution.packageId |\r\n                                    lookupValue:people.packageArray:'_id':'maxClients'}</strong> Active Clients:\r\n                                <strong>${requests.selectedRequest.requestDetails.length}</strong>\r\n                            </h5>\r\n                        </span>\r\n\r\n                        <div show.bind=\"institutionSelected && requests.apjInstitutionRequestArray.length\" id=\"existingRequestInfo\">\r\n\r\n                        </div>\r\n                        <div show.bind=\"institutionSelected && !requests.apjInstitutionRequestArray.length\" id=\"existingRequestInfo\">\r\n                            <h3>This institution has no active requests</h3>\r\n                        </div>\r\n\r\n                        <!-- <div class=\"row\" id=\"numStudents\" show.bind=\"personSelected && regularClient\">\r\n                            <div class=\"topMargin col-lg-5\">\r\n                                <label for=\"undergraduates\" class=\"control-label\">Undergraduates</label>\r\n                                <input id=\"undergraduates\" type=\"number\" placeholder=\"Number of Undergraduates\"\r\n                                    class=\"form-control\" value.bind=\"requests.selectedRequest.undergradIds\" />\r\n                            </div>\r\n                            <div class=\"topMargin col-lg-5\">\r\n                                <label for=\"graduates\" class=\"control-label\">Graduates</label>\r\n                                <input id=\"graduates\" type=\"number\" placeholder=\"Number of Graduates\"\r\n                                    class=\"form-control\" value.bind=\"requests.selectedRequest.graduateIds\" />\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row col-lg-offset-3\" show.bind=\"personSelected\">\r\n                            <span class=\"col-lg-8 \" id=\"numberOfStudentsError\"></span>\r\n                        </div> -->\r\n\r\n                        <!-- Begin and End Date -->\r\n                        <!-- <div class=\"row\" show.bind=\"sandBoxClient || personSelected\">\r\n                            <div class=\"col-lg-5 topMargin\">\r\n                                <label class=\"form-control-label \">Start Date</label>\r\n                                <flat-picker disabled.bind=\"showLockMessage\" controlid=\"startDate\" config.bind=\"config\"\r\n                                    change.delegate=\"changeBeginDate($event)\"\r\n                                    value.bind=\"requests.selectedRequest.startDate\" startdate.bind=\"minStartDate\"\r\n                                    enddate.bind=\"maxStartDate\"></flat-picker>\r\n                                <span id='startDateError'></span>\r\n                            </div>\r\n                            <div class=\"col-lg-5 topMargin\">\r\n                                <label class=\"form-control-label \">End Date</label>\r\n                                <flat-picker disabled.bind=\"showLockMessage\" controlid=\"endDate\" config.bind=\"config\"\r\n                                    value.bind=\"requests.selectedRequest.endDate\" startdate.bind=\"minEndDate\"\r\n                                    enddate.bind=\"maxEndDate\"></flat-picker>\r\n                                <span id='endDateError'></span>\r\n                            </div>\r\n                        </div> -->\r\n\r\n                    </div>\r\n                    <div show.bind=\"institutionSelected\" class=\"col-lg-8\">\r\n                        <div class=\"row\">\r\n                            <div class=\"col-md-5 topMargin\">\r\n                                <label id=\"productList\">Available Products</label>\r\n                                <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                                    <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\"\r\n                                        placeholder=\"Filter products\" />\r\n                                    <ul class=\"list-group\">\r\n                                        <a click.trigger=\"selectProduct($event)\" type=\"button\"\r\n                                            repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\"\r\n                                            class=\"list-group-item dropbtn\">${product.name}</a>\r\n                                    </ul>\r\n                                </div>\r\n                            </div>\r\n                            <div class=\"col-md-5 col-md-offset-1 topMargin\">\r\n                                <label id=\"requestProductsLabel\">Requested Products</label>\r\n                                <div class=\"well well2 overflow\" style=\"height:400px;\">\r\n                                    <ul class=\"list-group\">\r\n                                        <a show.bind=\"!product.delete\" click.trigger=\"removeProduct($event)\"\r\n                                            type=\"button\"\r\n                                            repeat.for=\"product of requests.selectedRequest.requestDetails\"\r\n                                            id=\"${product.productId}\"\r\n                                            class=\"list-group-item dropbtn\">${product.productId |\r\n                                            lookupValue:products.productsArray:\"_id\":\"name\"}</a>\r\n                                    </ul>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\" id=\"productListTable\">\r\n                            <div show.bind=\"requests.selectedRequest.requestDetails.length > 0\">\r\n                                <table class=\"table table-striped table-bordered col-md-10 topMargin\">\r\n                                    <thead>\r\n                                        <tr>\r\n                                            <th>Requested Product</th>\r\n                                            <th>Date Required</th>\r\n                                        </tr>\r\n                                    <tbody id=\"requiredProductsTable\">\r\n                                        <tr repeat.for=\"request of requests.selectedRequest.requestDetails\">\r\n                                            <td>${request.productId | lookupValue:products.productsArray:\"_id\":\"name\"}\r\n                                            </td>\r\n                                            <td>\r\n                                                <div class=\"form-group  col-md-8\">\r\n                                                    <flat-picker controlid=\"requiredDate-${$index}\"\r\n                                                        config.bind=\"configDate\" value.bind=\"request.requiredDate\">\r\n                                                    </flat-picker>\r\n                                                </div>\r\n                                            </td>\r\n                                        </tr>\r\n                                    </tbody>\r\n                                </table>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n\r\n                            <div class=\"topMargin\" show.bind=\"sandBoxClient || personSelected\">\r\n                                <editor value.bind=\"requests.selectedRequest.comments\" height=\"250\"></editor>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/acc/accHT.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../resources/elements/submenu.html'></compose>   \r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template>"; });
 define('text!modules/acc/accInstitute.html', ['module'], function(module) { module.exports = "<template>\r\n        <span id=\"loading\">\r\n            <ul class=\"bokeh\">\r\n                <li></li>\r\n                <li></li>\r\n                <li></li>\r\n            </ul>\r\n        </span>\r\n        <div show.bind=\"dataTable.displayArray && dataTable.displayArray.length || initialLoaded\">\r\n            <div show.bind=\"!institutionSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/institutionsTable.html\"></compose>\r\n            </div> <!-- Table Div -->\r\n            <div show.bind=\"institutionSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/institutionsForm.html\"></compose>\r\n            </div> <!-- Form Div -->\r\n        </div> <!-- Panel Body -->\r\n    </template>"; });
 define('text!modules/acc/accInstitutions.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../resources/elements/submenu.html'></compose>\r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template>"; });

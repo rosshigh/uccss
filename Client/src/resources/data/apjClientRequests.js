@@ -33,6 +33,20 @@ export class APJClientRequests {
         }
     }
 
+    async getAPJInstitutionRequests(options, refresh){
+        if (!this.apjInstitutionRequestArray || refresh) {
+            var url = this.CLIENT_REQUESTS_SERVICES;
+            url += options ? options : "";
+            let response = await this.data.get(url)
+            if (!response.error) {
+                this.apjInstitutionRequestArray = response;
+            } else {
+                this.apjInstitutionRequestArray = undefined;
+            }
+
+        }
+    }
+
     async getRequestDetail(id){
         
         let serverResponse = await this.data.get(this.CLIENT_REQUEST_DETAILS + "/" + id);
@@ -50,7 +64,7 @@ export class APJClientRequests {
             this.selectedRequest = this.emptyRequest();
         } else {
             try {
-                this.selectedRequest = this.utils.copyObject(this.requestsArray[index]);
+                this.selectedRequest = this.utils.copyObject(this.apjInstitutionRequestArray[index]);
                 this.editRequestIndex = index;
             } catch (error) {
                 console.log(error);
@@ -59,6 +73,7 @@ export class APJClientRequests {
 
         }
     }
+
 
     emptyRequest(){
         var newObj = new Object();;
