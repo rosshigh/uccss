@@ -86,6 +86,9 @@ export class accInstitute {
 
     async save() {
          if(this.validation.validate(1)){
+             if(!this.people.selectedInstitution._id){
+                this.people.selectedInstitution.packageId = this.people.selectedInstitution.packageId.packageId;
+             }
             let serverResponse = await this.people.saveAPJInstitution();
             if (!serverResponse.error) {
                 this.dataTable.updateArray(this.people.institutionsArray);

@@ -18054,14 +18054,17 @@ define('modules/acc/accInstitute',['exports', 'aurelia-framework', '../../resour
                         switch (_context5.prev = _context5.next) {
                             case 0:
                                 if (!this.validation.validate(1)) {
-                                    _context5.next = 8;
+                                    _context5.next = 9;
                                     break;
                                 }
 
-                                _context5.next = 3;
+                                if (!this.people.selectedInstitution._id) {
+                                    this.people.selectedInstitution.packageId = this.people.selectedInstitution.packageId.packageId;
+                                }
+                                _context5.next = 4;
                                 return this.people.saveAPJInstitution();
 
-                            case 3:
+                            case 4:
                                 serverResponse = _context5.sent;
 
                                 if (!serverResponse.error) {
@@ -18071,18 +18074,18 @@ define('modules/acc/accInstitute',['exports', 'aurelia-framework', '../../resour
                                     this.utils.showNotification("There was a problem updating saving the institution", 'error');
                                 }
                                 this._cleanUp();
-                                _context5.next = 10;
+                                _context5.next = 11;
                                 break;
 
-                            case 8:
+                            case 9:
                                 if (!(!this.people.selectedInstitution.institutionType || !this.people.selectedInstitution.memberType || !this.people.selectedInstitution.institutionStatus || !this.people.selectedInstitution.highestDegree)) {
-                                    _context5.next = 10;
+                                    _context5.next = 11;
                                     break;
                                 }
 
                                 return _context5.abrupt('return', this.dialog.showMessage("The IS4UA fields on the IS4UA tab are required", "Missing Data", ['OK']).then(function (response) {}));
 
-                            case 10:
+                            case 11:
                             case 'end':
                                 return _context5.stop();
                         }

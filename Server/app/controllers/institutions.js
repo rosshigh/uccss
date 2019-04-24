@@ -48,11 +48,11 @@ module.exports = function (app) {
 
   router.post('/api/apj/institutions', requireAuth, function (req, res) {
     var institution = new Model(req.body);
-
+console.log(institution) 
     Packages.findById(institution.packageId, function (err, package) {
       var newObj = {
         packageId: institution.packageId,
-        institutionId: institution._id,
+        institutionId: institution._id, 
         amount: package.price
       }
       institutionPackage = new InstitutionPackage(newObj);
