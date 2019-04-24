@@ -1,0 +1,28 @@
+{
+	"__v" : NumberInt(0),
+	"_id" : ObjectId("5caceee7d82a476028155bbe"),
+	"maxClients" : NumberInt(2),
+	"name" : "Intro",
+	"price" : NumberInt(5000)
+},
+{
+	"__v" : NumberInt(0),
+	"_id" : ObjectId("5caceefad82a476028155bbf"),
+	"maxClients" : NumberInt(4),
+	"name" : "Explorer",
+	"price" : NumberInt(7500)
+},
+{
+	"__v" : NumberInt(0),
+	"_id" : ObjectId("5cacef0ed82a476028155bc0"),
+	"maxClients" : NumberInt(7),
+	"name" : "Adventurer",
+	"price" : NumberInt(10000)
+},
+{
+	"__v" : NumberInt(0),
+	"_id" : ObjectId("5cacef1fd82a476028155bc1"),
+	"maxClients" : NumberInt(12),
+	"name" : "Grand Adventurer",
+	"price" : NumberInt(15000)
+},
