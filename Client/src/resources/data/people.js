@@ -432,6 +432,26 @@ export class People {
         }
     }
 
+    async saveAPJInstitution(){
+        if (!this.selectedInstitution._id) {
+            let response = await this.data.saveObject(this.selectedInstitution, 'apj/' + this.INSTITUTION_SERVICES, "post")
+                if (!response.error) {
+                    if(this.institutionsArray){
+                        this.institutionsArray.push(response);
+                    }
+                } 
+                return response;
+        } else {
+            let response = await this.data.saveObject(this.selectedInstitution, 'apj/' + this.INSTITUTION_SERVICES, "put")
+                if (!response.status) {
+                    if(this.institutionsArray){
+                        this.institutionsArray[this.editInstitutionIndex] = this.utils.copyObject(this.selectedInstitution, this.institutionsArray[this.editInstitutionIndex]);
+                    }
+                }  
+                return response;
+        }
+    }
+
     async deleteInstitution(){
          let serverResponse = await this.data.deleteObject(this.INSTITUTION_SERVICES + '/' + this.selectedInstitution._id);
             if (!serverResponse.error) {

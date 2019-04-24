@@ -78,7 +78,7 @@ export class accInstitute {
         this.editIndex = -1;
         this.people.getInstitutionPeople(-1);
         this.people.selectInstitution();
-        this.people.selectInstitution.apj = true;
+        this.people.selectedInstitution.apj = true;
         this.newInstitution = true;
         $("#editName").focus();
         this.institutionSelected = true;
@@ -86,7 +86,7 @@ export class accInstitute {
 
     async save() {
          if(this.validation.validate(1)){
-            let serverResponse = await this.people.saveInstitution();
+            let serverResponse = await this.people.saveAPJInstitution();
             if (!serverResponse.error) {
                 this.dataTable.updateArray(this.people.institutionsArray);
                 this.utils.showNotification(serverResponse.name + " was updated");

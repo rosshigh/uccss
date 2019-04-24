@@ -12,7 +12,7 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="bottomMargin list-group-item  toolbar">
-                        <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                        <span click.delegate="saveIt()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
                             data-placement="bottom" title="" data-original-title="Save"><i
                                 class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
                     </div>
@@ -29,56 +29,26 @@
                             </select>
                         </div>
 
-                        <span show.bind="people.selectedInstitution">
-                            <h5>Package: <strong>${people.selectedInstitution.packageId |
-                                    lookupValue:people.packageArray:'_id':'name'}</strong> Max Clients:
-                                <strong>${people.selectedInstitution.packageId |
-                                    lookupValue:people.packageArray:'_id':'maxClients'}</strong> Active Clients:
+                        <span show.bind="institutionSelected && selectedPackage">
+                            <h5>Package: <strong>${selectedPackage.name}</strong> Max Clients:
+                                <strong>${selectedPackage.maxClients}</strong> Active Clients:
                                 <strong>${requests.selectedRequest.requestDetails.length}</strong>
                             </h5>
                         </span>
+                        <span show.bind="institutionSelected && !selectedPackage">
+                            <h5>Currently there is no package assigned to the institution.</h5>
+                        </span>
 
-                        <div show.bind="institutionSelected && requests.apjInstitutionRequestArray.length" id="existingRequestInfo">
-
+                        <div show.bind="institutionSelected && requests.apjInstitutionRequestArray.length"
+                            id="existingRequestInfo">
+                           
                         </div>
-                        <div show.bind="institutionSelected && !requests.apjInstitutionRequestArray.length" id="existingRequestInfo">
+                        <div show.bind="institutionSelected && !requests.apjInstitutionRequestArray.length"
+                            id="existingRequestInfo">
                             <h3>This institution has no active requests</h3>
                         </div>
 
-                        <!-- <div class="row" id="numStudents" show.bind="personSelected && regularClient">
-                            <div class="topMargin col-lg-5">
-                                <label for="undergraduates" class="control-label">Undergraduates</label>
-                                <input id="undergraduates" type="number" placeholder="Number of Undergraduates"
-                                    class="form-control" value.bind="requests.selectedRequest.undergradIds" />
-                            </div>
-                            <div class="topMargin col-lg-5">
-                                <label for="graduates" class="control-label">Graduates</label>
-                                <input id="graduates" type="number" placeholder="Number of Graduates"
-                                    class="form-control" value.bind="requests.selectedRequest.graduateIds" />
-                            </div>
-                        </div>
-                        <div class="row col-lg-offset-3" show.bind="personSelected">
-                            <span class="col-lg-8 " id="numberOfStudentsError"></span>
-                        </div> -->
-
-                        <!-- Begin and End Date -->
-                        <!-- <div class="row" show.bind="sandBoxClient || personSelected">
-                            <div class="col-lg-5 topMargin">
-                                <label class="form-control-label ">Start Date</label>
-                                <flat-picker disabled.bind="showLockMessage" controlid="startDate" config.bind="config"
-                                    change.delegate="changeBeginDate($event)"
-                                    value.bind="requests.selectedRequest.startDate" startdate.bind="minStartDate"
-                                    enddate.bind="maxStartDate"></flat-picker>
-                                <span id='startDateError'></span>
-                            </div>
-                            <div class="col-lg-5 topMargin">
-                                <label class="form-control-label ">End Date</label>
-                                <flat-picker disabled.bind="showLockMessage" controlid="endDate" config.bind="config"
-                                    value.bind="requests.selectedRequest.endDate" startdate.bind="minEndDate"
-                                    enddate.bind="maxEndDate"></flat-picker>
-                                <span id='endDateError'></span>
-                            </div>
-                        </div> -->
+                        <compose view="./components/Requests.html"></compose>
 
                     </div>
                     <div show.bind="institutionSelected" class="col-lg-8">
@@ -89,9 +59,11 @@
                                     <input class="form-control" value.bind="filter" input.trigger="filterList()"
                                         placeholder="Filter products" />
                                     <ul class="list-group">
-                                        <a click.trigger="selectProduct($event)" type="button"
+                                        <li click.trigger="selectProduct(product)"
                                             repeat.for="product of filteredProductsArray" id="${product._id}"
-                                            class="list-group-item dropbtn">${product.name}</a>
+                                            class="list-group-item dropbtn">
+                                            <h4>${product.name}</h4>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -99,12 +71,13 @@
                                 <label id="requestProductsLabel">Requested Products</label>
                                 <div class="well well2 overflow" style="height:400px;">
                                     <ul class="list-group">
-                                        <a show.bind="!product.delete" click.trigger="removeProduct($event)"
-                                            type="button"
+                                        <li click.trigger="removeProduct($index)"
                                             repeat.for="product of requests.selectedRequest.requestDetails"
-                                            id="${product.productId}"
-                                            class="list-group-item dropbtn">${product.productId |
-                                            lookupValue:products.productsArray:"_id":"name"}</a>
+                                            id="${product.productId}" class="list-group-item dropbtn">
+                                            <h4>${product.productId | lookupValue:products.productsArray:"_id":"name"}
+                                            </h4>
+                                        </li>
+
                                     </ul>
                                 </div>
                             </div>

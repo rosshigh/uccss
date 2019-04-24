@@ -282,6 +282,8 @@ export class ArchiveHelpTickets {
     this.selectedRow = $(el.target).closest('tr');
     this.selectedRow.children().addClass('info')
     this.searchResults = true;
+    this.showRequestDetails = true;
+    this.showCourse = true;
 
     this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
   }

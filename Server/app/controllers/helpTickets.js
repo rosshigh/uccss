@@ -236,6 +236,7 @@ module.exports = function (app, config) {
     }
     query.populate('courseId', 'name number')
     query.populate('requestId')
+    query.populate('requestId')
     query.populate('personId', 'email firstName lastName phone mobile nickName file country')
     query.populate('content.personId', 'email firstName lastName phone mobile nickName')
     query.populate('institutionId', 'name')

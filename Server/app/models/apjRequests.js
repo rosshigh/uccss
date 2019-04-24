@@ -11,6 +11,18 @@ var PackageSchema = new Schema({
 
 module.exports = Mongoose.model('Packages', PackageSchema);
 
+var InstitutionPackageSchema = new Schema({
+  institutionId: { type: Schema.Types.ObjectId },
+  packageId: { type: Schema.Types.ObjectId },
+  dateStarted: { type: Date, default: Date.now },
+  dateEnded: { type: Date, default: null },
+  dateInvoiced: { type: Date, default: null },
+  datePaid: { type: Date, default: null },
+  amount: { type: Number }
+});
+
+module.exports = Mongoose.model('InstitutionPackage', InstitutionPackageSchema);
+
 var CustomerPackageSchema = new Schema({
   packageId: { type: Schema.Types.ObjectId }, 
   institutionId: { type: Schema.Types.ObjectId },
@@ -74,14 +86,14 @@ module.exports = Mongoose.model('ClientRequestDetailAPJ', ClientRequestDetailsSc
 
 var ClientRequestSchema = new Schema({
   clientRequestNo: { type: Number },
-  personId: { type:  Schema.Types.ObjectId },
-  studentIdsAssigned: { type: Number }, 
-  graduateIds: { type: Number, default: 0, min : 0 },
-  undergradIds: { type: Number, default: 0, min: 0 },
+  // personId: { type:  Schema.Types.ObjectId },
+  // studentIdsAssigned: { type: Number }, 
+  // graduateIds: { type: Number, default: 0, min : 0 },
+  // undergradIds: { type: Number, default: 0, min: 0 },
   comments: { type: String },
   whereHosted: { type: String, default: 'UCC' },
-  startDate: { type: Date },
-  endDate: { type: Date },
+  // startDate: { type: Date },
+  // endDate: { type: Date },
   requestStatus: { type: String },
   modifiedDate: { type: Date },
   requestDetails: [ { type: Schema.Types.ObjectId } ], //, ref: 'ClientRequestDetail'

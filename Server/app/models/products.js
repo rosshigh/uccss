@@ -38,7 +38,8 @@ var ProductSchema = new Schema({
   firstAllowableId: { type: String },
   lastAllowableId: { type: String },
   dateCreated: { type: Date, default: Date.now  },
-  dateModified: { type: Date, default: Date.now  }
+  dateModified: { type: Date, default: Date.now  },
+  apj: { type: Boolean, default: false }
 });
 
 ProductSchema.pre('update', function() {

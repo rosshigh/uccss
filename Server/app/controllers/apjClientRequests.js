@@ -43,6 +43,64 @@ module.exports = function (app) {
       })
   });
 
+  router.put('/api/apj/clientRequests/:id', requireAuth, function(req, res, next){
+    logger.log('info','Update clientRequest ' + req.body._id);     
+    
+    var clientRequest = new Model(req.body);   
+
+    clientRequest.requestDetails = new Array();  
+    if(req.body.requestDetailsToSave){      
+      var updates =req.body.requestDetailsToSave.map(detail => {     
+         if(detail._id){
+           if(detail.delete){
+            return { 
+              deleteOne: {
+                  filter: {_id: detail._id}
+              }
+            }          
+           } else {
+            clientRequest.requestDetails.push(detail._id);            
+            return { 
+              updateOne: { 
+                  "filter": { "_id": detail._id },              
+                  "update": detail 
+              } 
+            }   
+            
+           }
+         } else {
+           var obj = new ClientRequestDetail(detail);
+            obj.requestId = clientRequest._id;    
+            clientRequest.requestDetails.push(obj._id);        
+            return { "insertOne": { "document": obj } }
+
+         }
+       });      
+
+      ClientRequestDetail.bulkWrite(updates, function(err, result) {
+        if(err){
+          return next(error);
+        }     
+       
+        if(clientRequest.requestDetails.length === 0){
+          Model.findOneAndRemove({_id: clientRequest._id}, function(err, request) {
+            if(err) {
+              return next(err);
+            }         
+            res.status(200).json(request);
+          });
+        } else {               
+          Model.findOneAndUpdate({_id: clientRequest._id}, {$set: clientRequest}, function(err, request) {        
+            if (err) {
+              return next(err);
+            }                               
+            res.status(200).json(request);
+          }); 
+        }
+      });
+    }
+  });
+
   router.put('/api/apj/clientRequests', requireAuth, function (req, res, next) {
     logger.log('info', 'Update clientRequest', 'verbose');
 
@@ -66,6 +124,8 @@ module.exports = function (app) {
     });
 
   });
+
+
 
   router.post('/api/apj/clientRequests', requireAuth, function (req, res, next) {
     logger.log('info', 'Create clientRequest', 'verbose');
@@ -205,4 +265,5 @@ module.exports = function (app) {
         return next(error);
       })
   });
+
 }

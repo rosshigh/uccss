@@ -47,6 +47,14 @@ export class ACCRequests {
                 nav: true,
                 name: 'clientRequests',
                 title: 'Client Requests Analytics'
+            },
+            {
+                route: 'apjAssignments',
+                moduleId: './apjAssignments',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'apjAssignments',
+                title: 'Assignments'
             }
         ]);
 

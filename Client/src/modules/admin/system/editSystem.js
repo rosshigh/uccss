@@ -39,8 +39,8 @@ export class EditSystem {
     async attached(){
         $('#loading').show();
         let responses = await Promise.all([
-            this.systems.getSystemsArray('?order=sid'),
-            this.products.getProductsArray('?filter=active|eq|true&order=name'),
+            this.systems.getSystemsArray('?order=sid', true),
+            this.products.getProductsArray('?filter=active|eq|true&order=name', true),
             this.sessions.getSessionsArray(),
             this.config.getConfig(),
             this.config.getSessions()

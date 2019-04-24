@@ -1,0 +1,22 @@
+<template>
+    <span id="loading">
+        <ul class="bokeh">
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </span>
+
+    <div show.bind="requestSelected == 'table'">
+        <compose view="./components/apjRequestsTable.html"></compose>
+    </div>
+    <div show.bind="requestSelected == 'form'">
+        <compose view="./components/apjRequestsForm.html"></compose>
+    </div>
+    <!-- <div show.bind="requestSelected == 'edit'">
+        <compose view="./components/editRequestsForm.html"></compose>
+    </div>
+    <div show.bind="requestSelected == 'view'">
+        <compose view="./components/viewAssignmentForm.html"></compose>
+    </div> -->
+</template>

@@ -1,0 +1,8 @@
+<template>
+    <div show.bind="showTable">
+        <compose view="./components/requestsTable.html"></compose>
+    </div>
+    <div show.bind="!showTable">
+        <compose view="./components/requestForm.html"></compose>
+    </div>
+</template>

@@ -34,6 +34,18 @@ module.exports = function (app) {
       })
   }));
 
+  router.get('/api/apj/systems/product/:systems', requireAuth, asyncHandler(async (req, res) => {
+    logger.log('info', 'Getting product systems');
+    var productSystems = req.params.systems.split(':');
+    await Model.find({ $and: [{ sid: { $in: productSystems }},{ apj: true } ]})
+      .populate({ path: 'clients.assignments.assignment', model: 'ClientRequestDetail' })
+      .populate({ path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName' })
+      .exec().then(result => {
+        res.status(200).json(result);
+      })
+  }));
+
+
   router.get('/api/systems/:id', requireAuth, asyncHandler(async (req, res) => {
     logger.log('info', 'Get system ' + req.params.id);
     await Model.findById(req.params.id)

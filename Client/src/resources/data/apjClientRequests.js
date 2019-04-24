@@ -78,12 +78,8 @@ export class APJClientRequests {
     emptyRequest(){
         var newObj = new Object();;
         newObj.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
-        newObj.undergradIds = 0;
-        newObj.graduateIds = 0;
         newObj.startDate = "";
         newObj.endDate = "";
-        newObj.addUndergraduates = 0;
-        newObj.addGraduates = 0;
         newObj.comments = "";
         newObj.requestDetails = new Array();
         newObj.audit = new Array();
@@ -151,5 +147,19 @@ export class APJClientRequests {
             }
             return serverResponse;
         }
+    }
+
+    async saveRequestWithId(){
+        if(!this.selectedRequest){
+            return;
+        }
+
+        var serverResponse = await this.data.saveObject(this.selectedRequest, this.CLIENT_REQUESTS_SERVICES + "/" + this.selectedRequest._id, "put");
+            if(!serverResponse.error){
+                if(this.requestsArray && this.editRequestIndex){
+                    this.requestsArray[this.editRequestIndex]  = this.utils.copyObject(this.selectedRequest);
+                }
+            }
+            return serverResponse;
     }
 }

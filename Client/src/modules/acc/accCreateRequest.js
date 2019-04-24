@@ -16,7 +16,7 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 import fuelux from 'fuelux';
 import moment from 'moment';
 
-@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products, APJClientRequests, SiteInfo, EventAggregator)
+@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products,  APJClientRequests, SiteInfo, EventAggregator)
 export class ACCClientRequest {
 	configDate = {};
 
@@ -42,7 +42,7 @@ export class ACCClientRequest {
 
 	async activate() {
 		let responses = await Promise.all([
-			this.products.getProductsArray('?filter=active|eq|true&order=name', true),
+			this.products.getProductsArray('?filter=[and]active|eq|true:apj|eq|true&order=name', true),
 			this.people.getInstitutionsArray('?filter=[and]institutionStatus|eq|01:apj|eq|true&order=name'),
 			this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS', true),
 			this.people.getAPJPackages(),
@@ -67,30 +67,19 @@ export class ACCClientRequest {
 		$('#loading').hide();
 	}
 
-	changeBeginDate(evt) {
-		if (evt.detail && evt.detail.value.date !== "") {
-			this.minEndDate = moment(evt.detail.value.date).format("MM/DD/YYYY");
-			this.requests.selectedRequest.endDate = moment.max(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
-		}
-
-	}
-
-	selectProduct(el) {
-
-		if (this.alreadyOnList(el.target.id)) {
-			this.utils.showNotification("You can't add the same product more than once.", "warning")
+	selectProduct(product) {
+		if(this.requests.selectedRequest.requestDetails.length == this.selectedPackage.maxClients){
+			this.utils.showNotification("This university has reached their maximum requested products.","error");
 		} else {
 			$("#requestProductsLabel").html("Requested Products");
 			var newObj = this.requests.emptyRequestDetail();
-			newObj.productId = el.target.id;
-			// newObj.sessionId = this.sessionId;
-			// newObj.courseId = this.courseId;
+			newObj.productId = product._id;
 			this.requests.selectedRequest.requestDetails.push(newObj);
 			this.products.selectedProductFromId(newObj.productId);
-			this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = this.products.selectedProduct.name;
+			this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = product.name;
+	
+			this.validation.makeValid($("#productList"));
 		}
-
-		this.validation.makeValid($("#productList"));
 	}
 
 	alreadyOnList(id) {
@@ -100,11 +89,12 @@ export class ACCClientRequest {
 		return false;
 	}
 
-	removeProduct(el) {
-		for (var i = 0; i < this.requests.selectedRequest.requestDetails.length; i++) {
-			if (el.target.id === this.requests.selectedRequest.requestDetails[i].productId) {
-				if (this.requests.selectedRequest.requestDetails[i]._id) {
-					if (this.requests.selectedRequest.requestDetails[i].requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
+	removeProduct(index) {
+
+		// for (var i = 0; i < this.requests.selectedRequest.requestDetails.length; i++) {
+		// 	if (el.target.id === this.requests.selectedRequest.requestDetails[i].productId) {
+		// 		if (this.requests.selectedRequest.requestDetails[i]._id) {
+					if (this.requests.selectedRequest.requestDetails[index].requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
 						return this.dialog.showMessage(
 							"That request has already been assigned and cannot be deleted?",
 							"Cannot Delete Request",
@@ -119,18 +109,18 @@ export class ACCClientRequest {
 							['Yes', 'No']
 						).whenClosed(response => {
 							if (!response.wasCancelled) {
-								this.requests.selectedRequest.requestDetails[i].delete = true;
-								this.requests.selectedRequest.requestDetails.splice(i, 1);
+								this.requests.selectedRequest.requestDetails[index].delete = true;
+								this.requests.selectedRequest.requestDetails.splice(index, 1);
 							}
 						});
 					}
-					break;
-				} else {
-					this.requests.selectedRequest.requestDetails.splice(i, 1);
-					break;
-				}
-			}
-		}
+					// break;
+				// } else {
+				// 	this.requests.selectedRequest.requestDetails.splice(i, 1);
+				// 	break;
+		// 		}
+		// 	}
+		// }
 	}
 
 	_buildRequest() {
@@ -144,18 +134,6 @@ export class ACCClientRequest {
 			this.requests.selectedRequest.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
 		}
 		this.requests.selectedRequest.institutionId = this.selectedInstitution;
-	}
-
-	async save() {
-		if (this.validation.validate(1)) {
-			this._buildRequest();
-			let serverResponse = await this.requests.saveRequest({});
-			if (!serverResponse.status) {
-				this.utils.showNotification("The product request was updated");
-				this.systemSelected = false;
-			}
-			this._cleanUp();
-		}
 	}
 
 	_cleanUp() {
@@ -175,22 +153,36 @@ export class ACCClientRequest {
 	}
 
 	async changeInstitution(el) {
-		await this.people.selectInstitutionByID(this.selectedInstitution);
-		this.institutionSelected = true;
-		if (!this.config.SANDBOX_USED) {
-			this.typeSelected = true;
-			this.regularClient = true;
-			this.requestType = "regularCourse";
-		}
-		this.selectedPerson = "";
-		this.requestType = "";
-		$("#existingRequestInfo").empty().hide();
-		await this.requests.getAPJInstitutionRequests('?filter=institutionId|eq|' + this.selectedInstitution, true);
-		if (!this.requests.apjInstitutionRequestArray.length) {
-			this.requests.selectRequest();
+		if (this.selectedInstitution != "") {
+			await this.people.selectInstitutionByID(this.selectedInstitution);
+			this.getPackage();
+			this.institutionSelected = true;
+			if (!this.config.SANDBOX_USED) {
+				this.typeSelected = true;
+				this.regularClient = true;
+				this.requestType = "regularCourse";
+			}
+			this.selectedPerson = "";
+			this.requestType = "";
+			$("#existingRequestInfo").empty().hide();
+			await this.requests.getAPJInstitutionRequests('?filter=institutionId|eq|' + this.selectedInstitution, true);
+			if (!this.requests.apjInstitutionRequestArray.length) {
+				this.requests.selectRequest();
+			} else {
+				this.requests.selectRequest(0);
+			}
 		} else {
-			this.requests.selectRequest(0);
+			this.people.selectInstitution();
+			this.institutionSelected = false;
 		}
+
+	}
+
+	getPackage() {
+		this.selectedPackage = undefined;
+		this.people.packageArray.forEach(item => {
+			if (this.people.selectedInstitution.packageId != null && item._id === this.people.selectedInstitution.packageId.packageId) this.selectedPackage = item;
+		})
 	}
 
 	changePerson(el) {
@@ -223,38 +215,6 @@ export class ACCClientRequest {
 				break;
 		}
 	}
-
-	// async getRequests() {
-	// 	// await this._unLock();
-	// 	if (this.sessionId != -1 && this.courseId != -1) {
-	// 		this.ILockedIt = false;
-	// 		this.existingRequest = false;
-	// 		await this.requests.getClientRequestsArray('?filter=[and]personId|eq|' + this.selectedPerson + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
-	// 		if (this.requests.requestsArray && this.requests.requestsArray.length > 0) {
-	// 			this.requests.selectRequest(0);
-	// 			this.setDates(false);
-	// 			// await this._lock();
-	// 			this.ILockedIt = true;
-	// 			this.existingRequest = true;
-	// 			if (this.requests.requestsArray && this.requests.requestsArray.length > 0) {
-	// 				let dateFoo = moment(new Date(this.requests.selectedRequest.requestDetails[0].createdDate)).format(this.config.DATE_FORMAT_TABLE);
-	// 				let existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
-	// 				$("#existingRequestInfo").html('').append(existingMsg).fadeIn();
-	// 			} else {
-	// 				$("#existingRequestInfo").empty().hide();
-	// 			}
-	// 		} else {
-	// 			$("#existingRequestInfo").empty().hide();
-	// 			this.setDates(true);
-	// 			this.existingRequest = false;
-	// 			this.requests.selectRequest();
-	// 			this.requests.selectedRequest.sessionId = this.sessionId;
-	// 		}
-
-	// 	} else {
-	// 		this.existingRequest = false;
-	// 	}
-	// }
 
 	filterList() {
 		if (this.filter) {
@@ -360,6 +320,27 @@ export class ACCClientRequest {
 		// 	{ "rule": "required", "message": "Enter the course number", "value": "people.selectedCourse.number" },
 		// 	{ "rule": "required", "message": "Enter the course name", "value": "people.selectedCourse.name" }
 		// ]);
+	}
+
+	async saveIt() {
+		if (this.validation.validate(1)) {
+			if (!this.requests.selectedRequest._id) {
+				this._buildRequest();
+				let serverResponse = await this.requests.saveRequest();
+				if (!serverResponse.status) {
+					this.systemSelected = false;
+					this.utils.showNotification("Product request " + serverResponse.clientRequestNo + " was updated");
+				}
+			} else {
+				this._buildRequest();
+				let serverResponse = await this.requests.saveRequestWithId();
+				if (!serverResponse.status) {
+					this.utils.showNotification("The product request was updated");
+					this.systemSelected = false;
+				}
+			}
+			this._cleanUp();
+		}
 	}
 
 }
