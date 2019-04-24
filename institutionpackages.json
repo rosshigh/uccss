@@ -1,0 +1,45 @@
+{
+	"__v" : NumberInt(0),
+	"_id" : ObjectId("5cbb2e242eb36651ec611d9e"),
+	"amount" : NumberInt(5000),
+	"dateEnded" : ISODate("2019-04-20T09:37:48.942-05:00"),
+	"dateStarted" : ISODate("2019-04-20T09:35:16.958-05:00"),
+	"institutionId" : ObjectId("5cba243279218d46acdda5cf"),
+	"packageId" : ObjectId("5caceee7d82a476028155bbe")
+},
+{
+	"__v" : NumberInt(0),
+	"_id" : ObjectId("5cbb2e64aa2f471db046f7a3"),
+	"amount" : NumberInt(7500),
+	"dateEnded" : null,
+	"dateStarted" : ISODate("2019-04-20T09:36:20.787-05:00"),
+	"institutionId" : ObjectId("5cba243279218d46acdda5cf"),
+	"packageId" : ObjectId("5caceefad82a476028155bbf")
+},
+{
+	"__v" : NumberInt(0),
+	"_id" : ObjectId("5cbb2ebc3ac0ed52886be054"),
+	"amount" : NumberInt(10000),
+	"dateEnded" : null,
+	"dateStarted" : ISODate("2019-04-20T09:37:48.962-05:00"),
+	"institutionId" : ObjectId("5cba243279218d46acdda5cf"),
+	"packageId" : ObjectId("5cacef0ed82a476028155bc0")
+},
+{
+	"__v" : NumberInt(0),
+	"_id" : ObjectId("5cbb30f59303ec64f84d1aaf"),
+	"amount" : NumberInt(7500),
+	"dateEnded" : ISODate("2019-04-20T09:48:23.110-05:00"),
+	"dateStarted" : ISODate("2019-04-20T09:47:17.824-05:00"),
+	"institutionId" : ObjectId("5c893cb9688cb3e804363b5a"),
+	"packageId" : ObjectId("5caceefad82a476028155bbf")
+},
+{
+	"__v" : NumberInt(0),
+	"_id" : ObjectId("5cbb31379303ec64f84d1ab0"),
+	"amount" : NumberInt(15000),
+	"dateEnded" : null,
+	"dateStarted" : ISODate("2019-04-20T09:48:23.115-05:00"),
+	"institutionId" : ObjectId("5c893cb9688cb3e804363b5a"),
+	"packageId" : ObjectId("5cacef1fd82a476028155bc1")
+},
