@@ -22,7 +22,7 @@ export class People {
     COURSES_SERVICE = 'courses';
     PEOPLE_UPLOAD_SERVICE = '/people/upload/';
     NOTIFICATION_SERVICE = 'notifications';
-    PACKAGES_SERVICES = 'packages';
+    PACKAGES_SERVICES = 'apj/packages';
 
     constructor(data, utils) {
         this.data = data;

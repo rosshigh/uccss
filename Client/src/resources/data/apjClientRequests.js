@@ -11,6 +11,7 @@ export class APJClientRequests {
 
   CUSTOMER_ACTION = 'clientRequests/customerAction';
   CLIENT_REQUEST_EMAIL = "clientRequests/sendMail";
+  INVOICE_DATA = "apj/invoicedata";
 
     constructor(data, utils, config) {
         this.data = data;
@@ -161,5 +162,20 @@ export class APJClientRequests {
                 }
             }
             return serverResponse;
+    }
+
+    async getInvoiceDataArray(options, refresh){
+        if (!this.invoiceDataArray || refresh) {
+          var url = this.INVOICE_DATA; 
+          url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.invoiceDataArray = serverResponse;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
     }
 }

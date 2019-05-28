@@ -9,7 +9,7 @@ var PackageSchema = new Schema({
   maxClients: { type: Number }
 });
 
-module.exports = Mongoose.model('Packages', PackageSchema);
+module.exports = Mongoose.model('Packages', PackageSchema); 
 
 var InstitutionPackageSchema = new Schema({
   institutionId: { type: Schema.Types.ObjectId },
@@ -24,7 +24,7 @@ var InstitutionPackageSchema = new Schema({
 module.exports = Mongoose.model('InstitutionPackage', InstitutionPackageSchema);
 
 var CustomerPackageSchema = new Schema({
-  packageId: { type: Schema.Types.ObjectId }, 
+  packageId: { type: Schema.Types.ObjectId },
   institutionId: { type: Schema.Types.ObjectId },
   dateCreated: { type: Date, default: Date.now },
   requests: []
@@ -46,8 +46,8 @@ var AssignmentSchema = new Schema({
   lastFacID: { type: Number }
 }, { versionKey: false });
 
-AssignmentSchema.pre('update', function() {
-  this.update({},{ $set: { modifiedDate: new Date() } });
+AssignmentSchema.pre('update', function () {
+  this.update({}, { $set: { modifiedDate: new Date() } });
 });
 
 module.exports = Mongoose.model('AssignmentAPJ', AssignmentSchema);
@@ -57,12 +57,14 @@ var ClientRequestDetailsSchema = new Schema({
   createdDate: { type: Date, default: Date.now },
   requiredDate: { type: Date },
   modifiedDate: { type: Date, default: Date.now },
+  withinPackage: { type: Boolean, default: true },
+  dateInvoiced: { type: Date },
   productId: { type: Schema.Types.ObjectId, required: true, ref: 'product' },
   requestStatus: { type: String },
   requestId: { type: Schema.Types.ObjectId }, //, ref: 'ClientRequest'
   idsAssigned: { type: Number },
-   documents: [{
-    url: { type: String } 
+  documents: [{
+    url: { type: String }
   }],
   assignments: ['Assignment'],
   techComments: { type: String },
@@ -76,10 +78,10 @@ var ClientRequestDetailsSchema = new Schema({
   }]
 }, { versionKey: false });
 
-ClientRequestDetailsSchema.plugin(AutoIncrement, {inc_field: 'requestNoAPJ'});
+ClientRequestDetailsSchema.plugin(AutoIncrement, { inc_field: 'requestNoAPJ' });
 
-ClientRequestDetailsSchema.pre('update', function() {
-  this.update({},{ $set: { modifiedDate: new Date() } });
+ClientRequestDetailsSchema.pre('update', function () {
+  this.update({}, { $set: { modifiedDate: new Date() } });
 });
 
 module.exports = Mongoose.model('ClientRequestDetailAPJ', ClientRequestDetailsSchema);
@@ -96,7 +98,7 @@ var ClientRequestSchema = new Schema({
   // endDate: { type: Date },
   requestStatus: { type: String },
   modifiedDate: { type: Date },
-  requestDetails: [ { type: Schema.Types.ObjectId } ], //, ref: 'ClientRequestDetail'
+  requestDetails: [{ type: Schema.Types.ObjectId }], //, ref: 'ClientRequestDetail'
   institutionId: { type: Schema.Types.ObjectId },
   customerMessage: { type: String },
   audit: [{
@@ -108,10 +110,37 @@ var ClientRequestSchema = new Schema({
   }]
 }, { versionKey: false });
 
-ClientRequestSchema.plugin(AutoIncrement, {inc_field: 'clientRequestNoAPJ'});
+ClientRequestSchema.plugin(AutoIncrement, { inc_field: 'clientRequestNoAPJ' });
 
-ClientRequestSchema.pre('update', function() {
-  this.update({},{ $set: { modifiedDate: new Date() } });
+ClientRequestSchema.pre('update', function () {
+  this.update({}, { $set: { modifiedDate: new Date() } });
 });
 
 module.exports = Mongoose.model('ClientRequestAPJ', ClientRequestSchema);
+
+var InvoiceSchema = new Schema({
+  createdDate: { type: Date, default: Date.now },
+  issuedDate: { type: Date },
+  Amount: { type: Number },
+  datePaid: { type: Date },
+  invoiceDetails: [{
+    type: { type: String },
+    packageReference: { type: Schema.Types.ObjectId },
+    requestReference: { type: Schema.Types.ObjectId },
+    Amount: { type: Number }
+  }]
+});
+
+InvoiceSchema.plugin(AutoIncrement, { inc_field: 'invoiceNo' });
+
+module.exports = Mongoose.model('Invoice', InvoiceSchema);
+
+var ACCInvoiceData = new Schema({
+  invoicePeriod: { type: String },
+  invoiceDay: { type: Number },
+  invoiceMonth: { type: Number },
+  invoiceEndDay: { type: Number },
+  invoiceEndMonth: { type: Number }
+});
+
+module.exports = Mongoose.model('InvoiceData', ACCInvoiceData);

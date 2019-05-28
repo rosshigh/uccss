@@ -1,0 +1,2618 @@
+[
+    {
+        "_id": "5af8a1ea0ec90e1ec0968c88",
+        "unit": "5af31b7e8c89410cb4aa00e5",
+        "flash": "What are the activities in the purchase-to-pay process?",
+        "card": "<ol><li>Request the purchase of goods or services through the use of a purchase requisition.</li><li><span style=\"font-size: 1rem;\">Convert the purchase requisition to a purchase order (PO).</span></li><li>Process POs and perform PO follow-up.</li><li>Accept goods or services by entering a goods receipt referencing the PO.</li><li>Record and verify the vendor’s invoice.</li><li>Pay the vendor.</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a2190ec90e1ec0968c89",
+        "unit": "5af31b7e8c89410cb4aa00e5",
+        "flash": "What are the activities in the plan-to-produce process?",
+        "card": "<ol><li>Forecast product demand.</li><li>Run material requirements planning (MRP).</li><li>Manufacture the products.</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a2480ec90e1ec0968c8a",
+        "unit": "5af31b7e8c89410cb4aa00e5",
+        "flash": "What are the activities in the order-to-cash process?",
+        "card": "<ol><li><span style=\"font-size: 1rem;\">Create a sales order that contains customer requirements.</span></li><li>Fill the order and ship the goods to the customer.</li><li><span style=\"font-size: 1rem;\">Invoice the customer for goods or services rendered.</span><br></li><li>Receive the payment from the customer.</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a28e0ec90e1ec0968c8b",
+        "unit": "5af31b7e8c89410cb4aa00e5",
+        "flash": "What the components of&nbsp; SAP ERP?",
+        "card": "<ul><li>SAP ERP Financials</li><li>SAP ERP Human Capital Management</li><li>SAP ERP Operations</li><li>SAP ERP Corporate Services</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a2b40ec90e1ec0968c8c",
+        "unit": "5af31b7e8c89410cb4aa00e5",
+        "flash": "What is the ERP component called in the current version of SAP R/3 ERP?",
+        "card": "Enterprise Central Component (ECC)",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a2d80ec90e1ec0968c8d",
+        "unit": "5af31b7e8c89410cb4aa00e5",
+        "flash": "How is the SAP ERP system updated?",
+        "card": "Enhancement Packages",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a2f70ec90e1ec0968c8e",
+        "unit": "5af31b7e8c89410cb4aa00e5",
+        "flash": "What are the four types of enhancement packages?",
+        "card": "<ul><li>Simplification</li><li>Functionality</li><li>Enterprise SOA</li><li>Industries</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a3a90ec90e1ec0968c8f",
+        "unit": "5af31b7e8c89410cb4aa00e5",
+        "flash": "What are the components of the SAP Business Suite?",
+        "card": "<ul><li>SAP ERP</li><li>SAP Product Life Cycle Management (PLM)</li><li>SAP Supplier Relationship Management (SRM)</li><li>SAP Customer Relationship Management (CRM)</li><li>SAP Supply Chain Management (SCM)</li></ul><p>Note that SAP NetWeaver is <b>not</b> a component of the SAP business suite.</p>",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a3e90ec90e1ec0968c90",
+        "unit": "5af31b7e8c89410cb4aa00e5",
+        "flash": "What is the function of SAP NetWeaver?",
+        "card": "<p>It is the technical foundation for all the applications in the SAP business suite.</p><p>It provides a platform to achieve integration in:</p><ul><li>People</li><li>Process</li><li>Information</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a4400ec90e1ec0968c92",
+        "unit": "5af8a4250ec90e1ec0968c91",
+        "flash": "What is the highest organizational unit in SAP?",
+        "card": "Client",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a4500ec90e1ec0968c93",
+        "unit": "5af8a4250ec90e1ec0968c91",
+        "flash": "What does the client represent?",
+        "card": "The enterprise",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a4a30ec90e1ec0968c94",
+        "unit": "5af8a4250ec90e1ec0968c91",
+        "flash": "What is the purpose of organizational units&gt;",
+        "card": "<p>They represent the administrative structure of the enterprise.</p><p>They are used to enter, track and report data in the system.</p>",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a54d0ec90e1ec0968c95",
+        "unit": "5af8a4250ec90e1ec0968c91",
+        "flash": "What is the relationship between master data and organizational units?",
+        "card": "Master data is organized into views which contain the data relevant for a specific business process.&nbsp; The data in a view is <i>assigned </i>to or relevant for a specific organizational unit.&nbsp; When transactions are executed, they are executed for a specific business unit and the system knows which master data views to retrieve because the view is assigned to that organizational unit.",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a5ab0ec90e1ec0968c96",
+        "unit": "5af8a4250ec90e1ec0968c91",
+        "flash": "What is master data?",
+        "card": "<p>Data that is:</p><ul><li>Long term</li><li>Represents the business entities that define the enterprise</li><li>Centrally stored and accessed by multiple business processes</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a5c40ec90e1ec0968c97",
+        "unit": "5af8a4250ec90e1ec0968c91",
+        "flash": "What is created whenever a transaction is executed in an SAP ERP system?",
+        "card": "A document",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a6170ec90e1ec0968c98",
+        "unit": "5af8a4250ec90e1ec0968c91",
+        "flash": "What views does Customer master data contain?",
+        "card": "<ul><li>General data assigned to the client</li><li>FI data assigned to a company code</li><li>Sales data assigned to a sales area</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5af8a6400ec90e1ec0968c99",
+        "unit": "5af8a4250ec90e1ec0968c91",
+        "flash": "What is transaction data?",
+        "card": "<p>Data that is:</p><ul><li>Transient in the system</li><li>A record of a business event</li><li>Organized into documents</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afb4eb10ec90e1ec0968c9d",
+        "unit": "5af8a69e0ec90e1ec0968c9a",
+        "flash": "What master data is relevant for financial accounting?",
+        "card": "G/L Accounts",
+        "__v": 0
+    },
+    {
+        "_id": "5afb4ed50ec90e1ec0968c9e",
+        "unit": "5af8a69e0ec90e1ec0968c9a",
+        "flash": "What views do a G/L account include?",
+        "card": "<ul><li>Chart of accounts segment</li><li>Company code segment</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afb4f0e0ec90e1ec0968c9f",
+        "unit": "5af8a69e0ec90e1ec0968c9a",
+        "flash": "What information does the chart of accounts segment of a G/L account include?",
+        "card": "<p>Information that will be the same for all company codes.</p><ul><li>Account group</li><li>Account number</li><li>Description</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afb4f6f0ec90e1ec0968ca0",
+        "unit": "5af8a69e0ec90e1ec0968c9a",
+        "flash": "What is the role of the company code?",
+        "card": "<ul><li>&nbsp;An independent accounting entity</li><li>Smallest org unit at which you can create a fill set of financial statements</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afb4f940ec90e1ec0968ca1",
+        "unit": "5af8a69e0ec90e1ec0968c9a",
+        "flash": "What is the role of the segment?",
+        "card": "To produce financial statements based on some criteria other than the legal reporting boundaries.",
+        "__v": 0
+    },
+    {
+        "_id": "5afb4fb60ec90e1ec0968ca2",
+        "unit": "5af8a69e0ec90e1ec0968c9a",
+        "flash": "What is the purpose of the general ledger?",
+        "card": "To support financial reporting",
+        "__v": 0
+    },
+    {
+        "_id": "5afb4fcc0ec90e1ec0968ca3",
+        "unit": "5af8a69e0ec90e1ec0968c9a",
+        "flash": "What org units are defined for FI in the TERP10?",
+        "card": "<ul><li>Company code</li><li>Segment</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afb50400ec90e1ec0968ca4",
+        "unit": "5af8a69e0ec90e1ec0968c9a",
+        "flash": "<p>What of the following are FI activities?</p><ul><li>Valuate materials</li><li>Calculate production cost variances</li><li>Create financial statements</li></ul>",
+        "card": "Create financial statements",
+        "__v": 0
+    },
+    {
+        "_id": "5afb508d0ec90e1ec0968ca5",
+        "unit": "5af8a69e0ec90e1ec0968c9a",
+        "flash": "What are the characteristics of financial accounting?",
+        "card": "<ul><li>Externally oriented</li><li>Used to create financial statements</li><li>Regulated</li><li>Structured</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afb50d10ec90e1ec0968ca6",
+        "unit": "5af8a69e0ec90e1ec0968c9a",
+        "flash": "What steps are required to create the general ledger?",
+        "card": "<ol><li>Assign a Chart of Accounts to the company code</li><li>Create the G/L account master data</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5afb510d0ec90e1ec0968ca7",
+        "unit": "5af8a69e0ec90e1ec0968c9a",
+        "flash": "What does the account group determine?",
+        "card": "<ul><li>User defined account groups</li><li>Number range</li><li>Field status</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afb51280ec90e1ec0968ca8",
+        "unit": "5af8a69e0ec90e1ec0968c9a",
+        "flash": "What is a chart of accounts?",
+        "card": "A ordered list of accounts compatible with a specific financial statement version",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9c470ec90e1ec0968cac",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "List the components of Controlling?",
+        "card": "<ul><li>Cost Element Accounting</li><li>Overhead Cost Controlling</li><li>Product Cost Controlling</li><li>Profit Center Accounting</li><li>Profitability Analysis</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9c5e0ec90e1ec0968cad",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "Which component of controlling classifies costs?",
+        "card": "Cost element accounting",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9c740ec90e1ec0968cae",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "Which component of controlling is concerned with where costs occur?",
+        "card": "Overhead cost controlling",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9c920ec90e1ec0968caf",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "Which component of controlling is concerned with the costs associated with producing your products?",
+        "card": "Product cost controlling",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9cb30ec90e1ec0968cb0",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "Which component of controlling exams how profitable parts of your organization are?",
+        "card": "Profit center accounting",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9cd50ec90e1ec0968cb1",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "Which component of controlling examines how profitable your organization is in the market?",
+        "card": "Profitability analysis",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9cee0ec90e1ec0968cb2",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "What are the organizational units in controlling?",
+        "card": "<ul><li>Operating Concern</li><li>Controlling Area</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9d0d0ec90e1ec0968cb3",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "What is the relationship between controlling area and company code?",
+        "card": "One controlling area to many company codes",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9d2b0ec90e1ec0968cb4",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "What do company codes assigned to a controlling area have to share?",
+        "card": "<ul><li>Operative chart of accounts</li><li>Fiscal year variant</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9d470ec90e1ec0968cb5",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "The initial posting from FI into CO is called:",
+        "card": "Primary posting",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9d5e0ec90e1ec0968cb6",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "What types of FI accounts are linked to primary cost elements?",
+        "card": "<ul><li>Expense</li><li>Revenue</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9d710ec90e1ec0968cb7",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "What types of cost elements are linked to FI accounts?",
+        "card": "Primary cost elements",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9d9d0ec90e1ec0968cb8",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "What information must you provide if you post to an expense account that is linked to a primary cost element?",
+        "card": "A controlling object",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9dba0ec90e1ec0968cb9",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "A debit to an expense account in FI causes what to happen in CO?",
+        "card": "A debit to a primary cost element in a controlling object",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9dd80ec90e1ec0968cba",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "A posting from a cost center to an order in controlling uses what type of cost element?",
+        "card": "Secondary cost element",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9e030ec90e1ec0968cbb",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "A service that a controlling area provides to other parts of the organization in controlling is called:",
+        "card": "An activity type",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9e290ec90e1ec0968cbc",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "What two values do you need to perform a Direct Activity Allocation?",
+        "card": "<ul><li>Quantity of the activity&nbsp;</li><li>Price of the activity</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9e4b0ec90e1ec0968cbd",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "What determines the price in a Direct Activity Allocation?",
+        "card": "<ul><li>Activity type</li><li>Cost center</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9e800ec90e1ec0968cbe",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "When you perform a DAA, which side gets the debit and which side gets the credit?",
+        "card": "<ul><li>Debit goes to the receiver</li><li>Credit goes to the sender</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9e9c0ec90e1ec0968cbf",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "What type of cost element is used for DAA?",
+        "card": "Secondary cost element configured in the activity type master data",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9eb70ec90e1ec0968cc0",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "What type of object is always a statistical object?",
+        "card": "Profit center",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9f020ec90e1ec0968cc1",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "An order has been designated as a statistical object and receives a posting.&nbsp; Can this balance be reallocated to another object?",
+        "card": "No, statistical postings cannot be reallocated.&nbsp; Only true postings can.",
+        "__v": 0
+    },
+    {
+        "_id": "5afc9f590ec90e1ec0968cc2",
+        "unit": "5afc9bcd0ec90e1ec0968cab",
+        "flash": "<p>Which type of object can only be a true object?</p>",
+        "card": "Cost center",
+        "__v": 0
+    },
+    {
+        "_id": "5afca01d0ec90e1ec0968cc4",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What are the steps in the purchase-to-pay process?",
+        "card": "<ul><li>Determination of Requirements</li><li>Source of Supply Determination</li><li>Vendor Selection</li><li>Purchase Order Handling</li><li>Purchase Order Monitoring</li><li>Goods Receipt</li><li>Invoice Verification</li><li>Handling of Payments</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca0690ec90e1ec0968cc5",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What are the organizational units in the purchase-to-pay process?",
+        "card": "<ul><li>Client</li><li>Company Code</li><li>Plant</li><li>Storage Location</li><li>Purchasing Organization</li><li>Purchasing Group</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca0a00ec90e1ec0968cc6",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What organizational unit&nbsp; is responsible for procuring materials or services and negotiating the conditions of purchase with vendors, and assumes responsibility for the purchasing activities.",
+        "card": "Purchasing organization",
+        "__v": 0
+    },
+    {
+        "_id": "5afca0df0ec90e1ec0968cc7",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What purchasing organizational structure allows a single purchasing organization to purchase for all the plants assigned to a company code?",
+        "card": "Cross-Plant Purchasing",
+        "__v": 0
+    },
+    {
+        "_id": "5afca1090ec90e1ec0968cc8",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What are the three types of purchasing structures?",
+        "card": "<ul><li>Plant-Specific Purchasing</li><li>Cross-Plant Purchasing</li><li>Cross-Company Code Purchasing</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca1380ec90e1ec0968cc9",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What master data is relevant for the purchase-to-pay process?",
+        "card": "<ul><li>Material</li><li>Vendor</li><li>Purchasing info-record</li><li>Conditions</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca15c0ec90e1ec0968cca",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What are the views of the vendor master data?",
+        "card": "<ul><li>General (client)</li><li>Purchasing (purchasing organization)</li><li>Accounting (company code)</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca1c60ec90e1ec0968ccb",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What information is included in a purchasing info record?",
+        "card": "<ul><li>Current and future prices and conditions</li><li>Delivery data</li><li>Vendor data (e.g. contact person)</li><li>Vendor specific data about the material</li><li>Last purchase order number</li><li>Internal comments and texts</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca2010ec90e1ec0968ccc",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What types of conditions can be used in purchasing?",
+        "card": "<ul><li>Contracts</li><li>Purchasing info records</li><li>Quotations</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca2270ec90e1ec0968ccd",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What methods exist to create purchase requisitions?",
+        "card": "<ul><li>Manually</li><li>Automatic (e.g. MRP)</li><li>SAP SRM</li><li>SAP SCM</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca2410ec90e1ec0968cce",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "How do you purchase a consummable?",
+        "card": "Set the account assignment category in a purchasing document",
+        "__v": 0
+    },
+    {
+        "_id": "5afca2850ec90e1ec0968ccf",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "Can you purchase a material without a material master record?",
+        "card": "Yes",
+        "__v": 0
+    },
+    {
+        "_id": "5afca2b70ec90e1ec0968cd0",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "Is a goods receipt always required in the purchase-to-pay process?",
+        "card": "No, in the case of consummables, a GR is not always performed",
+        "__v": 0
+    },
+    {
+        "_id": "5afca33e0ec90e1ec0968cd1",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What are the effects of performing a goods receipt?",
+        "card": "<ul><li>MM and FI documents are always created and a CO document will be created if their is a consummable</li><li>The stock account is debited (and maybe a consumption account) and the GR/IR is credited</li><li>The material master is updated</li><li>The PO history is updated</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca35f0ec90e1ec0968cd2",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What are the three stock types?",
+        "card": "<ul><li>Unrestricted use</li><li>Stock in quality inspection</li><li>Blocked stock</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca3820ec90e1ec0968cd3",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What transaction allows you to see stock quantities organized by organizational unit.",
+        "card": "Stock Overview",
+        "__v": 0
+    },
+    {
+        "_id": "5afca3e30ec90e1ec0968cd4",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What is the relationship between plant and storage location?",
+        "card": "A plant can have one to many storage locations",
+        "__v": 0
+    },
+    {
+        "_id": "5afca3f90ec90e1ec0968cd5",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What is the relationship between company code and plant?",
+        "card": "A company code can one to many plants",
+        "__v": 0
+    },
+    {
+        "_id": "5afca4640ec90e1ec0968cd6",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What are the effects of invoice verification?",
+        "card": "<ul><li>A MM and FI document (and possibly a CO document) are created</li><li>Credit to the vendor subledger (and account payable) and debit to GR/IR</li><li>The PO History is updated</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca4970ec90e1ec0968cd7",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What organizational unit is required for a purchase requisition?",
+        "card": "The plant",
+        "__v": 0
+    },
+    {
+        "_id": "5afca4c70ec90e1ec0968cd8",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What organizational units are required for a purchase order",
+        "card": "<ul><li>Company code</li><li>Plant</li><li>Purchasing organization</li><li>Purchasing group</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca4d90ec90e1ec0968cd9",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What organizational level is required for a goods receipt?",
+        "card": "Storage location",
+        "__v": 0
+    },
+    {
+        "_id": "5afca5260ec90e1ec0968cda",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What occurs during the automatic payment run?",
+        "card": "<ul><li>Posts payment documents</li><li>Clears open items</li><li>Prepares data for printing payment media</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5afca5560ec90e1ec0968cdb",
+        "unit": "5afc9fb10ec90e1ec0968cc3",
+        "flash": "What are the effects of payment?",
+        "card": "<ul><li>An FI document is created</li><li>The vendor subledger (and accounts payable) are debited and bank is credited</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0037020ec90e1ec0968ce7",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What are the steps in the Plan-to-produce process?",
+        "card": "<ul><li>Perform planning</li><li>Determine requirements</li><li>Plan production</li><li>Produce material</li><li>Perform periodic processing</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0037220ec90e1ec0968ce8",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What organizational units are relevant for plan-to-produce?",
+        "card": "<ul><li>Client</li><li>Company Code</li><li>Plant</li><li>Storage Location</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0037490ec90e1ec0968ce9",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What are the types of procurement?",
+        "card": "<ul><li>External</li><li>Internal</li><li>Both</li><li>Neither</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0037760ec90e1ec0968cea",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What master data is relevant for plan-to-produce?",
+        "card": "<ul><li>Material</li><li>BOM</li><li>Routing</li><li>Workcenter</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b00378a0ec90e1ec0968ceb",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What does the BOM usage determine?",
+        "card": "The business use of the BOM",
+        "__v": 0
+    },
+    {
+        "_id": "5b0037de0ec90e1ec0968cec",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What is the relationship between the routing and workcenter?",
+        "card": "Workcenters are assigned to operations.&nbsp; The workcenter has formulas for capacities, scheduling and activity types for costing and the routing has the times used in those formulas.",
+        "__v": 0
+    },
+    {
+        "_id": "5b0037fe0ec90e1ec0968ced",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "How are BOMs and routings integrated?",
+        "card": "The components of the BOM are allocated or assigned to operations in the routing.",
+        "__v": 0
+    },
+    {
+        "_id": "5b0038290ec90e1ec0968cee",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What data is included in a workcenter?",
+        "card": "<ul><li>Basic data (standard values)</li><li>Default values</li><li>Capacities</li><li>Scheduling</li><li>Costs</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0038380ec90e1ec0968cef",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What controlling object is assigned to a workcenter?",
+        "card": "A cost center",
+        "__v": 0
+    },
+    {
+        "_id": "5b0038650ec90e1ec0968cf0",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What transaction is performed when operations in a production order are confirmed?",
+        "card": "DAA from the cost centers (credit) assigned to the workcenters to the production order (debit).",
+        "__v": 0
+    },
+    {
+        "_id": "5b0038840ec90e1ec0968cf1",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What are the two types of cost elements?",
+        "card": "<ul><li>Primary</li><li>Secondary</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0038940ec90e1ec0968cf2",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What cost element links FI and CO?",
+        "card": "Primary",
+        "__v": 0
+    },
+    {
+        "_id": "5b0038ab0ec90e1ec0968cf3",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What cost element is used only in allocations between controlling objects?",
+        "card": "Secondary",
+        "__v": 0
+    },
+    {
+        "_id": "5b0038dd0ec90e1ec0968cf4",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What is a cost center?",
+        "card": "The cost center is master data in a CO area that represents a delimited location where costs occur.",
+        "__v": 0
+    },
+    {
+        "_id": "5b0039510ec90e1ec0968cf5",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What is the standard hierarchy?",
+        "card": "An hierarchical reporting structure in which cost centers are on the lowest level and cost center groups are on the higher levels.&nbsp; A controlling area has one and only one standard hierarchy and every cost center must be assigned to the standard hierarchy.",
+        "__v": 0
+    },
+    {
+        "_id": "5b003a0d0ec90e1ec0968cf6",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "Explain DAA.",
+        "card": "Direct Activity Allocation is a way of allocating costs from cost centers to other objects when you can identify specific activities or services (activity types) the cost center provides.&nbsp; You must have the activity type price and the quantity of the service provided in order to determine the amount of the allocation.&nbsp; Activity type prices are set on a cost center.&nbsp; When the allocation is executed, the sender (the cost center) receives a credit on a secondary cost element and the receiver (any controlling object) receives a debit on the same secondary cost element.",
+        "__v": 0
+    },
+    {
+        "_id": "5b003a4d0ec90e1ec0968cf7",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What determines the price of an activity type?",
+        "card": "Activity types can be used with many cost centers and the price is set individually on each cost center in which it's used.",
+        "__v": 0
+    },
+    {
+        "_id": "5b003a710ec90e1ec0968cf8",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What are the three phases of product cost accounting?",
+        "card": "<ul><li>Product cost planning</li><li>Cost object controlling</li><li>Material ledger/actual costing</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003ab70ec90e1ec0968cf9",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What are the two components of product cost planning?",
+        "card": "<p>Quantity structure</p><ul><li>BOM</li><li>Routing</li></ul><p>Value structure</p><ul><li>Material prices</li><li>Activity type prices</li><li>Overheads</li><li>Process costs</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003ac70ec90e1ec0968cfa",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What value results from product cost planning?",
+        "card": "Standard cost",
+        "__v": 0
+    },
+    {
+        "_id": "5b003afc0ec90e1ec0968cfb",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What steps are required to update the standard price from a standard cost?",
+        "card": "<ul><li>Estimate the standard cost</li><li>mark it</li><li>release it</li></ul><p>Can only be done once per accounting period</p>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003b140ec90e1ec0968cfc",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What is accounted for in period end closing?",
+        "card": "<ul><li>Variances</li><li>WIP</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003b300ec90e1ec0968cfd",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What is the standard price used for?",
+        "card": "<ul><li>Inventory valuation</li><li>Goods movements valuation</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003b540ec90e1ec0968cfe",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What is the standard cost used for?",
+        "card": "<ul><li>Benchmark for cost object controlling</li><li>Cost of sales in profitability analysis</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003b750ec90e1ec0968cff",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What is the first step in material planning?",
+        "card": "Sales and Operation Planning (SOP)",
+        "__v": 0
+    },
+    {
+        "_id": "5b003b870ec90e1ec0968d00",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What are the inputs to SOP?",
+        "card": "<ul><li>Sales forecast</li><li>Inventory requirements</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003b930ec90e1ec0968d01",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What is the output from SOP?",
+        "card": "Production plan",
+        "__v": 0
+    },
+    {
+        "_id": "5b003bba0ec90e1ec0968d02",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What results in demand management when the SOP production plan is transferred to demand management?",
+        "card": "Planned Independent Requirements",
+        "__v": 0
+    },
+    {
+        "_id": "5b003bdc0ec90e1ec0968d03",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What are the two types of independent requirements?",
+        "card": "<ul><li>Planned independent requirements</li><li>Customer independent requirements</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003bff0ec90e1ec0968d04",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What is the output from MRP?",
+        "card": "Procurement proposals",
+        "__v": 0
+    },
+    {
+        "_id": "5b003c240ec90e1ec0968d05",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What types of procurement proposals result for materials procured externally?",
+        "card": "<ul><li>Purchase requisition</li><li>Planned order</li><li>Schedule line</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003c310ec90e1ec0968d06",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What types of procurement proposals result for materials procured in-house?",
+        "card": "Planned order",
+        "__v": 0
+    },
+    {
+        "_id": "5b003c490ec90e1ec0968d07",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "How does MRP determine whether to generate a procurement proposal?",
+        "card": "Net requirements calculation",
+        "__v": 0
+    },
+    {
+        "_id": "5b003c780ec90e1ec0968d08",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What is included in the supply side of the net requirements calculation?",
+        "card": "<ul><li>Firmed receipts</li><li>Firmed planned orders</li><li>Firmed purchase requisitions</li><li>Stock</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003c960ec90e1ec0968d09",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What is included in the demand side of the net requirements calculation?",
+        "card": "<ul><li>Requirements (independent, dependent, reservations)</li><li>Safety stock</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003cb00ec90e1ec0968d0a",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "How does MRP determine how much material to procure?",
+        "card": "Lot size procedure configured in the material master",
+        "__v": 0
+    },
+    {
+        "_id": "5b003d1e0ec90e1ec0968d0b",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What are the three options for the MRP processing key?",
+        "card": "<ul><li>Regenerative planning (NEUPL)</li><li>Net change for total horizon (NETCH)</li><li>Net change planning in the planning horizon (NETPL)</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003d360ec90e1ec0968d0c",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What MRP parameter determines the scope of planning?",
+        "card": "Processing key",
+        "__v": 0
+    },
+    {
+        "_id": "5b003da00ec90e1ec0968d0d",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What occurs when a planned order is converted to a production order?",
+        "card": "<ul><li>Material and capacity availability checks are performed</li><li>The routing operations are copied and detailed scheduling was performed</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003dbe0ec90e1ec0968d0e",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What step is required on a production order before manufacturing processes can begin?",
+        "card": "The order must be released",
+        "__v": 0
+    },
+    {
+        "_id": "5b003e7f0ec90e1ec0968d0f",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What are the effects of goods issue to a production order?",
+        "card": "<ul><li>MM, FI and CO documents are created</li><li>The material consumption account is debited and inventory is credited</li><li>The production order is debited</li><li>Material reservations are deleted</li><li>Material master records are updated</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0041e10ec90e1ec0968d16",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What are calculated as a part of period end closing?",
+        "card": "<ul><li>Work in process</li><li>Variance calculation</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003f0c0ec90e1ec0968d10",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What are the effects of confirmation?",
+        "card": "<ul><li>A DAA is performed from the cost center assigned to the workcenter to the production order</li><li>Debit of labor on the production order</li><li>Capacity reservations on workcenters are deleted</li><li>An automatic goods receipt is performed causing a credit to the production order</li><li>Debit to finished goods inventory (quantity * standard price) and a credit to plant activity</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b003f550ec90e1ec0968d11",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "The effects of the goods receipt are?",
+        "card": "<ul><li>MM, FI and CO documents are created</li><li>Debit to finished goods (quantity * standard price) and a credit to plant activity</li><li>The production order is credited</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b00401b0ec90e1ec0968d12",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What is the difference between a stock transfer and transfer posting?",
+        "card": "<p>A stock transfer is a physical movement of goods:</p><ul><li>SLoc to SLoc</li><li>Plant to Plant</li><li>Company Code to Company Code</li></ul><p>A transfer posting may have a physical movement but must include a change in status of the material:</p><ul><li>Stock to Stock (e.g. unrestricted to blocked stock)</li><li>Material to material</li><li>Consignment to warehouse (or any two of the many special classifications of stock)</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b00405e0ec90e1ec0968d13",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "When does valuation occur (an thus an FI document is created) as a result of a stock transfer?",
+        "card": "<p>When the plant changes:</p><ul><li>Plant to plant</li><li>Company code to company code</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0040a20ec90e1ec0968d14",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "When the valuation (and thus an FI document created) on a two step stock transfer or stock transport order?",
+        "card": "After the first step (goods issue) the material is considered to be in-transit at the receiving storage location so the valuation occurs only after the first step.",
+        "__v": 0
+    },
+    {
+        "_id": "5b0041210ec90e1ec0968d15",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What are the advantages of stock transport orders?",
+        "card": "<ul><li>Stock transport orders are integrated with MRP</li><li>Receipt at the destination can be planned</li><li>Delivery costs and transport can be managed</li><li>Goods can be received directly into consumption</li><li>Goods can be received into blocked or quality inspection</li><li>The process can be monitored with the PO history</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0042010ec90e1ec0968d17",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "What happens to variances left on the order after confirmation?",
+        "card": "The are settled",
+        "__v": 0
+    },
+    {
+        "_id": "5b0043ac0ec90e1ec0968d18",
+        "unit": "5b0036650ec90e1ec0968ce6",
+        "flash": "How does MRP work?",
+        "card": "<ul><li>MRP starts by performing net requirements calculation for independent requirements</li><li>If required, MRP created a procurement proposal</li><li>The proposal is scheduled using the times configured in the material master</li><li>If the material has a BOM, MRP create dependent requirements for each component in the BOM</li><li>MRP continues this processing planning each dependent requirement</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b00442e0ec90e1ec0968d1a",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What are the steps in the order-to-cash process?",
+        "card": "<ul><li>Sales order</li><li>Availability check</li><li>Outbound delivery</li><li>Picking</li><li>Goods issue</li><li>Transportation</li><li>Billing</li><li>Payment processing</li></ul>",
+        "__v": 0
+    },
+
+
+  
+
+    {
+        "_id": "5b0045630ec90e1ec0968d23",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What are the views of customer master data?",
+        "card": "<ul><li>General relevant at the client</li><li>Accounting relevant at the company code</li><li>Sales relevant at the sales area</li></ul>",
+        "__v": 0
+    },
+
+    {
+        "_id": "5b0045b50ec90e1ec0968d25",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What are the required partner functions for customers?",
+        "card": "<ul><li>Sold-to party</li><li>Ship-to party</li><li>Bill-to party</li><li>Payer</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0046070ec90e1ec0968d26",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What two integrations occur when creating a sales order?",
+        "card": "<ul><li>MM and SD (availability check)</li><li>PP and SD (transfer of requirements)</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0046240ec90e1ec0968d27",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What method is used to monitor the order to cash process?",
+        "card": "Document flow",
+        "__v": 0
+    },
+    {
+        "_id": "5b0046490ec90e1ec0968d28",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What organizational unit is required to create a sales order?",
+        "card": "Sales area",
+        "__v": 0
+    },
+    {
+        "_id": "5b0046520ec90e1ec0968d29",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What organizational unit is required to create a delivery?",
+        "card": "Shipping point",
+        "__v": 0
+    },
+    {
+        "_id": "5b00466b0ec90e1ec0968d2a",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What quantity is copied from the schedule line into a delivery?",
+        "card": "Delivery quantity",
+        "__v": 0
+    },
+    {
+        "_id": "5b0046830ec90e1ec0968d2b",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What quantity appears in the delivery when the transfer order is confirmed?",
+        "card": "Picked quantity",
+        "__v": 0
+    },
+    {
+        "_id": "5b00469a0ec90e1ec0968d2c",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What document is used to manage picking materials from the warehouse?",
+        "card": "Transfer order",
+        "__v": 0
+    },
+    {
+        "_id": "5b0046c30ec90e1ec0968d2d",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "The shipping process supports what activities?",
+        "card": "<ul><li>Creating outbound deliveries-</li><li>Picking (by creating transfer orders)-</li><li>Packing-</li><li>Posting the goods issue</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b00471a0ec90e1ec0968d2e",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What are the effects of goods issue?",
+        "card": "<ul><li>MM, FI and CO documents are created</li><li>The inventory account is credited and COGS is debited</li><li>Document flow is updated</li><li>The customer requirement is deleted</li><li>The billing due worklist is updated in A/R</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b00476a0ec90e1ec0968d2f",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What are the effects of billing?",
+        "card": "<ul><li>FI and CO documents are created</li><li>Customer subledger is debited and revenue is credited</li><li>Revenue is posted to CO-PA</li><li>Document flow is updated</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0047bb0ec90e1ec0968d30",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What is a worklist?",
+        "card": "A worklist is a list of documents that require processing.&nbsp; Documents can be processed directly from the worklist.&nbsp; For example, the billing due list consists of sales orders for which the goods have been issued and are waiting for customer billing to be issued.",
+        "__v": 0
+    },
+    {
+        "_id": "5b0048090ec90e1ec0968d31",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "<p>What would be used to answer this question:</p><p>Which areas of responsibility exceeded their revenue plan during the last month?</p>",
+        "card": "Profit center accounting",
+        "__v": 0
+    },
+    {
+        "_id": "5b0048360ec90e1ec0968d32",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "<p>What would be used to answer the following question?</p><p>Has your sales unit reached its contribution margin?</p>",
+        "card": "Profitability analysis",
+        "__v": 0
+    },
+    {
+        "_id": "5b0048900ec90e1ec0968d33",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What kinds of values are sales conditions?",
+        "card": "<ul><li>Prices</li><li>Discounts</li><li>Freight</li><li>Surcharges</li><li>Taxes</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0048ca0ec90e1ec0968d34",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What step in the order to cash process causes a posting to CO-PA?",
+        "card": "Billing due to the revenue posting",
+        "__v": 0
+    },
+    {
+        "_id": "5b0048f30ec90e1ec0968d35",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What are the reporting structures in CO-PA called?",
+        "card": "Profitability segments",
+        "__v": 0
+    },
+    {
+        "_id": "5b00491d0ec90e1ec0968d36",
+        "unit": "5b0043ce0ec90e1ec0968d19",
+        "flash": "What data fields are included in profitability segments?",
+        "card": "<ul><li>Characteristics</li><li>Values fields (measurables)</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0049a50ec90e1ec0968d38",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What type of master data record can be created at the same time an asset master record is created?",
+        "card": "An equipment master record",
+        "__v": 0
+    },
+    {
+        "_id": "5b0049bf0ec90e1ec0968d39",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "Two what two organizational units are assets assigned?",
+        "card": "<ul><li>Company code</li><li>Business area</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0049de0ec90e1ec0968d3a",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What does the asset class determine?",
+        "card": "<ul><li>Type of asset</li><li>Asset number range</li><li>Default values for depreciation</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004a0f0ec90e1ec0968d3b",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What types of internal orders are there?",
+        "card": "<ul><li>Overhead cost orders</li><li>Investment orders</li><li>Accrual orders</li><li>Orders with revenues</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004a220ec90e1ec0968d3c",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What happens to the costs in orders when you are done with the order?",
+        "card": "They are settled",
+        "__v": 0
+    },
+    {
+        "_id": "5b004a3e0ec90e1ec0968d3d",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What determine which objects are debited when an order is settled?",
+        "card": "The settlement rule",
+        "__v": 0
+    },
+    {
+        "_id": "5b004a4c0ec90e1ec0968d3e",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What happens to the order when it is settled?",
+        "card": "It receives a credit",
+        "__v": 0
+    },
+    {
+        "_id": "5b004a660ec90e1ec0968d3f",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What type of CO object can update G/L accounts?",
+        "card": "Orders",
+        "__v": 0
+    },
+    {
+        "_id": "5b004a9c0ec90e1ec0968d40",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "Commitment management is a FI process, true or false?",
+        "card": "False, commitment management is a CO process",
+        "__v": 0
+    },
+    {
+        "_id": "5b004acc0ec90e1ec0968d41",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "When does a commitment appear on an order?",
+        "card": "When a purchasing document is created with an account assignment category set to order and the order number entered as the account assignment object.",
+        "__v": 0
+    },
+    {
+        "_id": "5b004adf0ec90e1ec0968d42",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "When does a&nbsp; commitment become an actual cost?",
+        "card": "Upon goods receipt",
+        "__v": 0
+    },
+    {
+        "_id": "5b004b030ec90e1ec0968d43",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What do you have to do to an order before you can begin posting costs to it?",
+        "card": "Release it",
+        "__v": 0
+    },
+    {
+        "_id": "5b004b300ec90e1ec0968d44",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "When can you post depreciation to an asset?",
+        "card": "Only during the depreciation run",
+        "__v": 0
+    },
+    {
+        "_id": "5b004b4a0ec90e1ec0968d45",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What are different methods of calculating depreciation called in SAP ERP?",
+        "card": "Depreciation areas",
+        "__v": 0
+    },
+    {
+        "_id": "5b004b670ec90e1ec0968d46",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What number is used to classify the various asset transactions?",
+        "card": "Transaction type",
+        "__v": 0
+    },
+    {
+        "_id": "5b004b860ec90e1ec0968d47",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What is used to summarize all the transactions that involve an asset?",
+        "card": "Asset history sheet",
+        "__v": 0
+    },
+    {
+        "_id": "5b004bd30ec90e1ec0968d48",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What are the organizational levels in EAM?",
+        "card": "<p>General</p><ul><li>Client</li><li>Company code</li><li>Plant</li></ul><p>Location based</p><ul><li>Maintenance plant</li><li>Location</li><li>Maintenance work center</li></ul><p>Planning based</p><ul><li>Maintenance planning plant</li><li>Maintenance planner groups</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004bef0ec90e1ec0968d49",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "Can a maintenance planning plan plan maintenance for more than one plant?",
+        "card": "Yes",
+        "__v": 0
+    },
+    {
+        "_id": "5b004c0c0ec90e1ec0968d4a",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What are the technical objects?",
+        "card": "<ul><li>Functional location</li><li>Equipment</li><li>BOM or assembly</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004c300ec90e1ec0968d4b",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What criteria can you used to organize functional locations?",
+        "card": "<ul><li>Spatial</li><li>Technical</li><li>Functional</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004c580ec90e1ec0968d4c",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What is used to assign functional location objects to the functional location hierarchy?",
+        "card": "Structure indicator",
+        "__v": 0
+    },
+    {
+        "_id": "5b004c7c0ec90e1ec0968d4d",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What is the main difference between functional locations and equipment?",
+        "card": "Equipment can be managed with inventory processes",
+        "__v": 0
+    },
+    {
+        "_id": "5b004cac0ec90e1ec0968d4e",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What can BOMs be used for in EAM?",
+        "card": "<ul><li>Structuring an object</li><li>Spare parts planning in an order</li><li>Spare parts planning in a task list</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004cd70ec90e1ec0968d4f",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "How do you assign a BOM to an equipment master record?",
+        "card": "Assign the material number to the construction type field",
+        "__v": 0
+    },
+    {
+        "_id": "5b004d020ec90e1ec0968d50",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What are the steps in the maintenance process?",
+        "card": "<ul><li>Notification</li><li>Planning</li><li>Control</li><li>Execution</li><li>Completion</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004d310ec90e1ec0968d51",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What is included in a notification?",
+        "card": "<ul><li>Notification items</li><li>Activities (what you actually did)</li><li>Tasks (what you are planning do to)</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004d560ec90e1ec0968d52",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What objects can you assign to a notification?",
+        "card": "<ul><li>No object</li><li>Functional location</li><li>Equipment</li><li>Assembly (BOM)</li><li>Material with serial number</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004d890ec90e1ec0968d53",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What is the object list?",
+        "card": "You can only assign one object to a maintenance order header.&nbsp; The object list is used to assign additional objects to the order.",
+        "__v": 0
+    },
+    {
+        "_id": "5b004dc00ec90e1ec0968d54",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "You've created an order and planned operations and materials.&nbsp; What step do you have to take before work can begin?",
+        "card": "Release the order",
+        "__v": 0
+    },
+    {
+        "_id": "5b004de90ec90e1ec0968d55",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What can be confirmed on an order?",
+        "card": "<ul><li>Times</li><li>Activities</li><li>Measurements/counter readings</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004e160ec90e1ec0968d56",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What can be confirmed on the overall completion transaction?",
+        "card": "<ul><li>Times</li><li>Materials</li><li>Items</li><li>Activities</li><li>Technical completion</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004e660ec90e1ec0968d57",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What happens when you technically complete an order?",
+        "card": "<ul><li>Settlement rule created (if necessary)</li><li>Material reservations deleted</li><li>Unused purchase requisitions deleted</li><li>Capacity reservations deleted</li><li>Order status changed to TECO</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004e780ec90e1ec0968d58",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What can you do to an order after TECO?",
+        "card": "<ul><li>Post costs</li><li>Un-TECO it</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004f490ec90e1ec0968d59",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What happens to an order upon confirmation?",
+        "card": "<ul><li>Actual costs are posted to the order</li><li>Measurements and counter readings may be posted to the order</li><li>Times recorded</li><li>Unplanned materials are recorded</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b004f5d0ec90e1ec0968d5a",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What happens to the costs on an order when the work is completed?",
+        "card": "They are settled",
+        "__v": 0
+    },
+    {
+        "_id": "5b004fca0ec90e1ec0968d5b",
+        "unit": "5b00494e0ec90e1ec0968d37",
+        "flash": "What happens to a maintenance order when it is settled?",
+        "card": "The order is credited and the balance is zero",
+        "__v": 0
+    },
+    {
+        "_id": "5b0188810ec90e1ec0968d5d",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What are the structures that make up a project?",
+        "card": "<ul><li>WBS elements</li><li>Activities</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0188b90ec90e1ec0968d5e",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What is the role of WBS elements?",
+        "card": "WBS elements show required project activities in hierarchical form and are responsibility oriented",
+        "__v": 0
+    },
+    {
+        "_id": "5b0188e20ec90e1ec0968d5f",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What is the role of activities?",
+        "card": "Activites show the flow of a project, the specific operations that must be performed and are process oriented.",
+        "__v": 0
+    },
+    {
+        "_id": "5b0188f10ec90e1ec0968d60",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "How are WBS elements organized?",
+        "card": "Hierarchy",
+        "__v": 0
+    },
+    {
+        "_id": "5b0188ff0ec90e1ec0968d61",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "How are activities organized?",
+        "card": "Network",
+        "__v": 0
+    },
+    {
+        "_id": "5b01892c0ec90e1ec0968d62",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What are the functions of WBS elements?",
+        "card": "<ul><li>Dates</li><li>Cost/Revenues</li><li>Payment data</li><li>Budget</li><li>Periodic processing</li><li>Commitments</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0189710ec90e1ec0968d63",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What tools are used to maintain a project?",
+        "card": "<ul><li>Project builder</li><li>Project planning board which is a graphical tool</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0189c70ec90e1ec0968d64",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What are the operative indicators?",
+        "card": "<ul><li>Account assignment (Posting costs)</li><li>Planning (planning costs)</li><li>Billing (posting revenues)</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b018a060ec90e1ec0968d65",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What methods are there for maintaining a project in the project builder?",
+        "card": "<ul><li>Manually</li><li>Hierarchy graphic</li><li>Copy standard or operative project structures</li><li>Incorporate parts of standard or operative project structures</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b018a3f0ec90e1ec0968d66",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What types of activities can you create?",
+        "card": "<ul><li>Internal processing</li><li>External processing</li><li>Services for procuring external services</li><li>Cost activities</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b018a730ec90e1ec0968d67",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What can you plan on activities?",
+        "card": "<ul><li>Internal activities</li><li>External activities/services</li><li>Materials</li><li>Periodic processing</li><li>Costs</li><li>Milestones</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b018aae0ec90e1ec0968d68",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What can you maintain on the project planning board?",
+        "card": "<ul><li>Project structures</li><li>Dates</li><li>Payments</li><li>Resources</li><li>Materials</li><li>Costs, revenues</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b018adc0ec90e1ec0968d69",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What objects can be planned on the project planning board?",
+        "card": "<ul><li>WBS elements</li><li>Activities</li><li>Relationships</li><li>Materials</li><li>Milestones</li><li>Basic dates</li><li>PS Texts</li><li>Documents</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b018b600ec90e1ec0968d6a",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What methods exist to plan costs and revenues?",
+        "card": "<ul><li>Overall planning</li><li>Cost element planning</li><li>Unit costing</li><li>Easy cost planning</li><li>Projects and orders</li><li>Cost planning using activities</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b018b9b0ec90e1ec0968d6b",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What tools is used to manage the budget?",
+        "card": "Availability control",
+        "__v": 0
+    },
+    {
+        "_id": "5b018bd20ec90e1ec0968d6c",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What links activities in a network?",
+        "card": "Relationships",
+        "__v": 0
+    },
+    {
+        "_id": "5b018bfb0ec90e1ec0968d6d",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "Which activity type do you assign a workcenter?",
+        "card": "Internal",
+        "__v": 0
+    },
+    {
+        "_id": "5b018c1f0ec90e1ec0968d6e",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What is created when you assign a non-stock item to an activity?",
+        "card": "Purchase requisition",
+        "__v": 0
+    },
+    {
+        "_id": "5b018c2e0ec90e1ec0968d6f",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What is created when you assign a stock item to an activity?",
+        "card": "Reservation",
+        "__v": 0
+    },
+    {
+        "_id": "5b018c600ec90e1ec0968d70",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "What transaction is performed when you confirm work done on an internal activity?",
+        "card": "Direct activity allocation",
+        "__v": 0
+    },
+    {
+        "_id": "5b018cb60ec90e1ec0968d71",
+        "unit": "5b01883a0ec90e1ec0968d5c",
+        "flash": "Which components can CATS post to?",
+        "card": "<ul><li>HR</li><li>PS</li><li>PM</li><li>CS</li><li>CO</li><li>MM</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b018d7e0ec90e1ec0968d73",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What are the HCM processes?",
+        "card": "<ul><li>Organizational management</li><li>SAP E-Recruiting</li><li>Personnel Management</li><li>Personnel Development</li><li>Training and Event Management</li><li>Time Management</li><li>Performance Management</li><li>Payroll</li><li>Personnel Cost Planning</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b018dba0ec90e1ec0968d74",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What are the three HCM structure areas?",
+        "card": "<ul><li>Enterprise structure</li><li>Personnel structure</li><li>Organizational structure</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b018de30ec90e1ec0968d75",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "Which HCM structure defines the relationship of the employee with the company?",
+        "card": "Personnel structure",
+        "__v": 0
+    },
+    {
+        "_id": "5b018e030ec90e1ec0968d76",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What organizational units make up the enterprise structure?",
+        "card": "<ul><li>Client</li><li>Company code</li><li>Personnel area</li><li>Personnel subarea</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b018e1e0ec90e1ec0968d77",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "Which organizational structure is a subdivision of the company code?",
+        "card": "Personnel area",
+        "__v": 0
+    },
+    {
+        "_id": "5b018e3e0ec90e1ec0968d78",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "Which organizational structure is a subdivision of the personnel area and is the organizational unit at which the main personnel administration functions occur?",
+        "card": "Personnel subarea",
+        "__v": 0
+    },
+    {
+        "_id": "5b018e6c0ec90e1ec0968d79",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "Which organizational unit is a division of employees?",
+        "card": "Employee group",
+        "__v": 0
+    },
+    {
+        "_id": "5b018e860ec90e1ec0968d7a",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What organizational units make up the personnel structure?",
+        "card": "<ul><li>Employee group</li><li>Employee subgroup</li><li>Payroll area</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b018eac0ec90e1ec0968d7b",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "Which organizational unit defines when payroll is run?",
+        "card": "Payroll area",
+        "__v": 0
+    },
+    {
+        "_id": "5b018eeb0ec90e1ec0968d7c",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "Which organizational unit describes the various business units in the enterprise?",
+        "card": "Organizational unit",
+        "__v": 0
+    },
+    {
+        "_id": "5b018f100ec90e1ec0968d7d",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What describes roles within the organization including classification of responsibilities?",
+        "card": "Jobs",
+        "__v": 0
+    },
+    {
+        "_id": "5b018f290ec90e1ec0968d7e",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What represents an opening into which someone can be hired?",
+        "card": "Position",
+        "__v": 0
+    },
+    {
+        "_id": "5b018f720ec90e1ec0968d7f",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What is the relationship between jobs and positions?",
+        "card": "A job is a general description of roles and responsibilities.&nbsp; Positions are created from jobs and represent an opening into which someone can be hired.",
+        "__v": 0
+    },
+    {
+        "_id": "5b018fab0ec90e1ec0968d80",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What is the relationship between organizational units and positions?",
+        "card": "Positions are assigned to organizational units and inherit the cost center assigned to the organizational unit",
+        "__v": 0
+    },
+    {
+        "_id": "5b018fd40ec90e1ec0968d81",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "How do cost centers fit into the organizational plan?",
+        "card": "Cost centers can be assigned to organizational units and positions",
+        "__v": 0
+    },
+    {
+        "_id": "5b018fef0ec90e1ec0968d82",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What organizational unit represents an individual hired into a position?",
+        "card": "A person",
+        "__v": 0
+    },
+    {
+        "_id": "5b0190d80ec90e1ec0968d84",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What methods are available to manage HCM master data?",
+        "card": "<ul><li>Single screen (one person - one infotype)</li><li>Fast entry (multiple people - one infotype)</li><li>Personnel action (multiple people - multiple infotypes)</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0191050ec90e1ec0968d85",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "How is HCM master data organized?",
+        "card": "Infotypes which are groups of data fields relevant for specific topics",
+        "__v": 0
+    },
+    {
+        "_id": "5b0191220ec90e1ec0968d86",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "How would you view all the infotypes maintained on a person?",
+        "card": "Personnel file",
+        "__v": 0
+    },
+    {
+        "_id": "5b01917c0ec90e1ec0968d87",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What is a qualification?",
+        "card": "A skill or experience that a person has",
+        "__v": 0
+    },
+    {
+        "_id": "5b0191880ec90e1ec0968d88",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What is a requirement?",
+        "card": "A requirement defined for a job or position",
+        "__v": 0
+    },
+    {
+        "_id": "5b0191a60ec90e1ec0968d89",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What is a profile match up?",
+        "card": "A comparison of the qualifications a person has with the requirements for a position",
+        "__v": 0
+    },
+    {
+        "_id": "5b0191d40ec90e1ec0968d8a",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "Which HCM processes use the profile match up?",
+        "card": "<ul><li>Recruitment</li><li>Personnel development</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0192380ec90e1ec0968d8b",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What tool allows an employee to view and manage their personnel data?",
+        "card": "Employee self service",
+        "__v": 0
+    },
+    {
+        "_id": "5b01925e0ec90e1ec0968d8c",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "What can an employee manage using ESS?",
+        "card": "<ul><li>Personal information</li><li>Benefits</li><li>Time management</li><li>Skills and appraisals</li><li>Training</li><li>Life and work events</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5b0192c80ec90e1ec0968d8d",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "Which infotype maintenance transaction would you use when an employee passes a milestone like being hired, being promoted or retiring?",
+        "card": "Personnel action",
+        "__v": 0
+    },
+    {
+        "_id": "5b01906e0ec90e1ec0968d83",
+        "unit": "5b018ce40ec90e1ec0968d72",
+        "flash": "Which HCM processes have an integration with FICO?",
+        "card": "<ul><li>Personnel cost planning</li><li>Payroll Process</li><li>Compensation management</li><li>Training and Event Management</ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0424f76c911c805cb765",
+        "unit": "5cdefe8df76c911c805cb75b",
+        "flash": "Whta factors suggest the world is becomeing more complex?",
+        "card": "<ol><liExponential growth of digital information – social, mobile, big data</li><li>Globalization and spread of business networks</li><li>Process POs and perform PO follow-up.</li><li>Internet of Things (you could also say, the Internet of everything)</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf04f1f76c911c805cb766",
+        "unit": "5cdefe8df76c911c805cb75b",
+        "flash": "What factors have allowed smarter more powerful applications?",
+        "card": "<ol><li>Powerful multicore processors</li><li>Huge/affordable memory</li><li>Optimized cache</li><li>Cloud</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0561f76c911c805cb767",
+        "unit": "5cdefe8df76c911c805cb75b",
+        "flash": "What are some of the features of S/4 HANA?",
+        "card": "<ol><li>Small data footprint</li><li>Higher throughput</li><li>Faster analytics & reporting</li><li>Fewer process steps</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf05dcf76c911c805cb768",
+        "unit": "5cdefe8df76c911c805cb75b",
+        "flash": "What SAP cloud product combines industry-leading cloud-based applications with the world's largest Internet-based trading community to help companies discover and collaborate with a global network of partnerst?",
+        "card": "SAP Ariba",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0609f76c911c805cb769",
+        "unit": "5cdefe8df76c911c805cb75b",
+        "flash": "What SAP cloud product provides mobile solutions for travel and expense management?",
+        "card": "SAP Concur",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0627f76c911c805cb76a",
+        "unit": "5cdefe8df76c911c805cb75b",
+        "flash": "What SAP cloud product is the leader in cloud-based Human Capital Management (HCM) software for talent management, core HR, and HR analytics?",
+        "card": "SAP SuccessFactors",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0644f76c911c805cb76b",
+        "unit": "5cdefe8df76c911c805cb75b",
+        "flash": "What SAP cloud product provides a cloud-based Vendor Management System?",
+        "card": "SAP Fieldglass",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf065af76c911c805cb76c",
+        "unit": "5cdefe8df76c911c805cb75b",
+        "flash": "What SAP cloud product helps businesses around the globe sell more goods, services, and digital content through every touchpoint, channel, and device?",
+        "card": "SAP Hybris",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0b43f76c911c805cb76d",
+        "unit": "5cdefe8df76c911c805cb75b",
+        "flash": "What are the key aspects of S/4 HANA?",
+        "card": "<ol><li>Native SAP HANA Capabilities</li><li>Work patterns</li><li>Footprint reduction</li><li>New user experience</li><li>Choice of deployment</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0b95f76c911c805cb76e",
+        "unit": "5cdefe8df76c911c805cb75b",
+        "flash": "What are the key aspects of HANA data base?",
+        "card": "<ol><li>High compression</li><li>Column store</li><li>Any attribute is an index</li><li>OLTP and OLAP combined</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0bf2f76c911c805cb76f",
+        "unit": "5cdefe8df76c911c805cb75b",
+        "flash": "What is included on the SAP S/4HANA simplification list?",
+        "card": "With every new release of SAP S/4HANA, the simplification list is updated with release-dependent information. It describes the simplification items valid for SAP S/4HANA.",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0c4bf76c911c805cb770",
+        "unit": "5cdefe8df76c911c805cb75b",
+        "flash": "What is included with each item on the simplification list?",
+        "card": "<ol><li>Description</li><li>Business impact</li><li>Recommendations</li><li>SAP Notes for pre-checks</li><li>Choice of deployment</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0cd1f76c911c805cb771",
+        "unit": "5cdeff5cf76c911c805cb764",
+        "flash": "How have applications focus changed with SAP Fiori?",
+        "card": "<ol><li>Role based rather than function based applications</li><li>A single point of entry so one interface for all devices</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0da7f76c911c805cb772",
+        "unit": "5cdeff5cf76c911c805cb764",
+        "flash": "What are the types of users in most organizations?",
+        "card": "<ol><li>Occasional</li><li>Expert</li><li>Developer</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0dd1f76c911c805cb773",
+        "unit": "5cdeff5cf76c911c805cb764",
+        "flash": "What are the types of SAP Fiori applications?",
+        "card": "<ol><li>Transactional</li><li>Analytical</li><li>Factsheet</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0dedf76c911c805cb774",
+        "unit": "5cdeff5cf76c911c805cb764",
+        "flash": "What types of SAP Fiori applications bypass the ABAP stack and go straight to HANA?",
+        "card": "<ol><li>Analytical</li><li>Factsheet</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0e90f76c911c805cb775",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is the highest organizational unit in SAP?",
+        "card": "Client",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0eaef76c911c805cb776",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What does the client represent?",
+        "card": "The enterprise",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0ecdf76c911c805cb777",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is the purpose of organizational units?",
+        "card": "<p>They represent the administrative structure of the enterprise.</p><p>They are used to enter, track and report data in the system.</p>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0eebf76c911c805cb778",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is the relationship between master data and organizational units?",
+        "card": "Master data is organized into views which contain the data relevant for a specific business process.&nbsp; The data in a view is <i>assigned </i>to or relevant for a specific organizational unit.&nbsp; When transactions are executed, they are executed for a specific business unit and the system knows which master data views to retrieve because the view is assigned to that organizational unit.",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0f04f76c911c805cb779",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is master data?",
+        "card": "<p>Data that is:</p><ul><li>Long term</li><li>Represents the business entities that define the enterprise</li><li>Centrally stored and accessed by multiple business processes</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0f27f76c911c805cb77a",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is the role of the company code?",
+        "card": "<ul><li>&nbsp;An independent accounting entity</li><li>Smallest org unit at which you can create a fill set of financial statements</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0f46f76c911c805cb77b",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What org units are defined for FI in the TS410?",
+        "card": "<ul><li>Company code</li><li>Segment</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0f70f76c911c805cb77c",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What are the organizational units in controlling?",
+        "card": "<ul><li>Operating Concern</li><li>Controlling Area</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0f7ff76c911c805cb77d",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is the relationship between controlling area and company code?",
+        "card": "One controlling area to many company codes",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0f9ff76c911c805cb77e",
+        "unit": "5cdefea6f76c911c805cb75d",
+        "flash": "What do company codes assigned to a controlling area have to share?",
+        "card": "<ul><li>Operative chart of accounts</li><li>Fiscal year variant</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf0feff76c911c805cb77f",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What are the organizational units in the purchase-to-pay process?",
+        "card": "<ul><li>Client</li><li>Company Code</li><li>Plant</li><li>Storage Location</li><li>Purchasing Organization</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf1009f76c911c805cb780",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What organizational unit&nbsp; is responsible for procuring materials or services and negotiating the conditions of purchase with vendors, and assumes responsibility for the purchasing activities.",
+        "card": "Purchasing organization",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf1017f76c911c805cb781",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What purchasing organizational structure allows a single purchasing organization to purchase for all the plants assigned to a company code?",
+        "card": "Cross-Plant Purchasing",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf1026f76c911c805cb782",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What are the three types of purchasing structures?",
+        "card": "<ul><li>Plant-Specific Purchasing</li><li>Cross-Plant Purchasing</li><li>Cross-Company Code Purchasing</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf104bf76c911c805cb783",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is the relationship between plant and storage location?",
+        "card": "A plant can have one to many storage locations",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf1059f76c911c805cb784",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is the relationship between company code and plant?",
+        "card": "A company code can one to many plants",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf107af76c911c805cb785",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What organizational units are relevant for plan-to-produce?",
+        "card": "<ul><li>Client</li><li>Company Code</li><li>Plant</li><li>Storage Location</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf10e3f76c911c805cb786",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What are the organizational units relevant for order-to-cash?",
+        "card": "<ul><li>Company code</li><li>Sales area</li><ul><li>Sales organization</li><li>Distribution channel</li><li>Division</li></ul><li>Plant</li><li>Storage location</li><li>Shipping point</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf10f1f76c911c805cb787",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What are the responsibilities of the sales organization?",
+        "card": "<ul><li>Distributes goods and services to customers</li><li>Negotiate and fulfill the terms of sales</li><li>Product liability and rights of recourse</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf1101f76c911c805cb788",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is the role of the distribution channel?",
+        "card": "<ul><li>Means by which goods and services are distributed to customers</li><li>Differential pricing</li><li>Division of responsibilies</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf110ef76c911c805cb789",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What does a division represent?",
+        "card": "A product line",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf111af76c911c805cb78a",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is a sales area?",
+        "card": "A unique combination of sales organization, distribution channel and division",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf112af76c911c805cb78b",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is the relationship between company code and sales organization?",
+        "card": "One to many",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf1136f76c911c805cb78c",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is the relationship between sales area and plant?",
+        "card": "Many to many",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf1142f76c911c805cb78d",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is the relationship between shipping point and plant?",
+        "card": "Many to many",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf119df76c911c805cb78e",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What are the organizational levels in EAM?",
+        "card": "<p>General</p><ul><li>Client</li><li>Company code</li><li>Plant</li></ul><p>Location based</p><ul><li>Maintenance plant</li><li>Location</li><li>Maintenance work center</li></ul><p>Planning based</p><ul><li>Maintenance planning plant</li><li>Maintenance planner groups</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf11b1f76c911c805cb78f",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "Can a maintenance planning plan plan maintenance for more than one plant?",
+        "card": "Yes",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf1200f76c911c805cb790",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What organizational units make up the enterprise structure in HCM?",
+        "card": "<ul><li>Client</li><li>Company code</li><li>Personnel area</li><li>Personnel subarea</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf1213f76c911c805cb791",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "Which organizational structure in HCM is a subdivision of the company code?",
+        "card": "Personnel area",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf1224f76c911c805cb792",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "Which organizational structure in HCM is a subdivision of the personnel area and is the organizational unit at which the main personnel administration functions occur?",
+        "card": "Personnel subarea",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf136ff76c911c805cb793",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What field is required when you create a business partner?",
+        "card": "Business Partner Category",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2195f76c911c805cb795",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "What master data is relevant for financial accounting?",
+        "card": "G/L Accounts",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf21b1f76c911c805cb796",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "What views do a G/L account include?",
+        "card": "<ul><li>Chart of accounts segment</li><li>Company code segment</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf21caf76c911c805cb797",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "What information does the chart of accounts segment of a G/L account include?",
+        "card": "<p>Information that will be the same for all company codes.</p><ul><li>Account group</li><li>Account number</li><li>Description</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf21fff76c911c805cb798",
+        "unit": "5cdefea6f76c911c805cb75d",
+        "flash": "What is the purpose of the general ledger?",
+        "card": "To support financial reporting",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf223cf76c911c805cb799",
+        "unit": "5cdefe9ff76c911c805cb75c",
+        "flash": "What is the role of the segment?",
+        "card": "To produce financial statements based on some criteria other than the legal reporting boundaries.",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2260f76c911c805cb79a",
+        "unit": "5cdefea6f76c911c805cb75d",
+        "flash": "What are the characteristics of financial accounting?",
+        "card": "<ul><li>Externally oriented</li><li>Used to create financial statements</li><li>Regulated</li><li>Structured</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf22c4f76c911c805cb79b",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "What steps are required to create the general ledger?",
+        "card": "<ol><li>Assign a Chart of Accounts to the company code</li><li>Create the G/L account master data</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf22daf76c911c805cb79c",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "What does the account group determine?",
+        "card": "<ul><li>User defined account groups</li><li>Number range</li><li>Field status</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf22e9f76c911c805cb79d",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "What is a chart of accounts?",
+        "card": "A ordered list of accounts compatible with a specific financial statement version",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf22fef76c911c805cb79e",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "List the components of Controlling?",
+        "card": "<ul><li>Cost Element Accounting</li><li>Overhead Cost Controlling</li><li>Product Cost Controlling</li><li>Profit Center Accounting</li><li>Profitability Analysis</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2316f76c911c805cb79f",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "Which component of controlling classifies costs?",
+        "card": "Cost element accounting",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2324f76c911c805cb7a0",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "Which component of controlling is concerned with where costs occur?",
+        "card": "Overhead cost controlling",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2335f76c911c805cb7a1",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "Which component of controlling is concerned with the costs associated with producing your products?",
+        "card": "Product cost controlling",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2342f76c911c805cb7a2",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "Which component of controlling exams how profitable parts of your organization are?",
+        "card": "Profit center accounting",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf234ef76c911c805cb7a3",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "Which component of controlling examines how profitable your organization is in the market?",
+        "card": "Profitability analysis",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2381f76c911c805cb7a4",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "What information must you provide if you post to an expense account that is a primary cost?",
+        "card": "A controlling object",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf23b3f76c911c805cb7a5",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "A posting from a cost center using an assessment uses what type of cost element?",
+        "card": "Secondary cost element",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf23caf76c911c805cb7a6",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "A service that a controlling area provides to other parts of the organization in controlling is called:",
+        "card": "An activity type",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf23e4f76c911c805cb7a7",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "What two values do you need to perform an Activity Allocation?",
+        "card": "<ul><li>Quantity of the activity&nbsp;</li><li>Price of the activity</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf23f6f76c911c805cb7a8",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "What determines the price in a Direct Activity Allocation?",
+        "card": "<ul><li>Activity type</li><li>Cost center</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf240ff76c911c805cb7a9",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "When you perform an activity allocation, which side gets the debit and which side gets the credit?",
+        "card": "<ul><li>Debit goes to the receiver</li><li>Credit goes to the sender</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2429f76c911c805cb7aa",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "What type of cost element is used for activity allocation?",
+        "card": "Secondary cost element configured in the activity type master data",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf243ef76c911c805cb7ab",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "What type of object is always a statistical object?",
+        "card": "Profit center",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2472f76c911c805cb7ac",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "What type of objects can be a statistical objects?",
+        "card": "<ul><li>Orders</li><li>Projects</li><li>Profit Centers</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2493f76c911c805cb7ad",
+        "unit": "5cdf2168f76c911c805cb794",
+        "flash": "<p>Which type of object can only be a real object?</p>",
+        "card": "Cost center",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf24bdf76c911c805cb7ae",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What are the steps in the purchase-to-pay process?",
+        "card": "<ul><li>Determination of Requirements</li><li>Source of Supply Determination</li><li>Vendor Selection</li><li>Purchase Order Handling</li><li>Purchase Order Monitoring</li><li>Goods Receipt</li><li>Invoice Verification</li><li>Handling of Payments</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf24d8f76c911c805cb7af",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What master data is relevant for the purchase-to-pay process?",
+        "card": "<ul><li>Material</li><li>Vendor</li><li>Purchasing info-record</li><li>Conditions</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf24f2f76c911c805cb7b0",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What information is included in a purchasing info record?",
+        "card": "<ul><li>Current and future prices and conditions</li><li>Delivery data</li><li>Vendor data (e.g. contact person)</li><li>Vendor specific data about the material</li><li>Last purchase order number</li><li>Internal comments and texts</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf250df76c911c805cb7b1",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What types of conditions can be used in purchasing?",
+        "card": "<ul><li>Contracts</li><li>Purchasing info records</li><li>Quotations</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2526f76c911c805cb7b2",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "How do you purchase a consummable?",
+        "card": "Set the account assignment category in a purchasing document",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf253ff76c911c805cb7b3",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What are the effects of performing a goods receipt?",
+        "card": "<ul><li>MM and FI documents are always created and a CO document will be created if their is a consummable</li><li>The stock account is debited (and maybe a consumption account) and the GR/IR is credited</li><li>The material master is updated</li><li>The PO history is updated</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2553f76c911c805cb7b4",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What are the three stock types?",
+        "card": "<ul><li>Unrestricted use</li><li>Stock in quality inspection</li><li>Blocked stock</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf256bf76c911c805cb7b5",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What are the effects of invoice verification?",
+        "card": "<ul><li>A MM and FI document (and possibly a CO document) are created</li><li>Credit to the vendor subledger (and account payable) and debit to GR/IR</li><li>The PO History is updated</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2582f76c911c805cb7b6",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What organizational unit is required for a purchase requisition?",
+        "card": "The plant",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf2595f76c911c805cb7b7",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What organizational units are required for a purchase order",
+        "card": "<ul><li>Company code</li><li>Plant</li><li>Purchasing organization</li><li>Purchasing group</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf25aaf76c911c805cb7b8",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What organizational level is required for a goods receipt?",
+        "card": "Storage location",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf25bbf76c911c805cb7b9",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What occurs during the automatic payment run?",
+        "card": "<ul><li>Posts payment documents</li><li>Clears open items</li><li>Prepares data for printing payment media</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5cdf25d2f76c911c805cb7ba",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What are the effects of payment?",
+        "card": "<ul><li>An FI document is created</li><li>The vendor subledger (and accounts payable) are debited and bank is credited</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce040c2f76c911c805cb7bb",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "Which organizational unit describes the various business units in the enterprise?",
+        "card": "Organizational unit",
+        "__v": 0
+    },
+    {
+        "_id": "5ce040d1f76c911c805cb7bc",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "What describes roles within the organization including classification of responsibilities?",
+        "card": "Jobs",
+        "__v": 0
+    },
+    {
+        "_id": "5ce040ddf76c911c805cb7bd",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "What represents an opening into which someone can be hired?",
+        "card": "Position",
+        "__v": 0
+    },
+    {
+        "_id": "5ce040eaf76c911c805cb7be",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "What is the relationship between jobs and positions?",
+        "card": "A job is a general description of roles and responsibilities.&nbsp; Positions are created from jobs and represent an opening into which someone can be hired.",
+        "__v": 0
+    },
+    {
+        "_id": "5ce040fdf76c911c805cb7bf",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "What is the relationship between organizational units and positions?",
+        "card": "Positions are assigned to organizational units and inherit the cost center assigned to the organizational unit",
+        "__v": 0
+    },
+    {
+        "_id": "5ce0412cf76c911c805cb7c0",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "How do cost centers fit into the organizational plan?",
+        "card": "Cost centers can be assigned to organizational units and positions.  Positions may inherit the cost center assigned to their organizational unit.",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04142f76c911c805cb7c1",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "What represents an individual hired into a position?",
+        "card": "A person",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04151f76c911c805cb7c2",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "What methods are available to manage HCM master data?",
+        "card": "<ul><li>Single screen (one person - one infotype)</li><li>Fast entry (multiple people - one infotype)</li><li>Personnel action (multiple people - multiple infotypes)</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04163f76c911c805cb7c3",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "How is HCM master data organized?",
+        "card": "Infotypes which are groups of data fields relevant for specific topics",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04172f76c911c805cb7c4",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "How would you view all the infotypes maintained on a person?",
+        "card": "Personnel file",
+        "__v": 0
+    },
+    {
+        "_id": "5ce0418ef76c911c805cb7c5",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "What tool allows an employee to view and manage their personnel data?",
+        "card": "Employee self service",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04214f76c911c805cb7c6",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "What can an employee manage using ESS?",
+        "card": "<ul><li>Submit travel expenses</li><li>View the calendar</li><li>Search the Who's Who</li><li>Update personal information (such as address, marital status, and so on)</li><li>Enter work times</li><li>LEnroll in benefits</li><li>Update banking information</li><li>Enroll in a training course</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04229f76c911c805cb7c7",
+        "unit": "5cdefeadf76c911c805cb75e",
+        "flash": "Which infotype maintenance transaction would you use when an employee passes a milestone like being hired, being promoted or retiring?",
+        "card": "Personnel action",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04264f76c911c805cb7c8",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What are the activities in the purchase-to-pay process?",
+        "card": "<ol><li>Request the purchase of goods or services through the use of a purchase requisition.</li><li><span style=\"font-size: 1rem;\">Convert the purchase requisition to a purchase order (PO).</span></li><li>Process POs and perform PO follow-up.</li><li>Accept goods or services by entering a goods receipt referencing the PO.</li><li>Record and verify the vendor’s invoice.</li><li>Pay the vendor.</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce0428af76c911c805cb7c9",
+        "unit": "5cdefeb5f76c911c805cb75f",
+        "flash": "What are the types of procurement?",
+        "card": "<ul><li>External</li><li>Internal</li><li>Both</li><li>Neither</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce042edf76c911c805cb7ca",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What are the activities in the plan-to-produce process?",
+        "card": "<ol><li>Forecast product demand.</li><li>Run material requirements planning (MRP).</li><li>Manufacture the products.</li></ol>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04315f76c911c805cb7cb",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What master data is relevant for plan-to-produce?",
+        "card": "<ul><li>Material</li><li>BOM</li><li>Routing</li><li>Workcenter</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04322f76c911c805cb7cc",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What does the BOM usage determine?",
+        "card": "The business use of the BOM",
+        "__v": 0
+    },
+    {
+        "_id": "5ce0432ff76c911c805cb7cd",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What is the relationship between the routing and workcenter?",
+        "card": "Workcenters are assigned to operations.&nbsp; The workcenter has formulas for capacities, scheduling and activity types for costing and the routing has the times used in those formulas.",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04340f76c911c805cb7ce",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "How are BOMs and routings integrated?",
+        "card": "The components of the BOM are allocated or assigned to operations in the routing.",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04351f76c911c805cb7cf",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What data is included in a workcenter?",
+        "card": "<ul><li>Basic data (standard values)</li><li>Default values</li><li>Capacities</li><li>Scheduling</li><li>Costs</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce0435df76c911c805cb7d0",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What controlling object is assigned to a workcenter?",
+        "card": "A cost center",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04373f76c911c805cb7d1",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What transaction is performed when operations in a production order are confirmed?",
+        "card": "Activity allocation from the cost centers (credit) assigned to the workcenters to the production order (debit).",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04394f76c911c805cb7d2",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What determines the price of an activity type?",
+        "card": "Activity types can be used with many cost centers and the price is set individually on each cost center in which it's used.",
+        "__v": 0
+    },
+    {
+        "_id": "5ce043a9f76c911c805cb7d3",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What are the three phases of product cost accounting?",
+        "card": "<ul><li>Product cost planning</li><li>Cost object controlling</li><li>Material ledger/actual costing</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce043b9f76c911c805cb7d4",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What are the two components of product cost planning?",
+        "card": "<p>Quantity structure</p><ul><li>BOM</li><li>Routing</li></ul><p>Value structure</p><ul><li>Material prices</li><li>Activity type prices</li><li>Overheads</li><li>Process costs</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce043c8f76c911c805cb7d5",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What value results from product cost planning?",
+        "card": "Standard cost",
+        "__v": 0
+    },
+    {
+        "_id": "5ce043d6f76c911c805cb7d6",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What steps are required to update the standard price from a standard cost?",
+        "card": "<ul><li>Estimate the standard cost</li><li>mark it</li><li>release it</li></ul><p>Can only be done once per accounting period</p>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce043e7f76c911c805cb7d7",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What is accounted for in period end closing?",
+        "card": "<ul><li>Variances</li><li>WIP</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce043f5f76c911c805cb7d8",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What is the standard price used for?",
+        "card": "<ul><li>Inventory valuation</li><li>Goods movements valuation</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04403f76c911c805cb7d9",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What is the standard cost used for?",
+        "card": "<ul><li>Benchmark for cost object controlling</li><li>Cost of sales in profitability analysis</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce0441ef76c911c805cb7da",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What results in demand management when the SOP production plan is transferred to demand management?",
+        "card": "Planned Independent Requirements",
+        "__v": 0
+    },
+    {
+        "_id": "5ce0442df76c911c805cb7db",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What are the two types of independent requirements?",
+        "card": "<ul><li>Planned independent requirements</li><li>Customer independent requirements</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce0444bf76c911c805cb7dc",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What types of procurement proposals result for materials procured externally?",
+        "card": "<ul><li>Purchase requisition</li><li>Planned order</li><li>Schedule line</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04458f76c911c805cb7dd",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What types of procurement proposals result for materials procured in-house?",
+        "card": "Planned order",
+        "__v": 0
+    },
+    {
+        "_id": "5ce0446af76c911c805cb7de",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "How does MRP determine whether to generate a procurement proposal?",
+        "card": "Net requirements calculation",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04478f76c911c805cb7df",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What is included in the supply side of the net requirements calculation?",
+        "card": "<ul><li>Firmed receipts</li><li>Firmed planned orders</li><li>Firmed purchase requisitions</li><li>Stock</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04487f76c911c805cb7e0",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What is included in the demand side of the net requirements calculation?",
+        "card": "<ul><li>Requirements (independent, dependent, reservations)</li><li>Safety stock</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04496f76c911c805cb7e1",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "How does MRP determine how much material to procure?",
+        "card": "Lot size procedure configured in the material master",
+        "__v": 0
+    },
+    {
+        "_id": "5ce044b6f76c911c805cb7e2",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What are the two options for the MRP processing key?",
+        "card": "<ul><li>Regenerative planning (NEUPL)</li><li>Net change for total horizon (NETCH)</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce044c4f76c911c805cb7e3",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What MRP parameter determines the scope of planning?",
+        "card": "Processing key",
+        "__v": 0
+    },
+    {
+        "_id": "5ce044d2f76c911c805cb7e4",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What occurs when a planned order is converted to a production order?",
+        "card": "<ul><li>Material and capacity availability checks are performed</li><li>The routing operations are copied and detailed scheduling was performed</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce044e1f76c911c805cb7e5",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What step is required on a production order before manufacturing processes can begin?",
+        "card": "The order must be released",
+        "__v": 0
+    },
+    {
+        "_id": "5ce044eef76c911c805cb7e6",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What are the effects of goods issue to a production order?",
+        "card": "<ul><li>MM, FI and CO documents are created</li><li>The material consumption account is debited and inventory is credited</li><li>The production order is debited</li><li>Material reservations are deleted</li><li>Material master records are updated</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce044fbf76c911c805cb7e7",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What are calculated as a part of period end closing?",
+        "card": "<ul><li>Work in process</li><li>Variance calculation</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04509f76c911c805cb7e8",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What are the effects of confirmation?",
+        "card": "<ul><li>A DAA is performed from the cost center assigned to the workcenter to the production order</li><li>Debit of labor on the production order</li><li>Capacity reservations on workcenters are deleted</li><li>An automatic goods receipt is performed causing a credit to the production order</li><li>Debit to finished goods inventory (quantity * standard price) and a credit to plant activity</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04518f76c911c805cb7e9",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "The effects of the goods receipt are?",
+        "card": "<ul><li>MM, FI and CO documents are created</li><li>Debit to finished goods (quantity * standard price) and a credit to plant activity</li><li>The production order is credited</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04541f76c911c805cb7ea",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "What happens to variances left on the order after confirmation?",
+        "card": "The are settled",
+        "__v": 0
+    },
+    {
+        "_id": "5ce0454ef76c911c805cb7eb",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "How does MRP work?",
+        "card": "<ul><li>MRP starts by performing net requirements calculation for independent requirements</li><li>If required, MRP created a procurement proposal</li><li>The proposal is scheduled using the times configured in the material master</li><li>If the material has a BOM, MRP create dependent requirements for each component in the BOM</li><li>MRP continues this processing planning each dependent requirement</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce045eef76c911c805cb7ec",
+        "unit": "5cdefebbf76c911c805cb760",
+        "flash": "What is the difference between a stock transfer and transfer posting?",
+        "card": "<p>A stock transfer is a physical movement of goods:</p><ul><li>SLoc to SLoc</li><li>Plant to Plant</li><li>Company Code to Company Code</li></ul><p>A transfer posting may have a physical movement but must include a change in status of the material:</p><ul><li>Stock to Stock (e.g. unrestricted to blocked stock)</li><li>Material to material</li><li>Consignment to warehouse (or any two of the many special classifications of stock)</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce045fdf76c911c805cb7ed",
+        "unit": "5cdefebbf76c911c805cb760",
+        "flash": "When does valuation occur (an thus an FI document is created) as a result of a stock transfer?",
+        "card": "<p>When the plant changes:</p><ul><li>Plant to plant</li><li>Company code to company code</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04612f76c911c805cb7ee",
+        "unit": "5cdefebbf76c911c805cb760",
+        "flash": "When the valuation (and thus an FI document created) on a two step stock transfer or stock transport order?",
+        "card": "After the first step (goods issue) the material is considered to be in-transit at the receiving storage location so the valuation occurs only after the first step.",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04623f76c911c805cb7ef",
+        "unit": "5cdefebbf76c911c805cb760",
+        "flash": "What are the advantages of stock transport orders?",
+        "card": "<ul><li>Stock transport orders are integrated with MRP</li><li>Receipt at the destination can be planned</li><li>Delivery costs and transport can be managed</li><li>Goods can be received directly into consumption</li><li>Goods can be received into blocked or quality inspection</li><li>The process can be monitored with the PO history</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04694f76c911c805cb7f0",
+        "unit": "5cdefebbf76c911c805cb760",
+        "flash": "What are the organizational levels of WM?",
+        "card": "<ul><li>Warehouse number (assigned to a plant-storage location)</li><li>Storage type</li><li>Storage section</li><li>Storage bin</li></ul>",
+        "__v": 0
+    },
+    {
+        "_id": "5ce0470bf76c911c805cb7f1",
+        "unit": "5cdefebbf76c911c805cb760",
+        "flash": "Which document contains the data required for triggering and monitoring the complete outbound delivery process in EWM?",
+        "card": "Outbound delivery order",
+        "__v": 0
+    },
+    {
+        "_id": "5ce04769f76c911c805cb7f2",
+        "unit": "5cdefebbf76c911c805cb760",
+        "flash": "Which document sends data about the goods issue from EWM to S/4HANA?",
+        "card": "EWM outbound delivery",
+        "__v": 0
+    },
+    {
+        "_id": "5ce1d3d5f76c911c805cb7fa",
+        "unit": "5cdefec1f76c911c805cb761",
+        "flash": "In make-to-order sales where does the production order settle?",
+        "card": "The sales order",
+        "__v": 0
+    },
+    {
+        "_id": "5ce44ffcf76c911c805cb800",
+        "unit": "5cdefec8f76c911c805cb762",
+        "flash": "What are the activities in the order-to-cash process?",
+        "card": "<ol><li><span style=\"font-size: 1rem;\">Create a sales order that contains customer requirements.</span></li><li>Fill the order and ship the goods to the customer.</li><li><span style=\"font-size: 1rem;\">Invoice the customer for goods or services rendered.</span><br></li><li>Receive the payment from the customer.</li></ol>",
+        "__v": 0
+    }
+]

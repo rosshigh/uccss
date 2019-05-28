@@ -25,7 +25,10 @@ var InstitutionSchema = new Schema({
     url: { type: String },
     key: { type: String },
     faculty: [ {type: Schema.Types.ObjectId, ref: 'person'} ],
-    packageId: { type: Schema.Types.ObjectId }
+    packageId: { type: Schema.Types.ObjectId },
+    packageStartDate: { type: Date },
+    packageInvoiceDate: { type: Date },
+    packagePayDate: { type: Date }
 });
 
 InstitutionSchema.pre('update', function() {

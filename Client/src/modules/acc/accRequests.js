@@ -40,14 +40,15 @@ export class ACCRequests {
                 name: 'viewUserRequests',
                 title: 'View User Requests'
             },
-            {
-                route: 'clientRequestsAnalytics',
-                moduleId: '../../analytics/clientRequests',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'clientRequests',
-                title: 'Client Requests Analytics'
-            },
+            
+            // {
+            //     route: 'clientRequestsAnalytics',
+            //     moduleId: '../../analytics/clientRequests',
+            //     settings: { auth: true, roles: [] },
+            //     nav: true,
+            //     name: 'clientRequests',
+            //     title: 'Client Requests Analytics'
+            // },
             {
                 route: 'apjAssignments',
                 moduleId: './apjAssignments',

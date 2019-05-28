@@ -20,6 +20,8 @@ export class AppConfig {
 
     isMobile = false; 
 
+    UCC_PACKAGE_PERCENTAGE = .5;
+
     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
     DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';

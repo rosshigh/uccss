@@ -9,12 +9,11 @@ var express = require('express'),
   Assignment = mongoose.model('Assignment'),
   Person = mongoose.model('Person'),
   Package = mongoose.model('Packages'),
-  Product = mongoose.model('Product'),
+  InvoiceData = mongoose.model('InvoiceData'),
+  Invoice = mongoose.model('Invoice'),
   passport = require('passport'),
   Promise = require('bluebird'),
-  logger = require('../../config/logger'),
-  EmailLog = mongoose.model('EmailLog'),
-  ObjectId = require('mongodb').ObjectID;
+  logger = require('../../config/logger');
 
 var requireAuth = passport.authenticate('jwt', { session: false });
 
@@ -22,9 +21,9 @@ var ASSIGNED_REQUEST_CODE = '2';
 var CUSTOMER_ACTION_REQUEST_CODE = "4";
 
 module.exports = function (app) {
-  app.use('/', router);
+  app.use('/api/apj/', router);
 
-  router.get('/api/apj/clientRequests', requireAuth, function (req, res, next) {
+  router.get('/clientRequests', requireAuth, function (req, res, next) {
     logger.log('info', 'Get clientRequests');
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
@@ -43,7 +42,7 @@ module.exports = function (app) {
       })
   });
 
-  router.put('/api/apj/clientRequests/:id', requireAuth, function(req, res, next){
+  router.put('/clientRequests/:id', requireAuth, function(req, res, next){
     logger.log('info','Update clientRequest ' + req.body._id);     
     
     var clientRequest = new Model(req.body);   
@@ -101,7 +100,7 @@ module.exports = function (app) {
     }
   });
 
-  router.put('/api/apj/clientRequests', requireAuth, function (req, res, next) {
+  router.put('/clientRequests', requireAuth, function (req, res, next) {
     logger.log('info', 'Update clientRequest', 'verbose');
 
     Model.findOneAndUpdate({ _id: req.body._id }, req.body, function (err, request) {
@@ -125,9 +124,7 @@ module.exports = function (app) {
 
   });
 
-
-
-  router.post('/api/apj/clientRequests', requireAuth, function (req, res, next) {
+  router.post('/clientRequests', requireAuth, function (req, res, next) {
     logger.log('info', 'Create clientRequest', 'verbose');
 
     var clientRequest = new Model(req.body);
@@ -153,7 +150,7 @@ module.exports = function (app) {
       })
   });
 
-  router.get('/api/apj/clientRequestsDetails', requireAuth, function (req, res, next) {
+  router.get('/clientRequestsDetails', requireAuth, function (req, res, next) {
     logger.log('info', 'Get clientRequests', 'verbose');
 
     var query = buildQuery(req.query, ClientRequestDetail.find());
@@ -178,7 +175,7 @@ module.exports = function (app) {
       })
   });
 
-  router.get('/api/apj/clientRequestsDetails/:id', requireAuth, function (req, res, next) {
+  router.get('/clientRequestsDetails/:id', requireAuth, function (req, res, next) {
     logger.log('info', 'Get clientRequests', 'verbose');
 
     ClientRequestDetail.findById(req.params.id)
@@ -198,7 +195,7 @@ module.exports = function (app) {
       })
   });
 
-  router.put('/api/apj/clientRequestsDetails', function (req, res, next) {
+  router.put('/clientRequestsDetails', function (req, res, next) {
     logger.log('info', 'Update request detail', 'verbose');
 
     Model.findOneAndUpdate({ _id: req.body.requestId._id }, req.body.requestId, function (err, request) {
@@ -224,7 +221,7 @@ module.exports = function (app) {
     });
   });
 
-  router.get('/api/packages', requireAuth, function (req, res, next) {
+  router.get('/packages', requireAuth, function (req, res, next) {
     logger.log('info', 'Get packages');
     var query = buildQuery(req.query, Package.find());
     query.sort(req.query.order)
@@ -241,7 +238,23 @@ module.exports = function (app) {
       })
   });
 
-  router.post('/api/packages', requireAuth, function (req, res, next) {
+  router.get('/packages/:id', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get packages');
+      ClientRequestDetail.findById(req.params.id)
+      .exec()
+      .then(object => {
+        if (object) {
+          res.status(200).json(object);
+        } else {
+          res.status(200).json({ message: "No Packages were found" });
+        }
+      })
+      .catch(err => {
+        return next(err);
+      })
+  });
+
+  router.post('/packages', requireAuth, function (req, res, next) {
     logger.log('info', 'Create packages', "verbose");
     var packages = new Package(req.body);
     packages.save(function (err, object) {
@@ -253,7 +266,7 @@ module.exports = function (app) {
     });
   });
 
-  router.put('/api/packages', requireAuth, function (req, res, next) {
+  router.put('/packages', requireAuth, function (req, res, next) {
     logger.log('info', 'Update packages ' + req.body._id, 'verbose');
 
     Package.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false })
@@ -264,6 +277,121 @@ module.exports = function (app) {
       .catch(error => {
         return next(error);
       })
+  });
+
+  router.get('/invoices', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get invoices');
+    var query = buildQuery(req.query, Invoice.find());
+    query.sort(req.query.order)
+      .populate({ path: 'packageReference', model: 'InstitutionPackage' })
+      .populate({ path: 'requestReference', model: 'ClientRequestDetailAPJ'})
+      .exec()
+      .then(object => {
+        if (object) {
+          res.status(200).json(object);
+        } else {
+          res.status(200).json({ message: "No invoices were found" });
+        }
+      })
+      .catch(err => {
+        return next(err);
+      })
+  });
+
+  router.get('/invoices/:id', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get invoices');
+    var query = Invoice.findById(req.params.id);
+    query.sort(req.query.order)
+      .populate({ path: 'packageReference', model: 'InstitutionPackage' })
+      .populate({ path: 'requestReference', model: 'ClientRequestDetailAPJ'})
+      .exec()
+      .then(object => {
+        if (object) {
+          res.status(200).json(object);
+        } else {
+          res.status(200).json({ message: "No invoices were found" });
+        }
+      })
+      .catch(err => {
+        return next(err);
+      })
+  });
+
+  router.post('/invoices', requireAuth, function (req, res, next) {
+    logger.log('info', 'Create invoices', "verbose");
+    var invoice = new Invoice(req.body);
+    invoice.save(function (err, object) {
+      if (err) {
+        return next(err);
+      } else {
+        res.status(200).json(object);
+      }
+    });
+  });
+
+  router.put('/invoices', requireAuth, function (req, res, next) {
+    logger.log('info', 'Update invoices ' + req.body._id, 'verbose');
+
+    Invoice.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false })
+      .exec()
+      .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(error => {
+        return next(error);
+      })
+  });
+
+  router.get('/invoicedata',  function (req, res, next) {
+    logger.log('info', 'Get invoicedata');
+    var query = buildQuery(req.query, InvoiceData.find())
+      .exec()
+      .then(object => {
+        if (object) {
+          res.status(200).json(object);
+        } else {
+          res.status(200).json({ message: "No invoice data were found" });
+        }
+      })
+      .catch(err => {
+        return next(err);
+      })
+  });
+
+  router.post('/invoicedata',  function (req, res, next) {
+    logger.log('info', 'Create invioce data', "verbose");
+    var invoicedata = new InvoiceData(req.body);
+    invoicedata.save(function (err, object) {
+      if (err) {
+        return next(err);
+      } else {
+        res.status(200).json(object);
+      }
+    });
+  });
+
+  router.put('/invoicedata',  function (req, res, next) {
+    logger.log('info', 'Update invoices ' + req.body._id, 'verbose');
+
+    InvoiceData.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false })
+      .exec()
+      .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(error => {
+        return next(error);
+      })
+  });
+
+  router.delete('/invoicedata/:id',  function(req, res, next){
+    logger.log('info','Delete invoicedata ' + req.body._id,"verbose");
+    InvoiceData.find({_id: req.params.id}).remove().exec(function(err, object){
+        if (err) {
+            return next(err);
+        } else {
+            res.status(200).json({message: "invoice data deleted"});
+        }
+    })
   });
 
 }
