@@ -49,6 +49,7 @@ export class AppConfig {
             { role: 'BUSI', label: 'Billing', UCConly: false, authLevel: 2 },
             { role: 'PRIM', label: 'Primary', UCConly: false, authLevel: 4 },
             { role: 'TECH', label: 'Technical', UCConly: false, authLevel: 2 },
+            { role: "ACCT", label: "ACC", UCCOnly: false, authLevel: 7 },
             { role: 'UCCT', label: 'UCC Technical Staff', UCConly: true, authLevel: 8 },
             { role: 'UCCA', label: 'UCC Admin Staff', UCConly: true, authLevel: 6 },
             { role: 'UCSA', label: 'UCCSS Admin', UCConly: true, authLevel:  11},

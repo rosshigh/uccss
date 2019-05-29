@@ -92,6 +92,8 @@ var ClientRequestSchema = new Schema({
   // studentIdsAssigned: { type: Number }, 
   // graduateIds: { type: Number, default: 0, min : 0 },
   // undergradIds: { type: Number, default: 0, min: 0 },
+  invoiceRelevant: { type: Boolean, defualt: false },
+  amoung: { type: Number },
   comments: { type: String },
   whereHosted: { type: String, default: 'UCC' },
   // startDate: { type: Date },
