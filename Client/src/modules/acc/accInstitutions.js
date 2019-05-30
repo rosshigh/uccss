@@ -31,15 +31,16 @@ export class ACCCustomers {
             nav: true,
             name: 'accInstitute',
             title: 'Institutions'
-        },
-         {
-            route: 'people',
-            moduleId: './accPeople',
-            settings: { auth: true, roles: [] },
-            nav: true,
-            name: 'accPeople',
-            title: 'People'
         }
+        // ,
+        //  {
+        //     route: 'people',
+        //     moduleId: './accPeople',
+        //     settings: { auth: true, roles: [] },
+        //     nav: true,
+        //     name: 'accPeople',
+        //     title: 'People'
+        // }
         ]);
 
         this.router = router;

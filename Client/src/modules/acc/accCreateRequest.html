@@ -8,7 +8,7 @@
     </span>
 
     <div class="fluid-container">
-        <div class="panel panel-default" style="margin-top:50px;">
+        <div class="panel panel-default" style="margin-top:50px;padding:5px;">
             <div class="panel-body">
                 <div class="row">
                     <div class="bottomMargin list-group-item  toolbar">
@@ -24,7 +24,7 @@
                             <select id="institution" value.bind="selectedInstitution"
                                 change.delegate="changeInstitution($event)" class="form-control">
                                 <option value="">Choose the Institution</option>
-                                <option repeat.for="item of people.institutionsArray" value="${item._id}">${item.name}
+                                <option repeat.for="item of insitutionsArray" value="${item._id}">${item.name}
                                 </option>
                             </select>
                         </div>
@@ -41,7 +41,7 @@
 
                         <div show.bind="institutionSelected && requests.apjInstitutionRequestArray.length"
                             id="existingRequestInfo">
-                           
+
                         </div>
                         <div show.bind="institutionSelected && !requests.apjInstitutionRequestArray.length"
                             id="existingRequestInfo">
@@ -49,6 +49,10 @@
                         </div>
 
                         <compose view="./components/Requests.html"></compose>
+
+                        <div show.bind="institutionSelected" class="form-group col-md-12">
+                            <editor value.bind="requests.selectedRequest.comments" height="250"></editor>
+                        </div>
 
                     </div>
                     <div show.bind="institutionSelected" class="col-lg-8">
@@ -88,11 +92,15 @@
                                     <thead>
                                         <tr>
                                             <th>Requested Product</th>
+                                            <th>Number of Students</th>
                                             <th>Date Required</th>
                                         </tr>
                                     <tbody id="requiredProductsTable">
                                         <tr repeat.for="request of requests.selectedRequest.requestDetails">
                                             <td>${request.productId | lookupValue:products.productsArray:"_id":"name"}
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control" value.bind = "request.numberOfStudents">
                                             </td>
                                             <td>
                                                 <div class="form-group  col-md-8">

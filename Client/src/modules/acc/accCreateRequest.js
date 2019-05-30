@@ -55,12 +55,19 @@ export class ACCClientRequest {
 		this.filterList();
 		this._setUpValidation();
 
-		this.useSandbox = this.config.SANDBOX_USED;
-		if (!this.config.SANDBOX_USED) {
-			this.typeSelected = true;
-			this.regularClient = true;
-			this.requestType = "regularCourse";
-		}
+		// this.useSandbox = this.config.SANDBOX_USED;
+		// if (!this.config.SANDBOX_USED) {
+		// 	this.typeSelected = true;
+		// 	this.regularClient = true;
+		// 	this.requestType = "regularCourse";
+		// }
+		this.filterInstitutions();
+	}
+
+	filterInstitutions(){
+		this.insitutionsArray = this.people.institutionsArray.filter(item => {
+			return item.packageId !== null;
+		});
 	}
 
 	attached() {

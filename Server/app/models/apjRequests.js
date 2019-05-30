@@ -55,6 +55,7 @@ module.exports = Mongoose.model('AssignmentAPJ', AssignmentSchema);
 var ClientRequestDetailsSchema = new Schema({
   requestNo: { type: Number },
   createdDate: { type: Date, default: Date.now },
+  numberOfStudents: { type: Number },
   requiredDate: { type: Date },
   modifiedDate: { type: Date, default: Date.now },
   withinPackage: { type: Boolean, default: true },
@@ -93,7 +94,7 @@ var ClientRequestSchema = new Schema({
   // graduateIds: { type: Number, default: 0, min : 0 },
   // undergradIds: { type: Number, default: 0, min: 0 },
   invoiceRelevant: { type: Boolean, defualt: false },
-  amoung: { type: Number },
+  amount: { type: Number },
   comments: { type: String },
   whereHosted: { type: String, default: 'UCC' },
   // startDate: { type: Date },
