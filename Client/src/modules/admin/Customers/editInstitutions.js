@@ -38,7 +38,7 @@ export class EditInstitutions {
         $('#loading').show();
         let responses = await Promise.all([
             this.people.getPeopleArray('?order=lastName'),
-            this.people.getInstitutionsArray('?order=name'),
+            this.people.getInstitutionsArray('?order=name', true),
             this.is4ua.loadIs4ua()
         ]);
 

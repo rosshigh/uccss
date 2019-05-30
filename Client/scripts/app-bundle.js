@@ -27828,7 +27828,7 @@ define('modules/admin/Customers/editInstitutions',['exports', 'aurelia-framework
                                 (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
                                 (0, _jquery2.default)('#loading').show();
                                 _context.next = 4;
-                                return Promise.all([this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?order=name'), this.is4ua.loadIs4ua()]);
+                                return Promise.all([this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?order=name', true), this.is4ua.loadIs4ua()]);
 
                             case 4:
                                 responses = _context.sent;
