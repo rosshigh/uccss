@@ -57,7 +57,7 @@ export class AccCreateInvoice {
         this.openEditPanel = !this.openEditPanel;
     }
 
-    async getInstitutionToBeInvoiced() {
+    async getInstitutionToBeInvoiced() {  
         await this.people.getInstitutionsArray('?filter=apj|eq|true&order=name', true);
         this.totalInvoiceAmount = 0;
 
