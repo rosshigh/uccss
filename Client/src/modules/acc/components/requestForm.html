@@ -76,7 +76,7 @@
                                         <td>${client.client}</td>
                                         <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
                                         <td>${client.notValid | overlap}
-                                        <td><span click.trigger="deleteTable(client)" class="smallMarginRight"
+                                        <td><span click.trigger="deleteTable(client, $index)" class="smallMarginRight"
                                                 bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
                                                 data-original-title="Delete"><i class="fa fa-trash-o"
                                                     aria-hidden="true"></i></span></td>
@@ -154,14 +154,14 @@
                                                                     <p class="list-group-item-text">
                                                                             <span>${assignment.studentUserIds}</span></br>
                                                                         </p>
-                                                                    <span
+                                                                    <!-- <span
                                                                         if.bind="assignment.assignment.requestId == selectedRequestDetail.requestId._id || assignment.provisional"
                                                                         click.trigger="deleteTest($parent.client, $index)"
                                                                         class="smallMarginRight" bootstrap-tooltip
                                                                         data-toggle="tooltip" data-placement="bottom"
                                                                         title="" data-original-title="Delete"><i
                                                                             class="fa fa-trash-o"
-                                                                            aria-hidden="true"></i></span>
+                                                                            aria-hidden="true"></i></span> -->
                                                                 </div>
                                                             </td>
                                                         </tr>

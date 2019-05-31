@@ -47,7 +47,7 @@ export class APJAssignments {
         let responses = await Promise.all([
             this.products.getProductsArray('?filter=[and]active|eq|true:apj|eq|true&order=name', true),
             this.people.getInstitutionsArray('?filter=[and]institutionStatus|eq|01:apj|eq|true&order=name'),
-            this.systems.getSystemsArray('?filter=apj|eq|true',true),
+            this.systems.getSystemsArray('?filter=apj|eq|true', true),
             this.people.getAPJPackages(),
             this.config.getConfig()
         ]);
@@ -155,7 +155,7 @@ export class APJAssignments {
         }
     }
 
-    selectClient(index, client){
+    selectClient(index, client) {
         this.selectedClientIndex = index;
         for (let k = 0; k < this.selectedRequestDetail.assignments.length; k++) {
             if (this.selectedRequestDetail.assignments[k].client == client.client) return;
@@ -164,11 +164,10 @@ export class APJAssignments {
         this.selectedRequestDetail.assignments.push({
             staffId: this.userObj._id,
             client: client.client,
-            systemId: client.systemId,
-            assignedDate: new Date()
+            systemId: client.systemId
         });
 
-        this.insertAssignmentIntoSystem(client,  this.selectedRequestDetail.assignments)
+        this.insertAssignmentIntoSystem(client, this.selectedRequestDetail.assignments)
 
     }
 
@@ -192,11 +191,86 @@ export class APJAssignments {
         this.clientSelectedIndex = client.assignments.length - 1;
     }
 
-    save(){
-        console.log(this.selectedRequestDetail.assignments)
+    /*****************************************************************************************************
+      * Save the request 
+      ****************************************************************************************************/
+    async save() {
+        if (this._buildRequest()) {
+            this.requests.setSelectedRequest(this.requestToSave);
+            // var email = this._buildEmailObject();
+            let serverResponse = await this.requests.assignRequest(this.editIndex);
+            if (!serverResponse.status) {
+                this.utils.showNotification("The request was updated");
+                this._cleanUp();
+                this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
+                this.reSort();
+                await this.filterInAssigned();
+                this._cleanUp();
+            }
+        }
     }
 
-    updateClientAssignments(){
+    _cleanUp() {
+        this.selectedRequestDetail.assignments = [];
+        this.selectedSystem = {};
+        this.showTable = true;
+    }
+
+    reSort() {
+        this.dataTable.sortArray({}, {}, true);
+    }
+
+    /*****************************************************************************************************
+    * Build the data objects to send to the server 
+    ****************************************************************************************************/
+    _buildRequest() {
+        this.productSystems.forEach(system => {
+            system.clients.forEach(client => {
+                client.assignments.forEach(assignment => {
+                    assignment.provisional = false;
+                });
+            });
+        });
+        this.systemQueue = new Array();
+        this.selectedRequestDetail.assignments.forEach((item, index) => {
+            let saveSystem = true;
+            this.systemQueue.forEach(system => {
+                if (item.systemId === system._id) saveSystem = false;
+            })
+            if (saveSystem) this.systemQueue.push(this._getSystem(item.systemId));
+            delete item['provisional'];
+
+            item.assignedDate = item.assignedDate ? item.assignedDate : new Date();
+        });
+
+        this.systemQueue.forEach(server => {
+            server.clients.forEach(client => {
+                client.assignments.forEach(assignment => {
+                    assignment.assignment = assignment.assignment != null && assignment.assignment._id ? assignment.assignment._id : assignment.assignment;
+                })
+            })
+        });
+
+        // this.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
+        this.selectedRequestDetail.requestStatus = this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0 ? this.config.ASSIGNED_REQUEST_CODE : this.config.UNASSIGNED_REQUEST_CODE;
+        this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
+        this.requestToSave.requestDetailsToSave = new Array();
+        var request = this.utils.copyObject(this.selectedRequestDetail);
+        delete request['requestId'];
+        this.requestToSave.requestDetailsToSave.push(request);
+        this.requestToSave.systemsToSave = this.systemQueue;
+
+        return true;
+    }
+
+    _getSystem(id) {
+        for (let k = 0; k < this.productSystems.length; k++) {
+            if (this.productSystems[k]._id === id) return this.productSystems[k];
+        }
+        return null;
+    }
+
+    updateClientAssignments() {
         this.selectedSystem.clients[this.selectedClientIndex].studentIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentUserIds;
         this.selectedSystem.clients[this.selectedClientIndex].studentPassword = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentPassword;
         this.selectedSystem.clients[this.selectedClientIndex].facultyIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].facultyIDRange;
@@ -205,5 +279,111 @@ export class APJAssignments {
 
     back() {
         this.showTable = true;
+    }
+
+    deleteTable(assignment) {
+        this.setAssignmentIndex(assignment.client);
+        this.setClientIndex(assignment.client);
+        this.setClientAssignmentIndex(this.selectedSystem.clients[this.selectedClientIndex]);
+        this.deleteProposedClient(assignment);
+    }
+
+    findSystemClient(assignment) {
+        this.selectedClientIndex = null;
+        this.selectedSystem.clients.forEach((item, index) => {
+            if (item.client == assignment.client) {
+                this.selectedClientIndex = index;
+            }
+        });
+    }
+
+    //Find index of assignment in request detail
+    setAssignmentIndex(client) {
+        for (let k = 0; k < this.selectedRequestDetail.assignments.length; k++) {
+            if (this.selectedRequestDetail.assignments[k].client == client) {
+                this.assignmentDetailIndex = k;
+                return;
+            }
+        }
+    }
+
+    //Find index of client in selected system
+    setClientIndex(client) {
+        for (let k = 0; k < this.selectedSystem.clients.length; k++) {
+            if (this.selectedSystem.clients[k].client == client) {
+                this.selectedClientIndex = k;
+                return;
+            }
+        }
+    }
+
+    setClientAssignmentIndex(client) {
+        for (let k = 0; k < client.assignments.length; k++) {
+            if (client.assignments[k].assignment._id) {
+                if (client.assignments[k].assignment._id === this.selectedRequestDetail._id) {
+                    this.clientSelectedIndex = k;
+                    return;
+                }
+            } else if (client.assignments[k].assignment === this.selectedRequestDetail._id) {
+                this.clientSelectedIndex = k;
+                return;
+            }
+
+        }
+    }
+
+    /*****************************************************************************************************
+ * The user deletes an assignment 
+ * index - the index of the selected assignment
+ ****************************************************************************************************/
+    async deleteProposedClient() {
+        //Is this a saved assignment
+        if (this.selectedRequestDetail.assignments[this.assignmentDetailIndex].assignedDate) {
+            return this.dialog.showMessage(
+                "This will delete the assignment.  Are you sure you want to do that?",
+                "Delete Assignment",
+                ['Yes', 'No']
+            ).whenClosed(response => {
+                if (!response.wasCancelled) {
+                    this.deleteSaved(this.assignmentDetailIndex);
+                }
+            });
+        } else {
+            // if (this.forceManual) this.manualMode = false;
+            // this.forceManual = false;
+            //Undo the changes made by the assignment
+            // this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].idsAssigned);
+            // this.selectedSystem.clients[this.selectedClientIndex].idsAvailable = parseInt(this.selectedSystem.clients[this.selectedClientIndex].idsAvailable) + parseInt(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].idsAssigned);
+            // this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].idsAssigned);
+
+            //Delete the assignment and the client
+            this.deleteProvisinoalClientAssignment();
+            this.assignClientStatus()
+            this.assignmentDetailIndex = -1;
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+        }
+    }
+
+
+    deleteProvisinoalClientAssignment() {
+        this.setClientIndex(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].client);
+        // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex].assignments.splice(this.clientSelectedIndex, 1);
+        this.selectedSystem.clients[this.selectedClientIndex].assignments.splice(this.clientSelectedIndex, 1);
+        this.selectedRequestDetail.assignments.splice(this.assignmentDetailIndex, 1);
+    }
+
+    assignClientStatus() {
+        if (this.selectedSystem.clients[this.selectedClientIndex].clientStatus !== this.config.SANDBOX_CLIENT_CODE) {
+            if (this.selectedSystem.clients[this.selectedClientIndex].assignments && this.selectedSystem.clients[this.selectedClientIndex].assignments.length === 0) {
+                this.selectedSystem.clients[this.selectedClientIndex].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
+                // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
+            } else if (this.selectedSystem.clients[this.selectedClientIndex].assignments.length === 1) {
+                this.selectedSystem.clients[this.selectedClientIndex].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+            } else {
+                this.selectedSystem.clients[this.selectedClientIndex].clientStatus = this.config.SHARED_CLIENT_CODE;
+                // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex].clientStatus = this.config.SHARED_CLIENT_CODE;
+            }
+        }
     }
 }

@@ -449,7 +449,6 @@ module.exports = function (app) {
   });
   router.get('/api/clientRequestsDetailsTest', requireAuth, function(req, res, next){ 
     logger.log('info','Get clientRequests', 'verbose');
-    console.log('is this it')
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
     .exec()

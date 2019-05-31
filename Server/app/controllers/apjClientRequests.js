@@ -42,6 +42,64 @@ module.exports = function (app) {
       })
   });
 
+  router.put('/clientRequests/assign', requireAuth, function(req, res, next){
+    logger.log('info','Assign clientRequest ' + req.body._id);      
+    if(req.body._id){
+      var detailId;
+      var query = Model.findById(req.body._id, function(err, clientRequest){     
+        if(err){
+          return next(error);
+        }     
+        if(clientRequest) {
+          clientRequest.requestStatus = req.body.requestStatus;
+          clientRequest.audit = req.body.audit;
+        }
+        let tasks = new Array();   
+        if(req.body.requestDetailsToSave){
+          req.body.requestDetailsToSave.forEach((detail, index) => {            
+            detailId = detail._id;                        
+            tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
+          });
+        }   
+
+        if(req.body.systemsToSave){  
+          req.body.systemsToSave.forEach(detail => {                               
+            tasks.push(System.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
+          });
+        }
+    
+        Promise.all(tasks)
+            .then(request => {                               
+              Model.findOneAndUpdate({_id: clientRequest._id}, {$set: clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
+                    if(error){
+                      return next(error);
+                    } else { 
+                      ClientRequestDetail.findById(detailId)
+                      .select('requestStatus requiredDate createdDate requestId productId assignments.systemId assignments.client')
+                      .populate({ path: 'requestId', model: 'ClientRequestAPJ', populate: { path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country' } })
+                      .populate({ path: 'requestId', model: 'ClientRequestAPJ', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
+                      .populate({ path: "productId", model: "Product", select: "name" })
+                      .exec()
+                      .then(object => {
+                        if(object){
+                          res.status(200).json(object);
+                        } else {
+                          res.status(404).json({message: "No request was found"});
+                        }
+                      })
+                      .catch(err => {
+                        return next(err);
+                      })
+                    }
+              })
+            })
+            .catch(error => { //Promise        
+                return next(error);
+            })
+      })
+    }
+  });
+
   router.put('/clientRequests/:id', requireAuth, function(req, res, next){
     logger.log('info','Update clientRequest ' + req.body._id);     
     
