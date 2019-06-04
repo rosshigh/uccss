@@ -220,6 +220,34 @@ export class APJAssignments {
         this.dataTable.sortArray({}, {}, true);
     }
 
+    systemSelected() {
+        this.selectProductSystem(this.selectedSystemId)
+        // if (!this.products.selectedProduct.clientRelevant) {
+        //     this.calcAssignment();
+        // }
+    }
+
+    selectProductSystem(id) {
+        this.selectedSystemId = id;
+        this.productSystems.forEach((item, index) => {
+            if (item._id === id) {
+                this.selectedSystem = item;
+                this.selectedSystemIndex = index;
+            }
+        });
+        this.checkClientConfigured();
+    }
+
+    checkClientConfigured() {
+        this.clientsConfigured = false;
+        for (let i = 0; i < this.selectedSystem.clients.length; i++) {
+            if (this.selectedSystem.clients[i].productId === this.products.selectedProduct._id) {
+                this.clientsConfigured = true;
+                break;
+            }
+        }
+    }
+
     /*****************************************************************************************************
     * Build the data objects to send to the server 
     ****************************************************************************************************/

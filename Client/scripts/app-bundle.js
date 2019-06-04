@@ -3527,8 +3527,35 @@ define('modules/acc/apjAssignments',['exports', 'aurelia-framework', 'aurelia-ro
             this.dataTable.sortArray({}, {}, true);
         };
 
-        APJAssignments.prototype._buildRequest = function _buildRequest() {
+        APJAssignments.prototype.systemSelected = function systemSelected() {
+            this.selectProductSystem(this.selectedSystemId);
+        };
+
+        APJAssignments.prototype.selectProductSystem = function selectProductSystem(id) {
             var _this2 = this;
+
+            this.selectedSystemId = id;
+            this.productSystems.forEach(function (item, index) {
+                if (item._id === id) {
+                    _this2.selectedSystem = item;
+                    _this2.selectedSystemIndex = index;
+                }
+            });
+            this.checkClientConfigured();
+        };
+
+        APJAssignments.prototype.checkClientConfigured = function checkClientConfigured() {
+            this.clientsConfigured = false;
+            for (var i = 0; i < this.selectedSystem.clients.length; i++) {
+                if (this.selectedSystem.clients[i].productId === this.products.selectedProduct._id) {
+                    this.clientsConfigured = true;
+                    break;
+                }
+            }
+        };
+
+        APJAssignments.prototype._buildRequest = function _buildRequest() {
+            var _this3 = this;
 
             this.productSystems.forEach(function (system) {
                 system.clients.forEach(function (client) {
@@ -3540,10 +3567,10 @@ define('modules/acc/apjAssignments',['exports', 'aurelia-framework', 'aurelia-ro
             this.systemQueue = new Array();
             this.selectedRequestDetail.assignments.forEach(function (item, index) {
                 var saveSystem = true;
-                _this2.systemQueue.forEach(function (system) {
+                _this3.systemQueue.forEach(function (system) {
                     if (item.systemId === system._id) saveSystem = false;
                 });
-                if (saveSystem) _this2.systemQueue.push(_this2._getSystem(item.systemId));
+                if (saveSystem) _this3.systemQueue.push(_this3._getSystem(item.systemId));
                 delete item['provisional'];
 
                 item.assignedDate = item.assignedDate ? item.assignedDate : new Date();
@@ -3594,12 +3621,12 @@ define('modules/acc/apjAssignments',['exports', 'aurelia-framework', 'aurelia-ro
         };
 
         APJAssignments.prototype.findSystemClient = function findSystemClient(assignment) {
-            var _this3 = this;
+            var _this4 = this;
 
             this.selectedClientIndex = null;
             this.selectedSystem.clients.forEach(function (item, index) {
                 if (item.client == assignment.client) {
-                    _this3.selectedClientIndex = index;
+                    _this4.selectedClientIndex = index;
                 }
             });
         };
@@ -3638,7 +3665,7 @@ define('modules/acc/apjAssignments',['exports', 'aurelia-framework', 'aurelia-ro
 
         APJAssignments.prototype.deleteProposedClient = function () {
             var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
-                var _this4 = this;
+                var _this5 = this;
 
                 return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
@@ -3651,7 +3678,7 @@ define('modules/acc/apjAssignments',['exports', 'aurelia-framework', 'aurelia-ro
 
                                 return _context9.abrupt('return', this.dialog.showMessage("This will delete the assignment.  Are you sure you want to do that?", "Delete Assignment", ['Yes', 'No']).whenClosed(function (response) {
                                     if (!response.wasCancelled) {
-                                        _this4.deleteSaved(_this4.assignmentDetailIndex);
+                                        _this5.deleteSaved(_this5.assignmentDetailIndex);
                                     }
                                 }));
 
