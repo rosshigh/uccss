@@ -165,8 +165,9 @@ export class APJAssignments {
             staffId: this.userObj._id,
             client: client.client,
             systemId: client.systemId
-        });
 
+        });
+        this.assignClientStatus();
         this.insertAssignmentIntoSystem(client, this.selectedRequestDetail.assignments)
 
     }
@@ -179,8 +180,6 @@ export class APJAssignments {
             studentIDRange: details.studentUserIds,
             facultyIDRange: details.facultyUserIds,
             institutionId: this.selectedRequestDetail.requestId.institutionId,
-            firstID: details.firstID,
-            lastID: details.lastID,
             provisional: true
         });
         this.updateProductSystemsClient(clientCopy, clientCopy.systemId)
@@ -191,18 +190,70 @@ export class APJAssignments {
         this.clientSelectedIndex = client.assignments.length - 1;
     }
 
+    assignClientStatus() {
+        if (this.selectedSystem.clients[this.selectedClientIndex].clientStatus !== this.config.SANDBOX_CLIENT_CODE) {
+            if (this.selectedSystem.clients[this.selectedClientIndex].assignments && this.selectedSystem.clients[this.selectedClientIndex].assignments.length === 0) {
+                this.selectedSystem.clients[this.selectedClientIndex].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
+            } else if (this.selectedSystem.clients[this.selectedClientIndex].assignments.length === 1) {
+                this.selectedSystem.clients[this.selectedClientIndex].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+            } else {
+                this.selectedSystem.clients[this.selectedClientIndex].clientStatus = this.config.SHARED_CLIENT_CODE;
+            }
+        }
+    }
+
+    	/*****************************************************************************************************
+     * The user selects an assignment 
+     * index - the index of the selected assignment
+     * el - the event object
+     ****************************************************************************************************/
+    selectProposedClient(index, el) {
+        //Save the index 
+        this.assignmentDetailIndex = index;
+        this.setClientIndex(this.selectedRequestDetail.assignments[this.assignmentDetailIndex].client);
+        this.setClientAssignmentIndex(this.selectedSystem.clients[this.selectedClientIndex]);
+
+        if (this.assignmentDetailIndex == -1) {
+            this.selectedAssignedClient = "";
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+        } else {
+            this.selectedAssignedClient = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].client;
+
+            //Update the firstID and lastID fileds with the assignment firstID and lastID
+            // this.firstID = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].firstID;
+            // this.lastID = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].lastID;
+            // this.selectedSystem.clients[this.selectedClientIndex].lastIdAssigned = this.lastID;
+            // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex].lastIdAssigned = this.lastID;
+            // this.firstNumericFacID = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].firstFacID;
+            // this.lastNumericFacID = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].lastFacID;
+            // this.selectedSystem.clients[this.selectedClientIndex].lastFacIdAssigned = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].lastFacID;
+
+            // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex].lastFacIdAssigned = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].lastFacID;
+            // this.oldIdsAssigned = parseInt(this.lastID) - parseInt(this.lastID);
+            // this.oldLastID = this.lastID;
+            // this.lastFirstID = this.firstID;
+            // this.forceManual = this.selectedSystem.clients[this.selectedClientIndex].manual;
+            // this.manualMode = this.selectedSystem.clients[this.selectedClientIndex].manual;
+
+            //Highlight the table row
+            if (this.selectedAssignmentRow) this.selectedAssignmentRow.children().removeClass('info');
+            this.selectedAssignmentRow = $(el.target).closest('tr');
+            this.selectedAssignmentRow.children().addClass('info')
+        }
+
+    }
+
     /*****************************************************************************************************
       * Save the request 
       ****************************************************************************************************/
     async save() {
         if (this._buildRequest()) {
             this.requests.setSelectedRequest(this.requestToSave);
-            // var email = this._buildEmailObject();
             let serverResponse = await this.requests.assignRequest(this.editIndex);
             if (!serverResponse.status) {
                 this.utils.showNotification("The request was updated");
                 this._cleanUp();
-                this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
+                this.dataTable.updateArrayMaintainFilters(this.requests.requestsDetailsArray);
                 this.reSort();
                 await this.filterInAssigned();
                 this._cleanUp();
@@ -222,9 +273,6 @@ export class APJAssignments {
 
     systemSelected() {
         this.selectProductSystem(this.selectedSystemId)
-        // if (!this.products.selectedProduct.clientRelevant) {
-        //     this.calcAssignment();
-        // }
     }
 
     selectProductSystem(id) {
@@ -279,7 +327,6 @@ export class APJAssignments {
             })
         });
 
-        // this.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
         this.selectedRequestDetail.requestStatus = this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0 ? this.config.ASSIGNED_REQUEST_CODE : this.config.UNASSIGNED_REQUEST_CODE;
         this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
         this.requestToSave.requestDetailsToSave = new Array();

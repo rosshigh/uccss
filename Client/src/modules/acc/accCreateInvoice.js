@@ -23,7 +23,7 @@ export class AccCreateInvoice {
     async activate() {
         await this.apj.getInvoiceDataArray();
         await this.people.getAPJPackages('?order=price');
-        await this.config.getConfig(true)
+        await this.config.getConfig(true);
         this.createDates();
         // this.compuateInvoiceEndDate();
     }

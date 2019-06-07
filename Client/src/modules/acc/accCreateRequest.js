@@ -8,6 +8,7 @@ import { APJClientRequests } from '../../resources/data/apjClientRequests';
 import { AppConfig } from '../../config/appConfig';
 import { Utils } from '../../resources/utils/utils';
 import { People } from '../../resources/data/people';
+import { Systems } from '../../resources/data/systems';
 import Validation from '../../resources/utils/validation';
 import { CommonDialogs } from '../../resources/dialogs/common-dialogs';
 import Flatpickr from 'flatpickr';
@@ -16,11 +17,11 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 import fuelux from 'fuelux';
 import moment from 'moment';
 
-@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products,  APJClientRequests, SiteInfo, EventAggregator)
+@inject(Router, AppConfig, Systems, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products,  APJClientRequests, SiteInfo, EventAggregator)
 export class ACCClientRequest {
 	configDate = {};
 
-	constructor(router, config, validation, people, dialog, datatable, utils, sessions, products, requests, siteInfo, ea) {
+	constructor(router, config, systems, validation, people, dialog, datatable, utils, sessions, products, requests, siteInfo, ea) {
 		this.router = router;
 		this.config = config;
 		this.validation = validation;
@@ -33,6 +34,7 @@ export class ACCClientRequest {
 		this.products = products;
 		this.requests = requests;
 		this.siteInfo = siteInfo;
+		this.systems = systems;
 		this.dialog = dialog;
 		this.ea = ea;
 
@@ -46,6 +48,7 @@ export class ACCClientRequest {
 			this.people.getInstitutionsArray('?filter=[and]institutionStatus|eq|01:apj|eq|true&order=name'),
 			this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS', true),
 			this.people.getAPJPackages(),
+			this.systems.getSystemsArray('?filter=apj|eq|true', true),
 			this.config.getConfig()
 		]);
 

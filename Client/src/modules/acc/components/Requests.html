@@ -15,8 +15,8 @@
                 repeat.for="product of requests.selectedRequest.requestDetails"
                 click.trigger="requestChosen($event, $index)">
               <td>${product.productId  | lookupValue:products.productsArray:"_id":"name"}</td> 
-              <td>${product.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
-              <td>${product.client}</td>
+              <td>${product.assignments[0].systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
+              <td>${product.assignments[0].client}</td>
               <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
             </tr>
           </tbody>
