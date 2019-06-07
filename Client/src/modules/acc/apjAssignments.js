@@ -38,7 +38,7 @@ export class APJAssignments {
         this.ea = ea;
 
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        this.showTable = true;
+        // this.showTable = true;
         this.assignmentDetailIndex = 0;
 
     };
@@ -51,6 +51,7 @@ export class APJAssignments {
             this.people.getAPJPackages(),
             this.config.getConfig()
         ]);
+        this.requestSelected = "table";
 
         $('#loading').hide();
 
@@ -118,6 +119,30 @@ export class APJAssignments {
         this.dataTable.updateArray(this.requests.requestsDetailsArray);
     }
 
+    // async viewAssignment(index, request) {
+    //     this.editIndex = index;
+    //     let response = await this.requests.getRequestDetail(request._id);
+    //     if (!response.error) {
+    //         this.selectedRequestDetail = response;
+    //         this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
+    //         if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
+    //         await this.getProductSystems();
+    //         this.showTable = false;
+    //     }
+    // }
+
+    async selectARequest(index, request) {
+        this.editIndex = index;
+        let response = await this.requests.getRequestDetail(request._id);
+        if (!response.error) {
+            this.selectedRequestDetail = response;
+            this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
+            if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
+            await this.getProductSystems();
+            this.requestSelected = 'form';
+        }
+    }
+
     async viewAssignment(index, request) {
         this.editIndex = index;
         let response = await this.requests.getRequestDetail(request._id);
@@ -126,7 +151,7 @@ export class APJAssignments {
             this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
             if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
             await this.getProductSystems();
-            this.showTable = false;
+            this.requestSelected = 'view';
         }
 
     }
@@ -203,11 +228,11 @@ export class APJAssignments {
         }
     }
 
-    	/*****************************************************************************************************
-     * The user selects an assignment 
-     * index - the index of the selected assignment
-     * el - the event object
-     ****************************************************************************************************/
+    /*****************************************************************************************************
+ * The user selects an assignment 
+ * index - the index of the selected assignment
+ * el - the event object
+ ****************************************************************************************************/
     selectProposedClient(index, el) {
         //Save the index 
         this.assignmentDetailIndex = index;
@@ -265,7 +290,8 @@ export class APJAssignments {
     _cleanUp() {
         this.selectedRequestDetail.assignments = [];
         this.selectedSystem = {};
-        this.showTable = true;
+        this.requestSelected = "table";
+        // this.showTable = true;
     }
 
     reSort() {
@@ -354,7 +380,12 @@ export class APJAssignments {
     }
 
     back() {
-        this.showTable = true;
+        // this.showTable = true;
+        this.requestSelected = "table";
+    }
+
+    backView() {
+        this.requestSelected = "table";
     }
 
     deleteTable(assignment) {

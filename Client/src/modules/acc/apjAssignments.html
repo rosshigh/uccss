@@ -1,8 +1,27 @@
 <template>
-    <div show.bind="showTable">
+    <div show.bind="requestSelected == 'table'">
         <compose view="./components/requestsTable.html"></compose>
     </div>
-    <div show.bind="!showTable">
+    <div show.bind="requestSelected == 'form'">
         <compose view="./components/requestForm.html"></compose>
     </div>
+    <div show.bind="requestSelected == 'view'">
+            <compose view="./components/viewAssignmentForm.html"></compose>
+        </div>
+
+    <!-- <div show.bind="requestSelected == 'table'">
+            <compose view="./components/viewRequestsTable.html"></compose>
+        </div>
+        <div show.bind="requestSelected == 'form'">
+            <compose view="./components/viewRequestsForm.html"></compose>
+        </div>
+        <div show.bind="requestSelected == 'edit'">
+            <compose view="./components/editRequestsForm.html"></compose>
+        </div>
+        <div show.bind="requestSelected == 'view'">
+            <compose view="./components/viewAssignmentForm.html"></compose>
+        </div>
+        <div show.bind="requestSelected == 'email'">
+            <compose view="./components/bulkEmailForm.html"></compose>
+        </div> -->
 </template>

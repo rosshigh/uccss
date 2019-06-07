@@ -55,12 +55,10 @@ module.exports = function (app) {
               reqQuery.where(component[0]).in(values);
           }
         });
-      } else if (queryString.indexOf('[in]') > -1){
-console.log('THERE')        
+      } else if (queryString.indexOf('[in]') > -1){     
         queryString = queryString.substring(4);
         var component = queryString.split('[list]');
-        var list = component[1].split(':');
-console.log(list)        
+        var list = component[1].split(':');       
         reqQuery.where(component[0]).in(list)
       } else {
         var component = queryString.split('|');      

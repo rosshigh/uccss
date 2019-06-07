@@ -212,7 +212,6 @@ module.exports = function (app) {
 
   router.get('/clientRequestsDetails', requireAuth, function (req, res, next) {
     logger.log('info', 'Get clientRequests', 'verbose');
-console.log(req.query)
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
       .select('requestStatus requiredDate createdDate requestId productId assignments.systemId assignments.client')
@@ -224,8 +223,7 @@ console.log(req.query)
         if (object) {
           object.forEach(item => {
             if (item.requestId) item.requestId.audit = [];
-          });
-console.log(object)          
+          });        
           res.status(200).json(object);
         } else {
           res.status(404).json({ message: "No requests were found" });
