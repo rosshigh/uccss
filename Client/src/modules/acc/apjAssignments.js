@@ -88,18 +88,18 @@ export class APJAssignments {
         this.institutionFilterValue = "";
         if (this.isCheckedAssigned) {
             $('#loading').show();
-            await this.requests.getClientRequestsDetailsArray('?filter=requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE + '$' + this.config.CUSTOMER_ACTION_REQUEST_CODE, true);
+            await this.requests.getClientRequestsDetailsArray('?filter=[in]requestStatus[list]' + this.config.UNASSIGNED_REQUEST_CODE + ':' + this.config.UPDATED_REQUEST_CODE + ':' + this.config.CUSTOMER_ACTION_REQUEST_CODE, true);
             $('#loading').hide();
             if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
                 this.noRequests = false;
                 this.dataTable.updateArray(this.requests.requestsDetailsArray, 'requiredDate', -1);
             } else {
                 this.noRequests = true;
-                this.displayArray = new Array();
+                this.dataTable.displayArray = new Array();
             }
         } else {
             $('#loading').show();
-            await this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
+            await this.requests.getClientRequestsDetailsArray('', true);
             $('#loading').hide();
             this.dataTable.updateArray(this.requests.requestsDetailsArray, 'requiredDate', -1);
             if (this.requests.requestsDetailsArray.length) this.noRequests = false;

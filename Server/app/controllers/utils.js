@@ -7,7 +7,7 @@ module.exports = function (app) {
   //filter=[or]field1|value1:value2
   //filter=[and]field1|eq|value1:field2|eq|value2
   //filter=[in]field|list|value1:value2:value3
-  buildQuery = function(queryObject, reqQuery){
+  buildQuery = function(queryObject, reqQuery){    
     if(queryObject.order) {
       var order = queryObject.order.split(':');  
       let sortOrder = 1;
@@ -18,8 +18,8 @@ module.exports = function (app) {
       reqQuery.sort(sortObject);
     }
     if(queryObject.fields) reqQuery.select(queryObject.fields);   
-    if(queryObject.filter){
-      var queryString = queryObject.filter;     
+    if(queryObject.filter){    
+      var queryString = queryObject.filter;           
       if(queryString.indexOf('[or]') > -1){
         queryString = queryString.substring(4);
         var queryArray = queryString.split('|');
@@ -56,9 +56,11 @@ module.exports = function (app) {
           }
         });
       } else if (queryString.indexOf('[in]') > -1){
+console.log('THERE')        
         queryString = queryString.substring(4);
         var component = queryString.split('[list]');
         var list = component[1].split(':');
+console.log(list)        
         reqQuery.where(component[0]).in(list)
       } else {
         var component = queryString.split('|');      
