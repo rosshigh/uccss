@@ -159,6 +159,7 @@ export class accInstitute {
 
     _setupValidation(){
         this.validation.addRule(1,"editName",[{"rule":"required","message":"Name is required", "value": "people.selectedInstitution.name"}]);
+        // this.validation.addRule(1,"editInstitutonPakage",[{"rule":"required","message":"Package is required", "value": "people.selectedInstitution.packageId"}]);
         this.validation.addRule(1,"editInstitutionType",[{"rule":"required","message":"Institution type is required", "value": "people.selectedInstitution.institutionType"}]);
         this.validation.addRule(1,"editMemberType",[{"rule":"required","message":"Institution type is required", "value": "people.selectedInstitution.memberType"}]);
         this.validation.addRule(1,"editInstitutonStatusArray",[{"rule":"required","message":"Institution status is required", "value": "people.selectedInstitution.institutionStatus"}]);

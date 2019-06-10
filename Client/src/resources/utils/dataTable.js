@@ -240,7 +240,12 @@ export class DataTable{
         if (filterItem.options.compare.indexOf('custom') > -1) {
           matchValue = true;
         } else  {
-          matchValue = eval(filterItem.options.collectionProperty);
+          try {
+            matchValue = eval(filterItem.options.collectionProperty) 
+          }
+         catch(err) {
+          matchValue = false;
+         }
         }
 
         if(matchValue != undefined || (filterItem.options.type === "boolean" && matchValue == undefined)) {

@@ -46,7 +46,7 @@ export class CreateRequestTech {
 		let responses = await Promise.all([
 			this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=sortOrder', true),
 			this.products.getProductsArray('?filter=active|eq|true&order=name', true),
-			this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name'),
+			this.people.getInstitutionsArray('?filter=[and]institutionStatus|eq|01:apj|ne|true&order=name'),
 			this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS',true),
 			this.config.getConfig()
 		]);

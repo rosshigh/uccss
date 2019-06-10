@@ -45,7 +45,7 @@ export class ACCClientRequest {
 	async activate() {
 		let responses = await Promise.all([
 			this.products.getProductsArray('?filter=[and]active|eq|true:apj|eq|true&order=name', true),
-			this.people.getInstitutionsArray('?filter=[and]institutionStatus|eq|01:apj|eq|true&order=name'),
+			this.people.getInstitutionsArray('?filter=[and]institutionStatus|eq|01:apj|eq|true&order=name', true),
 			this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS', true),
 			this.people.getAPJPackages(),
 			this.systems.getSystemsArray('?filter=apj|eq|true', true),

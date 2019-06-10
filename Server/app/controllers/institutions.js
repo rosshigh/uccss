@@ -48,11 +48,10 @@ module.exports = function (app) {
 
   router.post('/api/apj/institutions', requireAuth, function (req, res) {
     var institution = new Model(req.body);
-console.log(institution) 
     Packages.findById(institution.packageId, function (err, package) {
       var newObj = {
         packageId: institution.packageId,
-        institutionId: institution._id, 
+        institutionId: institution._id,
         amount: package.price
       }
       institutionPackage = new InstitutionPackage(newObj);
@@ -94,28 +93,39 @@ console.log(institution)
           institutionPackage.save();
         }
       }
-      Packages.findById(req.body.packageId.packageId, function (err, package) {
-        var newObj = {
-          packageId: package._id,
-          institutionId: req.body._id,
-          amount: package.price
-        }
-        newInstitutionPackage = new InstitutionPackage(newObj);
-        newInstitutionPackage.save(function (err, object) {
-          if (err) {
-            return next(err);
+      if (req.body.packageId) {
+        Packages.findById(req.body.packageId.packageId, function (err, package) {
+          var newObj = {
+            packageId: package._id,
+            institutionId: req.body._id,
+            amount: package.price
           }
-
-          req.body.packageId = object._id;
-          Model.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false }, function (err, result) {
+          newInstitutionPackage = new InstitutionPackage(newObj);
+          newInstitutionPackage.save(function (err, object) {
             if (err) {
-              res.status(500).json(err);
-            } else {
-              res.status(200).json(result);
+              return next(err);
             }
-          })
-        });
-      })
+
+            req.body.packageId = object._id;
+            Model.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false }, function (err, result) {
+              if (err) {
+                res.status(500).json(err);
+              } else {
+                res.status(200).json(result);
+              }
+            })
+          });
+        })
+      } else {
+        Model.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false }, function (err, result) {
+          if (err) {
+            res.status(500).json(err);
+          } else {
+            res.status(200).json(result);
+          }
+        })
+      }
+
     });
   });
 

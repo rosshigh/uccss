@@ -41,6 +41,9 @@ module.exports = function (app) {
             case 'eq':
                 reqQuery.where(component[0]).eq(component[2]);
               break;
+            case 'ne':
+                reqQuery.where(component[0]).ne(component[2]);
+              break;
             case 'gt':
               reqQuery.where(component[0]).gt(component[2]);
               break;
