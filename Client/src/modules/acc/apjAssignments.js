@@ -118,25 +118,14 @@ export class APJAssignments {
         this.institutionFilterValue = "";
         this.dataTable.updateArray(this.requests.requestsDetailsArray);
     }
-
-    // async viewAssignment(index, request) {
-    //     this.editIndex = index;
-    //     let response = await this.requests.getRequestDetail(request._id);
-    //     if (!response.error) {
-    //         this.selectedRequestDetail = response;
-    //         this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
-    //         if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
-    //         await this.getProductSystems();
-    //         this.showTable = false;
-    //     }
-    // }
-
+ 
     async selectARequest(index, request) {
         this.editIndex = index;
         let response = await this.requests.getRequestDetail(request._id);
         if (!response.error) {
             this.selectedRequestDetail = response;
             this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
+            this.selectedRequestDetail.techComments = this.products.selectedProduct.productInfoApj ? this.products.selectedProduct.productInfoApj : "";
             if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
             await this.getProductSystems();
             this.requestSelected = 'form';

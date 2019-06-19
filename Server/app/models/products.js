@@ -6,13 +6,14 @@ var ProductSchema = new Schema({
   name: { type: String, require: true }, 
   clientInfo: { type: String },
   productInfo: { type: String },
+  productInfoApj: { type: String },
   productDescription: { type: String },
   status: { type: String },
   active: { type: Boolean, require: true },
   clientRelevant: { type: Boolean },
   idsAvailable: { type: Number },
   documents: [{
-    categoryCode: { type: Number },
+    categoryCode: { type: Number }, 
     categoryName: { type: String },
     fileName: { type: String },
     default: { type: Boolean, default: true } 

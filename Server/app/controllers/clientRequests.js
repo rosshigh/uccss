@@ -464,7 +464,7 @@ module.exports = function (app) {
       })
   });
 
-  router.get('/api/clientRequestsDetails', requireAuth, function(req, res, next){ 
+  router.get('/api/clientRequestsDetails',  function(req, res, next){ 
     logger.log('info','Get clientRequests', 'verbose');
     console.log('is this it')
     var query = buildQuery(req.query, ClientRequestDetail.find());
