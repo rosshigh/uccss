@@ -181,7 +181,7 @@ export class APJAssignments {
             systemId: client.systemId
 
         });
-        this.selectedRequestDetail.techComments = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
+        // this.selectedRequestDetail.techComments = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
         this.assignClientStatus();
         this.insertAssignmentIntoSystem(client, this.selectedRequestDetail.assignments)
 
