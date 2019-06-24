@@ -115,17 +115,17 @@
           </tr>
           <tr repeat.for="request of dataTable.displayArray"
             class="${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}">
-            <td  data-title="requiredDate">${request.requiredDate |
+            <td click.delegate="selectARequest($index, request)" data-title="requiredDate">${request.requiredDate |
               dateFormat:config.DATE_FORMAT_TABLE}</td>
-            <td class="hidden-sm" data-title="dateCreated">
+            <td click.delegate="selectARequest($index, request)" class="hidden-sm" data-title="dateCreated">
               ${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
-            <td data-title="Students">${request.numberOfStudents}</td>
-            <td data-title="status">${request.requestStatus |
+            <td click.delegate="selectARequest($index, request)" data-title="Students">${request.numberOfStudents}</td>
+            <td click.delegate="selectARequest($index, request)" data-title="status">${request.requestStatus |
               lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
            
-            <td data-title="product">${request.productId.name}</td>
+            <td click.delegate="selectARequest($index, request)" data-title="product">${request.productId.name}</td>
 
-            <td data-title="Name">
+            <td click.delegate="selectARequest($index, request)" data-title="Name">
               ${request.requestId.institutionId.name}</td>
             <td show.bind="!isCheckedAssigned"
               innerhtml.bind="request.assignments | parseAssignments:systems.systemsArray"></td>

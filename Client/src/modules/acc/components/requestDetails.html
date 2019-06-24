@@ -9,20 +9,12 @@
 
 						<div class="row">
 							<div class="col-lg-5 leftMargin">
-								<h5>Undergrads: <b>${selectedRequestDetail.requestId.undergradIds}</b></h5>
-							</div>
-							<div class="col-lg-5">
-								<h5>Graduate: <b>${selectedRequestDetail.requestId.graduateIds}</b></h5>
+								<h5>Student accounts: <b>${selectedRequestDetail.numberOfStudents}</b></h5>
 							</div>
 						</div>
-
 						<div class="row">
 							<div class="col-lg-5 leftMargin">
-								<h5>Start Date: <b>${selectedRequestDetail.requestId.startDate |
-										dateFormat:config.DATE_FORMAT_TABLE}</b></h5>
-							</div>
-							<div class="col-lg-5">
-								<h5>End Date: <b>${selectedRequestDetail.requestId.endDate |
+								<h5>Required Date: <b>${selectedRequestDetail.requiredDate |
 										dateFormat:config.DATE_FORMAT_TABLE}</b></h5>
 							</div>
 						</div>

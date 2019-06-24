@@ -328,33 +328,58 @@ export class ViewUserAssignments {
     }
 
     async filterInAssigned() {
+      this.requiredDateFilterValue = "";
+      this.createdDateFilterValue = "";
+      this.requestStatusFilter = "";
+      this.productFilterValue = "";
+      this.courseFilterValue = "";
+      this.helpTicketTypeFilterValue = "";
+      this.institutionFilterValue = "";
+      if (this.isCheckedAssigned) {
+          $('#loading').show();
+          await this.clientRequests.getClientRequestsDetailsArray('?filter=[in]requestStatus[list]' + this.config.UNASSIGNED_REQUEST_CODE + ':' + this.config.UPDATED_REQUEST_CODE + ':' + this.config.CUSTOMER_ACTION_REQUEST_CODE, true);
+          $('#loading').hide();
+          if (this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length) {
+              this.noRequests = false;
+              this.dataTable.updateArray(this.clientRequests.requestsDetailsArray, 'requiredDate', -1);
+          } else {
+              this.noRequests = true;
+              this.dataTable.displayArray = new Array();
+          }
+      } else {
+          $('#loading').show();
+          await this.clientRequests.getClientRequestsDetailsArray('', true);
+          $('#loading').hide();
+          this.dataTable.updateArray(this.clientRequests.requestsDetailsArray, 'requiredDate', -1);
+          if (this.clientRequests.requestsDetailsArray.length) this.noRequests = false;
+      }
 
-        this.requiredDateFilterValue = "";
-        this.createdDateFilterValue = "";
-        this.requestStatusFilter = "";
-        this.productFilterValue = "";
-        this.courseFilterValue = "";
-        this.helpTicketTypeFilterValue = "";
-        this.institutionFilterValue = "";
-        if (this.isCheckedAssigned) {
-            $('#loading').show();
-            await this.clientRequests.getClientRequestsDetailsArray('?filter=requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE + '$' + this.config.CUSTOMER_ACTION_REQUEST_CODE, true);
-            $('#loading').hide();
-            if (this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length) {
-                this.noRequests = false;
-                this.dataTable.updateArray(this.clientRequests.requestsDetailsArray, 'requiredDate', -1);
-            } else {
-                this.noRequests = true;
-                this.displayArray = new Array();
-            }
+        // this.requiredDateFilterValue = "";
+        // this.createdDateFilterValue = "";
+        // this.requestStatusFilter = "";
+        // this.productFilterValue = "";
+        // this.courseFilterValue = "";
+        // this.helpTicketTypeFilterValue = "";
+        // this.institutionFilterValue = "";
+        // if (this.isCheckedAssigned) {
+        //     $('#loading').show();
+        //     await this.clientRequests.getClientRequestsDetailsArray('?filter=requestStatus|in|' + this.config.UNASSIGNED_REQUEST_CODE + '$' + this.config.UPDATED_REQUEST_CODE + '$' + this.config.CUSTOMER_ACTION_REQUEST_CODE, true);
+        //     $('#loading').hide();
+        //     if (this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length) {
+        //         this.noRequests = false;
+        //         this.dataTable.updateArray(this.clientRequests.requestsDetailsArray, 'requiredDate', -1);
+        //     } else {
+        //         this.noRequests = true;
+        //         this.displayArray = new Array();
+        //     }
 
-        } else {
-            $('#loading').show();
-            await this.clientRequests.getClientRequestsDetailsArray('', true);
-            $('#loading').hide();
-            this.dataTable.updateArray(this.clientRequests.requestsDetailsArray, 'requiredDate', -1);
-            if(this.clientRequests.requestsDetailsArray.length) this.noRequests = false;
-        }
+        // } else {
+        //     $('#loading').show();
+        //     await this.clientRequests.getClientRequestsDetailsArray('', true);
+        //     $('#loading').hide();
+        //     this.dataTable.updateArray(this.clientRequests.requestsDetailsArray, 'requiredDate', -1);
+        //     if(this.clientRequests.requestsDetailsArray.length) this.noRequests = false;
+        // }
 
     }
 
