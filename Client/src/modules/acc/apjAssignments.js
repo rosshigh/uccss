@@ -45,7 +45,7 @@ export class APJAssignments {
 
   async activate() {
     let responses = await Promise.all([
-      this.products.getProductsArray('?filter=[and]active|eq|true:apj|eq|true&order=name', true),
+      this.products.getProductsArray('?filter=apj|eq|true&order=name', true),
       this.people.getInstitutionsArray('?filter=[and]institutionStatus|eq|01:apj|eq|true&order=name'),
       this.systems.getSystemsArray('?filter=apj|eq|true', true),
       this.people.getAPJPackages(),

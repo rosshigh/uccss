@@ -455,11 +455,11 @@ module.exports = function (app) {
 
   router.get('/systems/product/:systems', requireAuth, asyncHandler(async (req, res) => {
     logger.log('info', 'Getting product systems');
-    var productSystems = req.params.systems.split(':');
+    var productSystems = req.params.systems.split(':');    
     await System.find({ $and: [{ sid: { $in: productSystems }},{ apj: true } ]})
       .populate({ path: 'clients.assignments.assignment', model: 'ClientRequestDetailAPJ' })
       .populate({ path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName' })
-      .exec().then(result => {
+      .exec().then(result => { 
         res.status(200).json(result);
       })
   }));
