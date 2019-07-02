@@ -53,6 +53,7 @@ AssignmentSchema.pre('update', function () {
 module.exports = Mongoose.model('AssignmentAPJ', AssignmentSchema);
 
 var ClientRequestDetailsSchema = new Schema({
+  invoiceRelevant: { type: Boolean, default: false },
   requestNo: { type: Number },
   createdDate: { type: Date, default: Date.now },
   numberOfStudents: { type: Number },

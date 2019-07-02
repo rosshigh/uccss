@@ -38,6 +38,7 @@ export class ACCClientRequest {
     this.ea = ea;
 
     this.userObj = JSON.parse(sessionStorage.getItem('user'));;
+    this.invoiceRelevant = false;
 
   };
 
@@ -78,17 +79,45 @@ export class ACCClientRequest {
 
   selectProduct(product) {
     if (this.requests.selectedRequest.requestDetails.length == this.selectedPackage.maxClients) {
-      this.utils.showNotification("This university has reached their maximum requested products.", "error");
-    } else {
-      $("#requestProductsLabel").html("Requested Products");
-      var newObj = this.requests.emptyRequestDetail();
-      newObj.productId = product._id;
-      this.requests.selectedRequest.requestDetails.push(newObj);
-      this.products.selectedProductFromId(newObj.productId);
-      this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = product.name;
+      // this.utils.showNotification("This university has reached their maximum requested products.", "error");
+      return this.dialog.showMessage(
+        "TThis university has reached their maximum requested products.  This client will an extra charge.  Is that OK?",
+        "Extra Client",
+        ['YES','NO']
+      ).whenClosed(response => {
+        if(response.output === 'YES'){
+          this.invoiceRelevant = true;
+          this.addTheClient(product);
+        } else {
+          this.invoiceRelevant = false;
+          return;
+        }
+      });
+    } 
+    this.invoiceRelevant = false;
+    this.addTheClient(product);
+    // else {
+      // $("#requestProductsLabel").html("Requested Products");
+      // var newObj = this.requests.emptyRequestDetail();
+      // newObj.productId = product._id;
+      // this.requests.selectedRequest.requestDetails.push(newObj);
+      // this.products.selectedProductFromId(newObj.productId);
+      // this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = product.name;
 
-      this.validation.makeValid($("#productList"));
-    }
+      // this.validation.makeValid($("#productList"));
+    // }
+  }
+
+  addTheClient(product){
+    $("#requestProductsLabel").html("Requested Products");
+    var newObj = this.requests.emptyRequestDetail();
+    newObj.productId = product._id;
+    this.requests.selectedRequest.requestDetails.push(newObj);
+    this.products.selectedProductFromId(newObj.productId);
+    this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = product.name;
+    this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].invoiceRelevant = this.invoiceRelevant;
+
+    this.validation.makeValid($("#productList"));
   }
 
   alreadyOnList(id) {
@@ -134,6 +163,7 @@ export class ACCClientRequest {
 
   _buildRequest() {
     if (this.requests.selectedRequest._id) {
+      this.requests.selectedRequest.requestDetails.invoiceRelevant = this.invoiceRelevant;
       this.requests.selectedRequest.requestDetailsToSave = this.requests.selectedRequest.requestDetails;
       this.requests.selectedRequest.requestDetailsToSave.forEach((item, index) => {
         if (item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = this.config.UPDATED_REQUEST_CODE;

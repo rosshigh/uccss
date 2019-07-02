@@ -101,7 +101,7 @@
                                             <th>Date Required</th>
                                         </tr>
                                     <tbody id="requiredProductsTable">
-                                        <tr repeat.for="request of requests.selectedRequest.requestDetails">
+                                        <tr repeat.for="request of requests.selectedRequest.requestDetails" class="${request.invoiceRelevant ? 'success sortable' : 'sortable'}">
                                             <td>${request.productId | lookupValue:products.productsArray:"_id":"name"}
                                             </td>
                                             <td>

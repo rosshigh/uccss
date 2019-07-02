@@ -28,7 +28,7 @@
                                 <label>Student IDs</label>
                                 <input
                                     value.bind="selectedRequestDetail.assignments[assignmentDetailIndex].studentUserIds"
-                                    id="proposedIDRange" keyup.delegate="updateClientAssignments()"
+                                    id="proposedIDRange" disabled.bind="selectedClientIndex === undefined" keyup.delegate="updateClientAssignments()"
                                     placeholder="Proposed IDs" class="form-control" type="text" ref="proposedIDRange" />
                             </div>
 
@@ -36,7 +36,7 @@
                                 <label>Student Password</label>
                                 <input
                                     value.bind="selectedRequestDetail.assignments[assignmentDetailIndex].studentPassword"
-                                    id="proposedStudentPassword" placeholder="Proposed Password" class="form-control"
+                                    id="proposedStudentPassword" disabled.bind="selectedClientIndex === undefined" placeholder="Proposed Password" class="form-control"
                                     type="text" />
                             </div>
 
@@ -46,7 +46,7 @@
                                 <label>Faculty IDs</label>
                                 <input
                                     value.bind="selectedRequestDetail.assignments[assignmentDetailIndex].facultyUserIds"
-                                    id="proposedFacultyIDRange" keyup.delegate="updateClientAssignments()"
+                                    id="proposedFacultyIDRange" disabled.bind="selectedClientIndex === undefined" keyup.delegate="updateClientAssignments()"
                                     placeholder="Proposed Faculty IDs" class="form-control" type="text" />
                             </div>
 
@@ -54,7 +54,7 @@
                                 <label>Faculty Password</label>
                                 <input
                                     value.bind="selectedRequestDetail.assignments[assignmentDetailIndex].facultyPassword"
-                                    id="proposedFacultyPassword" placeholder="Proposed Faculty Password"
+                                    id="proposedFacultyPassword" disabled.bind="selectedClientIndex === undefined" placeholder="Proposed Faculty Password"
                                     class="form-control" type="text" />
                             </div>
                         </div>

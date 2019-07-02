@@ -54,10 +54,6 @@ export class APJAssignments {
     this.requestSelected = "table";
 
     $('#loading').hide();
-
-    // this.requests.selectRequest()
-    // this.filterList();
-    // this._setUpValidation();
     this.getRequests();
   }
 
@@ -362,10 +358,12 @@ export class APJAssignments {
   }
 
   updateClientAssignments() {
-    this.selectedSystem.clients[this.selectedClientIndex].studentIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentUserIds;
-    this.selectedSystem.clients[this.selectedClientIndex].studentPassword = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentPassword;
-    this.selectedSystem.clients[this.selectedClientIndex].facultyIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].facultyIDRange;
-    this.selectedSystem.clients[this.selectedClientIndex].facultyPassword = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].facultyPassword;
+    if (this.selectedClientIndex) {
+      this.selectedSystem.clients[this.selectedClientIndex].studentIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentUserIds;
+      this.selectedSystem.clients[this.selectedClientIndex].studentPassword = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentPassword;
+      this.selectedSystem.clients[this.selectedClientIndex].facultyIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].facultyIDRange;
+      this.selectedSystem.clients[this.selectedClientIndex].facultyPassword = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].facultyPassword;
+    }
   }
 
   back() {
@@ -429,9 +427,9 @@ export class APJAssignments {
   }
 
   /*****************************************************************************************************
-* The user deletes an assignment 
-* index - the index of the selected assignment
-****************************************************************************************************/
+  * The user deletes an assignment 
+  * index - the index of the selected assignment
+  ****************************************************************************************************/
   async deleteProposedClient() {
     //Is this a saved assignment
     if (this.selectedRequestDetail.assignments[this.assignmentDetailIndex].assignedDate) {
@@ -485,7 +483,7 @@ export class APJAssignments {
 
   institutionCustomFilter(value, item, context) {
     return item.requestId && item.requestId.institutionId && item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-}
+  }
 
   customInstitutionsSorter(sortProperty, sortDirection, sortArray, context) {
     this.sortProperty = 'institution';
