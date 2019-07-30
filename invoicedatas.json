@@ -1,0 +1,4 @@
+{"_id":{"$oid":"5ce9611450b6d23e44388747"},"invoicePeriod":"First Quarter","invoiceDay":{"$numberInt":"1"},"invoiceMonth":{"$numberInt":"1"},"invoiceEndDay":{"$numberInt":"31"},"invoiceEndMonth":{"$numberInt":"3"},"__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5ce9613450b6d23e44388748"},"invoicePeriod":"Second Quarter","invoiceDay":{"$numberInt":"1"},"invoiceMonth":{"$numberInt":"4"},"invoiceEndDay":{"$numberInt":"30"},"invoiceEndMonth":{"$numberInt":"6"},"__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5ce9616050b6d23e44388749"},"invoicePeriod":"Third Quarter","invoiceDay":{"$numberInt":"1"},"invoiceMonth":{"$numberInt":"7"},"invoiceEndDay":{"$numberInt":"30"},"invoiceEndMonth":{"$numberInt":"9"},"__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5ce9616f50b6d23e4438874a"},"invoicePeriod":"Fourth Quarter","invoiceDay":{"$numberInt":"1"},"invoiceMonth":{"$numberInt":"10"},"invoiceEndDay":{"$numberInt":"31"},"invoiceEndMonth":{"$numberInt":"12"},"__v":{"$numberInt":"0"}}

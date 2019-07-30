@@ -112,6 +112,12 @@
     display: inline-block;
 }
 
+.vertical-align {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .topMargin {
     margin-top: 25px;
 }
@@ -131,6 +137,23 @@
 .smallLeftMargin {
     margin-left: 10px;
 }
+
+.backColorOne {
+  background-color: ghostwhite;
+}
+
+.backColorTwo{
+  background-color: LightSalmon;
+}
+
+.backColorThree {
+  background-color: cyan;
+}
+
+.backColorFour{
+  background-color: lightgrey;
+}
+
 
 .bigTopMargin {
     margin-top: 50px;

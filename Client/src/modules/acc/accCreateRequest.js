@@ -81,7 +81,7 @@ export class ACCClientRequest {
     if (this.requests.selectedRequest.requestDetails.length == this.selectedPackage.maxClients) {
       // this.utils.showNotification("This university has reached their maximum requested products.", "error");
       return this.dialog.showMessage(
-        "TThis university has reached their maximum requested products.  This client will an extra charge.  Is that OK?",
+        "This university has reached their maximum requested products.  This client will incurr an extra charge.  Is that OK?",
         "Extra Client",
         ['YES','NO']
       ).whenClosed(response => {
@@ -96,16 +96,6 @@ export class ACCClientRequest {
     } 
     this.invoiceRelevant = false;
     this.addTheClient(product);
-    // else {
-      // $("#requestProductsLabel").html("Requested Products");
-      // var newObj = this.requests.emptyRequestDetail();
-      // newObj.productId = product._id;
-      // this.requests.selectedRequest.requestDetails.push(newObj);
-      // this.products.selectedProductFromId(newObj.productId);
-      // this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = product.name;
-
-      // this.validation.makeValid($("#productList"));
-    // }
   }
 
   addTheClient(product){
