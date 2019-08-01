@@ -78,7 +78,7 @@ export class ACCClientRequest {
   }
 
   selectProduct(product) {
-    if (this.requests.selectedRequest.requestDetails.length == this.selectedPackage.maxClients) {
+    if (this.requests.selectedRequest.requestDetails.length >= this.selectedPackage.maxClients) {
       // this.utils.showNotification("This university has reached their maximum requested products.", "error");
       return this.dialog.showMessage(
         "This university has reached their maximum requested products.  This client will incurr an extra charge.  Is that OK?",

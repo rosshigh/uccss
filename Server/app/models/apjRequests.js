@@ -90,16 +90,11 @@ module.exports = Mongoose.model('ClientRequestDetailAPJ', ClientRequestDetailsSc
 
 var ClientRequestSchema = new Schema({
   clientRequestNo: { type: Number },
-  // personId: { type:  Schema.Types.ObjectId },
-  // studentIdsAssigned: { type: Number }, 
-  // graduateIds: { type: Number, default: 0, min : 0 },
-  // undergradIds: { type: Number, default: 0, min: 0 },
   invoiceRelevant: { type: Boolean, defualt: false },
+  invoiceDate: { type: Date },
   amount: { type: Number },
   comments: { type: String },
   whereHosted: { type: String, default: 'UCC' },
-  // startDate: { type: Date },
-  // endDate: { type: Date },
   requestStatus: { type: String },
   modifiedDate: { type: Date },
   requestDetails: [{ type: Schema.Types.ObjectId }], //, ref: 'ClientRequestDetail'
