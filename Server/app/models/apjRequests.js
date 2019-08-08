@@ -62,6 +62,7 @@ var ClientRequestDetailsSchema = new Schema({
   withinPackage: { type: Boolean, default: true },
   dateInvoiced: { type: Date },
   productId: { type: Schema.Types.ObjectId, required: true, ref: 'product' },
+  price: { type: Number },
   requestStatus: { type: String },
   requestId: { type: Schema.Types.ObjectId }, //, ref: 'ClientRequest'
   idsAssigned: { type: Number },

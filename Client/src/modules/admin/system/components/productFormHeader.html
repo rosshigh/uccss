@@ -16,9 +16,8 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2">
+                        <div class="col-lg-2 topMargin">
                             <div class="form-group">
-
                                 <div class="col-sm-8">
                                     <div class="checkbox">
                                         <label class="pull-left">
@@ -29,7 +28,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 topMargin">
                             <div class="form-group">
                                 <div class="col-sm-8">
                                     <div class="checkbox">
@@ -41,6 +40,15 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-7 topMargin">
+                          <div class="form-group">
+                              <label for="editPrice" class="col-sm-2 control-label hideOnPhone">Price</label>
+                              <div class="col-sm-8">
+                                  <input value.bind="products.selectedProduct.price" id="editPrice"
+                                      class="form-control " placeholder="Price" type="text" />
+                              </div>
+                          </div>
+                      </div>
                     </div>
                 </div>
                 <div class="col-lg-6">

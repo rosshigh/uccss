@@ -145,11 +145,13 @@ export class AccCreateInvoice {
   // }
 
   addRequest(index, request){
+    if(request.price != null) this.totalInvoiceAmount += parseFloat(request.price);
     this.invoiceRelevantRequests.push(request);
     this.apj.requestsDetailsArray.splice(index, 1);
   }
 
   subtractRequest(index, request){
+    if(request.price != null) this.totalInvoiceAmount -= parseFloat(request.price);
     this.apj.requestsDetailsArray.push(request);
     this.invoiceRelevantRequests.splice(index, 1);
   }

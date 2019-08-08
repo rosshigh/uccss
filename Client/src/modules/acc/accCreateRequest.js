@@ -106,7 +106,10 @@ export class ACCClientRequest {
     this.products.selectedProductFromId(newObj.productId);
     this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = product.name;
     this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].invoiceRelevant = this.invoiceRelevant;
-
+    if(this.invoiceRelevant){
+      this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].price = product.price;
+    }
+    
     this.validation.makeValid($("#productList"));
   }
 

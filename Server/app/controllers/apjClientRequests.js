@@ -214,7 +214,7 @@ module.exports = function (app) {
     logger.log('info', 'Get clientRequests', 'verbose');
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
-      .select('requestStatus requiredDate createdDate numberOfStudents requestId productId assignments.systemId assignments.client')
+      .select('requestStatus price requiredDate createdDate numberOfStudents requestId productId assignments.systemId assignments.client')
       .populate({ path: 'requestId', model: 'ClientRequestAPJ', populate: { path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country' } })
       .populate({ path: 'requestId', model: 'ClientRequestAPJ', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
       .populate({ path: "productId", model: "Product", select: "name" })
