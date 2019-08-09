@@ -37044,28 +37044,45 @@ define('modules/tech/requests/archiveClientRequests',['exports', 'aurelia-framew
             return refresh;
         }();
 
-        ArchiveRequests.prototype.selectARequest = function selectARequest(index, el, request) {
-            var _this2 = this;
+        ArchiveRequests.prototype.selectARequest = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index, el, request) {
+                var response;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                _context4.next = 2;
+                                return this.clientRequests.getRequestDetail(request._id);
 
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.selectedRequestDetail = this.utils.copyObject(request);
-            this.productId = this.selectedRequestDetail.productId._id;
-            this.products.selectedProductFromId(this.productId);
-            if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
-            this.idsRequired = parseInt(this.selectedRequestDetail.requestId.graduateIds) + parseInt(this.selectedRequestDetail.requestId.undergradIds);
-            this.totalIdsAssigned = 0;
-            if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) {
-                this.selectedRequestDetail.assignments.forEach(function (item) {
-                    _this2.totalIdsAssigned += item.idsAssigned;
-                });
+                            case 2:
+                                response = _context4.sent;
+
+                                if (!response.error) {
+                                    this.selectedRequestDetail = response;
+                                    if (this.selectedRequestDetail.requestId && this.selectedRequestDetail.requestId.courseId === null) this.selectedRequestDetail.requestId.courseId = { _id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME };
+                                    this.originalRequestDetail = this.utils.copyObject(this.selectedRequestDetail);
+                                }
+
+                                this.requestSelected = true;
+
+                                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                                this.selectedRow = $(el.target).closest('tr');
+                                this.selectedRow.children().addClass('info');
+
+                            case 8:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function selectARequest(_x, _x2, _x3) {
+                return _ref4.apply(this, arguments);
             }
-            this.idsRemaining = this.idsRequired - this.totalIdsAssigned > 0 ? this.idsRequired - this.totalIdsAssigned : 0;
-            this.requestSelected = true;
 
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = $(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-        };
+            return selectARequest;
+        }();
 
         ArchiveRequests.prototype.back = function back() {
             this.requestSelected = false;

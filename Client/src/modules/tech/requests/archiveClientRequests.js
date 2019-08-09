@@ -77,20 +77,27 @@ export class ArchiveRequests {
         this.spinnerHTML = "";
     }
 
-    selectARequest(index,el, request){
-        this.editIndex = this.dataTable.getOriginalIndex(index);
-        this.selectedRequestDetail = this.utils.copyObject(request);
-		this.productId = this.selectedRequestDetail.productId._id;
-        this.products.selectedProductFromId(this.productId);
-        if(this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
-        this.idsRequired = parseInt(this.selectedRequestDetail.requestId.graduateIds) + parseInt(this.selectedRequestDetail.requestId.undergradIds);
-        this.totalIdsAssigned = 0;
-        if(this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0){
-            this.selectedRequestDetail.assignments.forEach(item => {
-                this.totalIdsAssigned += item.idsAssigned;
-            })
-        }
-        this.idsRemaining = this.idsRequired - this.totalIdsAssigned > 0 ?  this.idsRequired - this.totalIdsAssigned : 0;
+    async selectARequest(index,el, request){
+      let response = await this.clientRequests.getRequestDetail(request._id);
+      if (!response.error) {
+          this.selectedRequestDetail = response;
+          if (this.selectedRequestDetail.requestId && this.selectedRequestDetail.requestId.courseId === null) this.selectedRequestDetail.requestId.courseId = { _id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME };
+          this.originalRequestDetail = this.utils.copyObject(this.selectedRequestDetail);
+      }
+
+    //     this.editIndex = this.dataTable.getOriginalIndex(index);
+    //     this.selectedRequestDetail = this.utils.copyObject(request);
+		// this.productId = this.selectedRequestDetail.productId._id;
+    //     this.products.selectedProductFromId(this.productId);
+    //     if(this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
+    //     this.idsRequired = parseInt(this.selectedRequestDetail.requestId.graduateIds) + parseInt(this.selectedRequestDetail.requestId.undergradIds);
+    //     this.totalIdsAssigned = 0;
+    //     if(this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0){
+    //         this.selectedRequestDetail.assignments.forEach(item => {
+    //             this.totalIdsAssigned += item.idsAssigned;
+    //         })
+    //     }
+    //     this.idsRemaining = this.idsRequired - this.totalIdsAssigned > 0 ?  this.idsRequired - this.totalIdsAssigned : 0;
         this.requestSelected = true;
 
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
