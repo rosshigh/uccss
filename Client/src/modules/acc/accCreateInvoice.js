@@ -18,6 +18,8 @@ export class AccCreateInvoice {
 
     this.invoiceDate = new Date();
     this.startDate = new Date();
+    this.openSelectionPanel = true;
+    this.invoiceNumber = 1001;
   }
 
   async activate() {
@@ -55,13 +57,11 @@ export class AccCreateInvoice {
     await this.getInvoiceRelevantRequests();
   }
 
-  editInvoicePeriods() {
-    this.openEditPanel = !this.openEditPanel;
-  }
-
   async getInstitutionToBeInvoiced() {
     await this.people.getInstitutionsArray('?filter=apj|eq|true&order=name', true);
     this.totalInvoiceAmount = 0;
+    this.totalInstitutionInvoiceAmount = 0;
+    this.totalProductInvoiceAmount = 0;
     this.institutionsToBeInvoiced = new Array();
     this.classifyInstitutions();
   }
@@ -69,7 +69,7 @@ export class AccCreateInvoice {
   invoiceAllInstitutions() {
     this.classifyInstitutionsArray.forEach(item => {
       this.institutionsToBeInvoiced.push(item);
-      this.totalInvoiceAmount += item.packageId.amount * this.config.UCC_PACKAGE_PERCENTAGE;
+      this.totalInstitutionInvoiceAmount += item.packageId.amount * this.config.UCC_PACKAGE_PERCENTAGE;
     })
     this.classifyInstitutionsArray = [];
   }
@@ -78,7 +78,7 @@ export class AccCreateInvoice {
     this.institutionsToBeInvoiced.forEach(item => {
       this.classifyInstitutionsArray.push(item);
     })
-    this.totalInvoiceAmount = 0;
+    this.totalInstitutionInvoiceAmount = 0;
     this.institutionsToBeInvoiced = [];
   }
 
@@ -87,7 +87,7 @@ export class AccCreateInvoice {
   }
 
   deleteInstitutionsToBeInvoiced(index) {
-    this.totalInvoiceAmount -= this.institutionsToBeInvoiced[index].packageId.amount * this.config.UCC_PACKAGE_PERCENTAGE;
+    this.totalInstitutionInvoiceAmount -= this.institutionsToBeInvoiced[index].packageId.amount * this.config.UCC_PACKAGE_PERCENTAGE;
     this.institutionsToBeInvoiced.splice(index, 1);
   }
 
@@ -100,33 +100,34 @@ export class AccCreateInvoice {
           if (packageItem.packageId.datePaid !== null && moment(packageItem.packageId.datePaid).isBetween(this.selectedInvoicePeriod.startDate, this.selectedInvoicePeriod.endDate)) {
             //datePaid between selectedInvoicePeriod.startDate and selectedInvoicePeriod.endDate
             packageItem.category = 'backColorOne';
-            this.classifyInstitutionsArray.push(packageItem);
+            // this.classifyInstitutionsArray.push(packageItem);
             console.log('in session');
           } else if (moment(packageItem.packageId.dateStarted).isBetween(this.selectedInvoicePeriod.startDate, this.selectedInvoicePeriod.endDate)) {
             packageItem.category = 'backColorTwo';
-            this.classifyInstitutionsArray.push(packageItem);
+            // this.classifyInstitutionsArray.push(packageItem);
           } else if (packageItem.packageId.datePaid !== null && moment(packageItem.packageId.datePaid).before(yearAgo)) {
             //datePaid over a year before selectedInvoicePeriod.startDate
             packageItem.category = 'backColorThree';
-            this.classifyInstitutionsArray.push(packageItem);
-            console.log('over a year old');
+            // this.classifyInstitutionsArray.push(packageItem);
           } else if (packageItem.packageId.dateInvoiced === null) {
             packageItem.category = 'backColorFour';
-            this.classifyInstitutionsArray.push(packageItem);
+           
           }
+          packageItem.invoiceAmount = parseFloat(packageItem.packageId.amount) * this.config.UCC_PACKAGE_PERCENTAGE
+          this.classifyInstitutionsArray.push(packageItem);
         }
       });
     }
   }
 
   addInsitution(index, institution) {
-    this.totalInvoiceAmount += parseFloat(this.classifyInstitutionsArray[index].packageId.amount) * this.config.UCC_PACKAGE_PERCENTAGE;
+    this.totalInstitutionInvoiceAmount += parseFloat(this.classifyInstitutionsArray[index].packageId.amount) * this.config.UCC_PACKAGE_PERCENTAGE;
     this.institutionsToBeInvoiced.push(institution);
     this.classifyInstitutionsArray.splice(index, 1);
   }
 
   subtractInstitution(index, institution) {
-    this.totalInvoiceAmount -= this.institutionsToBeInvoiced[index].packageId.amount * this.config.UCC_PACKAGE_PERCENTAGE;
+    this.totalInstitutionInvoiceAmount -= this.institutionsToBeInvoiced[index].packageId.amount * this.config.UCC_PACKAGE_PERCENTAGE;
     this.classifyInstitutionsArray.push(institution);
     this.institutionsToBeInvoiced.splice(index, 1);
   }
@@ -145,15 +146,33 @@ export class AccCreateInvoice {
   // }
 
   addRequest(index, request){
-    if(request.price != null) this.totalInvoiceAmount += parseFloat(request.price);
+    if(request.price != null) this.totalProductInvoiceAmount += parseFloat(request.price);
     this.invoiceRelevantRequests.push(request);
     this.apj.requestsDetailsArray.splice(index, 1);
   }
 
   subtractRequest(index, request){
-    if(request.price != null) this.totalInvoiceAmount -= parseFloat(request.price);
+    if(request.price != null) this.totalProductInvoiceAmount -= parseFloat(request.price);
     this.apj.requestsDetailsArray.push(request);
     this.invoiceRelevantRequests.splice(index, 1);
+  }
+
+  openSelectionPanelFunction(){
+    this.openInvoicePanel = false;
+    this.openEditPanel = false;
+    this.openSelectionPanel = true;
+  }
+
+  editInvoicePeriods() {
+    this.openInvoicePanel = false;
+    this.openEditPanel = true;
+    this.openSelectionPanel = false;
+  }
+
+  openInvoicePanelFunction(){
+    this.openInvoicePanel = true;
+    this.openEditPanel = false;
+    this.openSelectionPanel = false;
   }
 
 }

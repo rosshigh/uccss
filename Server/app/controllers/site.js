@@ -11,7 +11,7 @@ var express = require('express'),
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
-module.exports = function (app) {
+module.exports = function (app, config) {
   app.use('/', router);
 
   router.get('/api/site', asyncHandler(async (req, res) => {
