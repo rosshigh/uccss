@@ -197,4 +197,12 @@ export class APJClientRequests {
             }
         }
     }
+
+    async createPDF(object){
+      let url = 'apj/invoices/createPDF';
+      // let object = {page: html};
+      let serverResponse = await this.data.saveObject(object, url, "post");
+      return serverResponse;
+      // http://localhost/api/apj/invoices/createPDF
+    }
 }

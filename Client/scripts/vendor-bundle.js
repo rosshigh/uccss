@@ -11550,319 +11550,6 @@ define('aurelia-binding',['exports', 'aurelia-logging', 'aurelia-pal', 'aurelia-
     }
   }
 });
-define('aurelia-bootstrapper',['exports', 'aurelia-pal', 'aurelia-pal-browser', 'aurelia-polyfills'], function (exports, _aureliaPal, _aureliaPalBrowser) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.bootstrap = bootstrap;
-
-
-  var bootstrapQueue = [];
-  var sharedLoader = null;
-  var Aurelia = null;
-
-  function onBootstrap(callback) {
-    return new Promise(function (resolve, reject) {
-      if (sharedLoader) {
-        resolve(callback(sharedLoader));
-      } else {
-        bootstrapQueue.push(function () {
-          try {
-            resolve(callback(sharedLoader));
-          } catch (e) {
-            reject(e);
-          }
-        });
-      }
-    });
-  }
-
-  function ready(global) {
-    return new Promise(function (resolve, reject) {
-      if (global.document.readyState === 'complete') {
-        resolve(global.document);
-      } else {
-        global.document.addEventListener('DOMContentLoaded', completed);
-        global.addEventListener('load', completed);
-      }
-
-      function completed() {
-        global.document.removeEventListener('DOMContentLoaded', completed);
-        global.removeEventListener('load', completed);
-        resolve(global.document);
-      }
-    });
-  }
-
-  function createLoader() {
-    if (_aureliaPal.PLATFORM.Loader) {
-      return Promise.resolve(new _aureliaPal.PLATFORM.Loader());
-    }
-
-    if (window.System && typeof window.System.import === 'function') {
-      return System.normalize('aurelia-bootstrapper').then(function (bootstrapperName) {
-        return System.normalize('aurelia-loader-default', bootstrapperName);
-      }).then(function (loaderName) {
-        return System.import(loaderName).then(function (m) {
-          return new m.DefaultLoader();
-        });
-      });
-    }
-
-    if (typeof window.require === 'function') {
-      return new Promise(function (resolve, reject) {
-        return require(['aurelia-loader-default'], function (m) {
-          return resolve(new m.DefaultLoader());
-        }, reject);
-      });
-    }
-
-    return Promise.reject('No PLATFORM.Loader is defined and there is neither a System API (ES6) or a Require API (AMD) globally available to load your app.');
-  }
-
-  function preparePlatform(loader) {
-    return loader.normalize('aurelia-bootstrapper').then(function (bootstrapperName) {
-      return loader.normalize('aurelia-framework', bootstrapperName).then(function (frameworkName) {
-        loader.map('aurelia-framework', frameworkName);
-
-        return Promise.all([loader.normalize('aurelia-dependency-injection', frameworkName).then(function (diName) {
-          return loader.map('aurelia-dependency-injection', diName);
-        }), loader.normalize('aurelia-router', bootstrapperName).then(function (routerName) {
-          return loader.map('aurelia-router', routerName);
-        }), loader.normalize('aurelia-logging-console', bootstrapperName).then(function (loggingConsoleName) {
-          return loader.map('aurelia-logging-console', loggingConsoleName);
-        })]).then(function () {
-          return loader.loadModule(frameworkName).then(function (m) {
-            return Aurelia = m.Aurelia;
-          });
-        });
-      });
-    });
-  }
-
-  function handleApp(loader, appHost) {
-    var moduleId = appHost.getAttribute('aurelia-app') || appHost.getAttribute('data-aurelia-app');
-    return config(loader, appHost, moduleId);
-  }
-
-  function config(loader, appHost, configModuleId) {
-    var aurelia = new Aurelia(loader);
-    aurelia.host = appHost;
-    aurelia.configModuleId = configModuleId || null;
-
-    if (configModuleId) {
-      return loader.loadModule(configModuleId).then(function (customConfig) {
-        if (!customConfig.configure) {
-          throw new Error("Cannot initialize module '" + configModuleId + "' without a configure function.");
-        }
-
-        customConfig.configure(aurelia);
-      });
-    }
-
-    aurelia.use.standardConfiguration().developmentLogging();
-
-    return aurelia.start().then(function () {
-      return aurelia.setRoot();
-    });
-  }
-
-  function run() {
-    return ready(window).then(function (doc) {
-      (0, _aureliaPalBrowser.initialize)();
-
-      var appHost = doc.querySelectorAll('[aurelia-app],[data-aurelia-app]');
-      return createLoader().then(function (loader) {
-        return preparePlatform(loader).then(function () {
-          for (var i = 0, ii = appHost.length; i < ii; ++i) {
-            handleApp(loader, appHost[i]).catch(console.error.bind(console));
-          }
-
-          sharedLoader = loader;
-          for (var _i = 0, _ii = bootstrapQueue.length; _i < _ii; ++_i) {
-            bootstrapQueue[_i]();
-          }
-          bootstrapQueue = null;
-        });
-      });
-    });
-  }
-
-  function bootstrap(configure) {
-    return onBootstrap(function (loader) {
-      var aurelia = new Aurelia(loader);
-      return configure(aurelia);
-    });
-  }
-
-  run();
-});
-define('aurelia-event-aggregator',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.EventAggregator = undefined;
-  exports.includeEventsIn = includeEventsIn;
-  exports.configure = configure;
-
-  var LogManager = _interopRequireWildcard(_aureliaLogging);
-
-  function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-        }
-      }
-
-      newObj.default = obj;
-      return newObj;
-    }
-  }
-
-  
-
-  var logger = LogManager.getLogger('event-aggregator');
-
-  var Handler = function () {
-    function Handler(messageType, callback) {
-      
-
-      this.messageType = messageType;
-      this.callback = callback;
-    }
-
-    Handler.prototype.handle = function handle(message) {
-      if (message instanceof this.messageType) {
-        this.callback.call(null, message);
-      }
-    };
-
-    return Handler;
-  }();
-
-  function invokeCallback(callback, data, event) {
-    try {
-      callback(data, event);
-    } catch (e) {
-      logger.error(e);
-    }
-  }
-
-  function invokeHandler(handler, data) {
-    try {
-      handler.handle(data);
-    } catch (e) {
-      logger.error(e);
-    }
-  }
-
-  var EventAggregator = exports.EventAggregator = function () {
-    function EventAggregator() {
-      
-
-      this.eventLookup = {};
-      this.messageHandlers = [];
-    }
-
-    EventAggregator.prototype.publish = function publish(event, data) {
-      var subscribers = void 0;
-      var i = void 0;
-
-      if (!event) {
-        throw new Error('Event was invalid.');
-      }
-
-      if (typeof event === 'string') {
-        subscribers = this.eventLookup[event];
-        if (subscribers) {
-          subscribers = subscribers.slice();
-          i = subscribers.length;
-
-          while (i--) {
-            invokeCallback(subscribers[i], data, event);
-          }
-        }
-      } else {
-        subscribers = this.messageHandlers.slice();
-        i = subscribers.length;
-
-        while (i--) {
-          invokeHandler(subscribers[i], event);
-        }
-      }
-    };
-
-    EventAggregator.prototype.subscribe = function subscribe(event, callback) {
-      var handler = void 0;
-      var subscribers = void 0;
-
-      if (!event) {
-        throw new Error('Event channel/type was invalid.');
-      }
-
-      if (typeof event === 'string') {
-        handler = callback;
-        subscribers = this.eventLookup[event] || (this.eventLookup[event] = []);
-      } else {
-        handler = new Handler(event, callback);
-        subscribers = this.messageHandlers;
-      }
-
-      subscribers.push(handler);
-
-      return {
-        dispose: function dispose() {
-          var idx = subscribers.indexOf(handler);
-          if (idx !== -1) {
-            subscribers.splice(idx, 1);
-          }
-        }
-      };
-    };
-
-    EventAggregator.prototype.subscribeOnce = function subscribeOnce(event, callback) {
-      var sub = this.subscribe(event, function (a, b) {
-        sub.dispose();
-        return callback(a, b);
-      });
-
-      return sub;
-    };
-
-    return EventAggregator;
-  }();
-
-  function includeEventsIn(obj) {
-    var ea = new EventAggregator();
-
-    obj.subscribeOnce = function (event, callback) {
-      return ea.subscribeOnce(event, callback);
-    };
-
-    obj.subscribe = function (event, callback) {
-      return ea.subscribe(event, callback);
-    };
-
-    obj.publish = function (event, data) {
-      ea.publish(event, data);
-    };
-
-    return ea;
-  }
-
-  function configure(config) {
-    config.instance(EventAggregator, includeEventsIn(config.aurelia));
-  }
-});
 define('aurelia-dependency-injection',['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aureliaMetadata, _aureliaPal) {
   'use strict';
 
@@ -12616,6 +12303,891 @@ define('aurelia-dependency-injection',['exports', 'aurelia-metadata', 'aurelia-p
     };
   }
 });
+define('aurelia-event-aggregator',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.EventAggregator = undefined;
+  exports.includeEventsIn = includeEventsIn;
+  exports.configure = configure;
+
+  var LogManager = _interopRequireWildcard(_aureliaLogging);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  
+
+  var logger = LogManager.getLogger('event-aggregator');
+
+  var Handler = function () {
+    function Handler(messageType, callback) {
+      
+
+      this.messageType = messageType;
+      this.callback = callback;
+    }
+
+    Handler.prototype.handle = function handle(message) {
+      if (message instanceof this.messageType) {
+        this.callback.call(null, message);
+      }
+    };
+
+    return Handler;
+  }();
+
+  function invokeCallback(callback, data, event) {
+    try {
+      callback(data, event);
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
+  function invokeHandler(handler, data) {
+    try {
+      handler.handle(data);
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
+  var EventAggregator = exports.EventAggregator = function () {
+    function EventAggregator() {
+      
+
+      this.eventLookup = {};
+      this.messageHandlers = [];
+    }
+
+    EventAggregator.prototype.publish = function publish(event, data) {
+      var subscribers = void 0;
+      var i = void 0;
+
+      if (!event) {
+        throw new Error('Event was invalid.');
+      }
+
+      if (typeof event === 'string') {
+        subscribers = this.eventLookup[event];
+        if (subscribers) {
+          subscribers = subscribers.slice();
+          i = subscribers.length;
+
+          while (i--) {
+            invokeCallback(subscribers[i], data, event);
+          }
+        }
+      } else {
+        subscribers = this.messageHandlers.slice();
+        i = subscribers.length;
+
+        while (i--) {
+          invokeHandler(subscribers[i], event);
+        }
+      }
+    };
+
+    EventAggregator.prototype.subscribe = function subscribe(event, callback) {
+      var handler = void 0;
+      var subscribers = void 0;
+
+      if (!event) {
+        throw new Error('Event channel/type was invalid.');
+      }
+
+      if (typeof event === 'string') {
+        handler = callback;
+        subscribers = this.eventLookup[event] || (this.eventLookup[event] = []);
+      } else {
+        handler = new Handler(event, callback);
+        subscribers = this.messageHandlers;
+      }
+
+      subscribers.push(handler);
+
+      return {
+        dispose: function dispose() {
+          var idx = subscribers.indexOf(handler);
+          if (idx !== -1) {
+            subscribers.splice(idx, 1);
+          }
+        }
+      };
+    };
+
+    EventAggregator.prototype.subscribeOnce = function subscribeOnce(event, callback) {
+      var sub = this.subscribe(event, function (a, b) {
+        sub.dispose();
+        return callback(a, b);
+      });
+
+      return sub;
+    };
+
+    return EventAggregator;
+  }();
+
+  function includeEventsIn(obj) {
+    var ea = new EventAggregator();
+
+    obj.subscribeOnce = function (event, callback) {
+      return ea.subscribeOnce(event, callback);
+    };
+
+    obj.subscribe = function (event, callback) {
+      return ea.subscribe(event, callback);
+    };
+
+    obj.publish = function (event, data) {
+      ea.publish(event, data);
+    };
+
+    return ea;
+  }
+
+  function configure(config) {
+    config.instance(EventAggregator, includeEventsIn(config.aurelia));
+  }
+});
+define('aurelia-bootstrapper',['exports', 'aurelia-pal', 'aurelia-pal-browser', 'aurelia-polyfills'], function (exports, _aureliaPal, _aureliaPalBrowser) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.bootstrap = bootstrap;
+
+
+  var bootstrapQueue = [];
+  var sharedLoader = null;
+  var Aurelia = null;
+
+  function onBootstrap(callback) {
+    return new Promise(function (resolve, reject) {
+      if (sharedLoader) {
+        resolve(callback(sharedLoader));
+      } else {
+        bootstrapQueue.push(function () {
+          try {
+            resolve(callback(sharedLoader));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }
+    });
+  }
+
+  function ready(global) {
+    return new Promise(function (resolve, reject) {
+      if (global.document.readyState === 'complete') {
+        resolve(global.document);
+      } else {
+        global.document.addEventListener('DOMContentLoaded', completed);
+        global.addEventListener('load', completed);
+      }
+
+      function completed() {
+        global.document.removeEventListener('DOMContentLoaded', completed);
+        global.removeEventListener('load', completed);
+        resolve(global.document);
+      }
+    });
+  }
+
+  function createLoader() {
+    if (_aureliaPal.PLATFORM.Loader) {
+      return Promise.resolve(new _aureliaPal.PLATFORM.Loader());
+    }
+
+    if (window.System && typeof window.System.import === 'function') {
+      return System.normalize('aurelia-bootstrapper').then(function (bootstrapperName) {
+        return System.normalize('aurelia-loader-default', bootstrapperName);
+      }).then(function (loaderName) {
+        return System.import(loaderName).then(function (m) {
+          return new m.DefaultLoader();
+        });
+      });
+    }
+
+    if (typeof window.require === 'function') {
+      return new Promise(function (resolve, reject) {
+        return require(['aurelia-loader-default'], function (m) {
+          return resolve(new m.DefaultLoader());
+        }, reject);
+      });
+    }
+
+    return Promise.reject('No PLATFORM.Loader is defined and there is neither a System API (ES6) or a Require API (AMD) globally available to load your app.');
+  }
+
+  function preparePlatform(loader) {
+    return loader.normalize('aurelia-bootstrapper').then(function (bootstrapperName) {
+      return loader.normalize('aurelia-framework', bootstrapperName).then(function (frameworkName) {
+        loader.map('aurelia-framework', frameworkName);
+
+        return Promise.all([loader.normalize('aurelia-dependency-injection', frameworkName).then(function (diName) {
+          return loader.map('aurelia-dependency-injection', diName);
+        }), loader.normalize('aurelia-router', bootstrapperName).then(function (routerName) {
+          return loader.map('aurelia-router', routerName);
+        }), loader.normalize('aurelia-logging-console', bootstrapperName).then(function (loggingConsoleName) {
+          return loader.map('aurelia-logging-console', loggingConsoleName);
+        })]).then(function () {
+          return loader.loadModule(frameworkName).then(function (m) {
+            return Aurelia = m.Aurelia;
+          });
+        });
+      });
+    });
+  }
+
+  function handleApp(loader, appHost) {
+    var moduleId = appHost.getAttribute('aurelia-app') || appHost.getAttribute('data-aurelia-app');
+    return config(loader, appHost, moduleId);
+  }
+
+  function config(loader, appHost, configModuleId) {
+    var aurelia = new Aurelia(loader);
+    aurelia.host = appHost;
+    aurelia.configModuleId = configModuleId || null;
+
+    if (configModuleId) {
+      return loader.loadModule(configModuleId).then(function (customConfig) {
+        if (!customConfig.configure) {
+          throw new Error("Cannot initialize module '" + configModuleId + "' without a configure function.");
+        }
+
+        customConfig.configure(aurelia);
+      });
+    }
+
+    aurelia.use.standardConfiguration().developmentLogging();
+
+    return aurelia.start().then(function () {
+      return aurelia.setRoot();
+    });
+  }
+
+  function run() {
+    return ready(window).then(function (doc) {
+      (0, _aureliaPalBrowser.initialize)();
+
+      var appHost = doc.querySelectorAll('[aurelia-app],[data-aurelia-app]');
+      return createLoader().then(function (loader) {
+        return preparePlatform(loader).then(function () {
+          for (var i = 0, ii = appHost.length; i < ii; ++i) {
+            handleApp(loader, appHost[i]).catch(console.error.bind(console));
+          }
+
+          sharedLoader = loader;
+          for (var _i = 0, _ii = bootstrapQueue.length; _i < _ii; ++_i) {
+            bootstrapQueue[_i]();
+          }
+          bootstrapQueue = null;
+        });
+      });
+    });
+  }
+
+  function bootstrap(configure) {
+    return onBootstrap(function (loader) {
+      var aurelia = new Aurelia(loader);
+      return configure(aurelia);
+    });
+  }
+
+  run();
+});
+define('aurelia-loader',['exports', 'aurelia-path', 'aurelia-metadata'], function (exports, _aureliaPath, _aureliaMetadata) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Loader = exports.TemplateRegistryEntry = exports.TemplateDependency = undefined;
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  
+
+  var TemplateDependency = exports.TemplateDependency = function TemplateDependency(src, name) {
+    
+
+    this.src = src;
+    this.name = name;
+  };
+
+  var TemplateRegistryEntry = exports.TemplateRegistryEntry = function () {
+    function TemplateRegistryEntry(address) {
+      
+
+      this.templateIsLoaded = false;
+      this.factoryIsReady = false;
+      this.resources = null;
+      this.dependencies = null;
+
+      this.address = address;
+      this.onReady = null;
+      this._template = null;
+      this._factory = null;
+    }
+
+    TemplateRegistryEntry.prototype.addDependency = function addDependency(src, name) {
+      var finalSrc = typeof src === 'string' ? (0, _aureliaPath.relativeToFile)(src, this.address) : _aureliaMetadata.Origin.get(src).moduleId;
+
+      this.dependencies.push(new TemplateDependency(finalSrc, name));
+    };
+
+    _createClass(TemplateRegistryEntry, [{
+      key: 'template',
+      get: function get() {
+        return this._template;
+      },
+      set: function set(value) {
+        var address = this.address;
+        var requires = void 0;
+        var current = void 0;
+        var src = void 0;
+        var dependencies = void 0;
+
+        this._template = value;
+        this.templateIsLoaded = true;
+
+        requires = value.content.querySelectorAll('require');
+        dependencies = this.dependencies = new Array(requires.length);
+
+        for (var i = 0, ii = requires.length; i < ii; ++i) {
+          current = requires[i];
+          src = current.getAttribute('from');
+
+          if (!src) {
+            throw new Error('<require> element in ' + address + ' has no "from" attribute.');
+          }
+
+          dependencies[i] = new TemplateDependency((0, _aureliaPath.relativeToFile)(src, address), current.getAttribute('as'));
+
+          if (current.parentNode) {
+            current.parentNode.removeChild(current);
+          }
+        }
+      }
+    }, {
+      key: 'factory',
+      get: function get() {
+        return this._factory;
+      },
+      set: function set(value) {
+        this._factory = value;
+        this.factoryIsReady = true;
+      }
+    }]);
+
+    return TemplateRegistryEntry;
+  }();
+
+  var Loader = exports.Loader = function () {
+    function Loader() {
+      
+
+      this.templateRegistry = {};
+    }
+
+    Loader.prototype.map = function map(id, source) {
+      throw new Error('Loaders must implement map(id, source).');
+    };
+
+    Loader.prototype.normalizeSync = function normalizeSync(moduleId, relativeTo) {
+      throw new Error('Loaders must implement normalizeSync(moduleId, relativeTo).');
+    };
+
+    Loader.prototype.normalize = function normalize(moduleId, relativeTo) {
+      throw new Error('Loaders must implement normalize(moduleId: string, relativeTo: string): Promise<string>.');
+    };
+
+    Loader.prototype.loadModule = function loadModule(id) {
+      throw new Error('Loaders must implement loadModule(id).');
+    };
+
+    Loader.prototype.loadAllModules = function loadAllModules(ids) {
+      throw new Error('Loader must implement loadAllModules(ids).');
+    };
+
+    Loader.prototype.loadTemplate = function loadTemplate(url) {
+      throw new Error('Loader must implement loadTemplate(url).');
+    };
+
+    Loader.prototype.loadText = function loadText(url) {
+      throw new Error('Loader must implement loadText(url).');
+    };
+
+    Loader.prototype.applyPluginToUrl = function applyPluginToUrl(url, pluginName) {
+      throw new Error('Loader must implement applyPluginToUrl(url, pluginName).');
+    };
+
+    Loader.prototype.addPlugin = function addPlugin(pluginName, implementation) {
+      throw new Error('Loader must implement addPlugin(pluginName, implementation).');
+    };
+
+    Loader.prototype.getOrCreateTemplateRegistryEntry = function getOrCreateTemplateRegistryEntry(address) {
+      return this.templateRegistry[address] || (this.templateRegistry[address] = new TemplateRegistryEntry(address));
+    };
+
+    return Loader;
+  }();
+});
+define('aurelia-history-browser',['exports', 'aurelia-pal', 'aurelia-history'], function (exports, _aureliaPal, _aureliaHistory) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.BrowserHistory = exports.DefaultLinkHandler = exports.LinkHandler = undefined;
+  exports.configure = configure;
+
+  var _class, _temp;
+
+  function _possibleConstructorReturn(self, call) {
+    if (!self) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+
+    return call && (typeof call === "object" || typeof call === "function") ? call : self;
+  }
+
+  function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  }
+
+  
+
+  var LinkHandler = exports.LinkHandler = function () {
+    function LinkHandler() {
+      
+    }
+
+    LinkHandler.prototype.activate = function activate(history) {};
+
+    LinkHandler.prototype.deactivate = function deactivate() {};
+
+    return LinkHandler;
+  }();
+
+  var DefaultLinkHandler = exports.DefaultLinkHandler = function (_LinkHandler) {
+    _inherits(DefaultLinkHandler, _LinkHandler);
+
+    function DefaultLinkHandler() {
+      
+
+      var _this = _possibleConstructorReturn(this, _LinkHandler.call(this));
+
+      _this.handler = function (e) {
+        var _DefaultLinkHandler$g = DefaultLinkHandler.getEventInfo(e),
+            shouldHandleEvent = _DefaultLinkHandler$g.shouldHandleEvent,
+            href = _DefaultLinkHandler$g.href;
+
+        if (shouldHandleEvent) {
+          e.preventDefault();
+          _this.history.navigate(href);
+        }
+      };
+      return _this;
+    }
+
+    DefaultLinkHandler.prototype.activate = function activate(history) {
+      if (history._hasPushState) {
+        this.history = history;
+        _aureliaPal.DOM.addEventListener('click', this.handler, true);
+      }
+    };
+
+    DefaultLinkHandler.prototype.deactivate = function deactivate() {
+      _aureliaPal.DOM.removeEventListener('click', this.handler);
+    };
+
+    DefaultLinkHandler.getEventInfo = function getEventInfo(event) {
+      var info = {
+        shouldHandleEvent: false,
+        href: null,
+        anchor: null
+      };
+
+      var target = DefaultLinkHandler.findClosestAnchor(event.target);
+      if (!target || !DefaultLinkHandler.targetIsThisWindow(target)) {
+        return info;
+      }
+
+      if (target.hasAttribute('download') || target.hasAttribute('router-ignore') || target.hasAttribute('data-router-ignore')) {
+        return info;
+      }
+
+      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+        return info;
+      }
+
+      var href = target.getAttribute('href');
+      info.anchor = target;
+      info.href = href;
+
+      var leftButtonClicked = event.which === 1;
+      var isRelative = href && !(href.charAt(0) === '#' || /^[a-z]+:/i.test(href));
+
+      info.shouldHandleEvent = leftButtonClicked && isRelative;
+      return info;
+    };
+
+    DefaultLinkHandler.findClosestAnchor = function findClosestAnchor(el) {
+      while (el) {
+        if (el.tagName === 'A') {
+          return el;
+        }
+
+        el = el.parentNode;
+      }
+    };
+
+    DefaultLinkHandler.targetIsThisWindow = function targetIsThisWindow(target) {
+      var targetWindow = target.getAttribute('target');
+      var win = _aureliaPal.PLATFORM.global;
+
+      return !targetWindow || targetWindow === win.name || targetWindow === '_self';
+    };
+
+    return DefaultLinkHandler;
+  }(LinkHandler);
+
+  function configure(config) {
+    config.singleton(_aureliaHistory.History, BrowserHistory);
+    config.transient(LinkHandler, DefaultLinkHandler);
+  }
+
+  var BrowserHistory = exports.BrowserHistory = (_temp = _class = function (_History) {
+    _inherits(BrowserHistory, _History);
+
+    function BrowserHistory(linkHandler) {
+      
+
+      var _this2 = _possibleConstructorReturn(this, _History.call(this));
+
+      _this2._isActive = false;
+      _this2._checkUrlCallback = _this2._checkUrl.bind(_this2);
+
+      _this2.location = _aureliaPal.PLATFORM.location;
+      _this2.history = _aureliaPal.PLATFORM.history;
+      _this2.linkHandler = linkHandler;
+      return _this2;
+    }
+
+    BrowserHistory.prototype.activate = function activate(options) {
+      if (this._isActive) {
+        throw new Error('History has already been activated.');
+      }
+
+      var wantsPushState = !!options.pushState;
+
+      this._isActive = true;
+      this.options = Object.assign({}, { root: '/' }, this.options, options);
+
+      this.root = ('/' + this.options.root + '/').replace(rootStripper, '/');
+
+      this._wantsHashChange = this.options.hashChange !== false;
+      this._hasPushState = !!(this.options.pushState && this.history && this.history.pushState);
+
+      var eventName = void 0;
+      if (this._hasPushState) {
+        eventName = 'popstate';
+      } else if (this._wantsHashChange) {
+        eventName = 'hashchange';
+      }
+
+      _aureliaPal.PLATFORM.addEventListener(eventName, this._checkUrlCallback);
+
+      if (this._wantsHashChange && wantsPushState) {
+        var loc = this.location;
+        var atRoot = loc.pathname.replace(/[^\/]$/, '$&/') === this.root;
+
+        if (!this._hasPushState && !atRoot) {
+          this.fragment = this._getFragment(null, true);
+          this.location.replace(this.root + this.location.search + '#' + this.fragment);
+
+          return true;
+        } else if (this._hasPushState && atRoot && loc.hash) {
+          this.fragment = this._getHash().replace(routeStripper, '');
+          this.history.replaceState({}, _aureliaPal.DOM.title, this.root + this.fragment + loc.search);
+        }
+      }
+
+      if (!this.fragment) {
+        this.fragment = this._getFragment();
+      }
+
+      this.linkHandler.activate(this);
+
+      if (!this.options.silent) {
+        return this._loadUrl();
+      }
+    };
+
+    BrowserHistory.prototype.deactivate = function deactivate() {
+      _aureliaPal.PLATFORM.removeEventListener('popstate', this._checkUrlCallback);
+      _aureliaPal.PLATFORM.removeEventListener('hashchange', this._checkUrlCallback);
+      this._isActive = false;
+      this.linkHandler.deactivate();
+    };
+
+    BrowserHistory.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
+      var origin = createOrigin(this.location.protocol, this.location.hostname, this.location.port);
+      return '' + origin + this.root;
+    };
+
+    BrowserHistory.prototype.navigate = function navigate(fragment) {
+      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+          _ref$trigger = _ref.trigger,
+          trigger = _ref$trigger === undefined ? true : _ref$trigger,
+          _ref$replace = _ref.replace,
+          replace = _ref$replace === undefined ? false : _ref$replace;
+
+      if (fragment && absoluteUrl.test(fragment)) {
+        this.location.href = fragment;
+        return true;
+      }
+
+      if (!this._isActive) {
+        return false;
+      }
+
+      fragment = this._getFragment(fragment || '');
+
+      if (this.fragment === fragment && !replace) {
+        return false;
+      }
+
+      this.fragment = fragment;
+
+      var url = this.root + fragment;
+
+      if (fragment === '' && url !== '/') {
+        url = url.slice(0, -1);
+      }
+
+      if (this._hasPushState) {
+        url = url.replace('//', '/');
+        this.history[replace ? 'replaceState' : 'pushState']({}, _aureliaPal.DOM.title, url);
+      } else if (this._wantsHashChange) {
+        updateHash(this.location, fragment, replace);
+      } else {
+        this.location.assign(url);
+      }
+
+      if (trigger) {
+        return this._loadUrl(fragment);
+      }
+
+      return true;
+    };
+
+    BrowserHistory.prototype.navigateBack = function navigateBack() {
+      this.history.back();
+    };
+
+    BrowserHistory.prototype.setTitle = function setTitle(title) {
+      _aureliaPal.DOM.title = title;
+    };
+
+    BrowserHistory.prototype.setState = function setState(key, value) {
+      var state = Object.assign({}, this.history.state);
+      var _location = this.location,
+          pathname = _location.pathname,
+          search = _location.search,
+          hash = _location.hash;
+
+      state[key] = value;
+      this.history.replaceState(state, null, '' + pathname + search + hash);
+    };
+
+    BrowserHistory.prototype.getState = function getState(key) {
+      var state = Object.assign({}, this.history.state);
+      return state[key];
+    };
+
+    BrowserHistory.prototype.getHistoryIndex = function getHistoryIndex() {
+      var historyIndex = this.getState('HistoryIndex');
+      if (historyIndex === undefined) {
+        historyIndex = this.history.length - 1;
+        this.setState('HistoryIndex', historyIndex);
+      }
+      return historyIndex;
+    };
+
+    BrowserHistory.prototype.go = function go(movement) {
+      this.history.go(movement);
+    };
+
+    BrowserHistory.prototype._getHash = function _getHash() {
+      return this.location.hash.substr(1);
+    };
+
+    BrowserHistory.prototype._getFragment = function _getFragment(fragment, forcePushState) {
+      var root = void 0;
+
+      if (!fragment) {
+        if (this._hasPushState || !this._wantsHashChange || forcePushState) {
+          fragment = this.location.pathname + this.location.search;
+          root = this.root.replace(trailingSlash, '');
+          if (!fragment.indexOf(root)) {
+            fragment = fragment.substr(root.length);
+          }
+        } else {
+          fragment = this._getHash();
+        }
+      }
+
+      return '/' + fragment.replace(routeStripper, '');
+    };
+
+    BrowserHistory.prototype._checkUrl = function _checkUrl() {
+      var current = this._getFragment();
+      if (current !== this.fragment) {
+        this._loadUrl();
+      }
+    };
+
+    BrowserHistory.prototype._loadUrl = function _loadUrl(fragmentOverride) {
+      var fragment = this.fragment = this._getFragment(fragmentOverride);
+
+      return this.options.routeHandler ? this.options.routeHandler(fragment) : false;
+    };
+
+    return BrowserHistory;
+  }(_aureliaHistory.History), _class.inject = [LinkHandler], _temp);
+
+  var routeStripper = /^#?\/*|\s+$/g;
+
+  var rootStripper = /^\/+|\/+$/g;
+
+  var trailingSlash = /\/$/;
+
+  var absoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
+
+  function updateHash(location, fragment, replace) {
+    if (replace) {
+      var _href = location.href.replace(/(javascript:|#).*$/, '');
+      location.replace(_href + '#' + fragment);
+    } else {
+      location.hash = '#' + fragment;
+    }
+  }
+
+  function createOrigin(protocol, hostname, port) {
+    return protocol + '//' + hostname + (port ? ':' + port : '');
+  }
+});
+define('aurelia-history',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  function mi(name) {
+    throw new Error('History must implement ' + name + '().');
+  }
+
+  var History = exports.History = function () {
+    function History() {
+      
+    }
+
+    History.prototype.activate = function activate(options) {
+      mi('activate');
+    };
+
+    History.prototype.deactivate = function deactivate() {
+      mi('deactivate');
+    };
+
+    History.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
+      mi('getAbsoluteRoot');
+    };
+
+    History.prototype.navigate = function navigate(fragment, options) {
+      mi('navigate');
+    };
+
+    History.prototype.navigateBack = function navigateBack() {
+      mi('navigateBack');
+    };
+
+    History.prototype.setTitle = function setTitle(title) {
+      mi('setTitle');
+    };
+
+    History.prototype.setState = function setState(key, value) {
+      mi('setState');
+    };
+
+    History.prototype.getState = function getState(key) {
+      mi('getState');
+    };
+
+    History.prototype.getHistoryIndex = function getHistoryIndex() {
+      mi('getHistoryIndex');
+    };
+
+    History.prototype.go = function go(movement) {
+      mi('go');
+    };
+
+    return History;
+  }();
+});
 define('aurelia-framework',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-metadata', 'aurelia-templating', 'aurelia-loader', 'aurelia-task-queue', 'aurelia-path', 'aurelia-pal', 'aurelia-logging'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaMetadata, _aureliaTemplating, _aureliaLoader, _aureliaTaskQueue, _aureliaPath, _aureliaPal, _aureliaLogging) {
   'use strict';
 
@@ -13243,576 +13815,198 @@ define('aurelia-framework',['exports', 'aurelia-dependency-injection', 'aurelia-
   exports.FrameworkConfiguration = FrameworkConfiguration;
   var LogManager = exports.LogManager = TheLogManager;
 });
-define('aurelia-history',['exports'], function (exports) {
+define('aurelia-logging',['exports'], function (exports) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  exports.getLogger = getLogger;
+  exports.addAppender = addAppender;
+  exports.removeAppender = removeAppender;
+  exports.getAppenders = getAppenders;
+  exports.clearAppenders = clearAppenders;
+  exports.addCustomLevel = addCustomLevel;
+  exports.removeCustomLevel = removeCustomLevel;
+  exports.setLevel = setLevel;
+  exports.getLevel = getLevel;
 
   
 
-  function mi(name) {
-    throw new Error('History must implement ' + name + '().');
-  }
-
-  var History = exports.History = function () {
-    function History() {
-      
-    }
-
-    History.prototype.activate = function activate(options) {
-      mi('activate');
-    };
-
-    History.prototype.deactivate = function deactivate() {
-      mi('deactivate');
-    };
-
-    History.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
-      mi('getAbsoluteRoot');
-    };
-
-    History.prototype.navigate = function navigate(fragment, options) {
-      mi('navigate');
-    };
-
-    History.prototype.navigateBack = function navigateBack() {
-      mi('navigateBack');
-    };
-
-    History.prototype.setTitle = function setTitle(title) {
-      mi('setTitle');
-    };
-
-    History.prototype.setState = function setState(key, value) {
-      mi('setState');
-    };
-
-    History.prototype.getState = function getState(key) {
-      mi('getState');
-    };
-
-    History.prototype.getHistoryIndex = function getHistoryIndex() {
-      mi('getHistoryIndex');
-    };
-
-    History.prototype.go = function go(movement) {
-      mi('go');
-    };
-
-    return History;
-  }();
-});
-define('aurelia-history-browser',['exports', 'aurelia-pal', 'aurelia-history'], function (exports, _aureliaPal, _aureliaHistory) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.BrowserHistory = exports.DefaultLinkHandler = exports.LinkHandler = undefined;
-  exports.configure = configure;
-
-  var _class, _temp;
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
-
-  
-
-  var LinkHandler = exports.LinkHandler = function () {
-    function LinkHandler() {
-      
-    }
-
-    LinkHandler.prototype.activate = function activate(history) {};
-
-    LinkHandler.prototype.deactivate = function deactivate() {};
-
-    return LinkHandler;
-  }();
-
-  var DefaultLinkHandler = exports.DefaultLinkHandler = function (_LinkHandler) {
-    _inherits(DefaultLinkHandler, _LinkHandler);
-
-    function DefaultLinkHandler() {
-      
-
-      var _this = _possibleConstructorReturn(this, _LinkHandler.call(this));
-
-      _this.handler = function (e) {
-        var _DefaultLinkHandler$g = DefaultLinkHandler.getEventInfo(e),
-            shouldHandleEvent = _DefaultLinkHandler$g.shouldHandleEvent,
-            href = _DefaultLinkHandler$g.href;
-
-        if (shouldHandleEvent) {
-          e.preventDefault();
-          _this.history.navigate(href);
-        }
-      };
-      return _this;
-    }
-
-    DefaultLinkHandler.prototype.activate = function activate(history) {
-      if (history._hasPushState) {
-        this.history = history;
-        _aureliaPal.DOM.addEventListener('click', this.handler, true);
-      }
-    };
-
-    DefaultLinkHandler.prototype.deactivate = function deactivate() {
-      _aureliaPal.DOM.removeEventListener('click', this.handler);
-    };
-
-    DefaultLinkHandler.getEventInfo = function getEventInfo(event) {
-      var info = {
-        shouldHandleEvent: false,
-        href: null,
-        anchor: null
-      };
-
-      var target = DefaultLinkHandler.findClosestAnchor(event.target);
-      if (!target || !DefaultLinkHandler.targetIsThisWindow(target)) {
-        return info;
-      }
-
-      if (target.hasAttribute('download') || target.hasAttribute('router-ignore') || target.hasAttribute('data-router-ignore')) {
-        return info;
-      }
-
-      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
-        return info;
-      }
-
-      var href = target.getAttribute('href');
-      info.anchor = target;
-      info.href = href;
-
-      var leftButtonClicked = event.which === 1;
-      var isRelative = href && !(href.charAt(0) === '#' || /^[a-z]+:/i.test(href));
-
-      info.shouldHandleEvent = leftButtonClicked && isRelative;
-      return info;
-    };
-
-    DefaultLinkHandler.findClosestAnchor = function findClosestAnchor(el) {
-      while (el) {
-        if (el.tagName === 'A') {
-          return el;
-        }
-
-        el = el.parentNode;
-      }
-    };
-
-    DefaultLinkHandler.targetIsThisWindow = function targetIsThisWindow(target) {
-      var targetWindow = target.getAttribute('target');
-      var win = _aureliaPal.PLATFORM.global;
-
-      return !targetWindow || targetWindow === win.name || targetWindow === '_self';
-    };
-
-    return DefaultLinkHandler;
-  }(LinkHandler);
-
-  function configure(config) {
-    config.singleton(_aureliaHistory.History, BrowserHistory);
-    config.transient(LinkHandler, DefaultLinkHandler);
-  }
-
-  var BrowserHistory = exports.BrowserHistory = (_temp = _class = function (_History) {
-    _inherits(BrowserHistory, _History);
-
-    function BrowserHistory(linkHandler) {
-      
-
-      var _this2 = _possibleConstructorReturn(this, _History.call(this));
-
-      _this2._isActive = false;
-      _this2._checkUrlCallback = _this2._checkUrl.bind(_this2);
-
-      _this2.location = _aureliaPal.PLATFORM.location;
-      _this2.history = _aureliaPal.PLATFORM.history;
-      _this2.linkHandler = linkHandler;
-      return _this2;
-    }
-
-    BrowserHistory.prototype.activate = function activate(options) {
-      if (this._isActive) {
-        throw new Error('History has already been activated.');
-      }
-
-      var wantsPushState = !!options.pushState;
-
-      this._isActive = true;
-      this.options = Object.assign({}, { root: '/' }, this.options, options);
-
-      this.root = ('/' + this.options.root + '/').replace(rootStripper, '/');
-
-      this._wantsHashChange = this.options.hashChange !== false;
-      this._hasPushState = !!(this.options.pushState && this.history && this.history.pushState);
-
-      var eventName = void 0;
-      if (this._hasPushState) {
-        eventName = 'popstate';
-      } else if (this._wantsHashChange) {
-        eventName = 'hashchange';
-      }
-
-      _aureliaPal.PLATFORM.addEventListener(eventName, this._checkUrlCallback);
-
-      if (this._wantsHashChange && wantsPushState) {
-        var loc = this.location;
-        var atRoot = loc.pathname.replace(/[^\/]$/, '$&/') === this.root;
-
-        if (!this._hasPushState && !atRoot) {
-          this.fragment = this._getFragment(null, true);
-          this.location.replace(this.root + this.location.search + '#' + this.fragment);
-
-          return true;
-        } else if (this._hasPushState && atRoot && loc.hash) {
-          this.fragment = this._getHash().replace(routeStripper, '');
-          this.history.replaceState({}, _aureliaPal.DOM.title, this.root + this.fragment + loc.search);
-        }
-      }
-
-      if (!this.fragment) {
-        this.fragment = this._getFragment();
-      }
-
-      this.linkHandler.activate(this);
-
-      if (!this.options.silent) {
-        return this._loadUrl();
-      }
-    };
-
-    BrowserHistory.prototype.deactivate = function deactivate() {
-      _aureliaPal.PLATFORM.removeEventListener('popstate', this._checkUrlCallback);
-      _aureliaPal.PLATFORM.removeEventListener('hashchange', this._checkUrlCallback);
-      this._isActive = false;
-      this.linkHandler.deactivate();
-    };
-
-    BrowserHistory.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
-      var origin = createOrigin(this.location.protocol, this.location.hostname, this.location.port);
-      return '' + origin + this.root;
-    };
-
-    BrowserHistory.prototype.navigate = function navigate(fragment) {
-      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-          _ref$trigger = _ref.trigger,
-          trigger = _ref$trigger === undefined ? true : _ref$trigger,
-          _ref$replace = _ref.replace,
-          replace = _ref$replace === undefined ? false : _ref$replace;
-
-      if (fragment && absoluteUrl.test(fragment)) {
-        this.location.href = fragment;
-        return true;
-      }
-
-      if (!this._isActive) {
-        return false;
-      }
-
-      fragment = this._getFragment(fragment || '');
-
-      if (this.fragment === fragment && !replace) {
-        return false;
-      }
-
-      this.fragment = fragment;
-
-      var url = this.root + fragment;
-
-      if (fragment === '' && url !== '/') {
-        url = url.slice(0, -1);
-      }
-
-      if (this._hasPushState) {
-        url = url.replace('//', '/');
-        this.history[replace ? 'replaceState' : 'pushState']({}, _aureliaPal.DOM.title, url);
-      } else if (this._wantsHashChange) {
-        updateHash(this.location, fragment, replace);
-      } else {
-        this.location.assign(url);
-      }
-
-      if (trigger) {
-        return this._loadUrl(fragment);
-      }
-
-      return true;
-    };
-
-    BrowserHistory.prototype.navigateBack = function navigateBack() {
-      this.history.back();
-    };
-
-    BrowserHistory.prototype.setTitle = function setTitle(title) {
-      _aureliaPal.DOM.title = title;
-    };
-
-    BrowserHistory.prototype.setState = function setState(key, value) {
-      var state = Object.assign({}, this.history.state);
-      var _location = this.location,
-          pathname = _location.pathname,
-          search = _location.search,
-          hash = _location.hash;
-
-      state[key] = value;
-      this.history.replaceState(state, null, '' + pathname + search + hash);
-    };
-
-    BrowserHistory.prototype.getState = function getState(key) {
-      var state = Object.assign({}, this.history.state);
-      return state[key];
-    };
-
-    BrowserHistory.prototype.getHistoryIndex = function getHistoryIndex() {
-      var historyIndex = this.getState('HistoryIndex');
-      if (historyIndex === undefined) {
-        historyIndex = this.history.length - 1;
-        this.setState('HistoryIndex', historyIndex);
-      }
-      return historyIndex;
-    };
-
-    BrowserHistory.prototype.go = function go(movement) {
-      this.history.go(movement);
-    };
-
-    BrowserHistory.prototype._getHash = function _getHash() {
-      return this.location.hash.substr(1);
-    };
-
-    BrowserHistory.prototype._getFragment = function _getFragment(fragment, forcePushState) {
-      var root = void 0;
-
-      if (!fragment) {
-        if (this._hasPushState || !this._wantsHashChange || forcePushState) {
-          fragment = this.location.pathname + this.location.search;
-          root = this.root.replace(trailingSlash, '');
-          if (!fragment.indexOf(root)) {
-            fragment = fragment.substr(root.length);
-          }
-        } else {
-          fragment = this._getHash();
-        }
-      }
-
-      return '/' + fragment.replace(routeStripper, '');
-    };
-
-    BrowserHistory.prototype._checkUrl = function _checkUrl() {
-      var current = this._getFragment();
-      if (current !== this.fragment) {
-        this._loadUrl();
-      }
-    };
-
-    BrowserHistory.prototype._loadUrl = function _loadUrl(fragmentOverride) {
-      var fragment = this.fragment = this._getFragment(fragmentOverride);
-
-      return this.options.routeHandler ? this.options.routeHandler(fragment) : false;
-    };
-
-    return BrowserHistory;
-  }(_aureliaHistory.History), _class.inject = [LinkHandler], _temp);
-
-  var routeStripper = /^#?\/*|\s+$/g;
-
-  var rootStripper = /^\/+|\/+$/g;
-
-  var trailingSlash = /\/$/;
-
-  var absoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
-
-  function updateHash(location, fragment, replace) {
-    if (replace) {
-      var _href = location.href.replace(/(javascript:|#).*$/, '');
-      location.replace(_href + '#' + fragment);
-    } else {
-      location.hash = '#' + fragment;
-    }
-  }
-
-  function createOrigin(protocol, hostname, port) {
-    return protocol + '//' + hostname + (port ? ':' + port : '');
-  }
-});
-define('aurelia-loader',['exports', 'aurelia-path', 'aurelia-metadata'], function (exports, _aureliaPath, _aureliaMetadata) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Loader = exports.TemplateRegistryEntry = exports.TemplateDependency = undefined;
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  
-
-  var TemplateDependency = exports.TemplateDependency = function TemplateDependency(src, name) {
-    
-
-    this.src = src;
-    this.name = name;
+  var logLevel = exports.logLevel = {
+    none: 0,
+    error: 10,
+    warn: 20,
+    info: 30,
+    debug: 40
   };
 
-  var TemplateRegistryEntry = exports.TemplateRegistryEntry = function () {
-    function TemplateRegistryEntry(address) {
-      
+  var loggers = {};
+  var appenders = [];
+  var globalDefaultLevel = logLevel.none;
 
-      this.templateIsLoaded = false;
-      this.factoryIsReady = false;
-      this.resources = null;
-      this.dependencies = null;
+  var standardLevels = ['none', 'error', 'warn', 'info', 'debug'];
+  function isStandardLevel(level) {
+    return standardLevels.filter(function (l) {
+      return l === level;
+    }).length > 0;
+  }
 
-      this.address = address;
-      this.onReady = null;
-      this._template = null;
-      this._factory = null;
-    }
+  function appendArgs() {
+    return [this].concat(Array.prototype.slice.call(arguments));
+  }
 
-    TemplateRegistryEntry.prototype.addDependency = function addDependency(src, name) {
-      var finalSrc = typeof src === 'string' ? (0, _aureliaPath.relativeToFile)(src, this.address) : _aureliaMetadata.Origin.get(src).moduleId;
+  function logFactory(level) {
+    var threshold = logLevel[level];
+    return function () {
+      if (this.level < threshold) {
+        return;
+      }
 
-      this.dependencies.push(new TemplateDependency(finalSrc, name));
+      var args = appendArgs.apply(this, arguments);
+      var i = appenders.length;
+      while (i--) {
+        var _appenders$i;
+
+        (_appenders$i = appenders[i])[level].apply(_appenders$i, args);
+      }
     };
+  }
 
-    _createClass(TemplateRegistryEntry, [{
-      key: 'template',
-      get: function get() {
-        return this._template;
-      },
-      set: function set(value) {
-        var address = this.address;
-        var requires = void 0;
-        var current = void 0;
-        var src = void 0;
-        var dependencies = void 0;
+  function logFactoryCustom(level) {
+    var threshold = logLevel[level];
+    return function () {
+      if (this.level < threshold) {
+        return;
+      }
 
-        this._template = value;
-        this.templateIsLoaded = true;
-
-        requires = value.content.querySelectorAll('require');
-        dependencies = this.dependencies = new Array(requires.length);
-
-        for (var i = 0, ii = requires.length; i < ii; ++i) {
-          current = requires[i];
-          src = current.getAttribute('from');
-
-          if (!src) {
-            throw new Error('<require> element in ' + address + ' has no "from" attribute.');
-          }
-
-          dependencies[i] = new TemplateDependency((0, _aureliaPath.relativeToFile)(src, address), current.getAttribute('as'));
-
-          if (current.parentNode) {
-            current.parentNode.removeChild(current);
-          }
+      var args = appendArgs.apply(this, arguments);
+      var i = appenders.length;
+      while (i--) {
+        var appender = appenders[i];
+        if (appender[level] !== undefined) {
+          appender[level].apply(appender, args);
         }
       }
-    }, {
-      key: 'factory',
-      get: function get() {
-        return this._factory;
-      },
-      set: function set(value) {
-        this._factory = value;
-        this.factoryIsReady = true;
+    };
+  }
+
+  function connectLoggers() {
+    var proto = Logger.prototype;
+    for (var _level in logLevel) {
+      if (isStandardLevel(_level)) {
+        if (_level !== 'none') {
+          proto[_level] = logFactory(_level);
+        }
+      } else {
+        proto[_level] = logFactoryCustom(_level);
       }
-    }]);
+    }
+  }
 
-    return TemplateRegistryEntry;
-  }();
+  function disconnectLoggers() {
+    var proto = Logger.prototype;
+    for (var _level2 in logLevel) {
+      if (_level2 !== 'none') {
+        proto[_level2] = function () {};
+      }
+    }
+  }
 
-  var Loader = exports.Loader = function () {
-    function Loader() {
-      
+  function getLogger(id) {
+    return loggers[id] || new Logger(id);
+  }
 
-      this.templateRegistry = {};
+  function addAppender(appender) {
+    if (appenders.push(appender) === 1) {
+      connectLoggers();
+    }
+  }
+
+  function removeAppender(appender) {
+    appenders = appenders.filter(function (a) {
+      return a !== appender;
+    });
+  }
+
+  function getAppenders() {
+    return [].concat(appenders);
+  }
+
+  function clearAppenders() {
+    appenders = [];
+    disconnectLoggers();
+  }
+
+  function addCustomLevel(name, value) {
+    if (logLevel[name] !== undefined) {
+      throw Error('Log level "' + name + '" already exists.');
     }
 
-    Loader.prototype.map = function map(id, source) {
-      throw new Error('Loaders must implement map(id, source).');
+    if (isNaN(value)) {
+      throw Error('Value must be a number.');
+    }
+
+    logLevel[name] = value;
+
+    if (appenders.length > 0) {
+      connectLoggers();
+    } else {
+      Logger.prototype[name] = function () {};
+    }
+  }
+
+  function removeCustomLevel(name) {
+    if (logLevel[name] === undefined) {
+      return;
+    }
+
+    if (isStandardLevel(name)) {
+      throw Error('Built-in log level "' + name + '" cannot be removed.');
+    }
+
+    delete logLevel[name];
+    delete Logger.prototype[name];
+  }
+
+  function setLevel(level) {
+    globalDefaultLevel = level;
+    for (var key in loggers) {
+      loggers[key].setLevel(level);
+    }
+  }
+
+  function getLevel() {
+    return globalDefaultLevel;
+  }
+
+  var Logger = exports.Logger = function () {
+    function Logger(id) {
+      
+
+      var cached = loggers[id];
+      if (cached) {
+        return cached;
+      }
+
+      loggers[id] = this;
+      this.id = id;
+      this.level = globalDefaultLevel;
+    }
+
+    Logger.prototype.debug = function debug(message) {};
+
+    Logger.prototype.info = function info(message) {};
+
+    Logger.prototype.warn = function warn(message) {};
+
+    Logger.prototype.error = function error(message) {};
+
+    Logger.prototype.setLevel = function setLevel(level) {
+      this.level = level;
     };
 
-    Loader.prototype.normalizeSync = function normalizeSync(moduleId, relativeTo) {
-      throw new Error('Loaders must implement normalizeSync(moduleId, relativeTo).');
-    };
-
-    Loader.prototype.normalize = function normalize(moduleId, relativeTo) {
-      throw new Error('Loaders must implement normalize(moduleId: string, relativeTo: string): Promise<string>.');
-    };
-
-    Loader.prototype.loadModule = function loadModule(id) {
-      throw new Error('Loaders must implement loadModule(id).');
-    };
-
-    Loader.prototype.loadAllModules = function loadAllModules(ids) {
-      throw new Error('Loader must implement loadAllModules(ids).');
-    };
-
-    Loader.prototype.loadTemplate = function loadTemplate(url) {
-      throw new Error('Loader must implement loadTemplate(url).');
-    };
-
-    Loader.prototype.loadText = function loadText(url) {
-      throw new Error('Loader must implement loadText(url).');
-    };
-
-    Loader.prototype.applyPluginToUrl = function applyPluginToUrl(url, pluginName) {
-      throw new Error('Loader must implement applyPluginToUrl(url, pluginName).');
-    };
-
-    Loader.prototype.addPlugin = function addPlugin(pluginName, implementation) {
-      throw new Error('Loader must implement addPlugin(pluginName, implementation).');
-    };
-
-    Loader.prototype.getOrCreateTemplateRegistryEntry = function getOrCreateTemplateRegistryEntry(address) {
-      return this.templateRegistry[address] || (this.templateRegistry[address] = new TemplateRegistryEntry(address));
-    };
-
-    return Loader;
+    return Logger;
   }();
 });
 define('aurelia-loader-default',['exports', 'aurelia-loader', 'aurelia-pal', 'aurelia-metadata'], function (exports, _aureliaLoader, _aureliaPal, _aureliaMetadata) {
@@ -14106,198 +14300,61 @@ define('aurelia-loader-default',['exports', 'aurelia-loader', 'aurelia-pal', 'au
     };
   }
 });
-define('aurelia-logging',['exports'], function (exports) {
-  'use strict';
+define('aurelia-logging-console',["exports"], function (exports) {
+  "use strict";
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.getLogger = getLogger;
-  exports.addAppender = addAppender;
-  exports.removeAppender = removeAppender;
-  exports.getAppenders = getAppenders;
-  exports.clearAppenders = clearAppenders;
-  exports.addCustomLevel = addCustomLevel;
-  exports.removeCustomLevel = removeCustomLevel;
-  exports.setLevel = setLevel;
-  exports.getLevel = getLevel;
 
   
 
-  var logLevel = exports.logLevel = {
-    none: 0,
-    error: 10,
-    warn: 20,
-    info: 30,
-    debug: 40
-  };
-
-  var loggers = {};
-  var appenders = [];
-  var globalDefaultLevel = logLevel.none;
-
-  var standardLevels = ['none', 'error', 'warn', 'info', 'debug'];
-  function isStandardLevel(level) {
-    return standardLevels.filter(function (l) {
-      return l === level;
-    }).length > 0;
-  }
-
-  function appendArgs() {
-    return [this].concat(Array.prototype.slice.call(arguments));
-  }
-
-  function logFactory(level) {
-    var threshold = logLevel[level];
-    return function () {
-      if (this.level < threshold) {
-        return;
-      }
-
-      var args = appendArgs.apply(this, arguments);
-      var i = appenders.length;
-      while (i--) {
-        var _appenders$i;
-
-        (_appenders$i = appenders[i])[level].apply(_appenders$i, args);
-      }
-    };
-  }
-
-  function logFactoryCustom(level) {
-    var threshold = logLevel[level];
-    return function () {
-      if (this.level < threshold) {
-        return;
-      }
-
-      var args = appendArgs.apply(this, arguments);
-      var i = appenders.length;
-      while (i--) {
-        var appender = appenders[i];
-        if (appender[level] !== undefined) {
-          appender[level].apply(appender, args);
-        }
-      }
-    };
-  }
-
-  function connectLoggers() {
-    var proto = Logger.prototype;
-    for (var _level in logLevel) {
-      if (isStandardLevel(_level)) {
-        if (_level !== 'none') {
-          proto[_level] = logFactory(_level);
-        }
-      } else {
-        proto[_level] = logFactoryCustom(_level);
-      }
-    }
-  }
-
-  function disconnectLoggers() {
-    var proto = Logger.prototype;
-    for (var _level2 in logLevel) {
-      if (_level2 !== 'none') {
-        proto[_level2] = function () {};
-      }
-    }
-  }
-
-  function getLogger(id) {
-    return loggers[id] || new Logger(id);
-  }
-
-  function addAppender(appender) {
-    if (appenders.push(appender) === 1) {
-      connectLoggers();
-    }
-  }
-
-  function removeAppender(appender) {
-    appenders = appenders.filter(function (a) {
-      return a !== appender;
-    });
-  }
-
-  function getAppenders() {
-    return [].concat(appenders);
-  }
-
-  function clearAppenders() {
-    appenders = [];
-    disconnectLoggers();
-  }
-
-  function addCustomLevel(name, value) {
-    if (logLevel[name] !== undefined) {
-      throw Error('Log level "' + name + '" already exists.');
-    }
-
-    if (isNaN(value)) {
-      throw Error('Value must be a number.');
-    }
-
-    logLevel[name] = value;
-
-    if (appenders.length > 0) {
-      connectLoggers();
-    } else {
-      Logger.prototype[name] = function () {};
-    }
-  }
-
-  function removeCustomLevel(name) {
-    if (logLevel[name] === undefined) {
-      return;
-    }
-
-    if (isStandardLevel(name)) {
-      throw Error('Built-in log level "' + name + '" cannot be removed.');
-    }
-
-    delete logLevel[name];
-    delete Logger.prototype[name];
-  }
-
-  function setLevel(level) {
-    globalDefaultLevel = level;
-    for (var key in loggers) {
-      loggers[key].setLevel(level);
-    }
-  }
-
-  function getLevel() {
-    return globalDefaultLevel;
-  }
-
-  var Logger = exports.Logger = function () {
-    function Logger(id) {
+  var ConsoleAppender = exports.ConsoleAppender = function () {
+    function ConsoleAppender() {
       
-
-      var cached = loggers[id];
-      if (cached) {
-        return cached;
-      }
-
-      loggers[id] = this;
-      this.id = id;
-      this.level = globalDefaultLevel;
     }
 
-    Logger.prototype.debug = function debug(message) {};
+    ConsoleAppender.prototype.debug = function debug(logger) {
+      var _console;
 
-    Logger.prototype.info = function info(message) {};
+      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        rest[_key - 1] = arguments[_key];
+      }
 
-    Logger.prototype.warn = function warn(message) {};
-
-    Logger.prototype.error = function error(message) {};
-
-    Logger.prototype.setLevel = function setLevel(level) {
-      this.level = level;
+      (_console = console).debug.apply(_console, ["DEBUG [" + logger.id + "]"].concat(rest));
     };
 
-    return Logger;
+    ConsoleAppender.prototype.info = function info(logger) {
+      var _console2;
+
+      for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        rest[_key2 - 1] = arguments[_key2];
+      }
+
+      (_console2 = console).info.apply(_console2, ["INFO [" + logger.id + "]"].concat(rest));
+    };
+
+    ConsoleAppender.prototype.warn = function warn(logger) {
+      var _console3;
+
+      for (var _len3 = arguments.length, rest = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+        rest[_key3 - 1] = arguments[_key3];
+      }
+
+      (_console3 = console).warn.apply(_console3, ["WARN [" + logger.id + "]"].concat(rest));
+    };
+
+    ConsoleAppender.prototype.error = function error(logger) {
+      var _console4;
+
+      for (var _len4 = arguments.length, rest = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+        rest[_key4 - 1] = arguments[_key4];
+      }
+
+      (_console4 = console).error.apply(_console4, ["ERROR [" + logger.id + "]"].concat(rest));
+    };
+
+    return ConsoleAppender;
   }();
 });
 define('aurelia-metadata',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
@@ -14685,63 +14742,6 @@ define('aurelia-pal',['exports'], function (exports) {
   function reset() {
     exports.isInitialized = isInitialized = false;
   }
-});
-define('aurelia-logging-console',["exports"], function (exports) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  
-
-  var ConsoleAppender = exports.ConsoleAppender = function () {
-    function ConsoleAppender() {
-      
-    }
-
-    ConsoleAppender.prototype.debug = function debug(logger) {
-      var _console;
-
-      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        rest[_key - 1] = arguments[_key];
-      }
-
-      (_console = console).debug.apply(_console, ["DEBUG [" + logger.id + "]"].concat(rest));
-    };
-
-    ConsoleAppender.prototype.info = function info(logger) {
-      var _console2;
-
-      for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-        rest[_key2 - 1] = arguments[_key2];
-      }
-
-      (_console2 = console).info.apply(_console2, ["INFO [" + logger.id + "]"].concat(rest));
-    };
-
-    ConsoleAppender.prototype.warn = function warn(logger) {
-      var _console3;
-
-      for (var _len3 = arguments.length, rest = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-        rest[_key3 - 1] = arguments[_key3];
-      }
-
-      (_console3 = console).warn.apply(_console3, ["WARN [" + logger.id + "]"].concat(rest));
-    };
-
-    ConsoleAppender.prototype.error = function error(logger) {
-      var _console4;
-
-      for (var _len4 = arguments.length, rest = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-        rest[_key4 - 1] = arguments[_key4];
-      }
-
-      (_console4 = console).error.apply(_console4, ["ERROR [" + logger.id + "]"].concat(rest));
-    };
-
-    return ConsoleAppender;
-  }();
 });
 define('aurelia-pal-browser',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
   'use strict';
@@ -27902,22 +27902,6 @@ define('text!humane-js/themes/original.css', ['module'], function(module) { modu
 ;define('toastr', ['toastr/toastr'], function (main) { return main; });
 
 define('text!toastr/build/toastr.min.css', ['module'], function(module) { module.exports = ".toast-title{font-weight:700}.toast-message{-ms-word-wrap:break-word;word-wrap:break-word}.toast-message a,.toast-message label{color:#FFF}.toast-message a:hover{color:#CCC;text-decoration:none}.toast-close-button{position:relative;right:-.3em;top:-.3em;float:right;font-size:20px;font-weight:700;color:#FFF;-webkit-text-shadow:0 1px 0 #fff;text-shadow:0 1px 0 #fff;opacity:.8;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=80);filter:alpha(opacity=80);line-height:1}.toast-close-button:focus,.toast-close-button:hover{color:#000;text-decoration:none;cursor:pointer;opacity:.4;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=40);filter:alpha(opacity=40)}.rtl .toast-close-button{left:-.3em;float:left;right:.3em}button.toast-close-button{padding:0;cursor:pointer;background:0 0;border:0;-webkit-appearance:none}.toast-top-center{top:0;right:0;width:100%}.toast-bottom-center{bottom:0;right:0;width:100%}.toast-top-full-width{top:0;right:0;width:100%}.toast-bottom-full-width{bottom:0;right:0;width:100%}.toast-top-left{top:12px;left:12px}.toast-top-right{top:12px;right:12px}.toast-bottom-right{right:12px;bottom:12px}.toast-bottom-left{bottom:12px;left:12px}#toast-container{position:fixed;z-index:999999;pointer-events:none}#toast-container *{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}#toast-container>div{position:relative;pointer-events:auto;overflow:hidden;margin:0 0 6px;padding:15px 15px 15px 50px;width:300px;-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;background-position:15px center;background-repeat:no-repeat;-moz-box-shadow:0 0 12px #999;-webkit-box-shadow:0 0 12px #999;box-shadow:0 0 12px #999;color:#FFF;opacity:.8;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=80);filter:alpha(opacity=80)}#toast-container>div.rtl{direction:rtl;padding:15px 50px 15px 15px;background-position:right 15px center}#toast-container>div:hover{-moz-box-shadow:0 0 12px #000;-webkit-box-shadow:0 0 12px #000;box-shadow:0 0 12px #000;opacity:1;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);filter:alpha(opacity=100);cursor:pointer}#toast-container>.toast-info{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGwSURBVEhLtZa9SgNBEMc9sUxxRcoUKSzSWIhXpFMhhYWFhaBg4yPYiWCXZxBLERsLRS3EQkEfwCKdjWJAwSKCgoKCcudv4O5YLrt7EzgXhiU3/4+b2ckmwVjJSpKkQ6wAi4gwhT+z3wRBcEz0yjSseUTrcRyfsHsXmD0AmbHOC9Ii8VImnuXBPglHpQ5wwSVM7sNnTG7Za4JwDdCjxyAiH3nyA2mtaTJufiDZ5dCaqlItILh1NHatfN5skvjx9Z38m69CgzuXmZgVrPIGE763Jx9qKsRozWYw6xOHdER+nn2KkO+Bb+UV5CBN6WC6QtBgbRVozrahAbmm6HtUsgtPC19tFdxXZYBOfkbmFJ1VaHA1VAHjd0pp70oTZzvR+EVrx2Ygfdsq6eu55BHYR8hlcki+n+kERUFG8BrA0BwjeAv2M8WLQBtcy+SD6fNsmnB3AlBLrgTtVW1c2QN4bVWLATaIS60J2Du5y1TiJgjSBvFVZgTmwCU+dAZFoPxGEEs8nyHC9Bwe2GvEJv2WXZb0vjdyFT4Cxk3e/kIqlOGoVLwwPevpYHT+00T+hWwXDf4AJAOUqWcDhbwAAAAASUVORK5CYII=)!important}#toast-container>.toast-error{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHOSURBVEhLrZa/SgNBEMZzh0WKCClSCKaIYOED+AAKeQQLG8HWztLCImBrYadgIdY+gIKNYkBFSwu7CAoqCgkkoGBI/E28PdbLZmeDLgzZzcx83/zZ2SSXC1j9fr+I1Hq93g2yxH4iwM1vkoBWAdxCmpzTxfkN2RcyZNaHFIkSo10+8kgxkXIURV5HGxTmFuc75B2RfQkpxHG8aAgaAFa0tAHqYFfQ7Iwe2yhODk8+J4C7yAoRTWI3w/4klGRgR4lO7Rpn9+gvMyWp+uxFh8+H+ARlgN1nJuJuQAYvNkEnwGFck18Er4q3egEc/oO+mhLdKgRyhdNFiacC0rlOCbhNVz4H9FnAYgDBvU3QIioZlJFLJtsoHYRDfiZoUyIxqCtRpVlANq0EU4dApjrtgezPFad5S19Wgjkc0hNVnuF4HjVA6C7QrSIbylB+oZe3aHgBsqlNqKYH48jXyJKMuAbiyVJ8KzaB3eRc0pg9VwQ4niFryI68qiOi3AbjwdsfnAtk0bCjTLJKr6mrD9g8iq/S/B81hguOMlQTnVyG40wAcjnmgsCNESDrjme7wfftP4P7SP4N3CJZdvzoNyGq2c/HWOXJGsvVg+RA/k2MC/wN6I2YA2Pt8GkAAAAASUVORK5CYII=)!important}#toast-container>.toast-success{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADsSURBVEhLY2AYBfQMgf///3P8+/evAIgvA/FsIF+BavYDDWMBGroaSMMBiE8VC7AZDrIFaMFnii3AZTjUgsUUWUDA8OdAH6iQbQEhw4HyGsPEcKBXBIC4ARhex4G4BsjmweU1soIFaGg/WtoFZRIZdEvIMhxkCCjXIVsATV6gFGACs4Rsw0EGgIIH3QJYJgHSARQZDrWAB+jawzgs+Q2UO49D7jnRSRGoEFRILcdmEMWGI0cm0JJ2QpYA1RDvcmzJEWhABhD/pqrL0S0CWuABKgnRki9lLseS7g2AlqwHWQSKH4oKLrILpRGhEQCw2LiRUIa4lwAAAABJRU5ErkJggg==)!important}#toast-container>.toast-warning{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGYSURBVEhL5ZSvTsNQFMbXZGICMYGYmJhAQIJAICYQPAACiSDB8AiICQQJT4CqQEwgJvYASAQCiZiYmJhAIBATCARJy+9rTsldd8sKu1M0+dLb057v6/lbq/2rK0mS/TRNj9cWNAKPYIJII7gIxCcQ51cvqID+GIEX8ASG4B1bK5gIZFeQfoJdEXOfgX4QAQg7kH2A65yQ87lyxb27sggkAzAuFhbbg1K2kgCkB1bVwyIR9m2L7PRPIhDUIXgGtyKw575yz3lTNs6X4JXnjV+LKM/m3MydnTbtOKIjtz6VhCBq4vSm3ncdrD2lk0VgUXSVKjVDJXJzijW1RQdsU7F77He8u68koNZTz8Oz5yGa6J3H3lZ0xYgXBK2QymlWWA+RWnYhskLBv2vmE+hBMCtbA7KX5drWyRT/2JsqZ2IvfB9Y4bWDNMFbJRFmC9E74SoS0CqulwjkC0+5bpcV1CZ8NMej4pjy0U+doDQsGyo1hzVJttIjhQ7GnBtRFN1UarUlH8F3xict+HY07rEzoUGPlWcjRFRr4/gChZgc3ZL2d8oAAAAASUVORK5CYII=)!important}#toast-container.toast-bottom-center>div,#toast-container.toast-top-center>div{width:300px;margin-left:auto;margin-right:auto}#toast-container.toast-bottom-full-width>div,#toast-container.toast-top-full-width>div{width:96%;margin-left:auto;margin-right:auto}.toast{background-color:#030303}.toast-success{background-color:#51A351}.toast-error{background-color:#BD362F}.toast-info{background-color:#2F96B4}.toast-warning{background-color:#F89406}.toast-progress{position:absolute;left:0;bottom:0;height:4px;background-color:#000;opacity:.4;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=40);filter:alpha(opacity=40)}@media all and (max-width:240px){#toast-container>div{padding:8px 8px 8px 50px;width:11em}#toast-container>div.rtl{padding:8px 50px 8px 8px}#toast-container .toast-close-button{right:-.2em;top:-.2em}#toast-container .rtl .toast-close-button{left:-.2em;right:.2em}}@media all and (min-width:241px) and (max-width:480px){#toast-container>div{padding:8px 8px 8px 50px;width:18em}#toast-container>div.rtl{padding:8px 50px 8px 8px}#toast-container .toast-close-button{right:-.2em;top:-.2em}#toast-container .rtl .toast-close-button{left:-.2em;right:.2em}}@media all and (min-width:481px) and (max-width:768px){#toast-container>div{padding:15px 15px 15px 50px;width:25em}#toast-container>div.rtl{padding:15px 50px 15px 15px}}"; });
-define('i18next/index',['require','exports','module','./i18next'],function (require, exports, module) {'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _i18next = require('./i18next');
-
-var _i18next2 = _interopRequireDefault(_i18next);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = _i18next2.default;
-});
-;define('i18next', ['i18next/index'], function (main) { return main; });
-
 define('aurelia-i18n/aurelia-i18n',['exports', 'aurelia-logging', 'aurelia-event-aggregator', 'aurelia-templating', 'aurelia-loader', 'aurelia-templating-resources', 'aurelia-pal', './i18n', './relativeTime', './df', './nf', './rt', './t', './base-i18n', './aurelia-i18n-loader'], function (exports, _aureliaLogging, _aureliaEventAggregator, _aureliaTemplating, _aureliaLoader, _aureliaTemplatingResources, _aureliaPal, _i18n, _relativeTime, _df, _nf, _rt, _t, _baseI18n, _aureliaI18nLoader) {
   'use strict';
 
@@ -28038,485 +28022,6 @@ define('aurelia-i18n/aurelia-i18n',['exports', 'aurelia-logging', 'aurelia-event
   exports.Backend = _aureliaI18nLoader.Backend;
 });;define('aurelia-i18n', ['aurelia-i18n/aurelia-i18n'], function (main) { return main; });
 
-/*
- * Toastr
- * Copyright 2012-2015
- * Authors: John Papa, Hans Fjällemark, and Tim Ferrell.
- * All Rights Reserved.
- * Use, reproduction, distribution, and modification of this code is subject to the terms and
- * conditions of the MIT license, available at http://www.opensource.org/licenses/mit-license.php
- *
- * ARIA Support: Greta Krafsig
- *
- * Project: https://github.com/CodeSeven/toastr
- */
-/* global define */
-(function (define) {
-    define('toastr/toastr',['jquery'], function ($) {
-        return (function () {
-            var $container;
-            var listener;
-            var toastId = 0;
-            var toastType = {
-                error: 'error',
-                info: 'info',
-                success: 'success',
-                warning: 'warning'
-            };
-
-            var toastr = {
-                clear: clear,
-                remove: remove,
-                error: error,
-                getContainer: getContainer,
-                info: info,
-                options: {},
-                subscribe: subscribe,
-                success: success,
-                version: '2.1.4',
-                warning: warning
-            };
-
-            var previousToast;
-
-            return toastr;
-
-            ////////////////
-
-            function error(message, title, optionsOverride) {
-                return notify({
-                    type: toastType.error,
-                    iconClass: getOptions().iconClasses.error,
-                    message: message,
-                    optionsOverride: optionsOverride,
-                    title: title
-                });
-            }
-
-            function getContainer(options, create) {
-                if (!options) { options = getOptions(); }
-                $container = $('#' + options.containerId);
-                if ($container.length) {
-                    return $container;
-                }
-                if (create) {
-                    $container = createContainer(options);
-                }
-                return $container;
-            }
-
-            function info(message, title, optionsOverride) {
-                return notify({
-                    type: toastType.info,
-                    iconClass: getOptions().iconClasses.info,
-                    message: message,
-                    optionsOverride: optionsOverride,
-                    title: title
-                });
-            }
-
-            function subscribe(callback) {
-                listener = callback;
-            }
-
-            function success(message, title, optionsOverride) {
-                return notify({
-                    type: toastType.success,
-                    iconClass: getOptions().iconClasses.success,
-                    message: message,
-                    optionsOverride: optionsOverride,
-                    title: title
-                });
-            }
-
-            function warning(message, title, optionsOverride) {
-                return notify({
-                    type: toastType.warning,
-                    iconClass: getOptions().iconClasses.warning,
-                    message: message,
-                    optionsOverride: optionsOverride,
-                    title: title
-                });
-            }
-
-            function clear($toastElement, clearOptions) {
-                var options = getOptions();
-                if (!$container) { getContainer(options); }
-                if (!clearToast($toastElement, options, clearOptions)) {
-                    clearContainer(options);
-                }
-            }
-
-            function remove($toastElement) {
-                var options = getOptions();
-                if (!$container) { getContainer(options); }
-                if ($toastElement && $(':focus', $toastElement).length === 0) {
-                    removeToast($toastElement);
-                    return;
-                }
-                if ($container.children().length) {
-                    $container.remove();
-                }
-            }
-
-            // internal functions
-
-            function clearContainer (options) {
-                var toastsToClear = $container.children();
-                for (var i = toastsToClear.length - 1; i >= 0; i--) {
-                    clearToast($(toastsToClear[i]), options);
-                }
-            }
-
-            function clearToast ($toastElement, options, clearOptions) {
-                var force = clearOptions && clearOptions.force ? clearOptions.force : false;
-                if ($toastElement && (force || $(':focus', $toastElement).length === 0)) {
-                    $toastElement[options.hideMethod]({
-                        duration: options.hideDuration,
-                        easing: options.hideEasing,
-                        complete: function () { removeToast($toastElement); }
-                    });
-                    return true;
-                }
-                return false;
-            }
-
-            function createContainer(options) {
-                $container = $('<div/>')
-                    .attr('id', options.containerId)
-                    .addClass(options.positionClass);
-
-                $container.appendTo($(options.target));
-                return $container;
-            }
-
-            function getDefaults() {
-                return {
-                    tapToDismiss: true,
-                    toastClass: 'toast',
-                    containerId: 'toast-container',
-                    debug: false,
-
-                    showMethod: 'fadeIn', //fadeIn, slideDown, and show are built into jQuery
-                    showDuration: 300,
-                    showEasing: 'swing', //swing and linear are built into jQuery
-                    onShown: undefined,
-                    hideMethod: 'fadeOut',
-                    hideDuration: 1000,
-                    hideEasing: 'swing',
-                    onHidden: undefined,
-                    closeMethod: false,
-                    closeDuration: false,
-                    closeEasing: false,
-                    closeOnHover: true,
-
-                    extendedTimeOut: 1000,
-                    iconClasses: {
-                        error: 'toast-error',
-                        info: 'toast-info',
-                        success: 'toast-success',
-                        warning: 'toast-warning'
-                    },
-                    iconClass: 'toast-info',
-                    positionClass: 'toast-top-right',
-                    timeOut: 5000, // Set timeOut and extendedTimeOut to 0 to make it sticky
-                    titleClass: 'toast-title',
-                    messageClass: 'toast-message',
-                    escapeHtml: false,
-                    target: 'body',
-                    closeHtml: '<button type="button">&times;</button>',
-                    closeClass: 'toast-close-button',
-                    newestOnTop: true,
-                    preventDuplicates: false,
-                    progressBar: false,
-                    progressClass: 'toast-progress',
-                    rtl: false
-                };
-            }
-
-            function publish(args) {
-                if (!listener) { return; }
-                listener(args);
-            }
-
-            function notify(map) {
-                var options = getOptions();
-                var iconClass = map.iconClass || options.iconClass;
-
-                if (typeof (map.optionsOverride) !== 'undefined') {
-                    options = $.extend(options, map.optionsOverride);
-                    iconClass = map.optionsOverride.iconClass || iconClass;
-                }
-
-                if (shouldExit(options, map)) { return; }
-
-                toastId++;
-
-                $container = getContainer(options, true);
-
-                var intervalId = null;
-                var $toastElement = $('<div/>');
-                var $titleElement = $('<div/>');
-                var $messageElement = $('<div/>');
-                var $progressElement = $('<div/>');
-                var $closeElement = $(options.closeHtml);
-                var progressBar = {
-                    intervalId: null,
-                    hideEta: null,
-                    maxHideTime: null
-                };
-                var response = {
-                    toastId: toastId,
-                    state: 'visible',
-                    startTime: new Date(),
-                    options: options,
-                    map: map
-                };
-
-                personalizeToast();
-
-                displayToast();
-
-                handleEvents();
-
-                publish(response);
-
-                if (options.debug && console) {
-                    console.log(response);
-                }
-
-                return $toastElement;
-
-                function escapeHtml(source) {
-                    if (source == null) {
-                        source = '';
-                    }
-
-                    return source
-                        .replace(/&/g, '&amp;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#39;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;');
-                }
-
-                function personalizeToast() {
-                    setIcon();
-                    setTitle();
-                    setMessage();
-                    setCloseButton();
-                    setProgressBar();
-                    setRTL();
-                    setSequence();
-                    setAria();
-                }
-
-                function setAria() {
-                    var ariaValue = '';
-                    switch (map.iconClass) {
-                        case 'toast-success':
-                        case 'toast-info':
-                            ariaValue =  'polite';
-                            break;
-                        default:
-                            ariaValue = 'assertive';
-                    }
-                    $toastElement.attr('aria-live', ariaValue);
-                }
-
-                function handleEvents() {
-                    if (options.closeOnHover) {
-                        $toastElement.hover(stickAround, delayedHideToast);
-                    }
-
-                    if (!options.onclick && options.tapToDismiss) {
-                        $toastElement.click(hideToast);
-                    }
-
-                    if (options.closeButton && $closeElement) {
-                        $closeElement.click(function (event) {
-                            if (event.stopPropagation) {
-                                event.stopPropagation();
-                            } else if (event.cancelBubble !== undefined && event.cancelBubble !== true) {
-                                event.cancelBubble = true;
-                            }
-
-                            if (options.onCloseClick) {
-                                options.onCloseClick(event);
-                            }
-
-                            hideToast(true);
-                        });
-                    }
-
-                    if (options.onclick) {
-                        $toastElement.click(function (event) {
-                            options.onclick(event);
-                            hideToast();
-                        });
-                    }
-                }
-
-                function displayToast() {
-                    $toastElement.hide();
-
-                    $toastElement[options.showMethod](
-                        {duration: options.showDuration, easing: options.showEasing, complete: options.onShown}
-                    );
-
-                    if (options.timeOut > 0) {
-                        intervalId = setTimeout(hideToast, options.timeOut);
-                        progressBar.maxHideTime = parseFloat(options.timeOut);
-                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
-                        if (options.progressBar) {
-                            progressBar.intervalId = setInterval(updateProgress, 10);
-                        }
-                    }
-                }
-
-                function setIcon() {
-                    if (map.iconClass) {
-                        $toastElement.addClass(options.toastClass).addClass(iconClass);
-                    }
-                }
-
-                function setSequence() {
-                    if (options.newestOnTop) {
-                        $container.prepend($toastElement);
-                    } else {
-                        $container.append($toastElement);
-                    }
-                }
-
-                function setTitle() {
-                    if (map.title) {
-                        var suffix = map.title;
-                        if (options.escapeHtml) {
-                            suffix = escapeHtml(map.title);
-                        }
-                        $titleElement.append(suffix).addClass(options.titleClass);
-                        $toastElement.append($titleElement);
-                    }
-                }
-
-                function setMessage() {
-                    if (map.message) {
-                        var suffix = map.message;
-                        if (options.escapeHtml) {
-                            suffix = escapeHtml(map.message);
-                        }
-                        $messageElement.append(suffix).addClass(options.messageClass);
-                        $toastElement.append($messageElement);
-                    }
-                }
-
-                function setCloseButton() {
-                    if (options.closeButton) {
-                        $closeElement.addClass(options.closeClass).attr('role', 'button');
-                        $toastElement.prepend($closeElement);
-                    }
-                }
-
-                function setProgressBar() {
-                    if (options.progressBar) {
-                        $progressElement.addClass(options.progressClass);
-                        $toastElement.prepend($progressElement);
-                    }
-                }
-
-                function setRTL() {
-                    if (options.rtl) {
-                        $toastElement.addClass('rtl');
-                    }
-                }
-
-                function shouldExit(options, map) {
-                    if (options.preventDuplicates) {
-                        if (map.message === previousToast) {
-                            return true;
-                        } else {
-                            previousToast = map.message;
-                        }
-                    }
-                    return false;
-                }
-
-                function hideToast(override) {
-                    var method = override && options.closeMethod !== false ? options.closeMethod : options.hideMethod;
-                    var duration = override && options.closeDuration !== false ?
-                        options.closeDuration : options.hideDuration;
-                    var easing = override && options.closeEasing !== false ? options.closeEasing : options.hideEasing;
-                    if ($(':focus', $toastElement).length && !override) {
-                        return;
-                    }
-                    clearTimeout(progressBar.intervalId);
-                    return $toastElement[method]({
-                        duration: duration,
-                        easing: easing,
-                        complete: function () {
-                            removeToast($toastElement);
-                            clearTimeout(intervalId);
-                            if (options.onHidden && response.state !== 'hidden') {
-                                options.onHidden();
-                            }
-                            response.state = 'hidden';
-                            response.endTime = new Date();
-                            publish(response);
-                        }
-                    });
-                }
-
-                function delayedHideToast() {
-                    if (options.timeOut > 0 || options.extendedTimeOut > 0) {
-                        intervalId = setTimeout(hideToast, options.extendedTimeOut);
-                        progressBar.maxHideTime = parseFloat(options.extendedTimeOut);
-                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
-                    }
-                }
-
-                function stickAround() {
-                    clearTimeout(intervalId);
-                    progressBar.hideEta = 0;
-                    $toastElement.stop(true, true)[options.showMethod](
-                        {duration: options.showDuration, easing: options.showEasing}
-                    );
-                }
-
-                function updateProgress() {
-                    var percentage = ((progressBar.hideEta - (new Date().getTime())) / progressBar.maxHideTime) * 100;
-                    $progressElement.width(percentage + '%');
-                }
-            }
-
-            function getOptions() {
-                return $.extend({}, getDefaults(), toastr.options);
-            }
-
-            function removeToast($toastElement) {
-                if (!$container) { $container = getContainer(); }
-                if ($toastElement.is(':visible')) {
-                    return;
-                }
-                $toastElement.remove();
-                $toastElement = null;
-                if ($container.children().length === 0) {
-                    $container.remove();
-                    previousToast = undefined;
-                }
-            }
-
-        })();
-    });
-}(typeof define === 'function' && define.amd ? define : function (deps, factory) {
-    if (typeof module !== 'undefined' && module.exports) { //Node
-        module.exports = factory(require('jquery'));
-    } else {
-        window.toastr = factory(window.jQuery);
-    }
-}));
-;define('toastr', ['toastr/toastr'], function (main) { return main; });
-
-define('text!toastr/build/toastr.css', ['module'], function(module) { module.exports = ".toast-title {\n  font-weight: bold;\n}\n.toast-message {\n  -ms-word-wrap: break-word;\n  word-wrap: break-word;\n}\n.toast-message a,\n.toast-message label {\n  color: #FFFFFF;\n}\n.toast-message a:hover {\n  color: #CCCCCC;\n  text-decoration: none;\n}\n.toast-close-button {\n  position: relative;\n  right: -0.3em;\n  top: -0.3em;\n  float: right;\n  font-size: 20px;\n  font-weight: bold;\n  color: #FFFFFF;\n  -webkit-text-shadow: 0 1px 0 #ffffff;\n  text-shadow: 0 1px 0 #ffffff;\n  opacity: 0.8;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);\n  filter: alpha(opacity=80);\n  line-height: 1;\n}\n.toast-close-button:hover,\n.toast-close-button:focus {\n  color: #000000;\n  text-decoration: none;\n  cursor: pointer;\n  opacity: 0.4;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n  filter: alpha(opacity=40);\n}\n.rtl .toast-close-button {\n  left: -0.3em;\n  float: left;\n  right: 0.3em;\n}\n/*Additional properties for button version\n iOS requires the button element instead of an anchor tag.\n If you want the anchor version, it requires `href=\"#\"`.*/\nbutton.toast-close-button {\n  padding: 0;\n  cursor: pointer;\n  background: transparent;\n  border: 0;\n  -webkit-appearance: none;\n}\n.toast-top-center {\n  top: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-bottom-center {\n  bottom: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-top-full-width {\n  top: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-bottom-full-width {\n  bottom: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-top-left {\n  top: 12px;\n  left: 12px;\n}\n.toast-top-right {\n  top: 12px;\n  right: 12px;\n}\n.toast-bottom-right {\n  right: 12px;\n  bottom: 12px;\n}\n.toast-bottom-left {\n  bottom: 12px;\n  left: 12px;\n}\n#toast-container {\n  position: fixed;\n  z-index: 999999;\n  pointer-events: none;\n  /*overrides*/\n}\n#toast-container * {\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n#toast-container > div {\n  position: relative;\n  pointer-events: auto;\n  overflow: hidden;\n  margin: 0 0 6px;\n  padding: 15px 15px 15px 50px;\n  width: 300px;\n  -moz-border-radius: 3px 3px 3px 3px;\n  -webkit-border-radius: 3px 3px 3px 3px;\n  border-radius: 3px 3px 3px 3px;\n  background-position: 15px center;\n  background-repeat: no-repeat;\n  -moz-box-shadow: 0 0 12px #999999;\n  -webkit-box-shadow: 0 0 12px #999999;\n  box-shadow: 0 0 12px #999999;\n  color: #FFFFFF;\n  opacity: 0.8;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);\n  filter: alpha(opacity=80);\n}\n#toast-container > div.rtl {\n  direction: rtl;\n  padding: 15px 50px 15px 15px;\n  background-position: right 15px center;\n}\n#toast-container > div:hover {\n  -moz-box-shadow: 0 0 12px #000000;\n  -webkit-box-shadow: 0 0 12px #000000;\n  box-shadow: 0 0 12px #000000;\n  opacity: 1;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n  filter: alpha(opacity=100);\n  cursor: pointer;\n}\n#toast-container > .toast-info {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGwSURBVEhLtZa9SgNBEMc9sUxxRcoUKSzSWIhXpFMhhYWFhaBg4yPYiWCXZxBLERsLRS3EQkEfwCKdjWJAwSKCgoKCcudv4O5YLrt7EzgXhiU3/4+b2ckmwVjJSpKkQ6wAi4gwhT+z3wRBcEz0yjSseUTrcRyfsHsXmD0AmbHOC9Ii8VImnuXBPglHpQ5wwSVM7sNnTG7Za4JwDdCjxyAiH3nyA2mtaTJufiDZ5dCaqlItILh1NHatfN5skvjx9Z38m69CgzuXmZgVrPIGE763Jx9qKsRozWYw6xOHdER+nn2KkO+Bb+UV5CBN6WC6QtBgbRVozrahAbmm6HtUsgtPC19tFdxXZYBOfkbmFJ1VaHA1VAHjd0pp70oTZzvR+EVrx2Ygfdsq6eu55BHYR8hlcki+n+kERUFG8BrA0BwjeAv2M8WLQBtcy+SD6fNsmnB3AlBLrgTtVW1c2QN4bVWLATaIS60J2Du5y1TiJgjSBvFVZgTmwCU+dAZFoPxGEEs8nyHC9Bwe2GvEJv2WXZb0vjdyFT4Cxk3e/kIqlOGoVLwwPevpYHT+00T+hWwXDf4AJAOUqWcDhbwAAAAASUVORK5CYII=\") !important;\n}\n#toast-container > .toast-error {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHOSURBVEhLrZa/SgNBEMZzh0WKCClSCKaIYOED+AAKeQQLG8HWztLCImBrYadgIdY+gIKNYkBFSwu7CAoqCgkkoGBI/E28PdbLZmeDLgzZzcx83/zZ2SSXC1j9fr+I1Hq93g2yxH4iwM1vkoBWAdxCmpzTxfkN2RcyZNaHFIkSo10+8kgxkXIURV5HGxTmFuc75B2RfQkpxHG8aAgaAFa0tAHqYFfQ7Iwe2yhODk8+J4C7yAoRTWI3w/4klGRgR4lO7Rpn9+gvMyWp+uxFh8+H+ARlgN1nJuJuQAYvNkEnwGFck18Er4q3egEc/oO+mhLdKgRyhdNFiacC0rlOCbhNVz4H9FnAYgDBvU3QIioZlJFLJtsoHYRDfiZoUyIxqCtRpVlANq0EU4dApjrtgezPFad5S19Wgjkc0hNVnuF4HjVA6C7QrSIbylB+oZe3aHgBsqlNqKYH48jXyJKMuAbiyVJ8KzaB3eRc0pg9VwQ4niFryI68qiOi3AbjwdsfnAtk0bCjTLJKr6mrD9g8iq/S/B81hguOMlQTnVyG40wAcjnmgsCNESDrjme7wfftP4P7SP4N3CJZdvzoNyGq2c/HWOXJGsvVg+RA/k2MC/wN6I2YA2Pt8GkAAAAASUVORK5CYII=\") !important;\n}\n#toast-container > .toast-success {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADsSURBVEhLY2AYBfQMgf///3P8+/evAIgvA/FsIF+BavYDDWMBGroaSMMBiE8VC7AZDrIFaMFnii3AZTjUgsUUWUDA8OdAH6iQbQEhw4HyGsPEcKBXBIC4ARhex4G4BsjmweU1soIFaGg/WtoFZRIZdEvIMhxkCCjXIVsATV6gFGACs4Rsw0EGgIIH3QJYJgHSARQZDrWAB+jawzgs+Q2UO49D7jnRSRGoEFRILcdmEMWGI0cm0JJ2QpYA1RDvcmzJEWhABhD/pqrL0S0CWuABKgnRki9lLseS7g2AlqwHWQSKH4oKLrILpRGhEQCw2LiRUIa4lwAAAABJRU5ErkJggg==\") !important;\n}\n#toast-container > .toast-warning {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGYSURBVEhL5ZSvTsNQFMbXZGICMYGYmJhAQIJAICYQPAACiSDB8AiICQQJT4CqQEwgJvYASAQCiZiYmJhAIBATCARJy+9rTsldd8sKu1M0+dLb057v6/lbq/2rK0mS/TRNj9cWNAKPYIJII7gIxCcQ51cvqID+GIEX8ASG4B1bK5gIZFeQfoJdEXOfgX4QAQg7kH2A65yQ87lyxb27sggkAzAuFhbbg1K2kgCkB1bVwyIR9m2L7PRPIhDUIXgGtyKw575yz3lTNs6X4JXnjV+LKM/m3MydnTbtOKIjtz6VhCBq4vSm3ncdrD2lk0VgUXSVKjVDJXJzijW1RQdsU7F77He8u68koNZTz8Oz5yGa6J3H3lZ0xYgXBK2QymlWWA+RWnYhskLBv2vmE+hBMCtbA7KX5drWyRT/2JsqZ2IvfB9Y4bWDNMFbJRFmC9E74SoS0CqulwjkC0+5bpcV1CZ8NMej4pjy0U+doDQsGyo1hzVJttIjhQ7GnBtRFN1UarUlH8F3xict+HY07rEzoUGPlWcjRFRr4/gChZgc3ZL2d8oAAAAASUVORK5CYII=\") !important;\n}\n#toast-container.toast-top-center > div,\n#toast-container.toast-bottom-center > div {\n  width: 300px;\n  margin-left: auto;\n  margin-right: auto;\n}\n#toast-container.toast-top-full-width > div,\n#toast-container.toast-bottom-full-width > div {\n  width: 96%;\n  margin-left: auto;\n  margin-right: auto;\n}\n.toast {\n  background-color: #030303;\n}\n.toast-success {\n  background-color: #51A351;\n}\n.toast-error {\n  background-color: #BD362F;\n}\n.toast-info {\n  background-color: #2F96B4;\n}\n.toast-warning {\n  background-color: #F89406;\n}\n.toast-progress {\n  position: absolute;\n  left: 0;\n  bottom: 0;\n  height: 4px;\n  background-color: #000000;\n  opacity: 0.4;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n  filter: alpha(opacity=40);\n}\n/*Responsive Design*/\n@media all and (max-width: 240px) {\n  #toast-container > div {\n    padding: 8px 8px 8px 50px;\n    width: 11em;\n  }\n  #toast-container > div.rtl {\n    padding: 8px 50px 8px 8px;\n  }\n  #toast-container .toast-close-button {\n    right: -0.2em;\n    top: -0.2em;\n  }\n  #toast-container .rtl .toast-close-button {\n    left: -0.2em;\n    right: 0.2em;\n  }\n}\n@media all and (min-width: 241px) and (max-width: 480px) {\n  #toast-container > div {\n    padding: 8px 8px 8px 50px;\n    width: 18em;\n  }\n  #toast-container > div.rtl {\n    padding: 8px 50px 8px 8px;\n  }\n  #toast-container .toast-close-button {\n    right: -0.2em;\n    top: -0.2em;\n  }\n  #toast-container .rtl .toast-close-button {\n    left: -0.2em;\n    right: 0.2em;\n  }\n}\n@media all and (min-width: 481px) and (max-width: 768px) {\n  #toast-container > div {\n    padding: 15px 15px 15px 50px;\n    width: 25em;\n  }\n  #toast-container > div.rtl {\n    padding: 15px 50px 15px 15px;\n  }\n}\n"; });
 define('regenerator-runtime/runtime',['require','exports','module'],function (require, exports, module) {/**
  * Copyright (c) 2014-present, Facebook, Inc.
  *
@@ -29231,6 +28736,690 @@ var regeneratorRuntime = (function (exports) {
 
 });
 ;define('regenerator-runtime', ['regenerator-runtime/runtime'], function (main) { return main; });
+
+/*
+ * Toastr
+ * Copyright 2012-2015
+ * Authors: John Papa, Hans Fjällemark, and Tim Ferrell.
+ * All Rights Reserved.
+ * Use, reproduction, distribution, and modification of this code is subject to the terms and
+ * conditions of the MIT license, available at http://www.opensource.org/licenses/mit-license.php
+ *
+ * ARIA Support: Greta Krafsig
+ *
+ * Project: https://github.com/CodeSeven/toastr
+ */
+/* global define */
+(function (define) {
+    define('toastr/toastr',['jquery'], function ($) {
+        return (function () {
+            var $container;
+            var listener;
+            var toastId = 0;
+            var toastType = {
+                error: 'error',
+                info: 'info',
+                success: 'success',
+                warning: 'warning'
+            };
+
+            var toastr = {
+                clear: clear,
+                remove: remove,
+                error: error,
+                getContainer: getContainer,
+                info: info,
+                options: {},
+                subscribe: subscribe,
+                success: success,
+                version: '2.1.4',
+                warning: warning
+            };
+
+            var previousToast;
+
+            return toastr;
+
+            ////////////////
+
+            function error(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.error,
+                    iconClass: getOptions().iconClasses.error,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function getContainer(options, create) {
+                if (!options) { options = getOptions(); }
+                $container = $('#' + options.containerId);
+                if ($container.length) {
+                    return $container;
+                }
+                if (create) {
+                    $container = createContainer(options);
+                }
+                return $container;
+            }
+
+            function info(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.info,
+                    iconClass: getOptions().iconClasses.info,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function subscribe(callback) {
+                listener = callback;
+            }
+
+            function success(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.success,
+                    iconClass: getOptions().iconClasses.success,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function warning(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.warning,
+                    iconClass: getOptions().iconClasses.warning,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function clear($toastElement, clearOptions) {
+                var options = getOptions();
+                if (!$container) { getContainer(options); }
+                if (!clearToast($toastElement, options, clearOptions)) {
+                    clearContainer(options);
+                }
+            }
+
+            function remove($toastElement) {
+                var options = getOptions();
+                if (!$container) { getContainer(options); }
+                if ($toastElement && $(':focus', $toastElement).length === 0) {
+                    removeToast($toastElement);
+                    return;
+                }
+                if ($container.children().length) {
+                    $container.remove();
+                }
+            }
+
+            // internal functions
+
+            function clearContainer (options) {
+                var toastsToClear = $container.children();
+                for (var i = toastsToClear.length - 1; i >= 0; i--) {
+                    clearToast($(toastsToClear[i]), options);
+                }
+            }
+
+            function clearToast ($toastElement, options, clearOptions) {
+                var force = clearOptions && clearOptions.force ? clearOptions.force : false;
+                if ($toastElement && (force || $(':focus', $toastElement).length === 0)) {
+                    $toastElement[options.hideMethod]({
+                        duration: options.hideDuration,
+                        easing: options.hideEasing,
+                        complete: function () { removeToast($toastElement); }
+                    });
+                    return true;
+                }
+                return false;
+            }
+
+            function createContainer(options) {
+                $container = $('<div/>')
+                    .attr('id', options.containerId)
+                    .addClass(options.positionClass);
+
+                $container.appendTo($(options.target));
+                return $container;
+            }
+
+            function getDefaults() {
+                return {
+                    tapToDismiss: true,
+                    toastClass: 'toast',
+                    containerId: 'toast-container',
+                    debug: false,
+
+                    showMethod: 'fadeIn', //fadeIn, slideDown, and show are built into jQuery
+                    showDuration: 300,
+                    showEasing: 'swing', //swing and linear are built into jQuery
+                    onShown: undefined,
+                    hideMethod: 'fadeOut',
+                    hideDuration: 1000,
+                    hideEasing: 'swing',
+                    onHidden: undefined,
+                    closeMethod: false,
+                    closeDuration: false,
+                    closeEasing: false,
+                    closeOnHover: true,
+
+                    extendedTimeOut: 1000,
+                    iconClasses: {
+                        error: 'toast-error',
+                        info: 'toast-info',
+                        success: 'toast-success',
+                        warning: 'toast-warning'
+                    },
+                    iconClass: 'toast-info',
+                    positionClass: 'toast-top-right',
+                    timeOut: 5000, // Set timeOut and extendedTimeOut to 0 to make it sticky
+                    titleClass: 'toast-title',
+                    messageClass: 'toast-message',
+                    escapeHtml: false,
+                    target: 'body',
+                    closeHtml: '<button type="button">&times;</button>',
+                    closeClass: 'toast-close-button',
+                    newestOnTop: true,
+                    preventDuplicates: false,
+                    progressBar: false,
+                    progressClass: 'toast-progress',
+                    rtl: false
+                };
+            }
+
+            function publish(args) {
+                if (!listener) { return; }
+                listener(args);
+            }
+
+            function notify(map) {
+                var options = getOptions();
+                var iconClass = map.iconClass || options.iconClass;
+
+                if (typeof (map.optionsOverride) !== 'undefined') {
+                    options = $.extend(options, map.optionsOverride);
+                    iconClass = map.optionsOverride.iconClass || iconClass;
+                }
+
+                if (shouldExit(options, map)) { return; }
+
+                toastId++;
+
+                $container = getContainer(options, true);
+
+                var intervalId = null;
+                var $toastElement = $('<div/>');
+                var $titleElement = $('<div/>');
+                var $messageElement = $('<div/>');
+                var $progressElement = $('<div/>');
+                var $closeElement = $(options.closeHtml);
+                var progressBar = {
+                    intervalId: null,
+                    hideEta: null,
+                    maxHideTime: null
+                };
+                var response = {
+                    toastId: toastId,
+                    state: 'visible',
+                    startTime: new Date(),
+                    options: options,
+                    map: map
+                };
+
+                personalizeToast();
+
+                displayToast();
+
+                handleEvents();
+
+                publish(response);
+
+                if (options.debug && console) {
+                    console.log(response);
+                }
+
+                return $toastElement;
+
+                function escapeHtml(source) {
+                    if (source == null) {
+                        source = '';
+                    }
+
+                    return source
+                        .replace(/&/g, '&amp;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                }
+
+                function personalizeToast() {
+                    setIcon();
+                    setTitle();
+                    setMessage();
+                    setCloseButton();
+                    setProgressBar();
+                    setRTL();
+                    setSequence();
+                    setAria();
+                }
+
+                function setAria() {
+                    var ariaValue = '';
+                    switch (map.iconClass) {
+                        case 'toast-success':
+                        case 'toast-info':
+                            ariaValue =  'polite';
+                            break;
+                        default:
+                            ariaValue = 'assertive';
+                    }
+                    $toastElement.attr('aria-live', ariaValue);
+                }
+
+                function handleEvents() {
+                    if (options.closeOnHover) {
+                        $toastElement.hover(stickAround, delayedHideToast);
+                    }
+
+                    if (!options.onclick && options.tapToDismiss) {
+                        $toastElement.click(hideToast);
+                    }
+
+                    if (options.closeButton && $closeElement) {
+                        $closeElement.click(function (event) {
+                            if (event.stopPropagation) {
+                                event.stopPropagation();
+                            } else if (event.cancelBubble !== undefined && event.cancelBubble !== true) {
+                                event.cancelBubble = true;
+                            }
+
+                            if (options.onCloseClick) {
+                                options.onCloseClick(event);
+                            }
+
+                            hideToast(true);
+                        });
+                    }
+
+                    if (options.onclick) {
+                        $toastElement.click(function (event) {
+                            options.onclick(event);
+                            hideToast();
+                        });
+                    }
+                }
+
+                function displayToast() {
+                    $toastElement.hide();
+
+                    $toastElement[options.showMethod](
+                        {duration: options.showDuration, easing: options.showEasing, complete: options.onShown}
+                    );
+
+                    if (options.timeOut > 0) {
+                        intervalId = setTimeout(hideToast, options.timeOut);
+                        progressBar.maxHideTime = parseFloat(options.timeOut);
+                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
+                        if (options.progressBar) {
+                            progressBar.intervalId = setInterval(updateProgress, 10);
+                        }
+                    }
+                }
+
+                function setIcon() {
+                    if (map.iconClass) {
+                        $toastElement.addClass(options.toastClass).addClass(iconClass);
+                    }
+                }
+
+                function setSequence() {
+                    if (options.newestOnTop) {
+                        $container.prepend($toastElement);
+                    } else {
+                        $container.append($toastElement);
+                    }
+                }
+
+                function setTitle() {
+                    if (map.title) {
+                        var suffix = map.title;
+                        if (options.escapeHtml) {
+                            suffix = escapeHtml(map.title);
+                        }
+                        $titleElement.append(suffix).addClass(options.titleClass);
+                        $toastElement.append($titleElement);
+                    }
+                }
+
+                function setMessage() {
+                    if (map.message) {
+                        var suffix = map.message;
+                        if (options.escapeHtml) {
+                            suffix = escapeHtml(map.message);
+                        }
+                        $messageElement.append(suffix).addClass(options.messageClass);
+                        $toastElement.append($messageElement);
+                    }
+                }
+
+                function setCloseButton() {
+                    if (options.closeButton) {
+                        $closeElement.addClass(options.closeClass).attr('role', 'button');
+                        $toastElement.prepend($closeElement);
+                    }
+                }
+
+                function setProgressBar() {
+                    if (options.progressBar) {
+                        $progressElement.addClass(options.progressClass);
+                        $toastElement.prepend($progressElement);
+                    }
+                }
+
+                function setRTL() {
+                    if (options.rtl) {
+                        $toastElement.addClass('rtl');
+                    }
+                }
+
+                function shouldExit(options, map) {
+                    if (options.preventDuplicates) {
+                        if (map.message === previousToast) {
+                            return true;
+                        } else {
+                            previousToast = map.message;
+                        }
+                    }
+                    return false;
+                }
+
+                function hideToast(override) {
+                    var method = override && options.closeMethod !== false ? options.closeMethod : options.hideMethod;
+                    var duration = override && options.closeDuration !== false ?
+                        options.closeDuration : options.hideDuration;
+                    var easing = override && options.closeEasing !== false ? options.closeEasing : options.hideEasing;
+                    if ($(':focus', $toastElement).length && !override) {
+                        return;
+                    }
+                    clearTimeout(progressBar.intervalId);
+                    return $toastElement[method]({
+                        duration: duration,
+                        easing: easing,
+                        complete: function () {
+                            removeToast($toastElement);
+                            clearTimeout(intervalId);
+                            if (options.onHidden && response.state !== 'hidden') {
+                                options.onHidden();
+                            }
+                            response.state = 'hidden';
+                            response.endTime = new Date();
+                            publish(response);
+                        }
+                    });
+                }
+
+                function delayedHideToast() {
+                    if (options.timeOut > 0 || options.extendedTimeOut > 0) {
+                        intervalId = setTimeout(hideToast, options.extendedTimeOut);
+                        progressBar.maxHideTime = parseFloat(options.extendedTimeOut);
+                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
+                    }
+                }
+
+                function stickAround() {
+                    clearTimeout(intervalId);
+                    progressBar.hideEta = 0;
+                    $toastElement.stop(true, true)[options.showMethod](
+                        {duration: options.showDuration, easing: options.showEasing}
+                    );
+                }
+
+                function updateProgress() {
+                    var percentage = ((progressBar.hideEta - (new Date().getTime())) / progressBar.maxHideTime) * 100;
+                    $progressElement.width(percentage + '%');
+                }
+            }
+
+            function getOptions() {
+                return $.extend({}, getDefaults(), toastr.options);
+            }
+
+            function removeToast($toastElement) {
+                if (!$container) { $container = getContainer(); }
+                if ($toastElement.is(':visible')) {
+                    return;
+                }
+                $toastElement.remove();
+                $toastElement = null;
+                if ($container.children().length === 0) {
+                    $container.remove();
+                    previousToast = undefined;
+                }
+            }
+
+        })();
+    });
+}(typeof define === 'function' && define.amd ? define : function (deps, factory) {
+    if (typeof module !== 'undefined' && module.exports) { //Node
+        module.exports = factory(require('jquery'));
+    } else {
+        window.toastr = factory(window.jQuery);
+    }
+}));
+;define('toastr', ['toastr/toastr'], function (main) { return main; });
+
+define('text!toastr/build/toastr.css', ['module'], function(module) { module.exports = ".toast-title {\n  font-weight: bold;\n}\n.toast-message {\n  -ms-word-wrap: break-word;\n  word-wrap: break-word;\n}\n.toast-message a,\n.toast-message label {\n  color: #FFFFFF;\n}\n.toast-message a:hover {\n  color: #CCCCCC;\n  text-decoration: none;\n}\n.toast-close-button {\n  position: relative;\n  right: -0.3em;\n  top: -0.3em;\n  float: right;\n  font-size: 20px;\n  font-weight: bold;\n  color: #FFFFFF;\n  -webkit-text-shadow: 0 1px 0 #ffffff;\n  text-shadow: 0 1px 0 #ffffff;\n  opacity: 0.8;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);\n  filter: alpha(opacity=80);\n  line-height: 1;\n}\n.toast-close-button:hover,\n.toast-close-button:focus {\n  color: #000000;\n  text-decoration: none;\n  cursor: pointer;\n  opacity: 0.4;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n  filter: alpha(opacity=40);\n}\n.rtl .toast-close-button {\n  left: -0.3em;\n  float: left;\n  right: 0.3em;\n}\n/*Additional properties for button version\n iOS requires the button element instead of an anchor tag.\n If you want the anchor version, it requires `href=\"#\"`.*/\nbutton.toast-close-button {\n  padding: 0;\n  cursor: pointer;\n  background: transparent;\n  border: 0;\n  -webkit-appearance: none;\n}\n.toast-top-center {\n  top: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-bottom-center {\n  bottom: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-top-full-width {\n  top: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-bottom-full-width {\n  bottom: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-top-left {\n  top: 12px;\n  left: 12px;\n}\n.toast-top-right {\n  top: 12px;\n  right: 12px;\n}\n.toast-bottom-right {\n  right: 12px;\n  bottom: 12px;\n}\n.toast-bottom-left {\n  bottom: 12px;\n  left: 12px;\n}\n#toast-container {\n  position: fixed;\n  z-index: 999999;\n  pointer-events: none;\n  /*overrides*/\n}\n#toast-container * {\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n#toast-container > div {\n  position: relative;\n  pointer-events: auto;\n  overflow: hidden;\n  margin: 0 0 6px;\n  padding: 15px 15px 15px 50px;\n  width: 300px;\n  -moz-border-radius: 3px 3px 3px 3px;\n  -webkit-border-radius: 3px 3px 3px 3px;\n  border-radius: 3px 3px 3px 3px;\n  background-position: 15px center;\n  background-repeat: no-repeat;\n  -moz-box-shadow: 0 0 12px #999999;\n  -webkit-box-shadow: 0 0 12px #999999;\n  box-shadow: 0 0 12px #999999;\n  color: #FFFFFF;\n  opacity: 0.8;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);\n  filter: alpha(opacity=80);\n}\n#toast-container > div.rtl {\n  direction: rtl;\n  padding: 15px 50px 15px 15px;\n  background-position: right 15px center;\n}\n#toast-container > div:hover {\n  -moz-box-shadow: 0 0 12px #000000;\n  -webkit-box-shadow: 0 0 12px #000000;\n  box-shadow: 0 0 12px #000000;\n  opacity: 1;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n  filter: alpha(opacity=100);\n  cursor: pointer;\n}\n#toast-container > .toast-info {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGwSURBVEhLtZa9SgNBEMc9sUxxRcoUKSzSWIhXpFMhhYWFhaBg4yPYiWCXZxBLERsLRS3EQkEfwCKdjWJAwSKCgoKCcudv4O5YLrt7EzgXhiU3/4+b2ckmwVjJSpKkQ6wAi4gwhT+z3wRBcEz0yjSseUTrcRyfsHsXmD0AmbHOC9Ii8VImnuXBPglHpQ5wwSVM7sNnTG7Za4JwDdCjxyAiH3nyA2mtaTJufiDZ5dCaqlItILh1NHatfN5skvjx9Z38m69CgzuXmZgVrPIGE763Jx9qKsRozWYw6xOHdER+nn2KkO+Bb+UV5CBN6WC6QtBgbRVozrahAbmm6HtUsgtPC19tFdxXZYBOfkbmFJ1VaHA1VAHjd0pp70oTZzvR+EVrx2Ygfdsq6eu55BHYR8hlcki+n+kERUFG8BrA0BwjeAv2M8WLQBtcy+SD6fNsmnB3AlBLrgTtVW1c2QN4bVWLATaIS60J2Du5y1TiJgjSBvFVZgTmwCU+dAZFoPxGEEs8nyHC9Bwe2GvEJv2WXZb0vjdyFT4Cxk3e/kIqlOGoVLwwPevpYHT+00T+hWwXDf4AJAOUqWcDhbwAAAAASUVORK5CYII=\") !important;\n}\n#toast-container > .toast-error {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHOSURBVEhLrZa/SgNBEMZzh0WKCClSCKaIYOED+AAKeQQLG8HWztLCImBrYadgIdY+gIKNYkBFSwu7CAoqCgkkoGBI/E28PdbLZmeDLgzZzcx83/zZ2SSXC1j9fr+I1Hq93g2yxH4iwM1vkoBWAdxCmpzTxfkN2RcyZNaHFIkSo10+8kgxkXIURV5HGxTmFuc75B2RfQkpxHG8aAgaAFa0tAHqYFfQ7Iwe2yhODk8+J4C7yAoRTWI3w/4klGRgR4lO7Rpn9+gvMyWp+uxFh8+H+ARlgN1nJuJuQAYvNkEnwGFck18Er4q3egEc/oO+mhLdKgRyhdNFiacC0rlOCbhNVz4H9FnAYgDBvU3QIioZlJFLJtsoHYRDfiZoUyIxqCtRpVlANq0EU4dApjrtgezPFad5S19Wgjkc0hNVnuF4HjVA6C7QrSIbylB+oZe3aHgBsqlNqKYH48jXyJKMuAbiyVJ8KzaB3eRc0pg9VwQ4niFryI68qiOi3AbjwdsfnAtk0bCjTLJKr6mrD9g8iq/S/B81hguOMlQTnVyG40wAcjnmgsCNESDrjme7wfftP4P7SP4N3CJZdvzoNyGq2c/HWOXJGsvVg+RA/k2MC/wN6I2YA2Pt8GkAAAAASUVORK5CYII=\") !important;\n}\n#toast-container > .toast-success {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADsSURBVEhLY2AYBfQMgf///3P8+/evAIgvA/FsIF+BavYDDWMBGroaSMMBiE8VC7AZDrIFaMFnii3AZTjUgsUUWUDA8OdAH6iQbQEhw4HyGsPEcKBXBIC4ARhex4G4BsjmweU1soIFaGg/WtoFZRIZdEvIMhxkCCjXIVsATV6gFGACs4Rsw0EGgIIH3QJYJgHSARQZDrWAB+jawzgs+Q2UO49D7jnRSRGoEFRILcdmEMWGI0cm0JJ2QpYA1RDvcmzJEWhABhD/pqrL0S0CWuABKgnRki9lLseS7g2AlqwHWQSKH4oKLrILpRGhEQCw2LiRUIa4lwAAAABJRU5ErkJggg==\") !important;\n}\n#toast-container > .toast-warning {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGYSURBVEhL5ZSvTsNQFMbXZGICMYGYmJhAQIJAICYQPAACiSDB8AiICQQJT4CqQEwgJvYASAQCiZiYmJhAIBATCARJy+9rTsldd8sKu1M0+dLb057v6/lbq/2rK0mS/TRNj9cWNAKPYIJII7gIxCcQ51cvqID+GIEX8ASG4B1bK5gIZFeQfoJdEXOfgX4QAQg7kH2A65yQ87lyxb27sggkAzAuFhbbg1K2kgCkB1bVwyIR9m2L7PRPIhDUIXgGtyKw575yz3lTNs6X4JXnjV+LKM/m3MydnTbtOKIjtz6VhCBq4vSm3ncdrD2lk0VgUXSVKjVDJXJzijW1RQdsU7F77He8u68koNZTz8Oz5yGa6J3H3lZ0xYgXBK2QymlWWA+RWnYhskLBv2vmE+hBMCtbA7KX5drWyRT/2JsqZ2IvfB9Y4bWDNMFbJRFmC9E74SoS0CqulwjkC0+5bpcV1CZ8NMej4pjy0U+doDQsGyo1hzVJttIjhQ7GnBtRFN1UarUlH8F3xict+HY07rEzoUGPlWcjRFRr4/gChZgc3ZL2d8oAAAAASUVORK5CYII=\") !important;\n}\n#toast-container.toast-top-center > div,\n#toast-container.toast-bottom-center > div {\n  width: 300px;\n  margin-left: auto;\n  margin-right: auto;\n}\n#toast-container.toast-top-full-width > div,\n#toast-container.toast-bottom-full-width > div {\n  width: 96%;\n  margin-left: auto;\n  margin-right: auto;\n}\n.toast {\n  background-color: #030303;\n}\n.toast-success {\n  background-color: #51A351;\n}\n.toast-error {\n  background-color: #BD362F;\n}\n.toast-info {\n  background-color: #2F96B4;\n}\n.toast-warning {\n  background-color: #F89406;\n}\n.toast-progress {\n  position: absolute;\n  left: 0;\n  bottom: 0;\n  height: 4px;\n  background-color: #000000;\n  opacity: 0.4;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n  filter: alpha(opacity=40);\n}\n/*Responsive Design*/\n@media all and (max-width: 240px) {\n  #toast-container > div {\n    padding: 8px 8px 8px 50px;\n    width: 11em;\n  }\n  #toast-container > div.rtl {\n    padding: 8px 50px 8px 8px;\n  }\n  #toast-container .toast-close-button {\n    right: -0.2em;\n    top: -0.2em;\n  }\n  #toast-container .rtl .toast-close-button {\n    left: -0.2em;\n    right: 0.2em;\n  }\n}\n@media all and (min-width: 241px) and (max-width: 480px) {\n  #toast-container > div {\n    padding: 8px 8px 8px 50px;\n    width: 18em;\n  }\n  #toast-container > div.rtl {\n    padding: 8px 50px 8px 8px;\n  }\n  #toast-container .toast-close-button {\n    right: -0.2em;\n    top: -0.2em;\n  }\n  #toast-container .rtl .toast-close-button {\n    left: -0.2em;\n    right: 0.2em;\n  }\n}\n@media all and (min-width: 481px) and (max-width: 768px) {\n  #toast-container > div {\n    padding: 15px 15px 15px 50px;\n    width: 25em;\n  }\n  #toast-container > div.rtl {\n    padding: 15px 50px 15px 15px;\n  }\n}\n"; });
+define('i18next/index',['require','exports','module','./i18next'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _i18next = require('./i18next');
+
+var _i18next2 = _interopRequireDefault(_i18next);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = _i18next2.default;
+});
+;define('i18next', ['i18next/index'], function (main) { return main; });
+
+define('aurelia-dialog/aurelia-dialog',["require", "exports", "./dialog-configuration", "./dialog-settings", "./dialog-configuration", "./renderer", "./dialog-cancel-error", "./dialog-service", "./dialog-controller"], function (require, exports, dialog_configuration_1, dialog_settings_1, dialog_configuration_2, renderer_1, dialog_cancel_error_1, dialog_service_1, dialog_controller_1) {
+    "use strict";
+    function __export(m) {
+        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+    }
+    Object.defineProperty(exports, "__esModule", { value: true });
+    function configure(frameworkConfig, callback) {
+        var applyConfig = null;
+        var config = new dialog_configuration_1.DialogConfiguration(frameworkConfig, function (apply) { applyConfig = apply; });
+        if (typeof callback === 'function') {
+            callback(config);
+        }
+        else {
+            config.useDefaults();
+        }
+        return applyConfig();
+    }
+    exports.configure = configure;
+    __export(dialog_settings_1);
+    __export(dialog_configuration_2);
+    __export(renderer_1);
+    __export(dialog_cancel_error_1);
+    __export(dialog_service_1);
+    __export(dialog_controller_1);
+});
+;define('aurelia-dialog', ['aurelia-dialog/aurelia-dialog'], function (main) { return main; });
+
+define('aurelia-dialog/resources/attach-focus',["require", "exports", "aurelia-pal"], function (require, exports, aurelia_pal_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var AttachFocus = /** @class */ (function () {
+        function AttachFocus(element) {
+            this.element = element;
+            this.value = true;
+        }
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        AttachFocus.inject = function () {
+            return [aurelia_pal_1.DOM.Element];
+        };
+        AttachFocus.prototype.attached = function () {
+            if (this.value === '' || (this.value && this.value !== 'false')) {
+                this.element.focus();
+            }
+        };
+        /**
+         * @internal
+         */
+        AttachFocus.$resource = {
+            type: 'attribute',
+            name: 'attach-focus'
+        };
+        return AttachFocus;
+    }());
+    exports.AttachFocus = AttachFocus;
+});
+
+define('aurelia-dialog/resources/ux-dialog-body',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var UxDialogBody = /** @class */ (function () {
+        function UxDialogBody() {
+        }
+        /**
+         * @internal
+         */
+        UxDialogBody.$view = "<template><slot></slot></template>";
+        /**
+         * @internal
+         */
+        UxDialogBody.$resource = 'ux-dialog-body';
+        return UxDialogBody;
+    }());
+    exports.UxDialogBody = UxDialogBody;
+});
+
+define('aurelia-dialog/resources/ux-dialog-footer',["require", "exports", "../dialog-controller"], function (require, exports, dialog_controller_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * View-model for footer of Dialog.
+     */
+    var UxDialogFooter = /** @class */ (function () {
+        function UxDialogFooter(controller) {
+            this.controller = controller;
+            /**
+             * @bindable
+             */
+            this.buttons = [];
+            /**
+             * @bindable
+             */
+            this.useDefaultButtons = false;
+        }
+        UxDialogFooter.isCancelButton = function (value) {
+            return value === 'Cancel';
+        };
+        UxDialogFooter.prototype.close = function (buttonValue) {
+            if (UxDialogFooter.isCancelButton(buttonValue)) {
+                this.controller.cancel(buttonValue);
+            }
+            else {
+                this.controller.ok(buttonValue);
+            }
+        };
+        UxDialogFooter.prototype.useDefaultButtonsChanged = function (newValue) {
+            if (newValue) {
+                this.buttons = ['Cancel', 'Ok'];
+            }
+        };
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        UxDialogFooter.inject = [dialog_controller_1.DialogController];
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        UxDialogFooter.$view = "<template>\n    <slot></slot>\n    <template if.bind=\"buttons.length > 0\">\n      <button type=\"button\"\n        class=\"btn btn-default\"\n        repeat.for=\"button of buttons\"\n        click.trigger=\"close(button)\">\n        ${button}\n      </button>\n    </template>\n  </template>";
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        UxDialogFooter.$resource = {
+            name: 'ux-dialog-footer',
+            bindables: ['buttons', 'useDefaultButtons']
+        };
+        return UxDialogFooter;
+    }());
+    exports.UxDialogFooter = UxDialogFooter;
+});
+
+define('aurelia-dialog/resources/ux-dialog-header',["require", "exports", "../dialog-controller"], function (require, exports, dialog_controller_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var UxDialogHeader = /** @class */ (function () {
+        function UxDialogHeader(controller) {
+            this.controller = controller;
+        }
+        UxDialogHeader.prototype.bind = function () {
+            if (typeof this.showCloseButton !== 'boolean') {
+                this.showCloseButton = !this.controller.settings.lock;
+            }
+        };
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        UxDialogHeader.inject = [dialog_controller_1.DialogController];
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        UxDialogHeader.$view = "<template>\n    <button\n      type=\"button\"\n      class=\"dialog-close\"\n      aria-label=\"Close\"\n      if.bind=\"showCloseButton\"\n      click.trigger=\"controller.cancel()\">\n      <span aria-hidden=\"true\">&times;</span>\n    </button>\n\n    <div class=\"dialog-header-content\">\n      <slot></slot>\n    </div>\n  </template>";
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        UxDialogHeader.$resource = {
+            name: 'ux-dialog-header',
+            bindables: ['showCloseButton']
+        };
+        return UxDialogHeader;
+    }());
+    exports.UxDialogHeader = UxDialogHeader;
+});
+
+define('aurelia-dialog/resources/ux-dialog',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var UxDialog = /** @class */ (function () {
+        function UxDialog() {
+        }
+        /**
+         * @internal
+         */
+        UxDialog.$view = "<template><slot></slot></template>";
+        /**
+         * @internal
+         */
+        UxDialog.$resource = 'ux-dialog';
+        return UxDialog;
+    }());
+    exports.UxDialog = UxDialog;
+});
 
 /* NProgress, (c) 2013, 2014 Rico Sta. Cruz - http://ricostacruz.com/nprogress
  * @license MIT */
@@ -50431,195 +50620,6 @@ $$1.summernote = $$1.extend($$1.summernote, {
 ;define('summernote', ['summernote/summernote'], function (main) { return main; });
 
 define('text!summernote/summernote.css', ['module'], function(module) { module.exports = "@font-face{font-family:\"summernote\";font-style:normal;font-weight:normal;src:url(\"./font/summernote.eot?dbafe969167589eda84514394d126413\");src:url(\"./font/summernote.eot?#iefix\") format(\"embedded-opentype\"),url(\"./font/summernote.woff?dbafe969167589eda84514394d126413\") format(\"woff\"),url(\"./font/summernote.ttf?dbafe969167589eda84514394d126413\") format(\"truetype\")}[class^=\"note-icon-\"]:before,[class*=\" note-icon-\"]:before{display:inline-block;font:normal normal normal 14px summernote;font-size:inherit;-webkit-font-smoothing:antialiased;text-decoration:inherit;text-rendering:auto;text-transform:none;vertical-align:middle;speak:none;-moz-osx-font-smoothing:grayscale}.note-icon-align-center:before,.note-icon-align-indent:before,.note-icon-align-justify:before,.note-icon-align-left:before,.note-icon-align-outdent:before,.note-icon-align-right:before,.note-icon-align:before,.note-icon-arrow-circle-down:before,.note-icon-arrow-circle-left:before,.note-icon-arrow-circle-right:before,.note-icon-arrow-circle-up:before,.note-icon-arrows-alt:before,.note-icon-arrows-h:before,.note-icon-arrows-v:before,.note-icon-bold:before,.note-icon-caret:before,.note-icon-chain-broken:before,.note-icon-circle:before,.note-icon-close:before,.note-icon-code:before,.note-icon-col-after:before,.note-icon-col-before:before,.note-icon-col-remove:before,.note-icon-eraser:before,.note-icon-font:before,.note-icon-frame:before,.note-icon-italic:before,.note-icon-link:before,.note-icon-magic:before,.note-icon-menu-check:before,.note-icon-minus:before,.note-icon-orderedlist:before,.note-icon-pencil:before,.note-icon-picture:before,.note-icon-question:before,.note-icon-redo:before,.note-icon-row-above:before,.note-icon-row-below:before,.note-icon-row-remove:before,.note-icon-special-character:before,.note-icon-square:before,.note-icon-strikethrough:before,.note-icon-subscript:before,.note-icon-summernote:before,.note-icon-superscript:before,.note-icon-table:before,.note-icon-text-height:before,.note-icon-trash:before,.note-icon-underline:before,.note-icon-undo:before,.note-icon-unorderedlist:before,.note-icon-video:before{display:inline-block;font-family:\"summernote\";font-style:normal;font-weight:normal;text-decoration:inherit}.note-icon-align-center:before{content:\"\\f101\"}.note-icon-align-indent:before{content:\"\\f102\"}.note-icon-align-justify:before{content:\"\\f103\"}.note-icon-align-left:before{content:\"\\f104\"}.note-icon-align-outdent:before{content:\"\\f105\"}.note-icon-align-right:before{content:\"\\f106\"}.note-icon-align:before{content:\"\\f107\"}.note-icon-arrow-circle-down:before{content:\"\\f108\"}.note-icon-arrow-circle-left:before{content:\"\\f109\"}.note-icon-arrow-circle-right:before{content:\"\\f10a\"}.note-icon-arrow-circle-up:before{content:\"\\f10b\"}.note-icon-arrows-alt:before{content:\"\\f10c\"}.note-icon-arrows-h:before{content:\"\\f10d\"}.note-icon-arrows-v:before{content:\"\\f10e\"}.note-icon-bold:before{content:\"\\f10f\"}.note-icon-caret:before{content:\"\\f110\"}.note-icon-chain-broken:before{content:\"\\f111\"}.note-icon-circle:before{content:\"\\f112\"}.note-icon-close:before{content:\"\\f113\"}.note-icon-code:before{content:\"\\f114\"}.note-icon-col-after:before{content:\"\\f115\"}.note-icon-col-before:before{content:\"\\f116\"}.note-icon-col-remove:before{content:\"\\f117\"}.note-icon-eraser:before{content:\"\\f118\"}.note-icon-font:before{content:\"\\f119\"}.note-icon-frame:before{content:\"\\f11a\"}.note-icon-italic:before{content:\"\\f11b\"}.note-icon-link:before{content:\"\\f11c\"}.note-icon-magic:before{content:\"\\f11d\"}.note-icon-menu-check:before{content:\"\\f11e\"}.note-icon-minus:before{content:\"\\f11f\"}.note-icon-orderedlist:before{content:\"\\f120\"}.note-icon-pencil:before{content:\"\\f121\"}.note-icon-picture:before{content:\"\\f122\"}.note-icon-question:before{content:\"\\f123\"}.note-icon-redo:before{content:\"\\f124\"}.note-icon-row-above:before{content:\"\\f125\"}.note-icon-row-below:before{content:\"\\f126\"}.note-icon-row-remove:before{content:\"\\f127\"}.note-icon-special-character:before{content:\"\\f128\"}.note-icon-square:before{content:\"\\f129\"}.note-icon-strikethrough:before{content:\"\\f12a\"}.note-icon-subscript:before{content:\"\\f12b\"}.note-icon-summernote:before{content:\"\\f12c\"}.note-icon-superscript:before{content:\"\\f12d\"}.note-icon-table:before{content:\"\\f12e\"}.note-icon-text-height:before{content:\"\\f12f\"}.note-icon-trash:before{content:\"\\f130\"}.note-icon-underline:before{content:\"\\f131\"}.note-icon-undo:before{content:\"\\f132\"}.note-icon-unorderedlist:before{content:\"\\f133\"}.note-icon-video:before{content:\"\\f134\"}.note-editor{position:relative}.note-editor .note-dropzone{position:absolute;z-index:100;display:none;color:#87cefa;background-color:#fff;opacity:.95}.note-editor .note-dropzone .note-dropzone-message{display:table-cell;font-size:28px;font-weight:700;text-align:center;vertical-align:middle}.note-editor .note-dropzone.hover{color:#098ddf}.note-editor.dragover .note-dropzone{display:table}.note-editor .note-editing-area{position:relative}.note-editor .note-editing-area .note-editable{outline:0}.note-editor .note-editing-area .note-editable sup{vertical-align:super}.note-editor .note-editing-area .note-editable sub{vertical-align:sub}.note-editor .note-editing-area img.note-float-left{margin-right:10px}.note-editor .note-editing-area img.note-float-right{margin-left:10px}.note-editor.note-frame{border:1px solid #a9a9a9}.note-editor.note-frame.codeview .note-editing-area .note-editable{display:none}.note-editor.note-frame.codeview .note-editing-area .note-codable{display:block}.note-editor.note-frame .note-editing-area{overflow:hidden}.note-editor.note-frame .note-editing-area .note-editable{padding:10px;overflow:auto;color:#000;word-wrap:break-word;background-color:#fff}.note-editor.note-frame .note-editing-area .note-editable[contenteditable=\"false\"]{background-color:#e5e5e5}.note-editor.note-frame .note-editing-area .note-codable{display:none;width:100%;padding:10px;margin-bottom:0;font-family:Menlo,Monaco,monospace,sans-serif;font-size:14px;color:#ccc;background-color:#222;border:0;-webkit-border-radius:0;-moz-border-radius:0;border-radius:0;box-shadow:none;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;resize:none}.note-editor.note-frame.fullscreen{position:fixed;top:0;left:0;z-index:1050;width:100%!important}.note-editor.note-frame.fullscreen .note-editable{background-color:#fff}.note-editor.note-frame.fullscreen .note-resizebar{display:none}.note-editor.note-frame .note-status-output{display:block;width:100%;height:20px;margin-bottom:0;font-size:14px;line-height:1.42857143;color:#000;border:0;border-top:1px solid #e2e2e2}.note-editor.note-frame .note-status-output:empty{height:0;border-top:0 solid transparent}.note-editor.note-frame .note-status-output .pull-right{float:right!important}.note-editor.note-frame .note-status-output .text-muted{color:#777}.note-editor.note-frame .note-status-output .text-primary{color:#286090}.note-editor.note-frame .note-status-output .text-success{color:#3c763d}.note-editor.note-frame .note-status-output .text-info{color:#31708f}.note-editor.note-frame .note-status-output .text-warning{color:#8a6d3b}.note-editor.note-frame .note-status-output .text-danger{color:#a94442}.note-editor.note-frame .note-status-output .alert{padding:7px 10px 2px 10px;margin:-7px 0 0 0;color:#000;background-color:#f5f5f5;border-radius:0}.note-editor.note-frame .note-status-output .alert .note-icon{margin-right:5px}.note-editor.note-frame .note-status-output .alert-success{color:#3c763d!important;background-color:#dff0d8!important}.note-editor.note-frame .note-status-output .alert-info{color:#31708f!important;background-color:#d9edf7!important}.note-editor.note-frame .note-status-output .alert-warning{color:#8a6d3b!important;background-color:#fcf8e3!important}.note-editor.note-frame .note-status-output .alert-danger{color:#a94442!important;background-color:#f2dede!important}.note-editor.note-frame .note-statusbar{background-color:#f5f5f5;border-top:1px solid #ddd;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.note-editor.note-frame .note-statusbar .note-resizebar{width:100%;height:9px;padding-top:1px;cursor:ns-resize}.note-editor.note-frame .note-statusbar .note-resizebar .note-icon-bar{width:20px;margin:1px auto;border-top:1px solid #a9a9a9}.note-editor.note-frame .note-statusbar.locked .note-resizebar{cursor:default}.note-editor.note-frame .note-statusbar.locked .note-resizebar .note-icon-bar{display:none}.note-editor.note-frame .note-placeholder{padding:10px}.note-popover.popover{max-width:none}.note-popover.popover .popover-content a{display:inline-block;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}.note-popover.popover .arrow{left:20px!important}.note-toolbar{position:relative;z-index:500}.note-popover .popover-content,.panel-heading.note-toolbar{padding:0 0 5px 5px;margin:0}.note-popover .popover-content>.btn-group,.panel-heading.note-toolbar>.btn-group{margin-top:5px;margin-right:5px;margin-left:0}.note-popover .popover-content .btn-group .note-table,.panel-heading.note-toolbar .btn-group .note-table{min-width:0;padding:5px}.note-popover .popover-content .btn-group .note-table .note-dimension-picker,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker{font-size:18px}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-mousecatcher,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-mousecatcher{position:absolute!important;z-index:3;width:10em;height:10em;cursor:pointer}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-unhighlighted,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-unhighlighted{position:relative!important;z-index:1;width:5em;height:5em;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIj4+Pjp6ekKlAqjAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKhmnaJzPAAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-highlighted,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-highlighted{position:absolute!important;z-index:2;width:1em;height:1em;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIjd6vvD2f9LKLW+AAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKwNDEVT0AAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat}.note-popover .popover-content .note-style .dropdown-style blockquote,.panel-heading.note-toolbar .note-style .dropdown-style blockquote,.note-popover .popover-content .note-style .dropdown-style pre,.panel-heading.note-toolbar .note-style .dropdown-style pre{padding:5px 10px;margin:0}.note-popover .popover-content .note-style .dropdown-style h1,.panel-heading.note-toolbar .note-style .dropdown-style h1,.note-popover .popover-content .note-style .dropdown-style h2,.panel-heading.note-toolbar .note-style .dropdown-style h2,.note-popover .popover-content .note-style .dropdown-style h3,.panel-heading.note-toolbar .note-style .dropdown-style h3,.note-popover .popover-content .note-style .dropdown-style h4,.panel-heading.note-toolbar .note-style .dropdown-style h4,.note-popover .popover-content .note-style .dropdown-style h5,.panel-heading.note-toolbar .note-style .dropdown-style h5,.note-popover .popover-content .note-style .dropdown-style h6,.panel-heading.note-toolbar .note-style .dropdown-style h6,.note-popover .popover-content .note-style .dropdown-style p,.panel-heading.note-toolbar .note-style .dropdown-style p{padding:0;margin:0}.note-popover .popover-content .note-color .dropdown-toggle,.panel-heading.note-toolbar .note-color .dropdown-toggle{width:20px;padding-left:5px}.note-popover .popover-content .note-color .dropdown-menu,.panel-heading.note-toolbar .note-color .dropdown-menu{min-width:337px}.note-popover .popover-content .note-color .dropdown-menu .note-palette,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette{display:inline-block;width:160px;margin:0}.note-popover .popover-content .note-color .dropdown-menu .note-palette:first-child,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette:first-child{margin:0 5px}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-palette-title,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-palette-title{margin:2px 7px;font-size:12px;text-align:center;border-bottom:1px solid #eee}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset{width:100%;padding:0 3px;margin:3px;font-size:11px;cursor:pointer;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-row,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-row{height:20px}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset:hover,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset:hover{background:#eee}.note-popover .popover-content .note-para .dropdown-menu,.panel-heading.note-toolbar .note-para .dropdown-menu{min-width:216px;padding:5px}.note-popover .popover-content .note-para .dropdown-menu>div:first-child,.panel-heading.note-toolbar .note-para .dropdown-menu>div:first-child{margin-right:5px}.note-popover .popover-content .dropdown-menu,.panel-heading.note-toolbar .dropdown-menu{min-width:90px}.note-popover .popover-content .dropdown-menu.right,.panel-heading.note-toolbar .dropdown-menu.right{right:0;left:auto}.note-popover .popover-content .dropdown-menu.right::before,.panel-heading.note-toolbar .dropdown-menu.right::before{right:9px;left:auto!important}.note-popover .popover-content .dropdown-menu.right::after,.panel-heading.note-toolbar .dropdown-menu.right::after{right:10px;left:auto!important}.note-popover .popover-content .dropdown-menu.note-check li a i,.panel-heading.note-toolbar .dropdown-menu.note-check li a i{color:deepskyblue;visibility:hidden}.note-popover .popover-content .dropdown-menu.note-check li a.checked i,.panel-heading.note-toolbar .dropdown-menu.note-check li a.checked i{visibility:visible}.note-popover .popover-content .note-fontsize-10,.panel-heading.note-toolbar .note-fontsize-10{font-size:10px}.note-popover .popover-content .note-color-palette,.panel-heading.note-toolbar .note-color-palette{line-height:1}.note-popover .popover-content .note-color-palette div .note-color-btn,.panel-heading.note-toolbar .note-color-palette div .note-color-btn{width:20px;height:20px;padding:0;margin:0;border:1px solid #fff}.note-popover .popover-content .note-color-palette div .note-color-btn:hover,.panel-heading.note-toolbar .note-color-palette div .note-color-btn:hover{border:1px solid #000}.note-dialog>div{display:none}.note-dialog .form-group{margin-right:0;margin-left:0}.note-dialog .note-modal-form{margin:0}.note-dialog .note-image-dialog .note-dropzone{min-height:100px;margin-bottom:10px;font-size:30px;line-height:4;color:lightgray;text-align:center;border:4px dashed lightgray}@-moz-document url-prefix(){.note-image-input{height:auto}}.note-placeholder{position:absolute;display:none;color:gray}.note-handle .note-control-selection{position:absolute;display:none;border:1px solid #000}.note-handle .note-control-selection>div{position:absolute}.note-handle .note-control-selection .note-control-selection-bg{width:100%;height:100%;background-color:#000;-webkit-opacity:.3;-khtml-opacity:.3;-moz-opacity:.3;opacity:.3;-ms-filter:alpha(opacity=30);filter:alpha(opacity=30)}.note-handle .note-control-selection .note-control-handle{width:7px;height:7px;border:1px solid #000}.note-handle .note-control-selection .note-control-holder{width:7px;height:7px;border:1px solid #000}.note-handle .note-control-selection .note-control-sizing{width:7px;height:7px;background-color:#fff;border:1px solid #000}.note-handle .note-control-selection .note-control-nw{top:-5px;left:-5px;border-right:0;border-bottom:0}.note-handle .note-control-selection .note-control-ne{top:-5px;right:-5px;border-bottom:0;border-left:none}.note-handle .note-control-selection .note-control-sw{bottom:-5px;left:-5px;border-top:0;border-right:0}.note-handle .note-control-selection .note-control-se{right:-5px;bottom:-5px;cursor:se-resize}.note-handle .note-control-selection .note-control-se.note-control-holder{cursor:default;border-top:0;border-left:none}.note-handle .note-control-selection .note-control-selection-info{right:0;bottom:0;padding:5px;margin:5px;font-size:12px;color:#fff;background-color:#000;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;-webkit-opacity:.7;-khtml-opacity:.7;-moz-opacity:.7;opacity:.7;-ms-filter:alpha(opacity=70);filter:alpha(opacity=70)}.note-hint-popover{min-width:100px;padding:2px}.note-hint-popover .popover-content{max-height:150px;padding:3px;overflow:auto}.note-hint-popover .popover-content .note-hint-group .note-hint-item{display:block!important;padding:3px}.note-hint-popover .popover-content .note-hint-group .note-hint-item.active,.note-hint-popover .popover-content .note-hint-group .note-hint-item:hover{display:block;clear:both;font-weight:400;line-height:1.4;color:#fff;text-decoration:none;white-space:nowrap;cursor:pointer;background-color:#428bca;outline:0}"; });
-define('aurelia-dialog/aurelia-dialog',["require", "exports", "./dialog-configuration", "./dialog-settings", "./dialog-configuration", "./renderer", "./dialog-cancel-error", "./dialog-service", "./dialog-controller"], function (require, exports, dialog_configuration_1, dialog_settings_1, dialog_configuration_2, renderer_1, dialog_cancel_error_1, dialog_service_1, dialog_controller_1) {
-    "use strict";
-    function __export(m) {
-        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-    }
-    Object.defineProperty(exports, "__esModule", { value: true });
-    function configure(frameworkConfig, callback) {
-        var applyConfig = null;
-        var config = new dialog_configuration_1.DialogConfiguration(frameworkConfig, function (apply) { applyConfig = apply; });
-        if (typeof callback === 'function') {
-            callback(config);
-        }
-        else {
-            config.useDefaults();
-        }
-        return applyConfig();
-    }
-    exports.configure = configure;
-    __export(dialog_settings_1);
-    __export(dialog_configuration_2);
-    __export(renderer_1);
-    __export(dialog_cancel_error_1);
-    __export(dialog_service_1);
-    __export(dialog_controller_1);
-});
-;define('aurelia-dialog', ['aurelia-dialog/aurelia-dialog'], function (main) { return main; });
-
-define('aurelia-dialog/resources/attach-focus',["require", "exports", "aurelia-pal"], function (require, exports, aurelia_pal_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var AttachFocus = /** @class */ (function () {
-        function AttachFocus(element) {
-            this.element = element;
-            this.value = true;
-        }
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        AttachFocus.inject = function () {
-            return [aurelia_pal_1.DOM.Element];
-        };
-        AttachFocus.prototype.attached = function () {
-            if (this.value === '' || (this.value && this.value !== 'false')) {
-                this.element.focus();
-            }
-        };
-        /**
-         * @internal
-         */
-        AttachFocus.$resource = {
-            type: 'attribute',
-            name: 'attach-focus'
-        };
-        return AttachFocus;
-    }());
-    exports.AttachFocus = AttachFocus;
-});
-
-define('aurelia-dialog/resources/ux-dialog-body',["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var UxDialogBody = /** @class */ (function () {
-        function UxDialogBody() {
-        }
-        /**
-         * @internal
-         */
-        UxDialogBody.$view = "<template><slot></slot></template>";
-        /**
-         * @internal
-         */
-        UxDialogBody.$resource = 'ux-dialog-body';
-        return UxDialogBody;
-    }());
-    exports.UxDialogBody = UxDialogBody;
-});
-
-define('aurelia-dialog/resources/ux-dialog-footer',["require", "exports", "../dialog-controller"], function (require, exports, dialog_controller_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /**
-     * View-model for footer of Dialog.
-     */
-    var UxDialogFooter = /** @class */ (function () {
-        function UxDialogFooter(controller) {
-            this.controller = controller;
-            /**
-             * @bindable
-             */
-            this.buttons = [];
-            /**
-             * @bindable
-             */
-            this.useDefaultButtons = false;
-        }
-        UxDialogFooter.isCancelButton = function (value) {
-            return value === 'Cancel';
-        };
-        UxDialogFooter.prototype.close = function (buttonValue) {
-            if (UxDialogFooter.isCancelButton(buttonValue)) {
-                this.controller.cancel(buttonValue);
-            }
-            else {
-                this.controller.ok(buttonValue);
-            }
-        };
-        UxDialogFooter.prototype.useDefaultButtonsChanged = function (newValue) {
-            if (newValue) {
-                this.buttons = ['Cancel', 'Ok'];
-            }
-        };
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        UxDialogFooter.inject = [dialog_controller_1.DialogController];
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        UxDialogFooter.$view = "<template>\n    <slot></slot>\n    <template if.bind=\"buttons.length > 0\">\n      <button type=\"button\"\n        class=\"btn btn-default\"\n        repeat.for=\"button of buttons\"\n        click.trigger=\"close(button)\">\n        ${button}\n      </button>\n    </template>\n  </template>";
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        UxDialogFooter.$resource = {
-            name: 'ux-dialog-footer',
-            bindables: ['buttons', 'useDefaultButtons']
-        };
-        return UxDialogFooter;
-    }());
-    exports.UxDialogFooter = UxDialogFooter;
-});
-
-define('aurelia-dialog/resources/ux-dialog-header',["require", "exports", "../dialog-controller"], function (require, exports, dialog_controller_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var UxDialogHeader = /** @class */ (function () {
-        function UxDialogHeader(controller) {
-            this.controller = controller;
-        }
-        UxDialogHeader.prototype.bind = function () {
-            if (typeof this.showCloseButton !== 'boolean') {
-                this.showCloseButton = !this.controller.settings.lock;
-            }
-        };
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        UxDialogHeader.inject = [dialog_controller_1.DialogController];
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        UxDialogHeader.$view = "<template>\n    <button\n      type=\"button\"\n      class=\"dialog-close\"\n      aria-label=\"Close\"\n      if.bind=\"showCloseButton\"\n      click.trigger=\"controller.cancel()\">\n      <span aria-hidden=\"true\">&times;</span>\n    </button>\n\n    <div class=\"dialog-header-content\">\n      <slot></slot>\n    </div>\n  </template>";
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        UxDialogHeader.$resource = {
-            name: 'ux-dialog-header',
-            bindables: ['showCloseButton']
-        };
-        return UxDialogHeader;
-    }());
-    exports.UxDialogHeader = UxDialogHeader;
-});
-
-define('aurelia-dialog/resources/ux-dialog',["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var UxDialog = /** @class */ (function () {
-        function UxDialog() {
-        }
-        /**
-         * @internal
-         */
-        UxDialog.$view = "<template><slot></slot></template>";
-        /**
-         * @internal
-         */
-        UxDialog.$resource = 'ux-dialog';
-        return UxDialog;
-    }());
-    exports.UxDialog = UxDialog;
-});
-
 /*!
  * Fuel UX v3.17.0 
  * Copyright 2012-2018 ExactTarget
@@ -74102,4 +74102,4 @@ define('aurelia-google-analytics/analytics',['exports', 'aurelia-dependency-inje
 		return Analytics;
 	}()) || _class);
 });
-function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","text":"../node_modules\\text\\text","aurelia-notification":"../node_modules\\aurelia-notification\\dist\\amd\\aurelia-notification","jquery":"../node_modules\\jquery\\dist\\jquery","extend":"../node_modules\\extend\\index","moment":"../node_modules\\moment\\moment","deepmerge":"../node_modules\\deepmerge\\dist\\umd","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-http-client","location":"../node_modules/aurelia-http-client/dist/amd","main":"aurelia-http-client"},{"name":"humane-js","location":"../node_modules/humane-js","main":"humane"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr.js"},{"name":"i18next","location":"../node_modules/i18next/dist/commonjs","main":"index"},{"name":"aurelia-i18n","location":"../node_modules/aurelia-i18n/dist/amd","main":"aurelia-i18n"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr"},{"name":"regenerator-runtime","location":"../node_modules/regenerator-runtime","main":"runtime"},{"name":"nprogress","location":"../node_modules/nprogress","main":"nprogress"},{"name":"bootstrap","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min"},{"name":"aurelia-mask","location":"../node_modules/aurelia-mask/dist","main":"masked-input"},{"name":"flatpickr","location":"../node_modules/flatpickr/dist","main":"flatpickr"},{"name":"summernote","location":"../node_modules/summernote/dist/","main":"summernote"},{"name":"aurelia-dialog","location":"../node_modules/aurelia-dialog/dist/amd","main":"aurelia-dialog"},{"name":"fuelux","location":"../node_modules/fuelux/dist","main":"js/fuelux.min"},{"name":"fullcalendar","location":"../node_modules/fullcalendar/dist","main":"fullcalendar"},{"name":"chart.js","location":"../node_modules/chart.js/dist","main":"Chart.min.js"},{"name":"aurelia-chart","location":"../node_modules/aurelia-chart/dist/amd","main":"index"},{"name":"bootstrap-select","location":"../node_modules/bootstrap-select/dist/","main":"js/bootstrap-select"},{"name":"aurelia-google-analytics","location":"../node_modules/aurelia-google-analytics/dist/amd","main":"index"}],"stubModules":["text"],"shim":{"bootstrap":{"deps":["jquery"],"exports":"$"},"aurelia-chart":{"deps":["chart.js"]}},"bundles":{"app-bundle":["app","environment","main","config/appConfig","config/routerConfig","resources/index","modules/acc/accCreateInvoice","modules/acc/accCreateRequest","modules/acc/accHT","modules/acc/accInstitute","modules/acc/accInstitutions","modules/acc/accInvoice","modules/acc/accPeople","modules/acc/accRequests","modules/acc/accViewInvoice","modules/acc/apjAssignments","modules/acc/createHTs","modules/acc/viewHTs","modules/acc/viewUserRequests","modules/analytics/analytics","modules/analytics/clientRequests","modules/analytics/helpTickets","modules/analytics/institutions","modules/facco/editPeople","modules/facco/facco","modules/facco/viewAssignments","modules/facco/viewRequests","modules/home/about","modules/home/contact","modules/home/home","modules/home/institutions","modules/home/products","modules/home/register","modules/social/chapterList","modules/social/chapters","modules/social/editBlog","modules/social/social","modules/social/viewBlogs","modules/social/viewForums","modules/social/writeBlog","modules/techNotes/editCheckLists","modules/techNotes/editSystemUpdates","modules/techNotes/editTechNotes","modules/techNotes/techNotes","modules/user/profile","modules/user/resetPassword","modules/user/user","resources/charts/bar-chart","resources/charts/chart-data","resources/charts/chart-element","resources/charts/doughnut-chart","resources/data/admin","resources/data/apjClientRequests","resources/data/auth","resources/data/chapters","resources/data/clientRequests","resources/data/config","resources/data/curriculum","resources/data/dataServices","resources/data/documents","resources/data/downloads","resources/data/events","resources/data/helpTickets","resources/data/inventory","resources/data/is4ua","resources/data/people","resources/data/products","resources/data/sessionData","resources/data/sessions","resources/data/siteInfo","resources/data/social","resources/data/systems","resources/dialogs/common-dialogs","resources/dialogs/confirm-dialog","resources/dialogs/document-dialog","resources/dialogs/email-dialog","resources/dialogs/event-dialog","resources/dialogs/helpTicket-dialog","resources/dialogs/input-dialog","resources/dialogs/message-dialog","resources/dialogs/note-dialog","resources/dialogs/password-dialog","resources/elements/add-systems","resources/elements/calendar","resources/elements/flat-picker","resources/elements/loading-indicator","resources/elements/multiselect","resources/elements/nav-bar","resources/elements/rate-it","resources/elements/submenu","resources/elements/table-navigation-bar","resources/elements/tree-node","resources/editor/editor","resources/editor/styles","resources/utils/dataTable","resources/utils/utils","resources/utils/validation","resources/value-converters/activate-button","resources/value-converters/arrow","resources/value-converters/check-box","resources/value-converters/course-name","resources/value-converters/date-format","resources/value-converters/file-type","resources/value-converters/filter-array","resources/value-converters/filter-clients","resources/value-converters/filter-sessions","resources/value-converters/format-digits","resources/value-converters/format-number","resources/value-converters/format-phone","resources/value-converters/get-array-value","resources/value-converters/gravatar-url-id","resources/value-converters/gravatar-url","resources/value-converters/help-ticket-statuses","resources/value-converters/help-ticket-subtypes","resources/value-converters/help-ticket-type","resources/value-converters/idsRequested","resources/value-converters/info-filter","resources/value-converters/lookup-ht-status","resources/value-converters/lookup-value","resources/value-converters/onoff-switch","resources/value-converters/overlap","resources/value-converters/parse-apjassignments","resources/value-converters/parse-assignments","resources/value-converters/person-status-button","resources/value-converters/phone-number","resources/value-converters/request-status-class","resources/value-converters/sandbox","resources/value-converters/session-name","resources/value-converters/session-status-button","resources/value-converters/session-systems","resources/value-converters/session-type","resources/value-converters/session","resources/value-converters/sort-array","resources/value-converters/sort-date-time","resources/value-converters/stat-value","resources/value-converters/system-list","resources/value-converters/to-uppercase","resources/value-converters/translate-status","resources/value-converters/ucc-staff","resources/value-converters/ucc-title","modules/admin/Customers/bulkEmails","modules/admin/Customers/customers","modules/admin/Customers/editInstitutions","modules/admin/Customers/editPeople","modules/admin/documents/documents","modules/admin/inventory/editInventory","modules/admin/notes/editCalendar","modules/admin/notes/editNotes","modules/admin/notes/notes","modules/admin/site/admin","modules/admin/site/editConfig","modules/admin/site/editCurriculum","modules/admin/site/editDownloads","modules/admin/site/editHelpTickets","modules/admin/site/editMessages","modules/admin/site/editNews","modules/admin/site/site","modules/admin/system/editChanges","modules/admin/system/editProduct","modules/admin/system/editSession","modules/admin/system/editSystem","modules/admin/system/system","modules/tech/requests/apjRequests","modules/tech/requests/archiveClientRequests","modules/tech/requests/assignments","modules/tech/requests/createRequest","modules/tech/requests/techRequests","modules/tech/requests/viewUserRequests","modules/tech/support/archiveHelpTickets","modules/tech/support/createHelpTickets","modules/tech/support/support","modules/tech/support/viewHelpTickets","modules/techNotes/notes/techNotes","modules/user/requests/clientRequests","modules/user/requests/createRequests","modules/user/requests/viewProducts","modules/user/requests/viewRequests","modules/user/support/createHelpTickets.2","modules/user/support/createHelpTickets","modules/user/support/createHelpTicketsWiz","modules/user/support/curriculum","modules/user/support/downloads","modules/user/support/links","modules/user/support/support","modules/user/support/viewHelpTickets","aurelia-templating-resources/compose","aurelia-templating-resources/if","aurelia-templating-resources/if-core","aurelia-templating-resources/else","aurelia-templating-resources/with","aurelia-templating-resources/repeat","aurelia-templating-resources/repeat-strategy-locator","aurelia-templating-resources/null-repeat-strategy","aurelia-templating-resources/array-repeat-strategy","aurelia-templating-resources/repeat-utilities","aurelia-templating-resources/map-repeat-strategy","aurelia-templating-resources/set-repeat-strategy","aurelia-templating-resources/number-repeat-strategy","aurelia-templating-resources/analyze-view-factory","aurelia-templating-resources/abstract-repeater","aurelia-templating-resources/show","aurelia-templating-resources/aurelia-hide-style","aurelia-templating-resources/hide","aurelia-templating-resources/sanitize-html","aurelia-templating-resources/html-sanitizer","aurelia-templating-resources/replaceable","aurelia-templating-resources/focus","aurelia-templating-resources/css-resource","aurelia-templating-resources/attr-binding-behavior","aurelia-templating-resources/binding-mode-behaviors","aurelia-templating-resources/throttle-binding-behavior","aurelia-templating-resources/debounce-binding-behavior","aurelia-templating-resources/self-binding-behavior","aurelia-templating-resources/signal-binding-behavior","aurelia-templating-resources/binding-signaler","aurelia-templating-resources/update-trigger-binding-behavior","aurelia-templating-resources/html-resource-plugin","aurelia-templating-resources/dynamic-element","aurelia-i18n/i18n","i18next/i18next","i18next/logger","i18next/EventEmitter","i18next/ResourceStore","i18next/utils","i18next/Translator","i18next/postProcessor","i18next/compatibility/v1","i18next/LanguageUtils","i18next/PluralResolver","i18next/Interpolator","i18next/BackendConnector","i18next/CacheConnector","i18next/defaults","aurelia-i18n/relativeTime","aurelia-i18n/defaultTranslations/relative.time","aurelia-i18n/df","aurelia-i18n/utils","aurelia-i18n/nf","aurelia-i18n/rt","aurelia-i18n/t","aurelia-i18n/base-i18n","aurelia-i18n/aurelia-i18n-loader","aurelia-dialog/dialog-configuration","aurelia-dialog/renderer","aurelia-dialog/dialog-settings","aurelia-dialog/dialog-renderer","aurelia-dialog/dialog-cancel-error","aurelia-dialog/dialog-service","aurelia-dialog/lifecycle","aurelia-dialog/dialog-controller","aurelia-dialog/dialog-close-error","node_modules/chart.js/dist/Chart.js","resources/css/fullcalendar","resources/css/OLDsummernote","resources/css/styles","resources/css/summernote","resources/editor/skins/moono-lisa/dialog","resources/editor/skins/moono-lisa/dialog_ie","resources/editor/skins/moono-lisa/dialog_ie8","resources/editor/skins/moono-lisa/dialog_iequirks","resources/editor/skins/moono-lisa/editor","resources/editor/skins/moono-lisa/editor_gecko","resources/editor/skins/moono-lisa/editor_ie","resources/editor/skins/moono-lisa/editor_ie8","resources/editor/skins/moono-lisa/editor_iequirks","modules/user/user.1","resources/dialogs/documentForm","resources/dialogs/documentsTable","resources/htTimeline/response","resources/htTimeline/timeline","modules/acc/components/Address","modules/acc/components/assignmentDetails","modules/acc/components/assignRequestTable","modules/acc/components/Audit","modules/acc/components/bo","modules/acc/components/Courses.1","modules/acc/components/Courses","modules/acc/components/editInvoiceDates","modules/acc/components/editRequestsForm","modules/acc/components/Email","modules/acc/components/erp","modules/acc/components/hana","modules/acc/components/instAddress","modules/acc/components/instIs4ua","modules/acc/components/institutionDetails","modules/acc/components/institutionPanels","modules/acc/components/institutionsForm","modules/acc/components/institutionsTable","modules/acc/components/instPeople","modules/acc/components/Log","modules/acc/components/Password","modules/acc/components/peopleForm","modules/acc/components/peopleTable","modules/acc/components/requestDetails","modules/acc/components/requestForm","modules/acc/components/Requests","modules/acc/components/requestsTable","modules/acc/components/Roles","modules/acc/components/viewAssignmentForm","modules/acc/components/viewRequestsTable","modules/admin/site/downloadForm","modules/admin/site/downloadTable","modules/analytics/components/countryInstitutionProductRequestsTable","modules/analytics/components/countryProductRequestsTable","modules/analytics/components/curriculumHTChart","modules/analytics/components/curriculumHTTable","modules/analytics/components/helpTicketsByCurriculum","modules/analytics/components/helpTicketsByInstitution","modules/analytics/components/helpTicketsByPeople","modules/analytics/components/helpTicketsByStatus","modules/analytics/components/helpTicketsByType","modules/analytics/components/institutionHTChart","modules/analytics/components/institutionHTTable","modules/analytics/components/institutionRequestsDetail","modules/analytics/components/institutionsCharts","modules/analytics/components/institutionsTable","modules/analytics/components/peopleHTChart","modules/analytics/components/peopleHTTable","modules/analytics/components/productRequestsDetail","modules/analytics/components/productRequestsTable","modules/analytics/components/requestsByCountry","modules/analytics/components/requestsByInstitution","modules/analytics/components/requestsByInstitutionCountry","modules/analytics/components/requestsByProducts","modules/analytics/components/requestsInstitutionChart","modules/analytics/components/requestsProductChart","modules/analytics/components/requestsSAPProductChart","modules/analytics/components/requestsTable","modules/analytics/components/statusHTChart","modules/analytics/components/statusHTTable","modules/analytics/components/typeHTChart","modules/analytics/components/typeHTTable","modules/facco/components/assignmentsTable","modules/facco/components/peopleTable","modules/facco/components/requestDetailDetails","modules/facco/components/requestsTable","modules/facco/components/viewAssignmentsTable","modules/facco/components/viewRequestsTable","modules/home/components/homeContent","modules/home/components/homePageLinks","modules/home/components/newsItem","modules/home/components/uccInformation","modules/social/components/blogForm","modules/social/components/blogList","modules/social/components/blogListUCC","modules/social/components/blogPage","modules/social/components/blogPageUCC","modules/social/components/chapterList","modules/social/components/forumList","modules/social/components/forumPage","modules/social/components/writeBlogList","modules/techNotes/components/notesForm","modules/techNotes/components/notesTable","modules/techNotes/components/Systems","modules/user/components/banner","modules/user/components/carousel","modules/user/components/homePageLinks","modules/user/components/newsItem","modules/user/components/uccInformation","modules/admin/Customers/components/Address","modules/admin/Customers/components/Audit","modules/admin/Customers/components/composeEmail","modules/admin/Customers/components/Courses","modules/admin/Customers/components/Email","modules/admin/Customers/components/emailTable","modules/admin/Customers/components/instAddress","modules/admin/Customers/components/instIs4ua","modules/admin/Customers/components/institutionDetails","modules/admin/Customers/components/institutionPanels","modules/admin/Customers/components/institutionsForm","modules/admin/Customers/components/institutionsTable","modules/admin/Customers/components/instPeople","modules/admin/Customers/components/is4ua","modules/admin/Customers/components/Log","modules/admin/Customers/components/Password","modules/admin/Customers/components/peopleForm","modules/admin/Customers/components/peopleTable","modules/admin/Customers/components/Roles","modules/admin/Customers/components/selectionForm","modules/admin/Customers/components/selectionPanel","modules/admin/documents/components/documentForm","modules/admin/documents/components/documentsTable","modules/admin/inventory/components/documentForm","modules/admin/inventory/components/Documents","modules/admin/inventory/components/documentsTable","modules/admin/inventory/components/History","modules/admin/inventory/components/inventoryDetails","modules/admin/inventory/components/inventoryForm","modules/admin/inventory/components/inventoryPanels","modules/admin/inventory/components/inventoryTable","modules/admin/inventory/components/Maintenance","modules/admin/inventory/components/Purchase","modules/admin/inventory/components/Technical","modules/admin/notes/components/ArchiveRequestsForm","modules/admin/notes/components/helpTicket","modules/admin/notes/components/notesForm","modules/admin/notes/components/notesTable","modules/admin/site/components/configForm","modules/admin/site/components/configTable","modules/admin/site/components/curriculumForm","modules/admin/site/components/curriculumTable","modules/admin/site/components/document","modules/admin/site/components/documentForm","modules/admin/site/components/documentsTable","modules/admin/site/components/downloadForm","modules/admin/site/components/downloadTable","modules/admin/site/components/foreverLogs","modules/admin/site/components/htTypeForm","modules/admin/site/components/htTypeTable","modules/admin/site/components/logFileTable","modules/admin/site/components/messageForm","modules/admin/site/components/messageTable","modules/admin/site/components/newsForm","modules/admin/site/components/newsTable","modules/admin/site/components/uploadedFilesTable","modules/admin/system/components/Assignments","modules/admin/system/components/changesForm","modules/admin/system/components/changesTable","modules/admin/system/components/Description","modules/admin/system/components/documentForm","modules/admin/system/components/Documents","modules/admin/system/components/documentsTable","modules/admin/system/components/edit-client-form","modules/admin/system/components/is4ua","modules/admin/system/components/Notes","modules/admin/system/components/productForm","modules/admin/system/components/productFormHeader","modules/admin/system/components/productFormToolbar","modules/admin/system/components/productTable","modules/admin/system/components/sessionConfigTable","modules/admin/system/components/sessionForm","modules/admin/system/components/sessionTable","modules/admin/system/components/systemForm","modules/admin/system/components/Systems","modules/admin/system/components/systemTable","modules/tech/requests/components/apjRequestsTable","modules/tech/requests/components/ArchiveRequestsForm","modules/tech/requests/components/ArchiveRequestsTable","modules/tech/requests/components/archiveTable","modules/tech/requests/components/assignmentDetails","modules/tech/requests/components/bo","modules/tech/requests/components/bulkEmailForm","modules/tech/requests/components/Courses","modules/tech/requests/components/editRequestsForm","modules/tech/requests/components/erp","modules/tech/requests/components/hana","modules/tech/requests/components/requestDetailDetails","modules/tech/requests/components/requestDetails","modules/tech/requests/components/requestsTable","modules/tech/requests/components/userAssignmentDetails","modules/tech/requests/components/userRequestDetails","modules/tech/requests/components/viewAssignmentForm","modules/tech/requests/components/viewRequestsForm","modules/tech/requests/components/viewRequestsTable","modules/tech/requests/components/viewUserRequestsForm","modules/tech/requests/components/viewUserRequestsTable","modules/tech/support/components/additiontalInfo","modules/tech/support/components/assignmentDetails","modules/tech/support/components/bo","modules/tech/support/components/documentForm","modules/tech/support/components/Documents","modules/tech/support/components/documentsTable","modules/tech/support/components/erp","modules/tech/support/components/hana","modules/tech/support/components/helpTicketDetails","modules/tech/support/components/helpTicketType","modules/tech/support/components/requestDetails","modules/tech/support/components/Requests","modules/tech/support/components/searchHTForm","modules/tech/support/components/selectProduct","modules/tech/support/components/viewArchiveHTForm","modules/tech/support/components/viewAssignmentForm","modules/tech/support/components/viewHelpTicketTableFilters","modules/tech/support/components/viewHoverProfile","modules/tech/support/components/viewHTForm","modules/tech/support/components/viewHTSearchResults","modules/tech/support/components/viewHTTable","modules/tech/support/components/viewRequestsPanel","modules/tech/support/components/viewToolbarButtons","modules/user/requests/components/assignmentDetails","modules/user/requests/components/bo","modules/user/requests/components/client-request-step1","modules/user/requests/components/client-request-step2","modules/user/requests/components/client-request-step3","modules/user/requests/components/client-request-step4","modules/user/requests/components/Courses","modules/user/requests/components/erp","modules/user/requests/components/hana","modules/user/requests/components/requestDetails","modules/user/requests/components/viewRequestsForm","modules/user/requests/components/viewRequestsTable","modules/user/support/components/comment","modules/user/support/components/help-ticket-step1","modules/user/support/components/help-ticket-step2","modules/user/support/components/help-ticket-step3","modules/user/support/components/help-ticket-step4","modules/user/support/components/help-ticket-step5","modules/user/support/components/helpTicketDetails","modules/user/support/components/helpTicketType","modules/user/support/components/helpTicketWizard","modules/user/support/components/inputForm-0-0","modules/user/support/components/inputForm-1-0","modules/user/support/components/Requests","modules/user/support/components/viewHTForm","modules/user/support/components/viewHTTable"]}})}
+function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","text":"../node_modules\\text\\text","aurelia-notification":"../node_modules\\aurelia-notification\\dist\\amd\\aurelia-notification","jquery":"../node_modules\\jquery\\dist\\jquery","extend":"../node_modules\\extend\\index","moment":"../node_modules\\moment\\moment","deepmerge":"../node_modules\\deepmerge\\dist\\umd","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-http-client","location":"../node_modules/aurelia-http-client/dist/amd","main":"aurelia-http-client"},{"name":"humane-js","location":"../node_modules/humane-js","main":"humane"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr.js"},{"name":"aurelia-i18n","location":"../node_modules/aurelia-i18n/dist/amd","main":"aurelia-i18n"},{"name":"regenerator-runtime","location":"../node_modules/regenerator-runtime","main":"runtime"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr"},{"name":"i18next","location":"../node_modules/i18next/dist/commonjs","main":"index"},{"name":"aurelia-dialog","location":"../node_modules/aurelia-dialog/dist/amd","main":"aurelia-dialog"},{"name":"nprogress","location":"../node_modules/nprogress","main":"nprogress"},{"name":"bootstrap","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min"},{"name":"aurelia-mask","location":"../node_modules/aurelia-mask/dist","main":"masked-input"},{"name":"flatpickr","location":"../node_modules/flatpickr/dist","main":"flatpickr"},{"name":"summernote","location":"../node_modules/summernote/dist/","main":"summernote"},{"name":"fuelux","location":"../node_modules/fuelux/dist","main":"js/fuelux.min"},{"name":"fullcalendar","location":"../node_modules/fullcalendar/dist","main":"fullcalendar"},{"name":"chart.js","location":"../node_modules/chart.js/dist","main":"Chart.min.js"},{"name":"aurelia-chart","location":"../node_modules/aurelia-chart/dist/amd","main":"index"},{"name":"bootstrap-select","location":"../node_modules/bootstrap-select/dist/","main":"js/bootstrap-select"},{"name":"aurelia-google-analytics","location":"../node_modules/aurelia-google-analytics/dist/amd","main":"index"}],"stubModules":["text"],"shim":{"bootstrap":{"deps":["jquery"],"exports":"$"},"aurelia-chart":{"deps":["chart.js"]}},"bundles":{"app-bundle":["app","environment","main","config/appConfig","config/routerConfig","resources/index","modules/acc/accCreateInvoice","modules/acc/accCreateRequest","modules/acc/accHT","modules/acc/accInstitute","modules/acc/accInstitutions","modules/acc/accInvoice","modules/acc/accPeople","modules/acc/accRequests","modules/acc/accViewInvoice","modules/acc/apjAssignments","modules/acc/createHTs","modules/acc/viewHTs","modules/acc/viewUserRequests","modules/analytics/analytics","modules/analytics/clientRequests","modules/analytics/helpTickets","modules/analytics/institutions","modules/home/about","modules/home/contact","modules/home/home","modules/home/institutions","modules/home/products","modules/home/register","modules/facco/editPeople","modules/facco/facco","modules/facco/viewAssignments","modules/facco/viewRequests","modules/social/chapterList","modules/social/chapters","modules/social/editBlog","modules/social/social","modules/social/viewBlogs","modules/social/viewForums","modules/social/writeBlog","modules/techNotes/editCheckLists","modules/techNotes/editSystemUpdates","modules/techNotes/editTechNotes","modules/techNotes/techNotes","modules/user/profile","modules/user/resetPassword","modules/user/user","resources/charts/bar-chart","resources/charts/chart-data","resources/charts/chart-element","resources/charts/doughnut-chart","resources/data/admin","resources/data/apjClientRequests","resources/data/auth","resources/data/chapters","resources/data/clientRequests","resources/data/config","resources/data/curriculum","resources/data/dataServices","resources/data/documents","resources/data/downloads","resources/data/events","resources/data/helpTickets","resources/data/inventory","resources/data/is4ua","resources/data/people","resources/data/products","resources/data/sessionData","resources/data/sessions","resources/data/siteInfo","resources/data/social","resources/data/systems","resources/dialogs/common-dialogs","resources/dialogs/confirm-dialog","resources/dialogs/document-dialog","resources/dialogs/email-dialog","resources/dialogs/event-dialog","resources/dialogs/helpTicket-dialog","resources/dialogs/input-dialog","resources/dialogs/message-dialog","resources/dialogs/note-dialog","resources/dialogs/password-dialog","resources/editor/editor","resources/editor/styles","resources/elements/add-systems","resources/elements/calendar","resources/elements/flat-picker","resources/elements/loading-indicator","resources/elements/multiselect","resources/elements/nav-bar","resources/elements/rate-it","resources/elements/submenu","resources/elements/table-navigation-bar","resources/elements/tree-node","resources/utils/dataTable","resources/utils/utils","resources/utils/validation","resources/value-converters/activate-button","resources/value-converters/arrow","resources/value-converters/check-box","resources/value-converters/course-name","resources/value-converters/date-format","resources/value-converters/file-type","resources/value-converters/filter-array","resources/value-converters/filter-clients","resources/value-converters/filter-sessions","resources/value-converters/format-digits","resources/value-converters/format-number","resources/value-converters/format-phone","resources/value-converters/get-array-value","resources/value-converters/gravatar-url-id","resources/value-converters/gravatar-url","resources/value-converters/help-ticket-statuses","resources/value-converters/help-ticket-subtypes","resources/value-converters/help-ticket-type","resources/value-converters/idsRequested","resources/value-converters/info-filter","resources/value-converters/lookup-ht-status","resources/value-converters/lookup-value","resources/value-converters/onoff-switch","resources/value-converters/overlap","resources/value-converters/parse-apjassignments","resources/value-converters/parse-assignments","resources/value-converters/person-status-button","resources/value-converters/phone-number","resources/value-converters/request-status-class","resources/value-converters/sandbox","resources/value-converters/session-name","resources/value-converters/session-status-button","resources/value-converters/session-systems","resources/value-converters/session-type","resources/value-converters/session","resources/value-converters/sort-array","resources/value-converters/sort-date-time","resources/value-converters/stat-value","resources/value-converters/system-list","resources/value-converters/to-uppercase","resources/value-converters/translate-status","resources/value-converters/ucc-staff","resources/value-converters/ucc-title","modules/admin/Customers/bulkEmails","modules/admin/Customers/customers","modules/admin/Customers/editInstitutions","modules/admin/Customers/editPeople","modules/admin/documents/documents","modules/admin/inventory/editInventory","modules/admin/notes/editCalendar","modules/admin/notes/editNotes","modules/admin/notes/notes","modules/admin/site/admin","modules/admin/site/editConfig","modules/admin/site/editCurriculum","modules/admin/site/editDownloads","modules/admin/site/editHelpTickets","modules/admin/site/editMessages","modules/admin/site/editNews","modules/admin/site/site","modules/admin/system/editChanges","modules/admin/system/editProduct","modules/admin/system/editSession","modules/admin/system/editSystem","modules/admin/system/system","modules/techNotes/notes/techNotes","modules/user/requests/clientRequests","modules/user/requests/createRequests","modules/user/requests/viewProducts","modules/user/requests/viewRequests","modules/user/support/createHelpTickets.2","modules/user/support/createHelpTickets","modules/user/support/createHelpTicketsWiz","modules/user/support/curriculum","modules/user/support/downloads","modules/user/support/links","modules/user/support/support","modules/user/support/viewHelpTickets","modules/tech/requests/apjRequests","modules/tech/requests/archiveClientRequests","modules/tech/requests/assignments","modules/tech/requests/createRequest","modules/tech/requests/techRequests","modules/tech/requests/viewUserRequests","modules/tech/support/archiveHelpTickets","modules/tech/support/createHelpTickets","modules/tech/support/support","modules/tech/support/viewHelpTickets","aurelia-templating-resources/compose","aurelia-templating-resources/if","aurelia-templating-resources/if-core","aurelia-templating-resources/else","aurelia-templating-resources/with","aurelia-templating-resources/repeat","aurelia-templating-resources/repeat-strategy-locator","aurelia-templating-resources/null-repeat-strategy","aurelia-templating-resources/array-repeat-strategy","aurelia-templating-resources/repeat-utilities","aurelia-templating-resources/map-repeat-strategy","aurelia-templating-resources/set-repeat-strategy","aurelia-templating-resources/number-repeat-strategy","aurelia-templating-resources/analyze-view-factory","aurelia-templating-resources/abstract-repeater","aurelia-templating-resources/show","aurelia-templating-resources/aurelia-hide-style","aurelia-templating-resources/hide","aurelia-templating-resources/sanitize-html","aurelia-templating-resources/html-sanitizer","aurelia-templating-resources/replaceable","aurelia-templating-resources/focus","aurelia-templating-resources/css-resource","aurelia-templating-resources/attr-binding-behavior","aurelia-templating-resources/binding-mode-behaviors","aurelia-templating-resources/throttle-binding-behavior","aurelia-templating-resources/debounce-binding-behavior","aurelia-templating-resources/self-binding-behavior","aurelia-templating-resources/signal-binding-behavior","aurelia-templating-resources/binding-signaler","aurelia-templating-resources/update-trigger-binding-behavior","aurelia-templating-resources/html-resource-plugin","aurelia-templating-resources/dynamic-element","aurelia-i18n/i18n","i18next/i18next","i18next/logger","i18next/EventEmitter","i18next/ResourceStore","i18next/utils","i18next/Translator","i18next/postProcessor","i18next/compatibility/v1","i18next/LanguageUtils","i18next/PluralResolver","i18next/Interpolator","i18next/BackendConnector","i18next/CacheConnector","i18next/defaults","aurelia-i18n/relativeTime","aurelia-i18n/defaultTranslations/relative.time","aurelia-i18n/df","aurelia-i18n/utils","aurelia-i18n/nf","aurelia-i18n/rt","aurelia-i18n/t","aurelia-i18n/base-i18n","aurelia-i18n/aurelia-i18n-loader","aurelia-dialog/dialog-configuration","aurelia-dialog/renderer","aurelia-dialog/dialog-settings","aurelia-dialog/dialog-renderer","aurelia-dialog/dialog-cancel-error","aurelia-dialog/dialog-service","aurelia-dialog/lifecycle","aurelia-dialog/dialog-controller","aurelia-dialog/dialog-close-error","node_modules/chart.js/dist/Chart.js","resources/css/fullcalendar","resources/css/OLDsummernote","resources/css/styles","resources/css/summernote","resources/editor/skins/moono-lisa/dialog","resources/editor/skins/moono-lisa/dialog_ie","resources/editor/skins/moono-lisa/dialog_ie8","resources/editor/skins/moono-lisa/dialog_iequirks","resources/editor/skins/moono-lisa/editor","resources/editor/skins/moono-lisa/editor_gecko","resources/editor/skins/moono-lisa/editor_ie","resources/editor/skins/moono-lisa/editor_ie8","resources/editor/skins/moono-lisa/editor_iequirks","modules/user/user.1","resources/dialogs/documentForm","resources/dialogs/documentsTable","resources/htTimeline/response","resources/htTimeline/timeline","modules/acc/components/Address","modules/acc/components/assignmentDetails","modules/acc/components/assignRequestTable","modules/acc/components/Audit","modules/acc/components/bo","modules/acc/components/Courses.1","modules/acc/components/Courses","modules/acc/components/editInvoiceDates","modules/acc/components/editRequestsForm","modules/acc/components/Email","modules/acc/components/erp","modules/acc/components/hana","modules/acc/components/instAddress","modules/acc/components/instIs4ua","modules/acc/components/institutionDetails","modules/acc/components/institutionPanels","modules/acc/components/institutionsForm","modules/acc/components/institutionsTable","modules/acc/components/instPeople","modules/acc/components/Log","modules/acc/components/Password","modules/acc/components/peopleForm","modules/acc/components/peopleTable","modules/acc/components/requestDetails","modules/acc/components/requestForm","modules/acc/components/Requests","modules/acc/components/requestsTable","modules/acc/components/Roles","modules/acc/components/viewAssignmentForm","modules/acc/components/viewRequestsTable","modules/admin/site/downloadForm","modules/admin/site/downloadTable","modules/analytics/components/countryInstitutionProductRequestsTable","modules/analytics/components/countryProductRequestsTable","modules/analytics/components/curriculumHTChart","modules/analytics/components/curriculumHTTable","modules/analytics/components/helpTicketsByCurriculum","modules/analytics/components/helpTicketsByInstitution","modules/analytics/components/helpTicketsByPeople","modules/analytics/components/helpTicketsByStatus","modules/analytics/components/helpTicketsByType","modules/analytics/components/institutionHTChart","modules/analytics/components/institutionHTTable","modules/analytics/components/institutionRequestsDetail","modules/analytics/components/institutionsCharts","modules/analytics/components/institutionsTable","modules/analytics/components/peopleHTChart","modules/analytics/components/peopleHTTable","modules/analytics/components/productRequestsDetail","modules/analytics/components/productRequestsTable","modules/analytics/components/requestsByCountry","modules/analytics/components/requestsByInstitution","modules/analytics/components/requestsByInstitutionCountry","modules/analytics/components/requestsByProducts","modules/analytics/components/requestsInstitutionChart","modules/analytics/components/requestsProductChart","modules/analytics/components/requestsSAPProductChart","modules/analytics/components/requestsTable","modules/analytics/components/statusHTChart","modules/analytics/components/statusHTTable","modules/analytics/components/typeHTChart","modules/analytics/components/typeHTTable","modules/facco/components/assignmentsTable","modules/facco/components/peopleTable","modules/facco/components/requestDetailDetails","modules/facco/components/requestsTable","modules/facco/components/viewAssignmentsTable","modules/facco/components/viewRequestsTable","modules/home/components/homeContent","modules/home/components/homePageLinks","modules/home/components/newsItem","modules/home/components/uccInformation","modules/social/components/blogForm","modules/social/components/blogList","modules/social/components/blogListUCC","modules/social/components/blogPage","modules/social/components/blogPageUCC","modules/social/components/chapterList","modules/social/components/forumList","modules/social/components/forumPage","modules/social/components/writeBlogList","modules/techNotes/components/notesForm","modules/techNotes/components/notesTable","modules/techNotes/components/Systems","modules/user/components/banner","modules/user/components/carousel","modules/user/components/homePageLinks","modules/user/components/newsItem","modules/user/components/uccInformation","modules/admin/Customers/components/Address","modules/admin/Customers/components/Audit","modules/admin/Customers/components/composeEmail","modules/admin/Customers/components/Courses","modules/admin/Customers/components/Email","modules/admin/Customers/components/emailTable","modules/admin/Customers/components/instAddress","modules/admin/Customers/components/instIs4ua","modules/admin/Customers/components/institutionDetails","modules/admin/Customers/components/institutionPanels","modules/admin/Customers/components/institutionsForm","modules/admin/Customers/components/institutionsTable","modules/admin/Customers/components/instPeople","modules/admin/Customers/components/is4ua","modules/admin/Customers/components/Log","modules/admin/Customers/components/Password","modules/admin/Customers/components/peopleForm","modules/admin/Customers/components/peopleTable","modules/admin/Customers/components/Roles","modules/admin/Customers/components/selectionForm","modules/admin/Customers/components/selectionPanel","modules/admin/documents/components/documentForm","modules/admin/documents/components/documentsTable","modules/admin/inventory/components/documentForm","modules/admin/inventory/components/Documents","modules/admin/inventory/components/documentsTable","modules/admin/inventory/components/History","modules/admin/inventory/components/inventoryDetails","modules/admin/inventory/components/inventoryForm","modules/admin/inventory/components/inventoryPanels","modules/admin/inventory/components/inventoryTable","modules/admin/inventory/components/Maintenance","modules/admin/inventory/components/Purchase","modules/admin/inventory/components/Technical","modules/admin/notes/components/ArchiveRequestsForm","modules/admin/notes/components/helpTicket","modules/admin/notes/components/notesForm","modules/admin/notes/components/notesTable","modules/admin/site/components/configForm","modules/admin/site/components/configTable","modules/admin/site/components/curriculumForm","modules/admin/site/components/curriculumTable","modules/admin/site/components/document","modules/admin/site/components/documentForm","modules/admin/site/components/documentsTable","modules/admin/site/components/downloadForm","modules/admin/site/components/downloadTable","modules/admin/site/components/foreverLogs","modules/admin/site/components/htTypeForm","modules/admin/site/components/htTypeTable","modules/admin/site/components/logFileTable","modules/admin/site/components/messageForm","modules/admin/site/components/messageTable","modules/admin/site/components/newsForm","modules/admin/site/components/newsTable","modules/admin/site/components/uploadedFilesTable","modules/admin/system/components/Assignments","modules/admin/system/components/changesForm","modules/admin/system/components/changesTable","modules/admin/system/components/Description","modules/admin/system/components/documentForm","modules/admin/system/components/Documents","modules/admin/system/components/documentsTable","modules/admin/system/components/edit-client-form","modules/admin/system/components/is4ua","modules/admin/system/components/Notes","modules/admin/system/components/productForm","modules/admin/system/components/productFormHeader","modules/admin/system/components/productFormToolbar","modules/admin/system/components/productTable","modules/admin/system/components/sessionConfigTable","modules/admin/system/components/sessionForm","modules/admin/system/components/sessionTable","modules/admin/system/components/systemForm","modules/admin/system/components/Systems","modules/admin/system/components/systemTable","modules/tech/requests/components/apjRequestsTable","modules/tech/requests/components/ArchiveRequestsForm","modules/tech/requests/components/ArchiveRequestsTable","modules/tech/requests/components/archiveTable","modules/tech/requests/components/assignmentDetails","modules/tech/requests/components/bo","modules/tech/requests/components/bulkEmailForm","modules/tech/requests/components/Courses","modules/tech/requests/components/editRequestsForm","modules/tech/requests/components/erp","modules/tech/requests/components/hana","modules/tech/requests/components/requestDetailDetails","modules/tech/requests/components/requestDetails","modules/tech/requests/components/requestsTable","modules/tech/requests/components/userAssignmentDetails","modules/tech/requests/components/userRequestDetails","modules/tech/requests/components/viewAssignmentForm","modules/tech/requests/components/viewRequestsForm","modules/tech/requests/components/viewRequestsTable","modules/tech/requests/components/viewUserRequestsForm","modules/tech/requests/components/viewUserRequestsTable","modules/tech/support/components/additiontalInfo","modules/tech/support/components/assignmentDetails","modules/tech/support/components/bo","modules/tech/support/components/documentForm","modules/tech/support/components/Documents","modules/tech/support/components/documentsTable","modules/tech/support/components/erp","modules/tech/support/components/hana","modules/tech/support/components/helpTicketDetails","modules/tech/support/components/helpTicketType","modules/tech/support/components/requestDetails","modules/tech/support/components/Requests","modules/tech/support/components/searchHTForm","modules/tech/support/components/selectProduct","modules/tech/support/components/viewArchiveHTForm","modules/tech/support/components/viewAssignmentForm","modules/tech/support/components/viewHelpTicketTableFilters","modules/tech/support/components/viewHoverProfile","modules/tech/support/components/viewHTForm","modules/tech/support/components/viewHTSearchResults","modules/tech/support/components/viewHTTable","modules/tech/support/components/viewRequestsPanel","modules/tech/support/components/viewToolbarButtons","modules/user/requests/components/assignmentDetails","modules/user/requests/components/bo","modules/user/requests/components/client-request-step1","modules/user/requests/components/client-request-step2","modules/user/requests/components/client-request-step3","modules/user/requests/components/client-request-step4","modules/user/requests/components/Courses","modules/user/requests/components/erp","modules/user/requests/components/hana","modules/user/requests/components/requestDetails","modules/user/requests/components/viewRequestsForm","modules/user/requests/components/viewRequestsTable","modules/user/support/components/comment","modules/user/support/components/help-ticket-step1","modules/user/support/components/help-ticket-step2","modules/user/support/components/help-ticket-step3","modules/user/support/components/help-ticket-step4","modules/user/support/components/help-ticket-step5","modules/user/support/components/helpTicketDetails","modules/user/support/components/helpTicketType","modules/user/support/components/helpTicketWizard","modules/user/support/components/inputForm-0-0","modules/user/support/components/inputForm-1-0","modules/user/support/components/Requests","modules/user/support/components/viewHTForm","modules/user/support/components/viewHTTable"]}})}

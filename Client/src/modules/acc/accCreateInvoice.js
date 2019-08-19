@@ -19,15 +19,14 @@ export class AccCreateInvoice {
     this.invoiceDate = new Date();
     this.startDate = new Date();
     this.openSelectionPanel = true;
-    this.invoiceNumber = 1001;
+    this.showToolbar = true;
   }
 
   async activate() {
     await this.apj.getInvoiceDataArray();
-    await this.people.getAPJPackages('?order=price');
+    await this.people.getAPJPackages('?order=uccPayment');
     await this.config.getConfig(true);
     this.createDates();
-    // this.compuateInvoiceEndDate();
   }
 
   attached() {
@@ -82,6 +81,22 @@ export class AccCreateInvoice {
     this.institutionsToBeInvoiced = [];
   }
 
+  invoiceAllProducts(){
+    this.apj.requestsDetailsArray.forEach(item => {
+      this.invoiceRelevantRequests.push(item);
+      if(item.price != null) this.totalProductInvoiceAmount += parseFloat(item.price);
+    })
+    this.apj.requestsDetailsArray = [];
+  }
+
+  invoiceNoProducts(){
+    this.invoiceRelevantRequests.forEach(item => {
+      this.apj.requestsDetailsArray.push(item);
+    })
+    this.totalProductInvoiceAmount = 0;
+    this.invoiceRelevantRequests = [];
+  }
+
   deleteClassifiedInvoiceInstitution(index) {
     this.classifyInstitutionsArray.splice(index, 1);
   }
@@ -113,15 +128,24 @@ export class AccCreateInvoice {
             packageItem.category = 'backColorFour';
            
           }
-          packageItem.invoiceAmount = parseFloat(packageItem.packageId.amount) * this.config.UCC_PACKAGE_PERCENTAGE
+          packageItem.invoiceAmount = this.getUCCPayment(packageItem);
+          // parseFloat(packageItem.packageId.amount) * this.config.UCC_PACKAGE_PERCENTAGE
           this.classifyInstitutionsArray.push(packageItem);
         }
       });
     }
   }
 
+  getUCCPayment(packageToProcess){
+    let thisAmount = 0;
+    this.people.packageArray.forEach(item => {
+      if(item._id === packageToProcess.packageId.packageId) thisAmount = parseFloat(item.uccPayment);
+    });
+    return thisAmount;
+  }
+
   addInsitution(index, institution) {
-    this.totalInstitutionInvoiceAmount += parseFloat(this.classifyInstitutionsArray[index].packageId.amount) * this.config.UCC_PACKAGE_PERCENTAGE;
+    this.totalInstitutionInvoiceAmount += parseFloat(this.classifyInstitutionsArray[index].invoiceAmount) //* this.config.UCC_PACKAGE_PERCENTAGE;
     this.institutionsToBeInvoiced.push(institution);
     this.classifyInstitutionsArray.splice(index, 1);
   }
@@ -135,15 +159,7 @@ export class AccCreateInvoice {
   async getInvoiceRelevantRequests() {
     await this.apj.getClientRequestsDetailsArray('?filter=invoiceRelevant|eq|true', true);
     this.invoiceRelevantRequests = [];
-    // this.filterRequests();
   }
-
-  // filterRequests() {
-  //   this.invoiceRelevantRequests = [];
-  //   this.apj.requestsDetailsArray.forEach(item => {
-  //     // if()
-  //   });
-  // }
 
   addRequest(index, request){
     if(request.price != null) this.totalProductInvoiceAmount += parseFloat(request.price);
@@ -170,9 +186,30 @@ export class AccCreateInvoice {
   }
 
   openInvoicePanelFunction(){
+    this.invoiceNumber = this.invoiceDate.getFullYear() + '-' + this.invoicePeriod;
     this.openInvoicePanel = true;
     this.openEditPanel = false;
     this.openSelectionPanel = false;
   }
+
+  async printInvoicetoPDF(){
+    $('#loading').show();
+    var inputField = $("#invoiceNumberForm").html();
+    console.log(inputField)
+    var invoice = $("#invoicePanel").html().replace(/h3/g,'h6').replace(/h4/g,'h7').replace(inputField, 'Invoice No. ' + this.invoiceNumber);
+   
+    var html = "<!DOCTYPE HTML>";
+    html += '<html lang="en-us">';
+    html += '<head><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/yeti/bootstrap.min.css" rel="stylesheet"><style>.table-borderless td,.table-borderless th {border: 0 !important;}</style></head>';
+    
+    html += "<body style='padding:25px;'>";
+    html += invoice;
+    html += "</body></html>";
+    let result = await this.apj.createPDF({page: html, number: this.invoiceNumber});
+    console.log(result);
+    if(result.message === 'done')  this.showLink  = true;
+    $('#loading').hide();
+  }
+
 
 }

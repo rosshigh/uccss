@@ -118,6 +118,11 @@
   justify-content: center;
 }
 
+.table-borderless td,
+.table-borderless th {
+    border: 0 !important;
+}
+
 .topMargin {
     margin-top: 25px;
 }

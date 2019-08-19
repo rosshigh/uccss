@@ -6,6 +6,7 @@ var Mongoose = require('mongoose'),
 var PackageSchema = new Schema({
   name: { type: String },
   price: { type: Number },
+  uccPayment: { type: Number },
   maxClients: { type: Number }
 });
 
