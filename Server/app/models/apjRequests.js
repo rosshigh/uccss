@@ -121,15 +121,11 @@ module.exports = Mongoose.model('ClientRequestAPJ', ClientRequestSchema);
 
 var InvoiceSchema = new Schema({
   createdDate: { type: Date, default: Date.now },
+  invoiceNumber: { type: String },
+  packages: {type: Schema.Types.Mixed },
   issuedDate: { type: Date },
   Amount: { type: Number },
-  datePaid: { type: Date },
-  invoiceDetails: [{
-    type: { type: String },
-    packageReference: { type: Schema.Types.ObjectId },
-    requestReference: { type: Schema.Types.ObjectId },
-    Amount: { type: Number }
-  }]
+  datePaid: { type: Date }
 });
 
 InvoiceSchema.plugin(AutoIncrement, { inc_field: 'invoiceNo' });

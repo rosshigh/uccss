@@ -2,7 +2,8 @@ export class FormatNumberValueConverter {
 
   toView(value, digits) {
 	  if(value){
-		return String(value).replace(/(.)(?=(\d{3})+$)/g,'$1,');
+      let x =  value.toFixed(2);
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	  }
   }
 }

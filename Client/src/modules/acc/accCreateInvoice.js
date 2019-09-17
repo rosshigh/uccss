@@ -20,12 +20,17 @@ export class AccCreateInvoice {
     this.startDate = new Date();
     this.openSelectionPanel = true;
     this.showToolbar = true;
+    
   }
 
   async activate() {
     await this.apj.getInvoiceDataArray();
     await this.people.getAPJPackages('?order=uccPayment');
     await this.config.getConfig(true);
+    this.exchangeRate = parseFloat(this.config.EXCHANGE_RATE);
+    this.exchangeRateFloor = parseFloat(this.config.EXCHANGE_RATE_FLOOR);
+    this.exchangeRateCeiling = parseFloat(this.config.EXCHANGE_RATE_CEILING);
+    this.uccPackagePercentage = parseFloat(this.config.UCC_PACKAGE_PERCENTAGE);
     this.createDates();
   }
 
@@ -47,13 +52,12 @@ export class AccCreateInvoice {
     });
     this.selectedInvoicePeriod = this.apj.invoiceDataArray[this.invoicePeriod];
     await this.getInstitutionToBeInvoiced();
-    await this.getInvoiceRelevantRequests();
+    // await this.getInvoiceRelevantRequests();
   }
 
   async periodChanged() {
     this.selectedInvoicePeriod = this.apj.invoiceDataArray[this.invoicePeriod];
     await this.getInstitutionToBeInvoiced();
-    await this.getInvoiceRelevantRequests();
   }
 
   async getInstitutionToBeInvoiced() {
@@ -68,8 +72,9 @@ export class AccCreateInvoice {
   invoiceAllInstitutions() {
     this.classifyInstitutionsArray.forEach(item => {
       this.institutionsToBeInvoiced.push(item);
-      this.totalInstitutionInvoiceAmount += item.packageId.amount * this.config.UCC_PACKAGE_PERCENTAGE;
-    })
+      this.totalInstitutionInvoiceAmount += item.invoiceAmount;  //item.packageId.amount * this.config.UCC_PACKAGE_PERCENTAGE;
+    });
+    this.totalInstitutionInvoiceAmount = Math.round(this.totalInstitutionInvoiceAmount * 100) / 100
     this.classifyInstitutionsArray = [];
   }
 
@@ -81,21 +86,21 @@ export class AccCreateInvoice {
     this.institutionsToBeInvoiced = [];
   }
 
-  invoiceAllProducts(){
-    this.apj.requestsDetailsArray.forEach(item => {
-      this.invoiceRelevantRequests.push(item);
-      if(item.price != null) this.totalProductInvoiceAmount += parseFloat(item.price);
-    })
-    this.apj.requestsDetailsArray = [];
-  }
+  // invoiceAllProducts(){
+  //   this.apj.requestsDetailsArray.forEach(item => {
+  //     this.invoiceRelevantRequests.push(item);
+  //     if(item.price != null) this.totalProductInvoiceAmount += parseFloat(item.price);
+  //   })
+  //   this.apj.requestsDetailsArray = [];
+  // }
 
-  invoiceNoProducts(){
-    this.invoiceRelevantRequests.forEach(item => {
-      this.apj.requestsDetailsArray.push(item);
-    })
-    this.totalProductInvoiceAmount = 0;
-    this.invoiceRelevantRequests = [];
-  }
+  // invoiceNoProducts(){
+  //   this.invoiceRelevantRequests.forEach(item => {
+  //     this.apj.requestsDetailsArray.push(item);
+  //   })
+  //   this.totalProductInvoiceAmount = 0;
+  //   this.invoiceRelevantRequests = [];
+  // }
 
   deleteClassifiedInvoiceInstitution(index) {
     this.classifyInstitutionsArray.splice(index, 1);
@@ -129,7 +134,6 @@ export class AccCreateInvoice {
            
           }
           packageItem.invoiceAmount = this.getUCCPayment(packageItem);
-          // parseFloat(packageItem.packageId.amount) * this.config.UCC_PACKAGE_PERCENTAGE
           this.classifyInstitutionsArray.push(packageItem);
         }
       });
@@ -137,41 +141,37 @@ export class AccCreateInvoice {
   }
 
   getUCCPayment(packageToProcess){
-    let thisAmount = 0;
-    this.people.packageArray.forEach(item => {
-      if(item._id === packageToProcess.packageId.packageId) thisAmount = parseFloat(item.uccPayment);
-    });
-    return thisAmount;
+    return Math.round(packageToProcess.packageId.amount * this.uccPackagePercentage * this.exchangeRate * 100) / 100;
   }
 
   addInsitution(index, institution) {
-    this.totalInstitutionInvoiceAmount += parseFloat(this.classifyInstitutionsArray[index].invoiceAmount) //* this.config.UCC_PACKAGE_PERCENTAGE;
+    this.totalInstitutionInvoiceAmount += parseFloat(this.classifyInstitutionsArray[index].invoiceAmount);
     this.institutionsToBeInvoiced.push(institution);
     this.classifyInstitutionsArray.splice(index, 1);
   }
 
   subtractInstitution(index, institution) {
-    this.totalInstitutionInvoiceAmount -= this.institutionsToBeInvoiced[index].packageId.amount * this.config.UCC_PACKAGE_PERCENTAGE;
+    this.totalInstitutionInvoiceAmount -= parseFloat(this.classifyInstitutionsArray[index].invoiceAmount);
     this.classifyInstitutionsArray.push(institution);
     this.institutionsToBeInvoiced.splice(index, 1);
   }
 
-  async getInvoiceRelevantRequests() {
-    await this.apj.getClientRequestsDetailsArray('?filter=invoiceRelevant|eq|true', true);
-    this.invoiceRelevantRequests = [];
-  }
+  // async getInvoiceRelevantRequests() {
+  //   await this.apj.getClientRequestsDetailsArray('?filter=invoiceRelevant|eq|true', true);
+  //   this.invoiceRelevantRequests = [];
+  // }
 
-  addRequest(index, request){
-    if(request.price != null) this.totalProductInvoiceAmount += parseFloat(request.price);
-    this.invoiceRelevantRequests.push(request);
-    this.apj.requestsDetailsArray.splice(index, 1);
-  }
+  // addRequest(index, request){
+  //   if(request.price != null) this.totalProductInvoiceAmount += parseFloat(request.price);
+  //   this.invoiceRelevantRequests.push(request);
+  //   this.apj.requestsDetailsArray.splice(index, 1);
+  // }
 
-  subtractRequest(index, request){
-    if(request.price != null) this.totalProductInvoiceAmount -= parseFloat(request.price);
-    this.apj.requestsDetailsArray.push(request);
-    this.invoiceRelevantRequests.splice(index, 1);
-  }
+  // subtractRequest(index, request){
+  //   if(request.price != null) this.totalProductInvoiceAmount -= parseFloat(request.price);
+  //   this.apj.requestsDetailsArray.push(request);
+  //   this.invoiceRelevantRequests.splice(index, 1);
+  // }
 
   openSelectionPanelFunction(){
     this.openInvoicePanel = false;
@@ -209,6 +209,11 @@ export class AccCreateInvoice {
     console.log(result);
     if(result.message === 'done')  this.showLink  = true;
     $('#loading').hide();
+  }
+
+  checkExchangeRate(){
+    if(this.exchangeRate < this.exchangeRateFloor) this.exchangeRate = this.exchangeRateFloor;
+    if(this.exchangeRate > this.exchangeRateCeiling) this.exchangeRate = this.exchangeRateCeiling;
   }
 
 

@@ -23,7 +23,7 @@ var requireAuth = passport.authenticate('jwt', { session: false });
 var ASSIGNED_REQUEST_CODE = '2';
 var CUSTOMER_ACTION_REQUEST_CODE = "4";
 
-module.exports = function (app) {
+module.exports = function (app, config) {
   app.use('/api/apj/', router);
 
   router.get('/clientRequests', requireAuth, function (req, res, next) {

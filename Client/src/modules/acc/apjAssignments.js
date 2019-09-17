@@ -121,7 +121,9 @@ export class APJAssignments {
     if (!response.error) {
       this.selectedRequestDetail = response;
       this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
-      this.selectedRequestDetail.techComments = this.products.selectedProduct.productInfoApj ? this.products.selectedProduct.productInfoApj : "";
+      if(!this.selectedRequestDetail.techComments || !this.selectedRequestDetail.techComments.length){
+        this.selectedRequestDetail.techComments = this.products.selectedProduct.productInfoApj ? this.products.selectedProduct.productInfoApj : "";
+      }
       if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
       await this.getProductSystems();
       this.requestSelected = 'form';
