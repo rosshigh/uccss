@@ -6,25 +6,7 @@
       <li></li>
     </ul>
   </span>
-  <span id="toolbar">
-    <div class="list-group-item toolbar">
-      <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
-        data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border"
-          aria-hidden="true"></i></span>
-      <span click.delegate="editInvoicePeriods()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
-        data-placement="bottom" title="" data-original-title="Edit Periods"><i class="fa fa-pencil fa-lg fa-border"
-          aria-hidden="true"></i></span>
-      <span click.delegate="openSelectionPanelFunction()" class="smallMarginRight" bootstrap-tooltip
-        data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Select Items"><i
-          class="fa fa-list fa-lg fa-border" aria-hidden="true"></i></span>
-      <span click.delegate="openInvoicePanelFunction()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
-        data-placement="bottom" title="" data-original-title="View Invoice"><i class="fa  fa-usd fa-lg fa-border"
-          aria-hidden="true"></i></span>
-      <span show.bind="openInvoicePanel" click.delegate="printInvoicetoPDF()" class="smallMarginRight" bootstrap-tooltip
-        data-toggle="tooltip" data-placement="bottom" title="" data-original-title="View Invoice"><i
-          class="fa  fa-file-pdf-o fa-lg fa-border" aria-hidden="true"></i></span>
-    </div>
-  </span>
+  <compose view="./components/createInvoiceToolbar.html"></compose>
 
   <div class="fluid-container">
     <div class="panel panel-default" style="margin-top:50px;">
@@ -33,103 +15,7 @@
           <h1>Periods</h1>
         </div>
         <div show.bind="openInvoicePanel" id="invoicePanel" class="col-lg-offset-2 col-lg-8">
-          <span if.bind="showLink">
-            <label>Invoice pdf: </label>
-            <a href="/uploadedFiles/invoices/${invoiceNumber}.pdf" target="_blank>">${invoiceNumber}.pdf</a>
-          </span>
-          <!-- <div class="panel-body"> -->
-          <div class="panel panel-default">
-            <div class="panel-body">
-              <div class="pull-right col-lg-3">
-                <h5>${formattedDate}</h5>
-              </div>
-              <div class="leftMargin col-lg-7">
-                <span id="invoiceNumberForm">
-                  <form class="horizontal-form">
-                    <div class="col-lg-4">
-                      <div class="form-group">
-                        <label for="invoiceNumber" class="col-sm-5 control-label">Invoice No.</label>
-                        <div class="col-sm-6">
-                          <input value.bind="invoiceNumber" id="invoiceNumber" class="form-control " type="text" />
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-                </span>
-              </div>
-              <div class="leftMargin col-lg-5" innerhtml.bind="config.UCC_ADDRESS"></div>
-              <div class="leftMargin col-lg-5" innerhtml.bind="config.UCC_ADDRESS"></div>
-            </div>
-          </div>
-
-          <span if.bind="institutionsToBeInvoiced.length">
-            <table class="table leftMargin rightMargin table-borderless table-condensed">
-              <thead>
-                <tr>
-                  <th class="col-lg-3">Institution</th>
-                  <th class="col-lg-2">Package</th>
-                  <th class="col-lg-2">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr repeat.for="institution of institutionsToBeInvoiced">
-                  <td>${institution.name}</td>
-                  <td>${institution.packageId.packageId |
-                    lookupValue:people.packageArray:"_id":"name"}</td>
-                  <td>${institution.invoiceAmount | formatNumber}</td>
-                </tr>
-                <!-- <tr>
-                  <td>
-                    <h4>Total from Package Revenue:</h4>
-                  </td>
-                  <td></td>
-                  <td>
-                    <h4>${totalInstitutionInvoiceAmount | formatNumber}</h4>
-                  </td>
-                </tr> -->
-              </tbody>
-            </table>
-          </span>
-          <!-- <span if.bind="invoiceRelevantRequests.length">
-            <h5>Products</h5>
-            <table class="table leftMargin rightMargin topMargin table-borderless table-condensed">
-              <thead>
-                <tr>
-                  <th class="col-lg-3">Product</th>
-                  <th class="col-lg-2">Institution</th>
-                  <th class="col-lg-2">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr repeat.for="request of invoiceRelevantRequests">
-                  <td>${request.productId.name}</td>
-                  <td>${request.requestId.institutionId.name}</td>
-                  <td>${request.price | formatNumber}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <h4>Total from Product Revenue:</h4>
-                  </td>
-                  <td></td>
-                  <td>
-                    <h4>${totalProductInvoiceAmount | formatNumber}</h4>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </span> -->
-          <table class="table leftMargin rightMargin topMargin">
-            <tr>
-              <td>
-                <h3>Total Invoice Amount:</h3>
-              </td>
-              <td></td>
-              <td>
-                <h3>$ ${totalProductInvoiceAmount + totalInstitutionInvoiceAmount| formatNumber}</h3>
-              </td>
-            </tr>
-            </tbody>
-          </table>
+          <compose view="./components/invoicePanel.html"></compose>
         </div>
       </div>
       <div show.bind="openSelectionPanel">

@@ -20,7 +20,7 @@ export class AccCreateInvoice {
     this.startDate = new Date();
     this.openSelectionPanel = true;
     this.showToolbar = true;
-    
+
   }
 
   async activate() {
@@ -131,7 +131,7 @@ export class AccCreateInvoice {
             // this.classifyInstitutionsArray.push(packageItem);
           } else if (packageItem.packageId.dateInvoiced === null) {
             packageItem.category = 'backColorFour';
-           
+
           }
           packageItem.invoiceAmount = this.getUCCPayment(packageItem);
           this.classifyInstitutionsArray.push(packageItem);
@@ -140,7 +140,7 @@ export class AccCreateInvoice {
     }
   }
 
-  getUCCPayment(packageToProcess){
+  getUCCPayment(packageToProcess) {
     return Math.round(packageToProcess.packageId.amount * this.uccPackagePercentage * this.exchangeRate * 100) / 100;
   }
 
@@ -173,7 +173,7 @@ export class AccCreateInvoice {
   //   this.invoiceRelevantRequests.splice(index, 1);
   // }
 
-  openSelectionPanelFunction(){
+  openSelectionPanelFunction() {
     this.openInvoicePanel = false;
     this.openEditPanel = false;
     this.openSelectionPanel = true;
@@ -185,35 +185,60 @@ export class AccCreateInvoice {
     this.openSelectionPanel = false;
   }
 
-  openInvoicePanelFunction(){
+  openInvoicePanelFunction() {
     this.invoiceNumber = this.invoiceDate.getFullYear() + '-' + this.invoicePeriod;
     this.openInvoicePanel = true;
     this.openEditPanel = false;
     this.openSelectionPanel = false;
   }
 
-  async printInvoicetoPDF(){
+  _buildInvoice() {
+    let itemsArray = [];
+    this.institutionsToBeInvoiced.forEach(item => {
+      itemsArray.push({
+        institution: item._id,
+        amount: item.invoiceAmount,
+        institutionPackageId: item.packageId._id
+      });
+    });
+    return {
+      invoiceNumber: this.invoiceNumber ? this.invoiceNumber : this.invoiceDate.getFullYear() + '-' + this.invoicePeriod,
+      invoiceItems: itemsArray,
+      Amount: this.totalInstitutionInvoiceAmount
+    };
+
+  }
+
+  async saveInvoice() { 
+    if(this.openInvoicePanel && this.institutionsToBeInvoiced && this.institutionsToBeInvoiced.length){
+      let invoiceToSave = this._buildInvoice();
+      let response = await this.apj.saveInvoice(invoiceToSave);
+      console.log(response);
+    }
+  }
+
+  async printInvoicetoPDF() {
     $('#loading').show();
     var inputField = $("#invoiceNumberForm").html();
     console.log(inputField)
-    var invoice = $("#invoicePanel").html().replace(/h3/g,'h6').replace(/h4/g,'h7').replace(inputField, 'Invoice No. ' + this.invoiceNumber);
-   
+    var invoice = $("#invoicePanel").html().replace(/h3/g, 'h6').replace(/h4/g, 'h7').replace(inputField, 'Invoice No. ' + this.invoiceNumber);
+
     var html = "<!DOCTYPE HTML>";
     html += '<html lang="en-us">';
     html += '<head><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/yeti/bootstrap.min.css" rel="stylesheet"><style>.table-borderless td,.table-borderless th {border: 0 !important;}</style></head>';
-    
+
     html += "<body style='padding:25px;'>";
     html += invoice;
     html += "</body></html>";
-    let result = await this.apj.createPDF({page: html, number: this.invoiceNumber});
+    let result = await this.apj.createPDF({ page: html, number: this.invoiceNumber });
     console.log(result);
-    if(result.message === 'done')  this.showLink  = true;
+    if (result.message === 'done') this.showLink = true;
     $('#loading').hide();
   }
 
-  checkExchangeRate(){
-    if(this.exchangeRate < this.exchangeRateFloor) this.exchangeRate = this.exchangeRateFloor;
-    if(this.exchangeRate > this.exchangeRateCeiling) this.exchangeRate = this.exchangeRateCeiling;
+  checkExchangeRate() {
+    if (this.exchangeRate < this.exchangeRateFloor) this.exchangeRate = this.exchangeRateFloor;
+    if (this.exchangeRate > this.exchangeRateCeiling) this.exchangeRate = this.exchangeRateCeiling;
   }
 
 

@@ -483,6 +483,7 @@ export class AppConfig {
         this.EXCHANGE_RATE = this.getParameter('EXCHANGE_RATE');
         this.EXCHANGE_RATE_CEILING = this.getParameter('EXCHANGE_RATE_CEILING');
         this.EXCHANGE_RATE_FLOOR = this.getParameter('EXCHANGE_RATE_FLOOR');
+        this.ACC_ADDRESS = this.getParameter('ACC_ADDRESS');
         
     }
 

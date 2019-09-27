@@ -122,7 +122,7 @@ module.exports = Mongoose.model('ClientRequestAPJ', ClientRequestSchema);
 var InvoiceSchema = new Schema({
   createdDate: { type: Date, default: Date.now },
   invoiceNumber: { type: String },
-  packages: {type: Schema.Types.Mixed },
+  invoiceItems: {type: Schema.Types.Mixed },
   issuedDate: { type: Date },
   Amount: { type: Number },
   datePaid: { type: Date }

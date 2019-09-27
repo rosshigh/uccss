@@ -1,0 +1,64 @@
+<template>
+  <span if.bind="showLink">
+    <label>Invoice pdf: </label>
+    <a href="/uploadedFiles/invoices/${invoiceNumber}.pdf" target="_blank>">${invoiceNumber}.pdf</a>
+  </span>
+  <!-- <div class="panel-body"> -->
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div class="pull-right col-lg-3">
+        <h5>${formattedDate}</h5>
+      </div>
+      <div class="leftMargin col-lg-7">
+        <span id="invoiceNumberForm">
+          <form class="horizontal-form">
+            <div class="col-lg-4">
+              <div class="form-group">
+                <label for="invoiceNumber" class="col-sm-5 control-label">Invoice No.</label>
+                <div class="col-sm-6">
+                  <input if.bind="creatingInvoice" value.bind="invoiceNumber" id="invoiceNumber" class="form-control " type="text" />
+                  <h4 if.bind="!creatingInvoice">${invoiceNumber}</h4>
+                </div>
+              </div>
+            </div>
+          </form>
+        </span>
+      </div>
+      <div class="leftMargin col-lg-5" innerhtml.bind="config.UCC_ADDRESS"></div>
+      <div class="leftMargin col-lg-5" innerhtml.bind="config.ACC_ADDRESS"></div>
+    </div>
+  </div>
+
+  <span if.bind="institutionsToBeInvoiced.length">
+    <table class="table leftMargin rightMargin table-borderless table-condensed">
+      <thead>
+        <tr>
+          <th class="col-lg-3">Institution</th>
+          <th class="col-lg-2">Package</th>
+          <th class="col-lg-2">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr repeat.for="institution of institutionsToBeInvoiced">
+          <td>${institution.name}</td>
+          <td>${institution.packageId.packageId |
+            lookupValue:people.packageArray:"_id":"name"}</td>
+          <td>${institution.invoiceAmount | formatNumber}</td>
+        </tr>
+      </tbody>
+    </table>
+  </span>
+  <table class="table leftMargin rightMargin topMargin">
+    <tr>
+      <td>
+        <h3>Total Invoice Amount:</h3>
+      </td>
+      <td></td>
+      <td>
+        <h3>$ ${totalInstitutionInvoiceAmount| formatNumber}</h3>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+</template>

@@ -982,7 +982,7 @@ export class Assignments {
                     this.utils.showNotification("The request was updated");
                     this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
                     this.reSort();
-                    await this.filterInAssigned();
+                    // await this.filterInAssigned();
                     this._cleanUp();
                 }
             }

@@ -1,3 +1,15 @@
 <template>
-    <h1>View Invoice</h1>
+  <span id="loading">
+    <ul class="bokeh">
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+  </span>
+  <div show.bind="invoiceSelected == 'table'">
+    <compose view="./components/viewInvoicesTable.html"></compose>
+  </div>
+  <div show.bind="invoiceSelected == 'form'">
+      <compose view="./components/viewInvoicePanel.html"></compose>
+    </div>
 </template>

@@ -16,7 +16,8 @@ var express = require('express'),
   Promise = require('bluebird'),
   logger = require('../../config/logger'),
   asyncHandler = require('express-async-handler'),
-  puppeteer = require('puppeteer');
+  puppeteer = require('puppeteer'),
+  Promise = require('bluebird');
 
 var requireAuth = passport.authenticate('jwt', { session: false });
 
@@ -453,6 +454,12 @@ module.exports = function (app, config) {
       }
     })
   });
+
+  // router.post('/invoices', async function(req, res, next){
+  //   logger.log('info', 'Saving invoice');
+  //   console.log(req.body);
+  //   res.status(200).json({message: 'Invoice saved'});
+  // });
 
   router.post('/invoices/createPDF', async function (req, res, next) {
     console.log('saving pdf')

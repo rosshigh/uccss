@@ -109,7 +109,6 @@ export class ViewHelpTickets {
   attached() {
     this.refresh(false);
     if (!this.mobile) this.toolTips();
-    // $("#loading").hide();
     this.initialLoaded = true;
 
     setInterval(() => { if (!this.helpTicketSelected) this.refresh(false); }, this.refreshInterval * 60 * 1000);
@@ -574,6 +573,7 @@ export class ViewHelpTickets {
     this.files = new Array();
     this.filesSelected = "";
     this.helpTicketSelected = false;
+    this.showRequestPanel = false;
     $('input[type=file]').wrap('<form></form>').parent().trigger('reset').children().unwrap();
   }
 
