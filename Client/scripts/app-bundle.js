@@ -911,7 +911,7 @@ define('modules/acc/accCreateInvoice',['exports', 'aurelia-framework', '../../re
       var yearAgo = (0, _moment2.default)(this.selectedInvoicePeriod.startDate).subtract(365, 'days');
       if (this.apj.invoiceDataArray) {
         this.people.institutionsArray.forEach(function (packageItem) {
-          if (packageItem.packageId !== null) {
+          if (packageItem.packageId && packageItem.packageId !== null) {
             if (packageItem.packageId.datePaid !== null && (0, _moment2.default)(packageItem.packageId.datePaid).isBetween(_this4.selectedInvoicePeriod.startDate, _this4.selectedInvoicePeriod.endDate)) {
               packageItem.category = 'backColorOne';
 

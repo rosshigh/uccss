@@ -116,7 +116,7 @@ export class AccCreateInvoice {
     let yearAgo = moment(this.selectedInvoicePeriod.startDate).subtract(365, 'days');
     if (this.apj.invoiceDataArray) {
       this.people.institutionsArray.forEach(packageItem => {
-        if (packageItem.packageId !== null) {
+        if (packageItem.packageId && packageItem.packageId !== null) {
           if (packageItem.packageId.datePaid !== null && moment(packageItem.packageId.datePaid).isBetween(this.selectedInvoicePeriod.startDate, this.selectedInvoicePeriod.endDate)) {
             //datePaid between selectedInvoicePeriod.startDate and selectedInvoicePeriod.endDate
             packageItem.category = 'backColorOne';
