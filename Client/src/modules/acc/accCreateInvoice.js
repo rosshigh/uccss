@@ -213,7 +213,6 @@ export class AccCreateInvoice {
     if(this.openInvoicePanel && this.institutionsToBeInvoiced && this.institutionsToBeInvoiced.length){
       let invoiceToSave = this._buildInvoice();
       let response = await this.apj.saveInvoice(invoiceToSave);
-      console.log(response);
     }
   }
 
@@ -240,6 +239,32 @@ export class AccCreateInvoice {
     if (this.exchangeRate < this.exchangeRateFloor) this.exchangeRate = this.exchangeRateFloor;
     if (this.exchangeRate > this.exchangeRateCeiling) this.exchangeRate = this.exchangeRateCeiling;
   }
+
+  downloadInstExcel(){
+    let csvContent = "data:text/csv;charset=utf-8;,Name,Package,Date Started,Amount\r\n";
+    this.institutionsToBeInvoiced.forEach(item => {
+        csvContent += item.name + "," 
+            + this.getPackageName(item.packageId.packageId) + ","
+            +  moment(item.packageId.dateStarted).format('MMM Do YYYY') +","
+            + item.invoiceAmount;
+            csvContent +=  "\r\n";
+    })
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "invoicedInstitutions.csv");
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+}
+
+getPackageName(packageId){
+  let name = "";
+  this.people.packageArray.forEach(item => {
+      if(item._id === packageId) name = item.name;
+  })
+  return name;
+}
 
 
 }

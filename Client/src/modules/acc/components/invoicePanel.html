@@ -6,6 +6,7 @@
   <!-- <div class="panel-body"> -->
   <div class="panel panel-default">
     <div class="panel-body">
+      <h3>Proposed Invoice</h3>
       <div class="pull-right col-lg-3">
         <h5>${formattedDate}</h5>
       </div>
@@ -14,7 +15,7 @@
           <form class="horizontal-form">
             <div class="col-lg-4">
               <div class="form-group">
-                <label for="invoiceNumber" class="col-sm-5 control-label">Invoice No.</label>
+                <label for="invoiceNumber" class="col-sm-6 control-label">Invoice No.</label>
                 <div class="col-sm-6">
                   <input if.bind="creatingInvoice" value.bind="invoiceNumber" id="invoiceNumber" class="form-control " type="text" />
                   <h4 if.bind="!creatingInvoice">${invoiceNumber}</h4>
@@ -25,7 +26,7 @@
         </span>
       </div>
       <div class="leftMargin col-lg-5" innerhtml.bind="config.UCC_ADDRESS"></div>
-      <div class="leftMargin col-lg-5" innerhtml.bind="config.ACC_ADDRESS"></div>
+      <div class="leftMargin col-lg-5 pull-right" innerhtml.bind="config.ACC_ADDRESS"></div>
     </div>
   </div>
 

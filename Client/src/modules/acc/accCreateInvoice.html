@@ -57,7 +57,8 @@
             <div class="form-group">
               <div class="col-sm-10">
                 <label>Exchange Rate</label>
-                <input class="form-control" type="number" value.bind="exchangeRate" change.trigger="checkExchangeRate()" />
+                <input class="form-control" type="number" value.bind="exchangeRate"
+                  change.trigger="checkExchangeRate()" />
               </div>
             </div>
           </div>
@@ -139,7 +140,10 @@
               class="fa fa-arrow-left fa-3x fa-border topMargin leftMargin" aria-hidden="true"></i></span>
         </div>
         <div class="col-lg-5 topMargin">
-          <h4>Total from Packages: ${totalInstitutionInvoiceAmount | formatNumber:2}</h4>
+          <h4>Total from Packages: ${totalInstitutionInvoiceAmount | formatNumber:2}
+            <span show.bind="institutionsToBeInvoiced.length" click.delegate="downloadInstExcel()"
+              class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+              data-original-title="Export to Excel"><i class="fa fa-download" aria-hidden="true"></i></span></h4>
           <div class="well well2 overFlow" style="height:800px;">
             <ul class="list-group">
               <button click.trigger="subtractInstitution($index, institution)" type="button"

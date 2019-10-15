@@ -121,7 +121,7 @@ export class APJAssignments {
     if (!response.error) {
       this.selectedRequestDetail = response;
       this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
-      if(!this.selectedRequestDetail.techComments || !this.selectedRequestDetail.techComments.length){
+      if (!this.selectedRequestDetail.techComments || !this.selectedRequestDetail.techComments.length) {
         this.selectedRequestDetail.techComments = this.products.selectedProduct.productInfoApj ? this.products.selectedProduct.productInfoApj : "";
       }
       if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
@@ -504,4 +504,30 @@ export class APJAssignments {
     return item.productId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
   }
 
+  getStatus(status) { 
+    let statusDescription = "";
+    this.config.REQUEST_STATUS.forEach(item => {
+      if (item.code == status) statusDescription = item.description;
+    });
+    return statusDescription;
+  }
+
+  downloadAssignExcel() {
+    let csvContent = "data:text/csv;charset=utf-8;,Due Date,Created Date,Status,Product,Institution\r\n";
+    this.dataTable.displayArray.forEach(item => {
+      csvContent += moment(item.requiredDate).format('MMM Do YYYY') + ","
+        + moment(item.createdDate).format('MMM Do YYYY') + ","
+        + this.getStatus(item.requestStatus) + ","
+        + item.productId.name + ","
+        + item.requestId.institutionId.name;
+      csvContent += "\r\n";
+    })
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "assignments.csv");
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+  }
 }
