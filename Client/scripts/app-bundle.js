@@ -6182,6 +6182,52 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
             return getHelpTicket;
         }();
 
+        HelpTickets.prototype.getArchiveHelpTicket = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(id) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                if (!id) {
+                                    _context7.next = 13;
+                                    break;
+                                }
+
+                                _context7.prev = 1;
+                                _context7.next = 4;
+                                return this.data.get(this.HELP_TICKET_SERVICES + "/archive" + "/" + id);
+
+                            case 4:
+                                serverResponse = _context7.sent;
+
+                                if (!serverResponse.error) {
+                                    this.selectedHelpTicket = serverResponse;
+                                }
+                                return _context7.abrupt('return', serverResponse);
+
+                            case 9:
+                                _context7.prev = 9;
+                                _context7.t0 = _context7['catch'](1);
+
+                                console.log(_context7.t0);
+                                return _context7.abrupt('return', undefined);
+
+                            case 13:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this, [[1, 9]]);
+            }));
+
+            function getArchiveHelpTicket(_x11) {
+                return _ref7.apply(this, arguments);
+            }
+
+            return getArchiveHelpTicket;
+        }();
+
         HelpTickets.prototype.setHelpTicket = function setHelpTicket(helpTicket) {
             if (!helpTicket) {
                 this.emptyHelpTicket();
@@ -6191,23 +6237,23 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.getCurrentCount = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(options) {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(options) {
                 var url, response;
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
-                        switch (_context7.prev = _context7.next) {
+                        switch (_context8.prev = _context8.next) {
                             case 0:
                                 url = this.HELP_TICKET_SERVICES + '/current/count';
 
                                 url += options ? "/" + options : "";
-                                _context7.next = 4;
+                                _context8.next = 4;
                                 return this.data.get(url);
 
                             case 4:
-                                response = _context7.sent;
+                                response = _context8.sent;
 
                                 if (response.status) {
-                                    _context7.next = 13;
+                                    _context8.next = 13;
                                     break;
                                 }
 
@@ -6215,21 +6261,21 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 this.inProcessHelpTickets = this.utils.countItems(this.config.IN_PROCESS_HELPTICKET_STATUS, 'helpTicketStatus', response);
                                 this.underReviewHelpTickets = this.utils.countItems(this.config.UNDER_REVIEW_HELPTICKET_STATUS, 'helpTicketStatus', response);
                                 this.customerActionHelpTickets = this.utils.countItems(this.config.CUSTOMER_ACTION_HELPTICKET_STATUS, 'helpTicketStatus', response);
-                                return _context7.abrupt('return', response.count);
+                                return _context8.abrupt('return', response.count);
 
                             case 13:
-                                return _context7.abrupt('return', null);
+                                return _context8.abrupt('return', null);
 
                             case 14:
                             case 'end':
-                                return _context7.stop();
+                                return _context8.stop();
                         }
                     }
-                }, _callee7, this);
+                }, _callee8, this);
             }));
 
-            function getCurrentCount(_x11) {
-                return _ref7.apply(this, arguments);
+            function getCurrentCount(_x12) {
+                return _ref8.apply(this, arguments);
             }
 
             return getCurrentCount;
@@ -6319,51 +6365,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.updateOwner = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(obj) {
-                var response;
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
-                    while (1) {
-                        switch (_context8.prev = _context8.next) {
-                            case 0:
-                                if (this.selectedHelpTicket) {
-                                    _context8.next = 2;
-                                    break;
-                                }
-
-                                return _context8.abrupt('return');
-
-                            case 2:
-                                _context8.next = 4;
-                                return this.data.saveObject(obj, this.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
-
-                            case 4:
-                                response = _context8.sent;
-
-                                if (!response.error) {
-                                    this.selectedHelpTicket = response;
-                                    this.updateHelpTicket(this.selectedHelpTicket);
-                                } else {
-                                    this.data.processError(response, "There was an error updating the help ticket.");
-                                }
-                                return _context8.abrupt('return', response);
-
-                            case 7:
-                            case 'end':
-                                return _context8.stop();
-                        }
-                    }
-                }, _callee8, this);
-            }));
-
-            function updateOwner(_x12) {
-                return _ref8.apply(this, arguments);
-            }
-
-            return updateOwner;
-        }();
-
-        HelpTickets.prototype.updateStatus = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(email) {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(obj) {
                 var response;
                 return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
@@ -6378,13 +6380,14 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
 
                             case 2:
                                 _context9.next = 4;
-                                return this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + "/status/" + this.selectedHelpTicket._id, "put");
+                                return this.data.saveObject(obj, this.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
 
                             case 4:
                                 response = _context9.sent;
 
                                 if (!response.error) {
-                                    this.helpTicketsArray[this.editIndex].helpTicketStatus = response.helpTicketStatus;
+                                    this.selectedHelpTicket = response;
+                                    this.updateHelpTicket(this.selectedHelpTicket);
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
@@ -6398,15 +6401,15 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee9, this);
             }));
 
-            function updateStatus(_x13) {
+            function updateOwner(_x13) {
                 return _ref9.apply(this, arguments);
             }
 
-            return updateStatus;
+            return updateOwner;
         }();
 
-        HelpTickets.prototype.updateKeywords = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
+        HelpTickets.prototype.updateStatus = function () {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(email) {
                 var response;
                 return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
@@ -6421,13 +6424,13 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
 
                             case 2:
                                 _context10.next = 4;
-                                return this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + "/keywords/" + this.selectedHelpTicket._id, "put");
+                                return this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + "/status/" + this.selectedHelpTicket._id, "put");
 
                             case 4:
                                 response = _context10.sent;
 
                                 if (!response.error) {
-                                    this.helpTicketsArray[this.editIndex].keyWords = response.keyWords;
+                                    this.helpTicketsArray[this.editIndex].helpTicketStatus = response.helpTicketStatus;
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
@@ -6441,16 +6444,16 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee10, this);
             }));
 
-            function updateKeywords() {
+            function updateStatus(_x14) {
                 return _ref10.apply(this, arguments);
             }
 
-            return updateKeywords;
+            return updateStatus;
         }();
 
-        HelpTickets.prototype.reopenHelpTicket = function () {
+        HelpTickets.prototype.updateKeywords = function () {
             var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
-                var url, response;
+                var response;
                 return regeneratorRuntime.wrap(function _callee11$(_context11) {
                     while (1) {
                         switch (_context11.prev = _context11.next) {
@@ -6463,20 +6466,20 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 return _context11.abrupt('return');
 
                             case 2:
-                                if (this.selectedHelpTicketContent) this.selectedHelpTicket.content.push(this.selectedHelpTicketContent);
-                                url = this.HELP_TICKET_SERVICES + '/reopen';
-                                _context11.next = 6;
-                                return this.data.saveObject(this.selectedHelpTicket, url, "put");
+                                _context11.next = 4;
+                                return this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + "/keywords/" + this.selectedHelpTicket._id, "put");
 
-                            case 6:
+                            case 4:
                                 response = _context11.sent;
 
-                                if (!response.error) {} else {
+                                if (!response.error) {
+                                    this.helpTicketsArray[this.editIndex].keyWords = response.keyWords;
+                                } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
                                 return _context11.abrupt('return', response);
 
-                            case 9:
+                            case 7:
                             case 'end':
                                 return _context11.stop();
                         }
@@ -6484,16 +6487,16 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee11, this);
             }));
 
-            function reopenHelpTicket() {
+            function updateKeywords() {
                 return _ref11.apply(this, arguments);
             }
 
-            return reopenHelpTicket;
+            return updateKeywords;
         }();
 
-        HelpTickets.prototype.closeHelpTicket = function () {
+        HelpTickets.prototype.reopenHelpTicket = function () {
             var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
-                var response;
+                var url, response;
                 return regeneratorRuntime.wrap(function _callee12$(_context12) {
                     while (1) {
                         switch (_context12.prev = _context12.next) {
@@ -6507,20 +6510,19 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
 
                             case 2:
                                 if (this.selectedHelpTicketContent) this.selectedHelpTicket.content.push(this.selectedHelpTicketContent);
-                                _context12.next = 5;
-                                return this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + '/close', "put");
+                                url = this.HELP_TICKET_SERVICES + '/reopen';
+                                _context12.next = 6;
+                                return this.data.saveObject(this.selectedHelpTicket, url, "put");
 
-                            case 5:
+                            case 6:
                                 response = _context12.sent;
 
-                                if (!response.error) {
-                                    this.helpTicketsArray.splice(this.editIndex, 1);
-                                } else {
+                                if (!response.error) {} else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
                                 return _context12.abrupt('return', response);
 
-                            case 8:
+                            case 9:
                             case 'end':
                                 return _context12.stop();
                         }
@@ -6528,16 +6530,16 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee12, this);
             }));
 
-            function closeHelpTicket() {
+            function reopenHelpTicket() {
                 return _ref12.apply(this, arguments);
             }
 
-            return closeHelpTicket;
+            return reopenHelpTicket;
         }();
 
-        HelpTickets.prototype.saveHelpTicket = function () {
-            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(email) {
-                var url, response, HTNo, status;
+        HelpTickets.prototype.closeHelpTicket = function () {
+            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
+                var response;
                 return regeneratorRuntime.wrap(function _callee13$(_context13) {
                     while (1) {
                         switch (_context13.prev = _context13.next) {
@@ -6550,18 +6552,62 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 return _context13.abrupt('return');
 
                             case 2:
-                                url = this.HELP_TICKET_SERVICES;
+                                if (this.selectedHelpTicketContent) this.selectedHelpTicket.content.push(this.selectedHelpTicketContent);
+                                _context13.next = 5;
+                                return this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + '/close', "put");
 
-                                if (this.selectedHelpTicket._id) {
-                                    _context13.next = 11;
+                            case 5:
+                                response = _context13.sent;
+
+                                if (!response.error) {
+                                    this.helpTicketsArray.splice(this.editIndex, 1);
+                                } else {
+                                    this.data.processError(response, "There was an error updating the help ticket.");
+                                }
+                                return _context13.abrupt('return', response);
+
+                            case 8:
+                            case 'end':
+                                return _context13.stop();
+                        }
+                    }
+                }, _callee13, this);
+            }));
+
+            function closeHelpTicket() {
+                return _ref13.apply(this, arguments);
+            }
+
+            return closeHelpTicket;
+        }();
+
+        HelpTickets.prototype.saveHelpTicket = function () {
+            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(email) {
+                var url, response, HTNo, status;
+                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                    while (1) {
+                        switch (_context14.prev = _context14.next) {
+                            case 0:
+                                if (this.selectedHelpTicket) {
+                                    _context14.next = 2;
                                     break;
                                 }
 
-                                _context13.next = 6;
+                                return _context14.abrupt('return');
+
+                            case 2:
+                                url = this.HELP_TICKET_SERVICES;
+
+                                if (this.selectedHelpTicket._id) {
+                                    _context14.next = 11;
+                                    break;
+                                }
+
+                                _context14.next = 6;
                                 return this.data.saveObject(this.selectedHelpTicket, url, "post");
 
                             case 6:
-                                response = _context13.sent;
+                                response = _context14.sent;
 
                                 if (!response.error) {
                                     if (email && email.email) {
@@ -6576,15 +6622,15 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 } else {
                                     this.data.processError(response, "There was an error creating the help ticket.");
                                 }
-                                return _context13.abrupt('return', response);
+                                return _context14.abrupt('return', response);
 
                             case 11:
                                 status = this.selectedHelpTicket.helpTicketStatus;
-                                _context13.next = 14;
+                                _context14.next = 14;
                                 return this.data.saveObject(this.selectedHelpTicket, url, "put");
 
                             case 14:
-                                response = _context13.sent;
+                                response = _context14.sent;
 
                                 if (!response.error) {
                                     if (email && email.email) {
@@ -6600,52 +6646,9 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
-                                return _context13.abrupt('return', response);
-
-                            case 17:
-                            case 'end':
-                                return _context13.stop();
-                        }
-                    }
-                }, _callee13, this);
-            }));
-
-            function saveHelpTicket(_x14) {
-                return _ref13.apply(this, arguments);
-            }
-
-            return saveHelpTicket;
-        }();
-
-        HelpTickets.prototype.saveHelpTicketResponse = function () {
-            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(email) {
-                var url, response;
-                return regeneratorRuntime.wrap(function _callee14$(_context14) {
-                    while (1) {
-                        switch (_context14.prev = _context14.next) {
-                            case 0:
-                                if (!this.selectedHelpTicket._id) {
-                                    _context14.next = 7;
-                                    break;
-                                }
-
-                                url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
-                                _context14.next = 4;
-                                return this.data.saveObject(this.selectedHelpTicketContent, url, "put");
-
-                            case 4:
-                                response = _context14.sent;
-
-                                if (!response.error) {
-                                    if (!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
-                                    this.selectedHelpTicket = this.utils.copyObject(response);
-                                    this.updateHelpTicket(this.selectedHelpTicket);
-                                } else {
-                                    this.data.processError(response, "There was an error updating the help ticket.");
-                                }
                                 return _context14.abrupt('return', response);
 
-                            case 7:
+                            case 17:
                             case 'end':
                                 return _context14.stop();
                         }
@@ -6653,14 +6656,14 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee14, this);
             }));
 
-            function saveHelpTicketResponse(_x15) {
+            function saveHelpTicket(_x15) {
                 return _ref14.apply(this, arguments);
             }
 
-            return saveHelpTicketResponse;
+            return saveHelpTicket;
         }();
 
-        HelpTickets.prototype.saveHelpTicketResponseAndCLose = function () {
+        HelpTickets.prototype.saveHelpTicketResponse = function () {
             var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(email) {
                 var url, response;
                 return regeneratorRuntime.wrap(function _callee15$(_context15) {
@@ -6683,7 +6686,6 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                     if (!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                                     this.selectedHelpTicket = this.utils.copyObject(response);
                                     this.updateHelpTicket(this.selectedHelpTicket);
-                                    this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
@@ -6697,8 +6699,52 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee15, this);
             }));
 
-            function saveHelpTicketResponseAndCLose(_x16) {
+            function saveHelpTicketResponse(_x16) {
                 return _ref15.apply(this, arguments);
+            }
+
+            return saveHelpTicketResponse;
+        }();
+
+        HelpTickets.prototype.saveHelpTicketResponseAndCLose = function () {
+            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(email) {
+                var url, response;
+                return regeneratorRuntime.wrap(function _callee16$(_context16) {
+                    while (1) {
+                        switch (_context16.prev = _context16.next) {
+                            case 0:
+                                if (!this.selectedHelpTicket._id) {
+                                    _context16.next = 7;
+                                    break;
+                                }
+
+                                url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
+                                _context16.next = 4;
+                                return this.data.saveObject(this.selectedHelpTicketContent, url, "put");
+
+                            case 4:
+                                response = _context16.sent;
+
+                                if (!response.error) {
+                                    if (!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+                                    this.selectedHelpTicket = this.utils.copyObject(response);
+                                    this.updateHelpTicket(this.selectedHelpTicket);
+                                    this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+                                } else {
+                                    this.data.processError(response, "There was an error updating the help ticket.");
+                                }
+                                return _context16.abrupt('return', response);
+
+                            case 7:
+                            case 'end':
+                                return _context16.stop();
+                        }
+                    }
+                }, _callee16, this);
+            }));
+
+            function saveHelpTicketResponseAndCLose(_x17) {
+                return _ref16.apply(this, arguments);
             }
 
             return saveHelpTicketResponseAndCLose;
@@ -6719,39 +6765,6 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.uploadFile = function () {
-            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(files, content) {
-                var response;
-                return regeneratorRuntime.wrap(function _callee16$(_context16) {
-                    while (1) {
-                        switch (_context16.prev = _context16.next) {
-                            case 0:
-                                _context16.next = 2;
-                                return this.data.uploadFiles(files, this.HELP_TICKET_SERVICES + "/upload/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
-
-                            case 2:
-                                response = _context16.sent;
-
-                                if (!response.error) {
-                                    if (this.selectedHelpTicket) this.selectedHelpTicket = this.utils.copyObject(response);
-                                    if (this.helpTicketsArray && this.editIndex) this.updateHelpTicket(this.selectHelpTicket);
-                                }
-
-                            case 4:
-                            case 'end':
-                                return _context16.stop();
-                        }
-                    }
-                }, _callee16, this);
-            }));
-
-            function uploadFile(_x17, _x18) {
-                return _ref16.apply(this, arguments);
-            }
-
-            return uploadFile;
-        }();
-
-        HelpTickets.prototype.uploadFileArchive = function () {
             var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17(files, content) {
                 var response;
                 return regeneratorRuntime.wrap(function _callee17$(_context17) {
@@ -6759,7 +6772,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                         switch (_context17.prev = _context17.next) {
                             case 0:
                                 _context17.next = 2;
-                                return this.data.uploadFiles(files, this.HELP_TICKET_SERVICES + "/uploadArchive/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
+                                return this.data.uploadFiles(files, this.HELP_TICKET_SERVICES + "/upload/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
 
                             case 2:
                                 response = _context17.sent;
@@ -6777,8 +6790,41 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee17, this);
             }));
 
-            function uploadFileArchive(_x19, _x20) {
+            function uploadFile(_x18, _x19) {
                 return _ref17.apply(this, arguments);
+            }
+
+            return uploadFile;
+        }();
+
+        HelpTickets.prototype.uploadFileArchive = function () {
+            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18(files, content) {
+                var response;
+                return regeneratorRuntime.wrap(function _callee18$(_context18) {
+                    while (1) {
+                        switch (_context18.prev = _context18.next) {
+                            case 0:
+                                _context18.next = 2;
+                                return this.data.uploadFiles(files, this.HELP_TICKET_SERVICES + "/uploadArchive/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
+
+                            case 2:
+                                response = _context18.sent;
+
+                                if (!response.error) {
+                                    if (this.selectedHelpTicket) this.selectedHelpTicket = this.utils.copyObject(response);
+                                    if (this.helpTicketsArray && this.editIndex) this.updateHelpTicket(this.selectHelpTicket);
+                                }
+
+                            case 4:
+                            case 'end':
+                                return _context18.stop();
+                        }
+                    }
+                }, _callee18, this);
+            }));
+
+            function uploadFileArchive(_x20, _x21) {
+                return _ref18.apply(this, arguments);
             }
 
             return uploadFileArchive;
@@ -6825,51 +6871,51 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.getHelpTicketTypes = function () {
-            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18(options, refresh) {
+            var _ref19 = _asyncToGenerator(regeneratorRuntime.mark(function _callee19(options, refresh) {
                 var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee18$(_context18) {
+                return regeneratorRuntime.wrap(function _callee19$(_context19) {
                     while (1) {
-                        switch (_context18.prev = _context18.next) {
+                        switch (_context19.prev = _context19.next) {
                             case 0:
                                 if (!(!this.helpTicketTypesArray || refresh)) {
-                                    _context18.next = 13;
+                                    _context19.next = 13;
                                     break;
                                 }
 
                                 url = this.HELP_TICKET_TYPES;
 
                                 url += options ? options : "";
-                                _context18.prev = 3;
-                                _context18.next = 6;
+                                _context19.prev = 3;
+                                _context19.next = 6;
                                 return this.data.get(url);
 
                             case 6:
-                                serverResponse = _context18.sent;
+                                serverResponse = _context19.sent;
 
                                 if (!serverResponse.error) {
                                     this.helpTicketTypesArray = serverResponse.sort(function (a, b) {
                                         return a.category < b.category ? 0 : -1;
                                     });
                                 }
-                                _context18.next = 13;
+                                _context19.next = 13;
                                 break;
 
                             case 10:
-                                _context18.prev = 10;
-                                _context18.t0 = _context18['catch'](3);
+                                _context19.prev = 10;
+                                _context19.t0 = _context19['catch'](3);
 
-                                console.log(_context18.t0);
+                                console.log(_context19.t0);
 
                             case 13:
                             case 'end':
-                                return _context18.stop();
+                                return _context19.stop();
                         }
                     }
-                }, _callee18, this, [[3, 10]]);
+                }, _callee19, this, [[3, 10]]);
             }));
 
-            function getHelpTicketTypes(_x21, _x22) {
-                return _ref18.apply(this, arguments);
+            function getHelpTicketTypes(_x22, _x23) {
+                return _ref19.apply(this, arguments);
             }
 
             return getHelpTicketTypes;
@@ -6894,32 +6940,32 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.saveHelpTicketType = function () {
-            var _ref19 = _asyncToGenerator(regeneratorRuntime.mark(function _callee19() {
+            var _ref20 = _asyncToGenerator(regeneratorRuntime.mark(function _callee20() {
                 var url, response;
-                return regeneratorRuntime.wrap(function _callee19$(_context19) {
+                return regeneratorRuntime.wrap(function _callee20$(_context20) {
                     while (1) {
-                        switch (_context19.prev = _context19.next) {
+                        switch (_context20.prev = _context20.next) {
                             case 0:
                                 if (this.selectedHelpTicketType) {
-                                    _context19.next = 2;
+                                    _context20.next = 2;
                                     break;
                                 }
 
-                                return _context19.abrupt('return');
+                                return _context20.abrupt('return');
 
                             case 2:
                                 url = this.HELP_TICKET_TYPES;
 
                                 if (this.selectedHelpTicketType._id) {
-                                    _context19.next = 11;
+                                    _context20.next = 11;
                                     break;
                                 }
 
-                                _context19.next = 6;
+                                _context20.next = 6;
                                 return this.data.saveObject(this.selectedHelpTicket, url, "post");
 
                             case 6:
-                                response = _context19.sent;
+                                response = _context20.sent;
 
                                 if (!response.error) {
                                     this.selectedHelpTicketType = this.utils.copyObject(response);
@@ -6927,14 +6973,14 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 } else {
                                     this.data.processError(response, "There was an error creating the help ticket type.");
                                 }
-                                return _context19.abrupt('return', response);
+                                return _context20.abrupt('return', response);
 
                             case 11:
-                                _context19.next = 13;
+                                _context20.next = 13;
                                 return this.data.saveObject(this.selectedHelpTicketType, url, "put");
 
                             case 13:
-                                response = _context19.sent;
+                                response = _context20.sent;
 
                                 if (!response.error) {
                                     this.selectedHelpTicketType = this.utils.copyObject(response);
@@ -6942,38 +6988,9 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket type.");
                                 }
-                                return _context19.abrupt('return', response);
-
-                            case 16:
-                            case 'end':
-                                return _context19.stop();
-                        }
-                    }
-                }, _callee19, this);
-            }));
-
-            function saveHelpTicketType() {
-                return _ref19.apply(this, arguments);
-            }
-
-            return saveHelpTicketType;
-        }();
-
-        HelpTickets.prototype.countHelpTicketsStatus = function () {
-            var _ref20 = _asyncToGenerator(regeneratorRuntime.mark(function _callee20(status) {
-                var response;
-                return regeneratorRuntime.wrap(function _callee20$(_context20) {
-                    while (1) {
-                        switch (_context20.prev = _context20.next) {
-                            case 0:
-                                _context20.next = 2;
-                                return this.data.get(this.HELP_TICKET_SERVICES + '/count/' + status);
-
-                            case 2:
-                                response = _context20.sent;
                                 return _context20.abrupt('return', response);
 
-                            case 4:
+                            case 16:
                             case 'end':
                                 return _context20.stop();
                         }
@@ -6981,8 +6998,37 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee20, this);
             }));
 
-            function countHelpTicketsStatus(_x23) {
+            function saveHelpTicketType() {
                 return _ref20.apply(this, arguments);
+            }
+
+            return saveHelpTicketType;
+        }();
+
+        HelpTickets.prototype.countHelpTicketsStatus = function () {
+            var _ref21 = _asyncToGenerator(regeneratorRuntime.mark(function _callee21(status) {
+                var response;
+                return regeneratorRuntime.wrap(function _callee21$(_context21) {
+                    while (1) {
+                        switch (_context21.prev = _context21.next) {
+                            case 0:
+                                _context21.next = 2;
+                                return this.data.get(this.HELP_TICKET_SERVICES + '/count/' + status);
+
+                            case 2:
+                                response = _context21.sent;
+                                return _context21.abrupt('return', response);
+
+                            case 4:
+                            case 'end':
+                                return _context21.stop();
+                        }
+                    }
+                }, _callee21, this);
+            }));
+
+            function countHelpTicketsStatus(_x24) {
+                return _ref21.apply(this, arguments);
             }
 
             return countHelpTicketsStatus;
@@ -7130,46 +7176,46 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.archiveSearch = function () {
-            var _ref21 = _asyncToGenerator(regeneratorRuntime.mark(function _callee21(searchObj, collection) {
+            var _ref22 = _asyncToGenerator(regeneratorRuntime.mark(function _callee22(searchObj, collection) {
                 var url, resultArray, response;
-                return regeneratorRuntime.wrap(function _callee21$(_context21) {
+                return regeneratorRuntime.wrap(function _callee22$(_context22) {
                     while (1) {
-                        switch (_context21.prev = _context21.next) {
+                        switch (_context22.prev = _context22.next) {
                             case 0:
                                 if (!searchObj) {
-                                    _context21.next = 12;
+                                    _context22.next = 12;
                                     break;
                                 }
 
                                 url = this.HELP_TICKET_SERVICES + "/archive" + (collection ? '/' + collection : '');
                                 resultArray = new Array();
-                                _context21.next = 5;
+                                _context22.next = 5;
                                 return this.data.saveObject(searchObj, url, "post");
 
                             case 5:
-                                response = _context21.sent;
+                                response = _context22.sent;
 
                                 if (response.error) {
-                                    _context21.next = 11;
+                                    _context22.next = 11;
                                     break;
                                 }
 
                                 resultArray = response;
-                                return _context21.abrupt('return', resultArray);
+                                return _context22.abrupt('return', resultArray);
 
                             case 11:
-                                return _context21.abrupt('return', new Array());
+                                return _context22.abrupt('return', new Array());
 
                             case 12:
                             case 'end':
-                                return _context21.stop();
+                                return _context22.stop();
                         }
                     }
-                }, _callee21, this);
+                }, _callee22, this);
             }));
 
-            function archiveSearch(_x24, _x25) {
-                return _ref21.apply(this, arguments);
+            function archiveSearch(_x25, _x26) {
+                return _ref22.apply(this, arguments);
             }
 
             return archiveSearch;
@@ -7266,38 +7312,38 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.getHelpTicketLock = function () {
-            var _ref22 = _asyncToGenerator(regeneratorRuntime.mark(function _callee22(id) {
+            var _ref23 = _asyncToGenerator(regeneratorRuntime.mark(function _callee23(id) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee22$(_context22) {
+                return regeneratorRuntime.wrap(function _callee23$(_context23) {
                     while (1) {
-                        switch (_context22.prev = _context22.next) {
+                        switch (_context23.prev = _context23.next) {
                             case 0:
-                                _context22.next = 2;
+                                _context23.next = 2;
                                 return this.data.get(this.HELP_TICKET_LOCK_SERVICES + "/" + id);
 
                             case 2:
-                                response = _context22.sent;
+                                response = _context23.sent;
 
                                 if (response.error) {
-                                    _context22.next = 7;
+                                    _context23.next = 7;
                                     break;
                                 }
 
-                                return _context22.abrupt('return', response);
+                                return _context23.abrupt('return', response);
 
                             case 7:
                                 this.data.processError(response, "There was an error retrieving the help ticket lock.");
 
                             case 8:
                             case 'end':
-                                return _context22.stop();
+                                return _context23.stop();
                         }
                     }
-                }, _callee22, this);
+                }, _callee23, this);
             }));
 
-            function getHelpTicketLock(_x26) {
-                return _ref22.apply(this, arguments);
+            function getHelpTicketLock(_x27) {
+                return _ref23.apply(this, arguments);
             }
 
             return getHelpTicketLock;
@@ -7308,29 +7354,29 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.archiveHelpTickets = function () {
-            var _ref23 = _asyncToGenerator(regeneratorRuntime.mark(function _callee23() {
+            var _ref24 = _asyncToGenerator(regeneratorRuntime.mark(function _callee24() {
                 var response;
-                return regeneratorRuntime.wrap(function _callee23$(_context23) {
+                return regeneratorRuntime.wrap(function _callee24$(_context24) {
                     while (1) {
-                        switch (_context23.prev = _context23.next) {
+                        switch (_context24.prev = _context24.next) {
                             case 0:
-                                _context23.next = 2;
+                                _context24.next = 2;
                                 return this.data.saveObject({}, this.HELP_TICKET_SERVICES + '/archiveClosed', "post");
 
                             case 2:
-                                response = _context23.sent;
-                                return _context23.abrupt('return', response);
+                                response = _context24.sent;
+                                return _context24.abrupt('return', response);
 
                             case 4:
                             case 'end':
-                                return _context23.stop();
+                                return _context24.stop();
                         }
                     }
-                }, _callee23, this);
+                }, _callee24, this);
             }));
 
             function archiveHelpTickets() {
-                return _ref23.apply(this, arguments);
+                return _ref24.apply(this, arguments);
             }
 
             return archiveHelpTickets;
@@ -37382,7 +37428,7 @@ define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework'
             switch (_context6.prev = _context6.next) {
               case 0:
                 _context6.next = 2;
-                return this.helpTickets.getHelpTicket(helpTicket._id);
+                return this.helpTickets.getArchiveHelpTicket(helpTicket._id);
 
               case 2:
                 if (!this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
@@ -69959,12 +70005,12 @@ define('text!modules/tech/support/components/requestDetails.html', ['module'], f
 define('text!modules/tech/support/components/Requests.html', ['module'], function(module) { module.exports = "<template>\r\n    <h5>These are your current product requests.  If the issue you are having is related to a specific product, please select it.</h5>\r\n    <div class=\"topMargin\">\r\n      <span id=\"selectProductRequestError\"></span>\r\n      <h5 show.bind=\"clientRequestsArray.length === 0\">You have no product requests that apply to this type of help ticket.</h5>\r\n      <table id=\"clientTable\" show.bind=\"clientRequestsArray.length > 0\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\r\n        <thead>\r\n        <tr class=\"header\">\r\n          <th>Course</th>\r\n          <th>Session</th>\r\n          <th>Product</th>\r\n          <th>System</th>\r\n          <th>Client</th>\r\n          <th>Status</th>\r\n          <th></th>\r\n        </tr>\r\n        </thead>\r\n        <tbody>\r\n          <tr class=\"sortable\" id=\"${product.id}\" productId=\"${product.productId}\" \r\n              repeat.for=\"product of clientRequestsArray\"\r\n              click.trigger=\"requestChosen($event, $index)\">\r\n            <td>${product.courseName}</td>\r\n            <td>${product.sessionId | session:sessions.sessionsArray}</td>\r\n            <td>${product.productName}</td> \r\n            <td>${product.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</td>\r\n            <td>${product.client}</td>\r\n            <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</td>\r\n            <td>\r\n              <span class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"View Assignment\">\r\n                <i class=\"fa fa-eye fa-lg fa-border\" click.delegate=\"viewAssignment($index, product)\" aria-hidden=\"true\"></i>\r\n              </span>\r\n            </td>\r\n          </tr>\r\n        </tbody>\r\n      </table>\r\n      <span id=\"client\"></span>\r\n    </div>\r\n  </div>\r\n</div>\r\n      <!-- <div>\r\n        <h5 show.bind=\"clientRequestsArray.length === 0\">You have no product requests that apply to this type of help ticket.</h5>\r\n        <table id=\"clientTable\" show.bind=\"clientRequestsArray.length > 0\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\r\n          <thead>\r\n          <tr class=\"header\">\r\n            <th>Course</th>\r\n            <th>Session</th>\r\n            <th>Product</th>\r\n            <th>System</th>\r\n            <th>Client</th>\r\n            <th>Status</th>\r\n            <th show.bind=\"viewHelpTickets\">User IDS</th>\r\n            <th show.bind=\"viewHelpTickets\">Faculty IDs</th>\r\n            <th></th>\r\n          </tr>\r\n          </thead>\r\n          <tbody>\r\n            <tr id=\"${product.id}\" productId=\"${product.productId}\" \r\n                repeat.for=\"product of clientRequestsArray\">\r\n              <td>${product.courseId | courseName:people.coursesArray}</td>\r\n              <td>${product.sessionId | sessionName:sessions.sessionsArray}</td>\r\n              <td>${product.productId._id | lookupValue:products.productsArray:\"_id\":\"name\"}</td>\r\n              <td>${product.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</td>\r\n              <td>${product.client}</td>\r\n              <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</td>\r\n              <td show.bind=\"viewHelpTickets\">${product.studentIds}<br>${product.studentPassword}</td>\r\n              <td show.bind=\"viewHelpTickets\">${product.facultyIds}<br>${product.facultyPassword}</td>\r\n              <td>\r\n                <span class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"View Assignment\">\r\n                  <i class=\"fa fa-eye fa-lg fa-border\" click.delegate=\"viewAssignment($index, product)\" aria-hidden=\"true\"></i>\r\n                </span>\r\n              </td>\r\n            </tr>\r\n          </tbody>\r\n        </table>\r\n        <span id=\"client\"></span>\r\n      </div>\r\n    </div>\r\n  </div> -->\r\n</template>"; });
 define('text!modules/tech/support/components/searchHTForm.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n\r\n\t<div class=\"row\">\r\n\t\t<div class=\"list-group-item toolbar\">\r\n\t\t\t<span click.delegate=\"search()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n\t\t\t title=\"\" data-original-title=\"Search\"><i class=\"fa fa-search fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<span click.delegate=\"clearCriteria()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n\t\t\t data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Criteria\"><i class=\"fa fa-ban fa-lg fa-border\"\r\n\t\t\t\t aria-hidden=\"true\"></i></span>\r\n\t\t\t<!-- <span  click.delegate=\"archiveClosedTickets()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \r\n\t\t\t\t\ttitle=\"\" data-original-title=\"Archive Tickets\"><i class=\"fa fa-archive fa-lg fa-border\" aria-hidden=\"true\"></i></span> \r\n\t\t\t\t\t<span class=\"checkbox marginLeft\" style=\"white-space: nowrap;display:inline;\">\r\n\t\t\t\t\t\t<label>\r\n\t\t\t\t\t\t  <input checked.bind=\"isCheckedCurrent\" type=\"checkbox\"> Search current help ticket collection\r\n\t\t\t\t\t\t</label>\r\n\t\t\t\t\t</span> -->\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t\t<div class=\"container positionUnderToolbar\">\r\n\t\t\t<div class=\"panel panel-default marginTop\">\r\n\t\t\t\t<div class=\"panel-body\">\r\n\t\t\t\t\t<div class=\"row\">\r\n\r\n\t\t\t\t\t\t<div class=\"col-lg-3\">\r\n\t\t\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-lg-12 topMargin\">\r\n\t\t\t\t\t\t\t\t\t<label>Help Ticket Number</label>\r\n\t\t\t\t\t\t\t\t\t<input input.delegate=\"helpTicketNoEntered()\" class=\"form-control\" value.bind=\"helpTicketNo\" type=\"text\" />\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div id=\"elementsToOperateOn\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-lg-5 topMargin\">\r\n\t\t\t\t\t\t\t\t<label>Date Created</label>\r\n\t\t\t\t\t\t\t\t<div class=\"panel panel-primary topMargin\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"panel-body\">\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<label>Date From</label>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<flat-picker controlid=\"endDate\" config.bind=\"configDate\" value.bind=\"dateFrom\"></flat-picker>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-lg-12  topMargin\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<label>Date To</label>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<flat-picker controlid=\"endDateTo\" config.bind=\"configDate\" value.bind=\"dateTo\"></flat-picker>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"col-lg-5  col-lg-offset-1\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t\t\t\t\t<label>KeyWords</label>\r\n\t\t\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"keyWords\" type=\"text\" />\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t\t\t\t\t<label>Content</label>\r\n\t\t\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"content\" type=\"text\" />\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t\t\t\t\t<label>Type</label>\r\n\t\t\t\t\t\t\t\t\t\t<select change.delegate=\"typeChanged()\" value.bind=\"selectedType\" id=\"helpTicketPurpose\" class=\"form-control\">\r\n\t\t\t\t\t\t\t\t\t\t\t<option value=\"-1\"></option>\r\n\t\t\t\t\t\t\t\t\t\t\t<option repeat.for=\"types of helpTickets.helpTicketTypesArray | helpTicketSubtypes\" model.bind=\"types.type\">${types.description}</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-lg-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<multiselect label=\"Status\" options.bind=\"config.HELP_TICKET_STATUSES\" value.bind=\"selectedStatus\"></multiselect>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-lg-12 topMargin\">\r\n\t\t\t\t\t\t\t\t<div class=\"panel-group\" id=\"accordion\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"panel panel-primary\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"panel-heading dropbtn\" style=\"background-color:${config.SUBMENU_BACKGROUND}\">\r\n\t\t\t\t\t\t\t\t\t\t\t<h4 click.trigger=\"toggleProduct()\" class=\"panel-title\">Search by Product</h4>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div show.bind=\"showPanel\" class=\"panel-body\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-5 topMargin\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<label id=\"productList\">Available Products</label>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter products\" />\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"selectProduct($event)\" type=\"button\" repeat.for=\"product of filteredProductsArray\"\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t id=\"${product._id}\" class=\"list-group-item\">${product.name}</button>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-5 col-md-offset-1 topMargin\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<label id=\"requestProductsLabel\">Requested Products</label>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"well well2 overflow\" style=\"height:400px;\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"removeProduct($event)\" type=\"button\" repeat.for=\"product of selectedProducts\" id=\"${product}\"\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t class=\"list-group-item\">${product | lookupValue:products.productsArray:\"_id\":\"name\"}</button>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<div class=\"panel panel-primary\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"panel-heading dropbtn\" style=\"background-color:${config.SUBMENU_BACKGROUND}\">\r\n\t\t\t\t\t\t\t\t\t\t\t<h4 click.trigger=\"toggleCustomer()\" class=\"panel-title\">Search by Customer</h4>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div show.bind=\"showCustomer\" class=\"panel-body\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-5 topMargin\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<label id=\"productList\">Available People</label>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"peopleFilter\" input.trigger=\"filterPeopleList()\" placeholder=\"Filter people\" />\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"selectPerson($event, person)\" type=\"button\" repeat.for=\"person of filteredPersonArray\"\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t id=\"${person._id}\" class=\"list-group-item\">${person.fullName}</button>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-5 col-md-offset-1 topMargin\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<label>Requested Person</label>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"well well2 overflow\" style=\"height:400px;\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"removePerson($event)\" type=\"button\" repeat.for=\"person of selectedPeople\" id=\"${person}\"\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t class=\"list-group-item\">${person | lookupValue:people.peopleArray:\"_id\":\"fullName\"}</button>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<div class=\"panel panel-primary\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"panel-heading dropbtn\" style=\"background-color:${config.SUBMENU_BACKGROUND}\">\r\n\t\t\t\t\t\t\t\t\t\t\t<h4 click.trigger=\"toggleInstitution()\" class=\"panel-title\">Search by Institution</h4>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div show.bind=\"showInstitution\" class=\"panel-body\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-5 topMargin\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<label id=\"productList\">Available Institutions</label>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"institutionsFilter\" input.trigger=\"filterInstitutionsList()\"\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t placeholder=\"Filter institutions\" />\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"selectInstitution($event)\" type=\"button\" repeat.for=\"institution of filteredInstitutionArray\"\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t id=\"${institution._id}\" class=\"list-group-item\">${institution.name}</button>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-5 col-md-offset-1 topMargin\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<label>Requested Institution</label>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"well well2 overflow\" style=\"height:400px;\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"removeInstitution($event)\" type=\"button\" repeat.for=\"institution of selectedInstitutions\"\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t id=\"${institution}\" class=\"list-group-item\">${institution |\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tlookupValue:people.institutionsArray:\"_id\":\"name\"}</button>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n</template>"; });
 define('text!modules/tech/support/components/selectProduct.html', ['module'], function(module) { module.exports = "<template>\r\n     <compose view='./Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\r\n\r\n      <!-- Product Select -->\r\n      <div show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\">\r\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\r\n          <thead>\r\n          <tr class=\"header\">\r\n            <th>Product</th>\r\n            <th>System</th>\r\n            <th>Client Number</th>\r\n            <th>Status</th>\r\n          </tr>\r\n          </thead>\r\n          <tbody>\r\n          <tr id=\"${product.id}\" productId=\"${product.productId}\" \r\n              repeat.for=\"product of clientRequestsArray[0].requestDetails\">\r\n            <td >${product.productId}</td>\r\n            <td>${product.sid | lookupValue:systems:\"_id\":\"sid\"}</td>\r\n            <td>${product.client}</td>\r\n            <td>${product.status | lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</td>\r\n          </tr>\r\n          </tbody>\r\n        </table>\r\n        <span id=\"client\"></span>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>"; });
-define('text!modules/tech/support/components/viewArchiveHTForm.html', ['module'], function(module) { module.exports = "<template>\r\n\t    <div class=\"col-lg-12\">\r\n      <div class=\"row\">\r\n        <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\r\n      </div>\r\n\r\n    <!-- Buttons -->\r\n    <div class=\"row\">\r\n      <div class=\"list-group-item toolbar\" id=\"toolbar\">\r\n          <span click.trigger=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n          <span click.trigger=\"flag()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Flag\"><i class=\"fa fa-flag fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n          <span class=\"pull-right\">${lockMessage}</span>\r\n      </div> \r\n    </div>\r\n    \r\n    <!-- Help Ticket Header -->\r\n    <div class=\"topMargin\">\r\n        <!-- widget content -->\r\n        <div class=\"row\">\r\n          <div class=\"panel panel-default  leftMargin rightMargin\">        \r\n            <div class=\"panel-body\">\r\n              <div class=\"row\">\r\n                 <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Customer: ${helpTickets.selectedHelpTicket.personId.fullName}</h5>\r\n                  </div>\r\n                </div>\r\n                <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Institution: ${helpTickets.selectedHelpTicket.institutionId.name}</h5>\r\n                  </div>\r\n                </div>\r\n                <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Last modified: ${helpTickets.selectedHelpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</h5>\r\n                  </div>\r\n                </div>\r\n                 <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h5>\r\n                  </div>\r\n                </div>\r\n              </div>\r\n              <div class=\"row\">\r\n                 <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h5>\r\n                  </div>\r\n                </div>\r\n                 <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Keywords: ${helpTickets.selectedHelpTicket.keyWords}</h5>\r\n                  </div>\r\n                </div>\r\n                <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Phone: ${helpTickets.selectedHelpTicket.personId.phone | phoneNumber} Mobile: ${helpTickets.selectedHelpTicket.personId.mobile | phoneNumber}</h5>\r\n                  </div>\r\n                </div>\r\n                <div class=\"col-md-3\">\r\n                  <div class=\"form-group\">\r\n                    <h5 class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId.fullName}</h5>\r\n                  </div>\r\n                </div>\r\n              </div>\r\n              <div class=\"row\">\r\n                  <div class=\"form-group col-md-3\">\r\n                     <h5 class=\"col-md-offset-1\">Type: ${helpTickets.selectedHelpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</h5>\r\n                  </div>\r\n                  <div class=\"form-group col-md-3\">\r\n\t\t\t\t\t  <h5 class=\"col-md-offset-1\">Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:\"code\":\"description\"}</h5>\r\n                   </div>\r\n                  <div class=\"form-group col-md-3\">\r\n\t\t\t\t\t   <h5 class=\"col-md-offset-1\">Priority: ${helpTickets.selectedHelpTicket.priority  | getArrayValue:config.HELP_TICKET_PRIORITIES:'priority'}</h5>\r\n                  </div>\r\n                </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\r\n        <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\r\n  \r\n\t</div>\r\n\t</template>"; });
+define('text!modules/tech/support/components/viewArchiveHTForm.html', ['module'], function(module) { module.exports = "<template>\n\t    <div class=\"col-lg-12\">\n      <div class=\"row\">\n        <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\n      </div>\n\n    <!-- Buttons -->\n    <div class=\"row\">\n      <div class=\"list-group-item toolbar\" id=\"toolbar\">\n          <span click.trigger=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.trigger=\"flag()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Flag\"><i class=\"fa fa-flag fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span class=\"pull-right\">${lockMessage}</span>\n          <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\n      </div> \n    </div>\n    \n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- widget content -->\n        <div class=\"row\">\n          <div class=\"panel panel-default  leftMargin rightMargin\">        \n            <div class=\"panel-body\">\n              <div class=\"row\">\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Customer: ${helpTickets.selectedHelpTicket.personId.fullName}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Institution: ${helpTickets.selectedHelpTicket.institutionId.name}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Last modified: ${helpTickets.selectedHelpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h5>\n                  </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Keywords: ${helpTickets.selectedHelpTicket.keyWords}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Phone: ${helpTickets.selectedHelpTicket.personId.phone | phoneNumber} Mobile: ${helpTickets.selectedHelpTicket.personId.mobile | phoneNumber}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId.fullName}</h5>\n                  </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                  <div class=\"form-group col-md-3\">\n                     <h5 class=\"col-md-offset-1\">Type: ${helpTickets.selectedHelpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</h5>\n                  </div>\n                  <div class=\"form-group col-md-3\">\n\t\t\t\t\t  <h5 class=\"col-md-offset-1\">Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:\"code\":\"description\"}</h5>\n                   </div>\n                  <div class=\"form-group col-md-3\">\n\t\t\t\t\t   <h5 class=\"col-md-offset-1\">Priority: ${helpTickets.selectedHelpTicket.priority  | getArrayValue:config.HELP_TICKET_PRIORITIES:'priority'}</h5>\n                  </div>\n                </div>\n            </div>\n          </div>\n        </div>\n\n        <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\n  \n\t</div>\n\t</template>\n"; });
 define('text!modules/tech/support/components/viewAssignmentForm.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class=\"fluid-container\">\r\n\t\t<!-- Buttons -->\r\n\t\t<div class=\"bottomMargin leftMargin rightMargin list-group-item\">\r\n\t\t\t<span click.delegate=\"backView()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t</div>\r\n\t\t<div class=\"col-lg-6 col-md-12\">\r\n\t\t\t<compose view=\"./requestDetails.html\"></compose>\r\n\t\t</div>\r\n\t\t<div class=\"col-lg-6 col-md-12\">\r\n\t\t\t<compose view=\"./assignmentDetails.html\"></compose>\r\n\t\t</div>\r\n\t</div>\r\n</template>"; });
 define('text!modules/tech/support/components/viewHelpTicketTableFilters.html', ['module'], function(module) { module.exports = "<template \"containerless\">\r\n\t<th></th>\r\n              <th class=\"col-md-1\">\r\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\r\n                        <option value=\"\"></option>\r\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\r\n                                value.bind=\"type.code\">${type.description}</option>\r\n                      </select>\r\n              </th>\r\n              <th>\r\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"owner.[0].personId\" compare=\"obj\">\r\n                  <option value=\"\"></option>\r\n                  <option repeat.for=\"person of people.peopleArray | uccStaff\"\r\n                          value.bind=\"person._id\">${person.fullName}</option>\r\n                </select>\r\n              </th>\r\n              <th></th>\r\n              <th>\r\n                <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\r\n                        <option value=\"\"></option>\r\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\r\n                                value.bind=\"status.code\">${status.description}</option>\r\n                      </select>\r\n              </th>\r\n              <th>\r\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\"\r\n                  class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\r\n              </th>\r\n              <th>\r\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\"\r\n                  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-nickName\" type=\"text\" compare=\"lookup\"\r\n                  class=\"form-control\" />\r\n              </th>\r\n              <th class=\"col-lg-1\">\r\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\r\n                    <option value=\"\"></option>\r\n                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                </select>\r\n              </th>\r\n</template>"; });
 define('text!modules/tech/support/components/viewHoverProfile.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"hoverProfile\">\r\n        <span click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n            data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\r\n        <hr />\r\n        <div class=\"col-md-4\">\r\n            <div class=\"topMargin\">\r\n                <img if.bind=\"personImage\" class=\"circular--square leftMargin\" src=\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${selectedRequestDetail.requestId.personId.file.fileName}\"\r\n                    height=\"100\">\r\n            </div>\r\n            <div if.bind=\"!personImage\" style=\"height:100px;width:100px;\" innerhtml.bind=\"selectedRequestDetail.requestId.personId.email | gravatarUrl:100:6\"></div>\r\n        </div>\r\n        <div class=\"col-md-8\">\r\n            <h5>Name: ${helpTickets.selectedHelpTicket.personId.fullName}</h5>\r\n            <h5>Phone: ${helpTickets.selectedHelpTicket.personId.phone | formatPhone}</h5>\r\n            <h5>Mobile: ${helpTickets.selectedHelpTicket.personId.mobile | formatPhone}</h5>\r\n            <h5>Email: ${helpTickets.selectedHelpTicket.personId.email}</h5>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/tech/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"panel panel-default\" style=\"padding:5px;\">\r\n    <div class=\"panel-body\">\r\n      <div class=\"row\">\r\n        <compose view=\"./viewHoverProfile.html\"></compose>\r\n\r\n        <!-- Buttons -->\r\n        <compose view=\"./viewToolbarButtons.html\"></compose>\r\n\r\n        <compose view=\"./viewRequestsPanel.html\"></compose>\r\n\r\n        <!-- Help Ticket Header -->\r\n        <div class=\"topMargin\">\r\n          <!-- Enter Response -->\r\n          <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin \">\r\n\r\n            <div class=\"panel panel-default leftMargin rightMargin\" style=\"background-color:ghostwhite;\">\r\n              <div class=\"panel-body\">\r\n                <div class=\"list-group-item col-md-12 topMargin\">\r\n                  <span click.trigger=\"saveResponse(config.REVIEW_HELPTICKET_STATUS)\" class=\"smallMarginRight\"\r\n                    bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i\r\n                      class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                  <span click.trigger=\"saveResponse(config.CUSTOMER_ACTION_HELPTICKET_STATUS)\" class=\"smallMarginRight\"\r\n                    bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save and Customer Action\"><i\r\n                      class=\"fa fa-users fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                  <span click.trigger=\"saveResponse(config.CLOSED_HELPTICKET_STATUS)\" class=\"smallMarginRight\"\r\n                    bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save and Close\"><i\r\n                      class=\"fa fa-window-close-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                  <span click.trigger=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                    data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\"\r\n                      aria-hidden=\"true\"></i></span>\r\n                </div>\r\n                <div class=\"row\">\r\n                  <div class=\"col-lg-1 topMargin\">\r\n                    <div class=\"checkbox \">\r\n                      <label>\r\n                        <input change.trigger=\"confidentialChecked()\" checked.bind=\"helpTickets.selectedHelpTicketContent.confidential\"\r\n                          id=\"confidentialCheckBox\" type=\"checkbox\"> Tech Staff\r\n                      </label>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"col-lg-2 topMargin\">\r\n                    <div class=\"checkbox\">\r\n                      <label>\r\n                        <input disabled.bind=\"sendMailDisable\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\r\n                      </label>\r\n                    </div>\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"leftMargin rightMargin\">\r\n                  <editor value.bind=\"responseMessage\" toolbar.bind=\"toolbar\" height=\"250\"></editor>\r\n                  <p>&nbsp;</p>\r\n\r\n                  <div class=\"row hidden-xs hidden-sm\">\r\n                    <div class=\"col-lg-6\">\r\n                      <div class=\"col-lg-3\">\r\n                        <label id=\"fileControlLabel\" class=\"btn btn-primary\">\r\n                          Browse for files <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"\r\n                            files.bind=\"files\" multiple>\r\n                        </label>\r\n                      </div>\r\n                    </div>\r\n\r\n                    <div class=\"col-lg-6\">\r\n                      <button click.delegate=\"insertDocument()\" class=\"btn btn-primary\">Insert Document</button>\r\n                    </div>\r\n                    <div class=\"col-lg-6 topMargin\">\r\n                      <div class=\"col-lg-10\">\r\n                        <ul>\r\n                          <li repeat.for=\"file of filesToUpload\" class=\"list-group-item\">${file.name}<span\r\n                              click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\r\n                        </ul>\r\n                      </div>\r\n                    </div>\r\n                    <div class='col-lg-6 topMargin'>\r\n                      <div class=\"col-lg-10\">\r\n                        <ul>\r\n                          <li repeat.for=\"file of helpTickets.selectedHelpTicketContent.documents\" class=\"list-group-item\">${file.fileName}<span\r\n                              click.delegate=\"removeDocument($index)\" class=\"pull-right\"><i class=\"fa fa-trash\"\r\n                                aria-hidden=\"true\"></i></span></li>\r\n                        </ul>\r\n                      </div>\r\n                    </div>\r\n                  </div>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n\r\n          <!-- widget content -->\r\n          <div class=\"row\">\r\n            <div class=\"panel panel-default  leftMargin rightMargin\" id=\"form\">\r\n              <div class=\"panel-body\">\r\n                <div class=\"row\">\r\n                  <div class=\"col-md-3\">\r\n                    <div class=\"form-group\">\r\n                      <h5 class=\"col-md-offset-1\" class=\"dropbtn\" click.delegate=\"showProfile(selectedRequestDetail, $event)\">Customer:\r\n                        ${helpTickets.selectedHelpTicket.personId.fullName} <i class=\"fa fa-info\" aria-hidden=\"true\"></i></h5>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"col-md-3\">\r\n                    <div class=\"form-group\">\r\n                      <h5 class=\"col-md-offset-1\">Institution: ${helpTickets.selectedHelpTicket.institutionId.name}</h5>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"col-md-3\">\r\n                    <div class=\"form-group\">\r\n                      <h5 class=\"col-md-offset-1\">Last modified: ${helpTickets.selectedHelpTicket.modifiedDate |\r\n                        dateFormat:config.DATE_FORMAT_TABLE:true}</h5>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"col-md-3\">\r\n                    <div class=\"form-group\">\r\n                      <h5 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate |\r\n                        dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h5>\r\n                    </div>\r\n                  </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                  <div class=\"col-md-3\">\r\n                    <div class=\"form-group\">\r\n                      <h5 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId |\r\n                        session:sessions.sessionsArray}</h5>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"col-md-3\">\r\n                    <div class=\"form-group\">\r\n                      <h5 class=\"col-md-offset-1\">Keywords: ${helpTickets.selectedHelpTicket.keyWords}</h5>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"col-md-3\">\r\n                    <div class=\"form-group\">\r\n                      <h5 if.bind=\"phoneMask\" class=\"col-md-offset-1\">Phone:\r\n                        ${helpTickets.selectedHelpTicket.personId.phone |\r\n                        phoneNumber:config.PHONE_MASKS:helpTickets.selectedHelpTicket.personId.country} Mobile:\r\n                        ${helpTickets.selectedHelpTicket.personId.mobile |\r\n                        phoneNumber:config.PHONE_MASKS:helpTickets.selectedHelpTicket.personId..country}</h5>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"col-md-3\">\r\n                    <div class=\"form-group\">\r\n                      <h5 class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId.fullName}</h5>\r\n                    </div>\r\n                  </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                  <div class=\"form-group col-lg-3\">\r\n                    <div class=\"input-group col-lg-11\">\r\n                      <label class=\" col-md-offset-1\">Type:</label>\r\n                      <select value.bind=\"helpTickets.selectedHelpTicket.helpTicketType\" class=\"form-control col-md-offset-1\"\r\n                        id=\"helpTicketType\">\r\n                        <option repeat.for=\"type of helpTickets.helpTicketTypesArray | helpTicketSubtypes\" model.bind=\"type.type\">${type.description}</option>\r\n                      </select>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"form-group col-lg-3\">\r\n                    <div class=\"input-group col-lg-11\">\r\n                      <label class=\"col-md-offset-1\">Status</label>\r\n                      <select id=\"helpTicketStatus\" value.bind=\"helpTickets.selectedHelpTicket.helpTicketStatus\" class=\"form-control col-md-offset-1\">\r\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\" model.bind=\"status.code\">${status.description}</option>\r\n                      </select>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"form-group col-lg-3\">\r\n                    <div class=\"input-group col-lg-11\">\r\n                      <label class=\"col-md-offset-1\">Priority</label>\r\n                      <select id=\"priority\" value.bind=\"helpTickets.selectedHelpTicket.priority\" class=\"form-control col-md-offset-1\">\r\n                        <option repeat.for=\"priority of config.HELP_TICKET_PRIORITIES\" model.bind=\"$index\">${priority.priority}</option>\r\n                      </select>\r\n                    </div>\r\n                  </div>\r\n                  <div class=\"form-group col-lg-3\">\r\n                    <div class=\"input-group col-lg-11\">\r\n                      <label class=\"col-md-offset-1\">Keywords</label>\r\n                      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicket.keyWords\" class=\"form-control col-md-offset-1\">\r\n                    </div>\r\n                  </div>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n\r\n          <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\r\n\r\n        </div>\r\n\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>"; });
-define('text!modules/tech/support/components/viewHTSearchResults.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\r\n  <div show.bind=\"!searchResults\">\r\n    <div class=\"row\">\r\n        <div class=\"list-group-item toolbar\">\r\n            <span click.delegate=\"backToSearch()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n        </div> \r\n    </div>\r\n\r\n    <div class=\"col-lg-12\">\r\n      <div class='row'>\r\n        <div id='no-more-tables'>\r\n          <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\r\n            <thead>\r\n              <tr>\r\n                <td colspan.bind='colSpan'><compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose></td>\r\n              </tr>\r\n              <tr>\r\n                <td colspan='colSpan'>\r\n                  <span click.trigger=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                  <span click.trigger=\"_cleanUpFilters()\" class=\"mousePointer\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter fa-ban\" aria-hidden=\"true\"></i></span>\r\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                </td>\r\n              </tr>\r\n              <tr>\r\n                <th><span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketNo'})\">No </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th style=\"width:20em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketType'})\">Type </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th style=\"width:15em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customOwnerSorter, propertyName: 'ownder'})\">Owner </span><i class=\"fa fa-sort\"></i></th>                   \r\n                <th style=\"width:10em;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})\">Status </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th style=\"width:8em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\">Date Created </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th style=\"width:8em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'modifiedDate'})\">Modified Created </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th style=\"width:15em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'personId.lastName'})\">Faculty </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th style=\"width:20em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'institutionId.name'})\">Institution </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n                <th>Email</th>\r\n              </tr>\r\n              <tr>\r\n                <th></th>\r\n                <th>\r\n                  <input value.bind=\"helpTicketTypeFilterValue\" input.trigger=\"dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th>\r\n                  <input value.bind=\"ownerFilterValue\" input.trigger=\"dataTable.filterList(ownerFilterValue, { type: 'custom',  filter: customOwnerFilter, collectionProperty: 'owner', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th>\r\n                  <select value.bind=\"helpTicketStatusFilter\" input.trigger=\"dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )\" class=\"form-control\">\r\n                    <option value=\"\"></option>\r\n                    <option repeat.for=\"status of helpTicketTypes\"\r\n                            value.bind=\"status.code\">${status.description}</option>\r\n                  </select>\r\n                </th>\r\n                <th>\r\n                  <input type=\"date\" value.bind=\"createdDateFilterValue\" input.trigger=\"dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th>\r\n                  <input type=\"date\" value.bind=\"modifiedDateFilterValue\" input.trigger=\"dataTable.filterList(modifiedDateFilterValue, {type: 'date', filter: 'modifiedDate',  collectionProperty: 'modifiedDate', compare: 'after'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th>\r\n                  <input value.bind=\"personFilterValue\" input.trigger=\"dataTable.filterList(personFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th>\r\n                  <input value.bind=\"institutionFilterValue\" input.trigger=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n                </th>\r\n                <th></th>\r\n              </tr>\r\n              \r\n            </thead>\r\n            <tbody>\r\n              <tr repeat.for=\"helpTicket of dataTable.displayArray\">\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Number\">${helpTicket.helpTicketNo}</td>\r\n                <td mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Owner\">\r\n                  <span show.bind=\"helpTicket.owner[0].personId === null\"></span>\r\n                  <span show.bind=\"helpTicket.owner[0].personId !== null\"> ${helpTicket.owner[0].personId.fullName}</span>\r\n                </td>\r\n                <td data-title=\"Status\"> \r\n                  ${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:\"code\":\"description\"}\r\n                  <span show.bind=\"helpTicket.helpTicketStatus === config.CLOSED_HELPTICKET_STATUS\" click.delegate=\"openHelpTicket(helpTicket)\" class=\"marginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Open\"><i class=\"fa fa-folder-open-o\" aria-hidden=\"true\"></i></span>\r\n                </td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Created Date\" >${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Modified Date\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" class=\"hidden-xs hidden-sm hidden-md\" style=\"width:10rem;\" data-title=\"Customer\">${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Insitution\">${helpTicket.institutionId.name}</td>\r\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Email\" >${helpTicket.personId.email}</td>\r\n              </tr>\r\n            </tbody>\r\n          </table>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n  </div>\r\n  <div class=\"row\" show.bind=\"searchResults\">\r\n    <compose view=\"./viewArchiveHTForm.html\"></compose>\r\n  </div>\r\n\t\r\n</template>"; });
+define('text!modules/tech/support/components/viewHTSearchResults.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\n  <div show.bind=\"!searchResults\">\n    <div class=\"row\">\n        <div class=\"list-group-item toolbar\">\n            <span click.delegate=\"backToSearch()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\n        </div> \n    </div>\n\n    <div class=\"col-lg-12\">\n      <div class='row'>\n        <div id='no-more-tables'>\n          <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\n            <thead>\n              <tr>\n                <td colspan.bind='colSpan'><compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose></td>\n              </tr>\n              <tr>\n                <td colspan='colSpan'>\n                  <span click.trigger=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                  <span click.trigger=\"_cleanUpFilters()\" class=\"mousePointer\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter fa-ban\" aria-hidden=\"true\"></i></span>\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                </td>\n              </tr>\n              <tr>\n                <th><span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketNo'})\">No </span><span><i class=\"fa fa-sort\"></i></span></th>\n                <th style=\"width:20em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketType'})\">Type </span><span><i class=\"fa fa-sort\"></i></span></th>\n                <th style=\"width:15em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customOwnerSorter, propertyName: 'ownder'})\">Owner </span><i class=\"fa fa-sort\"></i></th>                   \n                <th style=\"width:10em;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})\">Status </span><span><i class=\"fa fa-sort\"></i></span></th>\n                <th style=\"width:8em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\">Date Created </span><span><i class=\"fa fa-sort\"></i></span></th>\n                <th style=\"width:8em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'modifiedDate'})\">Modified Created </span><span><i class=\"fa fa-sort\"></i></span></th>\n                <th style=\"width:15em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'personId.lastName'})\">Faculty </span><span><i class=\"fa fa-sort\"></i></span></th>\n                <th style=\"width:20em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'institutionId.name'})\">Institution </span><span><i class=\"fa fa-sort\"></i></span></th>\n                <th>Email</th>\n              </tr>\n              <tr>\n                <th></th>\n                <th>\n                  <input value.bind=\"helpTicketTypeFilterValue\" input.trigger=\"dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\n                </th>\n                <th>\n                  <input value.bind=\"ownerFilterValue\" input.trigger=\"dataTable.filterList(ownerFilterValue, { type: 'custom',  filter: customOwnerFilter, collectionProperty: 'owner', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\n                </th>\n                <th>\n                  <select value.bind=\"helpTicketStatusFilter\" input.trigger=\"dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )\" class=\"form-control\">\n                    <option value=\"\"></option>\n                    <option repeat.for=\"status of helpTicketTypes\"\n                            value.bind=\"status.code\">${status.description}</option>\n                  </select>\n                </th>\n                <th>\n                  <input type=\"date\" value.bind=\"createdDateFilterValue\" input.trigger=\"dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )\"  class=\"form-control\" />\n                </th>\n                <th>\n                  <input type=\"date\" value.bind=\"modifiedDateFilterValue\" input.trigger=\"dataTable.filterList(modifiedDateFilterValue, {type: 'date', filter: 'modifiedDate',  collectionProperty: 'modifiedDate', compare: 'after'} )\"  class=\"form-control\" />\n                </th>\n                <th>\n                  <input value.bind=\"personFilterValue\" input.trigger=\"dataTable.filterList(personFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )\"  class=\"form-control\" />\n                </th>\n                <th>\n                  <input value.bind=\"institutionFilterValue\" input.trigger=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\n                </th>\n                <th></th>\n              </tr>\n              \n            </thead>\n            <tbody>\n              <tr repeat.for=\"helpTicket of dataTable.displayArray\">\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Number\">${helpTicket.helpTicketNo}</td>\n                <td mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Owner\">\n                  <span show.bind=\"helpTicket.owner[0].personId === null\"></span>\n                  <span show.bind=\"helpTicket.owner[0].personId !== null\"> ${helpTicket.owner[0].personId.fullName}</span>\n                </td>\n                <td data-title=\"Status\"> \n                  ${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:\"code\":\"description\"}\n                  <span show.bind=\"helpTicket.helpTicketStatus === config.CLOSED_HELPTICKET_STATUS\" click.delegate=\"openHelpTicket(helpTicket)\" class=\"marginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Open\"><i class=\"fa fa-folder-open-o\" aria-hidden=\"true\"></i></span>\n                </td>\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Created Date\" >${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Modified Date\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" class=\"hidden-xs hidden-sm hidden-md\" style=\"width:10rem;\" data-title=\"Customer\">${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Insitution\">${helpTicket.institutionId.name}</td>\n                <td click.trigger=\"selectHelpTicket(helpTicket, $event)\" data-title=\"Email\" >${helpTicket.personId.email}</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n  <div class=\"row\" show.bind=\"searchResults\">\n    <compose view=\"./viewArchiveHTForm.html\"></compose>\n  </div>\n\t\n</template>\n"; });
 define('text!modules/tech/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n          <div class=\"row\">\r\n              <div show.bind=\"!helpTicketSelected\" class=\"col-lg-12\">\r\n                  <div show.bind=\"nohelpTickets\" class=\"bottomMargin leftMargin\">\r\n                      <h4>You have no open help tickets</h4>\r\n                      <span class=\"checkbox marginLeft\" style=\"white-space: nowrap;display:inline;\">\r\n              <label>\r\n                <input checked.bind=\"isCheckedCurrent\" change.trigger=\"retrieveClosedHelpTickets()\" type=\"checkbox\"> View closed help tickets\r\n              </label>\r\n            </span>\r\n                  </div>\r\n                  \r\n  <div class=\"col-lg-12\">\r\n    <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\r\n    <div class=\"hoverProfile\" >\r\n        <span  click.trigger=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\r\n        <span  click.trigger=\"sendAnEmail(profileHelpTicket.personId)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\r\n        <hr/>\r\n        <div class=\"col-md-4\">\r\n          <div  class=\"topMargin\">\r\n              <img if.bind=\"profileHelpTicket.personId.file.fileName\" class=\"circular--square leftMargin\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${profileHelpTicket.personId.file.fileName}\" height=\"100\">\r\n          </div>\r\n          <div if.bind=\"!profileHelpTicket.personId.file.fileName\" style=\"height:100px;width:100px;\" innerhtml.bind=\"profileHelpTicket.personId.email | gravatarUrl:100:6\"></div>\r\n        </div>\r\n        <div class=\"col-md-8\">\r\n          <h5>Nickname: ${profileHelpTicket.personId.nickName}</h5>\r\n          <h5>Phone: ${profileHelpTicket.personId.phone  | formatPhone}</h5>\r\n          <h5>Mobile: ${profileHelpTicket.personId.mobile | formatPhone}</h5>\r\n        </div>\r\n    </div>\r\n\r\n    <div class='row'>\r\n      <div id='no-more-tables'>\r\n        <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\r\n          <thead>\r\n            <tr>\r\n                <td colspan='${colSpan}'>\r\n                  <div class=\"checkbox\">\r\n                    <label>\r\n                      <input disabled.bind=\"sendMailDisable\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\r\n                    </label>\r\n                  </div>\r\n                  <div class=\"col-xs-2\">\r\n                    <h4>Today:</h4> <h7>Created: ${helpTickets.helpTickeAges.today[0]} Modified: ${helpTickets.helpTickeAges.today[1]}</h7>\r\n                  </div>\r\n                  <div class=\"col-xs-2\">\r\n                    <h4>Yesterday:</h4><h7>Created: ${helpTickets.helpTickeAges.yesterday[0]} Modified: ${helpTickets.helpTickeAges.yesterday[1]}</h7>\r\n                </div>\r\n                <div class=\"col-xs-2\">\r\n                  <h4>One Week:</h4> <h7>Created: ${helpTickets.helpTickeAges.oneWeek[0]} Modified: ${helpTickets.helpTickeAges.oneWeek[1]}</h7>\r\n                </div>\r\n                <div class=\"col-xs-2\">\r\n                  <h4>Two Weeks:</h4> <h7>Created: ${helpTickets.helpTickeAges.twoWeeks[0]} Modified: ${helpTickets.helpTickeAges.twoWeeks[1]}</h7>\r\n                </div>\r\n                <div class=\"col-xs-2\" style=\"color:red;\" show.bind=\"helpTickets.helpTickeAges.older[0]>0 || helpTickets.helpTickeAges.older[1] > 0\">\r\n                  <h4>Older:</h4> <h7>Created: ${helpTickets.helpTickeAges.older[0]} Modified: ${helpTickets.helpTickeAges.older[1]}</h7>\r\n                </div>\r\n                </td>\r\n            </tr>\r\n            <tr>\r\n              <td colspan.bind='colSpan'><compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose></td>\r\n            </tr>\r\n            <tr>\r\n              <td colspan='colSpan'>\r\n                <span click.trigger=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                <span click.trigger=\"_cleanUpFilters()\" class=\"mousePointer\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter fa-ban\" aria-hidden=\"true\"></i></span>\r\n \r\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n              </td>\r\n            </tr>\r\n            <tr>\r\n              <th style=\"width:10em\"><span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketNo'})\">No </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:20em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketType'})\">Type </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:15em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customOwnerSorter, propertyName: 'ownder'})\">Owner </span><i class=\"fa fa-sort\"></i></th>                   \r\n              <th style=\"width:10em;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})\">Status </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:8em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\">Date Created </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:8em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'modifiedDate'})\">Date Modified </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:15em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'personId.lastName'})\">Faculty </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:20em\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'institutionId.name'})\">Institution </span><span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th style=\"width:15em\">Email</th>\r\n            </tr>\r\n            <tr>\r\n              <th>\r\n                  <input value.bind=\"helpTicketNoFilterValue\" input.trigger=\"dataTable.filterList(helpTicketNoFilterValue, { type: 'value',  filter: 'helpTicketNoFilter', collectionProperty: 'helpTicketNo', displayProperty: 'helpTicketNo',  compare:'match'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"helpTicketTypeFilterValue\" input.trigger=\"dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"ownerFilterValue\" input.trigger=\"dataTable.filterList(ownerFilterValue, { type: 'custom',  filter: customOwnerFilter, collectionProperty: 'owner', displayProperty: 'helpTicketType',  compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <select value.bind=\"helpTicketStatusFilter\" change.trigger=\"customHelpTicketStatusFilter()\" class=\"form-control\">\r\n                <!--input.trigger=\"dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )\" --> \r\n                  <option value=\"\"></option>\r\n                  <option repeat.for=\"status of helpTicketTypes\"\r\n                          value.bind=\"status.code\">${status.description}</option>\r\n                </select>\r\n              </th>\r\n              <th>\r\n                <input type=\"date\" value.bind=\"createdDateFilterValue\" input.trigger=\"dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )\"  class=\"form-control\" />\r\n              </th>\r\n               <th>\r\n                <input type=\"date\" value.bind=\"modifiedDateFilterValue\" input.trigger=\"dataTable.filterList(modifiedDateFilterValue, {type: 'date', filter: 'modifiedDate',  collectionProperty: 'modifiedDate', compare: 'after'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"personFilterValue\" input.trigger=\"dataTable.filterList(personFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"institutionFilterValue\" input.trigger=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n              <th></th>\r\n            </tr>\r\n            \r\n          </thead>\r\n          <tbody>\r\n            <tr repeat.for=\"helpTicket of dataTable.displayArray\" class=\"${helpTicket.priority | getArrayValue:config.HELP_TICKET_PRIORITIES:'status'}\">\r\n              <td style=\"width:100px;\" data-title=\"Number\">${helpTicket.helpTicketNo}</td>\r\n              <td  mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" click.trigger=\"selectHelpTicket($event, $index, helpTicket)\"\r\n                data-title=\"Type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}\r\n              </td>\r\n              <td data-title=\"Owner\">\r\n                <span show.bind=\"helpTicket.owner[0].personId === null\" click.trigger=\"ownHelpTicket(helpTicket)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg\" aria-hidden=\"true\"></i></span>\r\n                <span show.bind=\"helpTicket.owner[0].personId !== null\" click.trigger=\"ownHelpTicket(helpTicket)\"><i class=\"fa fa-child\" aria-hidden=\"true\"></i></span><span click.trigger=\"selectHelpTicket($event, $index, helpTicket)\" show.bind=\"helpTicket.owner[0].personId !== null\" > ${helpTicket.owner[0].personId.fullName} </span>\r\n                <!-- click.trigger=\"selectHelpTicket($event, $index, helpTicket)\" -->\r\n              </td>\r\n              <td \r\n              <td class=\"dropbtn\" data-title=\"Status\">\r\n                <div class=\"dropdown hidden-xs hidden-sm hidden-md\">\r\n                  <span class=\"dropbtn\"> ${helpTicket.helpTicketStatus | lookupHTStatus:config.HELP_TICKET_STATUSES}\r\n                    <div show.bind=\"helpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS && helpTicket.helpTicketStatus !== config.NEW_HELPTICKET_STATUS\" class=\"dropdown-content\">\r\n                      <a href=\"#\" click.trigger=\"changeStatus(helpTicket, status.code, status.description)\" repeat.for=\"status of config.HELP_TICKET_STATUSES | helpTicketStatuses:removeHTStatus\">${status.description}</a>\r\n                    </div>\r\n                  </span>\r\n                </div>\r\n                <div class=\"hidden-lg\">${helpTicket.helpTicketStatus | lookupHTStatus:config.HELP_TICKET_STATUSES}</div>\r\n\r\n              </td>\r\n              <td  data-title=\"Created Date\" click.trigger=\"selectHelpTicket($event, $index, helpTicket)\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n              <td  data-title=\"Modified Date\" click.trigger=\"selectHelpTicket($event, $index, helpTicket)\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\r\n              <td class=\"dropbtn hidden-xs hidden-sm hidden-md\" style=\"width:10rem;\" click.trigger=\"selectHelpTicket($event, $index, helpTicket)\" data-title=\"Customer\">${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>\r\n              <td class=\"hidden-lg\" style=\"width:10rem;\" click.trigger=\"selectHelpTicket($event, $index, helpTicket)\" data-title=\"Customer\" >${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>\r\n              <td  data-title=\"Insitution\" click.trigger=\"selectHelpTicket($event, $index, helpTicket)\">${helpTicket.institutionId.name}</td>\r\n              <td class=\"dropbtn\"  click.trigger=\"sendAnEmail(helpTicket.personId)\" data-title=\"Email\" >${helpTicket.personId.email}</td>\r\n            </tr>\r\n          </tbody>\r\n        </table>\r\n      </div>\r\n    </div>\r\n  </div>\r\n  </div>\r\n\r\n</div> \r\n</div> \r\n</div>\r\n</template>"; });
 define('text!modules/tech/support/components/viewRequestsPanel.html', ['module'], function(module) { module.exports = "<template>\r\n    <div show.bind=\"showRequestPanel\">\r\n        <div class=\"row\">\r\n            <!-- Session Select -->\r\n            <div class=\"col-lg-4\">\r\n                <div class=\"form-group topMargin leftMargin\">\r\n                    <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\r\n                        <option repeat.for=\"session of sessions.sessionsArray\" value.bind=\"session._id\">Session\r\n                            ${session.session} - ${session.year}</option>\r\n                    </select>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-lg-6 topMargin\">\r\n                <compose view=\"./Requests.html\"></compose>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/tech/support/components/viewToolbarButtons.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"row\">\r\n        <div class=\"list-group-item toolbar\" id=\"toolbar\">\r\n            <span click.trigger=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span click.trigger=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span click.trigger=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span click.trigger=\"ownHelpTicket()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span click.trigger=\"flag()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Flag\"><i class=\"fa fa-flag fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span click.trigger=\"showRequestsPanel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\r\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Requests\"><i class=\"fa fa-shopping-cart fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"showLockMessage\" click.trigger=\"unlockIt()\" class=\"smallMarginRight\" bootstrap-tooltip\r\n                data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Unlock\"><i class=\"fa fa-unlock-alt fa-lg fa-border\"\r\n                    aria-hidden=\"true\"></i></span>\r\n            <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\r\n        </div>\r\n    </div>\r\n</template>"; });

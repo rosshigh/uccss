@@ -105,6 +105,22 @@ export class HelpTickets {
         }
     }
 
+    async getArchiveHelpTicket(id) {
+      if (id) {
+          try {
+              let serverResponse = await this.data.get(this.HELP_TICKET_SERVICES + "/archive" + "/" + id);
+              if (!serverResponse.error) {
+                  this.selectedHelpTicket = serverResponse;
+              }
+              return serverResponse;
+          } catch (error) {
+              console.log(error);
+              return undefined;
+          }
+
+      }
+  }
+
     setHelpTicket(helpTicket) {
         if (!helpTicket) {
             this.emptyHelpTicket();

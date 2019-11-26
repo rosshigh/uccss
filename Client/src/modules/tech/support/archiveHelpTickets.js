@@ -275,7 +275,7 @@ export class ArchiveHelpTickets {
   async selectHelpTicket(helpTicket, el) {
     //Make the selected help ticket the selected help ticket
     // this.helpTickets.setHelpTicket(helpTicket);
-    await this.helpTickets.getHelpTicket(helpTicket._id);
+    await this.helpTickets.getArchiveHelpTicket(helpTicket._id);
     //If the help ticket has a systemId, retrieve the system from the server
     if (this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
       await this.systems.getSystem(this.helpTickets.content.content.systemId);

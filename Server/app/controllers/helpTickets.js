@@ -286,6 +286,26 @@ module.exports = function (app, config) {
       })
   });
 
+  router.get('/api/helpTickets/archive/:id', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get help ticket ' + req.params.id);
+    HelpTicketArchive.findOne({ _id: req.params.id })
+    // .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
+      // .populate({path: 'requestId', model: 'ClientRequestDetails', populate: {path: 'requestId', model: 'ClientRequest', select: 'cousrseId'}})
+      .populate('courseId','name number')
+      .populate('requestId')
+      .populate('personId', 'email firstName lastName phone mobile nickName file country')
+      .populate('content.personId', 'email firstName lastName phone mobile nickName file')
+      .populate('institutionId', 'name')
+      .populate('owner.personId', 'firstName lastName _id')
+      .exec()
+      .then(object => {
+        res.status(200).json(object);
+      })
+      .catch(error => {
+        return next(error);
+      })
+  });
+
   router.post('/api/helpTickets/', requireAuth, function (req, res, next) {
     logger.log('info', 'Create HelpTicket', "verbose");
     var helpTicket = new Model(req.body);
