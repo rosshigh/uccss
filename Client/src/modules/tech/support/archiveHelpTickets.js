@@ -10,10 +10,11 @@ import { Utils } from '../../../resources/utils/utils';
 import { People } from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
 import { CommonDialogs } from '../../../resources/dialogs/common-dialogs';
+import { Systems } from '../../../resources/data/systems';
 
 import moment from 'moment';
 
-@inject(Router, AppConfig, Validation, People, DataTable, Utils, HelpTickets, Sessions, Downloads, Products, CommonDialogs)
+@inject(Router, AppConfig, Validation, People, DataTable, Utils, HelpTickets, Sessions, Downloads, Products, CommonDialogs, Systems)
 export class ArchiveHelpTickets {
   searchResults = false;
   helpTicketSelected = false;
@@ -31,7 +32,7 @@ export class ArchiveHelpTickets {
   selectedPeople = new Array();
   selectedInstitutions = new Array();
 
-  constructor(router, config, validation, people, datatable, utils, helpTickets, sessions, apps, products, dialogs) {
+  constructor(router, config, validation, people, datatable, utils, helpTickets, sessions, apps, products, dialogs, systems) {
     this.router = router;
     this.config = config;
     this.validation = validation;
@@ -45,13 +46,14 @@ export class ArchiveHelpTickets {
     this.apps = apps;
     this.products = products;
     this.dialogs = dialogs;
+    this.systems = systems;
 
     this.userObj = JSON.parse(sessionStorage.getItem('user'));
     this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
   };
 
   async activate() {
-
+    this.systems.getSystemsArray();
   }
 
   async attached() {
@@ -272,11 +274,13 @@ export class ArchiveHelpTickets {
   *****************************************************************************************/
   async selectHelpTicket(helpTicket, el) {
     //Make the selected help ticket the selected help ticket
-    this.helpTickets.setHelpTicket(helpTicket);
+    // this.helpTickets.setHelpTicket(helpTicket);
+    await this.helpTickets.getHelpTicket(helpTicket._id);
     //If the help ticket has a systemId, retrieve the system from the server
     if (this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
       await this.systems.getSystem(this.helpTickets.content.content.systemId);
     }
+
 
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
     this.selectedRow = $(el.target).closest('tr');
