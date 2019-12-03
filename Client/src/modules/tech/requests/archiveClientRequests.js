@@ -174,5 +174,29 @@ export class ArchiveRequests {
 			return result * sortDirection;
 		});
     }
+
+    downloadExcel(){ 
+      let csvContent = "data:text/csv;charset=utf-8;,Due,Created,IDs,Product,Course,Faculty,Institution";
+      csvContent += "\r\n";
+      this.dataTable.baseArray.forEach(item => {
+          csvContent += item.requiredDate + ',';
+          csvContent += item.createdDate + ',';
+          csvContent += item.requestStatus + ',';
+          csvContent += item.productId.name + ',';
+          csvContent += item.requestId.courseId.name + ',';
+          csvContent += item.requestId.personId.fullName + ',';
+          csvContent += item.requestId.institutionId.name + ',';
+
+          csvContent +=  "\r\n";
+      })
+      var encodedUri = encodeURI(csvContent);
+      var link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "requestsArchive.csv");
+      document.body.appendChild(link); 
+
+      link.click();
+  }
+
 	
 }
