@@ -179,9 +179,13 @@ export class ArchiveRequests {
       let csvContent = "data:text/csv;charset=utf-8;,Due,Created,IDs,Product,Course,Faculty,Institution";
       csvContent += "\r\n";
       this.dataTable.baseArray.forEach(item => {
+        let graduateIds = item.requestId.graduateIds === null ? 0 : item.requestId.graduateIds;
+        let undergradIds = item.requestId.undergradIds === null ? 0 : item.requestId.undergradIds; 
+        let ids =  parseInt(graduateIds) + parseInt(undergradIds);
+
           csvContent += item.requiredDate + ',';
           csvContent += item.createdDate + ',';
-          csvContent += item.requestId + ',';
+          csvContent += ids + ',';
           csvContent += item.productId.name + ',';
           csvContent += item.requestId.courseId.name + ',';
           csvContent += item.requestId.personId.fullName + ',';
