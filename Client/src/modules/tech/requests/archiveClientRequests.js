@@ -181,7 +181,7 @@ export class ArchiveRequests {
       this.dataTable.baseArray.forEach(item => {
           csvContent += item.requiredDate + ',';
           csvContent += item.createdDate + ',';
-          csvContent += item.requestStatus + ',';
+          csvContent += item.requestId + ',';
           csvContent += item.productId.name + ',';
           csvContent += item.requestId.courseId.name + ',';
           csvContent += item.requestId.personId.fullName + ',';
