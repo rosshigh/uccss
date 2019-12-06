@@ -7,13 +7,14 @@ import {Sessions} from '../../resources/data/sessions';
 import {People} from '../../resources/data/people';
 import {HelpTickets} from '../../resources/data/helpTickets';
 import {ClientRequests} from '../../resources/data/clientRequests';
+import {APJClientRequests} from '../../resources/data/apjClientRequests';
 import {Events} from '../../resources/data/events';
 import moment from 'moment';
 
-@inject(Router, Utils, AppConfig, SiteInfo, Sessions, HelpTickets, ClientRequests, People, Events)
+@inject(Router, Utils, AppConfig, SiteInfo, Sessions, HelpTickets, ClientRequests, People, APJClientRequests, Events)
 export class User {
 
-  constructor(router, utils, config, siteinfo, sessions, helpTickets, requests, people, events){
+  constructor(router, utils, config, siteinfo, sessions, helpTickets, requests, people, events, apjRequests){
     this.router = router;
     this.utils = utils;
     this.config = config;
@@ -22,6 +23,7 @@ export class User {
     this.helpTickets = helpTickets;
     this.requests = requests;
     this.people = people;
+    this.apjRequests = apjRequests;
     this.events = events;
 
     this.userObj = JSON.parse(sessionStorage.getItem('user'));
@@ -53,23 +55,6 @@ export class User {
         }
     }
   }   
-
-//   updateTwitter(d,s,id){
-//     var js, fjs = d.getElementsByTagName(s)[0],
-//         t = window.twttr || {};
-//     if (d.getElementById(id)) return t;
-//     js = d.createElement(s);
-//     js.id = id;
-//     js.src = "https://platform.twitter.com/widgets.js";
-//     fjs.parentNode.insertBefore(js, fjs);
-
-//     t._e = [];
-//     t.ready = function(f) {
-//         t._e.push(f);
-//     };
-
-//   return t;
-//   }
 
   async activate(){
     await this.getData();
@@ -121,6 +106,7 @@ export class User {
   }
 
   async getData(){
+    // let apjUnassignedRequests = await this.apjRequests.getClientRequestsDetailsArray('?filter=requestStatus|eq|1',true);
     var currentDate = moment(new Date()).format("MM-DD-YYYY");
     var options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
     if(this.userObj.userRole >= this.config.UCC_ROLE){

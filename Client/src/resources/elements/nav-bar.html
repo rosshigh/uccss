@@ -1,5 +1,11 @@
 <template>
     <style>
+       
+        .accAlert {
+          color: ${config.MENU_COLOR};
+          background-color:${config.SUBMENU_BACKGROUND};
+        }
+        
         .navbar-default {
             color: $ {
                 config.MENU_COLOR
@@ -108,7 +114,7 @@
                     <li class="hidden-sm hidden-md" if.bind="isAuthenticated && userObj.userRole >= config.UA_ROLE"><a
                             href="#/analytics">Analytics</a></li>
                     <li class="dropdown">
-                        <a if.bind="userObj.userRole >= config.ACC_ROLE" href="#" class="dropdown-toggle"
+                        <a  if.bind="userObj.userRole >= config.ACC_ROLE" href="#" class="dropdown-toggle ${!apjUnassignedRequests.length ? 'accAlert' : ''}"
                             data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">ACC <span
                                 class="caret"></span></a>
                         <ul class="dropdown-menu">

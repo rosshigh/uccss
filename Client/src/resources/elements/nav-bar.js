@@ -6,17 +6,18 @@ import { Utils } from '../../resources/utils/utils';
 import { People } from '../../resources/data/people';
 import { AppConfig } from "../../config/appConfig";
 import { CommonDialogs } from '../dialogs/common-dialogs';
+import {APJClientRequests} from '../../resources/data/apjClientRequests';
 import moment from 'moment';
 import * as toastr from "toastr";
 import $ from "jquery";
 
-@inject(Router, EventAggregator, BindingEngine, Auth, Utils, People, AppConfig, CommonDialogs)
+@inject(Router, EventAggregator, BindingEngine, Auth, Utils, People, AppConfig, CommonDialogs, APJClientRequests)
 export class NavBar {
 
     isAuthenticated = false;
     subscription = {};
 
-    constructor(router, eventAggregator, bindingEngine, auth, utils, people, config, dialog) {
+    constructor(router, eventAggregator, bindingEngine, auth, utils, people, config, dialog, apjRequests) {
         this.eventAggregator = eventAggregator;
         this.router = router;
         this.bindingEngine = bindingEngine;
@@ -25,6 +26,7 @@ export class NavBar {
         this.people = people;
         this.config = config;
         this.dialog = dialog;
+        this.apjRequests = apjRequests;
 
         this.isAuthenticated = this.auth.isAuthenticated();
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
@@ -37,6 +39,7 @@ export class NavBar {
         setInterval(() => {
             this.people.getNotifications(this.userObj._id);
         }, 10 * 60 * 1000);
+        let apjUnassignedRequests = this.apjRequests.getClientRequestsDetailsArray('?filter=requestStatus|eq|1',true);
     }
 
     async login() {
