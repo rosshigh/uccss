@@ -105,13 +105,18 @@
 			<label class="form-control-label ">Required Date</label>
 				<flat-picker controlid="requiredDate" config.bind="dateConfig" value.bind="selectedRequestDetail.requiredDate" startdate.bind="minEndDate" enddate.bind="maxEndDate"></flat-picker>
 				<span id='requiredDateError'></span>
-		</div>
+    </div>
+    <div class="col-lg-12 topMargin" innerhtml.bind="selectedRequestDetail.requestId.comments"></div>
 	</div>
-
-
-	 <div class="col-lg-12 topMargin" innerhtml.bind="selectedRequestDetail.requestId.comments"></div>
-	 
-</div>
+  <!-- <div class="col-lg-12">
+    <div class="row topMargin">
+      <label class="form-control-label ">Comments</label>
+      <editor value.bind="selectedRequestDetail.requestId.comments" height="250"></editor> -->
+  
+     <!-- <div class="col-lg-12 topMargin" innerhtml.bind="selectedRequestDetail.requestId.comments"></div> -->
+     
+  <!-- </div>
+  </div> -->
 
 </div>
 </div>

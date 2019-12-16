@@ -32,14 +32,16 @@ export class NavBar {
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
     }
 
-    attached() {
+    async attached() {
         this.hideProfile();
         $(".dropdown-toggle").dropdown();
         if (this.userObj) this.people.getNotifications(this.userObj._id);
         setInterval(() => {
             this.people.getNotifications(this.userObj._id);
         }, 10 * 60 * 1000);
-        let apjUnassignedRequests = this.apjRequests.getClientRequestsDetailsArray('?filter=requestStatus|eq|1',true);
+        await this.apjRequests.getClientRequestsDetailsArray('?filter=requestStatus|eq|1',true);
+        this.apjUnassignedRequests = this.apjRequests.requestsDetailsArray;
+        console.log(this.apjUnassignedRequests)
     }
 
     async login() {

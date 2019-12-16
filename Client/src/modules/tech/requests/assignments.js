@@ -111,6 +111,8 @@ export class Assignments {
         this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
         let serverResponse = await this.clientRequests.saveRequestDetail();
         if (!serverResponse.error) {
+          // this.clientRequests.setSelectedRequest(this.electedRequestDetail.requestId);
+          // let serverResponse = await this.clientRequests.saveRequest();
             this.utils.showNotification("The request was updated");
             this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
             this.reSort();
