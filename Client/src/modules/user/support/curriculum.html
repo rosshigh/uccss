@@ -27,18 +27,12 @@
 							</tr>
 							<tr>
 								<th>Title </th>
-								<th>Rating</th>
-								<th>Rate It</th>
 								<th>Products</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr repeat.for="curriculum of curriculumArray">
 								<td click.delegate="selectCurriculum(curriculum)" data-title="Title" class="col-lg-6">${curriculum.title}</td>
-								<td data-title="Rating">${curriculum.rating | formatDigits:2}</td>
-								<td data-title="Rating" class="col-lg-2">
-									<rate-it id="${curriculum._id}" change.delegate="rateCurriculum($event)" rating.two-way="curriculum.rating" raters.bind="curriculum.raters"></rate-it>
-								</td>
 								<td data-title="Products" class="col-lg-4">
 									<ul class="list-group">
 										<li repeat.for="product of curriculum.products" class="list-group-item">${product | lookupValue:products.productsArray:"_id":"name"}</li>

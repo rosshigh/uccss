@@ -25,14 +25,14 @@
                         <thead>
                             <tr>
                                 <td colspan='4'>
-                                    <compose view="../../../resources/elements/table-navigation-bar.html"></compose>
+                                    <compose view="../../../resources/elements/table-navigation-bar.html"></compose> 
                                 </td>
                             </tr>
                             <tr>
-                                <th>Name </th>
+                                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'name'})"> Name  </span><i class="fa fa-sort"></i></th>
                                 <th>File</th>
                                 <th>Decription</th>
-                                <th>Date</th>
+                                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'file.dateUploaded'})"> Date </span><i class="fa fa-sort"></i></th>
                             </tr>
                         </thead>
                         <tbody>
