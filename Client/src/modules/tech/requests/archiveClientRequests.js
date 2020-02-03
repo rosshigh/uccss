@@ -35,10 +35,11 @@ export class ArchiveRequests {
 	attached(){
         $('[data-toggle="tooltip"]').tooltip();
     }
+    //?order=startDate:DSC',
     
     async activate() { 
         let responses = await Promise.all([
-            this.sessions.getSessionsArray('?filter=sessionStatus|eq|Closed&order=sortOrder:DSC', true),
+            this.sessions.getSessionsArray('?filter=sessionStatus|eq|Closed&order=startDate:DSC', true),
             this.products.getProductsArray('?order=name'),
             this.systems.getSystemsArray(),
             this.config.getConfig()
