@@ -165,7 +165,7 @@ export class EditInstitutions {
     downloadInstExcel(){
         let csvContent = "data:text/csv;charset=utf-8;,Name,City,State,Type\r\n";
         this.dataTable.baseArray.forEach(item => {
-            csvContent += item.name + "," + item.city + "," + item.state + "," + item.institutionType;
+            csvContent += item.name + "," + item.city + "," + item.region + "," + item.institutionType;
             csvContent +=  "\r\n";
         })
         var encodedUri = encodeURI(csvContent);

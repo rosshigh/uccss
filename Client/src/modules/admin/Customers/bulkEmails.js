@@ -146,9 +146,9 @@ export class BulkEmails {
     }
 
     downloadInstExcel(){
-        let csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,City,Region,Country,Roles,Institution\r\n";
+        let csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,Phone,City,Region,Country,Roles,Institution\r\n";
         this.dataTable.baseArray.forEach(item => {
-            csvContent += item.firstName + "," + item.lastName.replace(',',' ') + "," + item.email + "," + item.institutionId.city + "," + item.institutionId.region + "," + item.institutionId.country + "," + item.roles.join(':') + "," + item.institutionId.name ;
+            csvContent += item.firstName + "," + item.lastName.replace(',',' ') + "," + item.email + "," + item.phone + "," + item.institutionId.city + "," + item.institutionId.region + "," + item.institutionId.country + "," + item.roles.join(':') + "," + item.institutionId.name ;
             csvContent +=  "\r\n";
         })
         var encodedUri = encodeURI(csvContent);
