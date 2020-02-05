@@ -85,7 +85,7 @@ module.exports = function (app, config) {
   router.get('/api/people/bulkEmail', function(req, res, next){
     logger.log('info','Get people builkEmail', 'verbose');
     var query = buildQuery(req.query, Model.find());
-    query.select('lastName firstName institutionId fullName personStatus email roles')
+    query.select('lastName firstName institutionId fullName personStatus email phone roles')
     query.populate('institutionId',{institutionStatus: 1, institutionType: 1, memberType: 1, name: 1, region: 1, city: 1, country: 1})
     query.exec( function(err, object){
         if (err) {
