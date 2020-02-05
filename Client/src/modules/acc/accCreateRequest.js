@@ -73,6 +73,17 @@ export class ACCClientRequest {
     });
   }
 
+  filterInstiutionList(){
+    if(!this.filterValue) {
+      this.filterInstitutions();
+      return;
+    }
+    let filterValue = this.filterValue.toLowerCase();
+    this.insitutionsArray = this.people.institutionsArray.filter(item => {
+      return item.packageId !== null && item.name.toLowerCase().indexOf(filterValue) > -1;
+    });
+  }
+
   attached() {
     $('#loading').hide();
   }
@@ -127,10 +138,15 @@ export class ACCClientRequest {
     // 		if (this.requests.selectedRequest.requestDetails[i]._id) {
     if (this.requests.selectedRequest.requestDetails[index].requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
       return this.dialog.showMessage(
-        "That request has already been assigned and cannot be deleted?",
-        "Cannot Delete Request",
-        ['Ok']
+        "That request has already been assigned.  Are you sure you want to retire that assignment?",
+        "Retire Assignment",
+        ['Yes', 'No']
       ).whenClosed(response => {
+        if (!response.wasCancelled) {
+          console.log('Retire assignment index')
+          // this.requests.selectedRequest.requestDetails[index].delete = true;
+          // this.requests.selectedRequest.requestDetails.splice(index, 1);
+        }
       });
 
     } else {

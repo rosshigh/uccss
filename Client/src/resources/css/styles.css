@@ -127,6 +127,10 @@
     margin-top: 25px;
 }
 
+.smallTopMargin {
+  margin-top: 5px;
+}
+
 .bottomMargin {
     margin-bottom: 25px;
 }

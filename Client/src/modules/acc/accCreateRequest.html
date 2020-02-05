@@ -21,12 +21,18 @@
           <div class="col-lg-4">
 
             <div class="topMargin">
-              <select id="institution" value.bind="selectedInstitution" change.delegate="changeInstitution($event)"
-                class="form-control">
-                <option value="">Choose the Institution</option>
-                <option repeat.for="item of insitutionsArray" value="${item._id}">${item.name}
-                </option>
-              </select>
+              <div>
+                <input input.delegate="filterInstiutionList()" value.bind="filterValue" id="filterValue"
+                  class="form-control " placeholder="Filter institution" type="text" />
+              </div>
+              <div class="smallTopMargin">
+                <select id="institution" value.bind="selectedInstitution" change.delegate="changeInstitution($event)"
+                  class="form-control">
+                  <option value="">Choose the Institution</option>
+                  <option repeat.for="item of insitutionsArray" value="${item._id}">${item.name}
+                  </option>
+                </select>
+              </div>
             </div>
 
             <span show.bind="institutionSelected && selectedPackage">
@@ -76,8 +82,17 @@
                     <li click.trigger="removeProduct($index)"
                       repeat.for="product of requests.selectedRequest.requestDetails" id="${product.productId}"
                       class="list-group-item dropbtn">
-                      <h4>${product.productId | lookupValue:products.productsArray:"_id":"name"}
-                      </h4>
+                      <div class="row">
+                      <div class="col-sm-12">
+                        <h4>${product.productId | lookupValue:products.productsArray:"_id":"name"}
+                        </h4>
+                      </div>
+                      <!-- <div class="col-sm-3">
+                        <span click.delegate="deleteRequest($index)" class="smallMarginRight" bootstrap-tooltip
+                          data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete Request"><i
+                            class="fa fa-trash vertical-align" aria-hidden="true"></i></span>
+                      </div> -->
+                    </div>
                     </li>
 
                   </ul>
@@ -105,11 +120,12 @@
                       <td>${request.productId | lookupValue:products.productsArray:"_id":"name"}
                       </td>
                       <td>
-                        <input readonly.bind="!request.invoiceRelevant"type="number" class="form-control" value.bind="request.price">
+                        <input readonly.bind="!request.invoiceRelevant" type="number" class="form-control"
+                          value.bind="request.price">
                         ${request.invoiceRelevant}
                       </td>
                       <td>
-                        <input  type="number" class="form-control" value.bind="request.numberOfStudents">
+                        <input type="number" class="form-control" value.bind="request.numberOfStudents">
                       </td>
                       <td>
                         <div class="form-group  col-md-8">
