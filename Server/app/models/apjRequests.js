@@ -102,6 +102,7 @@ var ClientRequestSchema = new Schema({
   requestDetails: [{ type: Schema.Types.ObjectId }], //, ref: 'ClientRequestDetail'
   institutionId: { type: Schema.Types.ObjectId },
   customerMessage: { type: String },
+  active: { type: Boolean, default: true },
   audit: [{
     property: { type: String, default: 'Created' },
     eventDate: { type: Date, default: Date.now },

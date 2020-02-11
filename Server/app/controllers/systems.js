@@ -88,6 +88,32 @@ module.exports = function (app) {
           })
       })
     }
+    return next(error);
+  }));
+
+  router.put('/api/systems/client', requireAuth, asyncHandler(async (req, res) => {
+    logger.log('info', 'Update Systems Client' + req.body.systemId);
+    if (req.body) {
+      Model.findById(req.body.systemId)
+        .exec()
+        .then(result => {
+          for (let i = 0; i < result.clients.length; i++) {
+            if (result.clients[i].client = req.body.client) {
+              result.clients[i].clientStatus = req.body.status;
+            }
+          }
+          await Model.findOneAndUpdate({ _id: req.body.systemId }, result, { new: true, safe: true, multi: false }).then(result => {
+            res.status(200).json("Client updated");
+          })
+            .catch(error => {
+              return next(error);
+            })
+        })
+        .catch(error => {
+          return next(error);
+        })
+    }
+    return next(error);
   }));
 
   router.delete('/api/systems/:id', requireAuth, asyncHandler(async (req, res) => {
@@ -116,14 +142,14 @@ module.exports = function (app) {
 
   router.post('/api/changeCategory', requireAuth, asyncHandler(async (req, res) => {
     logger.log('info', 'Create changeCategory');
-      var category = new ChangeCategory(req.body);
-      await category.save().then(result => {
-        res.status(200).json(result);
-      })
+    var category = new ChangeCategory(req.body);
+    await category.save().then(result => {
+      res.status(200).json(result);
+    })
   }));
 
   router.put('/api/changeCategory', requireAuth, asyncHandler(async (req, res) => {
-    await ChangeCategory.findOneAndUpdate({_id: req.body._id}, req.body, {new: true, safe:true, multi:false}).then(result => {
+    await ChangeCategory.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true, safe: true, multi: false }).then(result => {
       res.status(200).json(result);
     })
   }));
@@ -138,7 +164,7 @@ module.exports = function (app) {
   router.get('/api/change', requireAuth, asyncHandler(async (req, res) => {
     logger.log('info', 'Get change');
     var query = buildQuery(req.query, Change.find())
-    query.populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName'})
+    query.populate({ path: 'personId', model: 'Person', select: 'firstName lastName fullName' })
     await query
       .exec().then(result => {
         res.status(200).json(result);
@@ -156,14 +182,14 @@ module.exports = function (app) {
   router.post('/api/change', requireAuth, asyncHandler(async (req, res) => {
     logger.log('info', 'Create change');
     console.log(req.body)
-      var category = new Change(req.body);
-      await category.save().then(result => {
-        res.status(200).json(result);
-      })
+    var category = new Change(req.body);
+    await category.save().then(result => {
+      res.status(200).json(result);
+    })
   }));
 
   router.put('/api/change', requireAuth, asyncHandler(async (req, res) => {
-    await Change.findOneAndUpdate({_id: req.body._id}, req.body, {new: true, safe:true, multi:false}).then(result => {
+    await Change.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true, safe: true, multi: false }).then(result => {
       res.status(200).json(result);
     })
   }));

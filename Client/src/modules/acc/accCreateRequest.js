@@ -89,20 +89,20 @@ export class ACCClientRequest {
   }
 
   selectProduct(product) {
-    if (this.requests.selectedRequest.requestDetails.length >= this.selectedPackage.maxClients) {
+    if (this.requests.selectedRequest.requestDetails.length >= this.selectedPackage.maxClients)    {
       // this.utils.showNotification("This university has reached their maximum requested products.", "error");
       return this.dialog.showMessage(
-        "This university has reached their maximum requested products.  This client will incurr an extra charge.  Is that OK?",
+        "This university has reached their maximum requested products.",
         "Extra Client",
-        ['YES','NO']
+        ['OK']
       ).whenClosed(response => {
-        if(response.output === 'YES'){
-          this.invoiceRelevant = true;
-          this.addTheClient(product);
-        } else {
-          this.invoiceRelevant = false;
-          return;
-        }
+        // if(response.output === 'YES'){
+        //   this.invoiceRelevant = true;
+        //   this.addTheClient(product);
+        // } else {
+        //   this.invoiceRelevant = false;
+        //   return;
+        // }
       });
     } 
     this.invoiceRelevant = false;
@@ -113,6 +113,7 @@ export class ACCClientRequest {
     $("#requestProductsLabel").html("Requested Products");
     var newObj = this.requests.emptyRequestDetail();
     newObj.productId = product._id;
+    this.requestDetails.push(newObj);
     this.requests.selectedRequest.requestDetails.push(newObj);
     this.products.selectedProductFromId(newObj.productId);
     this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = product.name;
@@ -131,21 +132,17 @@ export class ACCClientRequest {
     return false;
   }
 
-  removeProduct(index) {
-
-    // for (var i = 0; i < this.requests.selectedRequest.requestDetails.length; i++) {
-    // 	if (el.target.id === this.requests.selectedRequest.requestDetails[i].productId) {
-    // 		if (this.requests.selectedRequest.requestDetails[i]._id) {
-    if (this.requests.selectedRequest.requestDetails[index].requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
+  async removeProduct(index) {
+    if (this.requestDetails[index].requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
       return this.dialog.showMessage(
         "That request has already been assigned.  Are you sure you want to retire that assignment?",
         "Retire Assignment",
         ['Yes', 'No']
       ).whenClosed(response => {
         if (!response.wasCancelled) {
-          console.log('Retire assignment index')
-          // this.requests.selectedRequest.requestDetails[index].delete = true;
-          // this.requests.selectedRequest.requestDetails.splice(index, 1);
+          this.requestDetails[index].requestStatus = this.config.RETIRED_CLIENT_CODE;
+          this.saveIt();
+          this.updateClient(this.requestDetails[index]);
         }
       });
 
@@ -156,18 +153,47 @@ export class ACCClientRequest {
         ['Yes', 'No']
       ).whenClosed(response => {
         if (!response.wasCancelled) {
-          this.requests.selectedRequest.requestDetails[index].delete = true;
-          this.requests.selectedRequest.requestDetails.splice(index, 1);
+          this.requestDetails[index].delete = true;
+          this.removeRequestDetail(this.requestDetails[index]);
+          this.requestDetails.splice(index,1);
+          
         }
       });
     }
-    // break;
-    // } else {
-    // 	this.requests.selectedRequest.requestDetails.splice(i, 1);
-    // 	break;
-    // 		}
-    // 	}
-    // }
+  }
+
+  removeRequestDetail(request){
+    let spliceIndex = -1;
+    this.requests.selectedRequest.requestDetails.forEach((item, index) => {
+      if(item._id === request._id) spliceIndex = index;
+    });
+    this.requests.selectedRequest.requestDetails.splice(spliceIndex, 1);
+  }
+
+  async updateClient(request){
+    request.assignments.forEach(item => {
+      this.systems.selectedSystemFromId(item.systemId);
+      for(let i = 0; i < this.systems.selectedSystem.clients.length; i++){
+        if(this.systems.selectedSystem.clients[i].client == item.client){
+          this.systems.selectedSystem.clients[i].assignments.forEach((assign,index) => {
+            if(item._id === assign.assignment){
+              let indexToSplice = index;
+            }
+          });
+          this.systems.selectedSystem.clients[i].assignments.splice(indexToSplice,1);
+          if(this.systems.selectedSystem.clients[i].assignments.length === 0){
+            this.systems.selectedSystem.clients[i].clientStatus = this.config.RETIRED_CLIENT_CODE;
+          }
+        }
+      }
+      // this.systems.saveSystem();
+      // let clientToUpdate = {
+      //   systemId: item.systemId,
+      //   client: item.client,
+      //   status: this.config.RETIRED_CLIENT_CODE
+      // }
+      // this.systems.saveClient(clientToUpdate);
+    });
   }
 
   _buildRequest() {
@@ -219,11 +245,21 @@ export class ACCClientRequest {
       } else {
         this.requests.selectRequest(0);
       }
+      this.filterNotActiveRequests();
     } else {
       this.people.selectInstitution();
       this.institutionSelected = false;
     }
 
+  }
+
+  filterNotActiveRequests(){
+    this.requestDetails = [];
+    this.requests.selectedRequest.requestDetails.forEach(item => {
+      if(item.requestStatus !== this.config.RETIRED_CLIENT_CODE) {
+        this.requestDetails.push(item);
+      }
+    })
   }
 
   getPackage() {

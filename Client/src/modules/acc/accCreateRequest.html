@@ -80,21 +80,15 @@
                 <div class="well well2 overflow" style="height:400px;">
                   <ul class="list-group">
                     <li click.trigger="removeProduct($index)"
-                      repeat.for="product of requests.selectedRequest.requestDetails" id="${product.productId}"
-                      class="list-group-item dropbtn">
+                      repeat.for="product of requestDetails" id="${product.productId}"
+                      class="${product.assignments.length ? 'assignedColor list-group-item dropbtn' : 'list-group-item dropbtn'}">
                       <div class="row">
                       <div class="col-sm-12">
                         <h4>${product.productId | lookupValue:products.productsArray:"_id":"name"}
                         </h4>
                       </div>
-                      <!-- <div class="col-sm-3">
-                        <span click.delegate="deleteRequest($index)" class="smallMarginRight" bootstrap-tooltip
-                          data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete Request"><i
-                            class="fa fa-trash vertical-align" aria-hidden="true"></i></span>
-                      </div> -->
                     </div>
                     </li>
-
                   </ul>
                 </div>
               </div>
@@ -110,20 +104,20 @@
                   <thead>
                     <tr>
                       <th>Requested Product</th>
-                      <th>Price</th>
+                      <!-- <th>Price</th> -->
                       <th>Number of Students</th>
                       <th>Date Required</th>
                     </tr>
                   <tbody id="requiredProductsTable">
-                    <tr repeat.for="request of requests.selectedRequest.requestDetails"
-                      class="${request.invoiceRelevant ? 'success sortable' : 'sortable'}">
+                    <tr repeat.for="request of requests.selectedRequest.requestDetails  | filterApjRequestDetails"
+                      class="${request.assignments.length ? 'success sortable' : 'sortable'}">
                       <td>${request.productId | lookupValue:products.productsArray:"_id":"name"}
                       </td>
-                      <td>
+                      <!-- <td>
                         <input readonly.bind="!request.invoiceRelevant" type="number" class="form-control"
                           value.bind="request.price">
                         ${request.invoiceRelevant}
-                      </td>
+                      </td> -->
                       <td>
                         <input type="number" class="form-control" value.bind="request.numberOfStudents">
                       </td>

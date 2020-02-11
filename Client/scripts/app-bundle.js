@@ -154,8 +154,8 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
 
             this.HOST = location.origin;
             this.DOWNLOAD_URL = this.HOST + '/uploadedFiles';
-            this.BASE_URL = this.HOST + "/api/";
-            this.IMG_DOWNLOAD_URL = this.HOST + '/img/';
+            this.BASE_URL = "http://localhost/api/";
+            this.IMG_DOWNLOAD_URL = "http://localhost/img/";
             this.isMobile = false;
             this.UCC_PACKAGE_PERCENTAGE = .5;
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
@@ -200,7 +200,8 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.SHARED_CLIENT_CODE = 2;
             this.REFRESHED_CLIENT_CODE = 3;
             this.SANDBOX_CLIENT_CODE = 5;
-            this.CLIENT_STATUSES = [{ code: 1, description: "Unassigned", OKToDelete: true, lock: false }, { code: this.SHARED_CLIENT_CODE, description: "Shared", OKToDelete: false, lock: false }, { code: this.REFRESHED_CLIENT_CODE, description: "Refresh", OKToDelete: true, lock: true }, { code: this.ASSIGNED_CLIENT_CODE, description: "Assigned", OKToDelete: false, lock: true }, { code: this.SANDBOX_CLIENT_CODE, description: this.SANDBOX_NAME, OKToDelete: false, lock: false }];
+            this.RETIRED_CLIENT_CODE = 6;
+            this.CLIENT_STATUSES = [{ code: 1, description: "Unassigned", OKToDelete: true, lock: false }, { code: this.SHARED_CLIENT_CODE, description: "Shared", OKToDelete: false, lock: false }, { code: this.REFRESHED_CLIENT_CODE, description: "Refresh", OKToDelete: true, lock: true }, { code: this.ASSIGNED_CLIENT_CODE, description: "Assigned", OKToDelete: false, lock: true }, { code: this.SANDBOX_CLIENT_CODE, description: this.SANDBOX_NAME, OKToDelete: false, lock: false }, { code: this.RETIRED_CLIENT_CODE, description: "Retired", OKToDelete: false, lock: false }];
             this.HELP_TICKET_OTHER_TYPE = "2";
             this.HELP_TICKET_APP_TYPE = 3;
             this.HELP_TICKET_PASSWORD_RESET_TYPE = "02";
@@ -662,7 +663,7 @@ define('resources/index',['exports'], function (exports) {
   });
   exports.configure = configure;
   function configure(config) {
-    config.globalResources(['./editor/editor', './elements/calendar', './elements/multiselect', './elements/tree-node', './elements/submenu', './elements/nav-bar', './elements/rate-it', './elements/loading-indicator', './elements/table-navigation-bar', './elements/flat-picker', './elements/add-systems', './value-converters/info-filter', './value-converters/lookup-ht-status', './value-converters/arrow', './value-converters/request-status-class', './value-converters/course-name', './value-converters/parse-assignments', './value-converters/parse-apjassignments', './value-converters/format-number', './value-converters/session-name', './value-converters/session-type', './value-converters/date-format', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/ucc-title', './value-converters/phone-number', './value-converters/lookup-value', './value-converters/sandbox', './value-converters/idsRequested', './value-converters/person-status-button', './value-converters/session-status-button', './value-converters/translate-status', './value-converters/to-uppercase', './value-converters/sort-array', './value-converters/system-list', './value-converters/check-box', './value-converters/activate-button', './value-converters/help-ticket-type', './value-converters/help-ticket-subtypes', './value-converters/session', './value-converters/sort-date-time', './value-converters/file-type', './value-converters/format-digits', './value-converters/format-phone', './value-converters/onoff-switch', './value-converters/get-array-value', './value-converters/help-ticket-statuses', './value-converters/stat-value', './value-converters/filter-clients', './value-converters/overlap', './value-converters/filter-array', './value-converters/filter-sessions', './value-converters/session-systems', './value-converters/ucc-staff']);
+    config.globalResources(['./editor/editor', './elements/calendar', './elements/multiselect', './elements/tree-node', './elements/submenu', './elements/nav-bar', './elements/rate-it', './elements/loading-indicator', './elements/table-navigation-bar', './elements/flat-picker', './elements/add-systems', './value-converters/info-filter', './value-converters/lookup-ht-status', './value-converters/arrow', './value-converters/request-status-class', './value-converters/course-name', './value-converters/parse-assignments', './value-converters/parse-apjassignments', './value-converters/format-number', './value-converters/session-name', './value-converters/session-type', './value-converters/date-format', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/ucc-title', './value-converters/phone-number', './value-converters/lookup-value', './value-converters/sandbox', './value-converters/idsRequested', './value-converters/person-status-button', './value-converters/session-status-button', './value-converters/translate-status', './value-converters/to-uppercase', './value-converters/sort-array', './value-converters/system-list', './value-converters/check-box', './value-converters/activate-button', './value-converters/help-ticket-type', './value-converters/help-ticket-subtypes', './value-converters/session', './value-converters/sort-date-time', './value-converters/file-type', './value-converters/format-digits', './value-converters/format-phone', './value-converters/onoff-switch', './value-converters/get-array-value', './value-converters/help-ticket-statuses', './value-converters/stat-value', './value-converters/filter-clients', './value-converters/overlap', './value-converters/filter-array', './value-converters/filter-sessions', './value-converters/session-systems', './value-converters/ucc-staff', './value-converters/filter-apjrequestdetails']);
   }
 });
 define('modules/acc/accCreateInvoice',['exports', 'aurelia-framework', '../../resources/utils/dataTable', '../../resources/data/apjClientRequests', '../../resources/data/people', '../../config/appConfig', '../../resources/utils/utils', 'moment'], function (exports, _aureliaFramework, _dataTable, _apjClientRequests, _people, _appConfig, _utils, _moment) {
@@ -1235,18 +1236,8 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
     };
 
     ACCClientRequest.prototype.selectProduct = function selectProduct(product) {
-      var _this = this;
-
       if (this.requests.selectedRequest.requestDetails.length >= this.selectedPackage.maxClients) {
-        return this.dialog.showMessage("This university has reached their maximum requested products.  This client will incurr an extra charge.  Is that OK?", "Extra Client", ['YES', 'NO']).whenClosed(function (response) {
-          if (response.output === 'YES') {
-            _this.invoiceRelevant = true;
-            _this.addTheClient(product);
-          } else {
-            _this.invoiceRelevant = false;
-            return;
-          }
-        });
+        return this.dialog.showMessage("This university has reached their maximum requested products.", "Extra Client", ['OK']).whenClosed(function (response) {});
       }
       this.invoiceRelevant = false;
       this.addTheClient(product);
@@ -1256,6 +1247,7 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
       $("#requestProductsLabel").html("Requested Products");
       var newObj = this.requests.emptyRequestDetail();
       newObj.productId = product._id;
+      this.requestDetails.push(newObj);
       this.requests.selectedRequest.requestDetails.push(newObj);
       this.products.selectedProductFromId(newObj.productId);
       this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = product.name;
@@ -1274,24 +1266,98 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
       return false;
     };
 
-    ACCClientRequest.prototype.removeProduct = function removeProduct(index) {
-      var _this2 = this;
+    ACCClientRequest.prototype.removeProduct = function () {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(index) {
+        var _this = this;
 
-      if (this.requests.selectedRequest.requestDetails[index].requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
-        return this.dialog.showMessage("That request has already been assigned.  Are you sure you want to retire that assignment?", "Retire Assignment", ['Yes', 'No']).whenClosed(function (response) {
-          if (!response.wasCancelled) {
-            console.log('Retire assignment index');
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                if (!(this.requestDetails[index].requestStatus == this.config.ASSIGNED_REQUEST_CODE)) {
+                  _context2.next = 4;
+                  break;
+                }
+
+                return _context2.abrupt('return', this.dialog.showMessage("That request has already been assigned.  Are you sure you want to retire that assignment?", "Retire Assignment", ['Yes', 'No']).whenClosed(function (response) {
+                  if (!response.wasCancelled) {
+                    _this.requestDetails[index].requestStatus = _this.config.RETIRED_CLIENT_CODE;
+                    _this.saveIt();
+                    _this.updateClient(_this.requestDetails[index]);
+                  }
+                }));
+
+              case 4:
+                return _context2.abrupt('return', this.dialog.showMessage("Are you sure you want to delete that request?", "Delete Request", ['Yes', 'No']).whenClosed(function (response) {
+                  if (!response.wasCancelled) {
+                    _this.requestDetails[index].delete = true;
+                    _this.removeRequestDetail(_this.requestDetails[index]);
+                    _this.requestDetails.splice(index, 1);
+                  }
+                }));
+
+              case 5:
+              case 'end':
+                return _context2.stop();
+            }
           }
-        });
-      } else {
-        return this.dialog.showMessage("Are you sure you want to delete that request?", "Delete Request", ['Yes', 'No']).whenClosed(function (response) {
-          if (!response.wasCancelled) {
-            _this2.requests.selectedRequest.requestDetails[index].delete = true;
-            _this2.requests.selectedRequest.requestDetails.splice(index, 1);
-          }
-        });
+        }, _callee2, this);
+      }));
+
+      function removeProduct(_x) {
+        return _ref2.apply(this, arguments);
       }
+
+      return removeProduct;
+    }();
+
+    ACCClientRequest.prototype.removeRequestDetail = function removeRequestDetail(request) {
+      var spliceIndex = -1;
+      this.requests.selectedRequest.requestDetails.forEach(function (item, index) {
+        if (item._id === request._id) spliceIndex = index;
+      });
+      this.requests.selectedRequest.requestDetails.splice(spliceIndex, 1);
     };
+
+    ACCClientRequest.prototype.updateClient = function () {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(request) {
+        var _this2 = this;
+
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                request.assignments.forEach(function (item) {
+                  _this2.systems.selectedSystemFromId(item.systemId);
+                  for (var i = 0; i < _this2.systems.selectedSystem.clients.length; i++) {
+                    if (_this2.systems.selectedSystem.clients[i].client == item.client) {
+                      _this2.systems.selectedSystem.clients[i].assignments.forEach(function (assign, index) {
+                        if (item._id === assign.assignment) {
+                          var _indexToSplice = index;
+                        }
+                      });
+                      _this2.systems.selectedSystem.clients[i].assignments.splice(indexToSplice, 1);
+                      if (_this2.systems.selectedSystem.clients[i].assignments.length === 0) {
+                        _this2.systems.selectedSystem.clients[i].clientStatus = _this2.config.RETIRED_CLIENT_CODE;
+                      }
+                    }
+                  }
+                });
+
+              case 1:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function updateClient(_x2) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return updateClient;
+    }();
 
     ACCClientRequest.prototype._buildRequest = function _buildRequest() {
       var _this3 = this;
@@ -1326,17 +1392,17 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
     };
 
     ACCClientRequest.prototype.changeInstitution = function () {
-      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(el) {
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(el) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 if (!(this.selectedInstitution != "")) {
-                  _context2.next = 14;
+                  _context4.next = 15;
                   break;
                 }
 
-                _context2.next = 3;
+                _context4.next = 3;
                 return this.people.selectInstitutionByID(this.selectedInstitution);
 
               case 3:
@@ -1350,7 +1416,7 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
                 this.selectedPerson = "";
                 this.requestType = "";
                 $("#existingRequestInfo").empty().hide();
-                _context2.next = 11;
+                _context4.next = 11;
                 return this.requests.getAPJInstitutionRequests('?filter=institutionId|eq|' + this.selectedInstitution, true);
 
               case 11:
@@ -1359,34 +1425,46 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
                 } else {
                   this.requests.selectRequest(0);
                 }
-                _context2.next = 16;
+                this.filterNotActiveRequests();
+                _context4.next = 17;
                 break;
 
-              case 14:
+              case 15:
                 this.people.selectInstitution();
                 this.institutionSelected = false;
 
-              case 16:
+              case 17:
               case 'end':
-                return _context2.stop();
+                return _context4.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee4, this);
       }));
 
-      function changeInstitution(_x) {
-        return _ref2.apply(this, arguments);
+      function changeInstitution(_x3) {
+        return _ref4.apply(this, arguments);
       }
 
       return changeInstitution;
     }();
 
-    ACCClientRequest.prototype.getPackage = function getPackage() {
+    ACCClientRequest.prototype.filterNotActiveRequests = function filterNotActiveRequests() {
       var _this4 = this;
+
+      this.requestDetails = [];
+      this.requests.selectedRequest.requestDetails.forEach(function (item) {
+        if (item.requestStatus !== _this4.config.RETIRED_CLIENT_CODE) {
+          _this4.requestDetails.push(item);
+        }
+      });
+    };
+
+    ACCClientRequest.prototype.getPackage = function getPackage() {
+      var _this5 = this;
 
       this.selectedPackage = undefined;
       this.people.packageArray.forEach(function (item) {
-        if (_this4.people.selectedInstitution.packageId != null && item._id === _this4.people.selectedInstitution.packageId.packageId) _this4.selectedPackage = item;
+        if (_this5.people.selectedInstitution.packageId != null && item._id === _this5.people.selectedInstitution.packageId.packageId) _this5.selectedPackage = item;
       });
     };
 
@@ -1499,44 +1577,44 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
     };
 
     ACCClientRequest.prototype.saveIt = function () {
-      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
         var serverResponse, _serverResponse;
 
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 if (!this.validation.validate(1)) {
-                  _context3.next = 15;
+                  _context5.next = 15;
                   break;
                 }
 
                 if (this.requests.selectedRequest._id) {
-                  _context3.next = 9;
+                  _context5.next = 9;
                   break;
                 }
 
                 this._buildRequest();
-                _context3.next = 5;
+                _context5.next = 5;
                 return this.requests.saveRequest();
 
               case 5:
-                serverResponse = _context3.sent;
+                serverResponse = _context5.sent;
 
                 if (!serverResponse.status) {
                   this.systemSelected = false;
                   this.utils.showNotification("Product request " + serverResponse.clientRequestNo + " was updated");
                 }
-                _context3.next = 14;
+                _context5.next = 14;
                 break;
 
               case 9:
                 this._buildRequest();
-                _context3.next = 12;
+                _context5.next = 12;
                 return this.requests.saveRequestWithId();
 
               case 12:
-                _serverResponse = _context3.sent;
+                _serverResponse = _context5.sent;
 
                 if (!_serverResponse.status) {
                   this.utils.showNotification("The product request was updated");
@@ -1548,14 +1626,14 @@ define('modules/acc/accCreateRequest',['exports', 'aurelia-framework', 'aurelia-
 
               case 15:
               case 'end':
-                return _context3.stop();
+                return _context5.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee5, this);
       }));
 
       function saveIt() {
-        return _ref3.apply(this, arguments);
+        return _ref5.apply(this, arguments);
       }
 
       return saveIt;
@@ -23268,28 +23346,16 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
             return saveSystem;
         }();
 
-        Systems.prototype.deleteSystem = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var serverResponse;
+        Systems.prototype.saveClient = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(clientToSave) {
                 return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
                                 _context6.next = 2;
-                                return this.data.deleteObject(this.SYSTEMS_SERVICE + '/' + this.selectedSystem._id);
+                                return this.data.saveObject(clientToSave, this.SYSTEMS_SERVICE + "/client", "put");
 
                             case 2:
-                                serverResponse = _context6.sent;
-
-                                if (!serverResponse.error) {
-                                    this.systemsArray.splice(this.editIndex, 1);
-                                    this.editIndex = -1;
-                                } else {
-                                    this.data.processError(serverResponse, "Error deleting the system.<br>");
-                                }
-                                return _context6.abrupt('return', serverResponse);
-
-                            case 5:
                             case 'end':
                                 return _context6.stop();
                         }
@@ -23297,28 +23363,35 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
                 }, _callee6, this);
             }));
 
-            function deleteSystem() {
+            function saveClient(_x6) {
                 return _ref6.apply(this, arguments);
             }
 
-            return deleteSystem;
+            return saveClient;
         }();
 
-        Systems.prototype.saveProductChanges = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(obj) {
-                var response;
+        Systems.prototype.deleteSystem = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                var serverResponse;
                 return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
                         switch (_context7.prev = _context7.next) {
                             case 0:
                                 _context7.next = 2;
-                                return this.data.saveObject(obj, this.SYSTEMS_SERVICE + '/product/', "put");
+                                return this.data.deleteObject(this.SYSTEMS_SERVICE + '/' + this.selectedSystem._id);
 
                             case 2:
-                                response = _context7.sent;
-                                return _context7.abrupt('return', response);
+                                serverResponse = _context7.sent;
 
-                            case 4:
+                                if (!serverResponse.error) {
+                                    this.systemsArray.splice(this.editIndex, 1);
+                                    this.editIndex = -1;
+                                } else {
+                                    this.data.processError(serverResponse, "Error deleting the system.<br>");
+                                }
+                                return _context7.abrupt('return', serverResponse);
+
+                            case 5:
                             case 'end':
                                 return _context7.stop();
                         }
@@ -23326,8 +23399,37 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
                 }, _callee7, this);
             }));
 
-            function saveProductChanges(_x6) {
+            function deleteSystem() {
                 return _ref7.apply(this, arguments);
+            }
+
+            return deleteSystem;
+        }();
+
+        Systems.prototype.saveProductChanges = function () {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(obj) {
+                var response;
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                    while (1) {
+                        switch (_context8.prev = _context8.next) {
+                            case 0:
+                                _context8.next = 2;
+                                return this.data.saveObject(obj, this.SYSTEMS_SERVICE + '/product/', "put");
+
+                            case 2:
+                                response = _context8.sent;
+                                return _context8.abrupt('return', response);
+
+                            case 4:
+                            case 'end':
+                                return _context8.stop();
+                        }
+                    }
+                }, _callee8, this);
+            }));
+
+            function saveProductChanges(_x7) {
+                return _ref8.apply(this, arguments);
             }
 
             return saveProductChanges;
@@ -23344,10 +23446,10 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
         };
 
         Systems.prototype.deleteAllClients = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
-                        switch (_context8.prev = _context8.next) {
+                        switch (_context9.prev = _context9.next) {
                             case 0:
                                 if (this.selectedSystem._id) {
                                     this.selectedSystem.clients = new Array();
@@ -23355,14 +23457,14 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
 
                             case 1:
                             case 'end':
-                                return _context8.stop();
+                                return _context9.stop();
                         }
                     }
-                }, _callee8, this);
+                }, _callee9, this);
             }));
 
             function deleteAllClients() {
-                return _ref8.apply(this, arguments);
+                return _ref9.apply(this, arguments);
             }
 
             return deleteAllClients;
@@ -23535,18 +23637,18 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
         };
 
         Systems.prototype.getAssignmentDetails = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(id) {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(id) {
                 var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
-                        switch (_context9.prev = _context9.next) {
+                        switch (_context10.prev = _context10.next) {
                             case 0:
                                 url = "/serverAssignments/" + id;
-                                _context9.next = 3;
+                                _context10.next = 3;
                                 return this.data.get(url);
 
                             case 3:
-                                serverResponse = _context9.sent;
+                                serverResponse = _context10.sent;
 
                                 if (!serverResponse.error) {
                                     this.assignmentDetailsArray = serverResponse.sort(function (a, b) {
@@ -23558,104 +23660,104 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
 
                             case 5:
                             case 'end':
-                                return _context9.stop();
+                                return _context10.stop();
                         }
                     }
-                }, _callee9, this);
+                }, _callee10, this);
             }));
 
-            function getAssignmentDetails(_x7) {
-                return _ref9.apply(this, arguments);
+            function getAssignmentDetails(_x8) {
+                return _ref10.apply(this, arguments);
             }
 
             return getAssignmentDetails;
         }();
 
         Systems.prototype.getChangeArray = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(options, refresh) {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(options, refresh) {
                 var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                return regeneratorRuntime.wrap(function _callee11$(_context11) {
                     while (1) {
-                        switch (_context10.prev = _context10.next) {
+                        switch (_context11.prev = _context11.next) {
                             case 0:
                                 if (!(!this.changeArray || refresh)) {
-                                    _context10.next = 14;
+                                    _context11.next = 14;
                                     break;
                                 }
 
                                 url = this.CHANGE_SERVICE;
 
                                 url += options ? options : "";
-                                _context10.prev = 3;
-                                _context10.next = 6;
+                                _context11.prev = 3;
+                                _context11.next = 6;
                                 return this.data.get(url);
 
                             case 6:
-                                serverResponse = _context10.sent;
+                                serverResponse = _context11.sent;
 
                                 if (!serverResponse.error) {
                                     this.changeArray = serverResponse;
                                 }
-                                _context10.next = 14;
+                                _context11.next = 14;
                                 break;
 
                             case 10:
-                                _context10.prev = 10;
-                                _context10.t0 = _context10['catch'](3);
+                                _context11.prev = 10;
+                                _context11.t0 = _context11['catch'](3);
 
-                                console.log(_context10.t0);
+                                console.log(_context11.t0);
                                 this.changeArray = undefined;
 
                             case 14:
                             case 'end':
-                                return _context10.stop();
+                                return _context11.stop();
                         }
                     }
-                }, _callee10, this, [[3, 10]]);
+                }, _callee11, this, [[3, 10]]);
             }));
 
-            function getChangeArray(_x8, _x9) {
-                return _ref10.apply(this, arguments);
+            function getChangeArray(_x9, _x10) {
+                return _ref11.apply(this, arguments);
             }
 
             return getChangeArray;
         }();
 
         Systems.prototype.getChange = function () {
-            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(index) {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(index) {
                 var id, serverResponse;
-                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
                     while (1) {
-                        switch (_context11.prev = _context11.next) {
+                        switch (_context12.prev = _context12.next) {
                             case 0:
                                 if (!(index >= 0)) {
-                                    _context11.next = 7;
+                                    _context12.next = 7;
                                     break;
                                 }
 
                                 id = this.changeArray[index]._id;
-                                _context11.next = 4;
+                                _context12.next = 4;
                                 return this.data.get(this.CHANGE_SERVICE + "/" + id);
 
                             case 4:
-                                serverResponse = _context11.sent;
+                                serverResponse = _context12.sent;
 
                                 if (!serverResponse.error) {
                                     this.selectedChange = serverResponse;
                                     this.changeArray[index] = this.utils.copyObject(this.selectedChange);
                                 }
-                                return _context11.abrupt('return', serverResponse);
+                                return _context12.abrupt('return', serverResponse);
 
                             case 7:
                             case 'end':
-                                return _context11.stop();
+                                return _context12.stop();
                         }
                     }
-                }, _callee11, this);
+                }, _callee12, this);
             }));
 
-            function getChange(_x10) {
-                return _ref11.apply(this, arguments);
+            function getChange(_x11) {
+                return _ref12.apply(this, arguments);
             }
 
             return getChange;
@@ -23683,45 +23785,45 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
         };
 
         Systems.prototype.saveChange = function () {
-            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
+            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
                 var _serverResponse2, serverResponse;
 
-                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                return regeneratorRuntime.wrap(function _callee13$(_context13) {
                     while (1) {
-                        switch (_context12.prev = _context12.next) {
+                        switch (_context13.prev = _context13.next) {
                             case 0:
                                 if (this.selectedChange) {
-                                    _context12.next = 2;
+                                    _context13.next = 2;
                                     break;
                                 }
 
-                                return _context12.abrupt('return');
+                                return _context13.abrupt('return');
 
                             case 2:
                                 if (this.selectedChange._id) {
-                                    _context12.next = 10;
+                                    _context13.next = 10;
                                     break;
                                 }
 
-                                _context12.next = 5;
+                                _context13.next = 5;
                                 return this.data.saveObject(this.selectedChange, this.CHANGE_SERVICE, "post");
 
                             case 5:
-                                _serverResponse2 = _context12.sent;
+                                _serverResponse2 = _context13.sent;
 
                                 if (!_serverResponse2.error) {
                                     this.changeArray.push(_serverResponse2);
                                 } else {
                                     this.data.processError(_serverResponse2, "Error updating the change.<br>");
                                 }
-                                return _context12.abrupt('return', _serverResponse2);
+                                return _context13.abrupt('return', _serverResponse2);
 
                             case 10:
-                                _context12.next = 12;
+                                _context13.next = 12;
                                 return this.data.saveObject(this.selectedChange, this.CHANGE_SERVICE, "put");
 
                             case 12:
-                                serverResponse = _context12.sent;
+                                serverResponse = _context13.sent;
 
                                 if (!serverResponse.error) {
                                     this.selectedChange = serverResponse;
@@ -23729,45 +23831,9 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
                                 } else {
                                     this.data.processError(serverResponse, "Error updating the change .<br>");
                                 }
-                                return _context12.abrupt('return', serverResponse);
-
-                            case 15:
-                            case 'end':
-                                return _context12.stop();
-                        }
-                    }
-                }, _callee12, this);
-            }));
-
-            function saveChange() {
-                return _ref12.apply(this, arguments);
-            }
-
-            return saveChange;
-        }();
-
-        Systems.prototype.deleteChange = function () {
-            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee13$(_context13) {
-                    while (1) {
-                        switch (_context13.prev = _context13.next) {
-                            case 0:
-                                _context13.next = 2;
-                                return this.data.deleteObject(this.CHANGE_SERVICE + '/' + this.selectedChange._id);
-
-                            case 2:
-                                serverResponse = _context13.sent;
-
-                                if (!serverResponse.error) {
-                                    this.changeArray.splice(this.editIndex, 1);
-                                    this.editIndex = -1;
-                                } else {
-                                    this.data.processError(serverResponse, "Error deleting the change.<br>");
-                                }
                                 return _context13.abrupt('return', serverResponse);
 
-                            case 5:
+                            case 15:
                             case 'end':
                                 return _context13.stop();
                         }
@@ -23775,98 +23841,134 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
                 }, _callee13, this);
             }));
 
-            function deleteChange() {
+            function saveChange() {
                 return _ref13.apply(this, arguments);
+            }
+
+            return saveChange;
+        }();
+
+        Systems.prototype.deleteChange = function () {
+            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                    while (1) {
+                        switch (_context14.prev = _context14.next) {
+                            case 0:
+                                _context14.next = 2;
+                                return this.data.deleteObject(this.CHANGE_SERVICE + '/' + this.selectedChange._id);
+
+                            case 2:
+                                serverResponse = _context14.sent;
+
+                                if (!serverResponse.error) {
+                                    this.changeArray.splice(this.editIndex, 1);
+                                    this.editIndex = -1;
+                                } else {
+                                    this.data.processError(serverResponse, "Error deleting the change.<br>");
+                                }
+                                return _context14.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context14.stop();
+                        }
+                    }
+                }, _callee14, this);
+            }));
+
+            function deleteChange() {
+                return _ref14.apply(this, arguments);
             }
 
             return deleteChange;
         }();
 
         Systems.prototype.getChangeCategoryArray = function () {
-            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(options, refresh) {
+            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(options, refresh) {
                 var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                return regeneratorRuntime.wrap(function _callee15$(_context15) {
                     while (1) {
-                        switch (_context14.prev = _context14.next) {
+                        switch (_context15.prev = _context15.next) {
                             case 0:
                                 if (!(!this.changeCategoryArray || refresh)) {
-                                    _context14.next = 14;
+                                    _context15.next = 14;
                                     break;
                                 }
 
                                 url = this.CHANGE_CATEGORY_SERVICE;
 
                                 url += options ? options : "";
-                                _context14.prev = 3;
-                                _context14.next = 6;
+                                _context15.prev = 3;
+                                _context15.next = 6;
                                 return this.data.get(url);
 
                             case 6:
-                                serverResponse = _context14.sent;
+                                serverResponse = _context15.sent;
 
                                 if (!serverResponse.error) {
                                     this.changeCategoryArray = serverResponse;
                                 }
-                                _context14.next = 14;
+                                _context15.next = 14;
                                 break;
 
                             case 10:
-                                _context14.prev = 10;
-                                _context14.t0 = _context14['catch'](3);
+                                _context15.prev = 10;
+                                _context15.t0 = _context15['catch'](3);
 
-                                console.log(_context14.t0);
+                                console.log(_context15.t0);
                                 this.changeCategoryArray = undefined;
 
                             case 14:
                             case 'end':
-                                return _context14.stop();
+                                return _context15.stop();
                         }
                     }
-                }, _callee14, this, [[3, 10]]);
+                }, _callee15, this, [[3, 10]]);
             }));
 
-            function getChangeCategoryArray(_x11, _x12) {
-                return _ref14.apply(this, arguments);
+            function getChangeCategoryArray(_x12, _x13) {
+                return _ref15.apply(this, arguments);
             }
 
             return getChangeCategoryArray;
         }();
 
         Systems.prototype.getChangeCategory = function () {
-            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(index) {
+            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(index) {
                 var id, serverResponse;
-                return regeneratorRuntime.wrap(function _callee15$(_context15) {
+                return regeneratorRuntime.wrap(function _callee16$(_context16) {
                     while (1) {
-                        switch (_context15.prev = _context15.next) {
+                        switch (_context16.prev = _context16.next) {
                             case 0:
                                 if (!(index >= 0)) {
-                                    _context15.next = 7;
+                                    _context16.next = 7;
                                     break;
                                 }
 
                                 id = this.changeCategoryArray[index]._id;
-                                _context15.next = 4;
+                                _context16.next = 4;
                                 return this.data.get(this.CHANGE_CATEGORY_SERVICE + "/" + id);
 
                             case 4:
-                                serverResponse = _context15.sent;
+                                serverResponse = _context16.sent;
 
                                 if (!serverResponse.error) {
                                     this.selectedChangeCategory = serverResponse;
                                     this.changeCategoryArray[index] = this.utils.copyObject(this.selectedChangeCategory);
                                 }
-                                return _context15.abrupt('return', serverResponse);
+                                return _context16.abrupt('return', serverResponse);
 
                             case 7:
                             case 'end':
-                                return _context15.stop();
+                                return _context16.stop();
                         }
                     }
-                }, _callee15, this);
+                }, _callee16, this);
             }));
 
-            function getChangeCategory(_x13) {
-                return _ref15.apply(this, arguments);
+            function getChangeCategory(_x14) {
+                return _ref16.apply(this, arguments);
             }
 
             return getChangeCategory;
@@ -23904,93 +24006,29 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
         };
 
         Systems.prototype.categortInUse = function () {
-            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16() {
-                var response;
-                return regeneratorRuntime.wrap(function _callee16$(_context16) {
-                    while (1) {
-                        switch (_context16.prev = _context16.next) {
-                            case 0:
-                                _context16.next = 2;
-                                return this.data.get(this.CHANGE_CATEGORY_SERVICE + "?filter=category|eq|" + this.selectedChangeCategory.category);
-
-                            case 2:
-                                response = _context16.sent;
-
-                                if (response.error) {
-                                    _context16.next = 7;
-                                    break;
-                                }
-
-                                return _context16.abrupt('return', true);
-
-                            case 7:
-                                return _context16.abrupt('return', false);
-
-                            case 8:
-                            case 'end':
-                                return _context16.stop();
-                        }
-                    }
-                }, _callee16, this);
-            }));
-
-            function categortInUse() {
-                return _ref16.apply(this, arguments);
-            }
-
-            return categortInUse;
-        }();
-
-        Systems.prototype.saveChangeCategory = function () {
             var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17() {
-                var _serverResponse3, serverResponse;
-
+                var response;
                 return regeneratorRuntime.wrap(function _callee17$(_context17) {
                     while (1) {
                         switch (_context17.prev = _context17.next) {
                             case 0:
-                                if (this.selectedChangeCategory) {
-                                    _context17.next = 2;
-                                    break;
-                                }
-
-                                return _context17.abrupt('return');
+                                _context17.next = 2;
+                                return this.data.get(this.CHANGE_CATEGORY_SERVICE + "?filter=category|eq|" + this.selectedChangeCategory.category);
 
                             case 2:
-                                if (this.selectedChangeCategory._id) {
-                                    _context17.next = 10;
+                                response = _context17.sent;
+
+                                if (response.error) {
+                                    _context17.next = 7;
                                     break;
                                 }
 
-                                _context17.next = 5;
-                                return this.data.saveObject(this.selectedChangeCategory, this.CHANGE_CATEGORY_SERVICE, "post");
+                                return _context17.abrupt('return', true);
 
-                            case 5:
-                                _serverResponse3 = _context17.sent;
+                            case 7:
+                                return _context17.abrupt('return', false);
 
-                                if (!_serverResponse3.error) {
-                                    this.changeCategoryArray.push(_serverResponse3);
-                                } else {
-                                    this.data.processError(_serverResponse3, "Error updating the change category.<br>");
-                                }
-                                return _context17.abrupt('return', _serverResponse3);
-
-                            case 10:
-                                _context17.next = 12;
-                                return this.data.saveObject(this.selectedChangeCategory, this.CHANGE_CATEGORY_SERVICE, "put");
-
-                            case 12:
-                                serverResponse = _context17.sent;
-
-                                if (!serverResponse.error) {
-                                    this.selectedChangeCategory = serverResponse;
-                                    this.changeCategoryArray[this.categoryIndex] = this.utils.copyObject(this.selectedChangeCategory);
-                                } else {
-                                    this.data.processError(serverResponse, "Error updating the change category.<br>");
-                                }
-                                return _context17.abrupt('return', serverResponse);
-
-                            case 15:
+                            case 8:
                             case 'end':
                                 return _context17.stop();
                         }
@@ -23998,35 +24036,63 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
                 }, _callee17, this);
             }));
 
-            function saveChangeCategory() {
+            function categortInUse() {
                 return _ref17.apply(this, arguments);
             }
 
-            return saveChangeCategory;
+            return categortInUse;
         }();
 
-        Systems.prototype.deleteChangeCategory = function () {
+        Systems.prototype.saveChangeCategory = function () {
             var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18() {
-                var serverResponse;
+                var _serverResponse3, serverResponse;
+
                 return regeneratorRuntime.wrap(function _callee18$(_context18) {
                     while (1) {
                         switch (_context18.prev = _context18.next) {
                             case 0:
-                                _context18.next = 2;
-                                return this.data.deleteObject(this.CHANGE_CATEGORY_SERVICE + '/' + this.selectedChangeCategory._id);
+                                if (this.selectedChangeCategory) {
+                                    _context18.next = 2;
+                                    break;
+                                }
+
+                                return _context18.abrupt('return');
 
                             case 2:
+                                if (this.selectedChangeCategory._id) {
+                                    _context18.next = 10;
+                                    break;
+                                }
+
+                                _context18.next = 5;
+                                return this.data.saveObject(this.selectedChangeCategory, this.CHANGE_CATEGORY_SERVICE, "post");
+
+                            case 5:
+                                _serverResponse3 = _context18.sent;
+
+                                if (!_serverResponse3.error) {
+                                    this.changeCategoryArray.push(_serverResponse3);
+                                } else {
+                                    this.data.processError(_serverResponse3, "Error updating the change category.<br>");
+                                }
+                                return _context18.abrupt('return', _serverResponse3);
+
+                            case 10:
+                                _context18.next = 12;
+                                return this.data.saveObject(this.selectedChangeCategory, this.CHANGE_CATEGORY_SERVICE, "put");
+
+                            case 12:
                                 serverResponse = _context18.sent;
 
                                 if (!serverResponse.error) {
-                                    this.changeCategoryArray.splice(this.editIndex, 1);
-                                    this.editIndex = -1;
+                                    this.selectedChangeCategory = serverResponse;
+                                    this.changeCategoryArray[this.categoryIndex] = this.utils.copyObject(this.selectedChangeCategory);
                                 } else {
-                                    this.data.processError(serverResponse, "Error deleting the change category.<br>");
+                                    this.data.processError(serverResponse, "Error updating the change category.<br>");
                                 }
                                 return _context18.abrupt('return', serverResponse);
 
-                            case 5:
+                            case 15:
                             case 'end':
                                 return _context18.stop();
                         }
@@ -24034,8 +24100,44 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
                 }, _callee18, this);
             }));
 
-            function deleteChangeCategory() {
+            function saveChangeCategory() {
                 return _ref18.apply(this, arguments);
+            }
+
+            return saveChangeCategory;
+        }();
+
+        Systems.prototype.deleteChangeCategory = function () {
+            var _ref19 = _asyncToGenerator(regeneratorRuntime.mark(function _callee19() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee19$(_context19) {
+                    while (1) {
+                        switch (_context19.prev = _context19.next) {
+                            case 0:
+                                _context19.next = 2;
+                                return this.data.deleteObject(this.CHANGE_CATEGORY_SERVICE + '/' + this.selectedChangeCategory._id);
+
+                            case 2:
+                                serverResponse = _context19.sent;
+
+                                if (!serverResponse.error) {
+                                    this.changeCategoryArray.splice(this.editIndex, 1);
+                                    this.editIndex = -1;
+                                } else {
+                                    this.data.processError(serverResponse, "Error deleting the change category.<br>");
+                                }
+                                return _context19.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context19.stop();
+                        }
+                    }
+                }, _callee19, this);
+            }));
+
+            function deleteChangeCategory() {
+                return _ref19.apply(this, arguments);
             }
 
             return deleteChangeCategory;
@@ -28633,9 +28735,10 @@ define('modules/admin/Customers/bulkEmails',['exports', 'aurelia-framework', '..
         };
 
         BulkEmails.prototype.downloadInstExcel = function downloadInstExcel() {
-            var csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,Phone,City,Region,Country,Roles,Institution\r\n";
+            var csvContent = "data:text/csv;charset=utf-8;,First Name,FullName,Last Name,Email,Phone,City,Region,Country,Roles,Institution\r\n";
             this.dataTable.baseArray.forEach(function (item) {
-                csvContent += item.firstName + "," + item.lastName.replace(',', ' ') + "," + item.email + "," + item.phone + "," + item.institutionId.city + "," + item.institutionId.region + "," + item.institutionId.country + "," + item.roles.join(':') + "," + item.institutionId.name;
+
+                csvContent += item.firstName + "," + item.lastName.replace(',', ' ') + "," + item.firstName + " " + item.lastName.replace(',', ' ') + "," + item.email + "," + item.phone + "," + item.institutionId.city + "," + item.institutionId.region + "," + item.institutionId.country + "," + item.roles.join(':') + "," + item.institutionId.name;
                 csvContent += "\r\n";
             });
             var encodedUri = encodeURI(csvContent);
@@ -69773,14 +69876,46 @@ module.exports = function() {
 },{"1":1,"26":26,"33":33,"34":34,"46":46}]},{},[7])(7)
 });
 
+define('resources/value-converters/filter-apjrequestdetails',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var filterApjRequestDetailsValueConverter = exports.filterApjRequestDetailsValueConverter = function () {
+    function filterApjRequestDetailsValueConverter() {
+      _classCallCheck(this, filterApjRequestDetailsValueConverter);
+    }
+
+    filterApjRequestDetailsValueConverter.prototype.toView = function toView(array) {
+      var returnArray = [];
+      if (!array || !array.length) return returnArray;
+      array.forEach(function (item) {
+        if (item.active === null || item.active === undefined || item.active) {
+          returnArray.push(item);
+        }
+      });
+      return returnArray;
+    };
+
+    return filterApjRequestDetailsValueConverter;
+  }();
+});
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"resources/css/styles.css\"></require>\r\n  <require from=\"humane-js/themes/jackedup.css\"></require>\r\n  <require from=\"toastr/build/toastr.min.css\"></require>\r\n  <require from=\"bootstrap-select/css/bootstrap-select.css\"></require>\r\n  <nav-bar></nav-bar>\r\n  <div class=\"page-host\">\r\n    <loading-indicator progress.bind=\"data.progress\" loading.bind=\"router.isNavigating || data.isRequesting\"></loading-indicator>\r\n    <router-view></router-view>\r\n  </div>\r\n</template>"; });
 define('text!modules/acc/accCreateInvoice.html', ['module'], function(module) { module.exports = "<template>\n  <span id=\"loading\">\n    <ul class=\"bokeh\">\n      <li></li>\n      <li></li>\n      <li></li>\n    </ul>\n  </span>\n  <compose view=\"./components/createInvoiceToolbar.html\"></compose>\n\n  <div class=\"fluid-container\">\n    <div class=\"panel panel-default\" style=\"margin-top:50px;\">\n      <div class=\"panel-body\">\n        <div show.bind=\"openEditPanel\" class=\"row\">\n          <h1>Periods</h1>\n        </div>\n        <div show.bind=\"openInvoicePanel\" id=\"invoicePanel\" class=\"col-lg-offset-2 col-lg-8\">\n          <compose view=\"./components/invoicePanel.html\"></compose>\n        </div>\n      </div>\n      <div show.bind=\"openSelectionPanel\">\n        <div class=\"row\" style=\"margin-left:30px;\">\n          <div class=\" col-lg-3\">\n            <div class=\"form-group\">\n              <div class=\"col-sm-10\">\n                <label>Invoice Period</label>\n                <select value.bind=\"invoicePeriod\" id=\"editInvoicePeriod\" class=\"form-control\"\n                  change.trigger=\"periodChanged()\">\n                  <option model.bind=\"-1\">Select an option</option>\n                  <option repeat.for=\"period of apj.invoiceDataArray\" model.bind=\"$index\">\n                    ${period.invoicePeriod}</option>\n                </select>\n              </div>\n            </div>\n          </div>\n          <div show.bind=\"invoicePeriod > -1\" class=\"col-lg-3\">\n            <div class=\"form-group\">\n              <div class=\"col-sm-10\">\n                <label>Invoice Start Date</label>\n                <flat-picker controlid=\"invoiceStartDate\" change.trigger=\"periodChanged()\" config.bind=\"dateConfig\"\n                  value.bind=\"selectedInvoicePeriod.startDate\">\n                </flat-picker>\n              </div>\n            </div>\n          </div>\n          <div show.bind=\"invoicePeriod > -1\" class=\"col-lg-3\">\n            <div class=\"form-group\">\n              <div class=\"col-sm-10\">\n                <label>Invoice End Date</label>\n                <flat-picker controlid=\"invoiceEndDate\" change.trigger=\"periodChanged()\" config.bind=\"dateConfig\"\n                  value.bind=\"selectedInvoicePeriod.endDate\">\n                </flat-picker>\n              </div>\n            </div>\n          </div>\n          <div class=\"col-lg-2\">\n            <div class=\"form-group\">\n              <div class=\"col-sm-10\">\n                <label>Exchange Rate</label>\n                <input class=\"form-control\" type=\"number\" value.bind=\"exchangeRate\"\n                  change.trigger=\"checkExchangeRate()\" />\n              </div>\n            </div>\n          </div>\n        </div>\n        <div class=\"row\" style=\"margin-left:30px;margin-right:30px;border:1px;\">\n          <div class=\"col-lg-8\">\n            <div class=\"form-group\">\n              <div class=\"col-sm-10\">\n                <label>&nbsp;</label>\n                <h4>Today: ${formattedDate}</h4>\n              </div>\n            </div>\n          </div>\n          <div class=\"col-lg-3\">\n            <H3 class=\"leftMargin\">Total Invoice Amount: ${totalProductInvoiceAmount + totalInstitutionInvoiceAmount |\n              formatNumber}</H3>\n          </div>\n        </div>\n        <div class=\"row\" style=\"margin-left:30px;margin-right:30px;border:1px;\">\n          <div class=\"col-lg-3 backColorOne vertical-align\" style=\"height:40px;border:1px solid black;\">\n            Paid date in this session\n          </div>\n          <div class=\"col-lg-3 backColorTwo vertical-align\" style=\"height:40px;border:1px solid black;\">\n            Date started in this session\n          </div>\n          <div class=\"col-lg-3 backColorThree vertical-align\" style=\"height:40px;border:1px solid black;\">\n            Paid date over a year in past\n          </div>\n          <div class=\"col-lg-3 backColorFour vertical-align\" style=\"height:40px;border:1px solid black;\">\n            Invoice date is null\n          </div>\n        </div>\n        <div class=\"col-lg-5 topMargin\">\n\n          <h4>Institutions</h4>\n          <div class=\"well well2 overFlow\" style=\"height:800px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"addInsitution($index, institution)\" type=\"button\"\n                repeat.for=\"institution of classifyInstitutionsArray\" id=\"${institution.name}\"\n                class=\"list-group-item ${institution.category}\">\n                <span class=\"col-sm-7\">\n                  <h4>${institution.name}</h4>\n                </span>\n                <span class=\"col-sm-5\">\n                  <span class=\"col-sm-8\">\n                    <h5>${institution.packageId.packageId |\n                      lookupValue:people.packageArray:\"_id\":\"name\"} ${institution.invoiceAmount | formatNumber:2}\n                    </h5>\n                  </span>\n                  <span class=\"col-sm-4\">\n                    <span click.delegate=\"deleteClassifiedInvoiceInstitution($index)\" class=\"smallMarginRight\"\n                      bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                      data-original-title=\"Delete Institution\"><i class=\"fa fa-trash-o fa-lg fa-border text-danger\"\n                        aria-hidden=\"true\"></i></span>\n                  </span>\n                </span>\n                <span class=\"col-lg-12\">\n                  <h5>\n                    Start Date: ${institution.packageId.dateStarted | dateFormat:config.DATE_FORMAT_TABLE}\n                    <span style=\"margin-left:20px;\">Invoice Date: ${institution.packageId.dateInvoiced |\n                      dateFormat:config.DATE_FORMAT_TABLE}</span>\n                    <span style=\"margin-left:20px;\">Paid Date:${institution.packageId.datePaid |\n                      dateFormat:config.DATE_FORMAT_TABLE}</span>\n                  </h5>\n                </span>\n              </button>\n            </ul>\n          </div>\n        </div>\n        <div class=\"col-lg-1 topMargin\">\n          <span click.trigger=\"getInstitutionToBeInvoiced()\" class=\"smallMarginRight\" bootstrap-tooltip\n            data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n              class=\"fa fa-refresh fa-3x fa-border leftMargin\" aria-hidden=\"true\"></i></span>\n          <span click.trigger=\"invoiceAllInstitutions()\" class=\"smallMarginRight\" bootstrap-tooltip\n            data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n              class=\"fa fa-arrow-right fa-3x fa-border topMargin leftMargin\" aria-hidden=\"true\"></i></span>\n          <span click.trigger=\"invoiceNoInstitutions()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n            data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n              class=\"fa fa-arrow-left fa-3x fa-border topMargin leftMargin\" aria-hidden=\"true\"></i></span>\n        </div>\n        <div class=\"col-lg-5 topMargin\">\n          <h4>Total from Packages: ${totalInstitutionInvoiceAmount | formatNumber:2}\n            <span show.bind=\"institutionsToBeInvoiced.length\" click.delegate=\"downloadInstExcel()\"\n              class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n              data-original-title=\"Export to Excel\"><i class=\"fa fa-download\" aria-hidden=\"true\"></i></span></h4>\n          <div class=\"well well2 overFlow\" style=\"height:800px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"subtractInstitution($index, institution)\" type=\"button\"\n                repeat.for=\"institution of institutionsToBeInvoiced\" id=\"${institution.name}\"\n                class=\"list-group-item ${institution.category}\">\n                <span class=\"col-sm-7\">\n                  <h4>${institution.name}</h4>\n                </span>\n                <span class=\"col-sm-5\">\n                  <span class=\"col-sm-7\">\n                    <h5>${institution.packageId.packageId |\n                      lookupValue:people.packageArray:\"_id\":\"name\"} ${institution.invoiceAmount | formatNumber:2}</h5>\n                  </span>\n                  <span class=\"col-sm-5\">\n                    <span click.trigger=\"deleteInstitutionsToBeInvoiced($index)\" class=\"smallMarginRight\"\n                      bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                      data-original-title=\"Delete Institution\"><i class=\"fa fa-trash-o fa-lg fa-border text-danger\"\n                        aria-hidden=\"true\"></i></span>\n                  </span>\n                </span>\n                <span class=\"col-sm-7\">\n                  <h6>Start Date: ${institution.packageId.dateStarted | dateFormat:config.DATE_FORMAT_TABLE}</h6>\n                </span>\n              </button>\n            </ul>\n          </div>\n        </div>\n\n        <!-- <div class=\"col-lg-5 topMargin\">\n          <h4>Invoice Relevant Requests</h4>\n          <div class=\"well well2 overFlow\" style=\"height:800px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"addRequest($index, request)\" type=\"button\"\n                repeat.for=\"request of apj.requestsDetailsArray\" id=\"${request.requestId.InstitutionId.name}\"\n                class=\"list-group-item\">\n                <span class=\"col-sm-6\">\n                  <h4>${request.requestId.institutionId.name}</h4>\n                </span>\n                <span class=\"col-sm-6\">\n                  <h5>${request.productId.name}</h5>\n                  <span class=\"col-sm-4\">\n                    <span click.delegate=\"deleteInvoiceRelevantRequest($index)\" class=\"smallMarginRight\"\n                      bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                      data-original-title=\"Delete Institution\"><i class=\"fa fa-trash-o fa-lg fa-border text-danger\"\n                        aria-hidden=\"true\"></i></span>\n                  </span>\n                </span>\n                <span class=\"col-lg-12\">\n                  <h5>\n                    <span class=\"col-lg-5\">\n                      Created Date: ${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}\n                    </span>\n                    <span>\n                      Price: ${request.price | formatNumber}\n                    </span>\n                  </h5>\n                </span>\n              </button>\n            </ul>\n          </div>\n        </div>\n        <div class=\"col-lg-1 topMargin\">\n          <span click.trigger=\"getInstitutionToBeInvoiced()\" class=\"smallMarginRight\" bootstrap-tooltip\n            data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n              class=\"fa fa-refresh fa-3x fa-border leftMargin\" aria-hidden=\"true\"></i></span>\n          <span click.trigger=\"invoiceAllProducts()\" class=\"smallMarginRight\" bootstrap-tooltip\n            data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n              class=\"fa fa-arrow-right fa-3x fa-border topMargin leftMargin\" aria-hidden=\"true\"></i></span>\n          <span click.trigger=\"invoiceNoProducts()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n            data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n              class=\"fa fa-arrow-left fa-3x fa-border topMargin leftMargin\" aria-hidden=\"true\"></i></span>\n        </div> -->\n        <!-- <div class=\"col-lg-5 topMargin\">\n          <h4>Total from products: ${totalProductInvoiceAmount | formatNumber}</h4>\n          <div class=\"well well2 overFlow\" style=\"height:800px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"subtractRequest($index, request)\" type=\"button\"\n                repeat.for=\"request of invoiceRelevantRequests\" class=\"list-group-item\">\n                <span class=\"col-sm-6\">\n                  <h4>${request.requestId.institutionId.name}</h4>\n                </span>\n                <span class=\"col-sm-6\">\n                  <h5>${request.productId.name}</h5>\n                  <span class=\"col-sm-4\">\n                    <span click.delegate=\"deleteInvoicingRequest($index)\" class=\"smallMarginRight\" bootstrap-tooltip\n                      data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Institution\"><i\n                        class=\"fa fa-trash-o fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n                  </span>\n                </span>\n                <span class=\"col-lg-12\">\n                  <h5>\n                    <span class=\"col-lg-5\">\n                      Created Date: ${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}\n                    </span>\n                    <span>\n                      Price: ${request.price | formatNumber}\n                    </span>\n                  </h5>\n                </span>\n              </button>\n            </ul>\n          </div>\n        </div> -->\n      </div>\n    </div>\n  </div>\n  </div>\n\n</template>\n"; });
 define('text!resources/css/fullcalendar.css', ['module'], function(module) { module.exports = "/*!\r\n * FullCalendar v3.4.0 Stylesheet\r\n * Docs & License: https://fullcalendar.io/\r\n * (c) 2017 Adam Shaw\r\n */\r\n\r\n\r\n.fc {\r\n\tdirection: ltr;\r\n\ttext-align: left;\r\n}\r\n\r\n.fc-rtl {\r\n\ttext-align: right;\r\n}\r\n\r\nbody .fc { /* extra precedence to overcome jqui */\r\n\tfont-size: 1em;\r\n}\r\n\r\n\r\n/* Colors\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-unthemed th,\r\n.fc-unthemed td,\r\n.fc-unthemed thead,\r\n.fc-unthemed tbody,\r\n.fc-unthemed .fc-divider,\r\n.fc-unthemed .fc-row,\r\n.fc-unthemed .fc-content, /* for gutter border */\r\n.fc-unthemed .fc-popover,\r\n.fc-unthemed .fc-list-view,\r\n.fc-unthemed .fc-list-heading td {\r\n\tborder-color: #ddd;\r\n}\r\n\r\n.fc-unthemed .fc-popover {\r\n\tbackground-color: #fff;\r\n}\r\n\r\n.fc-unthemed .fc-divider,\r\n.fc-unthemed .fc-popover .fc-header,\r\n.fc-unthemed .fc-list-heading td {\r\n\tbackground: #eee;\r\n}\r\n\r\n.fc-unthemed .fc-popover .fc-header .fc-close {\r\n\tcolor: #666;\r\n}\r\n\r\n.fc-unthemed td.fc-today {\r\n\tbackground: #fcf8e3;\r\n}\r\n\r\n.fc-highlight { /* when user is selecting cells */\r\n\tbackground: #bce8f1;\r\n\topacity: .3;\r\n}\r\n\r\n.fc-bgevent { /* default look for background events */\r\n\tbackground: rgb(143, 223, 130);\r\n\topacity: .3;\r\n}\r\n\r\n.fc-nonbusiness { /* default look for non-business-hours areas */\r\n\t/* will inherit .fc-bgevent's styles */\r\n\tbackground: #d7d7d7;\r\n}\r\n\r\n.fc-unthemed .fc-disabled-day {\r\n\tbackground: #d7d7d7;\r\n\topacity: .3;\r\n}\r\n\r\n.ui-widget .fc-disabled-day { /* themed */\r\n\tbackground-image: none;\r\n}\r\n\r\n\r\n/* Icons (inline elements with styled text that mock arrow icons)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-icon {\r\n\tdisplay: inline-block;\r\n\theight: 1em;\r\n\tline-height: 1em;\r\n\tfont-size: 1em;\r\n\ttext-align: center;\r\n\toverflow: hidden;\r\n\tfont-family: \"Courier New\", Courier, monospace;\r\n\r\n\t/* don't allow browser text-selection */\r\n\t-webkit-touch-callout: none;\r\n\t-webkit-user-select: none;\r\n\t-khtml-user-select: none;\r\n\t-moz-user-select: none;\r\n\t-ms-user-select: none;\r\n\tuser-select: none;\r\n\t}\r\n\r\n/*\r\nAcceptable font-family overrides for individual icons:\r\n\t\"Arial\", sans-serif\r\n\t\"Times New Roman\", serif\r\n\r\nNOTE: use percentage font sizes or else old IE chokes\r\n*/\r\n\r\n.fc-icon:after {\r\n\tposition: relative;\r\n}\r\n\r\n.fc-icon-left-single-arrow:after {\r\n\tcontent: \"\\02039\";\r\n\tfont-weight: bold;\r\n\tfont-size: 200%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-right-single-arrow:after {\r\n\tcontent: \"\\0203A\";\r\n\tfont-weight: bold;\r\n\tfont-size: 200%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-left-double-arrow:after {\r\n\tcontent: \"\\000AB\";\r\n\tfont-size: 160%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-right-double-arrow:after {\r\n\tcontent: \"\\000BB\";\r\n\tfont-size: 160%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-left-triangle:after {\r\n\tcontent: \"\\25C4\";\r\n\tfont-size: 125%;\r\n\ttop: 3%;\r\n}\r\n\r\n.fc-icon-right-triangle:after {\r\n\tcontent: \"\\25BA\";\r\n\tfont-size: 125%;\r\n\ttop: 3%;\r\n}\r\n\r\n.fc-icon-down-triangle:after {\r\n\tcontent: \"\\25BC\";\r\n\tfont-size: 125%;\r\n\ttop: 2%;\r\n}\r\n\r\n.fc-icon-x:after {\r\n\tcontent: \"\\000D7\";\r\n\tfont-size: 200%;\r\n\ttop: 6%;\r\n}\r\n\r\n\r\n/* Buttons (styled <button> tags, normalized to work cross-browser)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc button {\r\n\t/* force height to include the border and padding */\r\n\t-moz-box-sizing: border-box;\r\n\t-webkit-box-sizing: border-box;\r\n\tbox-sizing: border-box;\r\n\r\n\t/* dimensions */\r\n\tmargin: 0;\r\n\theight: 2.1em;\r\n\tpadding: 0 .6em;\r\n\r\n\t/* text & cursor */\r\n\tfont-size: 1em; /* normalize */\r\n\twhite-space: nowrap;\r\n\tcursor: pointer;\r\n}\r\n\r\n/* Firefox has an annoying inner border */\r\n.fc button::-moz-focus-inner { margin: 0; padding: 0; }\r\n\t\r\n.fc-state-default { /* non-theme */\r\n\tborder: 1px solid;\r\n}\r\n\r\n.fc-state-default.fc-corner-left { /* non-theme */\r\n\tborder-top-left-radius: 4px;\r\n\tborder-bottom-left-radius: 4px;\r\n}\r\n\r\n.fc-state-default.fc-corner-right { /* non-theme */\r\n\tborder-top-right-radius: 4px;\r\n\tborder-bottom-right-radius: 4px;\r\n}\r\n\r\n/* icons in buttons */\r\n\r\n.fc button .fc-icon { /* non-theme */\r\n\tposition: relative;\r\n\ttop: -0.05em; /* seems to be a good adjustment across browsers */\r\n\tmargin: 0 .2em;\r\n\tvertical-align: middle;\r\n}\r\n\t\r\n/*\r\n  button states\r\n  borrowed from twitter bootstrap (http://twitter.github.com/bootstrap/)\r\n*/\r\n\r\n.fc-state-default {\r\n\tbackground-color: #f5f5f5;\r\n\tbackground-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);\r\n\tbackground-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));\r\n\tbackground-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);\r\n\tbackground-image: -o-linear-gradient(top, #ffffff, #e6e6e6);\r\n\tbackground-image: linear-gradient(to bottom, #ffffff, #e6e6e6);\r\n\tbackground-repeat: repeat-x;\r\n\tborder-color: #e6e6e6 #e6e6e6 #bfbfbf;\r\n\tborder-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);\r\n\tcolor: #333;\r\n\ttext-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);\r\n\tbox-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);\r\n}\r\n\r\n.fc-state-hover,\r\n.fc-state-down,\r\n.fc-state-active,\r\n.fc-state-disabled {\r\n\tcolor: #333333;\r\n\tbackground-color: #e6e6e6;\r\n}\r\n\r\n.fc-state-hover {\r\n\tcolor: #333333;\r\n\ttext-decoration: none;\r\n\tbackground-position: 0 -15px;\r\n\t-webkit-transition: background-position 0.1s linear;\r\n\t   -moz-transition: background-position 0.1s linear;\r\n\t     -o-transition: background-position 0.1s linear;\r\n\t        transition: background-position 0.1s linear;\r\n}\r\n\r\n.fc-state-down,\r\n.fc-state-active {\r\n\tbackground-color: #cccccc;\r\n\tbackground-image: none;\r\n\tbox-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);\r\n}\r\n\r\n.fc-state-disabled {\r\n\tcursor: default;\r\n\tbackground-image: none;\r\n\topacity: 0.65;\r\n\tbox-shadow: none;\r\n}\r\n\r\n\r\n/* Buttons Groups\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-button-group {\r\n\tdisplay: inline-block;\r\n}\r\n\r\n/*\r\nevery button that is not first in a button group should scootch over one pixel and cover the\r\nprevious button's border...\r\n*/\r\n\r\n.fc .fc-button-group > * { /* extra precedence b/c buttons have margin set to zero */\r\n\tfloat: left;\r\n\tmargin: 0 0 0 -1px;\r\n}\r\n\r\n.fc .fc-button-group > :first-child { /* same */\r\n\tmargin-left: 0;\r\n}\r\n\r\n\r\n/* Popover\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-popover {\r\n\tposition: absolute;\r\n\tbox-shadow: 0 2px 6px rgba(0,0,0,.15);\r\n}\r\n\r\n.fc-popover .fc-header { /* TODO: be more consistent with fc-head/fc-body */\r\n\tpadding: 2px 4px;\r\n}\r\n\r\n.fc-popover .fc-header .fc-title {\r\n\tmargin: 0 2px;\r\n}\r\n\r\n.fc-popover .fc-header .fc-close {\r\n\tcursor: pointer;\r\n}\r\n\r\n.fc-ltr .fc-popover .fc-header .fc-title,\r\n.fc-rtl .fc-popover .fc-header .fc-close {\r\n\tfloat: left;\r\n}\r\n\r\n.fc-rtl .fc-popover .fc-header .fc-title,\r\n.fc-ltr .fc-popover .fc-header .fc-close {\r\n\tfloat: right;\r\n}\r\n\r\n/* unthemed */\r\n\r\n.fc-unthemed .fc-popover {\r\n\tborder-width: 1px;\r\n\tborder-style: solid;\r\n}\r\n\r\n.fc-unthemed .fc-popover .fc-header .fc-close {\r\n\tfont-size: .9em;\r\n\tmargin-top: 2px;\r\n}\r\n\r\n/* jqui themed */\r\n\r\n.fc-popover > .ui-widget-header + .ui-widget-content {\r\n\tborder-top: 0; /* where they meet, let the header have the border */\r\n}\r\n\r\n\r\n/* Misc Reusable Components\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-divider {\r\n\tborder-style: solid;\r\n\tborder-width: 1px;\r\n}\r\n\r\nhr.fc-divider {\r\n\theight: 0;\r\n\tmargin: 0;\r\n\tpadding: 0 0 2px; /* height is unreliable across browsers, so use padding */\r\n\tborder-width: 1px 0;\r\n}\r\n\r\n.fc-clear {\r\n\tclear: both;\r\n}\r\n\r\n.fc-bg,\r\n.fc-bgevent-skeleton,\r\n.fc-highlight-skeleton,\r\n.fc-helper-skeleton {\r\n\t/* these element should always cling to top-left/right corners */\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n.fc-bg {\r\n\tbottom: 0; /* strech bg to bottom edge */\r\n}\r\n\r\n.fc-bg table {\r\n\theight: 100%; /* strech bg to bottom edge */\r\n}\r\n\r\n\r\n/* Tables\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc table {\r\n\twidth: 100%;\r\n\tbox-sizing: border-box; /* fix scrollbar issue in firefox */\r\n\ttable-layout: fixed;\r\n\tborder-collapse: collapse;\r\n\tborder-spacing: 0;\r\n\tfont-size: 1em; /* normalize cross-browser */\r\n}\r\n\r\n.fc th {\r\n\ttext-align: center;\r\n}\r\n\r\n.fc th,\r\n.fc td {\r\n\tborder-style: solid;\r\n\tborder-width: 1px;\r\n\tpadding: 0;\r\n\tvertical-align: top;\r\n}\r\n\r\n.fc td.fc-today {\r\n\tborder-style: double; /* overcome neighboring borders */\r\n}\r\n\r\n\r\n/* Internal Nav Links\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\na[data-goto] {\r\n\tcursor: pointer;\r\n}\r\n\r\na[data-goto]:hover {\r\n\ttext-decoration: underline;\r\n}\r\n\r\n\r\n/* Fake Table Rows\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc .fc-row { /* extra precedence to overcome themes w/ .ui-widget-content forcing a 1px border */\r\n\t/* no visible border by default. but make available if need be (scrollbar width compensation) */\r\n\tborder-style: solid;\r\n\tborder-width: 0;\r\n}\r\n\r\n.fc-row table {\r\n\t/* don't put left/right border on anything within a fake row.\r\n\t   the outer tbody will worry about this */\r\n\tborder-left: 0 hidden transparent;\r\n\tborder-right: 0 hidden transparent;\r\n\r\n\t/* no bottom borders on rows */\r\n\tborder-bottom: 0 hidden transparent; \r\n}\r\n\r\n.fc-row:first-child table {\r\n\tborder-top: 0 hidden transparent; /* no top border on first row */\r\n}\r\n\r\n\r\n/* Day Row (used within the header and the DayGrid)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-row {\r\n\tposition: relative;\r\n}\r\n\r\n.fc-row .fc-bg {\r\n\tz-index: 1;\r\n}\r\n\r\n/* highlighting cells & background event skeleton */\r\n\r\n.fc-row .fc-bgevent-skeleton,\r\n.fc-row .fc-highlight-skeleton {\r\n\tbottom: 0; /* stretch skeleton to bottom of row */\r\n}\r\n\r\n.fc-row .fc-bgevent-skeleton table,\r\n.fc-row .fc-highlight-skeleton table {\r\n\theight: 100%; /* stretch skeleton to bottom of row */\r\n}\r\n\r\n.fc-row .fc-highlight-skeleton td,\r\n.fc-row .fc-bgevent-skeleton td {\r\n\tborder-color: transparent;\r\n}\r\n\r\n.fc-row .fc-bgevent-skeleton {\r\n\tz-index: 2;\r\n\r\n}\r\n\r\n.fc-row .fc-highlight-skeleton {\r\n\tz-index: 3;\r\n}\r\n\r\n/*\r\nrow content (which contains day/week numbers and events) as well as \"helper\" (which contains\r\ntemporary rendered events).\r\n*/\r\n\r\n.fc-row .fc-content-skeleton {\r\n\tposition: relative;\r\n\tz-index: 4;\r\n\tpadding-bottom: 2px; /* matches the space above the events */\r\n}\r\n\r\n.fc-row .fc-helper-skeleton {\r\n\tz-index: 5;\r\n}\r\n\r\n.fc-row .fc-content-skeleton td,\r\n.fc-row .fc-helper-skeleton td {\r\n\t/* see-through to the background below */\r\n\tbackground: none; /* in case <td>s are globally styled */\r\n\tborder-color: transparent;\r\n\r\n\t/* don't put a border between events and/or the day number */\r\n\tborder-bottom: 0;\r\n}\r\n\r\n.fc-row .fc-content-skeleton tbody td, /* cells with events inside (so NOT the day number cell) */\r\n.fc-row .fc-helper-skeleton tbody td {\r\n\t/* don't put a border between event cells */\r\n\tborder-top: 0;\r\n}\r\n\r\n\r\n/* Scrolling Container\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-scroller {\r\n\t-webkit-overflow-scrolling: touch;\r\n}\r\n\r\n/* TODO: move to agenda/basic */\r\n.fc-scroller > .fc-day-grid,\r\n.fc-scroller > .fc-time-grid {\r\n\tposition: relative; /* re-scope all positions */\r\n\twidth: 100%; /* hack to force re-sizing this inner element when scrollbars appear/disappear */\r\n}\r\n\r\n\r\n/* Global Event Styles\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-event {\r\n\tposition: relative; /* for resize handle and other inner positioning */\r\n\tdisplay: block; /* make the <a> tag block */\r\n\tfont-size: .85em;\r\n\tline-height: 1.3;\r\n\tborder-radius: 3px;\r\n\tborder: 1px solid #3a87ad; /* default BORDER color */\r\n\tfont-weight: normal; /* undo jqui's ui-widget-header bold */\r\n}\r\n\r\n.fc-event,\r\n.fc-event-dot {\r\n\tbackground-color: #3a87ad; /* default BACKGROUND color */\r\n}\r\n\r\n/* overpower some of bootstrap's and jqui's styles on <a> tags */\r\n.fc-event,\r\n.fc-event:hover,\r\n.ui-widget .fc-event {\r\n\tcolor: #fff; /* default TEXT color */\r\n\ttext-decoration: none; /* if <a> has an href */\r\n}\r\n\r\n.fc-event[href],\r\n.fc-event.fc-draggable {\r\n\tcursor: pointer; /* give events with links and draggable events a hand mouse pointer */\r\n}\r\n\r\n.fc-not-allowed, /* causes a \"warning\" cursor. applied on body */\r\n.fc-not-allowed .fc-event { /* to override an event's custom cursor */\r\n\tcursor: not-allowed;\r\n}\r\n\r\n.fc-event .fc-bg { /* the generic .fc-bg already does position */\r\n\tz-index: 1;\r\n\tbackground: #fff;\r\n\topacity: .25;\r\n}\r\n\r\n.fc-event .fc-content {\r\n\tposition: relative;\r\n\tz-index: 2;\r\n}\r\n\r\n/* resizer (cursor AND touch devices) */\r\n\r\n.fc-event .fc-resizer {\r\n\tposition: absolute;\r\n\tz-index: 4;\r\n}\r\n\r\n/* resizer (touch devices) */\r\n\r\n.fc-event .fc-resizer {\r\n\tdisplay: none;\r\n}\r\n\r\n.fc-event.fc-allow-mouse-resize .fc-resizer,\r\n.fc-event.fc-selected .fc-resizer {\r\n\t/* only show when hovering or selected (with touch) */\r\n\tdisplay: block;\r\n}\r\n\r\n/* hit area */\r\n\r\n.fc-event.fc-selected .fc-resizer:before {\r\n\t/* 40x40 touch area */\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tz-index: 9999; /* user of this util can scope within a lower z-index */\r\n\ttop: 50%;\r\n\tleft: 50%;\r\n\twidth: 40px;\r\n\theight: 40px;\r\n\tmargin-left: -20px;\r\n\tmargin-top: -20px;\r\n}\r\n\r\n\r\n/* Event Selection (only for touch devices)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-event.fc-selected {\r\n\tz-index: 9999 !important; /* overcomes inline z-index */\r\n\tbox-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);\r\n}\r\n\r\n.fc-event.fc-selected.fc-dragging {\r\n\tbox-shadow: 0 2px 7px rgba(0, 0, 0, 0.3);\r\n}\r\n\r\n\r\n/* Horizontal Events\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* bigger touch area when selected */\r\n.fc-h-event.fc-selected:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tz-index: 3; /* below resizers */\r\n\ttop: -10px;\r\n\tbottom: -10px;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* events that are continuing to/from another week. kill rounded corners and butt up against edge */\r\n\r\n.fc-ltr .fc-h-event.fc-not-start,\r\n.fc-rtl .fc-h-event.fc-not-end {\r\n\tmargin-left: 0;\r\n\tborder-left-width: 0;\r\n\tpadding-left: 1px; /* replace the border with padding */\r\n\tborder-top-left-radius: 0;\r\n\tborder-bottom-left-radius: 0;\r\n}\r\n\r\n.fc-ltr .fc-h-event.fc-not-end,\r\n.fc-rtl .fc-h-event.fc-not-start {\r\n\tmargin-right: 0;\r\n\tborder-right-width: 0;\r\n\tpadding-right: 1px; /* replace the border with padding */\r\n\tborder-top-right-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n/* resizer (cursor AND touch devices) */\r\n\r\n/* left resizer  */\r\n.fc-ltr .fc-h-event .fc-start-resizer,\r\n.fc-rtl .fc-h-event .fc-end-resizer {\r\n\tcursor: w-resize;\r\n\tleft: -1px; /* overcome border */\r\n}\r\n\r\n/* right resizer */\r\n.fc-ltr .fc-h-event .fc-end-resizer,\r\n.fc-rtl .fc-h-event .fc-start-resizer {\r\n\tcursor: e-resize;\r\n\tright: -1px; /* overcome border */\r\n}\r\n\r\n/* resizer (mouse devices) */\r\n\r\n.fc-h-event.fc-allow-mouse-resize .fc-resizer {\r\n\twidth: 7px;\r\n\ttop: -1px; /* overcome top border */\r\n\tbottom: -1px; /* overcome bottom border */\r\n}\r\n\r\n/* resizer (touch devices) */\r\n\r\n.fc-h-event.fc-selected .fc-resizer {\r\n\t/* 8x8 little dot */\r\n\tborder-radius: 4px;\r\n\tborder-width: 1px;\r\n\twidth: 6px;\r\n\theight: 6px;\r\n\tborder-style: solid;\r\n\tborder-color: inherit;\r\n\tbackground: #fff;\r\n\t/* vertically center */\r\n\ttop: 50%;\r\n\tmargin-top: -4px;\r\n}\r\n\r\n/* left resizer  */\r\n.fc-ltr .fc-h-event.fc-selected .fc-start-resizer,\r\n.fc-rtl .fc-h-event.fc-selected .fc-end-resizer {\r\n\tmargin-left: -4px; /* centers the 8x8 dot on the left edge */\r\n}\r\n\r\n/* right resizer */\r\n.fc-ltr .fc-h-event.fc-selected .fc-end-resizer,\r\n.fc-rtl .fc-h-event.fc-selected .fc-start-resizer {\r\n\tmargin-right: -4px; /* centers the 8x8 dot on the right edge */\r\n}\r\n\r\n\r\n/* DayGrid events\r\n----------------------------------------------------------------------------------------------------\r\nWe use the full \"fc-day-grid-event\" class instead of using descendants because the event won't\r\nbe a descendant of the grid when it is being dragged.\r\n*/\r\n\r\n.fc-day-grid-event {\r\n\tmargin: 1px 2px 0; /* spacing between events and edges */\r\n\tpadding: 0 1px;\r\n}\r\n\r\ntr:first-child > td > .fc-day-grid-event {\r\n\tmargin-top: 2px; /* a little bit more space before the first event */\r\n}\r\n\r\n.fc-day-grid-event.fc-selected:after {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tz-index: 1; /* same z-index as fc-bg, behind text */\r\n\t/* overcome the borders */\r\n\ttop: -1px;\r\n\tright: -1px;\r\n\tbottom: -1px;\r\n\tleft: -1px;\r\n\t/* darkening effect */\r\n\tbackground: #000;\r\n\topacity: .25;\r\n}\r\n\r\n.fc-day-grid-event .fc-content { /* force events to be one-line tall */\r\n\twhite-space: nowrap;\r\n\toverflow: hidden;\r\n}\r\n\r\n.fc-day-grid-event .fc-time {\r\n\tfont-weight: bold;\r\n}\r\n\r\n/* resizer (cursor devices) */\r\n\r\n/* left resizer  */\r\n.fc-ltr .fc-day-grid-event.fc-allow-mouse-resize .fc-start-resizer,\r\n.fc-rtl .fc-day-grid-event.fc-allow-mouse-resize .fc-end-resizer {\r\n\tmargin-left: -2px; /* to the day cell's edge */\r\n}\r\n\r\n/* right resizer */\r\n.fc-ltr .fc-day-grid-event.fc-allow-mouse-resize .fc-end-resizer,\r\n.fc-rtl .fc-day-grid-event.fc-allow-mouse-resize .fc-start-resizer {\r\n\tmargin-right: -2px; /* to the day cell's edge */\r\n}\r\n\r\n\r\n/* Event Limiting\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* \"more\" link that represents hidden events */\r\n\r\na.fc-more {\r\n\tmargin: 1px 3px;\r\n\tfont-size: .85em;\r\n\tcursor: pointer;\r\n\ttext-decoration: none;\r\n}\r\n\r\na.fc-more:hover {\r\n\ttext-decoration: underline;\r\n}\r\n\r\n.fc-limited { /* rows and cells that are hidden because of a \"more\" link */\r\n\tdisplay: none;\r\n}\r\n\r\n/* popover that appears when \"more\" link is clicked */\r\n\r\n.fc-day-grid .fc-row {\r\n\tz-index: 1; /* make the \"more\" popover one higher than this */\r\n}\r\n\r\n.fc-more-popover {\r\n\tz-index: 2;\r\n\twidth: 220px;\r\n}\r\n\r\n.fc-more-popover .fc-event-container {\r\n\tpadding: 10px;\r\n}\r\n\r\n\r\n/* Now Indicator\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-now-indicator {\r\n\tposition: absolute;\r\n\tborder: 0 solid red;\r\n}\r\n\r\n\r\n/* Utilities\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-unselectable {\r\n\t-webkit-user-select: none;\r\n\t -khtml-user-select: none;\r\n\t   -moz-user-select: none;\r\n\t    -ms-user-select: none;\r\n\t        user-select: none;\r\n\t-webkit-touch-callout: none;\r\n\t-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\r\n}\r\n\r\n\r\n\r\n/* Toolbar\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-toolbar {\r\n\ttext-align: center;\r\n}\r\n\r\n.fc-toolbar.fc-header-toolbar {\r\n\tmargin-bottom: 1em;\r\n}\r\n\r\n.fc-toolbar.fc-footer-toolbar {\r\n\tmargin-top: 1em;\r\n}\r\n\r\n.fc-toolbar .fc-left {\r\n\tfloat: left;\r\n}\r\n\r\n.fc-toolbar .fc-right {\r\n\tfloat: right;\r\n}\r\n\r\n.fc-toolbar .fc-center {\r\n\tdisplay: inline-block;\r\n}\r\n\r\n/* the things within each left/right/center section */\r\n.fc .fc-toolbar > * > * { /* extra precedence to override button border margins */\r\n\tfloat: left;\r\n\tmargin-left: .75em;\r\n}\r\n\r\n/* the first thing within each left/center/right section */\r\n.fc .fc-toolbar > * > :first-child { /* extra precedence to override button border margins */\r\n\tmargin-left: 0;\r\n}\r\n\t\r\n/* title text */\r\n\r\n.fc-toolbar h2 {\r\n\tmargin: 0;\r\n}\r\n\r\n/* button layering (for border precedence) */\r\n\r\n.fc-toolbar button {\r\n\tposition: relative;\r\n}\r\n\r\n.fc-toolbar .fc-state-hover,\r\n.fc-toolbar .ui-state-hover {\r\n\tz-index: 2;\r\n}\r\n\t\r\n.fc-toolbar .fc-state-down {\r\n\tz-index: 3;\r\n}\r\n\r\n.fc-toolbar .fc-state-active,\r\n.fc-toolbar .ui-state-active {\r\n\tz-index: 4;\r\n}\r\n\r\n.fc-toolbar button:focus {\r\n\tz-index: 5;\r\n}\r\n\r\n\r\n/* View Structure\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* undo twitter bootstrap's box-sizing rules. normalizes positioning techniques */\r\n/* don't do this for the toolbar because we'll want bootstrap to style those buttons as some pt */\r\n.fc-view-container *,\r\n.fc-view-container *:before,\r\n.fc-view-container *:after {\r\n\t-webkit-box-sizing: content-box;\r\n\t   -moz-box-sizing: content-box;\r\n\t        box-sizing: content-box;\r\n}\r\n\r\n.fc-view, /* scope positioning and z-index's for everything within the view */\r\n.fc-view > table { /* so dragged elements can be above the view's main element */\r\n\tposition: relative;\r\n\tz-index: 1;\r\n}\r\n\r\n\r\n\r\n/* BasicView\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* day row structure */\r\n\r\n.fc-basicWeek-view .fc-content-skeleton,\r\n.fc-basicDay-view .fc-content-skeleton {\r\n\t/* there may be week numbers in these views, so no padding-top */\r\n\tpadding-bottom: 1em; /* ensure a space at bottom of cell for user selecting/clicking */\r\n}\r\n\r\n.fc-basic-view .fc-body .fc-row {\r\n\tmin-height: 4em; /* ensure that all rows are at least this tall */\r\n}\r\n\r\n/* a \"rigid\" row will take up a constant amount of height because content-skeleton is absolute */\r\n\r\n.fc-row.fc-rigid {\r\n\toverflow: hidden;\r\n}\r\n\r\n.fc-row.fc-rigid .fc-content-skeleton {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* week and day number styling */\r\n\r\n.fc-day-top.fc-other-month {\r\n\topacity: 0.3;\r\n}\r\n\r\n.fc-basic-view .fc-week-number,\r\n.fc-basic-view .fc-day-number {\r\n\tpadding: 2px;\r\n}\r\n\r\n.fc-basic-view th.fc-week-number,\r\n.fc-basic-view th.fc-day-number {\r\n\tpadding: 0 2px; /* column headers can't have as much v space */\r\n}\r\n\r\n.fc-ltr .fc-basic-view .fc-day-top .fc-day-number { float: right; }\r\n.fc-rtl .fc-basic-view .fc-day-top .fc-day-number { float: left; }\r\n\r\n.fc-ltr .fc-basic-view .fc-day-top .fc-week-number { float: left; border-radius: 0 0 3px 0; }\r\n.fc-rtl .fc-basic-view .fc-day-top .fc-week-number { float: right; border-radius: 0 0 0 3px; }\r\n\r\n.fc-basic-view .fc-day-top .fc-week-number {\r\n\tmin-width: 1.5em;\r\n\ttext-align: center;\r\n\tbackground-color: #f2f2f2;\r\n\tcolor: #808080;\r\n}\r\n\r\n/* when week/day number have own column */\r\n\r\n.fc-basic-view td.fc-week-number {\r\n\ttext-align: center;\r\n}\r\n\r\n.fc-basic-view td.fc-week-number > * {\r\n\t/* work around the way we do column resizing and ensure a minimum width */\r\n\tdisplay: inline-block;\r\n\tmin-width: 1.25em;\r\n}\r\n\r\n\r\n/* AgendaView all-day area\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-agenda-view .fc-day-grid {\r\n\tposition: relative;\r\n\tz-index: 2; /* so the \"more..\" popover will be over the time grid */\r\n}\r\n\r\n.fc-agenda-view .fc-day-grid .fc-row {\r\n\tmin-height: 3em; /* all-day section will never get shorter than this */\r\n}\r\n\r\n.fc-agenda-view .fc-day-grid .fc-row .fc-content-skeleton {\r\n\tpadding-bottom: 1em; /* give space underneath events for clicking/selecting days */\r\n}\r\n\r\n\r\n/* TimeGrid axis running down the side (for both the all-day area and the slot area)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc .fc-axis { /* .fc to overcome default cell styles */\r\n\tvertical-align: middle;\r\n\tpadding: 0 4px;\r\n\twhite-space: nowrap;\r\n}\r\n\r\n.fc-ltr .fc-axis {\r\n\ttext-align: right;\r\n}\r\n\r\n.fc-rtl .fc-axis {\r\n\ttext-align: left;\r\n}\r\n\r\n.ui-widget td.fc-axis {\r\n\tfont-weight: normal; /* overcome jqui theme making it bold */\r\n}\r\n\r\n\r\n/* TimeGrid Structure\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid-container, /* so scroll container's z-index is below all-day */\r\n.fc-time-grid { /* so slats/bg/content/etc positions get scoped within here */\r\n\tposition: relative;\r\n\tz-index: 1;\r\n}\r\n\r\n.fc-time-grid {\r\n\tmin-height: 100%; /* so if height setting is 'auto', .fc-bg stretches to fill height */\r\n}\r\n\r\n.fc-time-grid table { /* don't put outer borders on slats/bg/content/etc */\r\n\tborder: 0 hidden transparent;\r\n}\r\n\r\n.fc-time-grid > .fc-bg {\r\n\tz-index: 1;\r\n}\r\n\r\n.fc-time-grid .fc-slats,\r\n.fc-time-grid > hr { /* the <hr> AgendaView injects when grid is shorter than scroller */\r\n\tposition: relative;\r\n\tz-index: 2;\r\n}\r\n\r\n.fc-time-grid .fc-content-col {\r\n\tposition: relative; /* because now-indicator lives directly inside */\r\n}\r\n\r\n.fc-time-grid .fc-content-skeleton {\r\n\tposition: absolute;\r\n\tz-index: 3;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* divs within a cell within the fc-content-skeleton */\r\n\r\n.fc-time-grid .fc-business-container {\r\n\tposition: relative;\r\n\tz-index: 1;\r\n}\r\n\r\n.fc-time-grid .fc-bgevent-container {\r\n\tposition: relative;\r\n\tz-index: 2;\r\n}\r\n\r\n.fc-time-grid .fc-highlight-container {\r\n\tposition: relative;\r\n\tz-index: 3;\r\n}\r\n\r\n.fc-time-grid .fc-event-container {\r\n\tposition: relative;\r\n\tz-index: 4;\r\n}\r\n\r\n.fc-time-grid .fc-now-indicator-line {\r\n\tz-index: 5;\r\n}\r\n\r\n.fc-time-grid .fc-helper-container { /* also is fc-event-container */\r\n\tposition: relative;\r\n\tz-index: 6;\r\n}\r\n\r\n\r\n/* TimeGrid Slats (lines that run horizontally)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid .fc-slats td {\r\n\theight: 1.5em;\r\n\tborder-bottom: 0; /* each cell is responsible for its top border */\r\n}\r\n\r\n.fc-time-grid .fc-slats .fc-minor td {\r\n\tborder-top-style: dotted;\r\n}\r\n\r\n.fc-time-grid .fc-slats .ui-widget-content { /* for jqui theme */\r\n\tbackground: none; /* see through to fc-bg */\r\n}\r\n\r\n\r\n/* TimeGrid Highlighting Slots\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid .fc-highlight-container { /* a div within a cell within the fc-highlight-skeleton */\r\n\tposition: relative; /* scopes the left/right of the fc-highlight to be in the column */\r\n}\r\n\r\n.fc-time-grid .fc-highlight {\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\tright: 0;\r\n\t/* top and bottom will be in by JS */\r\n}\r\n\r\n\r\n/* TimeGrid Event Containment\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-ltr .fc-time-grid .fc-event-container { /* space on the sides of events for LTR (default) */\r\n\tmargin: 0 2.5% 0 2px;\r\n}\r\n\r\n.fc-rtl .fc-time-grid .fc-event-container { /* space on the sides of events for RTL */\r\n\tmargin: 0 2px 0 2.5%;\r\n}\r\n\r\n.fc-time-grid .fc-event,\r\n.fc-time-grid .fc-bgevent {\r\n\tposition: absolute;\r\n\tz-index: 1; /* scope inner z-index's */\r\n}\r\n\r\n.fc-time-grid .fc-bgevent {\r\n\t/* background events always span full width */\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n\r\n/* Generic Vertical Event\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-v-event.fc-not-start { /* events that are continuing from another day */\r\n\t/* replace space made by the top border with padding */\r\n\tborder-top-width: 0;\r\n\tpadding-top: 1px;\r\n\r\n\t/* remove top rounded corners */\r\n\tborder-top-left-radius: 0;\r\n\tborder-top-right-radius: 0;\r\n}\r\n\r\n.fc-v-event.fc-not-end {\r\n\t/* replace space made by the top border with padding */\r\n\tborder-bottom-width: 0;\r\n\tpadding-bottom: 1px;\r\n\r\n\t/* remove bottom rounded corners */\r\n\tborder-bottom-left-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n\r\n/* TimeGrid Event Styling\r\n----------------------------------------------------------------------------------------------------\r\nWe use the full \"fc-time-grid-event\" class instead of using descendants because the event won't\r\nbe a descendant of the grid when it is being dragged.\r\n*/\r\n\r\n.fc-time-grid-event {\r\n\toverflow: hidden; /* don't let the bg flow over rounded corners */\r\n}\r\n\r\n.fc-time-grid-event.fc-selected {\r\n\t/* need to allow touch resizers to extend outside event's bounding box */\r\n\t/* common fc-selected styles hide the fc-bg, so don't need this anyway */\r\n\toverflow: visible;\r\n}\r\n\r\n.fc-time-grid-event.fc-selected .fc-bg {\r\n\tdisplay: none; /* hide semi-white background, to appear darker */\r\n}\r\n\r\n.fc-time-grid-event .fc-content {\r\n\toverflow: hidden; /* for when .fc-selected */\r\n}\r\n\r\n.fc-time-grid-event .fc-time,\r\n.fc-time-grid-event .fc-title {\r\n\tpadding: 0 1px;\r\n}\r\n\r\n.fc-time-grid-event .fc-time {\r\n\tfont-size: .85em;\r\n\twhite-space: nowrap;\r\n}\r\n\r\n/* short mode, where time and title are on the same line */\r\n\r\n.fc-time-grid-event.fc-short .fc-content {\r\n\t/* don't wrap to second line (now that contents will be inline) */\r\n\twhite-space: nowrap;\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time,\r\n.fc-time-grid-event.fc-short .fc-title {\r\n\t/* put the time and title on the same line */\r\n\tdisplay: inline-block;\r\n\tvertical-align: top;\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time span {\r\n\tdisplay: none; /* don't display the full time text... */\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time:before {\r\n\tcontent: attr(data-start); /* ...instead, display only the start time */\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time:after {\r\n\tcontent: \"\\000A0-\\000A0\"; /* seperate with a dash, wrapped in nbsp's */\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-title {\r\n\tfont-size: .85em; /* make the title text the same size as the time */\r\n\tpadding: 0; /* undo padding from above */\r\n}\r\n\r\n/* resizer (cursor device) */\r\n\r\n.fc-time-grid-event.fc-allow-mouse-resize .fc-resizer {\r\n\tleft: 0;\r\n\tright: 0;\r\n\tbottom: 0;\r\n\theight: 8px;\r\n\toverflow: hidden;\r\n\tline-height: 8px;\r\n\tfont-size: 11px;\r\n\tfont-family: monospace;\r\n\ttext-align: center;\r\n\tcursor: s-resize;\r\n}\r\n\r\n.fc-time-grid-event.fc-allow-mouse-resize .fc-resizer:after {\r\n\tcontent: \"=\";\r\n}\r\n\r\n/* resizer (touch device) */\r\n\r\n.fc-time-grid-event.fc-selected .fc-resizer {\r\n\t/* 10x10 dot */\r\n\tborder-radius: 5px;\r\n\tborder-width: 1px;\r\n\twidth: 8px;\r\n\theight: 8px;\r\n\tborder-style: solid;\r\n\tborder-color: inherit;\r\n\tbackground: #fff;\r\n\t/* horizontally center */\r\n\tleft: 50%;\r\n\tmargin-left: -5px;\r\n\t/* center on the bottom edge */\r\n\tbottom: -5px;\r\n}\r\n\r\n\r\n/* Now Indicator\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid .fc-now-indicator-line {\r\n\tborder-top-width: 1px;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* arrow on axis */\r\n\r\n.fc-time-grid .fc-now-indicator-arrow {\r\n\tmargin-top: -5px; /* vertically center on top coordinate */\r\n}\r\n\r\n.fc-ltr .fc-time-grid .fc-now-indicator-arrow {\r\n\tleft: 0;\r\n\t/* triangle pointing right... */\r\n\tborder-width: 5px 0 5px 6px;\r\n\tborder-top-color: transparent;\r\n\tborder-bottom-color: transparent;\r\n}\r\n\r\n.fc-rtl .fc-time-grid .fc-now-indicator-arrow {\r\n\tright: 0;\r\n\t/* triangle pointing left... */\r\n\tborder-width: 5px 6px 5px 0;\r\n\tborder-top-color: transparent;\r\n\tborder-bottom-color: transparent;\r\n}\r\n\r\n\r\n\r\n/* List View\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* possibly reusable */\r\n\r\n.fc-event-dot {\r\n\tdisplay: inline-block;\r\n\twidth: 10px;\r\n\theight: 10px;\r\n\tborder-radius: 5px;\r\n}\r\n\r\n/* view wrapper */\r\n\r\n.fc-rtl .fc-list-view {\r\n\tdirection: rtl; /* unlike core views, leverage browser RTL */\r\n}\r\n\r\n.fc-list-view {\r\n\tborder-width: 1px;\r\n\tborder-style: solid;\r\n}\r\n\r\n/* table resets */\r\n\r\n.fc .fc-list-table {\r\n\ttable-layout: auto; /* for shrinkwrapping cell content */\r\n}\r\n\r\n.fc-list-table td {\r\n\tborder-width: 1px 0 0;\r\n\tpadding: 8px 14px;\r\n}\r\n\r\n.fc-list-table tr:first-child td {\r\n\tborder-top-width: 0;\r\n}\r\n\r\n/* day headings with the list */\r\n\r\n.fc-list-heading {\r\n\tborder-bottom-width: 1px;\r\n}\r\n\r\n.fc-list-heading td {\r\n\tfont-weight: bold;\r\n}\r\n\r\n.fc-ltr .fc-list-heading-main { float: left; }\r\n.fc-ltr .fc-list-heading-alt { float: right; }\r\n\r\n.fc-rtl .fc-list-heading-main { float: right; }\r\n.fc-rtl .fc-list-heading-alt { float: left; }\r\n\r\n/* event list items */\r\n\r\n.fc-list-item.fc-has-url {\r\n\tcursor: pointer; /* whole row will be clickable */\r\n}\r\n\r\n.fc-list-item:hover td {\r\n\tbackground-color: #f5f5f5;\r\n}\r\n\r\n.fc-list-item-marker,\r\n.fc-list-item-time {\r\n\twhite-space: nowrap;\r\n\twidth: 1px;\r\n}\r\n\r\n/* make the dot closer to the event title */\r\n.fc-ltr .fc-list-item-marker { padding-right: 0; }\r\n.fc-rtl .fc-list-item-marker { padding-left: 0; }\r\n\r\n.fc-list-item-title a {\r\n\t/* every event title cell has an <a> tag */\r\n\ttext-decoration: none;\r\n\tcolor: inherit;\r\n}\r\n\r\n.fc-list-item-title a[href]:hover {\r\n\t/* hover effect only on titles with hrefs */\r\n\ttext-decoration: underline;\r\n}\r\n\r\n/* message when no events */\r\n\r\n.fc-list-empty-wrap2 {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n\tbottom: 0;\r\n}\r\n\r\n.fc-list-empty-wrap1 {\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tdisplay: table;\r\n}\r\n\r\n.fc-list-empty {\r\n\tdisplay: table-cell;\r\n\tvertical-align: middle;\r\n\ttext-align: center;\r\n}\r\n\r\n.fc-unthemed .fc-list-empty { /* theme will provide own background */\r\n\tbackground-color: #eee;\r\n}\r\n"; });
-define('text!modules/acc/accCreateRequest.html', ['module'], function(module) { module.exports = "<template>\n  <span id=\"loading\">\n    <ul class=\"bokeh\">\n      <li></li>\n      <li></li>\n      <li></li>\n    </ul>\n  </span>\n\n  <div class=\"fluid-container\">\n    <div class=\"panel panel-default\" style=\"margin-top:50px;padding:5px;\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n          <div class=\"bottomMargin list-group-item  toolbar\">\n            <span click.delegate=\"saveIt()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n              data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\"\n                aria-hidden=\"true\"></i></span>\n          </div>\n        </div>\n        <div class=\"row\">\n          <div class=\"col-lg-4\">\n\n            <div class=\"topMargin\">\n              <div>\n                <input input.delegate=\"filterInstiutionList()\" value.bind=\"filterValue\" id=\"filterValue\"\n                  class=\"form-control \" placeholder=\"Filter institution\" type=\"text\" />\n              </div>\n              <div class=\"smallTopMargin\">\n                <select id=\"institution\" value.bind=\"selectedInstitution\" change.delegate=\"changeInstitution($event)\"\n                  class=\"form-control\">\n                  <option value=\"\">Choose the Institution</option>\n                  <option repeat.for=\"item of insitutionsArray\" value=\"${item._id}\">${item.name}\n                  </option>\n                </select>\n              </div>\n            </div>\n\n            <span show.bind=\"institutionSelected && selectedPackage\">\n              <h5>Package: <strong>${selectedPackage.name}</strong> Max Clients:\n                <strong>${selectedPackage.maxClients}</strong> Active Clients:\n                <strong>${requests.selectedRequest.requestDetails.length}</strong>\n              </h5>\n            </span>\n            <span show.bind=\"institutionSelected && !selectedPackage\">\n              <h5>Currently there is no package assigned to the institution.</h5>\n            </span>\n\n            <div show.bind=\"institutionSelected && requests.apjInstitutionRequestArray.length\" id=\"existingRequestInfo\">\n\n            </div>\n            <div show.bind=\"institutionSelected && !requests.apjInstitutionRequestArray.length\"\n              id=\"existingRequestInfo\">\n              <h3>This institution has no active requests</h3>\n            </div>\n\n            <compose view=\"./components/Requests.html\"></compose>\n\n            <div show.bind=\"institutionSelected\" class=\"form-group col-md-12\">\n              <editor value.bind=\"requests.selectedRequest.comments\" height=\"250\"></editor>\n            </div>\n\n          </div>\n          <div show.bind=\"institutionSelected\" class=\"col-lg-8\">\n            <div class=\"row\">\n              <div class=\"col-md-5 topMargin\">\n                <label id=\"productList\">Available Products</label>\n                <div class=\"well well2 overFlow\" style=\"height:400px;\">\n                  <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\"\n                    placeholder=\"Filter products\" />\n                  <ul class=\"list-group\">\n                    <li click.trigger=\"selectProduct(product)\" repeat.for=\"product of filteredProductsArray\"\n                      id=\"${product._id}\" class=\"list-group-item dropbtn\">\n                      <h4>${product.name}</h4>\n                    </li>\n                  </ul>\n                </div>\n              </div>\n              <div class=\"col-md-5 col-md-offset-1 topMargin\">\n                <label id=\"requestProductsLabel\">Requested Products</label>\n                <div class=\"well well2 overflow\" style=\"height:400px;\">\n                  <ul class=\"list-group\">\n                    <li click.trigger=\"removeProduct($index)\"\n                      repeat.for=\"product of requests.selectedRequest.requestDetails\" id=\"${product.productId}\"\n                      class=\"list-group-item dropbtn\">\n                      <div class=\"row\">\n                      <div class=\"col-sm-12\">\n                        <h4>${product.productId | lookupValue:products.productsArray:\"_id\":\"name\"}\n                        </h4>\n                      </div>\n                      <!-- <div class=\"col-sm-3\">\n                        <span click.delegate=\"deleteRequest($index)\" class=\"smallMarginRight\" bootstrap-tooltip\n                          data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Request\"><i\n                            class=\"fa fa-trash vertical-align\" aria-hidden=\"true\"></i></span>\n                      </div> -->\n                    </div>\n                    </li>\n\n                  </ul>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col\"><span id=\"numberOfStudentsError\"></span></div>\n              <div class=\"col\"><span id=\"dateError\"></span></div>\n              <div class=\"col\"><span id=\"requiredDateError\"></span></div>\n            </div>\n            <div class=\"row\" id=\"productListTable\">\n              <div show.bind=\"requests.selectedRequest.requestDetails.length > 0\">\n                <table class=\"table table-striped table-bordered col-md-10 topMargin\">\n                  <thead>\n                    <tr>\n                      <th>Requested Product</th>\n                      <th>Price</th>\n                      <th>Number of Students</th>\n                      <th>Date Required</th>\n                    </tr>\n                  <tbody id=\"requiredProductsTable\">\n                    <tr repeat.for=\"request of requests.selectedRequest.requestDetails\"\n                      class=\"${request.invoiceRelevant ? 'success sortable' : 'sortable'}\">\n                      <td>${request.productId | lookupValue:products.productsArray:\"_id\":\"name\"}\n                      </td>\n                      <td>\n                        <input readonly.bind=\"!request.invoiceRelevant\" type=\"number\" class=\"form-control\"\n                          value.bind=\"request.price\">\n                        ${request.invoiceRelevant}\n                      </td>\n                      <td>\n                        <input type=\"number\" class=\"form-control\" value.bind=\"request.numberOfStudents\">\n                      </td>\n                      <td>\n                        <div class=\"form-group  col-md-8\">\n                          <flat-picker controlid=\"requiredDate-${$index}\" config.bind=\"configDate\"\n                            value.bind=\"request.requiredDate\">\n                          </flat-picker>\n                        </div>\n                      </td>\n                    </tr>\n                  </tbody>\n                </table>\n              </div>\n            </div>\n            <div class=\"row\">\n\n              <div class=\"topMargin\" show.bind=\"sandBoxClient || personSelected\">\n                <editor value.bind=\"requests.selectedRequest.comments\" height=\"250\"></editor>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
+define('text!modules/acc/accCreateRequest.html', ['module'], function(module) { module.exports = "<template>\n  <span id=\"loading\">\n    <ul class=\"bokeh\">\n      <li></li>\n      <li></li>\n      <li></li>\n    </ul>\n  </span>\n\n  <div class=\"fluid-container\">\n    <div class=\"panel panel-default\" style=\"margin-top:50px;padding:5px;\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n          <div class=\"bottomMargin list-group-item  toolbar\">\n            <span click.delegate=\"saveIt()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n              data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\"\n                aria-hidden=\"true\"></i></span>\n          </div>\n        </div>\n        <div class=\"row\">\n          <div class=\"col-lg-4\">\n\n            <div class=\"topMargin\">\n              <div>\n                <input input.delegate=\"filterInstiutionList()\" value.bind=\"filterValue\" id=\"filterValue\"\n                  class=\"form-control \" placeholder=\"Filter institution\" type=\"text\" />\n              </div>\n              <div class=\"smallTopMargin\">\n                <select id=\"institution\" value.bind=\"selectedInstitution\" change.delegate=\"changeInstitution($event)\"\n                  class=\"form-control\">\n                  <option value=\"\">Choose the Institution</option>\n                  <option repeat.for=\"item of insitutionsArray\" value=\"${item._id}\">${item.name}\n                  </option>\n                </select>\n              </div>\n            </div>\n\n            <span show.bind=\"institutionSelected && selectedPackage\">\n              <h5>Package: <strong>${selectedPackage.name}</strong> Max Clients:\n                <strong>${selectedPackage.maxClients}</strong> Active Clients:\n                <strong>${requests.selectedRequest.requestDetails.length}</strong>\n              </h5>\n            </span>\n            <span show.bind=\"institutionSelected && !selectedPackage\">\n              <h5>Currently there is no package assigned to the institution.</h5>\n            </span>\n\n            <div show.bind=\"institutionSelected && requests.apjInstitutionRequestArray.length\" id=\"existingRequestInfo\">\n\n            </div>\n            <div show.bind=\"institutionSelected && !requests.apjInstitutionRequestArray.length\"\n              id=\"existingRequestInfo\">\n              <h3>This institution has no active requests</h3>\n            </div>\n\n            <compose view=\"./components/Requests.html\"></compose>\n\n            <div show.bind=\"institutionSelected\" class=\"form-group col-md-12\">\n              <editor value.bind=\"requests.selectedRequest.comments\" height=\"250\"></editor>\n            </div>\n\n          </div>\n          <div show.bind=\"institutionSelected\" class=\"col-lg-8\">\n            <div class=\"row\">\n              <div class=\"col-md-5 topMargin\">\n                <label id=\"productList\">Available Products</label>\n                <div class=\"well well2 overFlow\" style=\"height:400px;\">\n                  <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\"\n                    placeholder=\"Filter products\" />\n                  <ul class=\"list-group\">\n                    <li click.trigger=\"selectProduct(product)\" repeat.for=\"product of filteredProductsArray\"\n                      id=\"${product._id}\" class=\"list-group-item dropbtn\">\n                      <h4>${product.name}</h4>\n                    </li>\n                  </ul>\n                </div>\n              </div>\n              <div class=\"col-md-5 col-md-offset-1 topMargin\">\n                <label id=\"requestProductsLabel\">Requested Products</label>\n                <div class=\"well well2 overflow\" style=\"height:400px;\">\n                  <ul class=\"list-group\">\n                    <li click.trigger=\"removeProduct($index)\"\n                      repeat.for=\"product of requestDetails\" id=\"${product.productId}\"\n                      class=\"${product.assignments.length ? 'assignedColor list-group-item dropbtn' : 'list-group-item dropbtn'}\">\n                      <div class=\"row\">\n                      <div class=\"col-sm-12\">\n                        <h4>${product.productId | lookupValue:products.productsArray:\"_id\":\"name\"}\n                        </h4>\n                      </div>\n                    </div>\n                    </li>\n                  </ul>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col\"><span id=\"numberOfStudentsError\"></span></div>\n              <div class=\"col\"><span id=\"dateError\"></span></div>\n              <div class=\"col\"><span id=\"requiredDateError\"></span></div>\n            </div>\n            <div class=\"row\" id=\"productListTable\">\n              <div show.bind=\"requests.selectedRequest.requestDetails.length > 0\">\n                <table class=\"table table-striped table-bordered col-md-10 topMargin\">\n                  <thead>\n                    <tr>\n                      <th>Requested Product</th>\n                      <!-- <th>Price</th> -->\n                      <th>Number of Students</th>\n                      <th>Date Required</th>\n                    </tr>\n                  <tbody id=\"requiredProductsTable\">\n                    <tr repeat.for=\"request of requests.selectedRequest.requestDetails  | filterApjRequestDetails\"\n                      class=\"${request.assignments.length ? 'success sortable' : 'sortable'}\">\n                      <td>${request.productId | lookupValue:products.productsArray:\"_id\":\"name\"}\n                      </td>\n                      <!-- <td>\n                        <input readonly.bind=\"!request.invoiceRelevant\" type=\"number\" class=\"form-control\"\n                          value.bind=\"request.price\">\n                        ${request.invoiceRelevant}\n                      </td> -->\n                      <td>\n                        <input type=\"number\" class=\"form-control\" value.bind=\"request.numberOfStudents\">\n                      </td>\n                      <td>\n                        <div class=\"form-group  col-md-8\">\n                          <flat-picker controlid=\"requiredDate-${$index}\" config.bind=\"configDate\"\n                            value.bind=\"request.requiredDate\">\n                          </flat-picker>\n                        </div>\n                      </td>\n                    </tr>\n                  </tbody>\n                </table>\n              </div>\n            </div>\n            <div class=\"row\">\n\n              <div class=\"topMargin\" show.bind=\"sandBoxClient || personSelected\">\n                <editor value.bind=\"requests.selectedRequest.comments\" height=\"250\"></editor>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
 define('text!resources/css/OLDsummernote.css', ['module'], function(module) { module.exports = "@font-face{font-family:\"summernote\";font-style:normal;font-weight:normal;src:url(\"font/summernote.eot?ad8d7e2d177d2473aecd9b35d16211fb\");src:url(\"font/summernote.eot?#iefix\") format(\"embedded-opentype\"),url(\"font/summernote.woff?ad8d7e2d177d2473aecd9b35d16211fb\") format(\"woff\"),url(\"font/summernote.ttf?ad8d7e2d177d2473aecd9b35d16211fb\") format(\"truetype\")}[class^=\"note-icon-\"]:before,[class*=\" note-icon-\"]:before{display:inline-block;font:normal normal normal 14px summernote;font-size:inherit;-webkit-font-smoothing:antialiased;text-decoration:inherit;text-rendering:auto;text-transform:none;vertical-align:middle;speak:none;-moz-osx-font-smoothing:grayscale}.note-icon-align-center:before{content:\"\\f101\"}.note-icon-align-indent:before{content:\"\\f102\"}.note-icon-align-justify:before{content:\"\\f103\"}.note-icon-align-left:before{content:\"\\f104\"}.note-icon-align-outdent:before{content:\"\\f105\"}.note-icon-align-right:before{content:\"\\f106\"}.note-icon-align:before{content:\"\\f107\"}.note-icon-arrows-alt:before{content:\"\\f108\"}.note-icon-bold:before{content:\"\\f109\"}.note-icon-caret:before{content:\"\\f10a\"}.note-icon-chain-broken:before{content:\"\\f10b\"}.note-icon-circle:before{content:\"\\f10c\"}.note-icon-close:before{content:\"\\f10d\"}.note-icon-code:before{content:\"\\f10e\"}.note-icon-eraser:before{content:\"\\f10f\"}.note-icon-font:before{content:\"\\f110\"}.note-icon-frame:before{content:\"\\f111\"}.note-icon-italic:before{content:\"\\f112\"}.note-icon-link:before{content:\"\\f113\"}.note-icon-magic:before{content:\"\\f114\"}.note-icon-menu-check:before{content:\"\\f115\"}.note-icon-minus:before{content:\"\\f116\"}.note-icon-orderedlist:before{content:\"\\f117\"}.note-icon-pencil:before{content:\"\\f118\"}.note-icon-picture:before{content:\"\\f119\"}.note-icon-question:before{content:\"\\f11a\"}.note-icon-redo:before{content:\"\\f11b\"}.note-icon-special-character:before{content:\"\\f11c\"}.note-icon-square:before{content:\"\\f11d\"}.note-icon-strikethrough:before{content:\"\\f11e\"}.note-icon-subscript:before{content:\"\\f11f\"}.note-icon-summernote:before{content:\"\\f120\"}.note-icon-superscript:before{content:\"\\f121\"}.note-icon-table:before{content:\"\\f122\"}.note-icon-text-height:before{content:\"\\f123\"}.note-icon-trash:before{content:\"\\f124\"}.note-icon-underline:before{content:\"\\f125\"}.note-icon-undo:before{content:\"\\f126\"}.note-icon-unorderedlist:before{content:\"\\f127\"}.note-icon-video:before{content:\"\\f128\"}.note-editor{position:relative}.note-editor .note-dropzone{position:absolute;z-index:100;display:none;color:#87cefa;background-color:white;opacity:.95}.note-editor .note-dropzone .note-dropzone-message{display:table-cell;font-size:28px;font-weight:bold;text-align:center;vertical-align:middle}.note-editor .note-dropzone.hover{color:#098ddf}.note-editor.dragover .note-dropzone{display:table}.note-editor .note-editing-area{position:relative}.note-editor .note-editing-area .note-editable{outline:0}.note-editor .note-editing-area .note-editable sup{vertical-align:super}.note-editor .note-editing-area .note-editable sub{vertical-align:sub}.note-editor.note-frame{border:1px solid #a9a9a9}.note-editor.note-frame.codeview .note-editing-area .note-editable{display:none}.note-editor.note-frame.codeview .note-editing-area .note-codable{display:block}.note-editor.note-frame .note-editing-area{overflow:hidden}.note-editor.note-frame .note-editing-area .note-editable{padding:10px;overflow:auto;color:#000;background-color:#fff}.note-editor.note-frame .note-editing-area .note-editable[contenteditable=\"false\"]{background-color:#e5e5e5}.note-editor.note-frame .note-editing-area .note-codable{display:none;width:100%;padding:10px;margin-bottom:0;font-family:Menlo,Monaco,monospace,sans-serif;font-size:14px;color:#ccc;background-color:#222;border:0;-webkit-border-radius:0;-moz-border-radius:0;border-radius:0;box-shadow:none;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;resize:none}.note-editor.note-frame.fullscreen{position:fixed;top:0;left:0;z-index:1050;width:100%!important}.note-editor.note-frame.fullscreen .note-editable{background-color:white}.note-editor.note-frame.fullscreen .note-resizebar{display:none}.note-editor.note-frame .note-statusbar{background-color:#f5f5f5;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.note-editor.note-frame .note-statusbar .note-resizebar{width:100%;height:8px;padding-top:1px;cursor:ns-resize}.note-editor.note-frame .note-statusbar .note-resizebar .note-icon-bar{width:20px;margin:1px auto;border-top:1px solid #a9a9a9}.note-editor.note-frame .note-placeholder{padding:10px}.note-popover.popover{max-width:none}.note-popover.popover .popover-content a{display:inline-block;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}.note-popover.popover .arrow{left:20px!important}.note-popover .popover-content,.panel-heading.note-toolbar{padding:0 0 5px 5px;margin:0}.note-popover .popover-content>.btn-group,.panel-heading.note-toolbar>.btn-group{margin-top:5px;margin-right:5px;margin-left:0}.note-popover .popover-content .btn-group .note-table,.panel-heading.note-toolbar .btn-group .note-table{min-width:0;padding:5px}.note-popover .popover-content .btn-group .note-table .note-dimension-picker,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker{font-size:18px}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-mousecatcher,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-mousecatcher{position:absolute!important;z-index:3;width:10em;height:10em;cursor:pointer}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-unhighlighted,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-unhighlighted{position:relative!important;z-index:1;width:5em;height:5em;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIj4+Pjp6ekKlAqjAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKhmnaJzPAAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-highlighted,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-highlighted{position:absolute!important;z-index:2;width:1em;height:1em;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIjd6vvD2f9LKLW+AAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKwNDEVT0AAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat}.note-popover .popover-content .note-style h1,.panel-heading.note-toolbar .note-style h1,.note-popover .popover-content .note-style h2,.panel-heading.note-toolbar .note-style h2,.note-popover .popover-content .note-style h3,.panel-heading.note-toolbar .note-style h3,.note-popover .popover-content .note-style h4,.panel-heading.note-toolbar .note-style h4,.note-popover .popover-content .note-style h5,.panel-heading.note-toolbar .note-style h5,.note-popover .popover-content .note-style h6,.panel-heading.note-toolbar .note-style h6,.note-popover .popover-content .note-style blockquote,.panel-heading.note-toolbar .note-style blockquote{margin:0}.note-popover .popover-content .note-color .dropdown-toggle,.panel-heading.note-toolbar .note-color .dropdown-toggle{width:20px;padding-left:5px}.note-popover .popover-content .note-color .dropdown-menu,.panel-heading.note-toolbar .note-color .dropdown-menu{min-width:340px}.note-popover .popover-content .note-color .dropdown-menu .btn-group,.panel-heading.note-toolbar .note-color .dropdown-menu .btn-group{margin:0}.note-popover .popover-content .note-color .dropdown-menu .btn-group:first-child,.panel-heading.note-toolbar .note-color .dropdown-menu .btn-group:first-child{margin:0 5px}.note-popover .popover-content .note-color .dropdown-menu .btn-group .note-palette-title,.panel-heading.note-toolbar .note-color .dropdown-menu .btn-group .note-palette-title{margin:2px 7px;font-size:12px;text-align:center;border-bottom:1px solid #eee}.note-popover .popover-content .note-color .dropdown-menu .btn-group .note-color-reset,.panel-heading.note-toolbar .note-color .dropdown-menu .btn-group .note-color-reset{width:100%;padding:0 3px;margin:3px;font-size:11px;cursor:pointer;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px}.note-popover .popover-content .note-color .dropdown-menu .btn-group .note-color-row,.panel-heading.note-toolbar .note-color .dropdown-menu .btn-group .note-color-row{height:20px}.note-popover .popover-content .note-color .dropdown-menu .btn-group .note-color-reset:hover,.panel-heading.note-toolbar .note-color .dropdown-menu .btn-group .note-color-reset:hover{background:#eee}.note-popover .popover-content .note-para .dropdown-menu,.panel-heading.note-toolbar .note-para .dropdown-menu{min-width:216px;padding:5px}.note-popover .popover-content .note-para .dropdown-menu>div:first-child,.panel-heading.note-toolbar .note-para .dropdown-menu>div:first-child{margin-right:5px}.note-popover .popover-content .dropdown-menu,.panel-heading.note-toolbar .dropdown-menu{min-width:90px}.note-popover .popover-content .dropdown-menu.right,.panel-heading.note-toolbar .dropdown-menu.right{right:0;left:auto}.note-popover .popover-content .dropdown-menu.right::before,.panel-heading.note-toolbar .dropdown-menu.right::before{right:9px;left:auto!important}.note-popover .popover-content .dropdown-menu.right::after,.panel-heading.note-toolbar .dropdown-menu.right::after{right:10px;left:auto!important}.note-popover .popover-content .dropdown-menu.note-check li a i,.panel-heading.note-toolbar .dropdown-menu.note-check li a i{color:deepskyblue;visibility:hidden}.note-popover .popover-content .dropdown-menu.note-check li a.checked i,.panel-heading.note-toolbar .dropdown-menu.note-check li a.checked i{visibility:visible}.note-popover .popover-content .note-fontsize-10,.panel-heading.note-toolbar .note-fontsize-10{font-size:10px}.note-popover .popover-content .note-color-palette,.panel-heading.note-toolbar .note-color-palette{line-height:1}.note-popover .popover-content .note-color-palette div .note-color-btn,.panel-heading.note-toolbar .note-color-palette div .note-color-btn{width:20px;height:20px;padding:0;margin:0;border:1px solid #fff}.note-popover .popover-content .note-color-palette div .note-color-btn:hover,.panel-heading.note-toolbar .note-color-palette div .note-color-btn:hover{border:1px solid #000}.note-dialog>div{display:none}.note-dialog .form-group{margin-right:0;margin-left:0}.note-dialog .note-modal-form{margin:0}.note-dialog .note-image-dialog .note-dropzone{min-height:100px;margin-bottom:10px;font-size:30px;line-height:4;color:lightgray;text-align:center;border:4px dashed lightgray}@-moz-document url-prefix(){.note-image-input{height:auto}}.note-placeholder{position:absolute;display:none;color:gray}.note-handle .note-control-selection{position:absolute;display:none;border:1px solid black}.note-handle .note-control-selection>div{position:absolute}.note-handle .note-control-selection .note-control-selection-bg{width:100%;height:100%;background-color:black;-webkit-opacity:.3;-khtml-opacity:.3;-moz-opacity:.3;opacity:.3;-ms-filter:alpha(opacity=30);filter:alpha(opacity=30)}.note-handle .note-control-selection .note-control-handle{width:7px;height:7px;border:1px solid black}.note-handle .note-control-selection .note-control-holder{width:7px;height:7px;border:1px solid black}.note-handle .note-control-selection .note-control-sizing{width:7px;height:7px;background-color:white;border:1px solid black}.note-handle .note-control-selection .note-control-nw{top:-5px;left:-5px;border-right:0;border-bottom:0}.note-handle .note-control-selection .note-control-ne{top:-5px;right:-5px;border-bottom:0;border-left:none}.note-handle .note-control-selection .note-control-sw{bottom:-5px;left:-5px;border-top:0;border-right:0}.note-handle .note-control-selection .note-control-se{right:-5px;bottom:-5px;cursor:se-resize}.note-handle .note-control-selection .note-control-se.note-control-holder{cursor:default;border-top:0;border-left:none}.note-handle .note-control-selection .note-control-selection-info{right:0;bottom:0;padding:5px;margin:5px;font-size:12px;color:white;background-color:black;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;-webkit-opacity:.7;-khtml-opacity:.7;-moz-opacity:.7;opacity:.7;-ms-filter:alpha(opacity=70);filter:alpha(opacity=70)}.note-hint-popover{min-width:100px;padding:2px}.note-hint-popover .popover-content{max-height:150px;padding:3px;overflow:auto}.note-hint-popover .popover-content .note-hint-group .note-hint-item{display:block!important;padding:3px}.note-hint-popover .popover-content .note-hint-group .note-hint-item.active,.note-hint-popover .popover-content .note-hint-group .note-hint-item:hover{display:block;clear:both;font-weight:400;line-height:1.4;color:white;text-decoration:none;white-space:nowrap;cursor:pointer;background-color:#428bca;outline:0}"; });
 define('text!modules/acc/accHT.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../resources/elements/submenu.html'></compose>   \r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template>"; });
 define('text!modules/acc/accInstitute.html', ['module'], function(module) { module.exports = "<template>\r\n        <span id=\"loading\">\r\n            <ul class=\"bokeh\">\r\n                <li></li>\r\n                <li></li>\r\n                <li></li>\r\n            </ul>\r\n        </span>\r\n        <div show.bind=\"dataTable.displayArray && dataTable.displayArray.length || initialLoaded\">\r\n            <div show.bind=\"!institutionSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/institutionsTable.html\"></compose>\r\n            </div> <!-- Table Div -->\r\n            <div show.bind=\"institutionSelected\" class=\"col-lg-12\">\r\n                <compose view=\"./components/institutionsForm.html\"></compose>\r\n            </div> <!-- Form Div -->\r\n        </div> <!-- Panel Body -->\r\n    </template>"; });
-define('text!resources/css/styles.css', ['module'], function(module) { module.exports = "@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);\n\n.toast {\n    opacity: 1 !important;\n}\n\n.toolbar {\n    position:fixed;\n    z-index:1000;\n    width:100%;\n    top:91px;\n    left:0;\n    background-color:ghostwhite;\n}\n\n.panelContrastColor {\n    background-color:ghostwhite;\n}\n\n.positionUnderToolbar{\n    margin-top:50px;\n}\n\n.provisional {\n    background-color: cyan;\n}\n\n.existing {\n    background-color: LightGoldenRodYellow;\n}\n\n.danger {\n    background-color:deeppink;\n}\n\n.customFont {\n    font-family: 'Montserrat', sans-serif;\n}\n.card-header{\n    font-size: 1.640625rem;\n}\n\n.card-title {\n    padding: 5px;\n}\n\n.card-title {\n    background-color: rgba(0, 0, 0, 0.03);\n    border: 1px solid rgba(0, 0, 0, 0.125);\n}\n\n.bigLabel{\n    font-size: 1.5rem;\n}\n\n.btn-default{\n    background-color:white;\n}\n    .hover_img a { position:relative; }\n    .hover_img a span { position:absolute; display:none; z-index:99; }\n    .hover_img a:hover span { display:block; }\n\n    .hover {\n        position:absolute;\n        height: 200px;\n        width: 600px;\n        z-index:99;\n        display:none; \n        box-shadow: 10px 10px 5px #888888;\n        overflow: hidden;\n        background-color: white;\n        padding: 10px;\n    }\n\n.fixed\n{\n    position: fixed;\n    top: 20px;\n    right: 40px;\n}\n\n.bold {\n    font-weight: bold;\n}\n\n.redText {\n    color: purple;\n    font-weight: bolder !important;\n}\n\n.banner {\n    height: 50px;\n    width: 100%;\n    background-color: white;\n    border-bottom-style: solid;\n    border-bottom-width: 1px;\n}\n\n.banner #notice {\n    margin-left: 30px;\n    font-size: 1.25em;\n    color: indianred;\n}\n\n.browse .textContainer {\n    height: 430px;\n    line-height: 400px;\n}\n\n.textContainer h4 {\n    vertical-align: middle;\n    display: inline-block;\n}\n\n.vertical-align {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.table-borderless td,\n.table-borderless th {\n    border: 0 !important;\n}\n\n.topMargin {\n    margin-top: 25px;\n}\n\n.smallTopMargin {\n  margin-top: 5px;\n}\n\n.bottomMargin {\n    margin-bottom: 25px;\n}\n\n.leftMargin {\n    margin-left: 25px;\n}\n\n.rightMargin {\n  margin-right: 25px;\n}\n\n.smallLeftMargin {\n    margin-left: 10px;\n}\n\n.backColorOne {\n  background-color: ghostwhite;\n}\n\n.backColorTwo{\n  background-color: LightSalmon;\n}\n\n.backColorThree {\n  background-color: cyan;\n}\n\n.backColorFour{\n  background-color: lightgrey;\n}\n\n\n.bigTopMargin {\n    margin-top: 50px;\n}\n\n.bigLeftMargin {\n    margin-left: 50px;\n}\n\n.smallMarginTop {\n    margin-top: 5px;\n}\n\n.smallMarginRight {\n    margin-right: 10px;\n}\n\n.parallax1 {\n    /* The image used */\n    background-image: url(\"/img/parallax1.jpg\");\n\n    /* Set a specific height */\n    min-height: 300px;\n\n    /* Create the parallax scrolling effect */\n    background-attachment: fixed;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n.parallax2 {\n    /* The image used */\n    background-image: url(\"/img/parallax2.jpg\");\n\n    /* Set a specific height */\n    min-height: 200px;\n\n    /* Create the parallax scrolling effect */\n    background-attachment: fixed;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n.caption span.border {\n    background-color: #111;\n    color: #fff;\n    padding: 18px;\n    font-size: 25px;\n    letter-spacing: 10px;\n}\n\n.caption {\n  position: absolute;\n  left: 0;\n  top: 25%;\n  width: 100%;\n  text-align: center;\n  color: #000;\n}\n\n.center-text {\n   text-align: center;\n}\n\n.home-page-header{\n    text-align: center;\n    font-size: 30px;\n}\n\n.underline {\n    text-decoration: underline;\n}\n\n.subMenu{\n    position: relative;\n    top: -5px;\n    left: 0px;\n    width: 100%;\n}\n\n.subMenu-container {\n    position: fixed; /* Set the navbar to fixed position */\n    top: 5rem;\n    width: 100%;\n    z-index:99;\n}\n\n.hover {\n    position:absolute;\n    height: 200px;\n    width: 600px;\n    z-index:99;\n    display:none;\n    box-shadow: 10px 10px 5px #888888;\n    overflow: hidden;\n    background-color: white;\n    padding: 10px;\n}\n\n.hoverProfile {\n    position:absolute;\n    height: 250px;\n    width: 500px;\n    z-index:99;\n    display:none;\n    box-shadow: 10px 10px 5px #888888;\n    overflow: hidden;\n    background-color: white;\n    padding: 10px;\n     right:0;\n    bottom:0;\n}\n\n.overFlow {\n    overflow-y:scroll;\n}\n\n.carouselSize {\n    width:700px;\n    height:500px;\n}\n\n.carouselImage {\n    height:500px;\n}\n\n.weatherIcon {\n    height: 50px;\n    width: 50px;\n}\n\n.page-host {\n    margin-top: 10rem;\n}\n\nspan i {\n    cursor: pointer;\n}\n\n.sortable {\n    cursor: pointer;   \n}\n\n.aurelia-flatpickr {\n    background-color: white !important;\n}\n\n/* Dropdown Button */\n.dropbtn {\n    border: none;\n    cursor: pointer;\n}\n\n/* The container <div> - needed to position the dropdown content */\n.dropdown {\n    position: relative;\n    display: inline-block;\n}\n\n/* Dropdown Content (Hidden by Default) */\n.dropdown-content {\n    display: none;\n    position: absolute;\n    background-color: #f9f9f9;\n    min-width: 160px;\n    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);\n    z-index: 1;\n}\n\n/* Links inside the dropdown */\n.dropdown-content a {\n    color: black;\n    padding: 12px 16px;\n    text-decoration: none;\n    display: block;\n}\n\n/* Change color of dropdown links on hover */\n.dropdown-content a:hover {background-color: #f1f1f1}\n\n/* Show the dropdown menu on hover */\n.dropdown:hover .dropdown-content {\n    display: block;\n}\n\n/* Change the background color of the dropdown button when the dropdown content is shown */\n.dropdown:hover .dropbtn {\n    background-color: #3e8e41;\n}\n\n.smart-timeline{position:relative}\n.smart-timeline-list{list-style:none;margin:0;padding:0}\n.smart-timeline-list:after{content:\" \";background-color:#eee;position:absolute;display:block;width:2px;top:0;left:95px;bottom:0;z-index:1}\n.smart-timeline-list li{position:relative;margin:0;padding:15px 0}\n.smart-timeline-list>li:hover{background-color:#f4f4f4}\n.smart-timeline-hover li:hover{background-color:#f9f9f9}\n.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}\n.smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}\n.smart-timeline-time{float:left;width:70px;text-align:right}\n.smart-timeline-time>small{font-style:italic}\n.smart-timeline-content{margin-left:123px}\n\n\n/****** Style Star Rating Widget *****/\n\n.rating { \n  border: none;\n  float: left;\n}\n\n.rating > span > input { display: none; } \n.rating > span > label:before { \n  margin: 5px;\n  font-size: 1.25em;\n  font-family: FontAwesome;\n  display: inline-block;\n  content: \"\\f005\";\n}\n\n.rating > span > .half:before { \n  content: \"\\f089\";\n  position: absolute;\n}\n\n.rating > span > label { \n    color: #ddd; \n    float: right; \n}\n\n/***** CSS Magic to Highlight Stars on Hover *****/\n\n.rating > span > input:checked ~ label, /* show gold star when clicked */\n.rating:not(:checked) > span > label:hover, /* hover current star */\n.rating:not(:checked) > span > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */\n\n.rating > span > input:checked + label:hover, /* hover current star when changing rating */\n.rating > span >  input:checked ~ label:hover,\n.rating > span > label:hover ~ input:checked ~ label, /* lighten current selection */\n.rating > span > input:checked ~ label:hover ~ label { color: #FFED85;  }\n\n.link-shadow {\n    -webkit-box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);\n    -moz-box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);\n    box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);\n}\n\n#curriculumInfo{\n     display:none;\n}\n\nux-dialog-header {\n    background-color: #ffbd00 ;\n    color: white;\n}\n\n.col-centered{\n    float: none;\n    margin: 0 auto;\n}\n\n.circular--square {\n  border-radius: 50%;\n}\n\n@media only screen and (max-width: 800px) {\n    \n    /* Force table to not be like tables anymore */\n\t#no-more-tables table, \n\t#no-more-tables thead, \n\t#no-more-tables tbody, \n\t#no-more-tables th, \n\t#no-more-tables td, \n\t#no-more-tables tr { \n\t\tdisplay: block; \n\t}\n \n\t/* Hide table headers (but not display: none;, for accessibility) */\n\t#no-more-tables thead tr { \n\t\tposition: absolute;\n\t\ttop: -9999px;\n\t\tleft: -9999px;\n\t}\n \n\t#no-more-tables tr { border: 1px solid #ccc; }\n \n\t#no-more-tables td { \n\t\t/* Behave  like a \"row\" */\n\t\tborder: none;\n\t\tborder-bottom: 1px solid #eee; \n\t\tposition: relative;\n\t\tpadding-left: 50%; \n\t\twhite-space: normal;\n\t\ttext-align:left;\n\t}\n \n\t#no-more-tables td:before { \n\t\t/* Now like a table header */\n\t\tposition: absolute;\n\t\t/* Top/left values mimic padding */\n\t\ttop: 6px;\n\t\tleft: 6px;\n\t\twidth: 45%; \n\t\tpadding-right: 10px; \n\t\twhite-space: nowrap;\n\t\ttext-align:left;\n\t\tfont-weight: bold;\n\t}\n\n    .clickable{\n        cursor: pointer;   \n    }\n\n    .smallFont{\n        font-size: small;\n    }\n\n\t/*\n\tLabel the data\n\t*/\n    #no-more-tables td:before { content: attr(data-title); }\n    \n    }\n\n    #loading {\n        background: repeat scroll 0 0;\n        height: 100%;\n        left: 0;\n        margin: auto;\n        position: fixed;\n        top: 0;\n        width: 100%;\n        z-index:99;\n    }\n\n    .bokeh {\n        border: 0.01em solid rgba(150, 150, 150, 0.1);\n        border-radius: 50%;\n        font-size: 100px;\n        height: 1em;\n        list-style: outside none none;\n        margin: 0 auto;\n        position: relative;\n        top: 35%;\n        width: 1em;\n        z-index: 2147483647;\n    }\n    .bokeh li {\n        border-radius: 50%;\n        height: 0.2em;\n        position: absolute;\n        width: 0.2em;\n    }\n    .bokeh li:nth-child(1) {\n        animation: 1.13s linear 0s normal none infinite running rota, 3.67s ease-in-out 0s alternate none infinite running opa;\n        background: #00c176 none repeat scroll 0 0;\n        left: 50%;\n        margin: 0 0 0 -0.1em;\n        top: 0;\n        transform-origin: 50% 250% 0;\n    }\n    .bokeh li:nth-child(2) {\n        animation: 1.86s linear 0s normal none infinite running rota, 4.29s ease-in-out 0s alternate none infinite running opa;\n        background: #ff003c none repeat scroll 0 0;\n        margin: -0.1em 0 0;\n        right: 0;\n        top: 50%;\n        transform-origin: -150% 50% 0;\n    }\n    .bokeh li:nth-child(3) {\n        animation: 1.45s linear 0s normal none infinite running rota, 5.12s ease-in-out 0s alternate none infinite running opa;\n        background: #fabe28 none repeat scroll 0 0;\n        bottom: 0;\n        left: 50%;\n        margin: 0 0 0 -0.1em;\n        transform-origin: 50% -150% 0;\n    }\n    .bokeh li:nth-child(4) {\n        animation: 1.72s linear 0s normal none infinite running rota, 5.25s ease-in-out 0s alternate none infinite running opa;\n        background: #88c100 none repeat scroll 0 0;\n        margin: -0.1em 0 0;\n        top: 50%;\n        transform-origin: 250% 50% 0;\n    }\n    \n    .translucent{\n        opacity: 0.2;\n    }\n    \n    @keyframes opa {\n    12% {\n        opacity: 0.8;\n    }\n    19.5% {\n        opacity: 0.88;\n    }\n    37.2% {\n        opacity: 0.64;\n    }\n    40.5% {\n        opacity: 0.52;\n    }\n    52.7% {\n        opacity: 0.69;\n    }\n    60.2% {\n        opacity: 0.6;\n    }\n    66.6% {\n        opacity: 0.52;\n    }\n    70% {\n        opacity: 0.63;\n    }\n    79.9% {\n        opacity: 0.6;\n    }\n    84.2% {\n        opacity: 0.75;\n    }\n    91% {\n        opacity: 0.87;\n    }\n    }\n    \n    @keyframes rota {\n        100% {\n            transform: rotate(360deg);\n        }\n    }\n\n    /* Tabs panel */\n.tabbable-panel {\n  border:1px solid #eee;\n  padding: 10px;\n}\n\n/* Default mode */\n.tabbable-line > .nav-tabs {\n  border: none;\n  margin: 0px;\n}\n.tabbable-line > .nav-tabs > li {\n  margin-right: 2px;\n}\n.tabbable-line > .nav-tabs > li > a {\n  border: 0;\n  margin-right: 0;\n  color: #737373;\n}\n.tabbable-line > .nav-tabs > li > a > i {\n  color: #a6a6a6;\n}\n.tabbable-line > .nav-tabs > li.open, .tabbable-line > .nav-tabs > li:hover {\n  border-bottom: 4px solid #fbcdcf;\n}\n.tabbable-line > .nav-tabs > li.open > a, .tabbable-line > .nav-tabs > li:hover > a {\n  border: 0;\n  background: none !important;\n  color: #333333;\n}\n.tabbable-line > .nav-tabs > li.open > a > i, .tabbable-line > .nav-tabs > li:hover > a > i {\n  color: #a6a6a6;\n}\n.tabbable-line > .nav-tabs > li.open .dropdown-menu, .tabbable-line > .nav-tabs > li:hover .dropdown-menu {\n  margin-top: 0px;\n}\n.tabbable-line > .nav-tabs > li.active {\n  border-bottom: 4px solid #f3565d;\n  position: relative;\n}\n.tabbable-line > .nav-tabs > li.active > a {\n  border: 0;\n  color: #333333;\n}\n.tabbable-line > .nav-tabs > li.active > a > i {\n  color: #404040;\n}\n.tabbable-line > .tab-content {\n  margin-top: -3px;\n  background-color: #fff;\n  border: 0;\n  border-top: 1px solid #eee;\n  padding: 15px 0;\n}\n.portlet .tabbable-line > .tab-content {\n  padding-bottom: 0;\n}\n\n/* Below tabs mode */\n\n.tabbable-line.tabs-below > .nav-tabs > li {\n  border-top: 4px solid transparent;\n}\n.tabbable-line.tabs-below > .nav-tabs > li > a {\n  margin-top: 0;\n}\n.tabbable-line.tabs-below > .nav-tabs > li:hover {\n  border-bottom: 0;\n  border-top: 4px solid #fbcdcf;\n}\n.tabbable-line.tabs-below > .nav-tabs > li.active {\n  margin-bottom: -2px;\n  border-bottom: 0;\n  border-top: 4px solid #f3565d;\n}\n.tabbable-line.tabs-below > .tab-content {\n  margin-top: -10px;\n  border-top: 0;\n  border-bottom: 1px solid #eee;\n  padding-bottom: 15px;\n}\n"; });
+define('text!resources/css/styles.css', ['module'], function(module) { module.exports = "@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);\n\n.toast {\n    opacity: 1 !important;\n}\n\n.assignedColor {\n  background-color: #dff0d8;\n}\n\n.toolbar {\n    position:fixed;\n    z-index:1000;\n    width:100%;\n    top:91px;\n    left:0;\n    background-color:ghostwhite;\n}\n\n.panelContrastColor {\n    background-color:ghostwhite;\n}\n\n.positionUnderToolbar{\n    margin-top:50px;\n}\n\n.provisional {\n    background-color: cyan;\n}\n\n.existing {\n    background-color: LightGoldenRodYellow;\n}\n\n.danger {\n    background-color:deeppink;\n}\n\n.customFont {\n    font-family: 'Montserrat', sans-serif;\n}\n.card-header{\n    font-size: 1.640625rem;\n}\n\n.card-title {\n    padding: 5px;\n}\n\n.card-title {\n    background-color: rgba(0, 0, 0, 0.03);\n    border: 1px solid rgba(0, 0, 0, 0.125);\n}\n\n.bigLabel{\n    font-size: 1.5rem;\n}\n\n.btn-default{\n    background-color:white;\n}\n    .hover_img a { position:relative; }\n    .hover_img a span { position:absolute; display:none; z-index:99; }\n    .hover_img a:hover span { display:block; }\n\n    .hover {\n        position:absolute;\n        height: 200px;\n        width: 600px;\n        z-index:99;\n        display:none; \n        box-shadow: 10px 10px 5px #888888;\n        overflow: hidden;\n        background-color: white;\n        padding: 10px;\n    }\n\n.fixed\n{\n    position: fixed;\n    top: 20px;\n    right: 40px;\n}\n\n.bold {\n    font-weight: bold;\n}\n\n.redText {\n    color: purple;\n    font-weight: bolder !important;\n}\n\n.banner {\n    height: 50px;\n    width: 100%;\n    background-color: white;\n    border-bottom-style: solid;\n    border-bottom-width: 1px;\n}\n\n.banner #notice {\n    margin-left: 30px;\n    font-size: 1.25em;\n    color: indianred;\n}\n\n.browse .textContainer {\n    height: 430px;\n    line-height: 400px;\n}\n\n.textContainer h4 {\n    vertical-align: middle;\n    display: inline-block;\n}\n\n.vertical-align {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.table-borderless td,\n.table-borderless th {\n    border: 0 !important;\n}\n\n.topMargin {\n    margin-top: 25px;\n}\n\n.smallTopMargin {\n  margin-top: 5px;\n}\n\n.bottomMargin {\n    margin-bottom: 25px;\n}\n\n.leftMargin {\n    margin-left: 25px;\n}\n\n.rightMargin {\n  margin-right: 25px;\n}\n\n.smallLeftMargin {\n    margin-left: 10px;\n}\n\n.backColorOne {\n  background-color: ghostwhite;\n}\n\n.backColorTwo{\n  background-color: LightSalmon;\n}\n\n.backColorThree {\n  background-color: cyan;\n}\n\n.backColorFour{\n  background-color: lightgrey;\n}\n\n\n.bigTopMargin {\n    margin-top: 50px;\n}\n\n.bigLeftMargin {\n    margin-left: 50px;\n}\n\n.smallMarginTop {\n    margin-top: 5px;\n}\n\n.smallMarginRight {\n    margin-right: 10px;\n}\n\n.parallax1 {\n    /* The image used */\n    background-image: url(\"/img/parallax1.jpg\");\n\n    /* Set a specific height */\n    min-height: 300px;\n\n    /* Create the parallax scrolling effect */\n    background-attachment: fixed;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n.parallax2 {\n    /* The image used */\n    background-image: url(\"/img/parallax2.jpg\");\n\n    /* Set a specific height */\n    min-height: 200px;\n\n    /* Create the parallax scrolling effect */\n    background-attachment: fixed;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n.caption span.border {\n    background-color: #111;\n    color: #fff;\n    padding: 18px;\n    font-size: 25px;\n    letter-spacing: 10px;\n}\n\n.caption {\n  position: absolute;\n  left: 0;\n  top: 25%;\n  width: 100%;\n  text-align: center;\n  color: #000;\n}\n\n.center-text {\n   text-align: center;\n}\n\n.home-page-header{\n    text-align: center;\n    font-size: 30px;\n}\n\n.underline {\n    text-decoration: underline;\n}\n\n.subMenu{\n    position: relative;\n    top: -5px;\n    left: 0px;\n    width: 100%;\n}\n\n.subMenu-container {\n    position: fixed; /* Set the navbar to fixed position */\n    top: 5rem;\n    width: 100%;\n    z-index:99;\n}\n\n.hover {\n    position:absolute;\n    height: 200px;\n    width: 600px;\n    z-index:99;\n    display:none;\n    box-shadow: 10px 10px 5px #888888;\n    overflow: hidden;\n    background-color: white;\n    padding: 10px;\n}\n\n.hoverProfile {\n    position:absolute;\n    height: 250px;\n    width: 500px;\n    z-index:99;\n    display:none;\n    box-shadow: 10px 10px 5px #888888;\n    overflow: hidden;\n    background-color: white;\n    padding: 10px;\n     right:0;\n    bottom:0;\n}\n\n.overFlow {\n    overflow-y:scroll;\n}\n\n.carouselSize {\n    width:700px;\n    height:500px;\n}\n\n.carouselImage {\n    height:500px;\n}\n\n.weatherIcon {\n    height: 50px;\n    width: 50px;\n}\n\n.page-host {\n    margin-top: 10rem;\n}\n\nspan i {\n    cursor: pointer;\n}\n\n.sortable {\n    cursor: pointer;   \n}\n\n.aurelia-flatpickr {\n    background-color: white !important;\n}\n\n/* Dropdown Button */\n.dropbtn {\n    border: none;\n    cursor: pointer;\n}\n\n/* The container <div> - needed to position the dropdown content */\n.dropdown {\n    position: relative;\n    display: inline-block;\n}\n\n/* Dropdown Content (Hidden by Default) */\n.dropdown-content {\n    display: none;\n    position: absolute;\n    background-color: #f9f9f9;\n    min-width: 160px;\n    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);\n    z-index: 1;\n}\n\n/* Links inside the dropdown */\n.dropdown-content a {\n    color: black;\n    padding: 12px 16px;\n    text-decoration: none;\n    display: block;\n}\n\n/* Change color of dropdown links on hover */\n.dropdown-content a:hover {background-color: #f1f1f1}\n\n/* Show the dropdown menu on hover */\n.dropdown:hover .dropdown-content {\n    display: block;\n}\n\n/* Change the background color of the dropdown button when the dropdown content is shown */\n.dropdown:hover .dropbtn {\n    background-color: #3e8e41;\n}\n\n.smart-timeline{position:relative}\n.smart-timeline-list{list-style:none;margin:0;padding:0}\n.smart-timeline-list:after{content:\" \";background-color:#eee;position:absolute;display:block;width:2px;top:0;left:95px;bottom:0;z-index:1}\n.smart-timeline-list li{position:relative;margin:0;padding:15px 0}\n.smart-timeline-list>li:hover{background-color:#f4f4f4}\n.smart-timeline-hover li:hover{background-color:#f9f9f9}\n.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}\n.smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}\n.smart-timeline-time{float:left;width:70px;text-align:right}\n.smart-timeline-time>small{font-style:italic}\n.smart-timeline-content{margin-left:123px}\n\n\n/****** Style Star Rating Widget *****/\n\n.rating { \n  border: none;\n  float: left;\n}\n\n.rating > span > input { display: none; } \n.rating > span > label:before { \n  margin: 5px;\n  font-size: 1.25em;\n  font-family: FontAwesome;\n  display: inline-block;\n  content: \"\\f005\";\n}\n\n.rating > span > .half:before { \n  content: \"\\f089\";\n  position: absolute;\n}\n\n.rating > span > label { \n    color: #ddd; \n    float: right; \n}\n\n/***** CSS Magic to Highlight Stars on Hover *****/\n\n.rating > span > input:checked ~ label, /* show gold star when clicked */\n.rating:not(:checked) > span > label:hover, /* hover current star */\n.rating:not(:checked) > span > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */\n\n.rating > span > input:checked + label:hover, /* hover current star when changing rating */\n.rating > span >  input:checked ~ label:hover,\n.rating > span > label:hover ~ input:checked ~ label, /* lighten current selection */\n.rating > span > input:checked ~ label:hover ~ label { color: #FFED85;  }\n\n.link-shadow {\n    -webkit-box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);\n    -moz-box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);\n    box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);\n}\n\n#curriculumInfo{\n     display:none;\n}\n\nux-dialog-header {\n    background-color: #ffbd00 ;\n    color: white;\n}\n\n.col-centered{\n    float: none;\n    margin: 0 auto;\n}\n\n.circular--square {\n  border-radius: 50%;\n}\n\n@media only screen and (max-width: 800px) {\n    \n    /* Force table to not be like tables anymore */\n\t#no-more-tables table, \n\t#no-more-tables thead, \n\t#no-more-tables tbody, \n\t#no-more-tables th, \n\t#no-more-tables td, \n\t#no-more-tables tr { \n\t\tdisplay: block; \n\t}\n \n\t/* Hide table headers (but not display: none;, for accessibility) */\n\t#no-more-tables thead tr { \n\t\tposition: absolute;\n\t\ttop: -9999px;\n\t\tleft: -9999px;\n\t}\n \n\t#no-more-tables tr { border: 1px solid #ccc; }\n \n\t#no-more-tables td { \n\t\t/* Behave  like a \"row\" */\n\t\tborder: none;\n\t\tborder-bottom: 1px solid #eee; \n\t\tposition: relative;\n\t\tpadding-left: 50%; \n\t\twhite-space: normal;\n\t\ttext-align:left;\n\t}\n \n\t#no-more-tables td:before { \n\t\t/* Now like a table header */\n\t\tposition: absolute;\n\t\t/* Top/left values mimic padding */\n\t\ttop: 6px;\n\t\tleft: 6px;\n\t\twidth: 45%; \n\t\tpadding-right: 10px; \n\t\twhite-space: nowrap;\n\t\ttext-align:left;\n\t\tfont-weight: bold;\n\t}\n\n    .clickable{\n        cursor: pointer;   \n    }\n\n    .smallFont{\n        font-size: small;\n    }\n\n\t/*\n\tLabel the data\n\t*/\n    #no-more-tables td:before { content: attr(data-title); }\n    \n    }\n\n    #loading {\n        background: repeat scroll 0 0;\n        height: 100%;\n        left: 0;\n        margin: auto;\n        position: fixed;\n        top: 0;\n        width: 100%;\n        z-index:99;\n    }\n\n    .bokeh {\n        border: 0.01em solid rgba(150, 150, 150, 0.1);\n        border-radius: 50%;\n        font-size: 100px;\n        height: 1em;\n        list-style: outside none none;\n        margin: 0 auto;\n        position: relative;\n        top: 35%;\n        width: 1em;\n        z-index: 2147483647;\n    }\n    .bokeh li {\n        border-radius: 50%;\n        height: 0.2em;\n        position: absolute;\n        width: 0.2em;\n    }\n    .bokeh li:nth-child(1) {\n        animation: 1.13s linear 0s normal none infinite running rota, 3.67s ease-in-out 0s alternate none infinite running opa;\n        background: #00c176 none repeat scroll 0 0;\n        left: 50%;\n        margin: 0 0 0 -0.1em;\n        top: 0;\n        transform-origin: 50% 250% 0;\n    }\n    .bokeh li:nth-child(2) {\n        animation: 1.86s linear 0s normal none infinite running rota, 4.29s ease-in-out 0s alternate none infinite running opa;\n        background: #ff003c none repeat scroll 0 0;\n        margin: -0.1em 0 0;\n        right: 0;\n        top: 50%;\n        transform-origin: -150% 50% 0;\n    }\n    .bokeh li:nth-child(3) {\n        animation: 1.45s linear 0s normal none infinite running rota, 5.12s ease-in-out 0s alternate none infinite running opa;\n        background: #fabe28 none repeat scroll 0 0;\n        bottom: 0;\n        left: 50%;\n        margin: 0 0 0 -0.1em;\n        transform-origin: 50% -150% 0;\n    }\n    .bokeh li:nth-child(4) {\n        animation: 1.72s linear 0s normal none infinite running rota, 5.25s ease-in-out 0s alternate none infinite running opa;\n        background: #88c100 none repeat scroll 0 0;\n        margin: -0.1em 0 0;\n        top: 50%;\n        transform-origin: 250% 50% 0;\n    }\n    \n    .translucent{\n        opacity: 0.2;\n    }\n    \n    @keyframes opa {\n    12% {\n        opacity: 0.8;\n    }\n    19.5% {\n        opacity: 0.88;\n    }\n    37.2% {\n        opacity: 0.64;\n    }\n    40.5% {\n        opacity: 0.52;\n    }\n    52.7% {\n        opacity: 0.69;\n    }\n    60.2% {\n        opacity: 0.6;\n    }\n    66.6% {\n        opacity: 0.52;\n    }\n    70% {\n        opacity: 0.63;\n    }\n    79.9% {\n        opacity: 0.6;\n    }\n    84.2% {\n        opacity: 0.75;\n    }\n    91% {\n        opacity: 0.87;\n    }\n    }\n    \n    @keyframes rota {\n        100% {\n            transform: rotate(360deg);\n        }\n    }\n\n    /* Tabs panel */\n.tabbable-panel {\n  border:1px solid #eee;\n  padding: 10px;\n}\n\n/* Default mode */\n.tabbable-line > .nav-tabs {\n  border: none;\n  margin: 0px;\n}\n.tabbable-line > .nav-tabs > li {\n  margin-right: 2px;\n}\n.tabbable-line > .nav-tabs > li > a {\n  border: 0;\n  margin-right: 0;\n  color: #737373;\n}\n.tabbable-line > .nav-tabs > li > a > i {\n  color: #a6a6a6;\n}\n.tabbable-line > .nav-tabs > li.open, .tabbable-line > .nav-tabs > li:hover {\n  border-bottom: 4px solid #fbcdcf;\n}\n.tabbable-line > .nav-tabs > li.open > a, .tabbable-line > .nav-tabs > li:hover > a {\n  border: 0;\n  background: none !important;\n  color: #333333;\n}\n.tabbable-line > .nav-tabs > li.open > a > i, .tabbable-line > .nav-tabs > li:hover > a > i {\n  color: #a6a6a6;\n}\n.tabbable-line > .nav-tabs > li.open .dropdown-menu, .tabbable-line > .nav-tabs > li:hover .dropdown-menu {\n  margin-top: 0px;\n}\n.tabbable-line > .nav-tabs > li.active {\n  border-bottom: 4px solid #f3565d;\n  position: relative;\n}\n.tabbable-line > .nav-tabs > li.active > a {\n  border: 0;\n  color: #333333;\n}\n.tabbable-line > .nav-tabs > li.active > a > i {\n  color: #404040;\n}\n.tabbable-line > .tab-content {\n  margin-top: -3px;\n  background-color: #fff;\n  border: 0;\n  border-top: 1px solid #eee;\n  padding: 15px 0;\n}\n.portlet .tabbable-line > .tab-content {\n  padding-bottom: 0;\n}\n\n/* Below tabs mode */\n\n.tabbable-line.tabs-below > .nav-tabs > li {\n  border-top: 4px solid transparent;\n}\n.tabbable-line.tabs-below > .nav-tabs > li > a {\n  margin-top: 0;\n}\n.tabbable-line.tabs-below > .nav-tabs > li:hover {\n  border-bottom: 0;\n  border-top: 4px solid #fbcdcf;\n}\n.tabbable-line.tabs-below > .nav-tabs > li.active {\n  margin-bottom: -2px;\n  border-bottom: 0;\n  border-top: 4px solid #f3565d;\n}\n.tabbable-line.tabs-below > .tab-content {\n  margin-top: -10px;\n  border-top: 0;\n  border-bottom: 1px solid #eee;\n  padding-bottom: 15px;\n}\n"; });
 define('text!modules/acc/accInstitutions.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../resources/elements/submenu.html'></compose>\r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template>"; });
 define('text!resources/css/summernote.css', ['module'], function(module) { module.exports = "@font-face{font-family:\"summernote\";font-style:normal;font-weight:normal;src:url(\"./font/summernote.eot?dbafe969167589eda84514394d126413\");src:url(\"./font/summernote.eot?#iefix\") format(\"embedded-opentype\"),url(\"./font/summernote.woff?dbafe969167589eda84514394d126413\") format(\"woff\"),url(\"./font/summernote.ttf?dbafe969167589eda84514394d126413\") format(\"truetype\")}[class^=\"note-icon-\"]:before,[class*=\" note-icon-\"]:before{display:inline-block;font:normal normal normal 14px summernote;font-size:inherit;-webkit-font-smoothing:antialiased;text-decoration:inherit;text-rendering:auto;text-transform:none;vertical-align:middle;speak:none;-moz-osx-font-smoothing:grayscale}.note-icon-align-center:before,.note-icon-align-indent:before,.note-icon-align-justify:before,.note-icon-align-left:before,.note-icon-align-outdent:before,.note-icon-align-right:before,.note-icon-align:before,.note-icon-arrow-circle-down:before,.note-icon-arrow-circle-left:before,.note-icon-arrow-circle-right:before,.note-icon-arrow-circle-up:before,.note-icon-arrows-alt:before,.note-icon-arrows-h:before,.note-icon-arrows-v:before,.note-icon-bold:before,.note-icon-caret:before,.note-icon-chain-broken:before,.note-icon-circle:before,.note-icon-close:before,.note-icon-code:before,.note-icon-col-after:before,.note-icon-col-before:before,.note-icon-col-remove:before,.note-icon-eraser:before,.note-icon-font:before,.note-icon-frame:before,.note-icon-italic:before,.note-icon-link:before,.note-icon-magic:before,.note-icon-menu-check:before,.note-icon-minus:before,.note-icon-orderedlist:before,.note-icon-pencil:before,.note-icon-picture:before,.note-icon-question:before,.note-icon-redo:before,.note-icon-row-above:before,.note-icon-row-below:before,.note-icon-row-remove:before,.note-icon-special-character:before,.note-icon-square:before,.note-icon-strikethrough:before,.note-icon-subscript:before,.note-icon-summernote:before,.note-icon-superscript:before,.note-icon-table:before,.note-icon-text-height:before,.note-icon-trash:before,.note-icon-underline:before,.note-icon-undo:before,.note-icon-unorderedlist:before,.note-icon-video:before{display:inline-block;font-family:\"summernote\";font-style:normal;font-weight:normal;text-decoration:inherit}.note-icon-align-center:before{content:\"\\f101\"}.note-icon-align-indent:before{content:\"\\f102\"}.note-icon-align-justify:before{content:\"\\f103\"}.note-icon-align-left:before{content:\"\\f104\"}.note-icon-align-outdent:before{content:\"\\f105\"}.note-icon-align-right:before{content:\"\\f106\"}.note-icon-align:before{content:\"\\f107\"}.note-icon-arrow-circle-down:before{content:\"\\f108\"}.note-icon-arrow-circle-left:before{content:\"\\f109\"}.note-icon-arrow-circle-right:before{content:\"\\f10a\"}.note-icon-arrow-circle-up:before{content:\"\\f10b\"}.note-icon-arrows-alt:before{content:\"\\f10c\"}.note-icon-arrows-h:before{content:\"\\f10d\"}.note-icon-arrows-v:before{content:\"\\f10e\"}.note-icon-bold:before{content:\"\\f10f\"}.note-icon-caret:before{content:\"\\f110\"}.note-icon-chain-broken:before{content:\"\\f111\"}.note-icon-circle:before{content:\"\\f112\"}.note-icon-close:before{content:\"\\f113\"}.note-icon-code:before{content:\"\\f114\"}.note-icon-col-after:before{content:\"\\f115\"}.note-icon-col-before:before{content:\"\\f116\"}.note-icon-col-remove:before{content:\"\\f117\"}.note-icon-eraser:before{content:\"\\f118\"}.note-icon-font:before{content:\"\\f119\"}.note-icon-frame:before{content:\"\\f11a\"}.note-icon-italic:before{content:\"\\f11b\"}.note-icon-link:before{content:\"\\f11c\"}.note-icon-magic:before{content:\"\\f11d\"}.note-icon-menu-check:before{content:\"\\f11e\"}.note-icon-minus:before{content:\"\\f11f\"}.note-icon-orderedlist:before{content:\"\\f120\"}.note-icon-pencil:before{content:\"\\f121\"}.note-icon-picture:before{content:\"\\f122\"}.note-icon-question:before{content:\"\\f123\"}.note-icon-redo:before{content:\"\\f124\"}.note-icon-row-above:before{content:\"\\f125\"}.note-icon-row-below:before{content:\"\\f126\"}.note-icon-row-remove:before{content:\"\\f127\"}.note-icon-special-character:before{content:\"\\f128\"}.note-icon-square:before{content:\"\\f129\"}.note-icon-strikethrough:before{content:\"\\f12a\"}.note-icon-subscript:before{content:\"\\f12b\"}.note-icon-summernote:before{content:\"\\f12c\"}.note-icon-superscript:before{content:\"\\f12d\"}.note-icon-table:before{content:\"\\f12e\"}.note-icon-text-height:before{content:\"\\f12f\"}.note-icon-trash:before{content:\"\\f130\"}.note-icon-underline:before{content:\"\\f131\"}.note-icon-undo:before{content:\"\\f132\"}.note-icon-unorderedlist:before{content:\"\\f133\"}.note-icon-video:before{content:\"\\f134\"}.note-editor{position:relative}.note-editor .note-dropzone{position:absolute;z-index:100;display:none;color:#87cefa;background-color:#fff;opacity:.95}.note-editor .note-dropzone .note-dropzone-message{display:table-cell;font-size:28px;font-weight:700;text-align:center;vertical-align:middle}.note-editor .note-dropzone.hover{color:#098ddf}.note-editor.dragover .note-dropzone{display:table}.note-editor .note-editing-area{position:relative}.note-editor .note-editing-area .note-editable{outline:0}.note-editor .note-editing-area .note-editable sup{vertical-align:super}.note-editor .note-editing-area .note-editable sub{vertical-align:sub}.note-editor .note-editing-area img.note-float-left{margin-right:10px}.note-editor .note-editing-area img.note-float-right{margin-left:10px}.note-editor.note-frame{border:1px solid #a9a9a9}.note-editor.note-frame.codeview .note-editing-area .note-editable{display:none}.note-editor.note-frame.codeview .note-editing-area .note-codable{display:block}.note-editor.note-frame .note-editing-area{overflow:hidden}.note-editor.note-frame .note-editing-area .note-editable{padding:10px;overflow:auto;color:#000;word-wrap:break-word;background-color:#fff}.note-editor.note-frame .note-editing-area .note-editable[contenteditable=\"false\"]{background-color:#e5e5e5}.note-editor.note-frame .note-editing-area .note-codable{display:none;width:100%;padding:10px;margin-bottom:0;font-family:Menlo,Monaco,monospace,sans-serif;font-size:14px;color:#ccc;background-color:#222;border:0;-webkit-border-radius:0;-moz-border-radius:0;border-radius:0;box-shadow:none;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;resize:none}.note-editor.note-frame.fullscreen{position:fixed;top:0;left:0;z-index:1050;width:100%!important}.note-editor.note-frame.fullscreen .note-editable{background-color:#fff}.note-editor.note-frame.fullscreen .note-resizebar{display:none}.note-editor.note-frame .note-status-output{display:block;width:100%;height:20px;margin-bottom:0;font-size:14px;line-height:1.42857143;color:#000;border:0;border-top:1px solid #e2e2e2}.note-editor.note-frame .note-status-output:empty{height:0;border-top:0 solid transparent}.note-editor.note-frame .note-status-output .pull-right{float:right!important}.note-editor.note-frame .note-status-output .text-muted{color:#777}.note-editor.note-frame .note-status-output .text-primary{color:#286090}.note-editor.note-frame .note-status-output .text-success{color:#3c763d}.note-editor.note-frame .note-status-output .text-info{color:#31708f}.note-editor.note-frame .note-status-output .text-warning{color:#8a6d3b}.note-editor.note-frame .note-status-output .text-danger{color:#a94442}.note-editor.note-frame .note-status-output .alert{padding:7px 10px 2px 10px;margin:-7px 0 0 0;color:#000;background-color:#f5f5f5;border-radius:0}.note-editor.note-frame .note-status-output .alert .note-icon{margin-right:5px}.note-editor.note-frame .note-status-output .alert-success{color:#3c763d!important;background-color:#dff0d8!important}.note-editor.note-frame .note-status-output .alert-info{color:#31708f!important;background-color:#d9edf7!important}.note-editor.note-frame .note-status-output .alert-warning{color:#8a6d3b!important;background-color:#fcf8e3!important}.note-editor.note-frame .note-status-output .alert-danger{color:#a94442!important;background-color:#f2dede!important}.note-editor.note-frame .note-statusbar{background-color:#f5f5f5;border-top:1px solid #ddd;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.note-editor.note-frame .note-statusbar .note-resizebar{width:100%;height:9px;padding-top:1px;cursor:ns-resize}.note-editor.note-frame .note-statusbar .note-resizebar .note-icon-bar{width:20px;margin:1px auto;border-top:1px solid #a9a9a9}.note-editor.note-frame .note-statusbar.locked .note-resizebar{cursor:default}.note-editor.note-frame .note-statusbar.locked .note-resizebar .note-icon-bar{display:none}.note-editor.note-frame .note-placeholder{padding:10px}.note-popover.popover{max-width:none}.note-popover.popover .popover-content a{display:inline-block;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}.note-popover.popover .arrow{left:20px!important}.note-toolbar{position:relative;z-index:500}.note-popover .popover-content,.panel-heading.note-toolbar{padding:0 0 5px 5px;margin:0}.note-popover .popover-content>.btn-group,.panel-heading.note-toolbar>.btn-group{margin-top:5px;margin-right:5px;margin-left:0}.note-popover .popover-content .btn-group .note-table,.panel-heading.note-toolbar .btn-group .note-table{min-width:0;padding:5px}.note-popover .popover-content .btn-group .note-table .note-dimension-picker,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker{font-size:18px}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-mousecatcher,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-mousecatcher{position:absolute!important;z-index:3;width:10em;height:10em;cursor:pointer}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-unhighlighted,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-unhighlighted{position:relative!important;z-index:1;width:5em;height:5em;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIj4+Pjp6ekKlAqjAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKhmnaJzPAAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-highlighted,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-highlighted{position:absolute!important;z-index:2;width:1em;height:1em;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIjd6vvD2f9LKLW+AAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKwNDEVT0AAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat}.note-popover .popover-content .note-style .dropdown-style blockquote,.panel-heading.note-toolbar .note-style .dropdown-style blockquote,.note-popover .popover-content .note-style .dropdown-style pre,.panel-heading.note-toolbar .note-style .dropdown-style pre{padding:5px 10px;margin:0}.note-popover .popover-content .note-style .dropdown-style h1,.panel-heading.note-toolbar .note-style .dropdown-style h1,.note-popover .popover-content .note-style .dropdown-style h2,.panel-heading.note-toolbar .note-style .dropdown-style h2,.note-popover .popover-content .note-style .dropdown-style h3,.panel-heading.note-toolbar .note-style .dropdown-style h3,.note-popover .popover-content .note-style .dropdown-style h4,.panel-heading.note-toolbar .note-style .dropdown-style h4,.note-popover .popover-content .note-style .dropdown-style h5,.panel-heading.note-toolbar .note-style .dropdown-style h5,.note-popover .popover-content .note-style .dropdown-style h6,.panel-heading.note-toolbar .note-style .dropdown-style h6,.note-popover .popover-content .note-style .dropdown-style p,.panel-heading.note-toolbar .note-style .dropdown-style p{padding:0;margin:0}.note-popover .popover-content .note-color .dropdown-toggle,.panel-heading.note-toolbar .note-color .dropdown-toggle{width:20px;padding-left:5px}.note-popover .popover-content .note-color .dropdown-menu,.panel-heading.note-toolbar .note-color .dropdown-menu{min-width:337px}.note-popover .popover-content .note-color .dropdown-menu .note-palette,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette{display:inline-block;width:160px;margin:0}.note-popover .popover-content .note-color .dropdown-menu .note-palette:first-child,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette:first-child{margin:0 5px}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-palette-title,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-palette-title{margin:2px 7px;font-size:12px;text-align:center;border-bottom:1px solid #eee}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset{width:100%;padding:0 3px;margin:3px;font-size:11px;cursor:pointer;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-row,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-row{height:20px}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset:hover,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset:hover{background:#eee}.note-popover .popover-content .note-para .dropdown-menu,.panel-heading.note-toolbar .note-para .dropdown-menu{min-width:216px;padding:5px}.note-popover .popover-content .note-para .dropdown-menu>div:first-child,.panel-heading.note-toolbar .note-para .dropdown-menu>div:first-child{margin-right:5px}.note-popover .popover-content .dropdown-menu,.panel-heading.note-toolbar .dropdown-menu{min-width:90px}.note-popover .popover-content .dropdown-menu.right,.panel-heading.note-toolbar .dropdown-menu.right{right:0;left:auto}.note-popover .popover-content .dropdown-menu.right::before,.panel-heading.note-toolbar .dropdown-menu.right::before{right:9px;left:auto!important}.note-popover .popover-content .dropdown-menu.right::after,.panel-heading.note-toolbar .dropdown-menu.right::after{right:10px;left:auto!important}.note-popover .popover-content .dropdown-menu.note-check li a i,.panel-heading.note-toolbar .dropdown-menu.note-check li a i{color:deepskyblue;visibility:hidden}.note-popover .popover-content .dropdown-menu.note-check li a.checked i,.panel-heading.note-toolbar .dropdown-menu.note-check li a.checked i{visibility:visible}.note-popover .popover-content .note-fontsize-10,.panel-heading.note-toolbar .note-fontsize-10{font-size:10px}.note-popover .popover-content .note-color-palette,.panel-heading.note-toolbar .note-color-palette{line-height:1}.note-popover .popover-content .note-color-palette div .note-color-btn,.panel-heading.note-toolbar .note-color-palette div .note-color-btn{width:20px;height:20px;padding:0;margin:0;border:1px solid #fff}.note-popover .popover-content .note-color-palette div .note-color-btn:hover,.panel-heading.note-toolbar .note-color-palette div .note-color-btn:hover{border:1px solid #000}.note-dialog>div{display:none}.note-dialog .form-group{margin-right:0;margin-left:0}.note-dialog .note-modal-form{margin:0}.note-dialog .note-image-dialog .note-dropzone{min-height:100px;margin-bottom:10px;font-size:30px;line-height:4;color:lightgray;text-align:center;border:4px dashed lightgray}@-moz-document url-prefix(){.note-image-input{height:auto}}.note-placeholder{position:absolute;display:none;color:gray}.note-handle .note-control-selection{position:absolute;display:none;border:1px solid #000}.note-handle .note-control-selection>div{position:absolute}.note-handle .note-control-selection .note-control-selection-bg{width:100%;height:100%;background-color:#000;-webkit-opacity:.3;-khtml-opacity:.3;-moz-opacity:.3;opacity:.3;-ms-filter:alpha(opacity=30);filter:alpha(opacity=30)}.note-handle .note-control-selection .note-control-handle{width:7px;height:7px;border:1px solid #000}.note-handle .note-control-selection .note-control-holder{width:7px;height:7px;border:1px solid #000}.note-handle .note-control-selection .note-control-sizing{width:7px;height:7px;background-color:#fff;border:1px solid #000}.note-handle .note-control-selection .note-control-nw{top:-5px;left:-5px;border-right:0;border-bottom:0}.note-handle .note-control-selection .note-control-ne{top:-5px;right:-5px;border-bottom:0;border-left:none}.note-handle .note-control-selection .note-control-sw{bottom:-5px;left:-5px;border-top:0;border-right:0}.note-handle .note-control-selection .note-control-se{right:-5px;bottom:-5px;cursor:se-resize}.note-handle .note-control-selection .note-control-se.note-control-holder{cursor:default;border-top:0;border-left:none}.note-handle .note-control-selection .note-control-selection-info{right:0;bottom:0;padding:5px;margin:5px;font-size:12px;color:#fff;background-color:#000;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;-webkit-opacity:.7;-khtml-opacity:.7;-moz-opacity:.7;opacity:.7;-ms-filter:alpha(opacity=70);filter:alpha(opacity=70)}.note-hint-popover{min-width:100px;padding:2px}.note-hint-popover .popover-content{max-height:150px;padding:3px;overflow:auto}.note-hint-popover .popover-content .note-hint-group .note-hint-item{display:block!important;padding:3px}.note-hint-popover .popover-content .note-hint-group .note-hint-item.active,.note-hint-popover .popover-content .note-hint-group .note-hint-item:hover{display:block;clear:both;font-weight:400;line-height:1.4;color:#fff;text-decoration:none;white-space:nowrap;cursor:pointer;background-color:#428bca;outline:0}"; });
 define('text!modules/acc/accInvoice.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose view='../../resources/elements/submenu.html'></compose>   \r\n    <div class=\"col-lg-12\">\r\n        <router-view></router-view>\r\n    </div>\r\n</template>"; });
@@ -69880,7 +70015,7 @@ define('text!modules/acc/components/peopleForm.html', ['module'], function(modul
 define('text!modules/acc/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-12 col-sm-12\">\r\n                    <div class='row'>\r\n                        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                            <div id=\"no-more-tables\">\r\n                                <table class=\"table table-striped table-hover cf\">\r\n                                    <thead class=\"cf\">\r\n                                        <tr colspan='7'>\r\n                                            <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                                        </tr>\r\n                                        <tr>\r\n                                        <tr>\r\n                                            <td colspan='7'>\r\n                                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"\r\n                                                    bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                                    title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\"\r\n                                                        aria-hidden=\"true\"></i></span>\r\n                                                <span click.delegate=\"new()\" class=\"smallMarginRight\" bootstrap-tooltip\r\n                                                    data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                                                    data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                                <span click.delegate=\"downloadInstExcel()\" class=\"smallMarginRight\"\r\n                                                    bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                                    title=\"\" data-original-title=\"Export to Excel\"><i class=\"fa fa-download\"\r\n                                                        aria-hidden=\"true\"></i></span>\r\n                                                <span click.delegate=\"_clearFilters()\" class=\"smallMarginRight\"\r\n                                                    bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                                    title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\"\r\n                                                        aria-hidden=\"true\"></i></span>\r\n                                                <!--\r\n                                    <span  click.delegate=\"archiveInactivePeople()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Archive Inactive\"><i class=\"fa fa-archive\" aria-hidden=\"true\"></i></span> \r\n                                    \r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                    -->\r\n\r\n                                            </td>\r\n                                        </tr>\r\n                                        <tr>\r\n                                            <th style=\"width:20rem;\"><span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'fullName'})\">Name\r\n                                                </span><i class=\"fa fa-sort\"></i></th>\r\n                                            <th class=\"col-lg-1\"><span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'nickName'})\">Nickname\r\n                                                </span><i class=\"fa fa-sort\"></i></th>\r\n                                            <th style=\"width:30rem;\"><span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customInstitutionSorter, propertyName: 'intitutionId'})\">Institution\r\n                                                </span><i class=\"fa fa-sort\"></i></th>\r\n                                            <th style=\"width:15rem;\">Phone</th>\r\n                                            <th style=\"width:20rem;\"><span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'email'})\">Email\r\n                                                </span><i class=\"fa fa-sort\"></i></th>\r\n                                            <th>Role</th>\r\n                                            <th>Status</th>\r\n                                        </tr>\r\n                                    </thead>\r\n                                    <tbody>\r\n                                        <tr>\r\n                                            <th>\r\n                                                <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilter', collectionProperty: 'fullName', displayProperty: 'fullName',  compare:'match'} )\"\r\n                                                    class=\"form-control\" />\r\n                                            </th>\r\n                                            <th>\r\n                                                <input value.bind=\"nickNameFilterValue\" input.delegate=\"dataTable.filterList(nickNameFilterValue, { type: 'text',  filter: 'nickNameFilter',  collectionProperty: 'nickName', displayProperty: 'nickName',  compare:'match'} )\"\r\n                                                    class=\"form-control\" />\r\n                                            </th>\r\n                                            <th>\r\n                                                <input value.bind=\"institutionFilterValue\" input.delegate=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"\r\n                                                    class=\"form-control\" />\r\n                                            </th>\r\n                                            <th></th>\r\n                                            <th>\r\n                                                <input value.bind=\"emailFilterValue\" input.delegate=\"dataTable.filterList(emailFilterValue, { type: 'text',  filter: 'emailFilter',  collectionProperty: 'email', displayProperty: 'email',  compare:'match'} )\"\r\n                                                    class=\"form-control\" />\r\n                                            </th>\r\n                                            <th>\r\n                                                <input value.bind=\"roleFilter\" input.delegate=\"dataTable.filterList($event, { type: 'custom',  filter: customRoleFilter, compare:'custom'} )\"\r\n                                                    class=\"form-control\" />\r\n\r\n                                            </th>\r\n                                            <th>\r\n                                                <select value.bind=\"activeFilterValue\" change.delegate=\"filterActive()\"\r\n                                                    class=\"form-control \" id=\"personStatus\">\r\n                                                    <option value=\"\"></option>\r\n                                                    <option repeat.for='status of is4ua.personStatusArray' model.bind='status.code'>${status.description}</option>\r\n                                                </select>\r\n                                            </th>\r\n                                        </tr>\r\n                                        <tr repeat.for=\"person of dataTable.displayArray\">\r\n                                            <td click.trigger=\"edit($index, $event)\" data-title=\"Name\">${person.firstName}\r\n                                                ${person.lastName}</td>\r\n                                            <td click.trigger=\"edit($index, $event)\" data-title=\"Nickname\">${person.nickName}</td>\r\n                                            <td click.trigger=\"edit($index, $event)\" data-title=\"Insitution\">${person.institutionId.name}</d>\r\n                                            <td click.trigger=\"edit($index, $event)\" data-tile=\"Phone\">${person.phone |\r\n                                                phoneNumber:config.PHONE_MASKS:person.country}</td>\r\n                                            <td class=\"dropbtn\" data-title=\"Email\" click.delegate=\"sendAnEmail(person._id)\">${person.email}</td>\r\n                                            <td click.trigger=\"edit($index, $event)\" data-title=\"Role\">${person.roles}</td>\r\n                                            <td class=\"dropbtn\" click.trigger=\"toggleStatus(person._id, person.personStatus)\"\r\n                                                data-title=\"Status\">${person.personStatus |\r\n                                                lookupValue:is4ua.personStatusArray:\"code\":\"description\"}\r\n                                                <span click.delegate=\"toggleStatus(person._id, person.personStatus)\"\r\n                                                    innerhtml=\"${person.personStatus | activateButton}\"></span>\r\n                                            </td>\r\n                                        </tr>\r\n                                    </tbody>\r\n                                </table>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/acc/components/requestDetails.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-12\">\n\t\t\t<h4 class=\"topMargin\"><strong>Request Details</strong></h4>\n\t\t\t<div class=\"panel panel-default topMargin\">\n\t\t\t\t<div class=\"panel-body leftJustify\">\n\t\t\t\t\t<div class=\"form-horizontal topMargin\">\n\t\t\t\t\t\t<h4>Product: ${selectedRequestDetail.productId.name}</h4>\n\n\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t<div class=\"col-lg-5 leftMargin\">\n\t\t\t\t\t\t\t\t<h5>Student accounts: <b>${selectedRequestDetail.numberOfStudents}</b></h5>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t<div class=\"col-lg-5 leftMargin\">\n\t\t\t\t\t\t\t\t<h5>Required Date: <b>${selectedRequestDetail.requiredDate |\n\t\t\t\t\t\t\t\t\t\tdateFormat:config.DATE_FORMAT_TABLE}</b></h5>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tshow.bind=\"selectedRequestDetail.requestId.customerMessage && selectedRequestDetail.requestId.customerMessage.length > 0\">\n\t\t\t\t\t\t\t<label class=\"topMargin\">Requests from the UCC</label>\n\t\t\t\t\t\t\t<div class=\"well\" innerhtml.bind=\"selectedRequestDetail.requestId.customerMessage\"></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tshow.bind=\"selectedRequestDetail.requestId.comments && selectedRequestDetail.requestId.comments.length > 0\">\n\t\t\t\t\t\t\t<label class=\"topMargin\">Comments</label>\n\t\t\t\t\t\t\t<div innerhtml.bind=\"selectedRequestDetail.requestId.comments\"></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div show.bind=\"products.selectedProduct.productDescription\">\n\t\t<h4>Product Information</h4>\n\t\t<div innerhtml.bind=\"products.selectedProduct.productDescription\"></div>\n\t</div>\n</template>\n"; });
 define('text!modules/acc/components/requestForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\" style=\"margin-top:50px;\">\n        <div class=\"panel-body\">\n            <div class=\"row\">\n                <div class=\"row\">\n                    <div class=\"list-group-item toolbar\">\n                        <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                            data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n                                class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                            data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i\n                                class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    </div>\n                </div>\n                <div class=\"row\">\n                    <div class=\"leftMargin col-lg-4\">\n                        <div class=\"panel panel-default\">\n                            <div class=\"panel-body\">\n                                <h4>Institution: ${selectedRequestDetail.requestId.institutionId.name}\n                                </h4>\n                                <h5 class=\"topMargin\">Product: ${selectedRequestDetail.productId.name}</h5>\n                                <h5 class=\"topMargin\">Required Date: ${selectedRequestDetail.requiredDate |\n                                    dateFormat:config.DATE_FORMAT_TABLE}</h5>\n                            </div>\n                        </div>\n                        <div class=\"row\">\n                            <div class=\"form-group col-lg-6\">\n                                <label>Student IDs</label>\n                                <input\n                                    value.bind=\"selectedRequestDetail.assignments[assignmentDetailIndex].studentUserIds\"\n                                    id=\"proposedIDRange\" disabled.bind=\"selectedClientIndex === undefined\" keyup.delegate=\"updateClientAssignments()\"\n                                    placeholder=\"Proposed IDs\" class=\"form-control\" type=\"text\" ref=\"proposedIDRange\" />\n                            </div>\n\n                            <div class=\"form-group col-lg-6\">\n                                <label>Student Password</label>\n                                <input\n                                    value.bind=\"selectedRequestDetail.assignments[assignmentDetailIndex].studentPassword\"\n                                    id=\"proposedStudentPassword\" disabled.bind=\"selectedClientIndex === undefined\" placeholder=\"Proposed Password\" class=\"form-control\"\n                                    type=\"text\" />\n                            </div>\n\n                        </div>\n                        <div class=\"row\">\n                            <div class=\"form-group col-lg-6\">\n                                <label>Faculty IDs</label>\n                                <input\n                                    value.bind=\"selectedRequestDetail.assignments[assignmentDetailIndex].facultyUserIds\"\n                                    id=\"proposedFacultyIDRange\" disabled.bind=\"selectedClientIndex === undefined\" keyup.delegate=\"updateClientAssignments()\"\n                                    placeholder=\"Proposed Faculty IDs\" class=\"form-control\" type=\"text\" />\n                            </div>\n\n                            <div class=\"form-group col-lg-6\">\n                                <label>Faculty Password</label>\n                                <input\n                                    value.bind=\"selectedRequestDetail.assignments[assignmentDetailIndex].facultyPassword\"\n                                    id=\"proposedFacultyPassword\" disabled.bind=\"selectedClientIndex === undefined\" placeholder=\"Proposed Faculty Password\"\n                                    class=\"form-control\" type=\"text\" />\n                            </div>\n                        </div>\n\n                        <div class=\"row smallLeftMargin topMargin\">\n                            <table id=\"assignmentTable\" class=\"table table-striped table-hover\">\n                                <thead>\n                                    <tr>\n                                        <th style=\"width:20px;\">System</th>\n                                        <th style=\"width:20px;\">Client</th>\n                                        <th style=\"width:30px;\">Assigned Date</th>\n                                        <th style=\"width:20px;\"></th>\n                                    </tr>\n                                </thead>\n                                <tbody>\n                                    <tr class=\"${client.notValid} dropbtn\"\n                                        repeat.for=\"client of selectedRequestDetail.assignments\">\n                                        <td click.trigger=\"selectProposedClient($index, $event)\">${client.systemId |\n                                            lookupValue:systems.systemsArray:\"_id\":\"sid\"}</td>\n                                        <td click.trigger=\"selectProposedClient($index, $event)\">${client.client}</td>\n                                        <td click.trigger=\"selectProposedClient($index, $event)\">${client.assignedDate |\n                                            dateFormat:config.DATE_FORMAT_TABLE}</td>\n                                        <td><span click.trigger=\"deleteTable(client, $index)\" class=\"smallMarginRight\"\n                                                bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                                                data-original-title=\"Delete\"><i class=\"fa fa-trash-o\"\n                                                    aria-hidden=\"true\"></i></span></td>\n                                    </tr>\n                                </tbody>\n                            </table>\n                        </div>\n                        <div class=\"row topMargin\">\n                            <fieldset class=\"form-group\">\n                                <div class=\"col-lg-12\">\n                                    <editor value.bind=\"selectedRequestDetail.techComments\" height=\"250\"></editor>\n                                </div>\n                            </fieldset>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-6 col-lg-offset-1\">\n                        <div class=\"panel panel-default smallLeftMargin smallMarginRight\">\n                            <div class=\"panel-body\">\n                                <div class=\"row\">\n                                    <div class=\"col-lg-6 pull-right\">\n                                        <div class=\"col-lg-7\" show.bind=\"!sandBoxOnly\">\n                                            <div class=\"checkbox\">\n                                                <label>\n                                                    <input checked.bind=\"unassignedOnly\" id=\"unassignedCheckBox\"\n                                                        type=\"checkbox\" change.trigger=\"changeUnassignedOnly()\"\n                                                        data-toggle=\"checkbox\"> Unassigned only\n                                                </label>\n                                            </div>\n                                        </div>\n                                        <div class=\"col-lg-5 pull-right\">\n                                            <div class=\"checkbox\">\n                                                <label>\n                                                    <input checked.bind=\"sandBoxOnly\" id=\"sandBoxOnlyCheckBox\"\n                                                        type=\"checkbox\" data-toggle=\"checkbox\">\n                                                    ${config.SANDBOX_NAME} only\n                                                </label>\n                                            </div>\n                                        </div>\n                                    </div>\n                                </div>\n                                <div class=\"form-group\">\n                                    <label class=\"control-label col-sm-3 hideOnPhone\">Systems</label>\n                                    <select change.delegate=\"systemSelected()\" class=\"form-control\"\n                                        value.bind=\"selectedSystemId\">\n                                        <option repeat.for='sys of productSystems' model.bind=\"sys._id\">${sys.sid}\n                                        </option>\n                                    </select>\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"topMargin smallMarginRight\">\n                            <div show.bind=\"clientsConfigured\">\n                                <table id=\"clientTable\" class=\"table table-striped table-hover\">\n                                    <thead>\n                                        <tr>\n                                            <th class=\"col-sm-1\">Client</th>\n                                            <th class=\"col-sm-1\">Status</th>\n                                            <th>Product</th>\n                                            <th class=\"col-sm-6\">Assignments</th>\n                                        </tr>\n                                    </thead>\n                                </table>\n                                <div style=\"overflow:auto;height:800px;\">\n                                    <table id=\"clientTable2\" class=\"table table-striped table-hover\">\n                                        <tbody>\n                                            <tr class=\"dropbtn\" click.trigger=\"selectClient($index, client)\"\n                                                repeat.for=\"client of selectedSystem.clients\">\n                                                <td class=\"col-sm-1\">${client.client}</br><span class=\"smallLeftMargin\"\n                                                        if.bind=\"client.manual\"><i class=\"fa fa-hand-paper-o\"\n                                                            aria-hidden=\"true\"></i></span></td>\n                                                <td class=\"col-sm-1\">${client.clientStatus |\n                                                    lookupValue:config.CLIENT_STATUSES:\"code\":\"description\"}</td>\n                                                <td>${products.selectedProduct.name}</td>\n                                                <td class=\"col-sm-6\">\n                                                    <table class=\"col-sm-12\">\n                                                        <tr repeat.for=\"assignment of client.assignments\">\n                                                            <td>\n                                                                <div class=\"col-lg-12 list-group-item\">\n                                                                    <p class=\"list-group-item-text\">\n                                                                        <span>${assignment.institutionId.name}</span></br>\n                                                                    </p>\n                                                                    <p class=\"list-group-item-text\">\n                                                                        <span>Student IDS: ${assignment.assignment.assignments[0].studentUserIds}</span></br>\n                                                                    </p>\n                                                                </div>\n                                                            </td>\n                                                        </tr>\n                                                    </table>\n                                                </td>\n                                        </tbody>\n                                    </table>\n                                </div>\n                            </div>\n                            <div show.bind=\"!clientsConfigured && productSystems.length\">\n                                <h5>There are no clients configured for this product in ${systems.selectedSystem.sid}\n                                </h5>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>\n"; });
-define('text!modules/acc/components/Requests.html', ['module'], function(module) { module.exports = "<template>\n      <div class=\"topMargin\">\n        <span id=\"selectProductRequestError\"></span>\n        <table id=\"clientTable\" show.bind=\"requests.selectedRequest.requestDetails.length\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n            <tr class=\"${product.invoiceRelevant ? 'success sortable' : 'sortable'}\" id=\"${product.id}\" productId=\"${product.productId}\" \n                repeat.for=\"product of requests.selectedRequest.requestDetails\">\n              <td>${product.productId  | lookupValue:products.productsArray:\"_id\":\"name\"}</td> \n              <td>${product.assignments[0].systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</td>\n              <td>${product.assignments[0].client}</td>\n              <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</td>\n            </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
+define('text!modules/acc/components/Requests.html', ['module'], function(module) { module.exports = "<template>\n      <div class=\"topMargin\">\n        <span id=\"selectProductRequestError\"></span>\n        <table id=\"clientTable\" show.bind=\"requests.selectedRequest.requestDetails.length\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n            <tr class=\"${product.assignments.length ? 'success sortable' : 'sortable'}\" id=\"${product.id}\" productId=\"${product.productId}\" \n                repeat.for=\"product of requests.selectedRequest.requestDetails  | filterApjRequestDetails\">\n              <td>${product.productId  | lookupValue:products.productsArray:\"_id\":\"name\"}</td> \n              <td>${product.assignments[0].systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</td>\n              <td>${product.assignments[0].client}</td>\n              <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</td>\n            </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
 define('text!modules/acc/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"container\">\n    <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"checkbox leftMargin\">\n          <label>\n            <input checked.bind=\"isCheckedAssigned\" change.trigger=\"filterInAssigned()\" type=\"checkbox\"> Filter out\n            Assigned Requests\n          </label>\n        </div>\n      </div>\n    </div>\n    <div id=\"no-more-tables\">\n      <table id=\"requestsTable\" class=\"table table-striped table-hover\">\n        <thead>\n          <tr>\n            <td colspan='10'>\n              <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n            </td>\n          </tr>\n          <tr>\n            <td colspan='10'>\n              <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\">\n                <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i>\n              </span>\n              <span click.delegate=\"clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\">\n                <i class=\"fa fa-filter\" aria-hidden=\"true\"></i>\n              </span>\n            </td>\n            <td></td>\n            <td></td>\n          </tr>\n          <tr>\n            <th class=\"col-lg-1\">\n              <span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requiredDate'})\">Due\n              </span>\n              <span>\n                <i class=\"fa fa-sort\"></i>\n              </span>\n            </th>\n            <th class=\"col-lg-1\" class=\"hidden-sm\">\n              <span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\">Created\n              </span>\n              <span>\n                <i class=\"fa fa-sort\"></i>\n              </span>\n            </th>\n            <th># of Students</th>\n            <th class=\"col-lg-1\">\n              <span class=\"sortable\"\n                click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customRequestStatusSorter, propertyName: 'requestStatus'})\">Status\n              </span>\n              <i class=\"fa fa-sort\"></i>\n            </th>\n\n            <th class=\"col-lg-2\">\n              <span class=\"sortable\"\n                click.trigger=\"dataTable.sortArray($event, {propertyName: 'productId.name'})\">Product </span>\n              <span>\n                <i class=\"fa fa-sort\"></i>\n              </span>\n            </th>\n\n            <th class=\"col-lg-1\">\n              <span class=\"sortable\"\n                click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customInstitutionsSorter, propertyName: 'requestId.institutionId'})\">Institution\n              </span>\n              <i class=\"fa fa-sort\"></i>\n            </th>\n            <th show.bind=\"!isCheckedAssigned\">Assignments</th>\n            <th></th>\n            <th></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr class=\"hidden-sm hidden-xs\">\n            <th>\n              <input type=\"date\" value.bind=\"requiredDateFilterValue\"\n                input.delegate=\"dataTable.filterList(requiredDateFilterValue, {type: 'date', filter: 'requiredDate',  collectionProperty: 'requiredDate', compare: 'after'} )\"\n                class=\"form-control\" />\n            </th>\n            <th>\n              <input type=\"date\" value.bind=\"createdDateFilterValue\"\n                input.delegate=\"dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )\"\n                class=\"form-control hidden-sm\" />\n            </th>\n            <th></th>\n            <th>\n              <select value.bind=\"requestStatusFilter\"\n                input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'requestStatusFilter',  collectionProperty: 'requestStatus', displayProperty: 'requestStatus',  compare:'match'} )\"\n                class=\"form-control\">\n                <option value=\"\"></option>\n                <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}\n                </option>\n              </select>\n            </th>\n\n            <th>\n              <input value.bind=\"productFilterValue\"\n                input.delegate=\"dataTable.filterList(productFilterValue, { type: 'custom',  filter: customProductNameFilter,  compare:'custom'} )\"\n                class=\"form-control\" />\n            </th>\n\n            <th>\n              <input value.bind=\"institutionFilterValue\"\n                input.delegate=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"\n                class=\"form-control\" />\n            </th>\n            <th show.bind=\"!isCheckedAssigned\"></th>\n            <th></th>\n            <th></th>\n          </tr>\n          <tr repeat.for=\"request of dataTable.displayArray\"\n            class=\"${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}\">\n            <td  data-title=\"requiredDate\">${request.requiredDate |\n              dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td class=\"hidden-sm\" data-title=\"dateCreated\">\n              ${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td data-title=\"Students\">${request.numberOfStudents}</td>\n            <td data-title=\"status\">${request.requestStatus |\n              lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</td>\n           \n            <td data-title=\"product\">${request.productId.name}</td>\n\n            <td data-title=\"Name\">\n              ${request.requestId.institutionId.name}</td>\n            <td show.bind=\"!isCheckedAssigned\"\n              innerhtml.bind=\"request.assignments | parseAssignments:systems.systemsArray\"></td>\n            <td>\n              <span class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Edit\">\n                <i class=\"fa fa-pencil fa-lg fa-border\" click.delegate=\"editRequest($index, request)\"\n                  aria-hidden=\"true\"></i>\n              </span>\n            </td>\n            <td>\n              <span class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"View Assignment\">\n                <i class=\"fa fa-eye fa-lg fa-border\" click.delegate=\"viewAssignment($index, request)\"\n                  aria-hidden=\"true\"></i>\n              </span>\n            </td>\n          </tr>\n          <tr if.bind=\"dataTable.displayArray.length > 20\">\n            <td colspan='10'>\n              <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n            </td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  </div>\n\n\n</template>\n"; });
 define('text!modules/acc/components/Roles.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"topMargin\">\r\n         <form>\r\n      <div class=\"col-md-5 topMargin\">\r\n        <label>Roles</label>\r\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n            <ul class=\"list-group\">\r\n              <button click.trigger=\"selectRole($event, role)\" type=\"button\" repeat.for=\"role of filteredArray\" id=\"${role.role}\"\r\n                      class=\"list-group-item\">${role.label}</button>\r\n            </ul>\r\n        </div>\r\n      </div>\r\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\r\n        <label>Assigned Roles</label>\r\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n          <ul class=\"list-group\">\r\n            <button click.trigger=\"removeRole($index, role)\" type=\"button\" repeat.for=\"role of people.selectedPerson.roles\" id=\"${role}\"\r\n                    class=\"list-group-item\">${role | lookupValue:config.ROLES:'role':'label'}</button>\r\n          </ul>\r\n        </div>\r\n      </div>\r\n    </form>\r\n</template"; });
 define('text!modules/acc/components/viewAssignmentForm.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class=\"panel panel-default\" style=\"margin-top:50px;\">\r\n\t\t<div class=\"panel-body\">\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"fluid-container\">\r\n\t\t\t\t\t<!-- Buttons -->\r\n\t\t\t\t\t<div class=\"toolbar list-group-item\">\r\n\t\t\t\t\t\t<span click.delegate=\"backView()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n\t\t\t\t\t\t title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"col-lg-6 col-md-12\">\r\n\t\t\t\t\t\t<compose view=\"./requestDetails.html\"></compose>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"col-lg-6 col-md-12\">\r\n\t\t\t\t\t\t<compose view=\"./assignmentDetails.html\"></compose> \r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>"; });

@@ -144,6 +144,10 @@ export class Systems{
         }
     }
 
+    async saveClient(clientToSave){
+      await this.data.saveObject(clientToSave, this.SYSTEMS_SERVICE + "/client", "put");
+    }
+
     async deleteSystem(){
         let serverResponse = await this.data.deleteObject(this.SYSTEMS_SERVICE + '/' + this.selectedSystem._id);
         if (!serverResponse.error) {
