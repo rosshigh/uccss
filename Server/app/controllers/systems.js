@@ -76,6 +76,7 @@ module.exports = function (app) {
   router.put('/api/systems', requireAuth, asyncHandler(async (req, res) => {
     logger.log('info', 'Update Systems ' + req.body._id);
     if (req.body) {
+     
       await Model.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true, safe: true, multi: false }).then(result => {
         Model.findById(req.body._id)
           .populate({ path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName' })
@@ -87,8 +88,9 @@ module.exports = function (app) {
             return next(error);
           })
       })
+    } else {
+      return next(error);
     }
-    return next(error);
   }));
 
   router.put('/api/systems/client', requireAuth, asyncHandler(async (req, res) => {
@@ -102,7 +104,7 @@ module.exports = function (app) {
               result.clients[i].clientStatus = req.body.status;
             }
           }
-          await Model.findOneAndUpdate({ _id: req.body.systemId }, result, { new: true, safe: true, multi: false }).then(result => {
+          Model.findOneAndUpdate({ _id: req.body.systemId }, result, { new: true, safe: true, multi: false }).then(result => {
             res.status(200).json("Client updated");
           })
             .catch(error => {

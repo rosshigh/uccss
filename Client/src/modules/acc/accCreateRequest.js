@@ -73,8 +73,8 @@ export class ACCClientRequest {
     });
   }
 
-  filterInstiutionList(){
-    if(!this.filterValue) {
+  filterInstiutionList() {
+    if (!this.filterValue) {
       this.filterInstitutions();
       return;
     }
@@ -89,7 +89,7 @@ export class ACCClientRequest {
   }
 
   selectProduct(product) {
-    if (this.requests.selectedRequest.requestDetails.length >= this.selectedPackage.maxClients)    {
+    if (this.requestDetails.length >= this.selectedPackage.maxClients) {
       // this.utils.showNotification("This university has reached their maximum requested products.", "error");
       return this.dialog.showMessage(
         "This university has reached their maximum requested products.",
@@ -104,12 +104,12 @@ export class ACCClientRequest {
         //   return;
         // }
       });
-    } 
+    }
     this.invoiceRelevant = false;
     this.addTheClient(product);
   }
 
-  addTheClient(product){
+  addTheClient(product) {
     $("#requestProductsLabel").html("Requested Products");
     var newObj = this.requests.emptyRequestDetail();
     newObj.productId = product._id;
@@ -118,10 +118,10 @@ export class ACCClientRequest {
     this.products.selectedProductFromId(newObj.productId);
     this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = product.name;
     this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].invoiceRelevant = this.invoiceRelevant;
-    if(this.invoiceRelevant){
+    if (this.invoiceRelevant) {
       this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].price = product.price;
     }
-    
+
     this.validation.makeValid($("#productList"));
   }
 
@@ -140,7 +140,7 @@ export class ACCClientRequest {
         ['Yes', 'No']
       ).whenClosed(response => {
         if (!response.wasCancelled) {
-          this.requestDetails[index].requestStatus = this.config.RETIRED_CLIENT_CODE;
+          this.requestDetails[index].requestStatus = this.config.RETIRED_REQUEST_CODE;
           this.saveIt();
           this.updateClient(this.requestDetails[index]);
         }
@@ -155,44 +155,43 @@ export class ACCClientRequest {
         if (!response.wasCancelled) {
           this.requestDetails[index].delete = true;
           this.removeRequestDetail(this.requestDetails[index]);
-          this.requestDetails.splice(index,1);
-          
+          this.requestDetails.splice(index, 1);
+          this.saveIt();
         }
       });
     }
   }
 
-  removeRequestDetail(request){
+  removeRequestDetail(request) {
     let spliceIndex = -1;
     this.requests.selectedRequest.requestDetails.forEach((item, index) => {
-      if(item._id === request._id) spliceIndex = index;
+      if (item._id === request._id) spliceIndex = index;
     });
     this.requests.selectedRequest.requestDetails.splice(spliceIndex, 1);
   }
 
-  async updateClient(request){
+  async updateClient(request) {
+    var indexToSplice = -1;
+    var saveSystem = false;
     request.assignments.forEach(item => {
       this.systems.selectedSystemFromId(item.systemId);
-      for(let i = 0; i < this.systems.selectedSystem.clients.length; i++){
-        if(this.systems.selectedSystem.clients[i].client == item.client){
-          this.systems.selectedSystem.clients[i].assignments.forEach((assign,index) => {
-            if(item._id === assign.assignment){
-              let indexToSplice = index;
+      for (let i = 0; i < this.systems.selectedSystem.clients.length; i++) {
+        if (this.systems.selectedSystem.clients[i].client == item.client) {
+          this.systems.selectedSystem.clients[i].assignments.forEach((assign, index) => {
+            if (request._id === assign.assignment) {
+              indexToSplice = index;
             }
           });
-          this.systems.selectedSystem.clients[i].assignments.splice(indexToSplice,1);
-          if(this.systems.selectedSystem.clients[i].assignments.length === 0){
+        }
+        if (indexToSplice > -1) {
+          saveSystem = true;
+          this.systems.selectedSystem.clients[i].assignments.splice(indexToSplice, 1);
+          if (this.systems.selectedSystem.clients[i].assignments.length === 0) {
             this.systems.selectedSystem.clients[i].clientStatus = this.config.RETIRED_CLIENT_CODE;
           }
         }
       }
-      // this.systems.saveSystem();
-      // let clientToUpdate = {
-      //   systemId: item.systemId,
-      //   client: item.client,
-      //   status: this.config.RETIRED_CLIENT_CODE
-      // }
-      // this.systems.saveClient(clientToUpdate);
+      if(saveSystem) this.systems.saveSystem();
     });
   }
 
@@ -201,7 +200,10 @@ export class ACCClientRequest {
       this.requests.selectedRequest.requestDetails.invoiceRelevant = this.invoiceRelevant;
       this.requests.selectedRequest.requestDetailsToSave = this.requests.selectedRequest.requestDetails;
       this.requests.selectedRequest.requestDetailsToSave.forEach((item, index) => {
-        if (item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = this.config.UPDATED_REQUEST_CODE;
+        if (item.requestStatus != this.config.ASSIGNED_REQUEST_CODE && item.requestStatus != this.config.RETIRED_REQUEST_CODE) item.requestStatus = this.config.UPDATED_REQUEST_CODE;
+        // if (item.requestStatus == this.config.RETIRED_REQUEST_CODE) {
+        //   this.requests.selectedRequest.requestDetails.splice(index, 1);
+        // }
       })
       this.requests.selectedRequest.requestStatus = this.config.UPDATED_REQUEST_CODE;
     } else {
@@ -253,10 +255,10 @@ export class ACCClientRequest {
 
   }
 
-  filterNotActiveRequests(){
+  filterNotActiveRequests() {
     this.requestDetails = [];
     this.requests.selectedRequest.requestDetails.forEach(item => {
-      if(item.requestStatus !== this.config.RETIRED_CLIENT_CODE) {
+      if (item.requestStatus != this.config.RETIRED_REQUEST_CODE) {
         this.requestDetails.push(item);
       }
     })
@@ -366,58 +368,6 @@ export class ACCClientRequest {
         return true;
       }
     }]);
-    // this.validation.addRule(1, "faculty", [
-    // 	{
-    // 		"rule": "custom", "message": "Select a person",
-    // 		"valFunction": function (context) {
-    // 			return !(context.selectedPerson == "");
-    // 		}
-    // 	}
-
-    // ]);
-    // this.validation.addRule(1, "startDateError", [
-    // 	{
-    // 		"rule": "required", "message": "Select a date",
-    // 		"value": "requests.selectedRequest.startDate"
-    // 	}
-    // ]);
-    // this.validation.addRule(1, "endDateError", [
-    // 	{
-    // 		"rule": "required", "message": "Select a date",
-    // 		"value": "requests.selectedRequest.endDate"
-    // 	}
-    // ]);
-
-    // this.validation.addRule(1, "requestType", [{
-    // 	"rule": "custom", "message": "Select a request type",
-    // 	"valFunction": function (context) {
-    // 		return !(context.requestType == "");
-    // 	}
-    // }]);
-    // this.validation.addRule(1, "numberOfStudentsError", [{
-    // 	"rule": "custom", "message": "Enter either the number of undergradate or graduate students",
-    // 	"valFunction": function (context) {
-    // 		if (context.requestType === "sandboxCourse" || context.requestType === "") {
-    // 			return true;
-    // 			// } else if(($("#undergraduates").val() === "" || $("#undergraduates").val() == 0) && ($("#graduates").val() === "" || $("#graduates").val() == 0)){
-    // 		} else if (context.requests.selectedRequest.undergradIds == 0 && context.requests.selectedRequest.graduateIds == 0) {
-    // 			return false;
-    // 		} else {
-    // 			return true;
-    // 		}
-    // 	}
-    // }]);
-    // this.validation.addRule(1, "productList", [{
-    // 	"rule": "custom", "message": "Select at least one product",
-    // 	"valFunction": function (context) {
-    // 		if (context.requests.selectedRequest.requestDetails.length === 0) {
-    // 			return false;
-    // 		} else {
-    // 			return true;
-    // 		}
-    // 	}
-    // }
-    // ]);
     this.validation.addRule(1, "dateError", [{
       "rule": "custom", "message": "Enter all required dates",
       "valFunction": function (context) {
@@ -429,10 +379,6 @@ export class ACCClientRequest {
         return true;
       }
     }]);
-    // this.validation.addRule(5, "number", [
-    // 	{ "rule": "required", "message": "Enter the course number", "value": "people.selectedCourse.number" },
-    // 	{ "rule": "required", "message": "Enter the course name", "value": "people.selectedCourse.name" }
-    // ]);
   }
 
   async saveIt() {

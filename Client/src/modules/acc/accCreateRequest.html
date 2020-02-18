@@ -109,7 +109,7 @@
                       <th>Date Required</th>
                     </tr>
                   <tbody id="requiredProductsTable">
-                    <tr repeat.for="request of requests.selectedRequest.requestDetails  | filterApjRequestDetails"
+                    <tr repeat.for="request of requestDetails"
                       class="${request.assignments.length ? 'success sortable' : 'sortable'}">
                       <td>${request.productId | lookupValue:products.productsArray:"_id":"name"}
                       </td>

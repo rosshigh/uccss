@@ -12,11 +12,11 @@ export class AppConfig {
     // BASE_URL = "https://uccsstest.ucc.uwm.edu/api/";
     // IMG_DOWNLOAD_URL = "https://uccsstest.ucc.uwm.edu/img/";  
 
-    BASE_URL = "http://localhost/api/";
-    IMG_DOWNLOAD_URL = "http://localhost/img/";   
+    // BASE_URL = "http://localhost/api/";
+    // IMG_DOWNLOAD_URL = "http://localhost/img/";   
 
-    // BASE_URL = this.HOST + "/api/";
-    // IMG_DOWNLOAD_URL = this.HOST + '/img/'  
+    BASE_URL = this.HOST + "/api/";
+    IMG_DOWNLOAD_URL = this.HOST + '/img/'  
 
     isMobile = false; 
 
@@ -82,6 +82,7 @@ export class AppConfig {
     CANCELLED_REQUEST_CODE = 5;
     PROVISIONAL_REQUEST_CODE = 6;
     REPLIED_REQUEST_CODE = 7;
+    RETIRED_REQUEST_CODE = 8;
 
     REQUEST_STATUS = [{ code: this.UNASSIGNED_REQUEST_CODE, description: 'Unassigned', status: "" }, 
                       { code: this.ASSIGNED_REQUEST_CODE, description: 'Assigned', status: "assign"  }, 
@@ -89,7 +90,8 @@ export class AppConfig {
                       { code: this.CUSTOMER_ACTION_REQUEST_CODE, description: 'Customer Action', status: "warning"  },
                       { code: this.CANCELLED_REQUEST_CODE, description: 'Cancelled', status: ""  },
                       { code: this.PROVISIONAL_REQUEST_CODE, description: 'Provisional', status: ""  },
-                      { code: this.REPLIED_REQUEST_CODE, description: 'Replied', status: "danger" }];
+                      { code: this.REPLIED_REQUEST_CODE, description: 'Replied', status: "danger" },
+                      { code: this.RETIRED_REQUEST_CODE, description: 'Retired', status: "danger" }];
 
     SANDBOX_ID = 'a1a1a1a1a1a1a1a1a1a1a1a1';      //Name used for sandbox requests
     ID_WILDCARD = "#";                          //Wildcard in id templates

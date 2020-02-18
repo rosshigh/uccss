@@ -12,7 +12,7 @@
           </thead>
           <tbody>
             <tr class="${product.assignments.length ? 'success sortable' : 'sortable'}" id="${product.id}" productId="${product.productId}" 
-                repeat.for="product of requests.selectedRequest.requestDetails  | filterApjRequestDetails">
+                repeat.for="product of requestDetails">
               <td>${product.productId  | lookupValue:products.productsArray:"_id":"name"}</td> 
               <td>${product.assignments[0].systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
               <td>${product.assignments[0].client}</td>
