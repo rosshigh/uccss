@@ -77,6 +77,18 @@ export class ViewHelpTickets {
       this.helpTickets.getHelpTicketTypes('?order=category'),
       this.config.getConfig()
     ]);
+
+    if (params.HTNumber == -1) {
+      await this.showHTList();
+    } else {
+      this.HTToShow = params.HTNumber;
+      this.showHelpTicketImmediately = true;
+
+    }
+  }
+
+  async showHTList() {
+
     this.sessions.getSessionsArray('?order=startDate:DSC');
     this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name');
     this.systems.getSystemsArray();
@@ -106,13 +118,32 @@ export class ViewHelpTickets {
     this.refreshInterval = this.config.HELP_TICKET_REFRESH_INTERVAL;
   }
 
-  attached() {
+  async showHT(HTNumber) {
+    console.log(HTNumber);
+    this.tableMargin = "margin-top:0px;"
+    //Make the selected help ticket the selected help ticket
+    await this.helpTickets.getHelpTicketByNumber(HTNumber);
+    this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
+    this.openHelpTicket();
+    let indices = this.getIndex();
+    let subTypeIndex = indices.subTypeIndex;
+    let categoryIndex = indices.categoryIndex;
+    this.createOutputForm(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].outputForm);
+
+    this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
+    this.helpTicketSelected = true;
+    window.scrollTo(0, 0);
+  }
+
+  async attached() {
     this.refresh(false);
     if (!this.mobile) this.toolTips();
     this.initialLoaded = true;
 
     setInterval(() => { if (!this.helpTicketSelected) this.refresh(false); }, this.refreshInterval * 60 * 1000);
     $.summernote.dom.emptyPara = "<div><br/></div>"
+
+    if (this.showHelpTicketImmediately) await this.showHT(this.HTToShow);
   }
 
   toolTips() {
@@ -410,9 +441,9 @@ export class ViewHelpTickets {
 
   }
 
-  async saveAndCLoseIt(status){
+  async saveAndCLoseIt(status) {
     this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
-    var helpTicket =  this.helpTickets.selectedHelpTicket._id; 
+    var helpTicket = this.helpTickets.selectedHelpTicket._id;
     this._createResponse();
     var email = new Object();
     if (this.sendEmail) {
@@ -431,20 +462,20 @@ export class ViewHelpTickets {
       email.email = this.helpTickets.selectedHelpTicket.personId.email;
       email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
     }
-   
+
     let serverResponse = await this.helpTickets.saveHelpTicketResponseAndCLose(email);
-    
+
     if (!serverResponse.error) {
-        await this.refresh(false);
-        this.utils.showNotification("The help ticket was updated");
-        if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFileArchive(this.filesToUpload,  this.helpTickets.selectedHelpTicket._id);
+      await this.refresh(false);
+      this.utils.showNotification("The help ticket was updated");
+      if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFileArchive(this.filesToUpload, this.helpTickets.selectedHelpTicket._id);
     }
     this._cleanUp();
   }
 
   async saveIt(status) {
     this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
-    var helpTicket =  this.helpTickets.selectedHelpTicket; 
+    var helpTicket = this.helpTickets.selectedHelpTicket;
     this._createResponse();
     var email = new Object();
     if (this.sendEmail) {
@@ -463,9 +494,9 @@ export class ViewHelpTickets {
       email.email = this.helpTickets.selectedHelpTicket.personId.email;
       email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
     }
-  
-      let serverResponse = await this.helpTickets.saveHelpTicketResponse(email);
-    
+
+    let serverResponse = await this.helpTickets.saveHelpTicketResponse(email);
+
     if (!serverResponse.error) {
       if (status == this.config.CLOSED_HELPTICKET_STATUS) {
         await this.refresh(false);
@@ -474,7 +505,7 @@ export class ViewHelpTickets {
         this.reSort();
       }
       this.utils.showNotification("The help ticket was updated");
-      if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload,  this.helpTickets.selectedHelpTicket._id);
+      if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, this.helpTickets.selectedHelpTicket._id);
     }
     this._cleanUp();
   }
@@ -484,14 +515,14 @@ export class ViewHelpTickets {
       this.helpTickets.selectHelpTicketByID(helpTicket._id);
     }
 
-    if(this.helpTickets.selectedHelpTicket.owner[0].personId !== "b1b1b1b1b1b1b1b1b1b1b1b1" && this.helpTickets.selectedHelpTicket.owner[0].personId != null){
+    if (this.helpTickets.selectedHelpTicket.owner[0].personId !== "b1b1b1b1b1b1b1b1b1b1b1b1" && this.helpTickets.selectedHelpTicket.owner[0].personId != null) {
       this.dialog.showMessage(
         "Are you sure you want to change ownership of this help ticket",
         "Save Changes",
         ['Yes', 'No']
       ).whenClosed(response => {
         if (!response.wasCancelled) {
-           this.ownIt();
+          this.ownIt();
         }
       });
     } else {
@@ -524,7 +555,7 @@ export class ViewHelpTickets {
     }
   }
 
-  async changeStatus(helpTicket, status) { 
+  async changeStatus(helpTicket, status) {
     if (status == this.config.MY_HELPTICKET_STATUS && this.userObj._id != helpTicket.owner[0].personId._id) {
       this.utils.showNotification('You must own this ticket before you can make it yours');
       return;
@@ -568,13 +599,18 @@ export class ViewHelpTickets {
   }
 
   _cleanUp() {
-    this.enterResponse = false;
-    this.filesToUpload = new Array();
-    this.files = new Array();
-    this.filesSelected = "";
-    this.helpTicketSelected = false;
-    this.showRequestPanel = false;
-    $('input[type=file]').wrap('<form></form>').parent().trigger('reset').children().unwrap();
+    if (this.showHelpTicketImmediately) {
+      this.showHelpTicketImmediately = false;
+      this.router.navigateToRoute('techHt', { HTNumber: -1 });
+    } else {
+      this.enterResponse = false;
+      this.filesToUpload = new Array();
+      this.files = new Array();
+      this.filesSelected = "";
+      $('input[type=file]').wrap('<form></form>').parent().trigger('reset').children().unwrap();
+      this.helpTicketSelected = false;
+      this.showRequestPanel = false;
+    }
   }
 
   flag() {
@@ -836,5 +872,5 @@ export class ViewHelpTickets {
 
   reSort() {
     this.dataTable.sortArray({}, {}, true);
-}
+  }
 }

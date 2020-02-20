@@ -105,6 +105,22 @@ export class HelpTickets {
         }
     }
 
+    async getHelpTicketByNumber(id) {
+      if (id) {
+          try {
+              let serverResponse = await this.data.get(this.HELP_TICKET_SERVICES + "?filter=helpTicketNo|eq|" + id);
+              if (!serverResponse.error) {
+                  this.selectedHelpTicket = serverResponse[0];
+              }
+              return serverResponse;
+          } catch (error) {
+              console.log(error);
+              return undefined;
+          }
+
+      }
+  }
+
     async getArchiveHelpTicket(id) {
       if (id) {
           try {

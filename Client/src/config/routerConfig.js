@@ -111,7 +111,7 @@ export default class {
                    settings: { auth: true, roles: [] } 
                 },
                 { 
-                  route: 'techHt',          
+                  route: 'techHt/:HTNumber',          
                   moduleId: './modules/tech/support/support',         
                   name: 'techHt',         
                   settings: { auth: true, roles: [] }

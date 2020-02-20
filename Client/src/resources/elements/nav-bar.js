@@ -162,9 +162,11 @@ export class NavBar {
     }
 
     updateNotification(notice, index){
+        let htNumber = notice.notice.split(' ');
         notice.checked = true;
         this.people.saveNotification(notice);
         this.people.notificationsArray.splice(index, 1);
+        if(htNumber[4] != 'closed') this.router.navigateToRoute('techHt',{HTNumber: htNumber[2]});
     }
 
     async events() {

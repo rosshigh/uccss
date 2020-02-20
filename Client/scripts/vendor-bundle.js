@@ -11550,154 +11550,66 @@ define('aurelia-binding',['exports', 'aurelia-logging', 'aurelia-pal', 'aurelia-
     }
   }
 });
-define('aurelia-bootstrapper',['exports', 'aurelia-pal', 'aurelia-pal-browser', 'aurelia-polyfills'], function (exports, _aureliaPal, _aureliaPalBrowser) {
+define('aurelia-history',['exports'], function (exports) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.bootstrap = bootstrap;
 
+  
 
-  var bootstrapQueue = [];
-  var sharedLoader = null;
-  var Aurelia = null;
-
-  function onBootstrap(callback) {
-    return new Promise(function (resolve, reject) {
-      if (sharedLoader) {
-        resolve(callback(sharedLoader));
-      } else {
-        bootstrapQueue.push(function () {
-          try {
-            resolve(callback(sharedLoader));
-          } catch (e) {
-            reject(e);
-          }
-        });
-      }
-    });
+  function mi(name) {
+    throw new Error('History must implement ' + name + '().');
   }
 
-  function ready(global) {
-    return new Promise(function (resolve, reject) {
-      if (global.document.readyState === 'complete') {
-        resolve(global.document);
-      } else {
-        global.document.addEventListener('DOMContentLoaded', completed);
-        global.addEventListener('load', completed);
-      }
-
-      function completed() {
-        global.document.removeEventListener('DOMContentLoaded', completed);
-        global.removeEventListener('load', completed);
-        resolve(global.document);
-      }
-    });
-  }
-
-  function createLoader() {
-    if (_aureliaPal.PLATFORM.Loader) {
-      return Promise.resolve(new _aureliaPal.PLATFORM.Loader());
+  var History = exports.History = function () {
+    function History() {
+      
     }
 
-    if (window.System && typeof window.System.import === 'function') {
-      return System.normalize('aurelia-bootstrapper').then(function (bootstrapperName) {
-        return System.normalize('aurelia-loader-default', bootstrapperName);
-      }).then(function (loaderName) {
-        return System.import(loaderName).then(function (m) {
-          return new m.DefaultLoader();
-        });
-      });
-    }
+    History.prototype.activate = function activate(options) {
+      mi('activate');
+    };
 
-    if (typeof window.require === 'function') {
-      return new Promise(function (resolve, reject) {
-        return require(['aurelia-loader-default'], function (m) {
-          return resolve(new m.DefaultLoader());
-        }, reject);
-      });
-    }
+    History.prototype.deactivate = function deactivate() {
+      mi('deactivate');
+    };
 
-    return Promise.reject('No PLATFORM.Loader is defined and there is neither a System API (ES6) or a Require API (AMD) globally available to load your app.');
-  }
+    History.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
+      mi('getAbsoluteRoot');
+    };
 
-  function preparePlatform(loader) {
-    return loader.normalize('aurelia-bootstrapper').then(function (bootstrapperName) {
-      return loader.normalize('aurelia-framework', bootstrapperName).then(function (frameworkName) {
-        loader.map('aurelia-framework', frameworkName);
+    History.prototype.navigate = function navigate(fragment, options) {
+      mi('navigate');
+    };
 
-        return Promise.all([loader.normalize('aurelia-dependency-injection', frameworkName).then(function (diName) {
-          return loader.map('aurelia-dependency-injection', diName);
-        }), loader.normalize('aurelia-router', bootstrapperName).then(function (routerName) {
-          return loader.map('aurelia-router', routerName);
-        }), loader.normalize('aurelia-logging-console', bootstrapperName).then(function (loggingConsoleName) {
-          return loader.map('aurelia-logging-console', loggingConsoleName);
-        })]).then(function () {
-          return loader.loadModule(frameworkName).then(function (m) {
-            return Aurelia = m.Aurelia;
-          });
-        });
-      });
-    });
-  }
+    History.prototype.navigateBack = function navigateBack() {
+      mi('navigateBack');
+    };
 
-  function handleApp(loader, appHost) {
-    var moduleId = appHost.getAttribute('aurelia-app') || appHost.getAttribute('data-aurelia-app');
-    return config(loader, appHost, moduleId);
-  }
+    History.prototype.setTitle = function setTitle(title) {
+      mi('setTitle');
+    };
 
-  function config(loader, appHost, configModuleId) {
-    var aurelia = new Aurelia(loader);
-    aurelia.host = appHost;
-    aurelia.configModuleId = configModuleId || null;
+    History.prototype.setState = function setState(key, value) {
+      mi('setState');
+    };
 
-    if (configModuleId) {
-      return loader.loadModule(configModuleId).then(function (customConfig) {
-        if (!customConfig.configure) {
-          throw new Error("Cannot initialize module '" + configModuleId + "' without a configure function.");
-        }
+    History.prototype.getState = function getState(key) {
+      mi('getState');
+    };
 
-        customConfig.configure(aurelia);
-      });
-    }
+    History.prototype.getHistoryIndex = function getHistoryIndex() {
+      mi('getHistoryIndex');
+    };
 
-    aurelia.use.standardConfiguration().developmentLogging();
+    History.prototype.go = function go(movement) {
+      mi('go');
+    };
 
-    return aurelia.start().then(function () {
-      return aurelia.setRoot();
-    });
-  }
-
-  function run() {
-    return ready(window).then(function (doc) {
-      (0, _aureliaPalBrowser.initialize)();
-
-      var appHost = doc.querySelectorAll('[aurelia-app],[data-aurelia-app]');
-      return createLoader().then(function (loader) {
-        return preparePlatform(loader).then(function () {
-          for (var i = 0, ii = appHost.length; i < ii; ++i) {
-            handleApp(loader, appHost[i]).catch(console.error.bind(console));
-          }
-
-          sharedLoader = loader;
-          for (var _i = 0, _ii = bootstrapQueue.length; _i < _ii; ++_i) {
-            bootstrapQueue[_i]();
-          }
-          bootstrapQueue = null;
-        });
-      });
-    });
-  }
-
-  function bootstrap(configure) {
-    return onBootstrap(function (loader) {
-      var aurelia = new Aurelia(loader);
-      return configure(aurelia);
-    });
-  }
-
-  run();
+    return History;
+  }();
 });
 define('aurelia-event-aggregator',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
   'use strict';
@@ -11862,6 +11774,633 @@ define('aurelia-event-aggregator',['exports', 'aurelia-logging'], function (expo
   function configure(config) {
     config.instance(EventAggregator, includeEventsIn(config.aurelia));
   }
+});
+define('aurelia-framework',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-metadata', 'aurelia-templating', 'aurelia-loader', 'aurelia-task-queue', 'aurelia-path', 'aurelia-pal', 'aurelia-logging'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaMetadata, _aureliaTemplating, _aureliaLoader, _aureliaTaskQueue, _aureliaPath, _aureliaPal, _aureliaLogging) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.LogManager = exports.FrameworkConfiguration = exports.Aurelia = undefined;
+  Object.keys(_aureliaDependencyInjection).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaDependencyInjection[key];
+      }
+    });
+  });
+  Object.keys(_aureliaBinding).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaBinding[key];
+      }
+    });
+  });
+  Object.keys(_aureliaMetadata).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaMetadata[key];
+      }
+    });
+  });
+  Object.keys(_aureliaTemplating).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaTemplating[key];
+      }
+    });
+  });
+  Object.keys(_aureliaLoader).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaLoader[key];
+      }
+    });
+  });
+  Object.keys(_aureliaTaskQueue).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaTaskQueue[key];
+      }
+    });
+  });
+  Object.keys(_aureliaPath).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaPath[key];
+      }
+    });
+  });
+  Object.keys(_aureliaPal).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaPal[key];
+      }
+    });
+  });
+
+  var TheLogManager = _interopRequireWildcard(_aureliaLogging);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  };
+
+  
+
+  function preventActionlessFormSubmit() {
+    _aureliaPal.DOM.addEventListener('submit', function (evt) {
+      var target = evt.target;
+      var action = target.action;
+
+      if (target.tagName.toLowerCase() === 'form' && !action) {
+        evt.preventDefault();
+      }
+    });
+  }
+
+  var Aurelia = exports.Aurelia = function () {
+    function Aurelia(loader, container, resources) {
+      
+
+      this.loader = loader || new _aureliaPal.PLATFORM.Loader();
+      this.container = container || new _aureliaDependencyInjection.Container().makeGlobal();
+      this.resources = resources || new _aureliaTemplating.ViewResources();
+      this.use = new FrameworkConfiguration(this);
+      this.logger = TheLogManager.getLogger('aurelia');
+      this.hostConfigured = false;
+      this.host = null;
+
+      this.use.instance(Aurelia, this);
+      this.use.instance(_aureliaLoader.Loader, this.loader);
+      this.use.instance(_aureliaTemplating.ViewResources, this.resources);
+    }
+
+    Aurelia.prototype.start = function start() {
+      var _this = this;
+
+      if (this._started) {
+        return this._started;
+      }
+
+      this.logger.info('Aurelia Starting');
+      return this._started = this.use.apply().then(function () {
+        preventActionlessFormSubmit();
+
+        if (!_this.container.hasResolver(_aureliaTemplating.BindingLanguage)) {
+          var message = 'You must configure Aurelia with a BindingLanguage implementation.';
+          _this.logger.error(message);
+          throw new Error(message);
+        }
+
+        _this.logger.info('Aurelia Started');
+        var evt = _aureliaPal.DOM.createCustomEvent('aurelia-started', { bubbles: true, cancelable: true });
+        _aureliaPal.DOM.dispatchEvent(evt);
+        return _this;
+      });
+    };
+
+    Aurelia.prototype.enhance = function enhance() {
+      var _this2 = this;
+
+      var bindingContext = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var applicationHost = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      this._configureHost(applicationHost || _aureliaPal.DOM.querySelectorAll('body')[0]);
+
+      return new Promise(function (resolve) {
+        var engine = _this2.container.get(_aureliaTemplating.TemplatingEngine);
+        _this2.root = engine.enhance({ container: _this2.container, element: _this2.host, resources: _this2.resources, bindingContext: bindingContext });
+        _this2.root.attached();
+        _this2._onAureliaComposed();
+        resolve(_this2);
+      });
+    };
+
+    Aurelia.prototype.setRoot = function setRoot() {
+      var _this3 = this;
+
+      var root = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var applicationHost = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      var instruction = {};
+
+      if (this.root && this.root.viewModel && this.root.viewModel.router) {
+        this.root.viewModel.router.deactivate();
+        this.root.viewModel.router.reset();
+      }
+
+      this._configureHost(applicationHost);
+
+      var engine = this.container.get(_aureliaTemplating.TemplatingEngine);
+      var transaction = this.container.get(_aureliaTemplating.CompositionTransaction);
+      delete transaction.initialComposition;
+
+      if (!root) {
+        if (this.configModuleId) {
+          root = (0, _aureliaPath.relativeToFile)('./app', this.configModuleId);
+        } else {
+          root = 'app';
+        }
+      }
+
+      instruction.viewModel = root;
+      instruction.container = instruction.childContainer = this.container;
+      instruction.viewSlot = this.hostSlot;
+      instruction.host = this.host;
+
+      return engine.compose(instruction).then(function (r) {
+        _this3.root = r;
+        instruction.viewSlot.attached();
+        _this3._onAureliaComposed();
+        return _this3;
+      });
+    };
+
+    Aurelia.prototype._configureHost = function _configureHost(applicationHost) {
+      if (this.hostConfigured) {
+        return;
+      }
+      applicationHost = applicationHost || this.host;
+
+      if (!applicationHost || typeof applicationHost === 'string') {
+        this.host = _aureliaPal.DOM.getElementById(applicationHost || 'applicationHost');
+      } else {
+        this.host = applicationHost;
+      }
+
+      if (!this.host) {
+        throw new Error('No applicationHost was specified.');
+      }
+
+      this.hostConfigured = true;
+      this.host.aurelia = this;
+      this.hostSlot = new _aureliaTemplating.ViewSlot(this.host, true);
+      this.hostSlot.transformChildNodesIntoView();
+      this.container.registerInstance(_aureliaPal.DOM.boundary, this.host);
+    };
+
+    Aurelia.prototype._onAureliaComposed = function _onAureliaComposed() {
+      var evt = _aureliaPal.DOM.createCustomEvent('aurelia-composed', { bubbles: true, cancelable: true });
+      setTimeout(function () {
+        return _aureliaPal.DOM.dispatchEvent(evt);
+      }, 1);
+    };
+
+    return Aurelia;
+  }();
+
+  var logger = TheLogManager.getLogger('aurelia');
+  var extPattern = /\.[^/.]+$/;
+
+  function runTasks(config, tasks) {
+    var current = void 0;
+    var next = function next() {
+      current = tasks.shift();
+      if (current) {
+        return Promise.resolve(current(config)).then(next);
+      }
+
+      return Promise.resolve();
+    };
+
+    return next();
+  }
+
+  function loadPlugin(fwConfig, loader, info) {
+    logger.debug('Loading plugin ' + info.moduleId + '.');
+    if (typeof info.moduleId === 'string') {
+      fwConfig.resourcesRelativeTo = info.resourcesRelativeTo;
+
+      var id = info.moduleId;
+
+      if (info.resourcesRelativeTo.length > 1) {
+        return loader.normalize(info.moduleId, info.resourcesRelativeTo[1]).then(function (normalizedId) {
+          return _loadPlugin(normalizedId);
+        });
+      }
+
+      return _loadPlugin(id);
+    } else if (typeof info.configure === 'function') {
+      if (fwConfig.configuredPlugins.indexOf(info.configure) !== -1) {
+        return Promise.resolve();
+      }
+      fwConfig.configuredPlugins.push(info.configure);
+
+      return Promise.resolve(info.configure.call(null, fwConfig, info.config || {}));
+    }
+    throw new Error(invalidConfigMsg(info.moduleId || info.configure, 'plugin'));
+
+    function _loadPlugin(moduleId) {
+      return loader.loadModule(moduleId).then(function (m) {
+        if ('configure' in m) {
+          if (fwConfig.configuredPlugins.indexOf(m.configure) !== -1) {
+            return Promise.resolve();
+          }
+          return Promise.resolve(m.configure(fwConfig, info.config || {})).then(function () {
+            fwConfig.configuredPlugins.push(m.configure);
+            fwConfig.resourcesRelativeTo = null;
+            logger.debug('Configured plugin ' + info.moduleId + '.');
+          });
+        }
+
+        fwConfig.resourcesRelativeTo = null;
+        logger.debug('Loaded plugin ' + info.moduleId + '.');
+      });
+    }
+  }
+
+  function loadResources(aurelia, resourcesToLoad, appResources) {
+    if (Object.keys(resourcesToLoad).length === 0) {
+      return Promise.resolve();
+    }
+    var viewEngine = aurelia.container.get(_aureliaTemplating.ViewEngine);
+
+    return Promise.all(Object.keys(resourcesToLoad).map(function (n) {
+      return _normalize(resourcesToLoad[n]);
+    })).then(function (loads) {
+      var names = [];
+      var importIds = [];
+
+      loads.forEach(function (l) {
+        names.push(undefined);
+        importIds.push(l.importId);
+      });
+
+      return viewEngine.importViewResources(importIds, names, appResources);
+    });
+
+    function _normalize(load) {
+      var moduleId = load.moduleId;
+      var ext = getExt(moduleId);
+
+      if (isOtherResource(moduleId)) {
+        moduleId = removeExt(moduleId);
+      }
+
+      return aurelia.loader.normalize(moduleId, load.relativeTo).then(function (normalized) {
+        return {
+          name: load.moduleId,
+          importId: isOtherResource(load.moduleId) ? addOriginalExt(normalized, ext) : normalized
+        };
+      });
+    }
+
+    function isOtherResource(name) {
+      var ext = getExt(name);
+      if (!ext) return false;
+      if (ext === '') return false;
+      if (ext === '.js' || ext === '.ts') return false;
+      return true;
+    }
+
+    function removeExt(name) {
+      return name.replace(extPattern, '');
+    }
+
+    function addOriginalExt(normalized, ext) {
+      return removeExt(normalized) + '.' + ext;
+    }
+  }
+
+  function getExt(name) {
+    var match = name.match(extPattern);
+    if (match && match.length > 0) {
+      return match[0].split('.')[1];
+    }
+  }
+
+  function loadBehaviors(config) {
+    return Promise.all(config.behaviorsToLoad.map(function (m) {
+      return m.load(config.container, m.target);
+    })).then(function () {
+      config.behaviorsToLoad = null;
+    });
+  }
+
+  function assertProcessed(plugins) {
+    if (plugins.processed) {
+      throw new Error('This config instance has already been applied. To load more plugins or global resources, create a new FrameworkConfiguration instance.');
+    }
+  }
+
+  function invalidConfigMsg(cfg, type) {
+    return 'Invalid ' + type + ' [' + cfg + '], ' + type + ' must be specified as functions or relative module IDs.';
+  }
+
+  var FrameworkConfiguration = function () {
+    function FrameworkConfiguration(aurelia) {
+      var _this4 = this;
+
+      
+
+      this.aurelia = aurelia;
+      this.container = aurelia.container;
+
+      this.info = [];
+      this.processed = false;
+      this.preTasks = [];
+      this.postTasks = [];
+
+      this.behaviorsToLoad = [];
+
+      this.configuredPlugins = [];
+      this.resourcesToLoad = {};
+      this.preTask(function () {
+        return aurelia.loader.normalize('aurelia-bootstrapper').then(function (name) {
+          return _this4.bootstrapperName = name;
+        });
+      });
+      this.postTask(function () {
+        return loadResources(aurelia, _this4.resourcesToLoad, aurelia.resources);
+      });
+    }
+
+    FrameworkConfiguration.prototype.instance = function instance(type, _instance) {
+      this.container.registerInstance(type, _instance);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.singleton = function singleton(type, implementation) {
+      this.container.registerSingleton(type, implementation);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.transient = function transient(type, implementation) {
+      this.container.registerTransient(type, implementation);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.preTask = function preTask(task) {
+      assertProcessed(this);
+      this.preTasks.push(task);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.postTask = function postTask(task) {
+      assertProcessed(this);
+      this.postTasks.push(task);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.feature = function feature(plugin) {
+      var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      switch (typeof plugin === 'undefined' ? 'undefined' : _typeof(plugin)) {
+        case 'string':
+          var hasIndex = /\/index$/i.test(plugin);
+          var _moduleId = hasIndex || getExt(plugin) ? plugin : plugin + '/index';
+          var root = hasIndex ? plugin.substr(0, plugin.length - 6) : plugin;
+          this.info.push({ moduleId: _moduleId, resourcesRelativeTo: [root, ''], config: config });
+          break;
+
+        case 'function':
+          this.info.push({ configure: plugin, config: config || {} });
+          break;
+        default:
+          throw new Error(invalidConfigMsg(plugin, 'feature'));
+      }
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.globalResources = function globalResources(resources) {
+      var _this5 = this;
+
+      assertProcessed(this);
+
+      var toAdd = Array.isArray(resources) ? resources : arguments;
+      var resource = void 0;
+      var resourcesRelativeTo = this.resourcesRelativeTo || ['', ''];
+
+      for (var i = 0, ii = toAdd.length; i < ii; ++i) {
+        resource = toAdd[i];
+        switch (typeof resource === 'undefined' ? 'undefined' : _typeof(resource)) {
+          case 'string':
+            var parent = resourcesRelativeTo[0];
+            var grandParent = resourcesRelativeTo[1];
+            var name = resource;
+
+            if ((resource.startsWith('./') || resource.startsWith('../')) && parent !== '') {
+              name = (0, _aureliaPath.join)(parent, resource);
+            }
+
+            this.resourcesToLoad[name] = { moduleId: name, relativeTo: grandParent };
+            break;
+          case 'function':
+            var meta = this.aurelia.resources.autoRegister(this.container, resource);
+            if (meta instanceof _aureliaTemplating.HtmlBehaviorResource && meta.elementName !== null) {
+              if (this.behaviorsToLoad.push(meta) === 1) {
+                this.postTask(function () {
+                  return loadBehaviors(_this5);
+                });
+              }
+            }
+            break;
+          default:
+            throw new Error(invalidConfigMsg(resource, 'resource'));
+        }
+      }
+
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.globalName = function globalName(resourcePath, newName) {
+      assertProcessed(this);
+      this.resourcesToLoad[resourcePath] = { moduleId: newName, relativeTo: '' };
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.plugin = function plugin(_plugin, pluginConfig) {
+      assertProcessed(this);
+
+      var info = void 0;
+      switch (typeof _plugin === 'undefined' ? 'undefined' : _typeof(_plugin)) {
+        case 'string':
+          info = { moduleId: _plugin, resourcesRelativeTo: [_plugin, ''], config: pluginConfig || {} };
+          break;
+        case 'function':
+          info = { configure: _plugin, config: pluginConfig || {} };
+          break;
+        default:
+          throw new Error(invalidConfigMsg(_plugin, 'plugin'));
+      }
+      this.info.push(info);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype._addNormalizedPlugin = function _addNormalizedPlugin(name, config) {
+      var _this6 = this;
+
+      var plugin = { moduleId: name, resourcesRelativeTo: [name, ''], config: config || {} };
+      this.info.push(plugin);
+
+      this.preTask(function () {
+        var relativeTo = [name, _this6.bootstrapperName];
+        plugin.moduleId = name;
+        plugin.resourcesRelativeTo = relativeTo;
+        return Promise.resolve();
+      });
+
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.defaultBindingLanguage = function defaultBindingLanguage() {
+      return this._addNormalizedPlugin('aurelia-templating-binding');
+    };
+
+    FrameworkConfiguration.prototype.router = function router() {
+      return this._addNormalizedPlugin('aurelia-templating-router');
+    };
+
+    FrameworkConfiguration.prototype.history = function history() {
+      return this._addNormalizedPlugin('aurelia-history-browser');
+    };
+
+    FrameworkConfiguration.prototype.defaultResources = function defaultResources() {
+      return this._addNormalizedPlugin('aurelia-templating-resources');
+    };
+
+    FrameworkConfiguration.prototype.eventAggregator = function eventAggregator() {
+      return this._addNormalizedPlugin('aurelia-event-aggregator');
+    };
+
+    FrameworkConfiguration.prototype.basicConfiguration = function basicConfiguration() {
+      return this.defaultBindingLanguage().defaultResources().eventAggregator();
+    };
+
+    FrameworkConfiguration.prototype.standardConfiguration = function standardConfiguration() {
+      return this.basicConfiguration().history().router();
+    };
+
+    FrameworkConfiguration.prototype.developmentLogging = function developmentLogging(level) {
+      var _this7 = this;
+
+      var logLevel = level ? TheLogManager.logLevel[level] : undefined;
+
+      if (logLevel === undefined) {
+        logLevel = TheLogManager.logLevel.debug;
+      }
+
+      this.preTask(function () {
+        return _this7.aurelia.loader.normalize('aurelia-logging-console', _this7.bootstrapperName).then(function (name) {
+          return _this7.aurelia.loader.loadModule(name).then(function (m) {
+            TheLogManager.addAppender(new m.ConsoleAppender());
+            TheLogManager.setLevel(logLevel);
+          });
+        });
+      });
+
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.apply = function apply() {
+      var _this8 = this;
+
+      if (this.processed) {
+        return Promise.resolve();
+      }
+
+      return runTasks(this, this.preTasks).then(function () {
+        var loader = _this8.aurelia.loader;
+        var info = _this8.info;
+        var current = void 0;
+
+        var next = function next() {
+          current = info.shift();
+          if (current) {
+            return loadPlugin(_this8, loader, current).then(next);
+          }
+
+          _this8.processed = true;
+          _this8.configuredPlugins = null;
+          return Promise.resolve();
+        };
+
+        return next().then(function () {
+          return runTasks(_this8, _this8.postTasks);
+        });
+      });
+    };
+
+    return FrameworkConfiguration;
+  }();
+
+  exports.FrameworkConfiguration = FrameworkConfiguration;
+  var LogManager = exports.LogManager = TheLogManager;
 });
 define('aurelia-dependency-injection',['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aureliaMetadata, _aureliaPal) {
   'use strict';
@@ -12616,1205 +13155,6 @@ define('aurelia-dependency-injection',['exports', 'aurelia-metadata', 'aurelia-p
     };
   }
 });
-define('aurelia-framework',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-metadata', 'aurelia-templating', 'aurelia-loader', 'aurelia-task-queue', 'aurelia-path', 'aurelia-pal', 'aurelia-logging'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaMetadata, _aureliaTemplating, _aureliaLoader, _aureliaTaskQueue, _aureliaPath, _aureliaPal, _aureliaLogging) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.LogManager = exports.FrameworkConfiguration = exports.Aurelia = undefined;
-  Object.keys(_aureliaDependencyInjection).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaDependencyInjection[key];
-      }
-    });
-  });
-  Object.keys(_aureliaBinding).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaBinding[key];
-      }
-    });
-  });
-  Object.keys(_aureliaMetadata).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaMetadata[key];
-      }
-    });
-  });
-  Object.keys(_aureliaTemplating).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaTemplating[key];
-      }
-    });
-  });
-  Object.keys(_aureliaLoader).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaLoader[key];
-      }
-    });
-  });
-  Object.keys(_aureliaTaskQueue).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaTaskQueue[key];
-      }
-    });
-  });
-  Object.keys(_aureliaPath).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaPath[key];
-      }
-    });
-  });
-  Object.keys(_aureliaPal).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaPal[key];
-      }
-    });
-  });
-
-  var TheLogManager = _interopRequireWildcard(_aureliaLogging);
-
-  function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-        }
-      }
-
-      newObj.default = obj;
-      return newObj;
-    }
-  }
-
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-  };
-
-  
-
-  function preventActionlessFormSubmit() {
-    _aureliaPal.DOM.addEventListener('submit', function (evt) {
-      var target = evt.target;
-      var action = target.action;
-
-      if (target.tagName.toLowerCase() === 'form' && !action) {
-        evt.preventDefault();
-      }
-    });
-  }
-
-  var Aurelia = exports.Aurelia = function () {
-    function Aurelia(loader, container, resources) {
-      
-
-      this.loader = loader || new _aureliaPal.PLATFORM.Loader();
-      this.container = container || new _aureliaDependencyInjection.Container().makeGlobal();
-      this.resources = resources || new _aureliaTemplating.ViewResources();
-      this.use = new FrameworkConfiguration(this);
-      this.logger = TheLogManager.getLogger('aurelia');
-      this.hostConfigured = false;
-      this.host = null;
-
-      this.use.instance(Aurelia, this);
-      this.use.instance(_aureliaLoader.Loader, this.loader);
-      this.use.instance(_aureliaTemplating.ViewResources, this.resources);
-    }
-
-    Aurelia.prototype.start = function start() {
-      var _this = this;
-
-      if (this._started) {
-        return this._started;
-      }
-
-      this.logger.info('Aurelia Starting');
-      return this._started = this.use.apply().then(function () {
-        preventActionlessFormSubmit();
-
-        if (!_this.container.hasResolver(_aureliaTemplating.BindingLanguage)) {
-          var message = 'You must configure Aurelia with a BindingLanguage implementation.';
-          _this.logger.error(message);
-          throw new Error(message);
-        }
-
-        _this.logger.info('Aurelia Started');
-        var evt = _aureliaPal.DOM.createCustomEvent('aurelia-started', { bubbles: true, cancelable: true });
-        _aureliaPal.DOM.dispatchEvent(evt);
-        return _this;
-      });
-    };
-
-    Aurelia.prototype.enhance = function enhance() {
-      var _this2 = this;
-
-      var bindingContext = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      var applicationHost = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      this._configureHost(applicationHost || _aureliaPal.DOM.querySelectorAll('body')[0]);
-
-      return new Promise(function (resolve) {
-        var engine = _this2.container.get(_aureliaTemplating.TemplatingEngine);
-        _this2.root = engine.enhance({ container: _this2.container, element: _this2.host, resources: _this2.resources, bindingContext: bindingContext });
-        _this2.root.attached();
-        _this2._onAureliaComposed();
-        resolve(_this2);
-      });
-    };
-
-    Aurelia.prototype.setRoot = function setRoot() {
-      var _this3 = this;
-
-      var root = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-      var applicationHost = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      var instruction = {};
-
-      if (this.root && this.root.viewModel && this.root.viewModel.router) {
-        this.root.viewModel.router.deactivate();
-        this.root.viewModel.router.reset();
-      }
-
-      this._configureHost(applicationHost);
-
-      var engine = this.container.get(_aureliaTemplating.TemplatingEngine);
-      var transaction = this.container.get(_aureliaTemplating.CompositionTransaction);
-      delete transaction.initialComposition;
-
-      if (!root) {
-        if (this.configModuleId) {
-          root = (0, _aureliaPath.relativeToFile)('./app', this.configModuleId);
-        } else {
-          root = 'app';
-        }
-      }
-
-      instruction.viewModel = root;
-      instruction.container = instruction.childContainer = this.container;
-      instruction.viewSlot = this.hostSlot;
-      instruction.host = this.host;
-
-      return engine.compose(instruction).then(function (r) {
-        _this3.root = r;
-        instruction.viewSlot.attached();
-        _this3._onAureliaComposed();
-        return _this3;
-      });
-    };
-
-    Aurelia.prototype._configureHost = function _configureHost(applicationHost) {
-      if (this.hostConfigured) {
-        return;
-      }
-      applicationHost = applicationHost || this.host;
-
-      if (!applicationHost || typeof applicationHost === 'string') {
-        this.host = _aureliaPal.DOM.getElementById(applicationHost || 'applicationHost');
-      } else {
-        this.host = applicationHost;
-      }
-
-      if (!this.host) {
-        throw new Error('No applicationHost was specified.');
-      }
-
-      this.hostConfigured = true;
-      this.host.aurelia = this;
-      this.hostSlot = new _aureliaTemplating.ViewSlot(this.host, true);
-      this.hostSlot.transformChildNodesIntoView();
-      this.container.registerInstance(_aureliaPal.DOM.boundary, this.host);
-    };
-
-    Aurelia.prototype._onAureliaComposed = function _onAureliaComposed() {
-      var evt = _aureliaPal.DOM.createCustomEvent('aurelia-composed', { bubbles: true, cancelable: true });
-      setTimeout(function () {
-        return _aureliaPal.DOM.dispatchEvent(evt);
-      }, 1);
-    };
-
-    return Aurelia;
-  }();
-
-  var logger = TheLogManager.getLogger('aurelia');
-  var extPattern = /\.[^/.]+$/;
-
-  function runTasks(config, tasks) {
-    var current = void 0;
-    var next = function next() {
-      current = tasks.shift();
-      if (current) {
-        return Promise.resolve(current(config)).then(next);
-      }
-
-      return Promise.resolve();
-    };
-
-    return next();
-  }
-
-  function loadPlugin(fwConfig, loader, info) {
-    logger.debug('Loading plugin ' + info.moduleId + '.');
-    if (typeof info.moduleId === 'string') {
-      fwConfig.resourcesRelativeTo = info.resourcesRelativeTo;
-
-      var id = info.moduleId;
-
-      if (info.resourcesRelativeTo.length > 1) {
-        return loader.normalize(info.moduleId, info.resourcesRelativeTo[1]).then(function (normalizedId) {
-          return _loadPlugin(normalizedId);
-        });
-      }
-
-      return _loadPlugin(id);
-    } else if (typeof info.configure === 'function') {
-      if (fwConfig.configuredPlugins.indexOf(info.configure) !== -1) {
-        return Promise.resolve();
-      }
-      fwConfig.configuredPlugins.push(info.configure);
-
-      return Promise.resolve(info.configure.call(null, fwConfig, info.config || {}));
-    }
-    throw new Error(invalidConfigMsg(info.moduleId || info.configure, 'plugin'));
-
-    function _loadPlugin(moduleId) {
-      return loader.loadModule(moduleId).then(function (m) {
-        if ('configure' in m) {
-          if (fwConfig.configuredPlugins.indexOf(m.configure) !== -1) {
-            return Promise.resolve();
-          }
-          return Promise.resolve(m.configure(fwConfig, info.config || {})).then(function () {
-            fwConfig.configuredPlugins.push(m.configure);
-            fwConfig.resourcesRelativeTo = null;
-            logger.debug('Configured plugin ' + info.moduleId + '.');
-          });
-        }
-
-        fwConfig.resourcesRelativeTo = null;
-        logger.debug('Loaded plugin ' + info.moduleId + '.');
-      });
-    }
-  }
-
-  function loadResources(aurelia, resourcesToLoad, appResources) {
-    if (Object.keys(resourcesToLoad).length === 0) {
-      return Promise.resolve();
-    }
-    var viewEngine = aurelia.container.get(_aureliaTemplating.ViewEngine);
-
-    return Promise.all(Object.keys(resourcesToLoad).map(function (n) {
-      return _normalize(resourcesToLoad[n]);
-    })).then(function (loads) {
-      var names = [];
-      var importIds = [];
-
-      loads.forEach(function (l) {
-        names.push(undefined);
-        importIds.push(l.importId);
-      });
-
-      return viewEngine.importViewResources(importIds, names, appResources);
-    });
-
-    function _normalize(load) {
-      var moduleId = load.moduleId;
-      var ext = getExt(moduleId);
-
-      if (isOtherResource(moduleId)) {
-        moduleId = removeExt(moduleId);
-      }
-
-      return aurelia.loader.normalize(moduleId, load.relativeTo).then(function (normalized) {
-        return {
-          name: load.moduleId,
-          importId: isOtherResource(load.moduleId) ? addOriginalExt(normalized, ext) : normalized
-        };
-      });
-    }
-
-    function isOtherResource(name) {
-      var ext = getExt(name);
-      if (!ext) return false;
-      if (ext === '') return false;
-      if (ext === '.js' || ext === '.ts') return false;
-      return true;
-    }
-
-    function removeExt(name) {
-      return name.replace(extPattern, '');
-    }
-
-    function addOriginalExt(normalized, ext) {
-      return removeExt(normalized) + '.' + ext;
-    }
-  }
-
-  function getExt(name) {
-    var match = name.match(extPattern);
-    if (match && match.length > 0) {
-      return match[0].split('.')[1];
-    }
-  }
-
-  function loadBehaviors(config) {
-    return Promise.all(config.behaviorsToLoad.map(function (m) {
-      return m.load(config.container, m.target);
-    })).then(function () {
-      config.behaviorsToLoad = null;
-    });
-  }
-
-  function assertProcessed(plugins) {
-    if (plugins.processed) {
-      throw new Error('This config instance has already been applied. To load more plugins or global resources, create a new FrameworkConfiguration instance.');
-    }
-  }
-
-  function invalidConfigMsg(cfg, type) {
-    return 'Invalid ' + type + ' [' + cfg + '], ' + type + ' must be specified as functions or relative module IDs.';
-  }
-
-  var FrameworkConfiguration = function () {
-    function FrameworkConfiguration(aurelia) {
-      var _this4 = this;
-
-      
-
-      this.aurelia = aurelia;
-      this.container = aurelia.container;
-
-      this.info = [];
-      this.processed = false;
-      this.preTasks = [];
-      this.postTasks = [];
-
-      this.behaviorsToLoad = [];
-
-      this.configuredPlugins = [];
-      this.resourcesToLoad = {};
-      this.preTask(function () {
-        return aurelia.loader.normalize('aurelia-bootstrapper').then(function (name) {
-          return _this4.bootstrapperName = name;
-        });
-      });
-      this.postTask(function () {
-        return loadResources(aurelia, _this4.resourcesToLoad, aurelia.resources);
-      });
-    }
-
-    FrameworkConfiguration.prototype.instance = function instance(type, _instance) {
-      this.container.registerInstance(type, _instance);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.singleton = function singleton(type, implementation) {
-      this.container.registerSingleton(type, implementation);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.transient = function transient(type, implementation) {
-      this.container.registerTransient(type, implementation);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.preTask = function preTask(task) {
-      assertProcessed(this);
-      this.preTasks.push(task);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.postTask = function postTask(task) {
-      assertProcessed(this);
-      this.postTasks.push(task);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.feature = function feature(plugin) {
-      var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      switch (typeof plugin === 'undefined' ? 'undefined' : _typeof(plugin)) {
-        case 'string':
-          var hasIndex = /\/index$/i.test(plugin);
-          var _moduleId = hasIndex || getExt(plugin) ? plugin : plugin + '/index';
-          var root = hasIndex ? plugin.substr(0, plugin.length - 6) : plugin;
-          this.info.push({ moduleId: _moduleId, resourcesRelativeTo: [root, ''], config: config });
-          break;
-
-        case 'function':
-          this.info.push({ configure: plugin, config: config || {} });
-          break;
-        default:
-          throw new Error(invalidConfigMsg(plugin, 'feature'));
-      }
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.globalResources = function globalResources(resources) {
-      var _this5 = this;
-
-      assertProcessed(this);
-
-      var toAdd = Array.isArray(resources) ? resources : arguments;
-      var resource = void 0;
-      var resourcesRelativeTo = this.resourcesRelativeTo || ['', ''];
-
-      for (var i = 0, ii = toAdd.length; i < ii; ++i) {
-        resource = toAdd[i];
-        switch (typeof resource === 'undefined' ? 'undefined' : _typeof(resource)) {
-          case 'string':
-            var parent = resourcesRelativeTo[0];
-            var grandParent = resourcesRelativeTo[1];
-            var name = resource;
-
-            if ((resource.startsWith('./') || resource.startsWith('../')) && parent !== '') {
-              name = (0, _aureliaPath.join)(parent, resource);
-            }
-
-            this.resourcesToLoad[name] = { moduleId: name, relativeTo: grandParent };
-            break;
-          case 'function':
-            var meta = this.aurelia.resources.autoRegister(this.container, resource);
-            if (meta instanceof _aureliaTemplating.HtmlBehaviorResource && meta.elementName !== null) {
-              if (this.behaviorsToLoad.push(meta) === 1) {
-                this.postTask(function () {
-                  return loadBehaviors(_this5);
-                });
-              }
-            }
-            break;
-          default:
-            throw new Error(invalidConfigMsg(resource, 'resource'));
-        }
-      }
-
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.globalName = function globalName(resourcePath, newName) {
-      assertProcessed(this);
-      this.resourcesToLoad[resourcePath] = { moduleId: newName, relativeTo: '' };
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.plugin = function plugin(_plugin, pluginConfig) {
-      assertProcessed(this);
-
-      var info = void 0;
-      switch (typeof _plugin === 'undefined' ? 'undefined' : _typeof(_plugin)) {
-        case 'string':
-          info = { moduleId: _plugin, resourcesRelativeTo: [_plugin, ''], config: pluginConfig || {} };
-          break;
-        case 'function':
-          info = { configure: _plugin, config: pluginConfig || {} };
-          break;
-        default:
-          throw new Error(invalidConfigMsg(_plugin, 'plugin'));
-      }
-      this.info.push(info);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype._addNormalizedPlugin = function _addNormalizedPlugin(name, config) {
-      var _this6 = this;
-
-      var plugin = { moduleId: name, resourcesRelativeTo: [name, ''], config: config || {} };
-      this.info.push(plugin);
-
-      this.preTask(function () {
-        var relativeTo = [name, _this6.bootstrapperName];
-        plugin.moduleId = name;
-        plugin.resourcesRelativeTo = relativeTo;
-        return Promise.resolve();
-      });
-
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.defaultBindingLanguage = function defaultBindingLanguage() {
-      return this._addNormalizedPlugin('aurelia-templating-binding');
-    };
-
-    FrameworkConfiguration.prototype.router = function router() {
-      return this._addNormalizedPlugin('aurelia-templating-router');
-    };
-
-    FrameworkConfiguration.prototype.history = function history() {
-      return this._addNormalizedPlugin('aurelia-history-browser');
-    };
-
-    FrameworkConfiguration.prototype.defaultResources = function defaultResources() {
-      return this._addNormalizedPlugin('aurelia-templating-resources');
-    };
-
-    FrameworkConfiguration.prototype.eventAggregator = function eventAggregator() {
-      return this._addNormalizedPlugin('aurelia-event-aggregator');
-    };
-
-    FrameworkConfiguration.prototype.basicConfiguration = function basicConfiguration() {
-      return this.defaultBindingLanguage().defaultResources().eventAggregator();
-    };
-
-    FrameworkConfiguration.prototype.standardConfiguration = function standardConfiguration() {
-      return this.basicConfiguration().history().router();
-    };
-
-    FrameworkConfiguration.prototype.developmentLogging = function developmentLogging(level) {
-      var _this7 = this;
-
-      var logLevel = level ? TheLogManager.logLevel[level] : undefined;
-
-      if (logLevel === undefined) {
-        logLevel = TheLogManager.logLevel.debug;
-      }
-
-      this.preTask(function () {
-        return _this7.aurelia.loader.normalize('aurelia-logging-console', _this7.bootstrapperName).then(function (name) {
-          return _this7.aurelia.loader.loadModule(name).then(function (m) {
-            TheLogManager.addAppender(new m.ConsoleAppender());
-            TheLogManager.setLevel(logLevel);
-          });
-        });
-      });
-
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.apply = function apply() {
-      var _this8 = this;
-
-      if (this.processed) {
-        return Promise.resolve();
-      }
-
-      return runTasks(this, this.preTasks).then(function () {
-        var loader = _this8.aurelia.loader;
-        var info = _this8.info;
-        var current = void 0;
-
-        var next = function next() {
-          current = info.shift();
-          if (current) {
-            return loadPlugin(_this8, loader, current).then(next);
-          }
-
-          _this8.processed = true;
-          _this8.configuredPlugins = null;
-          return Promise.resolve();
-        };
-
-        return next().then(function () {
-          return runTasks(_this8, _this8.postTasks);
-        });
-      });
-    };
-
-    return FrameworkConfiguration;
-  }();
-
-  exports.FrameworkConfiguration = FrameworkConfiguration;
-  var LogManager = exports.LogManager = TheLogManager;
-});
-define('aurelia-history',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  
-
-  function mi(name) {
-    throw new Error('History must implement ' + name + '().');
-  }
-
-  var History = exports.History = function () {
-    function History() {
-      
-    }
-
-    History.prototype.activate = function activate(options) {
-      mi('activate');
-    };
-
-    History.prototype.deactivate = function deactivate() {
-      mi('deactivate');
-    };
-
-    History.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
-      mi('getAbsoluteRoot');
-    };
-
-    History.prototype.navigate = function navigate(fragment, options) {
-      mi('navigate');
-    };
-
-    History.prototype.navigateBack = function navigateBack() {
-      mi('navigateBack');
-    };
-
-    History.prototype.setTitle = function setTitle(title) {
-      mi('setTitle');
-    };
-
-    History.prototype.setState = function setState(key, value) {
-      mi('setState');
-    };
-
-    History.prototype.getState = function getState(key) {
-      mi('getState');
-    };
-
-    History.prototype.getHistoryIndex = function getHistoryIndex() {
-      mi('getHistoryIndex');
-    };
-
-    History.prototype.go = function go(movement) {
-      mi('go');
-    };
-
-    return History;
-  }();
-});
-define('aurelia-history-browser',['exports', 'aurelia-pal', 'aurelia-history'], function (exports, _aureliaPal, _aureliaHistory) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.BrowserHistory = exports.DefaultLinkHandler = exports.LinkHandler = undefined;
-  exports.configure = configure;
-
-  var _class, _temp;
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
-
-  
-
-  var LinkHandler = exports.LinkHandler = function () {
-    function LinkHandler() {
-      
-    }
-
-    LinkHandler.prototype.activate = function activate(history) {};
-
-    LinkHandler.prototype.deactivate = function deactivate() {};
-
-    return LinkHandler;
-  }();
-
-  var DefaultLinkHandler = exports.DefaultLinkHandler = function (_LinkHandler) {
-    _inherits(DefaultLinkHandler, _LinkHandler);
-
-    function DefaultLinkHandler() {
-      
-
-      var _this = _possibleConstructorReturn(this, _LinkHandler.call(this));
-
-      _this.handler = function (e) {
-        var _DefaultLinkHandler$g = DefaultLinkHandler.getEventInfo(e),
-            shouldHandleEvent = _DefaultLinkHandler$g.shouldHandleEvent,
-            href = _DefaultLinkHandler$g.href;
-
-        if (shouldHandleEvent) {
-          e.preventDefault();
-          _this.history.navigate(href);
-        }
-      };
-      return _this;
-    }
-
-    DefaultLinkHandler.prototype.activate = function activate(history) {
-      if (history._hasPushState) {
-        this.history = history;
-        _aureliaPal.DOM.addEventListener('click', this.handler, true);
-      }
-    };
-
-    DefaultLinkHandler.prototype.deactivate = function deactivate() {
-      _aureliaPal.DOM.removeEventListener('click', this.handler);
-    };
-
-    DefaultLinkHandler.getEventInfo = function getEventInfo(event) {
-      var info = {
-        shouldHandleEvent: false,
-        href: null,
-        anchor: null
-      };
-
-      var target = DefaultLinkHandler.findClosestAnchor(event.target);
-      if (!target || !DefaultLinkHandler.targetIsThisWindow(target)) {
-        return info;
-      }
-
-      if (target.hasAttribute('download') || target.hasAttribute('router-ignore') || target.hasAttribute('data-router-ignore')) {
-        return info;
-      }
-
-      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
-        return info;
-      }
-
-      var href = target.getAttribute('href');
-      info.anchor = target;
-      info.href = href;
-
-      var leftButtonClicked = event.which === 1;
-      var isRelative = href && !(href.charAt(0) === '#' || /^[a-z]+:/i.test(href));
-
-      info.shouldHandleEvent = leftButtonClicked && isRelative;
-      return info;
-    };
-
-    DefaultLinkHandler.findClosestAnchor = function findClosestAnchor(el) {
-      while (el) {
-        if (el.tagName === 'A') {
-          return el;
-        }
-
-        el = el.parentNode;
-      }
-    };
-
-    DefaultLinkHandler.targetIsThisWindow = function targetIsThisWindow(target) {
-      var targetWindow = target.getAttribute('target');
-      var win = _aureliaPal.PLATFORM.global;
-
-      return !targetWindow || targetWindow === win.name || targetWindow === '_self';
-    };
-
-    return DefaultLinkHandler;
-  }(LinkHandler);
-
-  function configure(config) {
-    config.singleton(_aureliaHistory.History, BrowserHistory);
-    config.transient(LinkHandler, DefaultLinkHandler);
-  }
-
-  var BrowserHistory = exports.BrowserHistory = (_temp = _class = function (_History) {
-    _inherits(BrowserHistory, _History);
-
-    function BrowserHistory(linkHandler) {
-      
-
-      var _this2 = _possibleConstructorReturn(this, _History.call(this));
-
-      _this2._isActive = false;
-      _this2._checkUrlCallback = _this2._checkUrl.bind(_this2);
-
-      _this2.location = _aureliaPal.PLATFORM.location;
-      _this2.history = _aureliaPal.PLATFORM.history;
-      _this2.linkHandler = linkHandler;
-      return _this2;
-    }
-
-    BrowserHistory.prototype.activate = function activate(options) {
-      if (this._isActive) {
-        throw new Error('History has already been activated.');
-      }
-
-      var wantsPushState = !!options.pushState;
-
-      this._isActive = true;
-      this.options = Object.assign({}, { root: '/' }, this.options, options);
-
-      this.root = ('/' + this.options.root + '/').replace(rootStripper, '/');
-
-      this._wantsHashChange = this.options.hashChange !== false;
-      this._hasPushState = !!(this.options.pushState && this.history && this.history.pushState);
-
-      var eventName = void 0;
-      if (this._hasPushState) {
-        eventName = 'popstate';
-      } else if (this._wantsHashChange) {
-        eventName = 'hashchange';
-      }
-
-      _aureliaPal.PLATFORM.addEventListener(eventName, this._checkUrlCallback);
-
-      if (this._wantsHashChange && wantsPushState) {
-        var loc = this.location;
-        var atRoot = loc.pathname.replace(/[^\/]$/, '$&/') === this.root;
-
-        if (!this._hasPushState && !atRoot) {
-          this.fragment = this._getFragment(null, true);
-          this.location.replace(this.root + this.location.search + '#' + this.fragment);
-
-          return true;
-        } else if (this._hasPushState && atRoot && loc.hash) {
-          this.fragment = this._getHash().replace(routeStripper, '');
-          this.history.replaceState({}, _aureliaPal.DOM.title, this.root + this.fragment + loc.search);
-        }
-      }
-
-      if (!this.fragment) {
-        this.fragment = this._getFragment();
-      }
-
-      this.linkHandler.activate(this);
-
-      if (!this.options.silent) {
-        return this._loadUrl();
-      }
-    };
-
-    BrowserHistory.prototype.deactivate = function deactivate() {
-      _aureliaPal.PLATFORM.removeEventListener('popstate', this._checkUrlCallback);
-      _aureliaPal.PLATFORM.removeEventListener('hashchange', this._checkUrlCallback);
-      this._isActive = false;
-      this.linkHandler.deactivate();
-    };
-
-    BrowserHistory.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
-      var origin = createOrigin(this.location.protocol, this.location.hostname, this.location.port);
-      return '' + origin + this.root;
-    };
-
-    BrowserHistory.prototype.navigate = function navigate(fragment) {
-      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-          _ref$trigger = _ref.trigger,
-          trigger = _ref$trigger === undefined ? true : _ref$trigger,
-          _ref$replace = _ref.replace,
-          replace = _ref$replace === undefined ? false : _ref$replace;
-
-      if (fragment && absoluteUrl.test(fragment)) {
-        this.location.href = fragment;
-        return true;
-      }
-
-      if (!this._isActive) {
-        return false;
-      }
-
-      fragment = this._getFragment(fragment || '');
-
-      if (this.fragment === fragment && !replace) {
-        return false;
-      }
-
-      this.fragment = fragment;
-
-      var url = this.root + fragment;
-
-      if (fragment === '' && url !== '/') {
-        url = url.slice(0, -1);
-      }
-
-      if (this._hasPushState) {
-        url = url.replace('//', '/');
-        this.history[replace ? 'replaceState' : 'pushState']({}, _aureliaPal.DOM.title, url);
-      } else if (this._wantsHashChange) {
-        updateHash(this.location, fragment, replace);
-      } else {
-        this.location.assign(url);
-      }
-
-      if (trigger) {
-        return this._loadUrl(fragment);
-      }
-
-      return true;
-    };
-
-    BrowserHistory.prototype.navigateBack = function navigateBack() {
-      this.history.back();
-    };
-
-    BrowserHistory.prototype.setTitle = function setTitle(title) {
-      _aureliaPal.DOM.title = title;
-    };
-
-    BrowserHistory.prototype.setState = function setState(key, value) {
-      var state = Object.assign({}, this.history.state);
-      var _location = this.location,
-          pathname = _location.pathname,
-          search = _location.search,
-          hash = _location.hash;
-
-      state[key] = value;
-      this.history.replaceState(state, null, '' + pathname + search + hash);
-    };
-
-    BrowserHistory.prototype.getState = function getState(key) {
-      var state = Object.assign({}, this.history.state);
-      return state[key];
-    };
-
-    BrowserHistory.prototype.getHistoryIndex = function getHistoryIndex() {
-      var historyIndex = this.getState('HistoryIndex');
-      if (historyIndex === undefined) {
-        historyIndex = this.history.length - 1;
-        this.setState('HistoryIndex', historyIndex);
-      }
-      return historyIndex;
-    };
-
-    BrowserHistory.prototype.go = function go(movement) {
-      this.history.go(movement);
-    };
-
-    BrowserHistory.prototype._getHash = function _getHash() {
-      return this.location.hash.substr(1);
-    };
-
-    BrowserHistory.prototype._getFragment = function _getFragment(fragment, forcePushState) {
-      var root = void 0;
-
-      if (!fragment) {
-        if (this._hasPushState || !this._wantsHashChange || forcePushState) {
-          fragment = this.location.pathname + this.location.search;
-          root = this.root.replace(trailingSlash, '');
-          if (!fragment.indexOf(root)) {
-            fragment = fragment.substr(root.length);
-          }
-        } else {
-          fragment = this._getHash();
-        }
-      }
-
-      return '/' + fragment.replace(routeStripper, '');
-    };
-
-    BrowserHistory.prototype._checkUrl = function _checkUrl() {
-      var current = this._getFragment();
-      if (current !== this.fragment) {
-        this._loadUrl();
-      }
-    };
-
-    BrowserHistory.prototype._loadUrl = function _loadUrl(fragmentOverride) {
-      var fragment = this.fragment = this._getFragment(fragmentOverride);
-
-      return this.options.routeHandler ? this.options.routeHandler(fragment) : false;
-    };
-
-    return BrowserHistory;
-  }(_aureliaHistory.History), _class.inject = [LinkHandler], _temp);
-
-  var routeStripper = /^#?\/*|\s+$/g;
-
-  var rootStripper = /^\/+|\/+$/g;
-
-  var trailingSlash = /\/$/;
-
-  var absoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
-
-  function updateHash(location, fragment, replace) {
-    if (replace) {
-      var _href = location.href.replace(/(javascript:|#).*$/, '');
-      location.replace(_href + '#' + fragment);
-    } else {
-      location.hash = '#' + fragment;
-    }
-  }
-
-  function createOrigin(protocol, hostname, port) {
-    return protocol + '//' + hostname + (port ? ':' + port : '');
-  }
-});
-define('aurelia-loader',['exports', 'aurelia-path', 'aurelia-metadata'], function (exports, _aureliaPath, _aureliaMetadata) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Loader = exports.TemplateRegistryEntry = exports.TemplateDependency = undefined;
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  
-
-  var TemplateDependency = exports.TemplateDependency = function TemplateDependency(src, name) {
-    
-
-    this.src = src;
-    this.name = name;
-  };
-
-  var TemplateRegistryEntry = exports.TemplateRegistryEntry = function () {
-    function TemplateRegistryEntry(address) {
-      
-
-      this.templateIsLoaded = false;
-      this.factoryIsReady = false;
-      this.resources = null;
-      this.dependencies = null;
-
-      this.address = address;
-      this.onReady = null;
-      this._template = null;
-      this._factory = null;
-    }
-
-    TemplateRegistryEntry.prototype.addDependency = function addDependency(src, name) {
-      var finalSrc = typeof src === 'string' ? (0, _aureliaPath.relativeToFile)(src, this.address) : _aureliaMetadata.Origin.get(src).moduleId;
-
-      this.dependencies.push(new TemplateDependency(finalSrc, name));
-    };
-
-    _createClass(TemplateRegistryEntry, [{
-      key: 'template',
-      get: function get() {
-        return this._template;
-      },
-      set: function set(value) {
-        var address = this.address;
-        var requires = void 0;
-        var current = void 0;
-        var src = void 0;
-        var dependencies = void 0;
-
-        this._template = value;
-        this.templateIsLoaded = true;
-
-        requires = value.content.querySelectorAll('require');
-        dependencies = this.dependencies = new Array(requires.length);
-
-        for (var i = 0, ii = requires.length; i < ii; ++i) {
-          current = requires[i];
-          src = current.getAttribute('from');
-
-          if (!src) {
-            throw new Error('<require> element in ' + address + ' has no "from" attribute.');
-          }
-
-          dependencies[i] = new TemplateDependency((0, _aureliaPath.relativeToFile)(src, address), current.getAttribute('as'));
-
-          if (current.parentNode) {
-            current.parentNode.removeChild(current);
-          }
-        }
-      }
-    }, {
-      key: 'factory',
-      get: function get() {
-        return this._factory;
-      },
-      set: function set(value) {
-        this._factory = value;
-        this.factoryIsReady = true;
-      }
-    }]);
-
-    return TemplateRegistryEntry;
-  }();
-
-  var Loader = exports.Loader = function () {
-    function Loader() {
-      
-
-      this.templateRegistry = {};
-    }
-
-    Loader.prototype.map = function map(id, source) {
-      throw new Error('Loaders must implement map(id, source).');
-    };
-
-    Loader.prototype.normalizeSync = function normalizeSync(moduleId, relativeTo) {
-      throw new Error('Loaders must implement normalizeSync(moduleId, relativeTo).');
-    };
-
-    Loader.prototype.normalize = function normalize(moduleId, relativeTo) {
-      throw new Error('Loaders must implement normalize(moduleId: string, relativeTo: string): Promise<string>.');
-    };
-
-    Loader.prototype.loadModule = function loadModule(id) {
-      throw new Error('Loaders must implement loadModule(id).');
-    };
-
-    Loader.prototype.loadAllModules = function loadAllModules(ids) {
-      throw new Error('Loader must implement loadAllModules(ids).');
-    };
-
-    Loader.prototype.loadTemplate = function loadTemplate(url) {
-      throw new Error('Loader must implement loadTemplate(url).');
-    };
-
-    Loader.prototype.loadText = function loadText(url) {
-      throw new Error('Loader must implement loadText(url).');
-    };
-
-    Loader.prototype.applyPluginToUrl = function applyPluginToUrl(url, pluginName) {
-      throw new Error('Loader must implement applyPluginToUrl(url, pluginName).');
-    };
-
-    Loader.prototype.addPlugin = function addPlugin(pluginName, implementation) {
-      throw new Error('Loader must implement addPlugin(pluginName, implementation).');
-    };
-
-    Loader.prototype.getOrCreateTemplateRegistryEntry = function getOrCreateTemplateRegistryEntry(address) {
-      return this.templateRegistry[address] || (this.templateRegistry[address] = new TemplateRegistryEntry(address));
-    };
-
-    return Loader;
-  }();
-});
 define('aurelia-loader-default',['exports', 'aurelia-loader', 'aurelia-pal', 'aurelia-metadata'], function (exports, _aureliaLoader, _aureliaPal, _aureliaMetadata) {
   'use strict';
 
@@ -14106,63 +13446,6 @@ define('aurelia-loader-default',['exports', 'aurelia-loader', 'aurelia-pal', 'au
     };
   }
 });
-define('aurelia-logging-console',["exports"], function (exports) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  
-
-  var ConsoleAppender = exports.ConsoleAppender = function () {
-    function ConsoleAppender() {
-      
-    }
-
-    ConsoleAppender.prototype.debug = function debug(logger) {
-      var _console;
-
-      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        rest[_key - 1] = arguments[_key];
-      }
-
-      (_console = console).debug.apply(_console, ["DEBUG [" + logger.id + "]"].concat(rest));
-    };
-
-    ConsoleAppender.prototype.info = function info(logger) {
-      var _console2;
-
-      for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-        rest[_key2 - 1] = arguments[_key2];
-      }
-
-      (_console2 = console).info.apply(_console2, ["INFO [" + logger.id + "]"].concat(rest));
-    };
-
-    ConsoleAppender.prototype.warn = function warn(logger) {
-      var _console3;
-
-      for (var _len3 = arguments.length, rest = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-        rest[_key3 - 1] = arguments[_key3];
-      }
-
-      (_console3 = console).warn.apply(_console3, ["WARN [" + logger.id + "]"].concat(rest));
-    };
-
-    ConsoleAppender.prototype.error = function error(logger) {
-      var _console4;
-
-      for (var _len4 = arguments.length, rest = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-        rest[_key4 - 1] = arguments[_key4];
-      }
-
-      (_console4 = console).error.apply(_console4, ["ERROR [" + logger.id + "]"].concat(rest));
-    };
-
-    return ConsoleAppender;
-  }();
-});
 define('aurelia-logging',['exports'], function (exports) {
   'use strict';
 
@@ -14355,6 +13638,63 @@ define('aurelia-logging',['exports'], function (exports) {
     };
 
     return Logger;
+  }();
+});
+define('aurelia-logging-console',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  var ConsoleAppender = exports.ConsoleAppender = function () {
+    function ConsoleAppender() {
+      
+    }
+
+    ConsoleAppender.prototype.debug = function debug(logger) {
+      var _console;
+
+      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        rest[_key - 1] = arguments[_key];
+      }
+
+      (_console = console).debug.apply(_console, ["DEBUG [" + logger.id + "]"].concat(rest));
+    };
+
+    ConsoleAppender.prototype.info = function info(logger) {
+      var _console2;
+
+      for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        rest[_key2 - 1] = arguments[_key2];
+      }
+
+      (_console2 = console).info.apply(_console2, ["INFO [" + logger.id + "]"].concat(rest));
+    };
+
+    ConsoleAppender.prototype.warn = function warn(logger) {
+      var _console3;
+
+      for (var _len3 = arguments.length, rest = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+        rest[_key3 - 1] = arguments[_key3];
+      }
+
+      (_console3 = console).warn.apply(_console3, ["WARN [" + logger.id + "]"].concat(rest));
+    };
+
+    ConsoleAppender.prototype.error = function error(logger) {
+      var _console4;
+
+      for (var _len4 = arguments.length, rest = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+        rest[_key4 - 1] = arguments[_key4];
+      }
+
+      (_console4 = console).error.apply(_console4, ["ERROR [" + logger.id + "]"].concat(rest));
+    };
+
+    return ConsoleAppender;
   }();
 });
 define('aurelia-metadata',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
@@ -25333,298 +24673,6 @@ define('aurelia-templating-resources/aurelia-templating-resources',['exports', '
   exports.viewsRequireLifecycle = _analyzeViewFactory.viewsRequireLifecycle;
 });;define('aurelia-templating-resources', ['aurelia-templating-resources/aurelia-templating-resources'], function (main) { return main; });
 
-define('aurelia-testing/aurelia-testing',["require", "exports", "./compile-spy", "./view-spy", "./component-tester", "./wait"], function (require, exports, compile_spy_1, view_spy_1, component_tester_1, wait_1) {
-    "use strict";
-    function __export(m) {
-        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-    }
-    Object.defineProperty(exports, "__esModule", { value: true });
-    __export(compile_spy_1);
-    __export(view_spy_1);
-    __export(component_tester_1);
-    __export(wait_1);
-    function configure(config) {
-        config.globalResources([
-            './compile-spy',
-            './view-spy'
-        ]);
-    }
-    exports.configure = configure;
-});
-;define('aurelia-testing', ['aurelia-testing/aurelia-testing'], function (main) { return main; });
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-define('aurelia-testing/compile-spy',["require", "exports", "aurelia-templating", "aurelia-dependency-injection", "aurelia-logging", "aurelia-pal"], function (require, exports, aurelia_templating_1, aurelia_dependency_injection_1, aurelia_logging_1, aurelia_pal_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /**
-     * Attribute to be placed on any element to have it emit the View Compiler's
-     * TargetInstruction into the debug console, giving you insight into all the
-     * parsed bindings, behaviors and event handers for the targeted element.
-     */
-    var CompileSpy = /** @class */ (function () {
-        /**
-         * Creates and instanse of CompileSpy.
-         * @param element target element on where attribute is placed on.
-         * @param instruction instructions for how the target element should be enhanced.
-         */
-        function CompileSpy(element, instruction) {
-            aurelia_logging_1.getLogger('compile-spy').info(element.toString(), instruction);
-        }
-        CompileSpy = __decorate([
-            aurelia_templating_1.customAttribute('compile-spy'),
-            aurelia_dependency_injection_1.inject(aurelia_pal_1.DOM.Element, aurelia_templating_1.TargetInstruction)
-        ], CompileSpy);
-        return CompileSpy;
-    }());
-    exports.CompileSpy = CompileSpy;
-});
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-define('aurelia-testing/view-spy',["require", "exports", "aurelia-templating", "aurelia-logging"], function (require, exports, aurelia_templating_1, aurelia_logging_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /**
-     * Attribute to be placed on any HTML element in a view to emit the View instance
-     * to the debug console, giving you insight into the live View instance, including
-     * all child views, live bindings, behaviors and more.
-     */
-    var ViewSpy = /** @class */ (function () {
-        /**
-         * Creates a new instance of ViewSpy.
-         */
-        function ViewSpy() {
-            this.logger = aurelia_logging_1.getLogger('view-spy');
-        }
-        ViewSpy.prototype._log = function (lifecycleName, context) {
-            if (!this.value && lifecycleName === 'created') {
-                this.logger.info(lifecycleName, this.view);
-            }
-            else if (this.value && this.value.indexOf(lifecycleName) !== -1) {
-                this.logger.info(lifecycleName, this.view, context);
-            }
-        };
-        /**
-         * Invoked when the target view is created.
-         * @param view The target view.
-         */
-        ViewSpy.prototype.created = function (view) {
-            this.view = view;
-            this._log('created');
-        };
-        /**
-         * Invoked when the target view is bound.
-         * @param bindingContext The target view's binding context.
-         */
-        ViewSpy.prototype.bind = function (bindingContext) {
-            this._log('bind', bindingContext);
-        };
-        /**
-         * Invoked when the target element is attached to the DOM.
-         */
-        ViewSpy.prototype.attached = function () {
-            this._log('attached');
-        };
-        /**
-         * Invoked when the target element is detached from the DOM.
-         */
-        ViewSpy.prototype.detached = function () {
-            this._log('detached');
-        };
-        /**
-         * Invoked when the target element is unbound.
-         */
-        ViewSpy.prototype.unbind = function () {
-            this._log('unbind');
-        };
-        ViewSpy = __decorate([
-            aurelia_templating_1.customAttribute('view-spy')
-        ], ViewSpy);
-        return ViewSpy;
-    }());
-    exports.ViewSpy = ViewSpy;
-});
-
-define('aurelia-testing/component-tester',["require", "exports", "aurelia-templating", "./wait"], function (require, exports, aurelia_templating_1, wait_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var StageComponent = /** @class */ (function () {
-        function StageComponent() {
-        }
-        StageComponent.withResources = function (resources) {
-            if (resources === void 0) { resources = []; }
-            return new ComponentTester().withResources(resources);
-        };
-        return StageComponent;
-    }());
-    exports.StageComponent = StageComponent;
-    var ComponentTester = /** @class */ (function () {
-        function ComponentTester() {
-            this.resources = [];
-        }
-        ComponentTester.prototype.configure = function (aurelia) {
-            return aurelia.use.standardConfiguration();
-        };
-        ComponentTester.prototype.bootstrap = function (configure) {
-            this.configure = configure;
-        };
-        ComponentTester.prototype.withResources = function (resources) {
-            this.resources = resources;
-            return this;
-        };
-        ComponentTester.prototype.inView = function (html) {
-            this.html = html;
-            return this;
-        };
-        ComponentTester.prototype.boundTo = function (bindingContext) {
-            this.bindingContext = bindingContext;
-            return this;
-        };
-        ComponentTester.prototype.manuallyHandleLifecycle = function () {
-            this._prepareLifecycle();
-            return this;
-        };
-        ComponentTester.prototype.create = function (bootstrap) {
-            var _this = this;
-            return bootstrap(function (aurelia) {
-                return Promise.resolve(_this.configure(aurelia)).then(function () {
-                    if (_this.resources) {
-                        aurelia.use.globalResources(_this.resources);
-                    }
-                    return aurelia.start().then(function () {
-                        _this.host = document.createElement('div');
-                        _this.host.innerHTML = _this.html;
-                        document.body.appendChild(_this.host);
-                        return aurelia.enhance(_this.bindingContext, _this.host).then(function () {
-                            _this.rootView = aurelia.root;
-                            _this.element = _this.host.firstElementChild;
-                            if (aurelia.root.controllers.length) {
-                                _this.viewModel = aurelia.root.controllers[0].viewModel;
-                            }
-                            return new Promise(function (resolve) { return setTimeout(function () { return resolve(); }, 0); });
-                        });
-                    });
-                });
-            });
-        };
-        ComponentTester.prototype.dispose = function () {
-            if (this.host === undefined || this.rootView === undefined) {
-                throw new Error('Cannot call ComponentTester.dispose() before ComponentTester.create()');
-            }
-            this.rootView.detached();
-            this.rootView.unbind();
-            return this.host.parentNode.removeChild(this.host);
-        };
-        ComponentTester.prototype._prepareLifecycle = function () {
-            var _this = this;
-            // bind
-            var bindPrototype = aurelia_templating_1.View.prototype.bind;
-            // tslint:disable-next-line:no-empty
-            aurelia_templating_1.View.prototype.bind = function () { };
-            this.bind = function (bindingContext) { return new Promise(function (resolve) {
-                aurelia_templating_1.View.prototype.bind = bindPrototype;
-                if (bindingContext !== undefined) {
-                    _this.bindingContext = bindingContext;
-                }
-                _this.rootView.bind(_this.bindingContext);
-                setTimeout(function () { return resolve(); }, 0);
-            }); };
-            // attached
-            var attachedPrototype = aurelia_templating_1.View.prototype.attached;
-            // tslint:disable-next-line:no-empty
-            aurelia_templating_1.View.prototype.attached = function () { };
-            this.attached = function () { return new Promise(function (resolve) {
-                aurelia_templating_1.View.prototype.attached = attachedPrototype;
-                _this.rootView.attached();
-                setTimeout(function () { return resolve(); }, 0);
-            }); };
-            // detached
-            this.detached = function () { return new Promise(function (resolve) {
-                _this.rootView.detached();
-                setTimeout(function () { return resolve(); }, 0);
-            }); };
-            // unbind
-            this.unbind = function () { return new Promise(function (resolve) {
-                _this.rootView.unbind();
-                setTimeout(function () { return resolve(); }, 0);
-            }); };
-        };
-        ComponentTester.prototype.waitForElement = function (selector, options) {
-            var _this = this;
-            return wait_1.waitFor(function () { return _this.element.querySelector(selector); }, options);
-        };
-        ComponentTester.prototype.waitForElements = function (selector, options) {
-            var _this = this;
-            return wait_1.waitFor(function () { return _this.element.querySelectorAll(selector); }, options);
-        };
-        return ComponentTester;
-    }());
-    exports.ComponentTester = ComponentTester;
-});
-
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
-define('aurelia-testing/wait',["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /**
-     * Generic function to wait for something to happen. Uses polling
-     * @param getter: a getter function that returns anything else than `null` or an
-     *                empty array or an empty jQuery object when the
-     *                condition is met
-     * @param options: lookup options, defaults to
-     *                 `{present: true, interval: 50, timeout: 5000}`
-     */
-    function waitFor(getter, options) {
-        if (options === void 0) { options = { present: true, interval: 50, timeout: 5000 }; }
-        // prevents infinite recursion if the request times out
-        var timedOut = false;
-        options = __assign({ present: true, interval: 50, timeout: 5000 }, options);
-        function wait() {
-            var element = getter();
-            // boolean is needed here, hence the length > 0
-            var found = element !== null && (!(element instanceof NodeList) &&
-                !element.jquery || element.length > 0);
-            if (!options.present === !found || timedOut) {
-                return Promise.resolve(element);
-            }
-            return new Promise(function (rs) { return setTimeout(rs, options.interval); }).then(wait);
-        }
-        return Promise.race([
-            new Promise(function (_, rj) { return setTimeout(function () {
-                timedOut = true;
-                rj(options.present ? 'Element not found' : 'Element not removed');
-            }, options.timeout); }),
-            wait()
-        ]);
-    }
-    exports.waitFor = waitFor;
-    function waitForDocumentElement(selector, options) {
-        return waitFor(function () { return document.querySelector(selector); }, options);
-    }
-    exports.waitForDocumentElement = waitForDocumentElement;
-    function waitForDocumentElements(selector, options) {
-        return waitFor(function () { return document.querySelectorAll(selector); }, options);
-    }
-    exports.waitForDocumentElements = waitForDocumentElements;
-});
-
 define('aurelia-templating-router/aurelia-templating-router',['exports', 'aurelia-router', './route-loader', './router-view', './route-href'], function (exports, _aureliaRouter, _routeLoader, _routerView, _routeHref) {
   'use strict';
 
@@ -26078,6 +25126,364 @@ define('aurelia-templating-router/route-href',['exports', 'aurelia-templating', 
     return RouteHref;
   }()) || _class) || _class) || _class) || _class);
 });
+define('aurelia-history-browser',['exports', 'aurelia-pal', 'aurelia-history'], function (exports, _aureliaPal, _aureliaHistory) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.BrowserHistory = exports.DefaultLinkHandler = exports.LinkHandler = undefined;
+  exports.configure = configure;
+
+  var _class, _temp;
+
+  function _possibleConstructorReturn(self, call) {
+    if (!self) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+
+    return call && (typeof call === "object" || typeof call === "function") ? call : self;
+  }
+
+  function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  }
+
+  
+
+  var LinkHandler = exports.LinkHandler = function () {
+    function LinkHandler() {
+      
+    }
+
+    LinkHandler.prototype.activate = function activate(history) {};
+
+    LinkHandler.prototype.deactivate = function deactivate() {};
+
+    return LinkHandler;
+  }();
+
+  var DefaultLinkHandler = exports.DefaultLinkHandler = function (_LinkHandler) {
+    _inherits(DefaultLinkHandler, _LinkHandler);
+
+    function DefaultLinkHandler() {
+      
+
+      var _this = _possibleConstructorReturn(this, _LinkHandler.call(this));
+
+      _this.handler = function (e) {
+        var _DefaultLinkHandler$g = DefaultLinkHandler.getEventInfo(e),
+            shouldHandleEvent = _DefaultLinkHandler$g.shouldHandleEvent,
+            href = _DefaultLinkHandler$g.href;
+
+        if (shouldHandleEvent) {
+          e.preventDefault();
+          _this.history.navigate(href);
+        }
+      };
+      return _this;
+    }
+
+    DefaultLinkHandler.prototype.activate = function activate(history) {
+      if (history._hasPushState) {
+        this.history = history;
+        _aureliaPal.DOM.addEventListener('click', this.handler, true);
+      }
+    };
+
+    DefaultLinkHandler.prototype.deactivate = function deactivate() {
+      _aureliaPal.DOM.removeEventListener('click', this.handler);
+    };
+
+    DefaultLinkHandler.getEventInfo = function getEventInfo(event) {
+      var info = {
+        shouldHandleEvent: false,
+        href: null,
+        anchor: null
+      };
+
+      var target = DefaultLinkHandler.findClosestAnchor(event.target);
+      if (!target || !DefaultLinkHandler.targetIsThisWindow(target)) {
+        return info;
+      }
+
+      if (target.hasAttribute('download') || target.hasAttribute('router-ignore') || target.hasAttribute('data-router-ignore')) {
+        return info;
+      }
+
+      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+        return info;
+      }
+
+      var href = target.getAttribute('href');
+      info.anchor = target;
+      info.href = href;
+
+      var leftButtonClicked = event.which === 1;
+      var isRelative = href && !(href.charAt(0) === '#' || /^[a-z]+:/i.test(href));
+
+      info.shouldHandleEvent = leftButtonClicked && isRelative;
+      return info;
+    };
+
+    DefaultLinkHandler.findClosestAnchor = function findClosestAnchor(el) {
+      while (el) {
+        if (el.tagName === 'A') {
+          return el;
+        }
+
+        el = el.parentNode;
+      }
+    };
+
+    DefaultLinkHandler.targetIsThisWindow = function targetIsThisWindow(target) {
+      var targetWindow = target.getAttribute('target');
+      var win = _aureliaPal.PLATFORM.global;
+
+      return !targetWindow || targetWindow === win.name || targetWindow === '_self';
+    };
+
+    return DefaultLinkHandler;
+  }(LinkHandler);
+
+  function configure(config) {
+    config.singleton(_aureliaHistory.History, BrowserHistory);
+    config.transient(LinkHandler, DefaultLinkHandler);
+  }
+
+  var BrowserHistory = exports.BrowserHistory = (_temp = _class = function (_History) {
+    _inherits(BrowserHistory, _History);
+
+    function BrowserHistory(linkHandler) {
+      
+
+      var _this2 = _possibleConstructorReturn(this, _History.call(this));
+
+      _this2._isActive = false;
+      _this2._checkUrlCallback = _this2._checkUrl.bind(_this2);
+
+      _this2.location = _aureliaPal.PLATFORM.location;
+      _this2.history = _aureliaPal.PLATFORM.history;
+      _this2.linkHandler = linkHandler;
+      return _this2;
+    }
+
+    BrowserHistory.prototype.activate = function activate(options) {
+      if (this._isActive) {
+        throw new Error('History has already been activated.');
+      }
+
+      var wantsPushState = !!options.pushState;
+
+      this._isActive = true;
+      this.options = Object.assign({}, { root: '/' }, this.options, options);
+
+      this.root = ('/' + this.options.root + '/').replace(rootStripper, '/');
+
+      this._wantsHashChange = this.options.hashChange !== false;
+      this._hasPushState = !!(this.options.pushState && this.history && this.history.pushState);
+
+      var eventName = void 0;
+      if (this._hasPushState) {
+        eventName = 'popstate';
+      } else if (this._wantsHashChange) {
+        eventName = 'hashchange';
+      }
+
+      _aureliaPal.PLATFORM.addEventListener(eventName, this._checkUrlCallback);
+
+      if (this._wantsHashChange && wantsPushState) {
+        var loc = this.location;
+        var atRoot = loc.pathname.replace(/[^\/]$/, '$&/') === this.root;
+
+        if (!this._hasPushState && !atRoot) {
+          this.fragment = this._getFragment(null, true);
+          this.location.replace(this.root + this.location.search + '#' + this.fragment);
+
+          return true;
+        } else if (this._hasPushState && atRoot && loc.hash) {
+          this.fragment = this._getHash().replace(routeStripper, '');
+          this.history.replaceState({}, _aureliaPal.DOM.title, this.root + this.fragment + loc.search);
+        }
+      }
+
+      if (!this.fragment) {
+        this.fragment = this._getFragment();
+      }
+
+      this.linkHandler.activate(this);
+
+      if (!this.options.silent) {
+        return this._loadUrl();
+      }
+    };
+
+    BrowserHistory.prototype.deactivate = function deactivate() {
+      _aureliaPal.PLATFORM.removeEventListener('popstate', this._checkUrlCallback);
+      _aureliaPal.PLATFORM.removeEventListener('hashchange', this._checkUrlCallback);
+      this._isActive = false;
+      this.linkHandler.deactivate();
+    };
+
+    BrowserHistory.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
+      var origin = createOrigin(this.location.protocol, this.location.hostname, this.location.port);
+      return '' + origin + this.root;
+    };
+
+    BrowserHistory.prototype.navigate = function navigate(fragment) {
+      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+          _ref$trigger = _ref.trigger,
+          trigger = _ref$trigger === undefined ? true : _ref$trigger,
+          _ref$replace = _ref.replace,
+          replace = _ref$replace === undefined ? false : _ref$replace;
+
+      if (fragment && absoluteUrl.test(fragment)) {
+        this.location.href = fragment;
+        return true;
+      }
+
+      if (!this._isActive) {
+        return false;
+      }
+
+      fragment = this._getFragment(fragment || '');
+
+      if (this.fragment === fragment && !replace) {
+        return false;
+      }
+
+      this.fragment = fragment;
+
+      var url = this.root + fragment;
+
+      if (fragment === '' && url !== '/') {
+        url = url.slice(0, -1);
+      }
+
+      if (this._hasPushState) {
+        url = url.replace('//', '/');
+        this.history[replace ? 'replaceState' : 'pushState']({}, _aureliaPal.DOM.title, url);
+      } else if (this._wantsHashChange) {
+        updateHash(this.location, fragment, replace);
+      } else {
+        this.location.assign(url);
+      }
+
+      if (trigger) {
+        return this._loadUrl(fragment);
+      }
+
+      return true;
+    };
+
+    BrowserHistory.prototype.navigateBack = function navigateBack() {
+      this.history.back();
+    };
+
+    BrowserHistory.prototype.setTitle = function setTitle(title) {
+      _aureliaPal.DOM.title = title;
+    };
+
+    BrowserHistory.prototype.setState = function setState(key, value) {
+      var state = Object.assign({}, this.history.state);
+      var _location = this.location,
+          pathname = _location.pathname,
+          search = _location.search,
+          hash = _location.hash;
+
+      state[key] = value;
+      this.history.replaceState(state, null, '' + pathname + search + hash);
+    };
+
+    BrowserHistory.prototype.getState = function getState(key) {
+      var state = Object.assign({}, this.history.state);
+      return state[key];
+    };
+
+    BrowserHistory.prototype.getHistoryIndex = function getHistoryIndex() {
+      var historyIndex = this.getState('HistoryIndex');
+      if (historyIndex === undefined) {
+        historyIndex = this.history.length - 1;
+        this.setState('HistoryIndex', historyIndex);
+      }
+      return historyIndex;
+    };
+
+    BrowserHistory.prototype.go = function go(movement) {
+      this.history.go(movement);
+    };
+
+    BrowserHistory.prototype._getHash = function _getHash() {
+      return this.location.hash.substr(1);
+    };
+
+    BrowserHistory.prototype._getFragment = function _getFragment(fragment, forcePushState) {
+      var root = void 0;
+
+      if (!fragment) {
+        if (this._hasPushState || !this._wantsHashChange || forcePushState) {
+          fragment = this.location.pathname + this.location.search;
+          root = this.root.replace(trailingSlash, '');
+          if (!fragment.indexOf(root)) {
+            fragment = fragment.substr(root.length);
+          }
+        } else {
+          fragment = this._getHash();
+        }
+      }
+
+      return '/' + fragment.replace(routeStripper, '');
+    };
+
+    BrowserHistory.prototype._checkUrl = function _checkUrl() {
+      var current = this._getFragment();
+      if (current !== this.fragment) {
+        this._loadUrl();
+      }
+    };
+
+    BrowserHistory.prototype._loadUrl = function _loadUrl(fragmentOverride) {
+      var fragment = this.fragment = this._getFragment(fragmentOverride);
+
+      return this.options.routeHandler ? this.options.routeHandler(fragment) : false;
+    };
+
+    return BrowserHistory;
+  }(_aureliaHistory.History), _class.inject = [LinkHandler], _temp);
+
+  var routeStripper = /^#?\/*|\s+$/g;
+
+  var rootStripper = /^\/+|\/+$/g;
+
+  var trailingSlash = /\/$/;
+
+  var absoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
+
+  function updateHash(location, fragment, replace) {
+    if (replace) {
+      var _href = location.href.replace(/(javascript:|#).*$/, '');
+      location.replace(_href + '#' + fragment);
+    } else {
+      location.hash = '#' + fragment;
+    }
+  }
+
+  function createOrigin(protocol, hostname, port) {
+    return protocol + '//' + hostname + (port ? ':' + port : '');
+  }
+});
 define('aurelia-notification',['exports', 'extend', 'humane-js', 'aurelia-dependency-injection', 'aurelia-i18n', 'aurelia-pal'], function (exports, _extend, _humaneJs, _aureliaDependencyInjection, _aureliaI18n, _aureliaPal) {
   'use strict';
 
@@ -26300,1129 +25706,298 @@ define('aurelia-notification',['exports', 'extend', 'humane-js', 'aurelia-depend
     return Notification;
   }(), (_applyDecoratedDescriptor(_class3.prototype, 'define', [_dec2], Object.getOwnPropertyDescriptor(_class3.prototype, 'define'), _class3.prototype), _applyDecoratedDescriptor(_class3.prototype, 'setContainer', [_dec3], Object.getOwnPropertyDescriptor(_class3.prototype, 'setContainer'), _class3.prototype), _applyDecoratedDescriptor(_class3.prototype, 'setBaseCls', [_dec4], Object.getOwnPropertyDescriptor(_class3.prototype, 'setBaseCls'), _class3.prototype), _applyDecoratedDescriptor(_class3.prototype, 'translate', [_dec5], Object.getOwnPropertyDescriptor(_class3.prototype, 'translate'), _class3.prototype), _applyDecoratedDescriptor(_class3.prototype, 'log', [_dec6], Object.getOwnPropertyDescriptor(_class3.prototype, 'log'), _class3.prototype), _applyDecoratedDescriptor(_class3.prototype, 'spawn', [_dec7], Object.getOwnPropertyDescriptor(_class3.prototype, 'spawn'), _class3.prototype), _applyDecoratedDescriptor(_class3.prototype, 'remove', [_dec8], Object.getOwnPropertyDescriptor(_class3.prototype, 'remove'), _class3.prototype)), _class3)) || _class2);
 });
-define('aurelia-http-client/aurelia-http-client',['exports', 'aurelia-path', 'aurelia-pal'], function (exports, _aureliaPath, _aureliaPal) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.HttpClient = exports.RequestBuilder = exports.ErrorHttpResponseMessage = exports.HttpRequestMessage = exports.JSONPRequestMessage = exports.RequestMessageProcessor = exports.mimeTypes = exports.HttpResponseMessage = exports.RequestMessage = exports.Headers = undefined;
-  exports.timeoutTransformer = timeoutTransformer;
-  exports.callbackParameterNameTransformer = callbackParameterNameTransformer;
-  exports.credentialsTransformer = credentialsTransformer;
-  exports.progressTransformer = progressTransformer;
-  exports.downloadProgressTransformer = downloadProgressTransformer;
-  exports.responseTypeTransformer = responseTypeTransformer;
-  exports.headerTransformer = headerTransformer;
-  exports.contentTransformer = contentTransformer;
-  exports.createJSONPRequestMessageProcessor = createJSONPRequestMessageProcessor;
-  exports.createHttpRequestMessageProcessor = createHttpRequestMessageProcessor;
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+define('aurelia-testing/aurelia-testing',["require", "exports", "./compile-spy", "./view-spy", "./component-tester", "./wait"], function (require, exports, compile_spy_1, view_spy_1, component_tester_1, wait_1) {
+    "use strict";
+    function __export(m) {
+        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
     }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    Object.defineProperty(exports, "__esModule", { value: true });
+    __export(compile_spy_1);
+    __export(view_spy_1);
+    __export(component_tester_1);
+    __export(wait_1);
+    function configure(config) {
+        config.globalResources([
+            './compile-spy',
+            './view-spy'
+        ]);
     }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  
-
-  var Headers = exports.Headers = function () {
-    function Headers() {
-      var headers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-      
-
-      this.headers = {};
-
-      for (var _key in headers) {
-        this.headers[_key.toLowerCase()] = { key: _key, value: headers[_key] };
-      }
-    }
-
-    Headers.prototype.add = function add(key, value) {
-      this.headers[key.toLowerCase()] = { key: key, value: value };
-    };
-
-    Headers.prototype.get = function get(key) {
-      var header = this.headers[key.toLowerCase()];
-      return header ? header.value : undefined;
-    };
-
-    Headers.prototype.clear = function clear() {
-      this.headers = {};
-    };
-
-    Headers.prototype.has = function has(header) {
-      return this.headers.hasOwnProperty(header.toLowerCase());
-    };
-
-    Headers.prototype.configureXHR = function configureXHR(xhr) {
-      for (var name in this.headers) {
-        if (this.headers.hasOwnProperty(name)) {
-          xhr.setRequestHeader(this.headers[name].key, this.headers[name].value);
-        }
-      }
-    };
-
-    Headers.parse = function parse(headerStr) {
-      var headers = new Headers();
-      if (!headerStr) {
-        return headers;
-      }
-
-      var headerPairs = headerStr.split('\r\n');
-      for (var i = 0; i < headerPairs.length; i++) {
-        var headerPair = headerPairs[i];
-
-        var index = headerPair.indexOf(': ');
-        if (index > 0) {
-          var _key2 = headerPair.substring(0, index);
-          var val = headerPair.substring(index + 2);
-          headers.add(_key2, val);
-        }
-      }
-
-      return headers;
-    };
-
-    return Headers;
-  }();
-
-  var RequestMessage = exports.RequestMessage = function () {
-    function RequestMessage(method, url, content, headers) {
-      
-
-      this.method = method;
-      this.url = url;
-      this.content = content;
-      this.headers = headers || new Headers();
-      this.baseUrl = '';
-    }
-
-    RequestMessage.prototype.buildFullUrl = function buildFullUrl() {
-      var absoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
-      var url = absoluteUrl.test(this.url) ? this.url : (0, _aureliaPath.join)(this.baseUrl, this.url);
-
-      if (this.params) {
-        var qs = (0, _aureliaPath.buildQueryString)(this.params, this.traditional);
-        url = qs ? url + (this.url.indexOf('?') < 0 ? '?' : '&') + qs : url;
-      }
-
-      return url;
-    };
-
-    return RequestMessage;
-  }();
-
-  var HttpResponseMessage = exports.HttpResponseMessage = function () {
-    function HttpResponseMessage(requestMessage, xhr, responseType, reviver) {
-      
-
-      this.requestMessage = requestMessage;
-      this.statusCode = xhr.status;
-      this.response = xhr.response || xhr.responseText;
-      this.isSuccess = xhr.status >= 200 && xhr.status < 400;
-      this.statusText = xhr.statusText;
-      this.reviver = reviver;
-      this.mimeType = null;
-
-      if (xhr.getAllResponseHeaders) {
-        this.headers = Headers.parse(xhr.getAllResponseHeaders());
-      } else {
-        this.headers = new Headers();
-      }
-
-      var contentType = void 0;
-
-      if (this.headers && this.headers.headers) {
-        contentType = this.headers.get('Content-Type');
-      }
-
-      if (contentType) {
-        this.mimeType = responseType = contentType.split(';')[0].trim();
-        if (mimeTypes.hasOwnProperty(this.mimeType)) responseType = mimeTypes[this.mimeType];
-      }
-
-      this.responseType = responseType;
-    }
-
-    _createClass(HttpResponseMessage, [{
-      key: 'content',
-      get: function get() {
-        try {
-          if (this._content !== undefined) {
-            return this._content;
-          }
-
-          if (this.response === undefined || this.response === null || this.response === '') {
-            this._content = this.response;
-            return this._content;
-          }
-
-          if (this.responseType === 'json') {
-            this._content = JSON.parse(this.response, this.reviver);
-            return this._content;
-          }
-
-          if (this.reviver) {
-            this._content = this.reviver(this.response);
-            return this._content;
-          }
-
-          this._content = this.response;
-          return this._content;
-        } catch (e) {
-          if (this.isSuccess) {
-            throw e;
-          }
-
-          this._content = null;
-          return this._content;
-        }
-      }
-    }]);
-
-    return HttpResponseMessage;
-  }();
-
-  var mimeTypes = exports.mimeTypes = {
-    'text/html': 'html',
-    'text/javascript': 'js',
-    'application/javascript': 'js',
-    'text/json': 'json',
-    'application/json': 'json',
-    'application/rss+xml': 'rss',
-    'application/atom+xml': 'atom',
-    'application/xhtml+xml': 'xhtml',
-    'text/markdown': 'md',
-    'text/xml': 'xml',
-    'text/mathml': 'mml',
-    'application/xml': 'xml',
-    'text/yml': 'yml',
-    'text/csv': 'csv',
-    'text/css': 'css',
-    'text/less': 'less',
-    'text/stylus': 'styl',
-    'text/scss': 'scss',
-    'text/sass': 'sass',
-    'text/plain': 'txt'
-  };
-
-  function applyXhrTransformers(xhrTransformers, client, processor, message, xhr) {
-    var i = void 0;
-    var ii = void 0;
-
-    for (i = 0, ii = xhrTransformers.length; i < ii; ++i) {
-      xhrTransformers[i](client, processor, message, xhr);
-    }
-  }
-
-  var RequestMessageProcessor = exports.RequestMessageProcessor = function () {
-    function RequestMessageProcessor(xhrType, xhrTransformers) {
-      
-
-      this.XHRType = xhrType;
-      this.xhrTransformers = xhrTransformers;
-      this.isAborted = false;
-    }
-
-    RequestMessageProcessor.prototype.abort = function abort() {
-      if (this.xhr && this.xhr.readyState !== _aureliaPal.PLATFORM.XMLHttpRequest.UNSENT) {
-        this.xhr.abort();
-      }
-
-      this.isAborted = true;
-    };
-
-    RequestMessageProcessor.prototype.process = function process(client, requestMessage) {
-      var _this = this;
-
-      var promise = new Promise(function (resolve, reject) {
-        var rejectResponse = void 0;
-        if (client.rejectPromiseWithErrorObject) {
-          rejectResponse = function rejectResponse(resp) {
-            var errorResp = new ErrorHttpResponseMessage(resp);
-            reject(errorResp);
-          };
-        } else {
-          rejectResponse = function rejectResponse(resp) {
-            reject(resp);
-          };
-        }
-
-        var xhr = _this.xhr = new _this.XHRType();
-        xhr.onload = function (e) {
-          var response = new HttpResponseMessage(requestMessage, xhr, requestMessage.responseType, requestMessage.reviver);
-          if (response.isSuccess) {
-            resolve(response);
-          } else {
-            rejectResponse(response);
-          }
-        };
-
-        xhr.ontimeout = function (e) {
-          rejectResponse(new HttpResponseMessage(requestMessage, {
-            response: e,
-            status: xhr.status,
-            statusText: xhr.statusText
-          }, 'timeout'));
-        };
-
-        xhr.onerror = function (e) {
-          rejectResponse(new HttpResponseMessage(requestMessage, {
-            response: e,
-            status: xhr.status,
-            statusText: xhr.statusText
-          }, 'error'));
-        };
-
-        xhr.onabort = function (e) {
-          rejectResponse(new HttpResponseMessage(requestMessage, {
-            response: e,
-            status: xhr.status,
-            statusText: xhr.statusText
-          }, 'abort'));
-        };
-      });
-
-      return Promise.resolve(requestMessage).then(function (message) {
-        var processRequest = function processRequest() {
-          if (_this.isAborted) {
-            _this.xhr.abort();
-          } else {
-            _this.xhr.open(message.method, message.buildFullUrl(), true, message.user, message.password);
-            applyXhrTransformers(_this.xhrTransformers, client, _this, message, _this.xhr);
-            if (typeof message.content === 'undefined') {
-              _this.xhr.send();
-            } else {
-              _this.xhr.send(message.content);
-            }
-          }
-
-          return promise;
-        };
-
-        var chain = [[processRequest, undefined]];
-
-        var interceptors = message.interceptors || [];
-        interceptors.forEach(function (interceptor) {
-          if (interceptor.request || interceptor.requestError) {
-            chain.unshift([interceptor.request ? interceptor.request.bind(interceptor) : undefined, interceptor.requestError ? interceptor.requestError.bind(interceptor) : undefined]);
-          }
-
-          if (interceptor.response || interceptor.responseError) {
-            chain.push([interceptor.response ? interceptor.response.bind(interceptor) : undefined, interceptor.responseError ? interceptor.responseError.bind(interceptor) : undefined]);
-          }
-        });
-
-        var interceptorsPromise = Promise.resolve(message);
-
-        while (chain.length) {
-          var _interceptorsPromise;
-
-          interceptorsPromise = (_interceptorsPromise = interceptorsPromise).then.apply(_interceptorsPromise, chain.shift());
-        }
-
-        return interceptorsPromise;
-      });
-    };
-
-    return RequestMessageProcessor;
-  }();
-
-  function timeoutTransformer(client, processor, message, xhr) {
-    if (message.timeout !== undefined) {
-      xhr.timeout = message.timeout;
-    }
-  }
-
-  function callbackParameterNameTransformer(client, processor, message, xhr) {
-    if (message.callbackParameterName !== undefined) {
-      xhr.callbackParameterName = message.callbackParameterName;
-    }
-  }
-
-  function credentialsTransformer(client, processor, message, xhr) {
-    if (message.withCredentials !== undefined) {
-      xhr.withCredentials = message.withCredentials;
-    }
-  }
-
-  function progressTransformer(client, processor, message, xhr) {
-    if (message.progressCallback) {
-      xhr.upload.onprogress = message.progressCallback;
-    }
-  }
-
-  function downloadProgressTransformer(client, processor, message, xhr) {
-    if (message.downloadProgressCallback) {
-      xhr.onprogress = message.downloadProgressCallback;
-    }
-  }
-
-  function responseTypeTransformer(client, processor, message, xhr) {
-    var responseType = message.responseType;
-
-    if (responseType === 'json') {
-      responseType = 'text';
-    }
-
-    xhr.responseType = responseType;
-  }
-
-  function headerTransformer(client, processor, message, xhr) {
-    message.headers.configureXHR(xhr);
-  }
-
-  function contentTransformer(client, processor, message, xhr) {
-    if (message.skipContentProcessing) {
-      return;
-    }
-
-    if (_aureliaPal.PLATFORM.global.FormData && message.content instanceof FormData) {
-      return;
-    }
-
-    if (_aureliaPal.PLATFORM.global.Blob && message.content instanceof Blob) {
-      return;
-    }
-
-    if (_aureliaPal.PLATFORM.global.ArrayBuffer && message.content instanceof ArrayBuffer) {
-      return;
-    }
-
-    if (message.content instanceof Document) {
-      return;
-    }
-
-    if (typeof message.content === 'string') {
-      return;
-    }
-
-    if (message.content === null || message.content === undefined) {
-      return;
-    }
-
-    message.content = JSON.stringify(message.content, message.replacer);
-
-    if (!message.headers.has('Content-Type')) {
-      message.headers.add('Content-Type', 'application/json');
-    }
-  }
-
-  var JSONPRequestMessage = exports.JSONPRequestMessage = function (_RequestMessage) {
-    _inherits(JSONPRequestMessage, _RequestMessage);
-
-    function JSONPRequestMessage(url, callbackParameterName) {
-      
-
-      var _this2 = _possibleConstructorReturn(this, _RequestMessage.call(this, 'JSONP', url));
-
-      _this2.responseType = 'jsonp';
-      _this2.callbackParameterName = callbackParameterName;
-      return _this2;
-    }
-
-    return JSONPRequestMessage;
-  }(RequestMessage);
-
-  var JSONPXHR = function () {
-    function JSONPXHR() {
-      
-    }
-
-    JSONPXHR.prototype.open = function open(method, url) {
-      this.method = method;
-      this.url = url;
-      this.callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-    };
-
-    JSONPXHR.prototype.send = function send() {
-      var _this3 = this;
-
-      var url = this.url + (this.url.indexOf('?') >= 0 ? '&' : '?') + encodeURIComponent(this.callbackParameterName) + '=' + this.callbackName;
-      var script = _aureliaPal.DOM.createElement('script');
-
-      script.src = url;
-      script.onerror = function (e) {
-        cleanUp();
-
-        _this3.status = 0;
-        _this3.onerror(new Error('error'));
-      };
-
-      var cleanUp = function cleanUp() {
-        delete _aureliaPal.PLATFORM.global[_this3.callbackName];
-        _aureliaPal.DOM.removeNode(script);
-      };
-
-      _aureliaPal.PLATFORM.global[this.callbackName] = function (data) {
-        cleanUp();
-
-        if (_this3.status === undefined) {
-          _this3.status = 200;
-          _this3.statusText = 'OK';
-          _this3.response = data;
-          _this3.onload(_this3);
-        }
-      };
-
-      _aureliaPal.DOM.appendNode(script);
-
-      if (this.timeout !== undefined) {
-        setTimeout(function () {
-          if (_this3.status === undefined) {
-            _this3.status = 0;
-            _this3.ontimeout(new Error('timeout'));
-          }
-        }, this.timeout);
-      }
-    };
-
-    JSONPXHR.prototype.abort = function abort() {
-      if (this.status === undefined) {
-        this.status = 0;
-        this.onabort(new Error('abort'));
-      }
-    };
-
-    JSONPXHR.prototype.setRequestHeader = function setRequestHeader() {};
-
-    return JSONPXHR;
-  }();
-
-  function createJSONPRequestMessageProcessor() {
-    return new RequestMessageProcessor(JSONPXHR, [timeoutTransformer, callbackParameterNameTransformer]);
-  }
-
-  var HttpRequestMessage = exports.HttpRequestMessage = function (_RequestMessage2) {
-    _inherits(HttpRequestMessage, _RequestMessage2);
-
-    function HttpRequestMessage(method, url, content, headers) {
-      
-
-      var _this4 = _possibleConstructorReturn(this, _RequestMessage2.call(this, method, url, content, headers));
-
-      _this4.responseType = 'json';return _this4;
-    }
-
-    return HttpRequestMessage;
-  }(RequestMessage);
-
-  function createHttpRequestMessageProcessor() {
-    return new RequestMessageProcessor(_aureliaPal.PLATFORM.XMLHttpRequest, [timeoutTransformer, credentialsTransformer, progressTransformer, downloadProgressTransformer, responseTypeTransformer, contentTransformer, headerTransformer]);
-  }
-
-  var ErrorHttpResponseMessage = exports.ErrorHttpResponseMessage = function (_HttpResponseMessage) {
-    _inherits(ErrorHttpResponseMessage, _HttpResponseMessage);
-
-    function ErrorHttpResponseMessage(responseMessage) {
-      
-
-      var _this5 = _possibleConstructorReturn(this, _HttpResponseMessage.call(this, responseMessage.requestMessage, {
-        response: responseMessage.response,
-        status: responseMessage.statusCode,
-        statusText: responseMessage.statusText
-      }, responseMessage.responseType));
-
-      _this5.name = responseMessage.responseType;
-      _this5.message = 'Error: ' + responseMessage.statusCode + ' Status: ' + responseMessage.statusText;
-      return _this5;
-    }
-
-    return ErrorHttpResponseMessage;
-  }(HttpResponseMessage);
-
-  var RequestBuilder = exports.RequestBuilder = function () {
-    function RequestBuilder(client) {
-      
-
-      this.client = client;
-      this.transformers = client.requestTransformers.slice(0);
-      this.useJsonp = false;
-    }
-
-    RequestBuilder.prototype.asDelete = function asDelete() {
-      return this._addTransformer(function (client, processor, message) {
-        message.method = 'DELETE';
-      });
-    };
-
-    RequestBuilder.prototype.asGet = function asGet() {
-      return this._addTransformer(function (client, processor, message) {
-        message.method = 'GET';
-      });
-    };
-
-    RequestBuilder.prototype.asHead = function asHead() {
-      return this._addTransformer(function (client, processor, message) {
-        message.method = 'HEAD';
-      });
-    };
-
-    RequestBuilder.prototype.asOptions = function asOptions() {
-      return this._addTransformer(function (client, processor, message) {
-        message.method = 'OPTIONS';
-      });
-    };
-
-    RequestBuilder.prototype.asPatch = function asPatch() {
-      return this._addTransformer(function (client, processor, message) {
-        message.method = 'PATCH';
-      });
-    };
-
-    RequestBuilder.prototype.asPost = function asPost() {
-      return this._addTransformer(function (client, processor, message) {
-        message.method = 'POST';
-      });
-    };
-
-    RequestBuilder.prototype.asPut = function asPut() {
-      return this._addTransformer(function (client, processor, message) {
-        message.method = 'PUT';
-      });
-    };
-
-    RequestBuilder.prototype.asJsonp = function asJsonp(callbackParameterName) {
-      this.useJsonp = true;
-      return this._addTransformer(function (client, processor, message) {
-        message.callbackParameterName = callbackParameterName;
-      });
-    };
-
-    RequestBuilder.prototype.withUrl = function withUrl(url) {
-      return this._addTransformer(function (client, processor, message) {
-        message.url = url;
-      });
-    };
-
-    RequestBuilder.prototype.withContent = function withContent(content) {
-      return this._addTransformer(function (client, processor, message) {
-        message.content = content;
-      });
-    };
-
-    RequestBuilder.prototype.withBaseUrl = function withBaseUrl(baseUrl) {
-      return this._addTransformer(function (client, processor, message) {
-        message.baseUrl = baseUrl;
-      });
-    };
-
-    RequestBuilder.prototype.withParams = function withParams(params, traditional) {
-      return this._addTransformer(function (client, processor, message) {
-        message.traditional = traditional;
-        message.params = params;
-      });
-    };
-
-    RequestBuilder.prototype.withResponseType = function withResponseType(responseType) {
-      return this._addTransformer(function (client, processor, message) {
-        message.responseType = responseType;
-      });
-    };
-
-    RequestBuilder.prototype.withTimeout = function withTimeout(timeout) {
-      return this._addTransformer(function (client, processor, message) {
-        message.timeout = timeout;
-      });
-    };
-
-    RequestBuilder.prototype.withHeader = function withHeader(key, value) {
-      return this._addTransformer(function (client, processor, message) {
-        message.headers.add(key, value);
-      });
-    };
-
-    RequestBuilder.prototype.withCredentials = function withCredentials(value) {
-      return this._addTransformer(function (client, processor, message) {
-        message.withCredentials = value;
-      });
-    };
-
-    RequestBuilder.prototype.withLogin = function withLogin(user, password) {
-      return this._addTransformer(function (client, processor, message) {
-        message.user = user;message.password = password;
-      });
-    };
-
-    RequestBuilder.prototype.withReviver = function withReviver(reviver) {
-      return this._addTransformer(function (client, processor, message) {
-        message.reviver = reviver;
-      });
-    };
-
-    RequestBuilder.prototype.withReplacer = function withReplacer(replacer) {
-      return this._addTransformer(function (client, processor, message) {
-        message.replacer = replacer;
-      });
-    };
-
-    RequestBuilder.prototype.withProgressCallback = function withProgressCallback(progressCallback) {
-      return this._addTransformer(function (client, processor, message) {
-        message.progressCallback = progressCallback;
-      });
-    };
-
-    RequestBuilder.prototype.withDownloadProgressCallback = function withDownloadProgressCallback(downloadProgressCallback) {
-      return this._addTransformer(function (client, processor, message) {
-        message.downloadProgressCallback = downloadProgressCallback;
-      });
-    };
-
-    RequestBuilder.prototype.withCallbackParameterName = function withCallbackParameterName(callbackParameterName) {
-      return this._addTransformer(function (client, processor, message) {
-        message.callbackParameterName = callbackParameterName;
-      });
-    };
-
-    RequestBuilder.prototype.withInterceptor = function withInterceptor(interceptor) {
-      return this._addTransformer(function (client, processor, message) {
-        message.interceptors = message.interceptors || [];
-        message.interceptors.unshift(interceptor);
-      });
-    };
-
-    RequestBuilder.prototype.skipContentProcessing = function skipContentProcessing() {
-      return this._addTransformer(function (client, processor, message) {
-        message.skipContentProcessing = true;
-      });
-    };
-
-    RequestBuilder.prototype._addTransformer = function _addTransformer(fn) {
-      this.transformers.push(fn);
-      return this;
-    };
-
-    RequestBuilder.addHelper = function addHelper(name, fn) {
-      RequestBuilder.prototype[name] = function () {
-        return this._addTransformer(fn.apply(this, arguments));
-      };
-    };
-
-    RequestBuilder.prototype.send = function send() {
-      var message = this.useJsonp ? new JSONPRequestMessage() : new HttpRequestMessage();
-      return this.client.send(message, this.transformers);
-    };
-
-    return RequestBuilder;
-  }();
-
-  function trackRequestStart(client, processor) {
-    client.pendingRequests.push(processor);
-    client.isRequesting = true;
-  }
-
-  function trackRequestEnd(client, processor) {
-    var index = client.pendingRequests.indexOf(processor);
-
-    client.pendingRequests.splice(index, 1);
-    client.isRequesting = client.pendingRequests.length > 0;
-
-    if (!client.isRequesting) {
-      var evt = _aureliaPal.DOM.createCustomEvent('aurelia-http-client-requests-drained', { bubbles: true, cancelable: true });
-      setTimeout(function () {
-        return _aureliaPal.DOM.dispatchEvent(evt);
-      }, 1);
-    }
-  }
-
-  var HttpClient = exports.HttpClient = function () {
-    function HttpClient() {
-      
-
-      this.isRequesting = false;
-
-      this.rejectPromiseWithErrorObject = false;
-      this.requestTransformers = [];
-      this.requestProcessorFactories = new Map();
-      this.requestProcessorFactories.set(HttpRequestMessage, createHttpRequestMessageProcessor);
-      this.requestProcessorFactories.set(JSONPRequestMessage, createJSONPRequestMessageProcessor);
-      this.pendingRequests = [];
-    }
-
-    HttpClient.prototype.configure = function configure(fn) {
-      var builder = new RequestBuilder(this);
-      fn(builder);
-      this.requestTransformers = builder.transformers;
-      return this;
-    };
-
-    HttpClient.prototype.createRequest = function createRequest(url) {
-      var builder = new RequestBuilder(this);
-
-      if (url) {
-        builder.withUrl(url);
-      }
-
-      return builder;
-    };
-
-    HttpClient.prototype.send = function send(requestMessage, transformers) {
-      var _this6 = this;
-
-      var createProcessor = this.requestProcessorFactories.get(requestMessage.constructor);
-      var processor = void 0;
-      var promise = void 0;
-      var i = void 0;
-      var ii = void 0;
-
-      if (!createProcessor) {
-        throw new Error('No request message processor factory for ' + requestMessage.constructor + '.');
-      }
-
-      processor = createProcessor();
-      trackRequestStart(this, processor);
-
-      transformers = transformers || this.requestTransformers;
-
-      promise = Promise.resolve(requestMessage).then(function (message) {
-        for (i = 0, ii = transformers.length; i < ii; ++i) {
-          transformers[i](_this6, processor, message);
-        }
-
-        return processor.process(_this6, message).then(function (response) {
-          trackRequestEnd(_this6, processor);
-          return response;
-        }).catch(function (response) {
-          trackRequestEnd(_this6, processor);
-          throw response;
-        });
-      });
-
-      promise.abort = promise.cancel = function () {
-        processor.abort();
-      };
-
-      return promise;
-    };
-
-    HttpClient.prototype.delete = function _delete(url) {
-      return this.createRequest(url).asDelete().send();
-    };
-
-    HttpClient.prototype.get = function get(url, params, traditional) {
-      var req = this.createRequest(url).asGet();
-
-      if (params) {
-        return req.withParams(params, traditional).send();
-      }
-
-      return req.send();
-    };
-
-    HttpClient.prototype.head = function head(url) {
-      return this.createRequest(url).asHead().send();
-    };
-
-    HttpClient.prototype.jsonp = function jsonp(url) {
-      var callbackParameterName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'jsoncallback';
-
-      return this.createRequest(url).asJsonp(callbackParameterName).send();
-    };
-
-    HttpClient.prototype.options = function options(url) {
-      return this.createRequest(url).asOptions().send();
-    };
-
-    HttpClient.prototype.put = function put(url, content) {
-      return this.createRequest(url).asPut().withContent(content).send();
-    };
-
-    HttpClient.prototype.patch = function patch(url, content) {
-      return this.createRequest(url).asPatch().withContent(content).send();
-    };
-
-    HttpClient.prototype.post = function post(url, content) {
-      return this.createRequest(url).asPost().withContent(content).send();
-    };
-
-    return HttpClient;
-  }();
-});;define('aurelia-http-client', ['aurelia-http-client/aurelia-http-client'], function (main) { return main; });
-
-/**
- * humane.js
- * Humanized Messages for Notifications
- * @author Marc Harter (@wavded)
- * @example
- *   humane.log('hello world');
- * @license MIT
- * See more usage examples at: http://wavded.github.com/humane-js/
- */
-
-;!function (name, context, definition) {
-   if (typeof module !== 'undefined') module.exports = definition(name, context)
-   else if (typeof define === 'function' && typeof define.amd  === 'object') define('humane-js/humane',definition)
-   else context[name] = definition(name, context)
-}('humane', this, function (name, context) {
-   var win = window
-   var doc = document
-
-   var ENV = {
-      on: function (el, type, cb) {
-         'addEventListener' in win ? el.addEventListener(type,cb,false) : el.attachEvent('on'+type,cb)
-      },
-      off: function (el, type, cb) {
-         'removeEventListener' in win ? el.removeEventListener(type,cb,false) : el.detachEvent('on'+type,cb)
-      },
-      bind: function (fn, ctx) {
-         return function () { fn.apply(ctx,arguments) }
-      },
-      isArray: Array.isArray || function (obj) { return Object.prototype.toString.call(obj) === '[object Array]' },
-      config: function (preferred, fallback) {
-         return preferred != null ? preferred : fallback
-      },
-      transSupport: false,
-      useFilter: /msie [678]/i.test(navigator.userAgent), // sniff, sniff
-      _checkTransition: function () {
-         var el = doc.createElement('div')
-         var vendors = { webkit: 'webkit', Moz: '', O: 'o', ms: 'MS' }
-
-         for (var vendor in vendors)
-            if (vendor + 'Transition' in el.style) {
-               this.vendorPrefix = vendors[vendor]
-               this.transSupport = true
-            }
-      }
-   }
-   ENV._checkTransition()
-
-   var Humane = function (o) {
-      o || (o = {})
-      this.queue = []
-      this.baseCls = o.baseCls || 'humane'
-      this.addnCls = o.addnCls || ''
-      this.timeout = 'timeout' in o ? o.timeout : 2500
-      this.waitForMove = o.waitForMove || false
-      this.clickToClose = o.clickToClose || false
-      this.timeoutAfterMove = o.timeoutAfterMove || false
-      this.container = o.container
-
-      try { this._setupEl() } // attempt to setup elements
-      catch (e) {
-        ENV.on(win,'load',ENV.bind(this._setupEl, this)) // dom wasn't ready, wait till ready
-      }
-   }
-
-   Humane.prototype = {
-      constructor: Humane,
-      _setupEl: function () {
-         var el = doc.createElement('div')
-         el.style.display = 'none'
-         if (!this.container){
-           if(doc.body) this.container = doc.body;
-           else throw 'document.body is null'
-         }
-         this.container.appendChild(el)
-         this.el = el
-         this.removeEvent = ENV.bind(function(){
-            var timeoutAfterMove = ENV.config(this.currentMsg.timeoutAfterMove,this.timeoutAfterMove)
-            if (!timeoutAfterMove){
-               this.remove()
-            } else {
-               setTimeout(ENV.bind(this.remove,this),timeoutAfterMove)
-            }
-         },this)
-
-         this.transEvent = ENV.bind(this._afterAnimation,this)
-         this._run()
-      },
-      _afterTimeout: function () {
-         if (!ENV.config(this.currentMsg.waitForMove,this.waitForMove)) this.remove()
-
-         else if (!this.removeEventsSet) {
-            ENV.on(doc.body,'mousemove',this.removeEvent)
-            ENV.on(doc.body,'click',this.removeEvent)
-            ENV.on(doc.body,'keypress',this.removeEvent)
-            ENV.on(doc.body,'touchstart',this.removeEvent)
-            this.removeEventsSet = true
-         }
-      },
-      _run: function () {
-         if (this._animating || !this.queue.length || !this.el) return
-
-         this._animating = true
-         if (this.currentTimer) {
-            clearTimeout(this.currentTimer)
-            this.currentTimer = null
-         }
-
-         var msg = this.queue.shift()
-         var clickToClose = ENV.config(msg.clickToClose,this.clickToClose)
-
-         if (clickToClose) {
-            ENV.on(this.el,'click',this.removeEvent)
-            ENV.on(this.el,'touchstart',this.removeEvent)
-         }
-
-         var timeout = ENV.config(msg.timeout,this.timeout)
-
-         if (timeout > 0)
-            this.currentTimer = setTimeout(ENV.bind(this._afterTimeout,this), timeout)
-
-         if (ENV.isArray(msg.html)) msg.html = '<ul><li>'+msg.html.join('<li>')+'</ul>'
-
-         this.el.innerHTML = msg.html
-         this.currentMsg = msg
-         this.el.className = this.baseCls
-         if (ENV.transSupport) {
-            this.el.style.display = 'block'
-            setTimeout(ENV.bind(this._showMsg,this),50)
-         } else {
-            this._showMsg()
-         }
-
-      },
-      _setOpacity: function (opacity) {
-         if (ENV.useFilter){
-            try{
-               this.el.filters.item('DXImageTransform.Microsoft.Alpha').Opacity = opacity*100
-            } catch(err){}
-         } else {
-            this.el.style.opacity = String(opacity)
-         }
-      },
-      _showMsg: function () {
-         var addnCls = ENV.config(this.currentMsg.addnCls,this.addnCls)
-         if (ENV.transSupport) {
-            this.el.className = this.baseCls+' '+addnCls+' '+this.baseCls+'-animate'
-         }
-         else {
-            var opacity = 0
-            this.el.className = this.baseCls+' '+addnCls+' '+this.baseCls+'-js-animate'
-            this._setOpacity(0) // reset value so hover states work
-            this.el.style.display = 'block'
-
-            var self = this
-            var interval = setInterval(function(){
-               if (opacity < 1) {
-                  opacity += 0.1
-                  if (opacity > 1) opacity = 1
-                  self._setOpacity(opacity)
-               }
-               else clearInterval(interval)
-            }, 30)
-         }
-      },
-      _hideMsg: function () {
-         var addnCls = ENV.config(this.currentMsg.addnCls,this.addnCls)
-         if (ENV.transSupport) {
-            this.el.className = this.baseCls+' '+addnCls
-            ENV.on(this.el,ENV.vendorPrefix ? ENV.vendorPrefix+'TransitionEnd' : 'transitionend',this.transEvent)
-         }
-         else {
-            var opacity = 1
-            var self = this
-            var interval = setInterval(function(){
-               if(opacity > 0) {
-                  opacity -= 0.1
-                  if (opacity < 0) opacity = 0
-                  self._setOpacity(opacity);
-               }
-               else {
-                  self.el.className = self.baseCls+' '+addnCls
-                  clearInterval(interval)
-                  self._afterAnimation()
-               }
-            }, 30)
-         }
-      },
-      _afterAnimation: function () {
-         if (ENV.transSupport) ENV.off(this.el,ENV.vendorPrefix ? ENV.vendorPrefix+'TransitionEnd' : 'transitionend',this.transEvent)
-
-         if (this.currentMsg.cb) this.currentMsg.cb()
-         this.el.style.display = 'none'
-
-         this._animating = false
-         this._run()
-      },
-      remove: function (e) {
-         var cb = typeof e == 'function' ? e : null
-
-         ENV.off(doc.body,'mousemove',this.removeEvent)
-         ENV.off(doc.body,'click',this.removeEvent)
-         ENV.off(doc.body,'keypress',this.removeEvent)
-         ENV.off(doc.body,'touchstart',this.removeEvent)
-         ENV.off(this.el,'click',this.removeEvent)
-         ENV.off(this.el,'touchstart',this.removeEvent)
-         this.removeEventsSet = false
-
-         if (cb && this.currentMsg) this.currentMsg.cb = cb
-         if (this._animating) this._hideMsg()
-         else if (cb) cb()
-      },
-      log: function (html, o, cb, defaults) {
-         var msg = {}
-         if (defaults)
-           for (var opt in defaults)
-               msg[opt] = defaults[opt]
-
-         if (typeof o == 'function') cb = o
-         else if (o)
-            for (var opt in o) msg[opt] = o[opt]
-
-         msg.html = html
-         if (cb) msg.cb = cb
-         this.queue.push(msg)
-         this._run()
-         return this
-      },
-      spawn: function (defaults) {
-         var self = this
-         return function (html, o, cb) {
-            self.log.call(self,html,o,cb,defaults)
-            return self
-         }
-      },
-      create: function (o) { return new Humane(o) }
-   }
-   return new Humane()
+    exports.configure = configure;
 });
-;define('humane-js', ['humane-js/humane'], function (main) { return main; });
+;define('aurelia-testing', ['aurelia-testing/aurelia-testing'], function (main) { return main; });
 
-define('text!humane-js/themes/bigbox.css', ['module'], function(module) { module.exports = "html,\nbody {\n  min-height: 100%;\n}\n.humane,\n.humane-bigbox {\n  position: fixed;\n  -moz-transition: all 0.3s ease-out;\n  -webkit-transition: all 0.3s ease-out;\n  -ms-transition: all 0.3s ease-out;\n  -o-transition: all 0.3s ease-out;\n  transition: all 0.3s ease-out;\n  z-index: 100000;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n}\n.humane,\n.humane-bigbox {\n  font-family: Ubuntu, Verdana, sans-serif;\n  line-height: 40px;\n  font-size: 35px;\n  top: 25%;\n  left: 25%;\n  opacity: 0;\n  width: 50%;\n  min-height: 40px;\n  padding: 30px;\n  text-align: center;\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAc0lEQVQokb2RQQ6EMAwDx/7/n80BtIEC3RYhLlXrVLGTAYiBWBIGtkPSP01SfreTVoV5re9Rcee1scwDk9NurbR62sZJcpzy9O+2X5KsXabyPaQFYNuvkqkRviDTp9Vs8opC0TpkHvJtVjeReW/5kEyX1gKeLEKE9peeWAAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #000), color-stop(1, rgba(0,0,0,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, #000 0%, rgba(0,0,0,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #000 0%, rgba(0,0,0,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #000 0%, rgba(0,0,0,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, #000 0%, rgba(0,0,0,0.9) 100%) no-repeat;\n  background: linear-gradient(top, #000 0%, rgba(0,0,0,0.9) 100%) no-repeat;\n  *background-color: #000;\n  color: #fff;\n  -webkit-border-radius: 15px;\n  border-radius: 15px;\n  text-shadow: 0 -1px 1px #ddd;\n  -webkit-box-shadow: 0 15px 15px -15px #000;\n  box-shadow: 0 15px 15px -15px #000;\n  -moz-transform: scale(0.1);\n  -webkit-transform: scale(0.1);\n  -ms-transform: scale(0.1);\n  -o-transform: scale(0.1);\n  transform: scale(0.1);\n}\n.humane p,\n.humane-bigbox p,\n.humane ul,\n.humane-bigbox ul {\n  margin: 0;\n  padding: 0;\n}\n.humane ul,\n.humane-bigbox ul {\n  list-style: none;\n}\n.humane.humane-bigbox-info,\n.humane-bigbox.humane-bigbox-info {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAQElEQVQokWNgYEj5z8TAwPCfiYGBgQGVIEKMTG2DTYwRVez/IHIaNcUGyBnYgpORel6gpvFEJhBqpxIaG8/AAADsKDq/HhYQ2AAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #000064), color-stop(1, rgba(0,0,100,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, #000064 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #000064 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #000064 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, #000064 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: linear-gradient(top, #000064 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  *background-color: #030;\n}\n.humane.humane-bigbox-success,\n.humane-bigbox.humane-bigbox-success {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAPklEQVQokWNgSGH4z8TAACEYUAkixMjUNsjEGFHF/g8ip1FVbGCcgS04GannBaoaT1wCwWkvmXbQ2HgGBgYA8Yw6v+m4Kh8AAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #006400), color-stop(1, rgba(0,100,0,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, #006400 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #006400 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #006400 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, #006400 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: linear-gradient(top, #006400 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  *background-color: #030;\n}\n.humane.humane-bigbox-error,\n.humane-bigbox.humane-bigbox-error {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAPklEQVQokWNIYWD4z8QAJRhQCSLEyNQ2uMQYUcX+DyKnUVdsQJyBLTgZqecF6hpPVALBaS+ZdtDYeAYGBgYA9vA6v4OR3MkAAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #640000), color-stop(1, rgba(100,0,0,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, #640000 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #640000 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #640000 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, #640000 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: linear-gradient(top, #640000 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  *background-color: #300;\n}\n.humane.humane-animate,\n.humane-bigbox.humane-bigbox-animate {\n  opacity: 1;\n  -moz-transform: scale(1);\n  -webkit-transform: scale(1);\n  -ms-transform: scale(1);\n  -o-transform: scale(1);\n  transform: scale(1);\n}\n.humane.humane-animate:hover,\n.humane-bigbox.humane-bigbox-animate:hover {\n  opacity: 0.6;\n  -moz-transform: scale(0.8);\n  -webkit-transform: scale(0.8);\n  -ms-transform: scale(0.8);\n  -o-transform: scale(0.8);\n  transform: scale(0.8);\n}\n.humane.humane-js-animate,\n.humane-bigbox.humane-bigbox-js-animate {\n  opacity: 1;\n  -moz-transform: scale(1);\n  -webkit-transform: scale(1);\n  -ms-transform: scale(1);\n  -o-transform: scale(1);\n  transform: scale(1);\n}\n.humane.humane-js-animate:hover,\n.humane-bigbox.humane-bigbox-js-animate:hover {\n  opacity: 0.6;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);\n}\n"; });
-define('text!humane-js/themes/boldlight.css', ['module'], function(module) { module.exports = "html,\nbody {\n  min-height: 100%;\n}\n.humane,\n.humane-boldlight {\n  position: fixed;\n  -moz-transition: all 0.3s ease-out;\n  -webkit-transition: all 0.3s ease-out;\n  -ms-transition: all 0.3s ease-out;\n  -o-transition: all 0.3s ease-out;\n  transition: all 0.3s ease-out;\n  z-index: 100000;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n}\n.humane,\n.humane-boldlight {\n  font-family: Ubuntu, Verdana, sans-serif;\n  font-size: 25px;\n  letter-spacing: -1px;\n  top: 25%;\n  left: 25%;\n  opacity: 0;\n  width: 50%;\n  color: #000;\n  padding: 10px;\n  text-align: center;\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACWCAYAAAAfduJyAAAABmJLR0QA/wD/AP+gvaeTAAAAPElEQVQokWP4////Gab///8zQAgGBgYo8e/fP2QxSpSgydJNCYJLRSVoPqeOkgEIYop9TrGbSfcWpW4GAFeF/7lb/oWBAAAAAElFTkSuQmCC');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255,255,255,0.8)), color-stop(1, rgba(150,150,150,0.8))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(150,150,150,0.8) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(150,150,150,0.8) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(150,150,150,0.8) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(150,150,150,0.8) 100%) no-repeat;\n  background: linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(150,150,150,0.8) 100%) no-repeat;\n  *background-color: #fff;\n  -webkit-border-radius: 15px;\n  border-radius: 15px;\n  text-shadow: 0 -1px 1px rgba(221,221,221,0.4);\n  -webkit-box-shadow: 0 4px 4px -4px #eee;\n  box-shadow: 0 4px 4px -4px #eee;\n  -moz-transform: scale(1.1);\n  -webkit-transform: scale(1.1);\n  -ms-transform: scale(1.1);\n  -o-transform: scale(1.1);\n  transform: scale(1.1);\n}\n.humane p,\n.humane-boldlight p,\n.humane ul,\n.humane-boldlight ul {\n  margin: 0;\n  padding: 0;\n}\n.humane ul,\n.humane-boldlight ul {\n  list-style: none;\n}\n.humane.humane-boldlight-info,\n.humane-boldlight.humane-boldlight-info {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAR0lEQVQokWNISfn/n4mBgeE/EwMDAwMqQYQYmdoGlxgjI4rY//+Dx2nUFRsQZ2ALTrQQp8QL1DWeqASC014y7aCx8QwMDAwA1aZBIulmpvwAAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #6464ff), color-stop(1, rgba(100,100,255,0.8))) no-repeat;\n  background: -moz-linear-gradient(top, #6464ff 0%, rgba(100,100,255,0.8) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #6464ff 0%, rgba(100,100,255,0.8) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #6464ff 0%, rgba(100,100,255,0.8) 100%) no-repeat;\n  background: -o-linear-gradient(top, #6464ff 0%, rgba(100,100,255,0.8) 100%) no-repeat;\n  background: linear-gradient(top, #6464ff 0%, rgba(100,100,255,0.8) 100%) no-repeat;\n  *background-color: #6464ff;\n}\n.humane.humane-boldlight-success,\n.humane-boldlight.humane-boldlight-success {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAGklEQVQokWNI+Z9yhomBgYFhlBglRonhSgAAFX0EItSd0k8AAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #64ff64), color-stop(1, rgba(100,255,100,0.8))) no-repeat;\n  background: -moz-linear-gradient(top, #64ff64 0%, rgba(100,255,100,0.8) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #64ff64 0%, rgba(100,255,100,0.8) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #64ff64 0%, rgba(100,255,100,0.8) 100%) no-repeat;\n  background: -o-linear-gradient(top, #64ff64 0%, rgba(100,255,100,0.8) 100%) no-repeat;\n  background: linear-gradient(top, #64ff64 0%, rgba(100,255,100,0.8) 100%) no-repeat;\n  *background-color: #64ff64;\n}\n.humane.humane-boldlight-error,\n.humane-boldlight.humane-boldlight-error {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAGklEQVQokWP4n5JyhomBgYFhlBglRonhSgAAFhgEIhjGqQkAAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ff6464), color-stop(1, rgba(255,100,100,0.8))) no-repeat;\n  background: -moz-linear-gradient(top, #ff6464 0%, rgba(255,100,100,0.8) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #ff6464 0%, rgba(255,100,100,0.8) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #ff6464 0%, rgba(255,100,100,0.8) 100%) no-repeat;\n  background: -o-linear-gradient(top, #ff6464 0%, rgba(255,100,100,0.8) 100%) no-repeat;\n  background: linear-gradient(top, #ff6464 0%, rgba(255,100,100,0.8) 100%) no-repeat;\n  *background-color: #ff6464;\n}\n.humane.humane-animate,\n.humane-boldlight.humane-boldlight-animate {\n  opacity: 1;\n  -moz-transform: scale(1);\n  -webkit-transform: scale(1);\n  -ms-transform: scale(1);\n  -o-transform: scale(1);\n  transform: scale(1);\n}\n.humane.humane-animate:hover,\n.humane-boldlight.humane-boldlight-animate:hover {\n  opacity: 0.4;\n  -moz-transform: scale(1.8);\n  -webkit-transform: scale(1.8);\n  -ms-transform: scale(1.8);\n  -o-transform: scale(1.8);\n  transform: scale(1.8);\n}\n.humane.humane-animate,\n.humane-boldlight.humane-boldlight-js-animate {\n  opacity: 1;\n  -moz-transform: scale(1);\n  -webkit-transform: scale(1);\n  -ms-transform: scale(1);\n  -o-transform: scale(1);\n  transform: scale(1);\n}\n.humane.humane-animate:hover,\n.humane-boldlight.humane-boldlight-js-animate:hover {\n  opacity: 0.4;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n}\n"; });
-define('text!humane-js/themes/flatty.css', ['module'], function(module) { module.exports = "html,\nbody {\n  min-height: 100%;\n}\n.humane,\n.humane-flatty {\n  position: fixed;\n  -moz-transition: all 0.4s ease-in-out;\n  -webkit-transition: all 0.4s ease-in-out;\n  -ms-transition: all 0.4s ease-in-out;\n  -o-transition: all 0.4s ease-in-out;\n  transition: all 0.4s ease-in-out;\n  z-index: 100000;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n}\n.humane,\n.humane-flatty {\n  font-family: Helvetica Neue, Helvetica, san-serif;\n  font-size: 16px;\n  top: 0;\n  left: 30%;\n  opacity: 0;\n  width: 40%;\n  color: #444;\n  padding: 10px;\n  text-align: center;\n  background-color: #fff;\n  -webkit-border-bottom-right-radius: 3px;\n  -webkit-border-bottom-left-radius: 3px;\n  -moz-border-radius-bottomright: 3px;\n  -moz-border-radius-bottomleft: 3px;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.5);\n  box-shadow: 0 1px 2px rgba(0,0,0,0.5);\n  -moz-transform: translateY(-100px);\n  -webkit-transform: translateY(-100px);\n  -ms-transform: translateY(-100px);\n  -o-transform: translateY(-100px);\n  transform: translateY(-100px);\n}\n.humane p,\n.humane-flatty p,\n.humane ul,\n.humane-flatty ul {\n  margin: 0;\n  padding: 0;\n}\n.humane ul,\n.humane-flatty ul {\n  list-style: none;\n}\n.humane.humane-flatty-info,\n.humane-flatty.humane-flatty-info {\n  background-color: #3498db;\n  color: #FFF;\n}\n.humane.humane-flatty-success,\n.humane-flatty.humane-flatty-success {\n  background-color: #18bc9c;\n  color: #FFF;\n}\n.humane.humane-flatty-error,\n.humane-flatty.humane-flatty-error {\n  background-color: #e74c3c;\n  color: #FFF;\n}\n.humane-animate,\n.humane-flatty.humane-flatty-animate {\n  opacity: 1;\n  -moz-transform: translateY(0);\n  -webkit-transform: translateY(0);\n  -ms-transform: translateY(0);\n  -o-transform: translateY(0);\n  transform: translateY(0);\n}\n.humane-animate:hover,\n.humane-flatty.humane-flatty-animate:hover {\n  opacity: 0.7;\n}\n.humane-js-animate,\n.humane-flatty.humane-flatty-js-animate {\n  opacity: 1;\n  -moz-transform: translateY(0);\n  -webkit-transform: translateY(0);\n  -ms-transform: translateY(0);\n  -o-transform: translateY(0);\n  transform: translateY(0);\n}\n.humane-js-animate:hover,\n.humane-flatty.humane-flatty-js-animate:hover {\n  opacity: 0.7;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);\n}\n"; });
-define('text!humane-js/themes/jackedup.css', ['module'], function(module) { module.exports = "html,\nbody {\n  min-height: 100%;\n}\n.humane,\n.humane-jackedup {\n  position: fixed;\n  -moz-transition: all 0.6s ease-in-out;\n  -webkit-transition: all 0.6s ease-in-out;\n  -ms-transition: all 0.6s ease-in-out;\n  -o-transition: all 0.6s ease-in-out;\n  transition: all 0.6s ease-in-out;\n  z-index: 100000;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n}\n.humane,\n.humane-jackedup {\n  font-family: Helvetica Neue, Helvetica, san-serif;\n  font-size: 18px;\n  letter-spacing: -1px;\n  top: 20px;\n  left: 30%;\n  opacity: 0;\n  width: 40%;\n  color: #333;\n  padding: 10px;\n  text-align: center;\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACWCAYAAAAfduJyAAAABmJLR0QA/wD/AP+gvaeTAAAAIklEQVQokWNgYGCQZGJgYGDARTDSQnboGDqsnDt0DKWNLAAkiQFdC+vZNQAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(0,0,0,0.1)), color-stop(1, rgba(0,0,0,0.2))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 100%) no-repeat;\n  background: linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 100%) no-repeat;\n  background-color: #fff;\n  -webkit-border-radius: 3px;\n  border-radius: 3px;\n  text-shadow: 0 1px 1px rgba(255,255,255,0.8);\n  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.5);\n  box-shadow: 0 1px 2px rgba(0,0,0,0.5);\n  -moz-transform: translateY(-100px);\n  -webkit-transform: translateY(-100px);\n  -ms-transform: translateY(-100px);\n  -o-transform: translateY(-100px);\n  transform: translateY(-100px);\n}\n.humane p,\n.humane-jackedup p,\n.humane ul,\n.humane-jackedup ul {\n  margin: 0;\n  padding: 0;\n}\n.humane ul,\n.humane-jackedup ul {\n  list-style: none;\n}\n.humane.humane-jackedup-info,\n.humane-jackedup.humane-jackedup-info {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAR0lEQVQokWNISfn/n4mBgeE/EwMDAwMqQYQYmdoGlxgjI4rY//+Dx2nUFRsQZ2ALTrQQp8QL1DWeqASC014y7aCx8QwMDAwA1aZBIulmpvwAAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(0,0,0,0.7)), color-stop(1, rgba(0,0,0,0.85))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.85) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.85) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.85) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.85) 100%) no-repeat;\n  background: linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.85) 100%) no-repeat;\n  background-color: #fff;\n  color: #fff;\n  text-shadow: 0 -1px 1px rgba(0,0,0,0.35);\n}\n.humane.humane-jackedup-success,\n.humane-jackedup.humane-jackedup-success {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAASElEQVQokc2SMQ4AIAgDD9/K/79QVzWaENTownAJbWnA5SqACkA/Aiy59hczrGVC30Q7y57EmNU5NL5zwln50IMsfZMel+UBKtFBQSLWM9wLAAAAAElFTkSuQmCC');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #62c462), color-stop(1, #57a957)) no-repeat;\n  background: -moz-linear-gradient(top, #62c462 0%, #57a957 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #62c462 0%, #57a957 100%) no-repeat;\n  background: -ms-linear-gradient(top, #62c462 0%, #57a957 100%) no-repeat;\n  background: -o-linear-gradient(top, #62c462 0%, #57a957 100%) no-repeat;\n  background: linear-gradient(top, #62c462 0%, #57a957 100%) no-repeat;\n  background-color: #64ff64;\n  color: #fff;\n  text-shadow: 0 -1px 1px rgba(0,0,0,0.35);\n}\n.humane.humane-jackedup-error,\n.humane-jackedup.humane-jackedup-error {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAIAAACmkByiAAAABmJLR0QA/wD/AP+gvaeTAAAAf0lEQVQokY2TOQ7AIAwER/5mivy/yRc2RQDhA0jhghFYO5bhuS+TZMAoIUMEhhH4loGhfu71cenM3DutWMsaeGKjv3zO5N17KLPJ0+fQD8cpv5uVLPo4vnX0PpXj0nuaaeVzdmw+yXG1O96n2p3kozB757Ni1Z5UPsU9SP8AeAG1kHXE+7RlPAAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ee5f5b), color-stop(1, #c43c35)) no-repeat;\n  background: -moz-linear-gradient(top, #ee5f5b 0%, #c43c35 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #ee5f5b 0%, #c43c35 100%) no-repeat;\n  background: -ms-linear-gradient(top, #ee5f5b 0%, #c43c35 100%) no-repeat;\n  background: -o-linear-gradient(top, #ee5f5b 0%, #c43c35 100%) no-repeat;\n  background: linear-gradient(top, #ee5f5b 0%, #c43c35 100%) no-repeat;\n  background-color: #ee5f5b;\n  color: #fff;\n  text-shadow: 0 -1px 1px rgba(0,0,0,0.35);\n}\n.humane-animate,\n.humane-jackedup.humane-jackedup-animate {\n  opacity: 1;\n  -moz-transform: translateY(0);\n  -webkit-transform: translateY(0);\n  -ms-transform: translateY(0);\n  -o-transform: translateY(0);\n  transform: translateY(0);\n}\n.humane-animate:hover,\n.humane-jackedup.humane-jackedup-animate:hover {\n  opacity: 0.7;\n}\n.humane-js-animate,\n.humane-jackedup.humane-jackedup-js-animate {\n  opacity: 1;\n  -moz-transform: translateY(0);\n  -webkit-transform: translateY(0);\n  -ms-transform: translateY(0);\n  -o-transform: translateY(0);\n  transform: translateY(0);\n}\n.humane-js-animate:hover,\n.humane-jackedup.humane-jackedup-js-animate:hover {\n  opacity: 0.7;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);\n}\n"; });
-define('text!humane-js/themes/libnotify.css', ['module'], function(module) { module.exports = "html,\nbody {\n  min-height: 100%;\n}\n.humane,\n.humane-libnotify {\n  position: fixed;\n  -moz-transition: all 0.3s ease-out;\n  -webkit-transition: all 0.3s ease-out;\n  -ms-transition: all 0.3s ease-out;\n  -o-transition: all 0.3s ease-out;\n  transition: all 0.3s ease-out;\n  z-index: 100000;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n}\n.humane,\n.humane-libnotify {\n  font-family: Ubuntu, Arial, sans-serif;\n  text-align: center;\n  font-size: 15px;\n  top: 10px;\n  right: 10px;\n  opacity: 0;\n  width: 150px;\n  color: #fff;\n  padding: 10px;\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABQCAYAAADYxx/bAAAABmJLR0QA/wD/AP+gvaeTAAAANElEQVQYlWNgYGB4ysTAwMDAxMjICCUQXDQWAwMDAxMTExMedcRyB6d5CAMQ5hGrjSrmAQBQdgIXlosSTwAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(0,0,0,0.9)), color-stop(1, rgba(50,50,50,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(0,0,0,0.9) 0%, rgba(50,50,50,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(0,0,0,0.9) 0%, rgba(50,50,50,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(0,0,0,0.9) 0%, rgba(50,50,50,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(0,0,0,0.9) 0%, rgba(50,50,50,0.9) 100%) no-repeat;\n  background: linear-gradient(top, rgba(0,0,0,0.9) 0%, rgba(50,50,50,0.9) 100%) no-repeat;\n  *background-color: #000;\n  -webkit-border-radius: 5px;\n  border-radius: 5px;\n  -webkit-box-shadow: 0 4px 4px -4px #000;\n  box-shadow: 0 4px 4px -4px #000;\n  -moz-transform: translateY(-40px);\n  -webkit-transform: translateY(-40px);\n  -ms-transform: translateY(-40px);\n  -o-transform: translateY(-40px);\n  transform: translateY(-40px);\n}\n.humane p,\n.humane-libnotify p,\n.humane ul,\n.humane-libnotify ul {\n  margin: 0;\n  padding: 0;\n}\n.humane ul,\n.humane-libnotify ul {\n  list-style: none;\n}\n.humane.humane-libnotify-info,\n.humane-libnotify.humane-libnotify-info {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABQCAYAAADYxx/bAAAABmJLR0QA/wD/AP+gvaeTAAAAMUlEQVQYlWNgYDB6ysTAwMDAxMDACCcYUFkMDEwMDEwMBNVhkxg65jGhmke6M6hgHgBSdgHnpZwADwAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(0,0,50,0.9)), color-stop(1, rgba(0,0,100,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(0,0,50,0.9) 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(0,0,50,0.9) 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(0,0,50,0.9) 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(0,0,50,0.9) 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: linear-gradient(top, rgba(0,0,50,0.9) 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  *background-color: #030;\n}\n.humane.humane-libnotify-success,\n.humane-libnotify.humane-libnotify-success {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABQCAYAAADYxx/bAAAABmJLR0QA/wD/AP+gvaeTAAAAMUlEQVQYlWNgMGJ4ysTAwMDAxMAIJxhQWQwMDEwMTKgS2NRhkxg65jGhmke6M6hhHgBS2QHn2LzhygAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(0,50,0,0.9)), color-stop(1, rgba(0,100,0,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(0,50,0,0.9) 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(0,50,0,0.9) 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(0,50,0,0.9) 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(0,50,0,0.9) 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: linear-gradient(top, rgba(0,50,0,0.9) 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  *background-color: #030;\n}\n.humane.humane-libnotify-error,\n.humane-libnotify.humane-libnotify-error {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAPklEQVQokWMwYmB4ysTAwMCATjASFsOmBBvBRJ7x+O0g0wCS7CDTH/RwH7X9MVDuwyaG032D2M2UeIYO7gMAqt8C19Bn7+YAAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(50,0,0,0.9)), color-stop(1, rgba(100,0,0,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(50,0,0,0.9) 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(50,0,0,0.9) 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(50,0,0,0.9) 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(50,0,0,0.9) 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: linear-gradient(top, rgba(50,0,0,0.9) 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  *background-color: #300;\n}\n.humane.humane-animate,\n.humane-libnotify.humane-libnotify-animate {\n  opacity: 1;\n  -moz-transform: translateY(0);\n  -webkit-transform: translateY(0);\n  -ms-transform: translateY(0);\n  -o-transform: translateY(0);\n  transform: translateY(0);\n}\n.humane.humane-animate:hover,\n.humane-libnotify.humane-libnotify-animate:hover {\n  opacity: 0.2;\n}\n.humane.humane-animate,\n.humane-libnotify.humane-libnotify-js-animate {\n  opacity: 1;\n  -moz-transform: translateY(0);\n  -webkit-transform: translateY(0);\n  -ms-transform: translateY(0);\n  -o-transform: translateY(0);\n  transform: translateY(0);\n}\n.humane.humane-animate:hover,\n.humane-libnotify.humane-libnotify-js-animate:hover {\n  opacity: 0.2;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);\n}\n"; });
-define('text!humane-js/themes/original.css', ['module'], function(module) { module.exports = "html,\nbody {\n  min-height: 100%;\n}\n.humane,\n.humane-original {\n  position: fixed;\n  -moz-transition: all 0.2s ease-out;\n  -webkit-transition: all 0.2s ease-out;\n  -ms-transition: all 0.2s ease-out;\n  -o-transition: all 0.2s ease-out;\n  transition: all 0.2s ease-out;\n  z-index: 100000;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n}\n.humane,\n.humane-original {\n  font-family: Ubuntu, Verdana, sans-serif;\n  line-height: 40px;\n  font-size: 25px;\n  top: 25%;\n  left: 25%;\n  opacity: 0;\n  width: 50%;\n  min-height: 40px;\n  padding: 10px;\n  text-align: center;\n  background-color: #000;\n  color: #fff;\n  -webkit-border-radius: 15px;\n  border-radius: 15px;\n}\n.humane p,\n.humane-original p,\n.humane ul,\n.humane-original ul {\n  margin: 0;\n  padding: 0;\n}\n.humane ul,\n.humane-original ul {\n  list-style: none;\n}\n.humane.humane-original-info,\n.humane-original.humane-original-info {\n  background-color: #030;\n}\n.humane.humane-original-success,\n.humane-original.humane-original-success {\n  background-color: #030;\n}\n.humane.humane-original-error,\n.humane-original.humane-original-error {\n  background-color: #300;\n}\n.humane.humane-animate,\n.humane-original.humane-original-animate {\n  opacity: 0.8;\n}\n.humane.humane-animate:hover,\n.humane-original.humane-original-animate:hover {\n  opacity: 0.6;\n}\n.humane.humane-js-animate,\n.humane-original.humane-original-js-animate {\n  opacity: 0.8;\n}\n.humane.humane-js-animate:hover,\n.humane-original.humane-original-js-animate:hover {\n  opacity: 0.6;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);\n}\n"; });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+define('aurelia-testing/compile-spy',["require", "exports", "aurelia-templating", "aurelia-dependency-injection", "aurelia-logging", "aurelia-pal"], function (require, exports, aurelia_templating_1, aurelia_dependency_injection_1, aurelia_logging_1, aurelia_pal_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * Attribute to be placed on any element to have it emit the View Compiler's
+     * TargetInstruction into the debug console, giving you insight into all the
+     * parsed bindings, behaviors and event handers for the targeted element.
+     */
+    var CompileSpy = /** @class */ (function () {
+        /**
+         * Creates and instanse of CompileSpy.
+         * @param element target element on where attribute is placed on.
+         * @param instruction instructions for how the target element should be enhanced.
+         */
+        function CompileSpy(element, instruction) {
+            aurelia_logging_1.getLogger('compile-spy').info(element.toString(), instruction);
+        }
+        CompileSpy = __decorate([
+            aurelia_templating_1.customAttribute('compile-spy'),
+            aurelia_dependency_injection_1.inject(aurelia_pal_1.DOM.Element, aurelia_templating_1.TargetInstruction)
+        ], CompileSpy);
+        return CompileSpy;
+    }());
+    exports.CompileSpy = CompileSpy;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+define('aurelia-testing/view-spy',["require", "exports", "aurelia-templating", "aurelia-logging"], function (require, exports, aurelia_templating_1, aurelia_logging_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * Attribute to be placed on any HTML element in a view to emit the View instance
+     * to the debug console, giving you insight into the live View instance, including
+     * all child views, live bindings, behaviors and more.
+     */
+    var ViewSpy = /** @class */ (function () {
+        /**
+         * Creates a new instance of ViewSpy.
+         */
+        function ViewSpy() {
+            this.logger = aurelia_logging_1.getLogger('view-spy');
+        }
+        ViewSpy.prototype._log = function (lifecycleName, context) {
+            if (!this.value && lifecycleName === 'created') {
+                this.logger.info(lifecycleName, this.view);
+            }
+            else if (this.value && this.value.indexOf(lifecycleName) !== -1) {
+                this.logger.info(lifecycleName, this.view, context);
+            }
+        };
+        /**
+         * Invoked when the target view is created.
+         * @param view The target view.
+         */
+        ViewSpy.prototype.created = function (view) {
+            this.view = view;
+            this._log('created');
+        };
+        /**
+         * Invoked when the target view is bound.
+         * @param bindingContext The target view's binding context.
+         */
+        ViewSpy.prototype.bind = function (bindingContext) {
+            this._log('bind', bindingContext);
+        };
+        /**
+         * Invoked when the target element is attached to the DOM.
+         */
+        ViewSpy.prototype.attached = function () {
+            this._log('attached');
+        };
+        /**
+         * Invoked when the target element is detached from the DOM.
+         */
+        ViewSpy.prototype.detached = function () {
+            this._log('detached');
+        };
+        /**
+         * Invoked when the target element is unbound.
+         */
+        ViewSpy.prototype.unbind = function () {
+            this._log('unbind');
+        };
+        ViewSpy = __decorate([
+            aurelia_templating_1.customAttribute('view-spy')
+        ], ViewSpy);
+        return ViewSpy;
+    }());
+    exports.ViewSpy = ViewSpy;
+});
+
+define('aurelia-testing/component-tester',["require", "exports", "aurelia-templating", "./wait"], function (require, exports, aurelia_templating_1, wait_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var StageComponent = /** @class */ (function () {
+        function StageComponent() {
+        }
+        StageComponent.withResources = function (resources) {
+            if (resources === void 0) { resources = []; }
+            return new ComponentTester().withResources(resources);
+        };
+        return StageComponent;
+    }());
+    exports.StageComponent = StageComponent;
+    var ComponentTester = /** @class */ (function () {
+        function ComponentTester() {
+            this.resources = [];
+        }
+        ComponentTester.prototype.configure = function (aurelia) {
+            return aurelia.use.standardConfiguration();
+        };
+        ComponentTester.prototype.bootstrap = function (configure) {
+            this.configure = configure;
+        };
+        ComponentTester.prototype.withResources = function (resources) {
+            this.resources = resources;
+            return this;
+        };
+        ComponentTester.prototype.inView = function (html) {
+            this.html = html;
+            return this;
+        };
+        ComponentTester.prototype.boundTo = function (bindingContext) {
+            this.bindingContext = bindingContext;
+            return this;
+        };
+        ComponentTester.prototype.manuallyHandleLifecycle = function () {
+            this._prepareLifecycle();
+            return this;
+        };
+        ComponentTester.prototype.create = function (bootstrap) {
+            var _this = this;
+            return bootstrap(function (aurelia) {
+                return Promise.resolve(_this.configure(aurelia)).then(function () {
+                    if (_this.resources) {
+                        aurelia.use.globalResources(_this.resources);
+                    }
+                    return aurelia.start().then(function () {
+                        _this.host = document.createElement('div');
+                        _this.host.innerHTML = _this.html;
+                        document.body.appendChild(_this.host);
+                        return aurelia.enhance(_this.bindingContext, _this.host).then(function () {
+                            _this.rootView = aurelia.root;
+                            _this.element = _this.host.firstElementChild;
+                            if (aurelia.root.controllers.length) {
+                                _this.viewModel = aurelia.root.controllers[0].viewModel;
+                            }
+                            return new Promise(function (resolve) { return setTimeout(function () { return resolve(); }, 0); });
+                        });
+                    });
+                });
+            });
+        };
+        ComponentTester.prototype.dispose = function () {
+            if (this.host === undefined || this.rootView === undefined) {
+                throw new Error('Cannot call ComponentTester.dispose() before ComponentTester.create()');
+            }
+            this.rootView.detached();
+            this.rootView.unbind();
+            return this.host.parentNode.removeChild(this.host);
+        };
+        ComponentTester.prototype._prepareLifecycle = function () {
+            var _this = this;
+            // bind
+            var bindPrototype = aurelia_templating_1.View.prototype.bind;
+            // tslint:disable-next-line:no-empty
+            aurelia_templating_1.View.prototype.bind = function () { };
+            this.bind = function (bindingContext) { return new Promise(function (resolve) {
+                aurelia_templating_1.View.prototype.bind = bindPrototype;
+                if (bindingContext !== undefined) {
+                    _this.bindingContext = bindingContext;
+                }
+                _this.rootView.bind(_this.bindingContext);
+                setTimeout(function () { return resolve(); }, 0);
+            }); };
+            // attached
+            var attachedPrototype = aurelia_templating_1.View.prototype.attached;
+            // tslint:disable-next-line:no-empty
+            aurelia_templating_1.View.prototype.attached = function () { };
+            this.attached = function () { return new Promise(function (resolve) {
+                aurelia_templating_1.View.prototype.attached = attachedPrototype;
+                _this.rootView.attached();
+                setTimeout(function () { return resolve(); }, 0);
+            }); };
+            // detached
+            this.detached = function () { return new Promise(function (resolve) {
+                _this.rootView.detached();
+                setTimeout(function () { return resolve(); }, 0);
+            }); };
+            // unbind
+            this.unbind = function () { return new Promise(function (resolve) {
+                _this.rootView.unbind();
+                setTimeout(function () { return resolve(); }, 0);
+            }); };
+        };
+        ComponentTester.prototype.waitForElement = function (selector, options) {
+            var _this = this;
+            return wait_1.waitFor(function () { return _this.element.querySelector(selector); }, options);
+        };
+        ComponentTester.prototype.waitForElements = function (selector, options) {
+            var _this = this;
+            return wait_1.waitFor(function () { return _this.element.querySelectorAll(selector); }, options);
+        };
+        return ComponentTester;
+    }());
+    exports.ComponentTester = ComponentTester;
+});
+
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
+define('aurelia-testing/wait',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * Generic function to wait for something to happen. Uses polling
+     * @param getter: a getter function that returns anything else than `null` or an
+     *                empty array or an empty jQuery object when the
+     *                condition is met
+     * @param options: lookup options, defaults to
+     *                 `{present: true, interval: 50, timeout: 5000}`
+     */
+    function waitFor(getter, options) {
+        if (options === void 0) { options = { present: true, interval: 50, timeout: 5000 }; }
+        // prevents infinite recursion if the request times out
+        var timedOut = false;
+        options = __assign({ present: true, interval: 50, timeout: 5000 }, options);
+        function wait() {
+            var element = getter();
+            // boolean is needed here, hence the length > 0
+            var found = element !== null && (!(element instanceof NodeList) &&
+                !element.jquery || element.length > 0);
+            if (!options.present === !found || timedOut) {
+                return Promise.resolve(element);
+            }
+            return new Promise(function (rs) { return setTimeout(rs, options.interval); }).then(wait);
+        }
+        return Promise.race([
+            new Promise(function (_, rj) { return setTimeout(function () {
+                timedOut = true;
+                rj(options.present ? 'Element not found' : 'Element not removed');
+            }, options.timeout); }),
+            wait()
+        ]);
+    }
+    exports.waitFor = waitFor;
+    function waitForDocumentElement(selector, options) {
+        return waitFor(function () { return document.querySelector(selector); }, options);
+    }
+    exports.waitForDocumentElement = waitForDocumentElement;
+    function waitForDocumentElements(selector, options) {
+        return waitFor(function () { return document.querySelectorAll(selector); }, options);
+    }
+    exports.waitForDocumentElements = waitForDocumentElements;
+});
+
 /*
  * Toastr
  * Copyright 2012-2015
@@ -27902,22 +26477,252 @@ define('text!humane-js/themes/original.css', ['module'], function(module) { modu
 ;define('toastr', ['toastr/toastr'], function (main) { return main; });
 
 define('text!toastr/build/toastr.min.css', ['module'], function(module) { module.exports = ".toast-title{font-weight:700}.toast-message{-ms-word-wrap:break-word;word-wrap:break-word}.toast-message a,.toast-message label{color:#FFF}.toast-message a:hover{color:#CCC;text-decoration:none}.toast-close-button{position:relative;right:-.3em;top:-.3em;float:right;font-size:20px;font-weight:700;color:#FFF;-webkit-text-shadow:0 1px 0 #fff;text-shadow:0 1px 0 #fff;opacity:.8;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=80);filter:alpha(opacity=80);line-height:1}.toast-close-button:focus,.toast-close-button:hover{color:#000;text-decoration:none;cursor:pointer;opacity:.4;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=40);filter:alpha(opacity=40)}.rtl .toast-close-button{left:-.3em;float:left;right:.3em}button.toast-close-button{padding:0;cursor:pointer;background:0 0;border:0;-webkit-appearance:none}.toast-top-center{top:0;right:0;width:100%}.toast-bottom-center{bottom:0;right:0;width:100%}.toast-top-full-width{top:0;right:0;width:100%}.toast-bottom-full-width{bottom:0;right:0;width:100%}.toast-top-left{top:12px;left:12px}.toast-top-right{top:12px;right:12px}.toast-bottom-right{right:12px;bottom:12px}.toast-bottom-left{bottom:12px;left:12px}#toast-container{position:fixed;z-index:999999;pointer-events:none}#toast-container *{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}#toast-container>div{position:relative;pointer-events:auto;overflow:hidden;margin:0 0 6px;padding:15px 15px 15px 50px;width:300px;-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;background-position:15px center;background-repeat:no-repeat;-moz-box-shadow:0 0 12px #999;-webkit-box-shadow:0 0 12px #999;box-shadow:0 0 12px #999;color:#FFF;opacity:.8;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=80);filter:alpha(opacity=80)}#toast-container>div.rtl{direction:rtl;padding:15px 50px 15px 15px;background-position:right 15px center}#toast-container>div:hover{-moz-box-shadow:0 0 12px #000;-webkit-box-shadow:0 0 12px #000;box-shadow:0 0 12px #000;opacity:1;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);filter:alpha(opacity=100);cursor:pointer}#toast-container>.toast-info{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGwSURBVEhLtZa9SgNBEMc9sUxxRcoUKSzSWIhXpFMhhYWFhaBg4yPYiWCXZxBLERsLRS3EQkEfwCKdjWJAwSKCgoKCcudv4O5YLrt7EzgXhiU3/4+b2ckmwVjJSpKkQ6wAi4gwhT+z3wRBcEz0yjSseUTrcRyfsHsXmD0AmbHOC9Ii8VImnuXBPglHpQ5wwSVM7sNnTG7Za4JwDdCjxyAiH3nyA2mtaTJufiDZ5dCaqlItILh1NHatfN5skvjx9Z38m69CgzuXmZgVrPIGE763Jx9qKsRozWYw6xOHdER+nn2KkO+Bb+UV5CBN6WC6QtBgbRVozrahAbmm6HtUsgtPC19tFdxXZYBOfkbmFJ1VaHA1VAHjd0pp70oTZzvR+EVrx2Ygfdsq6eu55BHYR8hlcki+n+kERUFG8BrA0BwjeAv2M8WLQBtcy+SD6fNsmnB3AlBLrgTtVW1c2QN4bVWLATaIS60J2Du5y1TiJgjSBvFVZgTmwCU+dAZFoPxGEEs8nyHC9Bwe2GvEJv2WXZb0vjdyFT4Cxk3e/kIqlOGoVLwwPevpYHT+00T+hWwXDf4AJAOUqWcDhbwAAAAASUVORK5CYII=)!important}#toast-container>.toast-error{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHOSURBVEhLrZa/SgNBEMZzh0WKCClSCKaIYOED+AAKeQQLG8HWztLCImBrYadgIdY+gIKNYkBFSwu7CAoqCgkkoGBI/E28PdbLZmeDLgzZzcx83/zZ2SSXC1j9fr+I1Hq93g2yxH4iwM1vkoBWAdxCmpzTxfkN2RcyZNaHFIkSo10+8kgxkXIURV5HGxTmFuc75B2RfQkpxHG8aAgaAFa0tAHqYFfQ7Iwe2yhODk8+J4C7yAoRTWI3w/4klGRgR4lO7Rpn9+gvMyWp+uxFh8+H+ARlgN1nJuJuQAYvNkEnwGFck18Er4q3egEc/oO+mhLdKgRyhdNFiacC0rlOCbhNVz4H9FnAYgDBvU3QIioZlJFLJtsoHYRDfiZoUyIxqCtRpVlANq0EU4dApjrtgezPFad5S19Wgjkc0hNVnuF4HjVA6C7QrSIbylB+oZe3aHgBsqlNqKYH48jXyJKMuAbiyVJ8KzaB3eRc0pg9VwQ4niFryI68qiOi3AbjwdsfnAtk0bCjTLJKr6mrD9g8iq/S/B81hguOMlQTnVyG40wAcjnmgsCNESDrjme7wfftP4P7SP4N3CJZdvzoNyGq2c/HWOXJGsvVg+RA/k2MC/wN6I2YA2Pt8GkAAAAASUVORK5CYII=)!important}#toast-container>.toast-success{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADsSURBVEhLY2AYBfQMgf///3P8+/evAIgvA/FsIF+BavYDDWMBGroaSMMBiE8VC7AZDrIFaMFnii3AZTjUgsUUWUDA8OdAH6iQbQEhw4HyGsPEcKBXBIC4ARhex4G4BsjmweU1soIFaGg/WtoFZRIZdEvIMhxkCCjXIVsATV6gFGACs4Rsw0EGgIIH3QJYJgHSARQZDrWAB+jawzgs+Q2UO49D7jnRSRGoEFRILcdmEMWGI0cm0JJ2QpYA1RDvcmzJEWhABhD/pqrL0S0CWuABKgnRki9lLseS7g2AlqwHWQSKH4oKLrILpRGhEQCw2LiRUIa4lwAAAABJRU5ErkJggg==)!important}#toast-container>.toast-warning{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGYSURBVEhL5ZSvTsNQFMbXZGICMYGYmJhAQIJAICYQPAACiSDB8AiICQQJT4CqQEwgJvYASAQCiZiYmJhAIBATCARJy+9rTsldd8sKu1M0+dLb057v6/lbq/2rK0mS/TRNj9cWNAKPYIJII7gIxCcQ51cvqID+GIEX8ASG4B1bK5gIZFeQfoJdEXOfgX4QAQg7kH2A65yQ87lyxb27sggkAzAuFhbbg1K2kgCkB1bVwyIR9m2L7PRPIhDUIXgGtyKw575yz3lTNs6X4JXnjV+LKM/m3MydnTbtOKIjtz6VhCBq4vSm3ncdrD2lk0VgUXSVKjVDJXJzijW1RQdsU7F77He8u68koNZTz8Oz5yGa6J3H3lZ0xYgXBK2QymlWWA+RWnYhskLBv2vmE+hBMCtbA7KX5drWyRT/2JsqZ2IvfB9Y4bWDNMFbJRFmC9E74SoS0CqulwjkC0+5bpcV1CZ8NMej4pjy0U+doDQsGyo1hzVJttIjhQ7GnBtRFN1UarUlH8F3xict+HY07rEzoUGPlWcjRFRr4/gChZgc3ZL2d8oAAAAASUVORK5CYII=)!important}#toast-container.toast-bottom-center>div,#toast-container.toast-top-center>div{width:300px;margin-left:auto;margin-right:auto}#toast-container.toast-bottom-full-width>div,#toast-container.toast-top-full-width>div{width:96%;margin-left:auto;margin-right:auto}.toast{background-color:#030303}.toast-success{background-color:#51A351}.toast-error{background-color:#BD362F}.toast-info{background-color:#2F96B4}.toast-warning{background-color:#F89406}.toast-progress{position:absolute;left:0;bottom:0;height:4px;background-color:#000;opacity:.4;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=40);filter:alpha(opacity=40)}@media all and (max-width:240px){#toast-container>div{padding:8px 8px 8px 50px;width:11em}#toast-container>div.rtl{padding:8px 50px 8px 8px}#toast-container .toast-close-button{right:-.2em;top:-.2em}#toast-container .rtl .toast-close-button{left:-.2em;right:.2em}}@media all and (min-width:241px) and (max-width:480px){#toast-container>div{padding:8px 8px 8px 50px;width:18em}#toast-container>div.rtl{padding:8px 50px 8px 8px}#toast-container .toast-close-button{right:-.2em;top:-.2em}#toast-container .rtl .toast-close-button{left:-.2em;right:.2em}}@media all and (min-width:481px) and (max-width:768px){#toast-container>div{padding:15px 15px 15px 50px;width:25em}#toast-container>div.rtl{padding:15px 50px 15px 15px}}"; });
-define('i18next/index',['require','exports','module','./i18next'],function (require, exports, module) {'use strict';
+/**
+ * humane.js
+ * Humanized Messages for Notifications
+ * @author Marc Harter (@wavded)
+ * @example
+ *   humane.log('hello world');
+ * @license MIT
+ * See more usage examples at: http://wavded.github.com/humane-js/
+ */
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
+;!function (name, context, definition) {
+   if (typeof module !== 'undefined') module.exports = definition(name, context)
+   else if (typeof define === 'function' && typeof define.amd  === 'object') define('humane-js/humane',definition)
+   else context[name] = definition(name, context)
+}('humane', this, function (name, context) {
+   var win = window
+   var doc = document
+
+   var ENV = {
+      on: function (el, type, cb) {
+         'addEventListener' in win ? el.addEventListener(type,cb,false) : el.attachEvent('on'+type,cb)
+      },
+      off: function (el, type, cb) {
+         'removeEventListener' in win ? el.removeEventListener(type,cb,false) : el.detachEvent('on'+type,cb)
+      },
+      bind: function (fn, ctx) {
+         return function () { fn.apply(ctx,arguments) }
+      },
+      isArray: Array.isArray || function (obj) { return Object.prototype.toString.call(obj) === '[object Array]' },
+      config: function (preferred, fallback) {
+         return preferred != null ? preferred : fallback
+      },
+      transSupport: false,
+      useFilter: /msie [678]/i.test(navigator.userAgent), // sniff, sniff
+      _checkTransition: function () {
+         var el = doc.createElement('div')
+         var vendors = { webkit: 'webkit', Moz: '', O: 'o', ms: 'MS' }
+
+         for (var vendor in vendors)
+            if (vendor + 'Transition' in el.style) {
+               this.vendorPrefix = vendors[vendor]
+               this.transSupport = true
+            }
+      }
+   }
+   ENV._checkTransition()
+
+   var Humane = function (o) {
+      o || (o = {})
+      this.queue = []
+      this.baseCls = o.baseCls || 'humane'
+      this.addnCls = o.addnCls || ''
+      this.timeout = 'timeout' in o ? o.timeout : 2500
+      this.waitForMove = o.waitForMove || false
+      this.clickToClose = o.clickToClose || false
+      this.timeoutAfterMove = o.timeoutAfterMove || false
+      this.container = o.container
+
+      try { this._setupEl() } // attempt to setup elements
+      catch (e) {
+        ENV.on(win,'load',ENV.bind(this._setupEl, this)) // dom wasn't ready, wait till ready
+      }
+   }
+
+   Humane.prototype = {
+      constructor: Humane,
+      _setupEl: function () {
+         var el = doc.createElement('div')
+         el.style.display = 'none'
+         if (!this.container){
+           if(doc.body) this.container = doc.body;
+           else throw 'document.body is null'
+         }
+         this.container.appendChild(el)
+         this.el = el
+         this.removeEvent = ENV.bind(function(){
+            var timeoutAfterMove = ENV.config(this.currentMsg.timeoutAfterMove,this.timeoutAfterMove)
+            if (!timeoutAfterMove){
+               this.remove()
+            } else {
+               setTimeout(ENV.bind(this.remove,this),timeoutAfterMove)
+            }
+         },this)
+
+         this.transEvent = ENV.bind(this._afterAnimation,this)
+         this._run()
+      },
+      _afterTimeout: function () {
+         if (!ENV.config(this.currentMsg.waitForMove,this.waitForMove)) this.remove()
+
+         else if (!this.removeEventsSet) {
+            ENV.on(doc.body,'mousemove',this.removeEvent)
+            ENV.on(doc.body,'click',this.removeEvent)
+            ENV.on(doc.body,'keypress',this.removeEvent)
+            ENV.on(doc.body,'touchstart',this.removeEvent)
+            this.removeEventsSet = true
+         }
+      },
+      _run: function () {
+         if (this._animating || !this.queue.length || !this.el) return
+
+         this._animating = true
+         if (this.currentTimer) {
+            clearTimeout(this.currentTimer)
+            this.currentTimer = null
+         }
+
+         var msg = this.queue.shift()
+         var clickToClose = ENV.config(msg.clickToClose,this.clickToClose)
+
+         if (clickToClose) {
+            ENV.on(this.el,'click',this.removeEvent)
+            ENV.on(this.el,'touchstart',this.removeEvent)
+         }
+
+         var timeout = ENV.config(msg.timeout,this.timeout)
+
+         if (timeout > 0)
+            this.currentTimer = setTimeout(ENV.bind(this._afterTimeout,this), timeout)
+
+         if (ENV.isArray(msg.html)) msg.html = '<ul><li>'+msg.html.join('<li>')+'</ul>'
+
+         this.el.innerHTML = msg.html
+         this.currentMsg = msg
+         this.el.className = this.baseCls
+         if (ENV.transSupport) {
+            this.el.style.display = 'block'
+            setTimeout(ENV.bind(this._showMsg,this),50)
+         } else {
+            this._showMsg()
+         }
+
+      },
+      _setOpacity: function (opacity) {
+         if (ENV.useFilter){
+            try{
+               this.el.filters.item('DXImageTransform.Microsoft.Alpha').Opacity = opacity*100
+            } catch(err){}
+         } else {
+            this.el.style.opacity = String(opacity)
+         }
+      },
+      _showMsg: function () {
+         var addnCls = ENV.config(this.currentMsg.addnCls,this.addnCls)
+         if (ENV.transSupport) {
+            this.el.className = this.baseCls+' '+addnCls+' '+this.baseCls+'-animate'
+         }
+         else {
+            var opacity = 0
+            this.el.className = this.baseCls+' '+addnCls+' '+this.baseCls+'-js-animate'
+            this._setOpacity(0) // reset value so hover states work
+            this.el.style.display = 'block'
+
+            var self = this
+            var interval = setInterval(function(){
+               if (opacity < 1) {
+                  opacity += 0.1
+                  if (opacity > 1) opacity = 1
+                  self._setOpacity(opacity)
+               }
+               else clearInterval(interval)
+            }, 30)
+         }
+      },
+      _hideMsg: function () {
+         var addnCls = ENV.config(this.currentMsg.addnCls,this.addnCls)
+         if (ENV.transSupport) {
+            this.el.className = this.baseCls+' '+addnCls
+            ENV.on(this.el,ENV.vendorPrefix ? ENV.vendorPrefix+'TransitionEnd' : 'transitionend',this.transEvent)
+         }
+         else {
+            var opacity = 1
+            var self = this
+            var interval = setInterval(function(){
+               if(opacity > 0) {
+                  opacity -= 0.1
+                  if (opacity < 0) opacity = 0
+                  self._setOpacity(opacity);
+               }
+               else {
+                  self.el.className = self.baseCls+' '+addnCls
+                  clearInterval(interval)
+                  self._afterAnimation()
+               }
+            }, 30)
+         }
+      },
+      _afterAnimation: function () {
+         if (ENV.transSupport) ENV.off(this.el,ENV.vendorPrefix ? ENV.vendorPrefix+'TransitionEnd' : 'transitionend',this.transEvent)
+
+         if (this.currentMsg.cb) this.currentMsg.cb()
+         this.el.style.display = 'none'
+
+         this._animating = false
+         this._run()
+      },
+      remove: function (e) {
+         var cb = typeof e == 'function' ? e : null
+
+         ENV.off(doc.body,'mousemove',this.removeEvent)
+         ENV.off(doc.body,'click',this.removeEvent)
+         ENV.off(doc.body,'keypress',this.removeEvent)
+         ENV.off(doc.body,'touchstart',this.removeEvent)
+         ENV.off(this.el,'click',this.removeEvent)
+         ENV.off(this.el,'touchstart',this.removeEvent)
+         this.removeEventsSet = false
+
+         if (cb && this.currentMsg) this.currentMsg.cb = cb
+         if (this._animating) this._hideMsg()
+         else if (cb) cb()
+      },
+      log: function (html, o, cb, defaults) {
+         var msg = {}
+         if (defaults)
+           for (var opt in defaults)
+               msg[opt] = defaults[opt]
+
+         if (typeof o == 'function') cb = o
+         else if (o)
+            for (var opt in o) msg[opt] = o[opt]
+
+         msg.html = html
+         if (cb) msg.cb = cb
+         this.queue.push(msg)
+         this._run()
+         return this
+      },
+      spawn: function (defaults) {
+         var self = this
+         return function (html, o, cb) {
+            self.log.call(self,html,o,cb,defaults)
+            return self
+         }
+      },
+      create: function (o) { return new Humane(o) }
+   }
+   return new Humane()
 });
+;define('humane-js', ['humane-js/humane'], function (main) { return main; });
 
-var _i18next = require('./i18next');
-
-var _i18next2 = _interopRequireDefault(_i18next);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = _i18next2.default;
-});
-;define('i18next', ['i18next/index'], function (main) { return main; });
-
+define('text!humane-js/themes/bigbox.css', ['module'], function(module) { module.exports = "html,\nbody {\n  min-height: 100%;\n}\n.humane,\n.humane-bigbox {\n  position: fixed;\n  -moz-transition: all 0.3s ease-out;\n  -webkit-transition: all 0.3s ease-out;\n  -ms-transition: all 0.3s ease-out;\n  -o-transition: all 0.3s ease-out;\n  transition: all 0.3s ease-out;\n  z-index: 100000;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n}\n.humane,\n.humane-bigbox {\n  font-family: Ubuntu, Verdana, sans-serif;\n  line-height: 40px;\n  font-size: 35px;\n  top: 25%;\n  left: 25%;\n  opacity: 0;\n  width: 50%;\n  min-height: 40px;\n  padding: 30px;\n  text-align: center;\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAc0lEQVQokb2RQQ6EMAwDx/7/n80BtIEC3RYhLlXrVLGTAYiBWBIGtkPSP01SfreTVoV5re9Rcee1scwDk9NurbR62sZJcpzy9O+2X5KsXabyPaQFYNuvkqkRviDTp9Vs8opC0TpkHvJtVjeReW/5kEyX1gKeLEKE9peeWAAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #000), color-stop(1, rgba(0,0,0,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, #000 0%, rgba(0,0,0,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #000 0%, rgba(0,0,0,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #000 0%, rgba(0,0,0,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, #000 0%, rgba(0,0,0,0.9) 100%) no-repeat;\n  background: linear-gradient(top, #000 0%, rgba(0,0,0,0.9) 100%) no-repeat;\n  *background-color: #000;\n  color: #fff;\n  -webkit-border-radius: 15px;\n  border-radius: 15px;\n  text-shadow: 0 -1px 1px #ddd;\n  -webkit-box-shadow: 0 15px 15px -15px #000;\n  box-shadow: 0 15px 15px -15px #000;\n  -moz-transform: scale(0.1);\n  -webkit-transform: scale(0.1);\n  -ms-transform: scale(0.1);\n  -o-transform: scale(0.1);\n  transform: scale(0.1);\n}\n.humane p,\n.humane-bigbox p,\n.humane ul,\n.humane-bigbox ul {\n  margin: 0;\n  padding: 0;\n}\n.humane ul,\n.humane-bigbox ul {\n  list-style: none;\n}\n.humane.humane-bigbox-info,\n.humane-bigbox.humane-bigbox-info {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAQElEQVQokWNgYEj5z8TAwPCfiYGBgQGVIEKMTG2DTYwRVez/IHIaNcUGyBnYgpORel6gpvFEJhBqpxIaG8/AAADsKDq/HhYQ2AAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #000064), color-stop(1, rgba(0,0,100,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, #000064 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #000064 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #000064 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, #000064 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: linear-gradient(top, #000064 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  *background-color: #030;\n}\n.humane.humane-bigbox-success,\n.humane-bigbox.humane-bigbox-success {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAPklEQVQokWNgSGH4z8TAACEYUAkixMjUNsjEGFHF/g8ip1FVbGCcgS04GannBaoaT1wCwWkvmXbQ2HgGBgYA8Yw6v+m4Kh8AAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #006400), color-stop(1, rgba(0,100,0,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, #006400 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #006400 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #006400 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, #006400 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: linear-gradient(top, #006400 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  *background-color: #030;\n}\n.humane.humane-bigbox-error,\n.humane-bigbox.humane-bigbox-error {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAPklEQVQokWNIYWD4z8QAJRhQCSLEyNQ2uMQYUcX+DyKnUVdsQJyBLTgZqecF6hpPVALBaS+ZdtDYeAYGBgYA9vA6v4OR3MkAAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #640000), color-stop(1, rgba(100,0,0,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, #640000 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #640000 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #640000 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, #640000 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: linear-gradient(top, #640000 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  *background-color: #300;\n}\n.humane.humane-animate,\n.humane-bigbox.humane-bigbox-animate {\n  opacity: 1;\n  -moz-transform: scale(1);\n  -webkit-transform: scale(1);\n  -ms-transform: scale(1);\n  -o-transform: scale(1);\n  transform: scale(1);\n}\n.humane.humane-animate:hover,\n.humane-bigbox.humane-bigbox-animate:hover {\n  opacity: 0.6;\n  -moz-transform: scale(0.8);\n  -webkit-transform: scale(0.8);\n  -ms-transform: scale(0.8);\n  -o-transform: scale(0.8);\n  transform: scale(0.8);\n}\n.humane.humane-js-animate,\n.humane-bigbox.humane-bigbox-js-animate {\n  opacity: 1;\n  -moz-transform: scale(1);\n  -webkit-transform: scale(1);\n  -ms-transform: scale(1);\n  -o-transform: scale(1);\n  transform: scale(1);\n}\n.humane.humane-js-animate:hover,\n.humane-bigbox.humane-bigbox-js-animate:hover {\n  opacity: 0.6;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);\n}\n"; });
+define('text!humane-js/themes/boldlight.css', ['module'], function(module) { module.exports = "html,\nbody {\n  min-height: 100%;\n}\n.humane,\n.humane-boldlight {\n  position: fixed;\n  -moz-transition: all 0.3s ease-out;\n  -webkit-transition: all 0.3s ease-out;\n  -ms-transition: all 0.3s ease-out;\n  -o-transition: all 0.3s ease-out;\n  transition: all 0.3s ease-out;\n  z-index: 100000;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n}\n.humane,\n.humane-boldlight {\n  font-family: Ubuntu, Verdana, sans-serif;\n  font-size: 25px;\n  letter-spacing: -1px;\n  top: 25%;\n  left: 25%;\n  opacity: 0;\n  width: 50%;\n  color: #000;\n  padding: 10px;\n  text-align: center;\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACWCAYAAAAfduJyAAAABmJLR0QA/wD/AP+gvaeTAAAAPElEQVQokWP4////Gab///8zQAgGBgYo8e/fP2QxSpSgydJNCYJLRSVoPqeOkgEIYop9TrGbSfcWpW4GAFeF/7lb/oWBAAAAAElFTkSuQmCC');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255,255,255,0.8)), color-stop(1, rgba(150,150,150,0.8))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(150,150,150,0.8) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(150,150,150,0.8) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(150,150,150,0.8) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(150,150,150,0.8) 100%) no-repeat;\n  background: linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(150,150,150,0.8) 100%) no-repeat;\n  *background-color: #fff;\n  -webkit-border-radius: 15px;\n  border-radius: 15px;\n  text-shadow: 0 -1px 1px rgba(221,221,221,0.4);\n  -webkit-box-shadow: 0 4px 4px -4px #eee;\n  box-shadow: 0 4px 4px -4px #eee;\n  -moz-transform: scale(1.1);\n  -webkit-transform: scale(1.1);\n  -ms-transform: scale(1.1);\n  -o-transform: scale(1.1);\n  transform: scale(1.1);\n}\n.humane p,\n.humane-boldlight p,\n.humane ul,\n.humane-boldlight ul {\n  margin: 0;\n  padding: 0;\n}\n.humane ul,\n.humane-boldlight ul {\n  list-style: none;\n}\n.humane.humane-boldlight-info,\n.humane-boldlight.humane-boldlight-info {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAR0lEQVQokWNISfn/n4mBgeE/EwMDAwMqQYQYmdoGlxgjI4rY//+Dx2nUFRsQZ2ALTrQQp8QL1DWeqASC014y7aCx8QwMDAwA1aZBIulmpvwAAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #6464ff), color-stop(1, rgba(100,100,255,0.8))) no-repeat;\n  background: -moz-linear-gradient(top, #6464ff 0%, rgba(100,100,255,0.8) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #6464ff 0%, rgba(100,100,255,0.8) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #6464ff 0%, rgba(100,100,255,0.8) 100%) no-repeat;\n  background: -o-linear-gradient(top, #6464ff 0%, rgba(100,100,255,0.8) 100%) no-repeat;\n  background: linear-gradient(top, #6464ff 0%, rgba(100,100,255,0.8) 100%) no-repeat;\n  *background-color: #6464ff;\n}\n.humane.humane-boldlight-success,\n.humane-boldlight.humane-boldlight-success {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAGklEQVQokWNI+Z9yhomBgYFhlBglRonhSgAAFX0EItSd0k8AAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #64ff64), color-stop(1, rgba(100,255,100,0.8))) no-repeat;\n  background: -moz-linear-gradient(top, #64ff64 0%, rgba(100,255,100,0.8) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #64ff64 0%, rgba(100,255,100,0.8) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #64ff64 0%, rgba(100,255,100,0.8) 100%) no-repeat;\n  background: -o-linear-gradient(top, #64ff64 0%, rgba(100,255,100,0.8) 100%) no-repeat;\n  background: linear-gradient(top, #64ff64 0%, rgba(100,255,100,0.8) 100%) no-repeat;\n  *background-color: #64ff64;\n}\n.humane.humane-boldlight-error,\n.humane-boldlight.humane-boldlight-error {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAGklEQVQokWP4n5JyhomBgYFhlBglRonhSgAAFhgEIhjGqQkAAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ff6464), color-stop(1, rgba(255,100,100,0.8))) no-repeat;\n  background: -moz-linear-gradient(top, #ff6464 0%, rgba(255,100,100,0.8) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #ff6464 0%, rgba(255,100,100,0.8) 100%) no-repeat;\n  background: -ms-linear-gradient(top, #ff6464 0%, rgba(255,100,100,0.8) 100%) no-repeat;\n  background: -o-linear-gradient(top, #ff6464 0%, rgba(255,100,100,0.8) 100%) no-repeat;\n  background: linear-gradient(top, #ff6464 0%, rgba(255,100,100,0.8) 100%) no-repeat;\n  *background-color: #ff6464;\n}\n.humane.humane-animate,\n.humane-boldlight.humane-boldlight-animate {\n  opacity: 1;\n  -moz-transform: scale(1);\n  -webkit-transform: scale(1);\n  -ms-transform: scale(1);\n  -o-transform: scale(1);\n  transform: scale(1);\n}\n.humane.humane-animate:hover,\n.humane-boldlight.humane-boldlight-animate:hover {\n  opacity: 0.4;\n  -moz-transform: scale(1.8);\n  -webkit-transform: scale(1.8);\n  -ms-transform: scale(1.8);\n  -o-transform: scale(1.8);\n  transform: scale(1.8);\n}\n.humane.humane-animate,\n.humane-boldlight.humane-boldlight-js-animate {\n  opacity: 1;\n  -moz-transform: scale(1);\n  -webkit-transform: scale(1);\n  -ms-transform: scale(1);\n  -o-transform: scale(1);\n  transform: scale(1);\n}\n.humane.humane-animate:hover,\n.humane-boldlight.humane-boldlight-js-animate:hover {\n  opacity: 0.4;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n}\n"; });
+define('text!humane-js/themes/flatty.css', ['module'], function(module) { module.exports = "html,\nbody {\n  min-height: 100%;\n}\n.humane,\n.humane-flatty {\n  position: fixed;\n  -moz-transition: all 0.4s ease-in-out;\n  -webkit-transition: all 0.4s ease-in-out;\n  -ms-transition: all 0.4s ease-in-out;\n  -o-transition: all 0.4s ease-in-out;\n  transition: all 0.4s ease-in-out;\n  z-index: 100000;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n}\n.humane,\n.humane-flatty {\n  font-family: Helvetica Neue, Helvetica, san-serif;\n  font-size: 16px;\n  top: 0;\n  left: 30%;\n  opacity: 0;\n  width: 40%;\n  color: #444;\n  padding: 10px;\n  text-align: center;\n  background-color: #fff;\n  -webkit-border-bottom-right-radius: 3px;\n  -webkit-border-bottom-left-radius: 3px;\n  -moz-border-radius-bottomright: 3px;\n  -moz-border-radius-bottomleft: 3px;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.5);\n  box-shadow: 0 1px 2px rgba(0,0,0,0.5);\n  -moz-transform: translateY(-100px);\n  -webkit-transform: translateY(-100px);\n  -ms-transform: translateY(-100px);\n  -o-transform: translateY(-100px);\n  transform: translateY(-100px);\n}\n.humane p,\n.humane-flatty p,\n.humane ul,\n.humane-flatty ul {\n  margin: 0;\n  padding: 0;\n}\n.humane ul,\n.humane-flatty ul {\n  list-style: none;\n}\n.humane.humane-flatty-info,\n.humane-flatty.humane-flatty-info {\n  background-color: #3498db;\n  color: #FFF;\n}\n.humane.humane-flatty-success,\n.humane-flatty.humane-flatty-success {\n  background-color: #18bc9c;\n  color: #FFF;\n}\n.humane.humane-flatty-error,\n.humane-flatty.humane-flatty-error {\n  background-color: #e74c3c;\n  color: #FFF;\n}\n.humane-animate,\n.humane-flatty.humane-flatty-animate {\n  opacity: 1;\n  -moz-transform: translateY(0);\n  -webkit-transform: translateY(0);\n  -ms-transform: translateY(0);\n  -o-transform: translateY(0);\n  transform: translateY(0);\n}\n.humane-animate:hover,\n.humane-flatty.humane-flatty-animate:hover {\n  opacity: 0.7;\n}\n.humane-js-animate,\n.humane-flatty.humane-flatty-js-animate {\n  opacity: 1;\n  -moz-transform: translateY(0);\n  -webkit-transform: translateY(0);\n  -ms-transform: translateY(0);\n  -o-transform: translateY(0);\n  transform: translateY(0);\n}\n.humane-js-animate:hover,\n.humane-flatty.humane-flatty-js-animate:hover {\n  opacity: 0.7;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);\n}\n"; });
+define('text!humane-js/themes/jackedup.css', ['module'], function(module) { module.exports = "html,\nbody {\n  min-height: 100%;\n}\n.humane,\n.humane-jackedup {\n  position: fixed;\n  -moz-transition: all 0.6s ease-in-out;\n  -webkit-transition: all 0.6s ease-in-out;\n  -ms-transition: all 0.6s ease-in-out;\n  -o-transition: all 0.6s ease-in-out;\n  transition: all 0.6s ease-in-out;\n  z-index: 100000;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n}\n.humane,\n.humane-jackedup {\n  font-family: Helvetica Neue, Helvetica, san-serif;\n  font-size: 18px;\n  letter-spacing: -1px;\n  top: 20px;\n  left: 30%;\n  opacity: 0;\n  width: 40%;\n  color: #333;\n  padding: 10px;\n  text-align: center;\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACWCAYAAAAfduJyAAAABmJLR0QA/wD/AP+gvaeTAAAAIklEQVQokWNgYGCQZGJgYGDARTDSQnboGDqsnDt0DKWNLAAkiQFdC+vZNQAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(0,0,0,0.1)), color-stop(1, rgba(0,0,0,0.2))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 100%) no-repeat;\n  background: linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 100%) no-repeat;\n  background-color: #fff;\n  -webkit-border-radius: 3px;\n  border-radius: 3px;\n  text-shadow: 0 1px 1px rgba(255,255,255,0.8);\n  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.5);\n  box-shadow: 0 1px 2px rgba(0,0,0,0.5);\n  -moz-transform: translateY(-100px);\n  -webkit-transform: translateY(-100px);\n  -ms-transform: translateY(-100px);\n  -o-transform: translateY(-100px);\n  transform: translateY(-100px);\n}\n.humane p,\n.humane-jackedup p,\n.humane ul,\n.humane-jackedup ul {\n  margin: 0;\n  padding: 0;\n}\n.humane ul,\n.humane-jackedup ul {\n  list-style: none;\n}\n.humane.humane-jackedup-info,\n.humane-jackedup.humane-jackedup-info {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAR0lEQVQokWNISfn/n4mBgeE/EwMDAwMqQYQYmdoGlxgjI4rY//+Dx2nUFRsQZ2ALTrQQp8QL1DWeqASC014y7aCx8QwMDAwA1aZBIulmpvwAAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(0,0,0,0.7)), color-stop(1, rgba(0,0,0,0.85))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.85) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.85) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.85) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.85) 100%) no-repeat;\n  background: linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.85) 100%) no-repeat;\n  background-color: #fff;\n  color: #fff;\n  text-shadow: 0 -1px 1px rgba(0,0,0,0.35);\n}\n.humane.humane-jackedup-success,\n.humane-jackedup.humane-jackedup-success {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAASElEQVQokc2SMQ4AIAgDD9/K/79QVzWaENTownAJbWnA5SqACkA/Aiy59hczrGVC30Q7y57EmNU5NL5zwln50IMsfZMel+UBKtFBQSLWM9wLAAAAAElFTkSuQmCC');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #62c462), color-stop(1, #57a957)) no-repeat;\n  background: -moz-linear-gradient(top, #62c462 0%, #57a957 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #62c462 0%, #57a957 100%) no-repeat;\n  background: -ms-linear-gradient(top, #62c462 0%, #57a957 100%) no-repeat;\n  background: -o-linear-gradient(top, #62c462 0%, #57a957 100%) no-repeat;\n  background: linear-gradient(top, #62c462 0%, #57a957 100%) no-repeat;\n  background-color: #64ff64;\n  color: #fff;\n  text-shadow: 0 -1px 1px rgba(0,0,0,0.35);\n}\n.humane.humane-jackedup-error,\n.humane-jackedup.humane-jackedup-error {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAIAAACmkByiAAAABmJLR0QA/wD/AP+gvaeTAAAAf0lEQVQokY2TOQ7AIAwER/5mivy/yRc2RQDhA0jhghFYO5bhuS+TZMAoIUMEhhH4loGhfu71cenM3DutWMsaeGKjv3zO5N17KLPJ0+fQD8cpv5uVLPo4vnX0PpXj0nuaaeVzdmw+yXG1O96n2p3kozB757Ni1Z5UPsU9SP8AeAG1kHXE+7RlPAAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ee5f5b), color-stop(1, #c43c35)) no-repeat;\n  background: -moz-linear-gradient(top, #ee5f5b 0%, #c43c35 100%) no-repeat;\n  background: -webkit-linear-gradient(top, #ee5f5b 0%, #c43c35 100%) no-repeat;\n  background: -ms-linear-gradient(top, #ee5f5b 0%, #c43c35 100%) no-repeat;\n  background: -o-linear-gradient(top, #ee5f5b 0%, #c43c35 100%) no-repeat;\n  background: linear-gradient(top, #ee5f5b 0%, #c43c35 100%) no-repeat;\n  background-color: #ee5f5b;\n  color: #fff;\n  text-shadow: 0 -1px 1px rgba(0,0,0,0.35);\n}\n.humane-animate,\n.humane-jackedup.humane-jackedup-animate {\n  opacity: 1;\n  -moz-transform: translateY(0);\n  -webkit-transform: translateY(0);\n  -ms-transform: translateY(0);\n  -o-transform: translateY(0);\n  transform: translateY(0);\n}\n.humane-animate:hover,\n.humane-jackedup.humane-jackedup-animate:hover {\n  opacity: 0.7;\n}\n.humane-js-animate,\n.humane-jackedup.humane-jackedup-js-animate {\n  opacity: 1;\n  -moz-transform: translateY(0);\n  -webkit-transform: translateY(0);\n  -ms-transform: translateY(0);\n  -o-transform: translateY(0);\n  transform: translateY(0);\n}\n.humane-js-animate:hover,\n.humane-jackedup.humane-jackedup-js-animate:hover {\n  opacity: 0.7;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);\n}\n"; });
+define('text!humane-js/themes/libnotify.css', ['module'], function(module) { module.exports = "html,\nbody {\n  min-height: 100%;\n}\n.humane,\n.humane-libnotify {\n  position: fixed;\n  -moz-transition: all 0.3s ease-out;\n  -webkit-transition: all 0.3s ease-out;\n  -ms-transition: all 0.3s ease-out;\n  -o-transition: all 0.3s ease-out;\n  transition: all 0.3s ease-out;\n  z-index: 100000;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n}\n.humane,\n.humane-libnotify {\n  font-family: Ubuntu, Arial, sans-serif;\n  text-align: center;\n  font-size: 15px;\n  top: 10px;\n  right: 10px;\n  opacity: 0;\n  width: 150px;\n  color: #fff;\n  padding: 10px;\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABQCAYAAADYxx/bAAAABmJLR0QA/wD/AP+gvaeTAAAANElEQVQYlWNgYGB4ysTAwMDAxMjICCUQXDQWAwMDAxMTExMedcRyB6d5CAMQ5hGrjSrmAQBQdgIXlosSTwAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(0,0,0,0.9)), color-stop(1, rgba(50,50,50,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(0,0,0,0.9) 0%, rgba(50,50,50,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(0,0,0,0.9) 0%, rgba(50,50,50,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(0,0,0,0.9) 0%, rgba(50,50,50,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(0,0,0,0.9) 0%, rgba(50,50,50,0.9) 100%) no-repeat;\n  background: linear-gradient(top, rgba(0,0,0,0.9) 0%, rgba(50,50,50,0.9) 100%) no-repeat;\n  *background-color: #000;\n  -webkit-border-radius: 5px;\n  border-radius: 5px;\n  -webkit-box-shadow: 0 4px 4px -4px #000;\n  box-shadow: 0 4px 4px -4px #000;\n  -moz-transform: translateY(-40px);\n  -webkit-transform: translateY(-40px);\n  -ms-transform: translateY(-40px);\n  -o-transform: translateY(-40px);\n  transform: translateY(-40px);\n}\n.humane p,\n.humane-libnotify p,\n.humane ul,\n.humane-libnotify ul {\n  margin: 0;\n  padding: 0;\n}\n.humane ul,\n.humane-libnotify ul {\n  list-style: none;\n}\n.humane.humane-libnotify-info,\n.humane-libnotify.humane-libnotify-info {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABQCAYAAADYxx/bAAAABmJLR0QA/wD/AP+gvaeTAAAAMUlEQVQYlWNgYDB6ysTAwMDAxMDACCcYUFkMDEwMDEwMBNVhkxg65jGhmke6M6hgHgBSdgHnpZwADwAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(0,0,50,0.9)), color-stop(1, rgba(0,0,100,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(0,0,50,0.9) 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(0,0,50,0.9) 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(0,0,50,0.9) 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(0,0,50,0.9) 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  background: linear-gradient(top, rgba(0,0,50,0.9) 0%, rgba(0,0,100,0.9) 100%) no-repeat;\n  *background-color: #030;\n}\n.humane.humane-libnotify-success,\n.humane-libnotify.humane-libnotify-success {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABQCAYAAADYxx/bAAAABmJLR0QA/wD/AP+gvaeTAAAAMUlEQVQYlWNgMGJ4ysTAwMDAxMAIJxhQWQwMDEwMTKgS2NRhkxg65jGhmke6M6hhHgBS2QHn2LzhygAAAABJRU5ErkJggg==');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(0,50,0,0.9)), color-stop(1, rgba(0,100,0,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(0,50,0,0.9) 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(0,50,0,0.9) 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(0,50,0,0.9) 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(0,50,0,0.9) 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  background: linear-gradient(top, rgba(0,50,0,0.9) 0%, rgba(0,100,0,0.9) 100%) no-repeat;\n  *background-color: #030;\n}\n.humane.humane-libnotify-error,\n.humane-libnotify.humane-libnotify-error {\n  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADICAYAAAAp8ov1AAAABmJLR0QA/wD/AP+gvaeTAAAAPklEQVQokWMwYmB4ysTAwMCATjASFsOmBBvBRJ7x+O0g0wCS7CDTH/RwH7X9MVDuwyaG032D2M2UeIYO7gMAqt8C19Bn7+YAAAAASUVORK5CYII=');\n  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(50,0,0,0.9)), color-stop(1, rgba(100,0,0,0.9))) no-repeat;\n  background: -moz-linear-gradient(top, rgba(50,0,0,0.9) 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: -webkit-linear-gradient(top, rgba(50,0,0,0.9) 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: -ms-linear-gradient(top, rgba(50,0,0,0.9) 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: -o-linear-gradient(top, rgba(50,0,0,0.9) 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  background: linear-gradient(top, rgba(50,0,0,0.9) 0%, rgba(100,0,0,0.9) 100%) no-repeat;\n  *background-color: #300;\n}\n.humane.humane-animate,\n.humane-libnotify.humane-libnotify-animate {\n  opacity: 1;\n  -moz-transform: translateY(0);\n  -webkit-transform: translateY(0);\n  -ms-transform: translateY(0);\n  -o-transform: translateY(0);\n  transform: translateY(0);\n}\n.humane.humane-animate:hover,\n.humane-libnotify.humane-libnotify-animate:hover {\n  opacity: 0.2;\n}\n.humane.humane-animate,\n.humane-libnotify.humane-libnotify-js-animate {\n  opacity: 1;\n  -moz-transform: translateY(0);\n  -webkit-transform: translateY(0);\n  -ms-transform: translateY(0);\n  -o-transform: translateY(0);\n  transform: translateY(0);\n}\n.humane.humane-animate:hover,\n.humane-libnotify.humane-libnotify-js-animate:hover {\n  opacity: 0.2;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);\n}\n"; });
+define('text!humane-js/themes/original.css', ['module'], function(module) { module.exports = "html,\nbody {\n  min-height: 100%;\n}\n.humane,\n.humane-original {\n  position: fixed;\n  -moz-transition: all 0.2s ease-out;\n  -webkit-transition: all 0.2s ease-out;\n  -ms-transition: all 0.2s ease-out;\n  -o-transition: all 0.2s ease-out;\n  transition: all 0.2s ease-out;\n  z-index: 100000;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n}\n.humane,\n.humane-original {\n  font-family: Ubuntu, Verdana, sans-serif;\n  line-height: 40px;\n  font-size: 25px;\n  top: 25%;\n  left: 25%;\n  opacity: 0;\n  width: 50%;\n  min-height: 40px;\n  padding: 10px;\n  text-align: center;\n  background-color: #000;\n  color: #fff;\n  -webkit-border-radius: 15px;\n  border-radius: 15px;\n}\n.humane p,\n.humane-original p,\n.humane ul,\n.humane-original ul {\n  margin: 0;\n  padding: 0;\n}\n.humane ul,\n.humane-original ul {\n  list-style: none;\n}\n.humane.humane-original-info,\n.humane-original.humane-original-info {\n  background-color: #030;\n}\n.humane.humane-original-success,\n.humane-original.humane-original-success {\n  background-color: #030;\n}\n.humane.humane-original-error,\n.humane-original.humane-original-error {\n  background-color: #300;\n}\n.humane.humane-animate,\n.humane-original.humane-original-animate {\n  opacity: 0.8;\n}\n.humane.humane-animate:hover,\n.humane-original.humane-original-animate:hover {\n  opacity: 0.6;\n}\n.humane.humane-js-animate,\n.humane-original.humane-original-js-animate {\n  opacity: 0.8;\n}\n.humane.humane-js-animate:hover,\n.humane-original.humane-original-js-animate:hover {\n  opacity: 0.6;\n  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);\n}\n"; });
 define('aurelia-i18n/aurelia-i18n',['exports', 'aurelia-logging', 'aurelia-event-aggregator', 'aurelia-templating', 'aurelia-loader', 'aurelia-templating-resources', 'aurelia-pal', './i18n', './relativeTime', './df', './nf', './rt', './t', './base-i18n', './aurelia-i18n-loader'], function (exports, _aureliaLogging, _aureliaEventAggregator, _aureliaTemplating, _aureliaLoader, _aureliaTemplatingResources, _aureliaPal, _i18n, _relativeTime, _df, _nf, _rt, _t, _baseI18n, _aureliaI18nLoader) {
   'use strict';
 
@@ -28037,6 +26842,501 @@ define('aurelia-i18n/aurelia-i18n',['exports', 'aurelia-logging', 'aurelia-event
   exports.EventAggregator = _aureliaEventAggregator.EventAggregator;
   exports.Backend = _aureliaI18nLoader.Backend;
 });;define('aurelia-i18n', ['aurelia-i18n/aurelia-i18n'], function (main) { return main; });
+
+/*
+ * Toastr
+ * Copyright 2012-2015
+ * Authors: John Papa, Hans Fjällemark, and Tim Ferrell.
+ * All Rights Reserved.
+ * Use, reproduction, distribution, and modification of this code is subject to the terms and
+ * conditions of the MIT license, available at http://www.opensource.org/licenses/mit-license.php
+ *
+ * ARIA Support: Greta Krafsig
+ *
+ * Project: https://github.com/CodeSeven/toastr
+ */
+/* global define */
+(function (define) {
+    define('toastr/toastr',['jquery'], function ($) {
+        return (function () {
+            var $container;
+            var listener;
+            var toastId = 0;
+            var toastType = {
+                error: 'error',
+                info: 'info',
+                success: 'success',
+                warning: 'warning'
+            };
+
+            var toastr = {
+                clear: clear,
+                remove: remove,
+                error: error,
+                getContainer: getContainer,
+                info: info,
+                options: {},
+                subscribe: subscribe,
+                success: success,
+                version: '2.1.4',
+                warning: warning
+            };
+
+            var previousToast;
+
+            return toastr;
+
+            ////////////////
+
+            function error(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.error,
+                    iconClass: getOptions().iconClasses.error,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function getContainer(options, create) {
+                if (!options) { options = getOptions(); }
+                $container = $('#' + options.containerId);
+                if ($container.length) {
+                    return $container;
+                }
+                if (create) {
+                    $container = createContainer(options);
+                }
+                return $container;
+            }
+
+            function info(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.info,
+                    iconClass: getOptions().iconClasses.info,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function subscribe(callback) {
+                listener = callback;
+            }
+
+            function success(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.success,
+                    iconClass: getOptions().iconClasses.success,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function warning(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.warning,
+                    iconClass: getOptions().iconClasses.warning,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function clear($toastElement, clearOptions) {
+                var options = getOptions();
+                if (!$container) { getContainer(options); }
+                if (!clearToast($toastElement, options, clearOptions)) {
+                    clearContainer(options);
+                }
+            }
+
+            function remove($toastElement) {
+                var options = getOptions();
+                if (!$container) { getContainer(options); }
+                if ($toastElement && $(':focus', $toastElement).length === 0) {
+                    removeToast($toastElement);
+                    return;
+                }
+                if ($container.children().length) {
+                    $container.remove();
+                }
+            }
+
+            // internal functions
+
+            function clearContainer (options) {
+                var toastsToClear = $container.children();
+                for (var i = toastsToClear.length - 1; i >= 0; i--) {
+                    clearToast($(toastsToClear[i]), options);
+                }
+            }
+
+            function clearToast ($toastElement, options, clearOptions) {
+                var force = clearOptions && clearOptions.force ? clearOptions.force : false;
+                if ($toastElement && (force || $(':focus', $toastElement).length === 0)) {
+                    $toastElement[options.hideMethod]({
+                        duration: options.hideDuration,
+                        easing: options.hideEasing,
+                        complete: function () { removeToast($toastElement); }
+                    });
+                    return true;
+                }
+                return false;
+            }
+
+            function createContainer(options) {
+                $container = $('<div/>')
+                    .attr('id', options.containerId)
+                    .addClass(options.positionClass);
+
+                $container.appendTo($(options.target));
+                return $container;
+            }
+
+            function getDefaults() {
+                return {
+                    tapToDismiss: true,
+                    toastClass: 'toast',
+                    containerId: 'toast-container',
+                    debug: false,
+
+                    showMethod: 'fadeIn', //fadeIn, slideDown, and show are built into jQuery
+                    showDuration: 300,
+                    showEasing: 'swing', //swing and linear are built into jQuery
+                    onShown: undefined,
+                    hideMethod: 'fadeOut',
+                    hideDuration: 1000,
+                    hideEasing: 'swing',
+                    onHidden: undefined,
+                    closeMethod: false,
+                    closeDuration: false,
+                    closeEasing: false,
+                    closeOnHover: true,
+
+                    extendedTimeOut: 1000,
+                    iconClasses: {
+                        error: 'toast-error',
+                        info: 'toast-info',
+                        success: 'toast-success',
+                        warning: 'toast-warning'
+                    },
+                    iconClass: 'toast-info',
+                    positionClass: 'toast-top-right',
+                    timeOut: 5000, // Set timeOut and extendedTimeOut to 0 to make it sticky
+                    titleClass: 'toast-title',
+                    messageClass: 'toast-message',
+                    escapeHtml: false,
+                    target: 'body',
+                    closeHtml: '<button type="button">&times;</button>',
+                    closeClass: 'toast-close-button',
+                    newestOnTop: true,
+                    preventDuplicates: false,
+                    progressBar: false,
+                    progressClass: 'toast-progress',
+                    rtl: false
+                };
+            }
+
+            function publish(args) {
+                if (!listener) { return; }
+                listener(args);
+            }
+
+            function notify(map) {
+                var options = getOptions();
+                var iconClass = map.iconClass || options.iconClass;
+
+                if (typeof (map.optionsOverride) !== 'undefined') {
+                    options = $.extend(options, map.optionsOverride);
+                    iconClass = map.optionsOverride.iconClass || iconClass;
+                }
+
+                if (shouldExit(options, map)) { return; }
+
+                toastId++;
+
+                $container = getContainer(options, true);
+
+                var intervalId = null;
+                var $toastElement = $('<div/>');
+                var $titleElement = $('<div/>');
+                var $messageElement = $('<div/>');
+                var $progressElement = $('<div/>');
+                var $closeElement = $(options.closeHtml);
+                var progressBar = {
+                    intervalId: null,
+                    hideEta: null,
+                    maxHideTime: null
+                };
+                var response = {
+                    toastId: toastId,
+                    state: 'visible',
+                    startTime: new Date(),
+                    options: options,
+                    map: map
+                };
+
+                personalizeToast();
+
+                displayToast();
+
+                handleEvents();
+
+                publish(response);
+
+                if (options.debug && console) {
+                    console.log(response);
+                }
+
+                return $toastElement;
+
+                function escapeHtml(source) {
+                    if (source == null) {
+                        source = '';
+                    }
+
+                    return source
+                        .replace(/&/g, '&amp;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                }
+
+                function personalizeToast() {
+                    setIcon();
+                    setTitle();
+                    setMessage();
+                    setCloseButton();
+                    setProgressBar();
+                    setRTL();
+                    setSequence();
+                    setAria();
+                }
+
+                function setAria() {
+                    var ariaValue = '';
+                    switch (map.iconClass) {
+                        case 'toast-success':
+                        case 'toast-info':
+                            ariaValue =  'polite';
+                            break;
+                        default:
+                            ariaValue = 'assertive';
+                    }
+                    $toastElement.attr('aria-live', ariaValue);
+                }
+
+                function handleEvents() {
+                    if (options.closeOnHover) {
+                        $toastElement.hover(stickAround, delayedHideToast);
+                    }
+
+                    if (!options.onclick && options.tapToDismiss) {
+                        $toastElement.click(hideToast);
+                    }
+
+                    if (options.closeButton && $closeElement) {
+                        $closeElement.click(function (event) {
+                            if (event.stopPropagation) {
+                                event.stopPropagation();
+                            } else if (event.cancelBubble !== undefined && event.cancelBubble !== true) {
+                                event.cancelBubble = true;
+                            }
+
+                            if (options.onCloseClick) {
+                                options.onCloseClick(event);
+                            }
+
+                            hideToast(true);
+                        });
+                    }
+
+                    if (options.onclick) {
+                        $toastElement.click(function (event) {
+                            options.onclick(event);
+                            hideToast();
+                        });
+                    }
+                }
+
+                function displayToast() {
+                    $toastElement.hide();
+
+                    $toastElement[options.showMethod](
+                        {duration: options.showDuration, easing: options.showEasing, complete: options.onShown}
+                    );
+
+                    if (options.timeOut > 0) {
+                        intervalId = setTimeout(hideToast, options.timeOut);
+                        progressBar.maxHideTime = parseFloat(options.timeOut);
+                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
+                        if (options.progressBar) {
+                            progressBar.intervalId = setInterval(updateProgress, 10);
+                        }
+                    }
+                }
+
+                function setIcon() {
+                    if (map.iconClass) {
+                        $toastElement.addClass(options.toastClass).addClass(iconClass);
+                    }
+                }
+
+                function setSequence() {
+                    if (options.newestOnTop) {
+                        $container.prepend($toastElement);
+                    } else {
+                        $container.append($toastElement);
+                    }
+                }
+
+                function setTitle() {
+                    if (map.title) {
+                        var suffix = map.title;
+                        if (options.escapeHtml) {
+                            suffix = escapeHtml(map.title);
+                        }
+                        $titleElement.append(suffix).addClass(options.titleClass);
+                        $toastElement.append($titleElement);
+                    }
+                }
+
+                function setMessage() {
+                    if (map.message) {
+                        var suffix = map.message;
+                        if (options.escapeHtml) {
+                            suffix = escapeHtml(map.message);
+                        }
+                        $messageElement.append(suffix).addClass(options.messageClass);
+                        $toastElement.append($messageElement);
+                    }
+                }
+
+                function setCloseButton() {
+                    if (options.closeButton) {
+                        $closeElement.addClass(options.closeClass).attr('role', 'button');
+                        $toastElement.prepend($closeElement);
+                    }
+                }
+
+                function setProgressBar() {
+                    if (options.progressBar) {
+                        $progressElement.addClass(options.progressClass);
+                        $toastElement.prepend($progressElement);
+                    }
+                }
+
+                function setRTL() {
+                    if (options.rtl) {
+                        $toastElement.addClass('rtl');
+                    }
+                }
+
+                function shouldExit(options, map) {
+                    if (options.preventDuplicates) {
+                        if (map.message === previousToast) {
+                            return true;
+                        } else {
+                            previousToast = map.message;
+                        }
+                    }
+                    return false;
+                }
+
+                function hideToast(override) {
+                    var method = override && options.closeMethod !== false ? options.closeMethod : options.hideMethod;
+                    var duration = override && options.closeDuration !== false ?
+                        options.closeDuration : options.hideDuration;
+                    var easing = override && options.closeEasing !== false ? options.closeEasing : options.hideEasing;
+                    if ($(':focus', $toastElement).length && !override) {
+                        return;
+                    }
+                    clearTimeout(progressBar.intervalId);
+                    return $toastElement[method]({
+                        duration: duration,
+                        easing: easing,
+                        complete: function () {
+                            removeToast($toastElement);
+                            clearTimeout(intervalId);
+                            if (options.onHidden && response.state !== 'hidden') {
+                                options.onHidden();
+                            }
+                            response.state = 'hidden';
+                            response.endTime = new Date();
+                            publish(response);
+                        }
+                    });
+                }
+
+                function delayedHideToast() {
+                    if (options.timeOut > 0 || options.extendedTimeOut > 0) {
+                        intervalId = setTimeout(hideToast, options.extendedTimeOut);
+                        progressBar.maxHideTime = parseFloat(options.extendedTimeOut);
+                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
+                    }
+                }
+
+                function stickAround() {
+                    clearTimeout(intervalId);
+                    progressBar.hideEta = 0;
+                    $toastElement.stop(true, true)[options.showMethod](
+                        {duration: options.showDuration, easing: options.showEasing}
+                    );
+                }
+
+                function updateProgress() {
+                    var percentage = ((progressBar.hideEta - (new Date().getTime())) / progressBar.maxHideTime) * 100;
+                    $progressElement.width(percentage + '%');
+                }
+            }
+
+            function getOptions() {
+                return $.extend({}, getDefaults(), toastr.options);
+            }
+
+            function removeToast($toastElement) {
+                if (!$container) { $container = getContainer(); }
+                if ($toastElement.is(':visible')) {
+                    return;
+                }
+                $toastElement.remove();
+                $toastElement = null;
+                if ($container.children().length === 0) {
+                    $container.remove();
+                    previousToast = undefined;
+                }
+            }
+
+        })();
+    });
+}(typeof define === 'function' && define.amd ? define : function (deps, factory) {
+    if (typeof module !== 'undefined' && module.exports) { //Node
+        module.exports = factory(require('jquery'));
+    } else {
+        window.toastr = factory(window.jQuery);
+    }
+}));
+;define('toastr', ['toastr/toastr'], function (main) { return main; });
+
+define('text!toastr/build/toastr.css', ['module'], function(module) { module.exports = ".toast-title {\n  font-weight: bold;\n}\n.toast-message {\n  -ms-word-wrap: break-word;\n  word-wrap: break-word;\n}\n.toast-message a,\n.toast-message label {\n  color: #FFFFFF;\n}\n.toast-message a:hover {\n  color: #CCCCCC;\n  text-decoration: none;\n}\n.toast-close-button {\n  position: relative;\n  right: -0.3em;\n  top: -0.3em;\n  float: right;\n  font-size: 20px;\n  font-weight: bold;\n  color: #FFFFFF;\n  -webkit-text-shadow: 0 1px 0 #ffffff;\n  text-shadow: 0 1px 0 #ffffff;\n  opacity: 0.8;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);\n  filter: alpha(opacity=80);\n  line-height: 1;\n}\n.toast-close-button:hover,\n.toast-close-button:focus {\n  color: #000000;\n  text-decoration: none;\n  cursor: pointer;\n  opacity: 0.4;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n  filter: alpha(opacity=40);\n}\n.rtl .toast-close-button {\n  left: -0.3em;\n  float: left;\n  right: 0.3em;\n}\n/*Additional properties for button version\n iOS requires the button element instead of an anchor tag.\n If you want the anchor version, it requires `href=\"#\"`.*/\nbutton.toast-close-button {\n  padding: 0;\n  cursor: pointer;\n  background: transparent;\n  border: 0;\n  -webkit-appearance: none;\n}\n.toast-top-center {\n  top: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-bottom-center {\n  bottom: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-top-full-width {\n  top: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-bottom-full-width {\n  bottom: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-top-left {\n  top: 12px;\n  left: 12px;\n}\n.toast-top-right {\n  top: 12px;\n  right: 12px;\n}\n.toast-bottom-right {\n  right: 12px;\n  bottom: 12px;\n}\n.toast-bottom-left {\n  bottom: 12px;\n  left: 12px;\n}\n#toast-container {\n  position: fixed;\n  z-index: 999999;\n  pointer-events: none;\n  /*overrides*/\n}\n#toast-container * {\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n#toast-container > div {\n  position: relative;\n  pointer-events: auto;\n  overflow: hidden;\n  margin: 0 0 6px;\n  padding: 15px 15px 15px 50px;\n  width: 300px;\n  -moz-border-radius: 3px 3px 3px 3px;\n  -webkit-border-radius: 3px 3px 3px 3px;\n  border-radius: 3px 3px 3px 3px;\n  background-position: 15px center;\n  background-repeat: no-repeat;\n  -moz-box-shadow: 0 0 12px #999999;\n  -webkit-box-shadow: 0 0 12px #999999;\n  box-shadow: 0 0 12px #999999;\n  color: #FFFFFF;\n  opacity: 0.8;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);\n  filter: alpha(opacity=80);\n}\n#toast-container > div.rtl {\n  direction: rtl;\n  padding: 15px 50px 15px 15px;\n  background-position: right 15px center;\n}\n#toast-container > div:hover {\n  -moz-box-shadow: 0 0 12px #000000;\n  -webkit-box-shadow: 0 0 12px #000000;\n  box-shadow: 0 0 12px #000000;\n  opacity: 1;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n  filter: alpha(opacity=100);\n  cursor: pointer;\n}\n#toast-container > .toast-info {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGwSURBVEhLtZa9SgNBEMc9sUxxRcoUKSzSWIhXpFMhhYWFhaBg4yPYiWCXZxBLERsLRS3EQkEfwCKdjWJAwSKCgoKCcudv4O5YLrt7EzgXhiU3/4+b2ckmwVjJSpKkQ6wAi4gwhT+z3wRBcEz0yjSseUTrcRyfsHsXmD0AmbHOC9Ii8VImnuXBPglHpQ5wwSVM7sNnTG7Za4JwDdCjxyAiH3nyA2mtaTJufiDZ5dCaqlItILh1NHatfN5skvjx9Z38m69CgzuXmZgVrPIGE763Jx9qKsRozWYw6xOHdER+nn2KkO+Bb+UV5CBN6WC6QtBgbRVozrahAbmm6HtUsgtPC19tFdxXZYBOfkbmFJ1VaHA1VAHjd0pp70oTZzvR+EVrx2Ygfdsq6eu55BHYR8hlcki+n+kERUFG8BrA0BwjeAv2M8WLQBtcy+SD6fNsmnB3AlBLrgTtVW1c2QN4bVWLATaIS60J2Du5y1TiJgjSBvFVZgTmwCU+dAZFoPxGEEs8nyHC9Bwe2GvEJv2WXZb0vjdyFT4Cxk3e/kIqlOGoVLwwPevpYHT+00T+hWwXDf4AJAOUqWcDhbwAAAAASUVORK5CYII=\") !important;\n}\n#toast-container > .toast-error {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHOSURBVEhLrZa/SgNBEMZzh0WKCClSCKaIYOED+AAKeQQLG8HWztLCImBrYadgIdY+gIKNYkBFSwu7CAoqCgkkoGBI/E28PdbLZmeDLgzZzcx83/zZ2SSXC1j9fr+I1Hq93g2yxH4iwM1vkoBWAdxCmpzTxfkN2RcyZNaHFIkSo10+8kgxkXIURV5HGxTmFuc75B2RfQkpxHG8aAgaAFa0tAHqYFfQ7Iwe2yhODk8+J4C7yAoRTWI3w/4klGRgR4lO7Rpn9+gvMyWp+uxFh8+H+ARlgN1nJuJuQAYvNkEnwGFck18Er4q3egEc/oO+mhLdKgRyhdNFiacC0rlOCbhNVz4H9FnAYgDBvU3QIioZlJFLJtsoHYRDfiZoUyIxqCtRpVlANq0EU4dApjrtgezPFad5S19Wgjkc0hNVnuF4HjVA6C7QrSIbylB+oZe3aHgBsqlNqKYH48jXyJKMuAbiyVJ8KzaB3eRc0pg9VwQ4niFryI68qiOi3AbjwdsfnAtk0bCjTLJKr6mrD9g8iq/S/B81hguOMlQTnVyG40wAcjnmgsCNESDrjme7wfftP4P7SP4N3CJZdvzoNyGq2c/HWOXJGsvVg+RA/k2MC/wN6I2YA2Pt8GkAAAAASUVORK5CYII=\") !important;\n}\n#toast-container > .toast-success {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADsSURBVEhLY2AYBfQMgf///3P8+/evAIgvA/FsIF+BavYDDWMBGroaSMMBiE8VC7AZDrIFaMFnii3AZTjUgsUUWUDA8OdAH6iQbQEhw4HyGsPEcKBXBIC4ARhex4G4BsjmweU1soIFaGg/WtoFZRIZdEvIMhxkCCjXIVsATV6gFGACs4Rsw0EGgIIH3QJYJgHSARQZDrWAB+jawzgs+Q2UO49D7jnRSRGoEFRILcdmEMWGI0cm0JJ2QpYA1RDvcmzJEWhABhD/pqrL0S0CWuABKgnRki9lLseS7g2AlqwHWQSKH4oKLrILpRGhEQCw2LiRUIa4lwAAAABJRU5ErkJggg==\") !important;\n}\n#toast-container > .toast-warning {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGYSURBVEhL5ZSvTsNQFMbXZGICMYGYmJhAQIJAICYQPAACiSDB8AiICQQJT4CqQEwgJvYASAQCiZiYmJhAIBATCARJy+9rTsldd8sKu1M0+dLb057v6/lbq/2rK0mS/TRNj9cWNAKPYIJII7gIxCcQ51cvqID+GIEX8ASG4B1bK5gIZFeQfoJdEXOfgX4QAQg7kH2A65yQ87lyxb27sggkAzAuFhbbg1K2kgCkB1bVwyIR9m2L7PRPIhDUIXgGtyKw575yz3lTNs6X4JXnjV+LKM/m3MydnTbtOKIjtz6VhCBq4vSm3ncdrD2lk0VgUXSVKjVDJXJzijW1RQdsU7F77He8u68koNZTz8Oz5yGa6J3H3lZ0xYgXBK2QymlWWA+RWnYhskLBv2vmE+hBMCtbA7KX5drWyRT/2JsqZ2IvfB9Y4bWDNMFbJRFmC9E74SoS0CqulwjkC0+5bpcV1CZ8NMej4pjy0U+doDQsGyo1hzVJttIjhQ7GnBtRFN1UarUlH8F3xict+HY07rEzoUGPlWcjRFRr4/gChZgc3ZL2d8oAAAAASUVORK5CYII=\") !important;\n}\n#toast-container.toast-top-center > div,\n#toast-container.toast-bottom-center > div {\n  width: 300px;\n  margin-left: auto;\n  margin-right: auto;\n}\n#toast-container.toast-top-full-width > div,\n#toast-container.toast-bottom-full-width > div {\n  width: 96%;\n  margin-left: auto;\n  margin-right: auto;\n}\n.toast {\n  background-color: #030303;\n}\n.toast-success {\n  background-color: #51A351;\n}\n.toast-error {\n  background-color: #BD362F;\n}\n.toast-info {\n  background-color: #2F96B4;\n}\n.toast-warning {\n  background-color: #F89406;\n}\n.toast-progress {\n  position: absolute;\n  left: 0;\n  bottom: 0;\n  height: 4px;\n  background-color: #000000;\n  opacity: 0.4;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n  filter: alpha(opacity=40);\n}\n/*Responsive Design*/\n@media all and (max-width: 240px) {\n  #toast-container > div {\n    padding: 8px 8px 8px 50px;\n    width: 11em;\n  }\n  #toast-container > div.rtl {\n    padding: 8px 50px 8px 8px;\n  }\n  #toast-container .toast-close-button {\n    right: -0.2em;\n    top: -0.2em;\n  }\n  #toast-container .rtl .toast-close-button {\n    left: -0.2em;\n    right: 0.2em;\n  }\n}\n@media all and (min-width: 241px) and (max-width: 480px) {\n  #toast-container > div {\n    padding: 8px 8px 8px 50px;\n    width: 18em;\n  }\n  #toast-container > div.rtl {\n    padding: 8px 50px 8px 8px;\n  }\n  #toast-container .toast-close-button {\n    right: -0.2em;\n    top: -0.2em;\n  }\n  #toast-container .rtl .toast-close-button {\n    left: -0.2em;\n    right: 0.2em;\n  }\n}\n@media all and (min-width: 481px) and (max-width: 768px) {\n  #toast-container > div {\n    padding: 15px 15px 15px 50px;\n    width: 25em;\n  }\n  #toast-container > div.rtl {\n    padding: 15px 50px 15px 15px;\n  }\n}\n"; });
+define('i18next/index',['require','exports','module','./i18next'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _i18next = require('./i18next');
+
+var _i18next2 = _interopRequireDefault(_i18next);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = _i18next2.default;
+});
+;define('i18next', ['i18next/index'], function (main) { return main; });
 
 define('regenerator-runtime/runtime',['require','exports','module'],function (require, exports, module) {/**
  * Copyright (c) 2014-present, Facebook, Inc.
@@ -28753,674 +28053,155 @@ var regeneratorRuntime = (function (exports) {
 });
 ;define('regenerator-runtime', ['regenerator-runtime/runtime'], function (main) { return main; });
 
-define('aurelia-dialog/aurelia-dialog',["require", "exports", "./dialog-configuration", "./dialog-settings", "./dialog-configuration", "./renderer", "./dialog-cancel-error", "./dialog-service", "./dialog-controller"], function (require, exports, dialog_configuration_1, dialog_settings_1, dialog_configuration_2, renderer_1, dialog_cancel_error_1, dialog_service_1, dialog_controller_1) {
-    "use strict";
-    function __export(m) {
-        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-    }
-    Object.defineProperty(exports, "__esModule", { value: true });
-    function configure(frameworkConfig, callback) {
-        var applyConfig = null;
-        var config = new dialog_configuration_1.DialogConfiguration(frameworkConfig, function (apply) { applyConfig = apply; });
-        if (typeof callback === 'function') {
-            callback(config);
-        }
-        else {
-            config.useDefaults();
-        }
-        return applyConfig();
-    }
-    exports.configure = configure;
-    __export(dialog_settings_1);
-    __export(dialog_configuration_2);
-    __export(renderer_1);
-    __export(dialog_cancel_error_1);
-    __export(dialog_service_1);
-    __export(dialog_controller_1);
-});
-;define('aurelia-dialog', ['aurelia-dialog/aurelia-dialog'], function (main) { return main; });
-
-define('aurelia-dialog/resources/attach-focus',["require", "exports", "aurelia-pal"], function (require, exports, aurelia_pal_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var AttachFocus = /** @class */ (function () {
-        function AttachFocus(element) {
-            this.element = element;
-            this.value = true;
-        }
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        AttachFocus.inject = function () {
-            return [aurelia_pal_1.DOM.Element];
-        };
-        AttachFocus.prototype.attached = function () {
-            if (this.value === '' || (this.value && this.value !== 'false')) {
-                this.element.focus();
-            }
-        };
-        /**
-         * @internal
-         */
-        AttachFocus.$resource = {
-            type: 'attribute',
-            name: 'attach-focus'
-        };
-        return AttachFocus;
-    }());
-    exports.AttachFocus = AttachFocus;
-});
-
-define('aurelia-dialog/resources/ux-dialog-body',["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var UxDialogBody = /** @class */ (function () {
-        function UxDialogBody() {
-        }
-        /**
-         * @internal
-         */
-        UxDialogBody.$view = "<template><slot></slot></template>";
-        /**
-         * @internal
-         */
-        UxDialogBody.$resource = 'ux-dialog-body';
-        return UxDialogBody;
-    }());
-    exports.UxDialogBody = UxDialogBody;
-});
-
-define('aurelia-dialog/resources/ux-dialog-footer',["require", "exports", "../dialog-controller"], function (require, exports, dialog_controller_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /**
-     * View-model for footer of Dialog.
-     */
-    var UxDialogFooter = /** @class */ (function () {
-        function UxDialogFooter(controller) {
-            this.controller = controller;
-            /**
-             * @bindable
-             */
-            this.buttons = [];
-            /**
-             * @bindable
-             */
-            this.useDefaultButtons = false;
-        }
-        UxDialogFooter.isCancelButton = function (value) {
-            return value === 'Cancel';
-        };
-        UxDialogFooter.prototype.close = function (buttonValue) {
-            if (UxDialogFooter.isCancelButton(buttonValue)) {
-                this.controller.cancel(buttonValue);
-            }
-            else {
-                this.controller.ok(buttonValue);
-            }
-        };
-        UxDialogFooter.prototype.useDefaultButtonsChanged = function (newValue) {
-            if (newValue) {
-                this.buttons = ['Cancel', 'Ok'];
-            }
-        };
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        UxDialogFooter.inject = [dialog_controller_1.DialogController];
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        UxDialogFooter.$view = "<template>\n    <slot></slot>\n    <template if.bind=\"buttons.length > 0\">\n      <button type=\"button\"\n        class=\"btn btn-default\"\n        repeat.for=\"button of buttons\"\n        click.trigger=\"close(button)\">\n        ${button}\n      </button>\n    </template>\n  </template>";
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        UxDialogFooter.$resource = {
-            name: 'ux-dialog-footer',
-            bindables: ['buttons', 'useDefaultButtons']
-        };
-        return UxDialogFooter;
-    }());
-    exports.UxDialogFooter = UxDialogFooter;
-});
-
-define('aurelia-dialog/resources/ux-dialog-header',["require", "exports", "../dialog-controller"], function (require, exports, dialog_controller_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var UxDialogHeader = /** @class */ (function () {
-        function UxDialogHeader(controller) {
-            this.controller = controller;
-        }
-        UxDialogHeader.prototype.bind = function () {
-            if (typeof this.showCloseButton !== 'boolean') {
-                this.showCloseButton = !this.controller.settings.lock;
-            }
-        };
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        UxDialogHeader.inject = [dialog_controller_1.DialogController];
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        UxDialogHeader.$view = "<template>\n    <button\n      type=\"button\"\n      class=\"dialog-close\"\n      aria-label=\"Close\"\n      if.bind=\"showCloseButton\"\n      click.trigger=\"controller.cancel()\">\n      <span aria-hidden=\"true\">&times;</span>\n    </button>\n\n    <div class=\"dialog-header-content\">\n      <slot></slot>\n    </div>\n  </template>";
-        /**
-         * @internal
-         */
-        // tslint:disable-next-line:member-ordering
-        UxDialogHeader.$resource = {
-            name: 'ux-dialog-header',
-            bindables: ['showCloseButton']
-        };
-        return UxDialogHeader;
-    }());
-    exports.UxDialogHeader = UxDialogHeader;
-});
-
-define('aurelia-dialog/resources/ux-dialog',["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var UxDialog = /** @class */ (function () {
-        function UxDialog() {
-        }
-        /**
-         * @internal
-         */
-        UxDialog.$view = "<template><slot></slot></template>";
-        /**
-         * @internal
-         */
-        UxDialog.$resource = 'ux-dialog';
-        return UxDialog;
-    }());
-    exports.UxDialog = UxDialog;
-});
-
-/*
- * Toastr
- * Copyright 2012-2015
- * Authors: John Papa, Hans Fjällemark, and Tim Ferrell.
- * All Rights Reserved.
- * Use, reproduction, distribution, and modification of this code is subject to the terms and
- * conditions of the MIT license, available at http://www.opensource.org/licenses/mit-license.php
- *
- * ARIA Support: Greta Krafsig
- *
- * Project: https://github.com/CodeSeven/toastr
- */
-/* global define */
-(function (define) {
-    define('toastr/toastr',['jquery'], function ($) {
-        return (function () {
-            var $container;
-            var listener;
-            var toastId = 0;
-            var toastType = {
-                error: 'error',
-                info: 'info',
-                success: 'success',
-                warning: 'warning'
-            };
-
-            var toastr = {
-                clear: clear,
-                remove: remove,
-                error: error,
-                getContainer: getContainer,
-                info: info,
-                options: {},
-                subscribe: subscribe,
-                success: success,
-                version: '2.1.4',
-                warning: warning
-            };
-
-            var previousToast;
-
-            return toastr;
-
-            ////////////////
-
-            function error(message, title, optionsOverride) {
-                return notify({
-                    type: toastType.error,
-                    iconClass: getOptions().iconClasses.error,
-                    message: message,
-                    optionsOverride: optionsOverride,
-                    title: title
-                });
-            }
-
-            function getContainer(options, create) {
-                if (!options) { options = getOptions(); }
-                $container = $('#' + options.containerId);
-                if ($container.length) {
-                    return $container;
-                }
-                if (create) {
-                    $container = createContainer(options);
-                }
-                return $container;
-            }
-
-            function info(message, title, optionsOverride) {
-                return notify({
-                    type: toastType.info,
-                    iconClass: getOptions().iconClasses.info,
-                    message: message,
-                    optionsOverride: optionsOverride,
-                    title: title
-                });
-            }
-
-            function subscribe(callback) {
-                listener = callback;
-            }
-
-            function success(message, title, optionsOverride) {
-                return notify({
-                    type: toastType.success,
-                    iconClass: getOptions().iconClasses.success,
-                    message: message,
-                    optionsOverride: optionsOverride,
-                    title: title
-                });
-            }
-
-            function warning(message, title, optionsOverride) {
-                return notify({
-                    type: toastType.warning,
-                    iconClass: getOptions().iconClasses.warning,
-                    message: message,
-                    optionsOverride: optionsOverride,
-                    title: title
-                });
-            }
-
-            function clear($toastElement, clearOptions) {
-                var options = getOptions();
-                if (!$container) { getContainer(options); }
-                if (!clearToast($toastElement, options, clearOptions)) {
-                    clearContainer(options);
-                }
-            }
-
-            function remove($toastElement) {
-                var options = getOptions();
-                if (!$container) { getContainer(options); }
-                if ($toastElement && $(':focus', $toastElement).length === 0) {
-                    removeToast($toastElement);
-                    return;
-                }
-                if ($container.children().length) {
-                    $container.remove();
-                }
-            }
-
-            // internal functions
-
-            function clearContainer (options) {
-                var toastsToClear = $container.children();
-                for (var i = toastsToClear.length - 1; i >= 0; i--) {
-                    clearToast($(toastsToClear[i]), options);
-                }
-            }
-
-            function clearToast ($toastElement, options, clearOptions) {
-                var force = clearOptions && clearOptions.force ? clearOptions.force : false;
-                if ($toastElement && (force || $(':focus', $toastElement).length === 0)) {
-                    $toastElement[options.hideMethod]({
-                        duration: options.hideDuration,
-                        easing: options.hideEasing,
-                        complete: function () { removeToast($toastElement); }
-                    });
-                    return true;
-                }
-                return false;
-            }
-
-            function createContainer(options) {
-                $container = $('<div/>')
-                    .attr('id', options.containerId)
-                    .addClass(options.positionClass);
-
-                $container.appendTo($(options.target));
-                return $container;
-            }
-
-            function getDefaults() {
-                return {
-                    tapToDismiss: true,
-                    toastClass: 'toast',
-                    containerId: 'toast-container',
-                    debug: false,
-
-                    showMethod: 'fadeIn', //fadeIn, slideDown, and show are built into jQuery
-                    showDuration: 300,
-                    showEasing: 'swing', //swing and linear are built into jQuery
-                    onShown: undefined,
-                    hideMethod: 'fadeOut',
-                    hideDuration: 1000,
-                    hideEasing: 'swing',
-                    onHidden: undefined,
-                    closeMethod: false,
-                    closeDuration: false,
-                    closeEasing: false,
-                    closeOnHover: true,
-
-                    extendedTimeOut: 1000,
-                    iconClasses: {
-                        error: 'toast-error',
-                        info: 'toast-info',
-                        success: 'toast-success',
-                        warning: 'toast-warning'
-                    },
-                    iconClass: 'toast-info',
-                    positionClass: 'toast-top-right',
-                    timeOut: 5000, // Set timeOut and extendedTimeOut to 0 to make it sticky
-                    titleClass: 'toast-title',
-                    messageClass: 'toast-message',
-                    escapeHtml: false,
-                    target: 'body',
-                    closeHtml: '<button type="button">&times;</button>',
-                    closeClass: 'toast-close-button',
-                    newestOnTop: true,
-                    preventDuplicates: false,
-                    progressBar: false,
-                    progressClass: 'toast-progress',
-                    rtl: false
-                };
-            }
-
-            function publish(args) {
-                if (!listener) { return; }
-                listener(args);
-            }
-
-            function notify(map) {
-                var options = getOptions();
-                var iconClass = map.iconClass || options.iconClass;
-
-                if (typeof (map.optionsOverride) !== 'undefined') {
-                    options = $.extend(options, map.optionsOverride);
-                    iconClass = map.optionsOverride.iconClass || iconClass;
-                }
-
-                if (shouldExit(options, map)) { return; }
-
-                toastId++;
-
-                $container = getContainer(options, true);
-
-                var intervalId = null;
-                var $toastElement = $('<div/>');
-                var $titleElement = $('<div/>');
-                var $messageElement = $('<div/>');
-                var $progressElement = $('<div/>');
-                var $closeElement = $(options.closeHtml);
-                var progressBar = {
-                    intervalId: null,
-                    hideEta: null,
-                    maxHideTime: null
-                };
-                var response = {
-                    toastId: toastId,
-                    state: 'visible',
-                    startTime: new Date(),
-                    options: options,
-                    map: map
-                };
-
-                personalizeToast();
-
-                displayToast();
-
-                handleEvents();
-
-                publish(response);
-
-                if (options.debug && console) {
-                    console.log(response);
-                }
-
-                return $toastElement;
-
-                function escapeHtml(source) {
-                    if (source == null) {
-                        source = '';
-                    }
-
-                    return source
-                        .replace(/&/g, '&amp;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#39;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;');
-                }
-
-                function personalizeToast() {
-                    setIcon();
-                    setTitle();
-                    setMessage();
-                    setCloseButton();
-                    setProgressBar();
-                    setRTL();
-                    setSequence();
-                    setAria();
-                }
-
-                function setAria() {
-                    var ariaValue = '';
-                    switch (map.iconClass) {
-                        case 'toast-success':
-                        case 'toast-info':
-                            ariaValue =  'polite';
-                            break;
-                        default:
-                            ariaValue = 'assertive';
-                    }
-                    $toastElement.attr('aria-live', ariaValue);
-                }
-
-                function handleEvents() {
-                    if (options.closeOnHover) {
-                        $toastElement.hover(stickAround, delayedHideToast);
-                    }
-
-                    if (!options.onclick && options.tapToDismiss) {
-                        $toastElement.click(hideToast);
-                    }
-
-                    if (options.closeButton && $closeElement) {
-                        $closeElement.click(function (event) {
-                            if (event.stopPropagation) {
-                                event.stopPropagation();
-                            } else if (event.cancelBubble !== undefined && event.cancelBubble !== true) {
-                                event.cancelBubble = true;
-                            }
-
-                            if (options.onCloseClick) {
-                                options.onCloseClick(event);
-                            }
-
-                            hideToast(true);
-                        });
-                    }
-
-                    if (options.onclick) {
-                        $toastElement.click(function (event) {
-                            options.onclick(event);
-                            hideToast();
-                        });
-                    }
-                }
-
-                function displayToast() {
-                    $toastElement.hide();
-
-                    $toastElement[options.showMethod](
-                        {duration: options.showDuration, easing: options.showEasing, complete: options.onShown}
-                    );
-
-                    if (options.timeOut > 0) {
-                        intervalId = setTimeout(hideToast, options.timeOut);
-                        progressBar.maxHideTime = parseFloat(options.timeOut);
-                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
-                        if (options.progressBar) {
-                            progressBar.intervalId = setInterval(updateProgress, 10);
-                        }
-                    }
-                }
-
-                function setIcon() {
-                    if (map.iconClass) {
-                        $toastElement.addClass(options.toastClass).addClass(iconClass);
-                    }
-                }
-
-                function setSequence() {
-                    if (options.newestOnTop) {
-                        $container.prepend($toastElement);
-                    } else {
-                        $container.append($toastElement);
-                    }
-                }
-
-                function setTitle() {
-                    if (map.title) {
-                        var suffix = map.title;
-                        if (options.escapeHtml) {
-                            suffix = escapeHtml(map.title);
-                        }
-                        $titleElement.append(suffix).addClass(options.titleClass);
-                        $toastElement.append($titleElement);
-                    }
-                }
-
-                function setMessage() {
-                    if (map.message) {
-                        var suffix = map.message;
-                        if (options.escapeHtml) {
-                            suffix = escapeHtml(map.message);
-                        }
-                        $messageElement.append(suffix).addClass(options.messageClass);
-                        $toastElement.append($messageElement);
-                    }
-                }
-
-                function setCloseButton() {
-                    if (options.closeButton) {
-                        $closeElement.addClass(options.closeClass).attr('role', 'button');
-                        $toastElement.prepend($closeElement);
-                    }
-                }
-
-                function setProgressBar() {
-                    if (options.progressBar) {
-                        $progressElement.addClass(options.progressClass);
-                        $toastElement.prepend($progressElement);
-                    }
-                }
-
-                function setRTL() {
-                    if (options.rtl) {
-                        $toastElement.addClass('rtl');
-                    }
-                }
-
-                function shouldExit(options, map) {
-                    if (options.preventDuplicates) {
-                        if (map.message === previousToast) {
-                            return true;
-                        } else {
-                            previousToast = map.message;
-                        }
-                    }
-                    return false;
-                }
-
-                function hideToast(override) {
-                    var method = override && options.closeMethod !== false ? options.closeMethod : options.hideMethod;
-                    var duration = override && options.closeDuration !== false ?
-                        options.closeDuration : options.hideDuration;
-                    var easing = override && options.closeEasing !== false ? options.closeEasing : options.hideEasing;
-                    if ($(':focus', $toastElement).length && !override) {
-                        return;
-                    }
-                    clearTimeout(progressBar.intervalId);
-                    return $toastElement[method]({
-                        duration: duration,
-                        easing: easing,
-                        complete: function () {
-                            removeToast($toastElement);
-                            clearTimeout(intervalId);
-                            if (options.onHidden && response.state !== 'hidden') {
-                                options.onHidden();
-                            }
-                            response.state = 'hidden';
-                            response.endTime = new Date();
-                            publish(response);
-                        }
-                    });
-                }
-
-                function delayedHideToast() {
-                    if (options.timeOut > 0 || options.extendedTimeOut > 0) {
-                        intervalId = setTimeout(hideToast, options.extendedTimeOut);
-                        progressBar.maxHideTime = parseFloat(options.extendedTimeOut);
-                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
-                    }
-                }
-
-                function stickAround() {
-                    clearTimeout(intervalId);
-                    progressBar.hideEta = 0;
-                    $toastElement.stop(true, true)[options.showMethod](
-                        {duration: options.showDuration, easing: options.showEasing}
-                    );
-                }
-
-                function updateProgress() {
-                    var percentage = ((progressBar.hideEta - (new Date().getTime())) / progressBar.maxHideTime) * 100;
-                    $progressElement.width(percentage + '%');
-                }
-            }
-
-            function getOptions() {
-                return $.extend({}, getDefaults(), toastr.options);
-            }
-
-            function removeToast($toastElement) {
-                if (!$container) { $container = getContainer(); }
-                if ($toastElement.is(':visible')) {
-                    return;
-                }
-                $toastElement.remove();
-                $toastElement = null;
-                if ($container.children().length === 0) {
-                    $container.remove();
-                    previousToast = undefined;
-                }
-            }
-
-        })();
+define('aurelia-bootstrapper',['exports', 'aurelia-pal', 'aurelia-pal-browser', 'aurelia-polyfills'], function (exports, _aureliaPal, _aureliaPalBrowser) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.bootstrap = bootstrap;
+
+
+  var bootstrapQueue = [];
+  var sharedLoader = null;
+  var Aurelia = null;
+
+  function onBootstrap(callback) {
+    return new Promise(function (resolve, reject) {
+      if (sharedLoader) {
+        resolve(callback(sharedLoader));
+      } else {
+        bootstrapQueue.push(function () {
+          try {
+            resolve(callback(sharedLoader));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }
     });
-}(typeof define === 'function' && define.amd ? define : function (deps, factory) {
-    if (typeof module !== 'undefined' && module.exports) { //Node
-        module.exports = factory(require('jquery'));
-    } else {
-        window.toastr = factory(window.jQuery);
-    }
-}));
-;define('toastr', ['toastr/toastr'], function (main) { return main; });
+  }
 
-define('text!toastr/build/toastr.css', ['module'], function(module) { module.exports = ".toast-title {\n  font-weight: bold;\n}\n.toast-message {\n  -ms-word-wrap: break-word;\n  word-wrap: break-word;\n}\n.toast-message a,\n.toast-message label {\n  color: #FFFFFF;\n}\n.toast-message a:hover {\n  color: #CCCCCC;\n  text-decoration: none;\n}\n.toast-close-button {\n  position: relative;\n  right: -0.3em;\n  top: -0.3em;\n  float: right;\n  font-size: 20px;\n  font-weight: bold;\n  color: #FFFFFF;\n  -webkit-text-shadow: 0 1px 0 #ffffff;\n  text-shadow: 0 1px 0 #ffffff;\n  opacity: 0.8;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);\n  filter: alpha(opacity=80);\n  line-height: 1;\n}\n.toast-close-button:hover,\n.toast-close-button:focus {\n  color: #000000;\n  text-decoration: none;\n  cursor: pointer;\n  opacity: 0.4;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n  filter: alpha(opacity=40);\n}\n.rtl .toast-close-button {\n  left: -0.3em;\n  float: left;\n  right: 0.3em;\n}\n/*Additional properties for button version\n iOS requires the button element instead of an anchor tag.\n If you want the anchor version, it requires `href=\"#\"`.*/\nbutton.toast-close-button {\n  padding: 0;\n  cursor: pointer;\n  background: transparent;\n  border: 0;\n  -webkit-appearance: none;\n}\n.toast-top-center {\n  top: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-bottom-center {\n  bottom: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-top-full-width {\n  top: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-bottom-full-width {\n  bottom: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-top-left {\n  top: 12px;\n  left: 12px;\n}\n.toast-top-right {\n  top: 12px;\n  right: 12px;\n}\n.toast-bottom-right {\n  right: 12px;\n  bottom: 12px;\n}\n.toast-bottom-left {\n  bottom: 12px;\n  left: 12px;\n}\n#toast-container {\n  position: fixed;\n  z-index: 999999;\n  pointer-events: none;\n  /*overrides*/\n}\n#toast-container * {\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n#toast-container > div {\n  position: relative;\n  pointer-events: auto;\n  overflow: hidden;\n  margin: 0 0 6px;\n  padding: 15px 15px 15px 50px;\n  width: 300px;\n  -moz-border-radius: 3px 3px 3px 3px;\n  -webkit-border-radius: 3px 3px 3px 3px;\n  border-radius: 3px 3px 3px 3px;\n  background-position: 15px center;\n  background-repeat: no-repeat;\n  -moz-box-shadow: 0 0 12px #999999;\n  -webkit-box-shadow: 0 0 12px #999999;\n  box-shadow: 0 0 12px #999999;\n  color: #FFFFFF;\n  opacity: 0.8;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);\n  filter: alpha(opacity=80);\n}\n#toast-container > div.rtl {\n  direction: rtl;\n  padding: 15px 50px 15px 15px;\n  background-position: right 15px center;\n}\n#toast-container > div:hover {\n  -moz-box-shadow: 0 0 12px #000000;\n  -webkit-box-shadow: 0 0 12px #000000;\n  box-shadow: 0 0 12px #000000;\n  opacity: 1;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n  filter: alpha(opacity=100);\n  cursor: pointer;\n}\n#toast-container > .toast-info {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGwSURBVEhLtZa9SgNBEMc9sUxxRcoUKSzSWIhXpFMhhYWFhaBg4yPYiWCXZxBLERsLRS3EQkEfwCKdjWJAwSKCgoKCcudv4O5YLrt7EzgXhiU3/4+b2ckmwVjJSpKkQ6wAi4gwhT+z3wRBcEz0yjSseUTrcRyfsHsXmD0AmbHOC9Ii8VImnuXBPglHpQ5wwSVM7sNnTG7Za4JwDdCjxyAiH3nyA2mtaTJufiDZ5dCaqlItILh1NHatfN5skvjx9Z38m69CgzuXmZgVrPIGE763Jx9qKsRozWYw6xOHdER+nn2KkO+Bb+UV5CBN6WC6QtBgbRVozrahAbmm6HtUsgtPC19tFdxXZYBOfkbmFJ1VaHA1VAHjd0pp70oTZzvR+EVrx2Ygfdsq6eu55BHYR8hlcki+n+kERUFG8BrA0BwjeAv2M8WLQBtcy+SD6fNsmnB3AlBLrgTtVW1c2QN4bVWLATaIS60J2Du5y1TiJgjSBvFVZgTmwCU+dAZFoPxGEEs8nyHC9Bwe2GvEJv2WXZb0vjdyFT4Cxk3e/kIqlOGoVLwwPevpYHT+00T+hWwXDf4AJAOUqWcDhbwAAAAASUVORK5CYII=\") !important;\n}\n#toast-container > .toast-error {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHOSURBVEhLrZa/SgNBEMZzh0WKCClSCKaIYOED+AAKeQQLG8HWztLCImBrYadgIdY+gIKNYkBFSwu7CAoqCgkkoGBI/E28PdbLZmeDLgzZzcx83/zZ2SSXC1j9fr+I1Hq93g2yxH4iwM1vkoBWAdxCmpzTxfkN2RcyZNaHFIkSo10+8kgxkXIURV5HGxTmFuc75B2RfQkpxHG8aAgaAFa0tAHqYFfQ7Iwe2yhODk8+J4C7yAoRTWI3w/4klGRgR4lO7Rpn9+gvMyWp+uxFh8+H+ARlgN1nJuJuQAYvNkEnwGFck18Er4q3egEc/oO+mhLdKgRyhdNFiacC0rlOCbhNVz4H9FnAYgDBvU3QIioZlJFLJtsoHYRDfiZoUyIxqCtRpVlANq0EU4dApjrtgezPFad5S19Wgjkc0hNVnuF4HjVA6C7QrSIbylB+oZe3aHgBsqlNqKYH48jXyJKMuAbiyVJ8KzaB3eRc0pg9VwQ4niFryI68qiOi3AbjwdsfnAtk0bCjTLJKr6mrD9g8iq/S/B81hguOMlQTnVyG40wAcjnmgsCNESDrjme7wfftP4P7SP4N3CJZdvzoNyGq2c/HWOXJGsvVg+RA/k2MC/wN6I2YA2Pt8GkAAAAASUVORK5CYII=\") !important;\n}\n#toast-container > .toast-success {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADsSURBVEhLY2AYBfQMgf///3P8+/evAIgvA/FsIF+BavYDDWMBGroaSMMBiE8VC7AZDrIFaMFnii3AZTjUgsUUWUDA8OdAH6iQbQEhw4HyGsPEcKBXBIC4ARhex4G4BsjmweU1soIFaGg/WtoFZRIZdEvIMhxkCCjXIVsATV6gFGACs4Rsw0EGgIIH3QJYJgHSARQZDrWAB+jawzgs+Q2UO49D7jnRSRGoEFRILcdmEMWGI0cm0JJ2QpYA1RDvcmzJEWhABhD/pqrL0S0CWuABKgnRki9lLseS7g2AlqwHWQSKH4oKLrILpRGhEQCw2LiRUIa4lwAAAABJRU5ErkJggg==\") !important;\n}\n#toast-container > .toast-warning {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGYSURBVEhL5ZSvTsNQFMbXZGICMYGYmJhAQIJAICYQPAACiSDB8AiICQQJT4CqQEwgJvYASAQCiZiYmJhAIBATCARJy+9rTsldd8sKu1M0+dLb057v6/lbq/2rK0mS/TRNj9cWNAKPYIJII7gIxCcQ51cvqID+GIEX8ASG4B1bK5gIZFeQfoJdEXOfgX4QAQg7kH2A65yQ87lyxb27sggkAzAuFhbbg1K2kgCkB1bVwyIR9m2L7PRPIhDUIXgGtyKw575yz3lTNs6X4JXnjV+LKM/m3MydnTbtOKIjtz6VhCBq4vSm3ncdrD2lk0VgUXSVKjVDJXJzijW1RQdsU7F77He8u68koNZTz8Oz5yGa6J3H3lZ0xYgXBK2QymlWWA+RWnYhskLBv2vmE+hBMCtbA7KX5drWyRT/2JsqZ2IvfB9Y4bWDNMFbJRFmC9E74SoS0CqulwjkC0+5bpcV1CZ8NMej4pjy0U+doDQsGyo1hzVJttIjhQ7GnBtRFN1UarUlH8F3xict+HY07rEzoUGPlWcjRFRr4/gChZgc3ZL2d8oAAAAASUVORK5CYII=\") !important;\n}\n#toast-container.toast-top-center > div,\n#toast-container.toast-bottom-center > div {\n  width: 300px;\n  margin-left: auto;\n  margin-right: auto;\n}\n#toast-container.toast-top-full-width > div,\n#toast-container.toast-bottom-full-width > div {\n  width: 96%;\n  margin-left: auto;\n  margin-right: auto;\n}\n.toast {\n  background-color: #030303;\n}\n.toast-success {\n  background-color: #51A351;\n}\n.toast-error {\n  background-color: #BD362F;\n}\n.toast-info {\n  background-color: #2F96B4;\n}\n.toast-warning {\n  background-color: #F89406;\n}\n.toast-progress {\n  position: absolute;\n  left: 0;\n  bottom: 0;\n  height: 4px;\n  background-color: #000000;\n  opacity: 0.4;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n  filter: alpha(opacity=40);\n}\n/*Responsive Design*/\n@media all and (max-width: 240px) {\n  #toast-container > div {\n    padding: 8px 8px 8px 50px;\n    width: 11em;\n  }\n  #toast-container > div.rtl {\n    padding: 8px 50px 8px 8px;\n  }\n  #toast-container .toast-close-button {\n    right: -0.2em;\n    top: -0.2em;\n  }\n  #toast-container .rtl .toast-close-button {\n    left: -0.2em;\n    right: 0.2em;\n  }\n}\n@media all and (min-width: 241px) and (max-width: 480px) {\n  #toast-container > div {\n    padding: 8px 8px 8px 50px;\n    width: 18em;\n  }\n  #toast-container > div.rtl {\n    padding: 8px 50px 8px 8px;\n  }\n  #toast-container .toast-close-button {\n    right: -0.2em;\n    top: -0.2em;\n  }\n  #toast-container .rtl .toast-close-button {\n    left: -0.2em;\n    right: 0.2em;\n  }\n}\n@media all and (min-width: 481px) and (max-width: 768px) {\n  #toast-container > div {\n    padding: 15px 15px 15px 50px;\n    width: 25em;\n  }\n  #toast-container > div.rtl {\n    padding: 15px 50px 15px 15px;\n  }\n}\n"; });
+  function ready(global) {
+    return new Promise(function (resolve, reject) {
+      if (global.document.readyState === 'complete') {
+        resolve(global.document);
+      } else {
+        global.document.addEventListener('DOMContentLoaded', completed);
+        global.addEventListener('load', completed);
+      }
+
+      function completed() {
+        global.document.removeEventListener('DOMContentLoaded', completed);
+        global.removeEventListener('load', completed);
+        resolve(global.document);
+      }
+    });
+  }
+
+  function createLoader() {
+    if (_aureliaPal.PLATFORM.Loader) {
+      return Promise.resolve(new _aureliaPal.PLATFORM.Loader());
+    }
+
+    if (window.System && typeof window.System.import === 'function') {
+      return System.normalize('aurelia-bootstrapper').then(function (bootstrapperName) {
+        return System.normalize('aurelia-loader-default', bootstrapperName);
+      }).then(function (loaderName) {
+        return System.import(loaderName).then(function (m) {
+          return new m.DefaultLoader();
+        });
+      });
+    }
+
+    if (typeof window.require === 'function') {
+      return new Promise(function (resolve, reject) {
+        return require(['aurelia-loader-default'], function (m) {
+          return resolve(new m.DefaultLoader());
+        }, reject);
+      });
+    }
+
+    return Promise.reject('No PLATFORM.Loader is defined and there is neither a System API (ES6) or a Require API (AMD) globally available to load your app.');
+  }
+
+  function preparePlatform(loader) {
+    return loader.normalize('aurelia-bootstrapper').then(function (bootstrapperName) {
+      return loader.normalize('aurelia-framework', bootstrapperName).then(function (frameworkName) {
+        loader.map('aurelia-framework', frameworkName);
+
+        return Promise.all([loader.normalize('aurelia-dependency-injection', frameworkName).then(function (diName) {
+          return loader.map('aurelia-dependency-injection', diName);
+        }), loader.normalize('aurelia-router', bootstrapperName).then(function (routerName) {
+          return loader.map('aurelia-router', routerName);
+        }), loader.normalize('aurelia-logging-console', bootstrapperName).then(function (loggingConsoleName) {
+          return loader.map('aurelia-logging-console', loggingConsoleName);
+        })]).then(function () {
+          return loader.loadModule(frameworkName).then(function (m) {
+            return Aurelia = m.Aurelia;
+          });
+        });
+      });
+    });
+  }
+
+  function handleApp(loader, appHost) {
+    var moduleId = appHost.getAttribute('aurelia-app') || appHost.getAttribute('data-aurelia-app');
+    return config(loader, appHost, moduleId);
+  }
+
+  function config(loader, appHost, configModuleId) {
+    var aurelia = new Aurelia(loader);
+    aurelia.host = appHost;
+    aurelia.configModuleId = configModuleId || null;
+
+    if (configModuleId) {
+      return loader.loadModule(configModuleId).then(function (customConfig) {
+        if (!customConfig.configure) {
+          throw new Error("Cannot initialize module '" + configModuleId + "' without a configure function.");
+        }
+
+        customConfig.configure(aurelia);
+      });
+    }
+
+    aurelia.use.standardConfiguration().developmentLogging();
+
+    return aurelia.start().then(function () {
+      return aurelia.setRoot();
+    });
+  }
+
+  function run() {
+    return ready(window).then(function (doc) {
+      (0, _aureliaPalBrowser.initialize)();
+
+      var appHost = doc.querySelectorAll('[aurelia-app],[data-aurelia-app]');
+      return createLoader().then(function (loader) {
+        return preparePlatform(loader).then(function () {
+          for (var i = 0, ii = appHost.length; i < ii; ++i) {
+            handleApp(loader, appHost[i]).catch(console.error.bind(console));
+          }
+
+          sharedLoader = loader;
+          for (var _i = 0, _ii = bootstrapQueue.length; _i < _ii; ++_i) {
+            bootstrapQueue[_i]();
+          }
+          bootstrapQueue = null;
+        });
+      });
+    });
+  }
+
+  function bootstrap(configure) {
+    return onBootstrap(function (loader) {
+      var aurelia = new Aurelia(loader);
+      return configure(aurelia);
+    });
+  }
+
+  run();
+});
 /* NProgress, (c) 2013, 2014 Rico Sta. Cruz - http://ricostacruz.com/nprogress
  * @license MIT */
 
@@ -41123,6 +39904,2185 @@ exports.isNumeric = isNumeric;
 //# sourceMappingURL=masker.js.map
 });
 
+/* flatpickr v4.5.2, @license MIT */
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define('flatpickr/flatpickr',factory) :
+    (global.flatpickr = factory());
+}(this, (function () { 'use strict';
+
+    var pad = function pad(number) {
+      return ("0" + number).slice(-2);
+    };
+    var int = function int(bool) {
+      return bool === true ? 1 : 0;
+    };
+    function debounce(func, wait, immediate) {
+      if (immediate === void 0) {
+        immediate = false;
+      }
+
+      var timeout;
+      return function () {
+        var context = this,
+            args = arguments;
+        timeout !== null && clearTimeout(timeout);
+        timeout = window.setTimeout(function () {
+          timeout = null;
+          if (!immediate) func.apply(context, args);
+        }, wait);
+        if (immediate && !timeout) func.apply(context, args);
+      };
+    }
+    var arrayify = function arrayify(obj) {
+      return obj instanceof Array ? obj : [obj];
+    };
+
+    var do_nothing = function do_nothing() {
+      return undefined;
+    };
+
+    var monthToStr = function monthToStr(monthNumber, shorthand, locale) {
+      return locale.months[shorthand ? "shorthand" : "longhand"][monthNumber];
+    };
+    var revFormat = {
+      D: do_nothing,
+      F: function F(dateObj, monthName, locale) {
+        dateObj.setMonth(locale.months.longhand.indexOf(monthName));
+      },
+      G: function G(dateObj, hour) {
+        dateObj.setHours(parseFloat(hour));
+      },
+      H: function H(dateObj, hour) {
+        dateObj.setHours(parseFloat(hour));
+      },
+      J: function J(dateObj, day) {
+        dateObj.setDate(parseFloat(day));
+      },
+      K: function K(dateObj, amPM, locale) {
+        dateObj.setHours(dateObj.getHours() % 12 + 12 * int(new RegExp(locale.amPM[1], "i").test(amPM)));
+      },
+      M: function M(dateObj, shortMonth, locale) {
+        dateObj.setMonth(locale.months.shorthand.indexOf(shortMonth));
+      },
+      S: function S(dateObj, seconds) {
+        dateObj.setSeconds(parseFloat(seconds));
+      },
+      U: function U(_, unixSeconds) {
+        return new Date(parseFloat(unixSeconds) * 1000);
+      },
+      W: function W(dateObj, weekNum) {
+        var weekNumber = parseInt(weekNum);
+        return new Date(dateObj.getFullYear(), 0, 2 + (weekNumber - 1) * 7, 0, 0, 0, 0);
+      },
+      Y: function Y(dateObj, year) {
+        dateObj.setFullYear(parseFloat(year));
+      },
+      Z: function Z(_, ISODate) {
+        return new Date(ISODate);
+      },
+      d: function d(dateObj, day) {
+        dateObj.setDate(parseFloat(day));
+      },
+      h: function h(dateObj, hour) {
+        dateObj.setHours(parseFloat(hour));
+      },
+      i: function i(dateObj, minutes) {
+        dateObj.setMinutes(parseFloat(minutes));
+      },
+      j: function j(dateObj, day) {
+        dateObj.setDate(parseFloat(day));
+      },
+      l: do_nothing,
+      m: function m(dateObj, month) {
+        dateObj.setMonth(parseFloat(month) - 1);
+      },
+      n: function n(dateObj, month) {
+        dateObj.setMonth(parseFloat(month) - 1);
+      },
+      s: function s(dateObj, seconds) {
+        dateObj.setSeconds(parseFloat(seconds));
+      },
+      w: do_nothing,
+      y: function y(dateObj, year) {
+        dateObj.setFullYear(2000 + parseFloat(year));
+      }
+    };
+    var tokenRegex = {
+      D: "(\\w+)",
+      F: "(\\w+)",
+      G: "(\\d\\d|\\d)",
+      H: "(\\d\\d|\\d)",
+      J: "(\\d\\d|\\d)\\w+",
+      K: "",
+      M: "(\\w+)",
+      S: "(\\d\\d|\\d)",
+      U: "(.+)",
+      W: "(\\d\\d|\\d)",
+      Y: "(\\d{4})",
+      Z: "(.+)",
+      d: "(\\d\\d|\\d)",
+      h: "(\\d\\d|\\d)",
+      i: "(\\d\\d|\\d)",
+      j: "(\\d\\d|\\d)",
+      l: "(\\w+)",
+      m: "(\\d\\d|\\d)",
+      n: "(\\d\\d|\\d)",
+      s: "(\\d\\d|\\d)",
+      w: "(\\d\\d|\\d)",
+      y: "(\\d{2})"
+    };
+    var formats = {
+      Z: function Z(date) {
+        return date.toISOString();
+      },
+      D: function D(date, locale, options) {
+        return locale.weekdays.shorthand[formats.w(date, locale, options)];
+      },
+      F: function F(date, locale, options) {
+        return monthToStr(formats.n(date, locale, options) - 1, false, locale);
+      },
+      G: function G(date, locale, options) {
+        return pad(formats.h(date, locale, options));
+      },
+      H: function H(date) {
+        return pad(date.getHours());
+      },
+      J: function J(date, locale) {
+        return locale.ordinal !== undefined ? date.getDate() + locale.ordinal(date.getDate()) : date.getDate();
+      },
+      K: function K(date, locale) {
+        return locale.amPM[int(date.getHours() > 11)];
+      },
+      M: function M(date, locale) {
+        return monthToStr(date.getMonth(), true, locale);
+      },
+      S: function S(date) {
+        return pad(date.getSeconds());
+      },
+      U: function U(date) {
+        return date.getTime() / 1000;
+      },
+      W: function W(date, _, options) {
+        return options.getWeek(date);
+      },
+      Y: function Y(date) {
+        return date.getFullYear();
+      },
+      d: function d(date) {
+        return pad(date.getDate());
+      },
+      h: function h(date) {
+        return date.getHours() % 12 ? date.getHours() % 12 : 12;
+      },
+      i: function i(date) {
+        return pad(date.getMinutes());
+      },
+      j: function j(date) {
+        return date.getDate();
+      },
+      l: function l(date, locale) {
+        return locale.weekdays.longhand[date.getDay()];
+      },
+      m: function m(date) {
+        return pad(date.getMonth() + 1);
+      },
+      n: function n(date) {
+        return date.getMonth() + 1;
+      },
+      s: function s(date) {
+        return date.getSeconds();
+      },
+      w: function w(date) {
+        return date.getDay();
+      },
+      y: function y(date) {
+        return String(date.getFullYear()).substring(2);
+      }
+    };
+
+    var english = {
+      weekdays: {
+        shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        longhand: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+      },
+      months: {
+        shorthand: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        longhand: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+      },
+      daysInMonth: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+      firstDayOfWeek: 0,
+      ordinal: function ordinal(nth) {
+        var s = nth % 100;
+        if (s > 3 && s < 21) return "th";
+
+        switch (s % 10) {
+          case 1:
+            return "st";
+
+          case 2:
+            return "nd";
+
+          case 3:
+            return "rd";
+
+          default:
+            return "th";
+        }
+      },
+      rangeSeparator: " to ",
+      weekAbbreviation: "Wk",
+      scrollTitle: "Scroll to increment",
+      toggleTitle: "Click to toggle",
+      amPM: ["AM", "PM"],
+      yearAriaLabel: "Year"
+    };
+
+    var createDateFormatter = function createDateFormatter(_ref) {
+      var _ref$config = _ref.config,
+          config = _ref$config === void 0 ? defaults : _ref$config,
+          _ref$l10n = _ref.l10n,
+          l10n = _ref$l10n === void 0 ? english : _ref$l10n;
+      return function (dateObj, frmt, overrideLocale) {
+        var locale = overrideLocale || l10n;
+
+        if (config.formatDate !== undefined) {
+          return config.formatDate(dateObj, frmt, locale);
+        }
+
+        return frmt.split("").map(function (c, i, arr) {
+          return formats[c] && arr[i - 1] !== "\\" ? formats[c](dateObj, locale, config) : c !== "\\" ? c : "";
+        }).join("");
+      };
+    };
+    var createDateParser = function createDateParser(_ref2) {
+      var _ref2$config = _ref2.config,
+          config = _ref2$config === void 0 ? defaults : _ref2$config,
+          _ref2$l10n = _ref2.l10n,
+          l10n = _ref2$l10n === void 0 ? english : _ref2$l10n;
+      return function (date, givenFormat, timeless, customLocale) {
+        if (date !== 0 && !date) return undefined;
+        var locale = customLocale || l10n;
+        var parsedDate;
+        var date_orig = date;
+        if (date instanceof Date) parsedDate = new Date(date.getTime());else if (typeof date !== "string" && date.toFixed !== undefined) parsedDate = new Date(date);else if (typeof date === "string") {
+          var format = givenFormat || (config || defaults).dateFormat;
+          var datestr = String(date).trim();
+
+          if (datestr === "today") {
+            parsedDate = new Date();
+            timeless = true;
+          } else if (/Z$/.test(datestr) || /GMT$/.test(datestr)) parsedDate = new Date(date);else if (config && config.parseDate) parsedDate = config.parseDate(date, format);else {
+            parsedDate = !config || !config.noCalendar ? new Date(new Date().getFullYear(), 0, 1, 0, 0, 0, 0) : new Date(new Date().setHours(0, 0, 0, 0));
+            var matched,
+                ops = [];
+
+            for (var i = 0, matchIndex = 0, regexStr = ""; i < format.length; i++) {
+              var token = format[i];
+              var isBackSlash = token === "\\";
+              var escaped = format[i - 1] === "\\" || isBackSlash;
+
+              if (tokenRegex[token] && !escaped) {
+                regexStr += tokenRegex[token];
+                var match = new RegExp(regexStr).exec(date);
+
+                if (match && (matched = true)) {
+                  ops[token !== "Y" ? "push" : "unshift"]({
+                    fn: revFormat[token],
+                    val: match[++matchIndex]
+                  });
+                }
+              } else if (!isBackSlash) regexStr += ".";
+
+              ops.forEach(function (_ref3) {
+                var fn = _ref3.fn,
+                    val = _ref3.val;
+                return parsedDate = fn(parsedDate, val, locale) || parsedDate;
+              });
+            }
+
+            parsedDate = matched ? parsedDate : undefined;
+          }
+        }
+
+        if (!(parsedDate instanceof Date && !isNaN(parsedDate.getTime()))) {
+          config.errorHandler(new Error("Invalid date provided: " + date_orig));
+          return undefined;
+        }
+
+        if (timeless === true) parsedDate.setHours(0, 0, 0, 0);
+        return parsedDate;
+      };
+    };
+    function compareDates(date1, date2, timeless) {
+      if (timeless === void 0) {
+        timeless = true;
+      }
+
+      if (timeless !== false) {
+        return new Date(date1.getTime()).setHours(0, 0, 0, 0) - new Date(date2.getTime()).setHours(0, 0, 0, 0);
+      }
+
+      return date1.getTime() - date2.getTime();
+    }
+    var getWeek = function getWeek(givenDate) {
+      var date = new Date(givenDate.getTime());
+      date.setHours(0, 0, 0, 0);
+      date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+      var week1 = new Date(date.getFullYear(), 0, 4);
+      return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+    };
+    var isBetween = function isBetween(ts, ts1, ts2) {
+      return ts > Math.min(ts1, ts2) && ts < Math.max(ts1, ts2);
+    };
+    var duration = {
+      DAY: 86400000
+    };
+
+    var HOOKS = ["onChange", "onClose", "onDayCreate", "onDestroy", "onKeyDown", "onMonthChange", "onOpen", "onParseConfig", "onReady", "onValueUpdate", "onYearChange", "onPreCalendarPosition"];
+    var defaults = {
+      _disable: [],
+      _enable: [],
+      allowInput: false,
+      altFormat: "F j, Y",
+      altInput: false,
+      altInputClass: "form-control input",
+      animate: typeof window === "object" && window.navigator.userAgent.indexOf("MSIE") === -1,
+      ariaDateFormat: "F j, Y",
+      clickOpens: true,
+      closeOnSelect: true,
+      conjunction: ", ",
+      dateFormat: "Y-m-d",
+      defaultHour: 12,
+      defaultMinute: 0,
+      defaultSeconds: 0,
+      disable: [],
+      disableMobile: false,
+      enable: [],
+      enableSeconds: false,
+      enableTime: false,
+      errorHandler: function errorHandler(err) {
+        return typeof console !== "undefined" && console.warn(err);
+      },
+      getWeek: getWeek,
+      hourIncrement: 1,
+      ignoredFocusElements: [],
+      inline: false,
+      locale: "default",
+      minuteIncrement: 5,
+      mode: "single",
+      nextArrow: "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 17 17'><g></g><path d='M13.207 8.472l-7.854 7.854-0.707-0.707 7.146-7.146-7.146-7.148 0.707-0.707 7.854 7.854z' /></svg>",
+      noCalendar: false,
+      now: new Date(),
+      onChange: [],
+      onClose: [],
+      onDayCreate: [],
+      onDestroy: [],
+      onKeyDown: [],
+      onMonthChange: [],
+      onOpen: [],
+      onParseConfig: [],
+      onReady: [],
+      onValueUpdate: [],
+      onYearChange: [],
+      onPreCalendarPosition: [],
+      plugins: [],
+      position: "auto",
+      positionElement: undefined,
+      prevArrow: "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 17 17'><g></g><path d='M5.207 8.471l7.146 7.147-0.707 0.707-7.853-7.854 7.854-7.853 0.707 0.707-7.147 7.146z' /></svg>",
+      shorthandCurrentMonth: false,
+      showMonths: 1,
+      static: false,
+      time_24hr: false,
+      weekNumbers: false,
+      wrap: false
+    };
+
+    function toggleClass(elem, className, bool) {
+      if (bool === true) return elem.classList.add(className);
+      elem.classList.remove(className);
+    }
+    function createElement(tag, className, content) {
+      var e = window.document.createElement(tag);
+      className = className || "";
+      content = content || "";
+      e.className = className;
+      if (content !== undefined) e.textContent = content;
+      return e;
+    }
+    function clearNode(node) {
+      while (node.firstChild) {
+        node.removeChild(node.firstChild);
+      }
+    }
+    function findParent(node, condition) {
+      if (condition(node)) return node;else if (node.parentNode) return findParent(node.parentNode, condition);
+      return undefined;
+    }
+    function createNumberInput(inputClassName, opts) {
+      var wrapper = createElement("div", "numInputWrapper"),
+          numInput = createElement("input", "numInput " + inputClassName),
+          arrowUp = createElement("span", "arrowUp"),
+          arrowDown = createElement("span", "arrowDown");
+      numInput.type = "text";
+      numInput.pattern = "\\d*";
+      if (opts !== undefined) for (var key in opts) {
+        numInput.setAttribute(key, opts[key]);
+      }
+      wrapper.appendChild(numInput);
+      wrapper.appendChild(arrowUp);
+      wrapper.appendChild(arrowDown);
+      return wrapper;
+    }
+
+    if (typeof Object.assign !== "function") {
+      Object.assign = function (target) {
+        if (!target) {
+          throw TypeError("Cannot convert undefined or null to object");
+        }
+
+        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        var _loop = function _loop() {
+          var source = args[_i];
+
+          if (source) {
+            Object.keys(source).forEach(function (key) {
+              return target[key] = source[key];
+            });
+          }
+        };
+
+        for (var _i = 0; _i < args.length; _i++) {
+          _loop();
+        }
+
+        return target;
+      };
+    }
+
+    var DEBOUNCED_CHANGE_MS = 300;
+
+    function FlatpickrInstance(element, instanceConfig) {
+      var self = {
+        config: Object.assign({}, flatpickr.defaultConfig),
+        l10n: english
+      };
+      self.parseDate = createDateParser({
+        config: self.config,
+        l10n: self.l10n
+      });
+      self._handlers = [];
+      self._bind = bind;
+      self._setHoursFromDate = setHoursFromDate;
+      self._positionCalendar = positionCalendar;
+      self.changeMonth = changeMonth;
+      self.changeYear = changeYear;
+      self.clear = clear;
+      self.close = close;
+      self._createElement = createElement;
+      self.destroy = destroy;
+      self.isEnabled = isEnabled;
+      self.jumpToDate = jumpToDate;
+      self.open = open;
+      self.redraw = redraw;
+      self.set = set;
+      self.setDate = setDate;
+      self.toggle = toggle;
+
+      function setupHelperFunctions() {
+        self.utils = {
+          getDaysInMonth: function getDaysInMonth(month, yr) {
+            if (month === void 0) {
+              month = self.currentMonth;
+            }
+
+            if (yr === void 0) {
+              yr = self.currentYear;
+            }
+
+            if (month === 1 && (yr % 4 === 0 && yr % 100 !== 0 || yr % 400 === 0)) return 29;
+            return self.l10n.daysInMonth[month];
+          }
+        };
+      }
+
+      function init() {
+        self.element = self.input = element;
+        self.isOpen = false;
+        parseConfig();
+        setupLocale();
+        setupInputs();
+        setupDates();
+        setupHelperFunctions();
+        if (!self.isMobile) build();
+        bindEvents();
+
+        if (self.selectedDates.length || self.config.noCalendar) {
+          if (self.config.enableTime) {
+            setHoursFromDate(self.config.noCalendar ? self.latestSelectedDateObj || self.config.minDate : undefined);
+          }
+
+          updateValue(false);
+        }
+
+        setCalendarWidth();
+        self.showTimeInput = self.selectedDates.length > 0 || self.config.noCalendar;
+        var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+        if (!self.isMobile && isSafari) {
+          positionCalendar();
+        }
+
+        triggerEvent("onReady");
+      }
+
+      function bindToInstance(fn) {
+        return fn.bind(self);
+      }
+
+      function setCalendarWidth() {
+        var config = self.config;
+        if (config.weekNumbers === false && config.showMonths === 1) return;else if (config.noCalendar !== true) {
+          window.requestAnimationFrame(function () {
+            self.calendarContainer.style.visibility = "hidden";
+            self.calendarContainer.style.display = "block";
+
+            if (self.daysContainer !== undefined) {
+              var daysWidth = (self.days.offsetWidth + 1) * config.showMonths;
+              self.daysContainer.style.width = daysWidth + "px";
+              self.calendarContainer.style.width = daysWidth + (self.weekWrapper !== undefined ? self.weekWrapper.offsetWidth : 0) + "px";
+              self.calendarContainer.style.removeProperty("visibility");
+              self.calendarContainer.style.removeProperty("display");
+            }
+          });
+        }
+      }
+
+      function updateTime(e) {
+        if (self.selectedDates.length === 0) return;
+
+        if (e !== undefined && e.type !== "blur") {
+          timeWrapper(e);
+        }
+
+        var prevValue = self._input.value;
+        setHoursFromInputs();
+        updateValue();
+
+        if (self._input.value !== prevValue) {
+          self._debouncedChange();
+        }
+      }
+
+      function ampm2military(hour, amPM) {
+        return hour % 12 + 12 * int(amPM === self.l10n.amPM[1]);
+      }
+
+      function military2ampm(hour) {
+        switch (hour % 24) {
+          case 0:
+          case 12:
+            return 12;
+
+          default:
+            return hour % 12;
+        }
+      }
+
+      function setHoursFromInputs() {
+        if (self.hourElement === undefined || self.minuteElement === undefined) return;
+        var hours = (parseInt(self.hourElement.value.slice(-2), 10) || 0) % 24,
+            minutes = (parseInt(self.minuteElement.value, 10) || 0) % 60,
+            seconds = self.secondElement !== undefined ? (parseInt(self.secondElement.value, 10) || 0) % 60 : 0;
+
+        if (self.amPM !== undefined) {
+          hours = ampm2military(hours, self.amPM.textContent);
+        }
+
+        var limitMinHours = self.config.minTime !== undefined || self.config.minDate && self.minDateHasTime && self.latestSelectedDateObj && compareDates(self.latestSelectedDateObj, self.config.minDate, true) === 0;
+        var limitMaxHours = self.config.maxTime !== undefined || self.config.maxDate && self.maxDateHasTime && self.latestSelectedDateObj && compareDates(self.latestSelectedDateObj, self.config.maxDate, true) === 0;
+
+        if (limitMaxHours) {
+          var maxTime = self.config.maxTime !== undefined ? self.config.maxTime : self.config.maxDate;
+          hours = Math.min(hours, maxTime.getHours());
+          if (hours === maxTime.getHours()) minutes = Math.min(minutes, maxTime.getMinutes());
+          if (minutes === maxTime.getMinutes()) seconds = Math.min(seconds, maxTime.getSeconds());
+        }
+
+        if (limitMinHours) {
+          var minTime = self.config.minTime !== undefined ? self.config.minTime : self.config.minDate;
+          hours = Math.max(hours, minTime.getHours());
+          if (hours === minTime.getHours()) minutes = Math.max(minutes, minTime.getMinutes());
+          if (minutes === minTime.getMinutes()) seconds = Math.max(seconds, minTime.getSeconds());
+        }
+
+        setHours(hours, minutes, seconds);
+      }
+
+      function setHoursFromDate(dateObj) {
+        var date = dateObj || self.latestSelectedDateObj;
+        if (date) setHours(date.getHours(), date.getMinutes(), date.getSeconds());
+      }
+
+      function setDefaultHours() {
+        var hours = self.config.defaultHour;
+        var minutes = self.config.defaultMinute;
+        var seconds = self.config.defaultSeconds;
+
+        if (self.config.minDate !== undefined) {
+          var min_hr = self.config.minDate.getHours();
+          var min_minutes = self.config.minDate.getMinutes();
+          hours = Math.max(hours, min_hr);
+          if (hours === min_hr) minutes = Math.max(min_minutes, minutes);
+          if (hours === min_hr && minutes === min_minutes) seconds = self.config.minDate.getSeconds();
+        }
+
+        if (self.config.maxDate !== undefined) {
+          var max_hr = self.config.maxDate.getHours();
+          var max_minutes = self.config.maxDate.getMinutes();
+          hours = Math.min(hours, max_hr);
+          if (hours === max_hr) minutes = Math.min(max_minutes, minutes);
+          if (hours === max_hr && minutes === max_minutes) seconds = self.config.maxDate.getSeconds();
+        }
+
+        setHours(hours, minutes, seconds);
+      }
+
+      function setHours(hours, minutes, seconds) {
+        if (self.latestSelectedDateObj !== undefined) {
+          self.latestSelectedDateObj.setHours(hours % 24, minutes, seconds || 0, 0);
+        }
+
+        if (!self.hourElement || !self.minuteElement || self.isMobile) return;
+        self.hourElement.value = pad(!self.config.time_24hr ? (12 + hours) % 12 + 12 * int(hours % 12 === 0) : hours);
+        self.minuteElement.value = pad(minutes);
+        if (self.amPM !== undefined) self.amPM.textContent = self.l10n.amPM[int(hours >= 12)];
+        if (self.secondElement !== undefined) self.secondElement.value = pad(seconds);
+      }
+
+      function onYearInput(event) {
+        var year = parseInt(event.target.value) + (event.delta || 0);
+
+        if (year / 1000 > 1 || event.key === "Enter" && !/[^\d]/.test(year.toString())) {
+          changeYear(year);
+        }
+      }
+
+      function bind(element, event, handler, options) {
+        if (event instanceof Array) return event.forEach(function (ev) {
+          return bind(element, ev, handler, options);
+        });
+        if (element instanceof Array) return element.forEach(function (el) {
+          return bind(el, event, handler, options);
+        });
+        element.addEventListener(event, handler, options);
+
+        self._handlers.push({
+          element: element,
+          event: event,
+          handler: handler,
+          options: options
+        });
+      }
+
+      function onClick(handler) {
+        return function (evt) {
+          evt.which === 1 && handler(evt);
+        };
+      }
+
+      function triggerChange() {
+        triggerEvent("onChange");
+      }
+
+      function bindEvents() {
+        if (self.config.wrap) {
+          ["open", "close", "toggle", "clear"].forEach(function (evt) {
+            Array.prototype.forEach.call(self.element.querySelectorAll("[data-" + evt + "]"), function (el) {
+              return bind(el, "click", self[evt]);
+            });
+          });
+        }
+
+        if (self.isMobile) {
+          setupMobile();
+          return;
+        }
+
+        var debouncedResize = debounce(onResize, 50);
+        self._debouncedChange = debounce(triggerChange, DEBOUNCED_CHANGE_MS);
+        if (self.daysContainer && !/iPhone|iPad|iPod/i.test(navigator.userAgent)) bind(self.daysContainer, "mouseover", function (e) {
+          if (self.config.mode === "range") onMouseOver(e.target);
+        });
+        bind(window.document.body, "keydown", onKeyDown);
+        if (!self.config.static) bind(self._input, "keydown", onKeyDown);
+        if (!self.config.inline && !self.config.static) bind(window, "resize", debouncedResize);
+        if (window.ontouchstart !== undefined) bind(window.document, "click", documentClick);else bind(window.document, "mousedown", onClick(documentClick));
+        bind(window.document, "focus", documentClick, {
+          capture: true
+        });
+
+        if (self.config.clickOpens === true) {
+          bind(self._input, "focus", self.open);
+          bind(self._input, "mousedown", onClick(self.open));
+        }
+
+        if (self.daysContainer !== undefined) {
+          bind(self.monthNav, "mousedown", onClick(onMonthNavClick));
+          bind(self.monthNav, ["keyup", "increment"], onYearInput);
+          bind(self.daysContainer, "mousedown", onClick(selectDate));
+        }
+
+        if (self.timeContainer !== undefined && self.minuteElement !== undefined && self.hourElement !== undefined) {
+          var selText = function selText(e) {
+            return e.target.select();
+          };
+
+          bind(self.timeContainer, ["increment"], updateTime);
+          bind(self.timeContainer, "blur", updateTime, {
+            capture: true
+          });
+          bind(self.timeContainer, "mousedown", onClick(timeIncrement));
+          bind([self.hourElement, self.minuteElement], ["focus", "click"], selText);
+          if (self.secondElement !== undefined) bind(self.secondElement, "focus", function () {
+            return self.secondElement && self.secondElement.select();
+          });
+
+          if (self.amPM !== undefined) {
+            bind(self.amPM, "mousedown", onClick(function (e) {
+              updateTime(e);
+              triggerChange();
+            }));
+          }
+        }
+      }
+
+      function jumpToDate(jumpDate) {
+        var jumpTo = jumpDate !== undefined ? self.parseDate(jumpDate) : self.latestSelectedDateObj || (self.config.minDate && self.config.minDate > self.now ? self.config.minDate : self.config.maxDate && self.config.maxDate < self.now ? self.config.maxDate : self.now);
+
+        try {
+          if (jumpTo !== undefined) {
+            self.currentYear = jumpTo.getFullYear();
+            self.currentMonth = jumpTo.getMonth();
+          }
+        } catch (e) {
+          e.message = "Invalid date supplied: " + jumpTo;
+          self.config.errorHandler(e);
+        }
+
+        self.redraw();
+      }
+
+      function timeIncrement(e) {
+        if (~e.target.className.indexOf("arrow")) incrementNumInput(e, e.target.classList.contains("arrowUp") ? 1 : -1);
+      }
+
+      function incrementNumInput(e, delta, inputElem) {
+        var target = e && e.target;
+        var input = inputElem || target && target.parentNode && target.parentNode.firstChild;
+        var event = createEvent("increment");
+        event.delta = delta;
+        input && input.dispatchEvent(event);
+      }
+
+      function build() {
+        var fragment = window.document.createDocumentFragment();
+        self.calendarContainer = createElement("div", "flatpickr-calendar");
+        self.calendarContainer.tabIndex = -1;
+
+        if (!self.config.noCalendar) {
+          fragment.appendChild(buildMonthNav());
+          self.innerContainer = createElement("div", "flatpickr-innerContainer");
+
+          if (self.config.weekNumbers) {
+            var _buildWeeks = buildWeeks(),
+                weekWrapper = _buildWeeks.weekWrapper,
+                weekNumbers = _buildWeeks.weekNumbers;
+
+            self.innerContainer.appendChild(weekWrapper);
+            self.weekNumbers = weekNumbers;
+            self.weekWrapper = weekWrapper;
+          }
+
+          self.rContainer = createElement("div", "flatpickr-rContainer");
+          self.rContainer.appendChild(buildWeekdays());
+
+          if (!self.daysContainer) {
+            self.daysContainer = createElement("div", "flatpickr-days");
+            self.daysContainer.tabIndex = -1;
+          }
+
+          buildDays();
+          self.rContainer.appendChild(self.daysContainer);
+          self.innerContainer.appendChild(self.rContainer);
+          fragment.appendChild(self.innerContainer);
+        }
+
+        if (self.config.enableTime) {
+          fragment.appendChild(buildTime());
+        }
+
+        toggleClass(self.calendarContainer, "rangeMode", self.config.mode === "range");
+        toggleClass(self.calendarContainer, "animate", self.config.animate === true);
+        toggleClass(self.calendarContainer, "multiMonth", self.config.showMonths > 1);
+        self.calendarContainer.appendChild(fragment);
+        var customAppend = self.config.appendTo !== undefined && self.config.appendTo.nodeType !== undefined;
+
+        if (self.config.inline || self.config.static) {
+          self.calendarContainer.classList.add(self.config.inline ? "inline" : "static");
+
+          if (self.config.inline) {
+            if (!customAppend && self.element.parentNode) self.element.parentNode.insertBefore(self.calendarContainer, self._input.nextSibling);else if (self.config.appendTo !== undefined) self.config.appendTo.appendChild(self.calendarContainer);
+          }
+
+          if (self.config.static) {
+            var wrapper = createElement("div", "flatpickr-wrapper");
+            if (self.element.parentNode) self.element.parentNode.insertBefore(wrapper, self.element);
+            wrapper.appendChild(self.element);
+            if (self.altInput) wrapper.appendChild(self.altInput);
+            wrapper.appendChild(self.calendarContainer);
+          }
+        }
+
+        if (!self.config.static && !self.config.inline) (self.config.appendTo !== undefined ? self.config.appendTo : window.document.body).appendChild(self.calendarContainer);
+      }
+
+      function createDay(className, date, dayNumber, i) {
+        var dateIsEnabled = isEnabled(date, true),
+            dayElement = createElement("span", "flatpickr-day " + className, date.getDate().toString());
+        dayElement.dateObj = date;
+        dayElement.$i = i;
+        dayElement.setAttribute("aria-label", self.formatDate(date, self.config.ariaDateFormat));
+
+        if (className.indexOf("hidden") === -1 && compareDates(date, self.now) === 0) {
+          self.todayDateElem = dayElement;
+          dayElement.classList.add("today");
+          dayElement.setAttribute("aria-current", "date");
+        }
+
+        if (dateIsEnabled) {
+          dayElement.tabIndex = -1;
+
+          if (isDateSelected(date)) {
+            dayElement.classList.add("selected");
+            self.selectedDateElem = dayElement;
+
+            if (self.config.mode === "range") {
+              toggleClass(dayElement, "startRange", self.selectedDates[0] && compareDates(date, self.selectedDates[0], true) === 0);
+              toggleClass(dayElement, "endRange", self.selectedDates[1] && compareDates(date, self.selectedDates[1], true) === 0);
+              if (className === "nextMonthDay") dayElement.classList.add("inRange");
+            }
+          }
+        } else {
+          dayElement.classList.add("disabled");
+        }
+
+        if (self.config.mode === "range") {
+          if (isDateInRange(date) && !isDateSelected(date)) dayElement.classList.add("inRange");
+        }
+
+        if (self.weekNumbers && self.config.showMonths === 1 && className !== "prevMonthDay" && dayNumber % 7 === 1) {
+          self.weekNumbers.insertAdjacentHTML("beforeend", "<span class='flatpickr-day'>" + self.config.getWeek(date) + "</span>");
+        }
+
+        triggerEvent("onDayCreate", dayElement);
+        return dayElement;
+      }
+
+      function focusOnDayElem(targetNode) {
+        targetNode.focus();
+        if (self.config.mode === "range") onMouseOver(targetNode);
+      }
+
+      function getFirstAvailableDay(delta) {
+        var startMonth = delta > 0 ? 0 : self.config.showMonths - 1;
+        var endMonth = delta > 0 ? self.config.showMonths : -1;
+
+        for (var m = startMonth; m != endMonth; m += delta) {
+          var month = self.daysContainer.children[m];
+          var startIndex = delta > 0 ? 0 : month.children.length - 1;
+          var endIndex = delta > 0 ? month.children.length : -1;
+
+          for (var i = startIndex; i != endIndex; i += delta) {
+            var c = month.children[i];
+            if (c.className.indexOf("hidden") === -1 && isEnabled(c.dateObj)) return c;
+          }
+        }
+
+        return undefined;
+      }
+
+      function getNextAvailableDay(current, delta) {
+        var givenMonth = current.className.indexOf("Month") === -1 ? current.dateObj.getMonth() : self.currentMonth;
+        var endMonth = delta > 0 ? self.config.showMonths : -1;
+        var loopDelta = delta > 0 ? 1 : -1;
+
+        for (var m = givenMonth - self.currentMonth; m != endMonth; m += loopDelta) {
+          var month = self.daysContainer.children[m];
+          var startIndex = givenMonth - self.currentMonth === m ? current.$i + delta : delta < 0 ? month.children.length - 1 : 0;
+          var numMonthDays = month.children.length;
+
+          for (var i = startIndex; i >= 0 && i < numMonthDays && i != (delta > 0 ? numMonthDays : -1); i += loopDelta) {
+            var c = month.children[i];
+            if (c.className.indexOf("hidden") === -1 && isEnabled(c.dateObj) && Math.abs(current.$i - i) >= Math.abs(delta)) return focusOnDayElem(c);
+          }
+        }
+
+        self.changeMonth(loopDelta);
+        focusOnDay(getFirstAvailableDay(loopDelta), 0);
+        return undefined;
+      }
+
+      function focusOnDay(current, offset) {
+        var dayFocused = isInView(document.activeElement || document.body);
+        var startElem = current !== undefined ? current : dayFocused ? document.activeElement : self.selectedDateElem !== undefined && isInView(self.selectedDateElem) ? self.selectedDateElem : self.todayDateElem !== undefined && isInView(self.todayDateElem) ? self.todayDateElem : getFirstAvailableDay(offset > 0 ? 1 : -1);
+        if (startElem === undefined) return self._input.focus();
+        if (!dayFocused) return focusOnDayElem(startElem);
+        getNextAvailableDay(startElem, offset);
+      }
+
+      function buildMonthDays(year, month) {
+        var firstOfMonth = (new Date(year, month, 1).getDay() - self.l10n.firstDayOfWeek + 7) % 7;
+        var prevMonthDays = self.utils.getDaysInMonth((month - 1 + 12) % 12);
+        var daysInMonth = self.utils.getDaysInMonth(month),
+            days = window.document.createDocumentFragment(),
+            isMultiMonth = self.config.showMonths > 1,
+            prevMonthDayClass = isMultiMonth ? "prevMonthDay hidden" : "prevMonthDay",
+            nextMonthDayClass = isMultiMonth ? "nextMonthDay hidden" : "nextMonthDay";
+        var dayNumber = prevMonthDays + 1 - firstOfMonth,
+            dayIndex = 0;
+
+        for (; dayNumber <= prevMonthDays; dayNumber++, dayIndex++) {
+          days.appendChild(createDay(prevMonthDayClass, new Date(year, month - 1, dayNumber), dayNumber, dayIndex));
+        }
+
+        for (dayNumber = 1; dayNumber <= daysInMonth; dayNumber++, dayIndex++) {
+          days.appendChild(createDay("", new Date(year, month, dayNumber), dayNumber, dayIndex));
+        }
+
+        for (var dayNum = daysInMonth + 1; dayNum <= 42 - firstOfMonth && (self.config.showMonths === 1 || dayIndex % 7 !== 0); dayNum++, dayIndex++) {
+          days.appendChild(createDay(nextMonthDayClass, new Date(year, month + 1, dayNum % daysInMonth), dayNum, dayIndex));
+        }
+
+        var dayContainer = createElement("div", "dayContainer");
+        dayContainer.appendChild(days);
+        return dayContainer;
+      }
+
+      function buildDays() {
+        if (self.daysContainer === undefined) {
+          return;
+        }
+
+        clearNode(self.daysContainer);
+        if (self.weekNumbers) clearNode(self.weekNumbers);
+        var frag = document.createDocumentFragment();
+
+        for (var i = 0; i < self.config.showMonths; i++) {
+          var d = new Date(self.currentYear, self.currentMonth, 1);
+          d.setMonth(self.currentMonth + i);
+          frag.appendChild(buildMonthDays(d.getFullYear(), d.getMonth()));
+        }
+
+        self.daysContainer.appendChild(frag);
+        self.days = self.daysContainer.firstChild;
+
+        if (self.config.mode === "range" && self.selectedDates.length === 1) {
+          onMouseOver();
+        }
+      }
+
+      function buildMonth() {
+        var container = createElement("div", "flatpickr-month");
+        var monthNavFragment = window.document.createDocumentFragment();
+        var monthElement = createElement("span", "cur-month");
+        var yearInput = createNumberInput("cur-year", {
+          tabindex: "-1"
+        });
+        var yearElement = yearInput.getElementsByTagName("input")[0];
+        yearElement.setAttribute("aria-label", self.l10n.yearAriaLabel);
+        if (self.config.minDate) yearElement.setAttribute("data-min", self.config.minDate.getFullYear().toString());
+
+        if (self.config.maxDate) {
+          yearElement.setAttribute("data-max", self.config.maxDate.getFullYear().toString());
+          yearElement.disabled = !!self.config.minDate && self.config.minDate.getFullYear() === self.config.maxDate.getFullYear();
+        }
+
+        var currentMonth = createElement("div", "flatpickr-current-month");
+        currentMonth.appendChild(monthElement);
+        currentMonth.appendChild(yearInput);
+        monthNavFragment.appendChild(currentMonth);
+        container.appendChild(monthNavFragment);
+        return {
+          container: container,
+          yearElement: yearElement,
+          monthElement: monthElement
+        };
+      }
+
+      function buildMonths() {
+        clearNode(self.monthNav);
+        self.monthNav.appendChild(self.prevMonthNav);
+
+        for (var m = self.config.showMonths; m--;) {
+          var month = buildMonth();
+          self.yearElements.push(month.yearElement);
+          self.monthElements.push(month.monthElement);
+          self.monthNav.appendChild(month.container);
+        }
+
+        self.monthNav.appendChild(self.nextMonthNav);
+      }
+
+      function buildMonthNav() {
+        self.monthNav = createElement("div", "flatpickr-months");
+        self.yearElements = [];
+        self.monthElements = [];
+        self.prevMonthNav = createElement("span", "flatpickr-prev-month");
+        self.prevMonthNav.innerHTML = self.config.prevArrow;
+        self.nextMonthNav = createElement("span", "flatpickr-next-month");
+        self.nextMonthNav.innerHTML = self.config.nextArrow;
+        buildMonths();
+        Object.defineProperty(self, "_hidePrevMonthArrow", {
+          get: function get() {
+            return self.__hidePrevMonthArrow;
+          },
+          set: function set(bool) {
+            if (self.__hidePrevMonthArrow !== bool) {
+              toggleClass(self.prevMonthNav, "disabled", bool);
+              self.__hidePrevMonthArrow = bool;
+            }
+          }
+        });
+        Object.defineProperty(self, "_hideNextMonthArrow", {
+          get: function get() {
+            return self.__hideNextMonthArrow;
+          },
+          set: function set(bool) {
+            if (self.__hideNextMonthArrow !== bool) {
+              toggleClass(self.nextMonthNav, "disabled", bool);
+              self.__hideNextMonthArrow = bool;
+            }
+          }
+        });
+        self.currentYearElement = self.yearElements[0];
+        updateNavigationCurrentMonth();
+        return self.monthNav;
+      }
+
+      function buildTime() {
+        self.calendarContainer.classList.add("hasTime");
+        if (self.config.noCalendar) self.calendarContainer.classList.add("noCalendar");
+        self.timeContainer = createElement("div", "flatpickr-time");
+        self.timeContainer.tabIndex = -1;
+        var separator = createElement("span", "flatpickr-time-separator", ":");
+        var hourInput = createNumberInput("flatpickr-hour");
+        self.hourElement = hourInput.getElementsByTagName("input")[0];
+        var minuteInput = createNumberInput("flatpickr-minute");
+        self.minuteElement = minuteInput.getElementsByTagName("input")[0];
+        self.hourElement.tabIndex = self.minuteElement.tabIndex = -1;
+        self.hourElement.value = pad(self.latestSelectedDateObj ? self.latestSelectedDateObj.getHours() : self.config.time_24hr ? self.config.defaultHour : military2ampm(self.config.defaultHour));
+        self.minuteElement.value = pad(self.latestSelectedDateObj ? self.latestSelectedDateObj.getMinutes() : self.config.defaultMinute);
+        self.hourElement.setAttribute("data-step", self.config.hourIncrement.toString());
+        self.minuteElement.setAttribute("data-step", self.config.minuteIncrement.toString());
+        self.hourElement.setAttribute("data-min", self.config.time_24hr ? "0" : "1");
+        self.hourElement.setAttribute("data-max", self.config.time_24hr ? "23" : "12");
+        self.minuteElement.setAttribute("data-min", "0");
+        self.minuteElement.setAttribute("data-max", "59");
+        self.timeContainer.appendChild(hourInput);
+        self.timeContainer.appendChild(separator);
+        self.timeContainer.appendChild(minuteInput);
+        if (self.config.time_24hr) self.timeContainer.classList.add("time24hr");
+
+        if (self.config.enableSeconds) {
+          self.timeContainer.classList.add("hasSeconds");
+          var secondInput = createNumberInput("flatpickr-second");
+          self.secondElement = secondInput.getElementsByTagName("input")[0];
+          self.secondElement.value = pad(self.latestSelectedDateObj ? self.latestSelectedDateObj.getSeconds() : self.config.defaultSeconds);
+          self.secondElement.setAttribute("data-step", self.minuteElement.getAttribute("data-step"));
+          self.secondElement.setAttribute("data-min", self.minuteElement.getAttribute("data-min"));
+          self.secondElement.setAttribute("data-max", self.minuteElement.getAttribute("data-max"));
+          self.timeContainer.appendChild(createElement("span", "flatpickr-time-separator", ":"));
+          self.timeContainer.appendChild(secondInput);
+        }
+
+        if (!self.config.time_24hr) {
+          self.amPM = createElement("span", "flatpickr-am-pm", self.l10n.amPM[int((self.latestSelectedDateObj ? self.hourElement.value : self.config.defaultHour) > 11)]);
+          self.amPM.title = self.l10n.toggleTitle;
+          self.amPM.tabIndex = -1;
+          self.timeContainer.appendChild(self.amPM);
+        }
+
+        return self.timeContainer;
+      }
+
+      function buildWeekdays() {
+        if (!self.weekdayContainer) self.weekdayContainer = createElement("div", "flatpickr-weekdays");else clearNode(self.weekdayContainer);
+
+        for (var i = self.config.showMonths; i--;) {
+          var container = createElement("div", "flatpickr-weekdaycontainer");
+          self.weekdayContainer.appendChild(container);
+        }
+
+        updateWeekdays();
+        return self.weekdayContainer;
+      }
+
+      function updateWeekdays() {
+        var firstDayOfWeek = self.l10n.firstDayOfWeek;
+        var weekdays = self.l10n.weekdays.shorthand.concat();
+
+        if (firstDayOfWeek > 0 && firstDayOfWeek < weekdays.length) {
+          weekdays = weekdays.splice(firstDayOfWeek, weekdays.length).concat(weekdays.splice(0, firstDayOfWeek));
+        }
+
+        for (var i = self.config.showMonths; i--;) {
+          self.weekdayContainer.children[i].innerHTML = "\n      <span class=flatpickr-weekday>\n        " + weekdays.join("</span><span class=flatpickr-weekday>") + "\n      </span>\n      ";
+        }
+      }
+
+      function buildWeeks() {
+        self.calendarContainer.classList.add("hasWeeks");
+        var weekWrapper = createElement("div", "flatpickr-weekwrapper");
+        weekWrapper.appendChild(createElement("span", "flatpickr-weekday", self.l10n.weekAbbreviation));
+        var weekNumbers = createElement("div", "flatpickr-weeks");
+        weekWrapper.appendChild(weekNumbers);
+        return {
+          weekWrapper: weekWrapper,
+          weekNumbers: weekNumbers
+        };
+      }
+
+      function changeMonth(value, is_offset) {
+        if (is_offset === void 0) {
+          is_offset = true;
+        }
+
+        var delta = is_offset ? value : value - self.currentMonth;
+        if (delta < 0 && self._hidePrevMonthArrow === true || delta > 0 && self._hideNextMonthArrow === true) return;
+        self.currentMonth += delta;
+
+        if (self.currentMonth < 0 || self.currentMonth > 11) {
+          self.currentYear += self.currentMonth > 11 ? 1 : -1;
+          self.currentMonth = (self.currentMonth + 12) % 12;
+          triggerEvent("onYearChange");
+        }
+
+        buildDays();
+        triggerEvent("onMonthChange");
+        updateNavigationCurrentMonth();
+      }
+
+      function clear(triggerChangeEvent) {
+        if (triggerChangeEvent === void 0) {
+          triggerChangeEvent = true;
+        }
+
+        self.input.value = "";
+        if (self.altInput !== undefined) self.altInput.value = "";
+        if (self.mobileInput !== undefined) self.mobileInput.value = "";
+        self.selectedDates = [];
+        self.latestSelectedDateObj = undefined;
+        self.showTimeInput = false;
+
+        if (self.config.enableTime === true) {
+          setDefaultHours();
+        }
+
+        self.redraw();
+        if (triggerChangeEvent) triggerEvent("onChange");
+      }
+
+      function close() {
+        self.isOpen = false;
+
+        if (!self.isMobile) {
+          self.calendarContainer.classList.remove("open");
+
+          self._input.classList.remove("active");
+        }
+
+        triggerEvent("onClose");
+      }
+
+      function destroy() {
+        if (self.config !== undefined) triggerEvent("onDestroy");
+
+        for (var i = self._handlers.length; i--;) {
+          var h = self._handlers[i];
+          h.element.removeEventListener(h.event, h.handler, h.options);
+        }
+
+        self._handlers = [];
+
+        if (self.mobileInput) {
+          if (self.mobileInput.parentNode) self.mobileInput.parentNode.removeChild(self.mobileInput);
+          self.mobileInput = undefined;
+        } else if (self.calendarContainer && self.calendarContainer.parentNode) {
+          if (self.config.static && self.calendarContainer.parentNode) {
+            var wrapper = self.calendarContainer.parentNode;
+            wrapper.lastChild && wrapper.removeChild(wrapper.lastChild);
+
+            if (wrapper.parentNode) {
+              while (wrapper.firstChild) {
+                wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
+              }
+
+              wrapper.parentNode.removeChild(wrapper);
+            }
+          } else self.calendarContainer.parentNode.removeChild(self.calendarContainer);
+        }
+
+        if (self.altInput) {
+          self.input.type = "text";
+          if (self.altInput.parentNode) self.altInput.parentNode.removeChild(self.altInput);
+          delete self.altInput;
+        }
+
+        if (self.input) {
+          self.input.type = self.input._type;
+          self.input.classList.remove("flatpickr-input");
+          self.input.removeAttribute("readonly");
+          self.input.value = "";
+        }
+
+        ["_showTimeInput", "latestSelectedDateObj", "_hideNextMonthArrow", "_hidePrevMonthArrow", "__hideNextMonthArrow", "__hidePrevMonthArrow", "isMobile", "isOpen", "selectedDateElem", "minDateHasTime", "maxDateHasTime", "days", "daysContainer", "_input", "_positionElement", "innerContainer", "rContainer", "monthNav", "todayDateElem", "calendarContainer", "weekdayContainer", "prevMonthNav", "nextMonthNav", "currentMonthElement", "currentYearElement", "navigationCurrentMonth", "selectedDateElem", "config"].forEach(function (k) {
+          try {
+            delete self[k];
+          } catch (_) {}
+        });
+      }
+
+      function isCalendarElem(elem) {
+        if (self.config.appendTo && self.config.appendTo.contains(elem)) return true;
+        return self.calendarContainer.contains(elem);
+      }
+
+      function documentClick(e) {
+        if (self.isOpen && !self.config.inline) {
+          var isCalendarElement = isCalendarElem(e.target);
+          var isInput = e.target === self.input || e.target === self.altInput || self.element.contains(e.target) || e.path && e.path.indexOf && (~e.path.indexOf(self.input) || ~e.path.indexOf(self.altInput));
+          var lostFocus = e.type === "blur" ? isInput && e.relatedTarget && !isCalendarElem(e.relatedTarget) : !isInput && !isCalendarElement;
+          var isIgnored = !self.config.ignoredFocusElements.some(function (elem) {
+            return elem.contains(e.target);
+          });
+
+          if (lostFocus && isIgnored) {
+            self.close();
+
+            if (self.config.mode === "range" && self.selectedDates.length === 1) {
+              self.clear(false);
+              self.redraw();
+            }
+          }
+        }
+      }
+
+      function changeYear(newYear) {
+        if (!newYear || self.config.minDate && newYear < self.config.minDate.getFullYear() || self.config.maxDate && newYear > self.config.maxDate.getFullYear()) return;
+        var newYearNum = newYear,
+            isNewYear = self.currentYear !== newYearNum;
+        self.currentYear = newYearNum || self.currentYear;
+
+        if (self.config.maxDate && self.currentYear === self.config.maxDate.getFullYear()) {
+          self.currentMonth = Math.min(self.config.maxDate.getMonth(), self.currentMonth);
+        } else if (self.config.minDate && self.currentYear === self.config.minDate.getFullYear()) {
+          self.currentMonth = Math.max(self.config.minDate.getMonth(), self.currentMonth);
+        }
+
+        if (isNewYear) {
+          self.redraw();
+          triggerEvent("onYearChange");
+        }
+      }
+
+      function isEnabled(date, timeless) {
+        if (timeless === void 0) {
+          timeless = true;
+        }
+
+        var dateToCheck = self.parseDate(date, undefined, timeless);
+        if (self.config.minDate && dateToCheck && compareDates(dateToCheck, self.config.minDate, timeless !== undefined ? timeless : !self.minDateHasTime) < 0 || self.config.maxDate && dateToCheck && compareDates(dateToCheck, self.config.maxDate, timeless !== undefined ? timeless : !self.maxDateHasTime) > 0) return false;
+        if (self.config.enable.length === 0 && self.config.disable.length === 0) return true;
+        if (dateToCheck === undefined) return false;
+        var bool = self.config.enable.length > 0,
+            array = bool ? self.config.enable : self.config.disable;
+
+        for (var i = 0, d; i < array.length; i++) {
+          d = array[i];
+          if (typeof d === "function" && d(dateToCheck)) return bool;else if (d instanceof Date && dateToCheck !== undefined && d.getTime() === dateToCheck.getTime()) return bool;else if (typeof d === "string" && dateToCheck !== undefined) {
+            var parsed = self.parseDate(d, undefined, true);
+            return parsed && parsed.getTime() === dateToCheck.getTime() ? bool : !bool;
+          } else if (typeof d === "object" && dateToCheck !== undefined && d.from && d.to && dateToCheck.getTime() >= d.from.getTime() && dateToCheck.getTime() <= d.to.getTime()) return bool;
+        }
+
+        return !bool;
+      }
+
+      function isInView(elem) {
+        if (self.daysContainer !== undefined) return elem.className.indexOf("hidden") === -1 && self.daysContainer.contains(elem);
+        return false;
+      }
+
+      function onKeyDown(e) {
+        var isInput = e.target === self._input;
+        var allowInput = self.config.allowInput;
+        var allowKeydown = self.isOpen && (!allowInput || !isInput);
+        var allowInlineKeydown = self.config.inline && isInput && !allowInput;
+
+        if (e.keyCode === 13 && isInput) {
+          if (allowInput) {
+            self.setDate(self._input.value, true, e.target === self.altInput ? self.config.altFormat : self.config.dateFormat);
+            return e.target.blur();
+          } else self.open();
+        } else if (isCalendarElem(e.target) || allowKeydown || allowInlineKeydown) {
+          var isTimeObj = !!self.timeContainer && self.timeContainer.contains(e.target);
+
+          switch (e.keyCode) {
+            case 13:
+              if (isTimeObj) updateTime();else selectDate(e);
+              break;
+
+            case 27:
+              e.preventDefault();
+              focusAndClose();
+              break;
+
+            case 8:
+            case 46:
+              if (isInput && !self.config.allowInput) {
+                e.preventDefault();
+                self.clear();
+              }
+
+              break;
+
+            case 37:
+            case 39:
+              if (!isTimeObj) {
+                e.preventDefault();
+
+                if (self.daysContainer !== undefined && (allowInput === false || isInView(document.activeElement))) {
+                  var _delta = e.keyCode === 39 ? 1 : -1;
+
+                  if (!e.ctrlKey) focusOnDay(undefined, _delta);else {
+                    changeMonth(_delta);
+                    focusOnDay(getFirstAvailableDay(1), 0);
+                  }
+                }
+              } else if (self.hourElement) self.hourElement.focus();
+
+              break;
+
+            case 38:
+            case 40:
+              e.preventDefault();
+              var delta = e.keyCode === 40 ? 1 : -1;
+
+              if (self.daysContainer && e.target.$i !== undefined) {
+                if (e.ctrlKey) {
+                  changeYear(self.currentYear - delta);
+                  focusOnDay(getFirstAvailableDay(1), 0);
+                } else if (!isTimeObj) focusOnDay(undefined, delta * 7);
+              } else if (self.config.enableTime) {
+                if (!isTimeObj && self.hourElement) self.hourElement.focus();
+                updateTime(e);
+
+                self._debouncedChange();
+              }
+
+              break;
+
+            case 9:
+              if (!isTimeObj) {
+                self.element.focus();
+                break;
+              }
+
+              var elems = [self.hourElement, self.minuteElement, self.secondElement, self.amPM].filter(function (x) {
+                return x;
+              });
+              var i = elems.indexOf(e.target);
+
+              if (i !== -1) {
+                var target = elems[i + (e.shiftKey ? -1 : 1)];
+
+                if (target !== undefined) {
+                  e.preventDefault();
+                  target.focus();
+                } else {
+                  self.element.focus();
+                }
+              }
+
+              break;
+
+            default:
+              break;
+          }
+        }
+
+        if (self.amPM !== undefined && e.target === self.amPM) {
+          switch (e.key) {
+            case self.l10n.amPM[0].charAt(0):
+            case self.l10n.amPM[0].charAt(0).toLowerCase():
+              self.amPM.textContent = self.l10n.amPM[0];
+              setHoursFromInputs();
+              updateValue();
+              break;
+
+            case self.l10n.amPM[1].charAt(0):
+            case self.l10n.amPM[1].charAt(0).toLowerCase():
+              self.amPM.textContent = self.l10n.amPM[1];
+              setHoursFromInputs();
+              updateValue();
+              break;
+          }
+        }
+
+        triggerEvent("onKeyDown", e);
+      }
+
+      function onMouseOver(elem) {
+        if (self.selectedDates.length !== 1 || elem && (!elem.classList.contains("flatpickr-day") || elem.classList.contains("disabled"))) return;
+        var hoverDate = elem ? elem.dateObj.getTime() : self.days.firstElementChild.dateObj.getTime(),
+            initialDate = self.parseDate(self.selectedDates[0], undefined, true).getTime(),
+            rangeStartDate = Math.min(hoverDate, self.selectedDates[0].getTime()),
+            rangeEndDate = Math.max(hoverDate, self.selectedDates[0].getTime()),
+            lastDate = self.daysContainer.lastChild.lastChild.dateObj.getTime();
+        var containsDisabled = false;
+        var minRange = 0,
+            maxRange = 0;
+
+        for (var t = rangeStartDate; t < lastDate; t += duration.DAY) {
+          if (!isEnabled(new Date(t), true)) {
+            containsDisabled = containsDisabled || t > rangeStartDate && t < rangeEndDate;
+            if (t < initialDate && (!minRange || t > minRange)) minRange = t;else if (t > initialDate && (!maxRange || t < maxRange)) maxRange = t;
+          }
+        }
+
+        for (var m = 0; m < self.config.showMonths; m++) {
+          var month = self.daysContainer.children[m];
+          var prevMonth = self.daysContainer.children[m - 1];
+
+          var _loop = function _loop(i, l) {
+            var dayElem = month.children[i],
+                date = dayElem.dateObj;
+            var timestamp = date.getTime();
+            var outOfRange = minRange > 0 && timestamp < minRange || maxRange > 0 && timestamp > maxRange;
+
+            if (outOfRange) {
+              dayElem.classList.add("notAllowed");
+              ["inRange", "startRange", "endRange"].forEach(function (c) {
+                dayElem.classList.remove(c);
+              });
+              return "continue";
+            } else if (containsDisabled && !outOfRange) return "continue";
+
+            ["startRange", "inRange", "endRange", "notAllowed"].forEach(function (c) {
+              dayElem.classList.remove(c);
+            });
+
+            if (elem !== undefined) {
+              elem.classList.add(hoverDate < self.selectedDates[0].getTime() ? "startRange" : "endRange");
+
+              if (month.contains(elem) || !(m > 0 && prevMonth && prevMonth.lastChild.dateObj.getTime() >= timestamp)) {
+                if (initialDate < hoverDate && timestamp === initialDate) dayElem.classList.add("startRange");else if (initialDate > hoverDate && timestamp === initialDate) dayElem.classList.add("endRange");
+                if (timestamp >= minRange && (maxRange === 0 || timestamp <= maxRange) && isBetween(timestamp, initialDate, hoverDate)) dayElem.classList.add("inRange");
+              }
+            }
+          };
+
+          for (var i = 0, l = month.children.length; i < l; i++) {
+            var _ret = _loop(i, l);
+
+            if (_ret === "continue") continue;
+          }
+        }
+      }
+
+      function onResize() {
+        if (self.isOpen && !self.config.static && !self.config.inline) positionCalendar();
+      }
+
+      function open(e, positionElement) {
+        if (positionElement === void 0) {
+          positionElement = self._positionElement;
+        }
+
+        if (self.isMobile === true) {
+          if (e) {
+            e.preventDefault();
+            e.target && e.target.blur();
+          }
+
+          if (self.mobileInput !== undefined) {
+            self.mobileInput.focus();
+            self.mobileInput.click();
+          }
+
+          triggerEvent("onOpen");
+          return;
+        }
+
+        if (self._input.disabled || self.config.inline) return;
+        var wasOpen = self.isOpen;
+        self.isOpen = true;
+
+        if (!wasOpen) {
+          self.calendarContainer.classList.add("open");
+
+          self._input.classList.add("active");
+
+          triggerEvent("onOpen");
+          positionCalendar(positionElement);
+        }
+
+        if (self.config.enableTime === true && self.config.noCalendar === true) {
+          if (self.selectedDates.length === 0) {
+            self.setDate(self.config.minDate !== undefined ? new Date(self.config.minDate.getTime()) : new Date(), false);
+            setDefaultHours();
+            updateValue();
+          }
+
+          if (self.config.allowInput === false && (e === undefined || !self.timeContainer.contains(e.relatedTarget))) {
+            setTimeout(function () {
+              return self.hourElement.select();
+            }, 50);
+          }
+        }
+      }
+
+      function minMaxDateSetter(type) {
+        return function (date) {
+          var dateObj = self.config["_" + type + "Date"] = self.parseDate(date, self.config.dateFormat);
+          var inverseDateObj = self.config["_" + (type === "min" ? "max" : "min") + "Date"];
+
+          if (dateObj !== undefined) {
+            self[type === "min" ? "minDateHasTime" : "maxDateHasTime"] = dateObj.getHours() > 0 || dateObj.getMinutes() > 0 || dateObj.getSeconds() > 0;
+          }
+
+          if (self.selectedDates) {
+            self.selectedDates = self.selectedDates.filter(function (d) {
+              return isEnabled(d);
+            });
+            if (!self.selectedDates.length && type === "min") setHoursFromDate(dateObj);
+            updateValue();
+          }
+
+          if (self.daysContainer) {
+            redraw();
+            if (dateObj !== undefined) self.currentYearElement[type] = dateObj.getFullYear().toString();else self.currentYearElement.removeAttribute(type);
+            self.currentYearElement.disabled = !!inverseDateObj && dateObj !== undefined && inverseDateObj.getFullYear() === dateObj.getFullYear();
+          }
+        };
+      }
+
+      function parseConfig() {
+        var boolOpts = ["wrap", "weekNumbers", "allowInput", "clickOpens", "time_24hr", "enableTime", "noCalendar", "altInput", "shorthandCurrentMonth", "inline", "static", "enableSeconds", "disableMobile"];
+        var userConfig = Object.assign({}, instanceConfig, JSON.parse(JSON.stringify(element.dataset || {})));
+        var formats$$1 = {};
+        self.config.parseDate = userConfig.parseDate;
+        self.config.formatDate = userConfig.formatDate;
+        Object.defineProperty(self.config, "enable", {
+          get: function get() {
+            return self.config._enable;
+          },
+          set: function set(dates) {
+            self.config._enable = parseDateRules(dates);
+          }
+        });
+        Object.defineProperty(self.config, "disable", {
+          get: function get() {
+            return self.config._disable;
+          },
+          set: function set(dates) {
+            self.config._disable = parseDateRules(dates);
+          }
+        });
+        var timeMode = userConfig.mode === "time";
+
+        if (!userConfig.dateFormat && (userConfig.enableTime || timeMode)) {
+          formats$$1.dateFormat = userConfig.noCalendar || timeMode ? "H:i" + (userConfig.enableSeconds ? ":S" : "") : flatpickr.defaultConfig.dateFormat + " H:i" + (userConfig.enableSeconds ? ":S" : "");
+        }
+
+        if (userConfig.altInput && (userConfig.enableTime || timeMode) && !userConfig.altFormat) {
+          formats$$1.altFormat = userConfig.noCalendar || timeMode ? "h:i" + (userConfig.enableSeconds ? ":S K" : " K") : flatpickr.defaultConfig.altFormat + (" h:i" + (userConfig.enableSeconds ? ":S" : "") + " K");
+        }
+
+        Object.defineProperty(self.config, "minDate", {
+          get: function get() {
+            return self.config._minDate;
+          },
+          set: minMaxDateSetter("min")
+        });
+        Object.defineProperty(self.config, "maxDate", {
+          get: function get() {
+            return self.config._maxDate;
+          },
+          set: minMaxDateSetter("max")
+        });
+
+        var minMaxTimeSetter = function minMaxTimeSetter(type) {
+          return function (val) {
+            self.config[type === "min" ? "_minTime" : "_maxTime"] = self.parseDate(val, "H:i");
+          };
+        };
+
+        Object.defineProperty(self.config, "minTime", {
+          get: function get() {
+            return self.config._minTime;
+          },
+          set: minMaxTimeSetter("min")
+        });
+        Object.defineProperty(self.config, "maxTime", {
+          get: function get() {
+            return self.config._maxTime;
+          },
+          set: minMaxTimeSetter("max")
+        });
+
+        if (userConfig.mode === "time") {
+          self.config.noCalendar = true;
+          self.config.enableTime = true;
+        }
+
+        Object.assign(self.config, formats$$1, userConfig);
+
+        for (var i = 0; i < boolOpts.length; i++) {
+          self.config[boolOpts[i]] = self.config[boolOpts[i]] === true || self.config[boolOpts[i]] === "true";
+        }
+
+        HOOKS.filter(function (hook) {
+          return self.config[hook] !== undefined;
+        }).forEach(function (hook) {
+          self.config[hook] = arrayify(self.config[hook] || []).map(bindToInstance);
+        });
+        self.isMobile = !self.config.disableMobile && !self.config.inline && self.config.mode === "single" && !self.config.disable.length && !self.config.enable.length && !self.config.weekNumbers && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        for (var _i = 0; _i < self.config.plugins.length; _i++) {
+          var pluginConf = self.config.plugins[_i](self) || {};
+
+          for (var key in pluginConf) {
+            if (HOOKS.indexOf(key) > -1) {
+              self.config[key] = arrayify(pluginConf[key]).map(bindToInstance).concat(self.config[key]);
+            } else if (typeof userConfig[key] === "undefined") self.config[key] = pluginConf[key];
+          }
+        }
+
+        triggerEvent("onParseConfig");
+      }
+
+      function setupLocale() {
+        if (typeof self.config.locale !== "object" && typeof flatpickr.l10ns[self.config.locale] === "undefined") self.config.errorHandler(new Error("flatpickr: invalid locale " + self.config.locale));
+        self.l10n = Object.assign({}, flatpickr.l10ns.default, typeof self.config.locale === "object" ? self.config.locale : self.config.locale !== "default" ? flatpickr.l10ns[self.config.locale] : undefined);
+        tokenRegex.K = "(" + self.l10n.amPM[0] + "|" + self.l10n.amPM[1] + "|" + self.l10n.amPM[0].toLowerCase() + "|" + self.l10n.amPM[1].toLowerCase() + ")";
+        self.formatDate = createDateFormatter(self);
+        self.parseDate = createDateParser({
+          config: self.config,
+          l10n: self.l10n
+        });
+      }
+
+      function positionCalendar(customPositionElement) {
+        if (self.calendarContainer === undefined) return;
+        triggerEvent("onPreCalendarPosition");
+        var positionElement = customPositionElement || self._positionElement;
+        var calendarHeight = Array.prototype.reduce.call(self.calendarContainer.children, function (acc, child) {
+          return acc + child.offsetHeight;
+        }, 0),
+            calendarWidth = self.calendarContainer.offsetWidth,
+            configPos = self.config.position.split(" "),
+            configPosVertical = configPos[0],
+            configPosHorizontal = configPos.length > 1 ? configPos[1] : null,
+            inputBounds = positionElement.getBoundingClientRect(),
+            distanceFromBottom = window.innerHeight - inputBounds.bottom,
+            showOnTop = configPosVertical === "above" || configPosVertical !== "below" && distanceFromBottom < calendarHeight && inputBounds.top > calendarHeight;
+        var top = window.pageYOffset + inputBounds.top + (!showOnTop ? positionElement.offsetHeight + 2 : -calendarHeight - 2);
+        toggleClass(self.calendarContainer, "arrowTop", !showOnTop);
+        toggleClass(self.calendarContainer, "arrowBottom", showOnTop);
+        if (self.config.inline) return;
+        var left = window.pageXOffset + inputBounds.left - (configPosHorizontal != null && configPosHorizontal === "center" ? (calendarWidth - inputBounds.width) / 2 : 0);
+        var right = window.document.body.offsetWidth - inputBounds.right;
+        var rightMost = left + calendarWidth > window.document.body.offsetWidth;
+        toggleClass(self.calendarContainer, "rightMost", rightMost);
+        if (self.config.static) return;
+        self.calendarContainer.style.top = top + "px";
+
+        if (!rightMost) {
+          self.calendarContainer.style.left = left + "px";
+          self.calendarContainer.style.right = "auto";
+        } else {
+          self.calendarContainer.style.left = "auto";
+          self.calendarContainer.style.right = right + "px";
+        }
+      }
+
+      function redraw() {
+        if (self.config.noCalendar || self.isMobile) return;
+        updateNavigationCurrentMonth();
+        buildDays();
+      }
+
+      function focusAndClose() {
+        self._input.focus();
+
+        if (window.navigator.userAgent.indexOf("MSIE") !== -1 || navigator.msMaxTouchPoints !== undefined) {
+          setTimeout(self.close, 0);
+        } else {
+          self.close();
+        }
+      }
+
+      function selectDate(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var isSelectable = function isSelectable(day) {
+          return day.classList && day.classList.contains("flatpickr-day") && !day.classList.contains("disabled") && !day.classList.contains("notAllowed");
+        };
+
+        var t = findParent(e.target, isSelectable);
+        if (t === undefined) return;
+        var target = t;
+        var selectedDate = self.latestSelectedDateObj = new Date(target.dateObj.getTime());
+        var shouldChangeMonth = (selectedDate.getMonth() < self.currentMonth || selectedDate.getMonth() > self.currentMonth + self.config.showMonths - 1) && self.config.mode !== "range";
+        self.selectedDateElem = target;
+        if (self.config.mode === "single") self.selectedDates = [selectedDate];else if (self.config.mode === "multiple") {
+          var selectedIndex = isDateSelected(selectedDate);
+          if (selectedIndex) self.selectedDates.splice(parseInt(selectedIndex), 1);else self.selectedDates.push(selectedDate);
+        } else if (self.config.mode === "range") {
+          if (self.selectedDates.length === 2) self.clear(false);
+          self.selectedDates.push(selectedDate);
+          if (compareDates(selectedDate, self.selectedDates[0], true) !== 0) self.selectedDates.sort(function (a, b) {
+            return a.getTime() - b.getTime();
+          });
+        }
+        setHoursFromInputs();
+
+        if (shouldChangeMonth) {
+          var isNewYear = self.currentYear !== selectedDate.getFullYear();
+          self.currentYear = selectedDate.getFullYear();
+          self.currentMonth = selectedDate.getMonth();
+          if (isNewYear) triggerEvent("onYearChange");
+          triggerEvent("onMonthChange");
+        }
+
+        updateNavigationCurrentMonth();
+        buildDays();
+        updateValue();
+        if (self.config.enableTime) setTimeout(function () {
+          return self.showTimeInput = true;
+        }, 50);
+        if (!shouldChangeMonth && self.config.mode !== "range" && self.config.showMonths === 1) focusOnDayElem(target);else self.selectedDateElem && self.selectedDateElem.focus();
+        if (self.hourElement !== undefined) setTimeout(function () {
+          return self.hourElement !== undefined && self.hourElement.select();
+        }, 451);
+
+        if (self.config.closeOnSelect) {
+          var single = self.config.mode === "single" && !self.config.enableTime;
+          var range = self.config.mode === "range" && self.selectedDates.length === 2 && !self.config.enableTime;
+
+          if (single || range) {
+            focusAndClose();
+          }
+        }
+
+        triggerChange();
+      }
+
+      var CALLBACKS = {
+        locale: [setupLocale, updateWeekdays],
+        showMonths: [buildMonths, setCalendarWidth, buildWeekdays]
+      };
+
+      function set(option, value) {
+        if (option !== null && typeof option === "object") Object.assign(self.config, option);else {
+          self.config[option] = value;
+          if (CALLBACKS[option] !== undefined) CALLBACKS[option].forEach(function (x) {
+            return x();
+          });else if (HOOKS.indexOf(option) > -1) self.config[option] = arrayify(value);
+        }
+        self.redraw();
+        jumpToDate();
+        updateValue(false);
+      }
+
+      function setSelectedDate(inputDate, format) {
+        var dates = [];
+        if (inputDate instanceof Array) dates = inputDate.map(function (d) {
+          return self.parseDate(d, format);
+        });else if (inputDate instanceof Date || typeof inputDate === "number") dates = [self.parseDate(inputDate, format)];else if (typeof inputDate === "string") {
+          switch (self.config.mode) {
+            case "single":
+            case "time":
+              dates = [self.parseDate(inputDate, format)];
+              break;
+
+            case "multiple":
+              dates = inputDate.split(self.config.conjunction).map(function (date) {
+                return self.parseDate(date, format);
+              });
+              break;
+
+            case "range":
+              dates = inputDate.split(self.l10n.rangeSeparator).map(function (date) {
+                return self.parseDate(date, format);
+              });
+              break;
+
+            default:
+              break;
+          }
+        } else self.config.errorHandler(new Error("Invalid date supplied: " + JSON.stringify(inputDate)));
+        self.selectedDates = dates.filter(function (d) {
+          return d instanceof Date && isEnabled(d, false);
+        });
+        if (self.config.mode === "range") self.selectedDates.sort(function (a, b) {
+          return a.getTime() - b.getTime();
+        });
+      }
+
+      function setDate(date, triggerChange, format) {
+        if (triggerChange === void 0) {
+          triggerChange = false;
+        }
+
+        if (format === void 0) {
+          format = self.config.dateFormat;
+        }
+
+        if (date !== 0 && !date || date instanceof Array && date.length === 0) return self.clear(triggerChange);
+        setSelectedDate(date, format);
+        self.showTimeInput = self.selectedDates.length > 0;
+        self.latestSelectedDateObj = self.selectedDates[0];
+        self.redraw();
+        jumpToDate();
+        setHoursFromDate();
+        updateValue(triggerChange);
+        if (triggerChange) triggerEvent("onChange");
+      }
+
+      function parseDateRules(arr) {
+        return arr.slice().map(function (rule) {
+          if (typeof rule === "string" || typeof rule === "number" || rule instanceof Date) {
+            return self.parseDate(rule, undefined, true);
+          } else if (rule && typeof rule === "object" && rule.from && rule.to) return {
+            from: self.parseDate(rule.from, undefined),
+            to: self.parseDate(rule.to, undefined)
+          };
+
+          return rule;
+        }).filter(function (x) {
+          return x;
+        });
+      }
+
+      function setupDates() {
+        self.selectedDates = [];
+        self.now = self.parseDate(self.config.now) || new Date();
+        var preloadedDate = self.config.defaultDate || ((self.input.nodeName === "INPUT" || self.input.nodeName === "TEXTAREA") && self.input.placeholder && self.input.value === self.input.placeholder ? null : self.input.value);
+        if (preloadedDate) setSelectedDate(preloadedDate, self.config.dateFormat);
+        var initialDate = self.selectedDates.length > 0 ? self.selectedDates[0] : self.config.minDate && self.config.minDate.getTime() > self.now.getTime() ? self.config.minDate : self.config.maxDate && self.config.maxDate.getTime() < self.now.getTime() ? self.config.maxDate : self.now;
+        self.currentYear = initialDate.getFullYear();
+        self.currentMonth = initialDate.getMonth();
+        if (self.selectedDates.length > 0) self.latestSelectedDateObj = self.selectedDates[0];
+        if (self.config.minTime !== undefined) self.config.minTime = self.parseDate(self.config.minTime, "H:i");
+        if (self.config.maxTime !== undefined) self.config.maxTime = self.parseDate(self.config.maxTime, "H:i");
+        self.minDateHasTime = !!self.config.minDate && (self.config.minDate.getHours() > 0 || self.config.minDate.getMinutes() > 0 || self.config.minDate.getSeconds() > 0);
+        self.maxDateHasTime = !!self.config.maxDate && (self.config.maxDate.getHours() > 0 || self.config.maxDate.getMinutes() > 0 || self.config.maxDate.getSeconds() > 0);
+        Object.defineProperty(self, "showTimeInput", {
+          get: function get() {
+            return self._showTimeInput;
+          },
+          set: function set(bool) {
+            self._showTimeInput = bool;
+            if (self.calendarContainer) toggleClass(self.calendarContainer, "showTimeInput", bool);
+            self.isOpen && positionCalendar();
+          }
+        });
+      }
+
+      function setupInputs() {
+        self.input = self.config.wrap ? element.querySelector("[data-input]") : element;
+
+        if (!self.input) {
+          self.config.errorHandler(new Error("Invalid input element specified"));
+          return;
+        }
+
+        self.input._type = self.input.type;
+        self.input.type = "text";
+        self.input.classList.add("flatpickr-input");
+        self._input = self.input;
+
+        if (self.config.altInput) {
+          self.altInput = createElement(self.input.nodeName, self.input.className + " " + self.config.altInputClass);
+          self._input = self.altInput;
+          self.altInput.placeholder = self.input.placeholder;
+          self.altInput.disabled = self.input.disabled;
+          self.altInput.required = self.input.required;
+          self.altInput.tabIndex = self.input.tabIndex;
+          self.altInput.type = "text";
+          self.input.setAttribute("type", "hidden");
+          if (!self.config.static && self.input.parentNode) self.input.parentNode.insertBefore(self.altInput, self.input.nextSibling);
+        }
+
+        if (!self.config.allowInput) self._input.setAttribute("readonly", "readonly");
+        self._positionElement = self.config.positionElement || self._input;
+      }
+
+      function setupMobile() {
+        var inputType = self.config.enableTime ? self.config.noCalendar ? "time" : "datetime-local" : "date";
+        self.mobileInput = createElement("input", self.input.className + " flatpickr-mobile");
+        self.mobileInput.step = self.input.getAttribute("step") || "any";
+        self.mobileInput.tabIndex = 1;
+        self.mobileInput.type = inputType;
+        self.mobileInput.disabled = self.input.disabled;
+        self.mobileInput.required = self.input.required;
+        self.mobileInput.placeholder = self.input.placeholder;
+        self.mobileFormatStr = inputType === "datetime-local" ? "Y-m-d\\TH:i:S" : inputType === "date" ? "Y-m-d" : "H:i:S";
+
+        if (self.selectedDates.length > 0) {
+          self.mobileInput.defaultValue = self.mobileInput.value = self.formatDate(self.selectedDates[0], self.mobileFormatStr);
+        }
+
+        if (self.config.minDate) self.mobileInput.min = self.formatDate(self.config.minDate, "Y-m-d");
+        if (self.config.maxDate) self.mobileInput.max = self.formatDate(self.config.maxDate, "Y-m-d");
+        self.input.type = "hidden";
+        if (self.altInput !== undefined) self.altInput.type = "hidden";
+
+        try {
+          if (self.input.parentNode) self.input.parentNode.insertBefore(self.mobileInput, self.input.nextSibling);
+        } catch (_a) {}
+
+        bind(self.mobileInput, "change", function (e) {
+          self.setDate(e.target.value, false, self.mobileFormatStr);
+          triggerEvent("onChange");
+          triggerEvent("onClose");
+        });
+      }
+
+      function toggle(e) {
+        if (self.isOpen === true) return self.close();
+        self.open(e);
+      }
+
+      function triggerEvent(event, data) {
+        if (self.config === undefined) return;
+        var hooks = self.config[event];
+
+        if (hooks !== undefined && hooks.length > 0) {
+          for (var i = 0; hooks[i] && i < hooks.length; i++) {
+            hooks[i](self.selectedDates, self.input.value, self, data);
+          }
+        }
+
+        if (event === "onChange") {
+          self.input.dispatchEvent(createEvent("change"));
+          self.input.dispatchEvent(createEvent("input"));
+        }
+      }
+
+      function createEvent(name) {
+        var e = document.createEvent("Event");
+        e.initEvent(name, true, true);
+        return e;
+      }
+
+      function isDateSelected(date) {
+        for (var i = 0; i < self.selectedDates.length; i++) {
+          if (compareDates(self.selectedDates[i], date) === 0) return "" + i;
+        }
+
+        return false;
+      }
+
+      function isDateInRange(date) {
+        if (self.config.mode !== "range" || self.selectedDates.length < 2) return false;
+        return compareDates(date, self.selectedDates[0]) >= 0 && compareDates(date, self.selectedDates[1]) <= 0;
+      }
+
+      function updateNavigationCurrentMonth() {
+        if (self.config.noCalendar || self.isMobile || !self.monthNav) return;
+        self.yearElements.forEach(function (yearElement, i) {
+          var d = new Date(self.currentYear, self.currentMonth, 1);
+          d.setMonth(self.currentMonth + i);
+          self.monthElements[i].textContent = monthToStr(d.getMonth(), self.config.shorthandCurrentMonth, self.l10n) + " ";
+          yearElement.value = d.getFullYear().toString();
+        });
+        self._hidePrevMonthArrow = self.config.minDate !== undefined && (self.currentYear === self.config.minDate.getFullYear() ? self.currentMonth <= self.config.minDate.getMonth() : self.currentYear < self.config.minDate.getFullYear());
+        self._hideNextMonthArrow = self.config.maxDate !== undefined && (self.currentYear === self.config.maxDate.getFullYear() ? self.currentMonth + 1 > self.config.maxDate.getMonth() : self.currentYear > self.config.maxDate.getFullYear());
+      }
+
+      function getDateStr(format) {
+        return self.selectedDates.map(function (dObj) {
+          return self.formatDate(dObj, format);
+        }).filter(function (d, i, arr) {
+          return self.config.mode !== "range" || self.config.enableTime || arr.indexOf(d) === i;
+        }).join(self.config.mode !== "range" ? self.config.conjunction : self.l10n.rangeSeparator);
+      }
+
+      function updateValue(triggerChange) {
+        if (triggerChange === void 0) {
+          triggerChange = true;
+        }
+
+        if (self.selectedDates.length === 0) return self.clear(triggerChange);
+
+        if (self.mobileInput !== undefined && self.mobileFormatStr) {
+          self.mobileInput.value = self.latestSelectedDateObj !== undefined ? self.formatDate(self.latestSelectedDateObj, self.mobileFormatStr) : "";
+        }
+
+        self.input.value = getDateStr(self.config.dateFormat);
+
+        if (self.altInput !== undefined) {
+          self.altInput.value = getDateStr(self.config.altFormat);
+        }
+
+        if (triggerChange !== false) triggerEvent("onValueUpdate");
+      }
+
+      function onMonthNavClick(e) {
+        e.preventDefault();
+        var isPrevMonth = self.prevMonthNav.contains(e.target);
+        var isNextMonth = self.nextMonthNav.contains(e.target);
+
+        if (isPrevMonth || isNextMonth) {
+          changeMonth(isPrevMonth ? -1 : 1);
+        } else if (self.yearElements.indexOf(e.target) >= 0) {
+          e.target.select();
+        } else if (e.target.classList.contains("arrowUp")) {
+          self.changeYear(self.currentYear + 1);
+        } else if (e.target.classList.contains("arrowDown")) {
+          self.changeYear(self.currentYear - 1);
+        }
+      }
+
+      function timeWrapper(e) {
+        e.preventDefault();
+        var isKeyDown = e.type === "keydown",
+            input = e.target;
+
+        if (self.amPM !== undefined && e.target === self.amPM) {
+          self.amPM.textContent = self.l10n.amPM[int(self.amPM.textContent === self.l10n.amPM[0])];
+        }
+
+        var min = parseFloat(input.getAttribute("data-min")),
+            max = parseFloat(input.getAttribute("data-max")),
+            step = parseFloat(input.getAttribute("data-step")),
+            curValue = parseInt(input.value, 10),
+            delta = e.delta || (isKeyDown ? e.which === 38 ? 1 : -1 : 0);
+        var newValue = curValue + step * delta;
+
+        if (typeof input.value !== "undefined" && input.value.length === 2) {
+          var isHourElem = input === self.hourElement,
+              isMinuteElem = input === self.minuteElement;
+
+          if (newValue < min) {
+            newValue = max + newValue + int(!isHourElem) + (int(isHourElem) && int(!self.amPM));
+            if (isMinuteElem) incrementNumInput(undefined, -1, self.hourElement);
+          } else if (newValue > max) {
+            newValue = input === self.hourElement ? newValue - max - int(!self.amPM) : min;
+            if (isMinuteElem) incrementNumInput(undefined, 1, self.hourElement);
+          }
+
+          if (self.amPM && isHourElem && (step === 1 ? newValue + curValue === 23 : Math.abs(newValue - curValue) > step)) {
+            self.amPM.textContent = self.l10n.amPM[int(self.amPM.textContent === self.l10n.amPM[0])];
+          }
+
+          input.value = pad(newValue);
+        }
+      }
+
+      init();
+      return self;
+    }
+
+    function _flatpickr(nodeList, config) {
+      var nodes = Array.prototype.slice.call(nodeList);
+      var instances = [];
+
+      for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+
+        try {
+          if (node.getAttribute("data-fp-omit") !== null) continue;
+
+          if (node._flatpickr !== undefined) {
+            node._flatpickr.destroy();
+
+            node._flatpickr = undefined;
+          }
+
+          node._flatpickr = FlatpickrInstance(node, config || {});
+          instances.push(node._flatpickr);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      return instances.length === 1 ? instances[0] : instances;
+    }
+
+    if (typeof HTMLElement !== "undefined") {
+      HTMLCollection.prototype.flatpickr = NodeList.prototype.flatpickr = function (config) {
+        return _flatpickr(this, config);
+      };
+
+      HTMLElement.prototype.flatpickr = function (config) {
+        return _flatpickr([this], config);
+      };
+    }
+
+    var flatpickr = function flatpickr(selector, config) {
+      if (selector instanceof NodeList) return _flatpickr(selector, config);else if (typeof selector === "string") return _flatpickr(window.document.querySelectorAll(selector), config);
+      return _flatpickr([selector], config);
+    };
+
+    flatpickr.defaultConfig = defaults;
+    flatpickr.l10ns = {
+      en: Object.assign({}, english),
+      default: Object.assign({}, english)
+    };
+
+    flatpickr.localize = function (l10n) {
+      flatpickr.l10ns.default = Object.assign({}, flatpickr.l10ns.default, l10n);
+    };
+
+    flatpickr.setDefaults = function (config) {
+      flatpickr.defaultConfig = Object.assign({}, flatpickr.defaultConfig, config);
+    };
+
+    flatpickr.parseDate = createDateParser({});
+    flatpickr.formatDate = createDateFormatter({});
+    flatpickr.compareDates = compareDates;
+
+    if (typeof jQuery !== "undefined") {
+      jQuery.fn.flatpickr = function (config) {
+        return _flatpickr(this, config);
+      };
+    }
+
+    Date.prototype.fp_incr = function (days) {
+      return new Date(this.getFullYear(), this.getMonth(), this.getDate() + (typeof days === "string" ? parseInt(days, 10) : days));
+    };
+
+    if (typeof window !== "undefined") {
+      window.flatpickr = flatpickr;
+    }
+
+    return flatpickr;
+
+})));
+;define('flatpickr', ['flatpickr/flatpickr'], function (main) { return main; });
+
+define('text!flatpickr/flatpickr.css', ['module'], function(module) { module.exports = ".flatpickr-calendar {\n  background: transparent;\n  opacity: 0;\n  display: none;\n  text-align: center;\n  visibility: hidden;\n  padding: 0;\n  -webkit-animation: none;\n          animation: none;\n  direction: ltr;\n  border: 0;\n  font-size: 14px;\n  line-height: 24px;\n  border-radius: 5px;\n  position: absolute;\n  width: 307.875px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n  background: #fff;\n  -webkit-box-shadow: 1px 0 0 #e6e6e6, -1px 0 0 #e6e6e6, 0 1px 0 #e6e6e6, 0 -1px 0 #e6e6e6, 0 3px 13px rgba(0,0,0,0.08);\n          box-shadow: 1px 0 0 #e6e6e6, -1px 0 0 #e6e6e6, 0 1px 0 #e6e6e6, 0 -1px 0 #e6e6e6, 0 3px 13px rgba(0,0,0,0.08);\n}\n.flatpickr-calendar.open,\n.flatpickr-calendar.inline {\n  opacity: 1;\n  max-height: 640px;\n  visibility: visible;\n}\n.flatpickr-calendar.open {\n  display: inline-block;\n  z-index: 99999;\n}\n.flatpickr-calendar.animate.open {\n  -webkit-animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.inline {\n  display: block;\n  position: relative;\n  top: 2px;\n}\n.flatpickr-calendar.static {\n  position: absolute;\n  top: calc(100% + 2px);\n}\n.flatpickr-calendar.static.open {\n  z-index: 999;\n  display: block;\n}\n.flatpickr-calendar.multiMonth .flatpickr-days .dayContainer:nth-child(n+1) .flatpickr-day.inRange:nth-child(7n+7) {\n  -webkit-box-shadow: none !important;\n          box-shadow: none !important;\n}\n.flatpickr-calendar.multiMonth .flatpickr-days .dayContainer:nth-child(n+2) .flatpickr-day.inRange:nth-child(7n+1) {\n  -webkit-box-shadow: -2px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n          box-shadow: -2px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n}\n.flatpickr-calendar .hasWeeks .dayContainer,\n.flatpickr-calendar .hasTime .dayContainer {\n  border-bottom: 0;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.flatpickr-calendar .hasWeeks .dayContainer {\n  border-left: 0;\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\n  height: 40px;\n  border-top: 1px solid #e6e6e6;\n}\n.flatpickr-calendar.noCalendar.hasTime .flatpickr-time {\n  height: auto;\n}\n.flatpickr-calendar:before,\n.flatpickr-calendar:after {\n  position: absolute;\n  display: block;\n  pointer-events: none;\n  border: solid transparent;\n  content: '';\n  height: 0;\n  width: 0;\n  left: 22px;\n}\n.flatpickr-calendar.rightMost:before,\n.flatpickr-calendar.rightMost:after {\n  left: auto;\n  right: 22px;\n}\n.flatpickr-calendar:before {\n  border-width: 5px;\n  margin: 0 -5px;\n}\n.flatpickr-calendar:after {\n  border-width: 4px;\n  margin: 0 -4px;\n}\n.flatpickr-calendar.arrowTop:before,\n.flatpickr-calendar.arrowTop:after {\n  bottom: 100%;\n}\n.flatpickr-calendar.arrowTop:before {\n  border-bottom-color: #e6e6e6;\n}\n.flatpickr-calendar.arrowTop:after {\n  border-bottom-color: #fff;\n}\n.flatpickr-calendar.arrowBottom:before,\n.flatpickr-calendar.arrowBottom:after {\n  top: 100%;\n}\n.flatpickr-calendar.arrowBottom:before {\n  border-top-color: #e6e6e6;\n}\n.flatpickr-calendar.arrowBottom:after {\n  border-top-color: #fff;\n}\n.flatpickr-calendar:focus {\n  outline: 0;\n}\n.flatpickr-wrapper {\n  position: relative;\n  display: inline-block;\n}\n.flatpickr-months {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n.flatpickr-months .flatpickr-month {\n  background: transparent;\n  color: rgba(0,0,0,0.9);\n  fill: rgba(0,0,0,0.9);\n  height: 28px;\n  line-height: 1;\n  text-align: center;\n  position: relative;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  overflow: hidden;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\n.flatpickr-months .flatpickr-prev-month,\n.flatpickr-months .flatpickr-next-month {\n  text-decoration: none;\n  cursor: pointer;\n  position: absolute;\n  top: 0px;\n  line-height: 16px;\n  height: 28px;\n  padding: 10px;\n  z-index: 3;\n  color: rgba(0,0,0,0.9);\n  fill: rgba(0,0,0,0.9);\n}\n.flatpickr-months .flatpickr-prev-month.disabled,\n.flatpickr-months .flatpickr-next-month.disabled {\n  display: none;\n}\n.flatpickr-months .flatpickr-prev-month i,\n.flatpickr-months .flatpickr-next-month i {\n  position: relative;\n}\n.flatpickr-months .flatpickr-prev-month.flatpickr-prev-month,\n.flatpickr-months .flatpickr-next-month.flatpickr-prev-month {\n/*\n      /*rtl:begin:ignore*/\n/*\n      */\n  left: 0;\n/*\n      /*rtl:end:ignore*/\n/*\n      */\n}\n/*\n      /*rtl:begin:ignore*/\n/*\n      /*rtl:end:ignore*/\n.flatpickr-months .flatpickr-prev-month.flatpickr-next-month,\n.flatpickr-months .flatpickr-next-month.flatpickr-next-month {\n/*\n      /*rtl:begin:ignore*/\n/*\n      */\n  right: 0;\n/*\n      /*rtl:end:ignore*/\n/*\n      */\n}\n/*\n      /*rtl:begin:ignore*/\n/*\n      /*rtl:end:ignore*/\n.flatpickr-months .flatpickr-prev-month:hover,\n.flatpickr-months .flatpickr-next-month:hover {\n  color: #959ea9;\n}\n.flatpickr-months .flatpickr-prev-month:hover svg,\n.flatpickr-months .flatpickr-next-month:hover svg {\n  fill: #f64747;\n}\n.flatpickr-months .flatpickr-prev-month svg,\n.flatpickr-months .flatpickr-next-month svg {\n  width: 14px;\n  height: 14px;\n}\n.flatpickr-months .flatpickr-prev-month svg path,\n.flatpickr-months .flatpickr-next-month svg path {\n  -webkit-transition: fill 0.1s;\n  transition: fill 0.1s;\n  fill: inherit;\n}\n.numInputWrapper {\n  position: relative;\n  height: auto;\n}\n.numInputWrapper input,\n.numInputWrapper span {\n  display: inline-block;\n}\n.numInputWrapper input {\n  width: 100%;\n}\n.numInputWrapper input::-ms-clear {\n  display: none;\n}\n.numInputWrapper span {\n  position: absolute;\n  right: 0;\n  width: 14px;\n  padding: 0 4px 0 2px;\n  height: 50%;\n  line-height: 50%;\n  opacity: 0;\n  cursor: pointer;\n  border: 1px solid rgba(57,57,57,0.15);\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.numInputWrapper span:hover {\n  background: rgba(0,0,0,0.1);\n}\n.numInputWrapper span:active {\n  background: rgba(0,0,0,0.2);\n}\n.numInputWrapper span:after {\n  display: block;\n  content: \"\";\n  position: absolute;\n}\n.numInputWrapper span.arrowUp {\n  top: 0;\n  border-bottom: 0;\n}\n.numInputWrapper span.arrowUp:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-bottom: 4px solid rgba(57,57,57,0.6);\n  top: 26%;\n}\n.numInputWrapper span.arrowDown {\n  top: 50%;\n}\n.numInputWrapper span.arrowDown:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-top: 4px solid rgba(57,57,57,0.6);\n  top: 40%;\n}\n.numInputWrapper span svg {\n  width: inherit;\n  height: auto;\n}\n.numInputWrapper span svg path {\n  fill: rgba(0,0,0,0.5);\n}\n.numInputWrapper:hover {\n  background: rgba(0,0,0,0.05);\n}\n.numInputWrapper:hover span {\n  opacity: 1;\n}\n.flatpickr-current-month {\n  font-size: 135%;\n  line-height: inherit;\n  font-weight: 300;\n  color: inherit;\n  position: absolute;\n  width: 75%;\n  left: 12.5%;\n  padding: 6.16px 0 0 0;\n  line-height: 1;\n  height: 28px;\n  display: inline-block;\n  text-align: center;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n}\n.flatpickr-current-month span.cur-month {\n  font-family: inherit;\n  font-weight: 700;\n  color: inherit;\n  display: inline-block;\n  margin-left: 0.5ch;\n  padding: 0;\n}\n.flatpickr-current-month span.cur-month:hover {\n  background: rgba(0,0,0,0.05);\n}\n.flatpickr-current-month .numInputWrapper {\n  width: 6ch;\n  width: 7ch\\0;\n  display: inline-block;\n}\n.flatpickr-current-month .numInputWrapper span.arrowUp:after {\n  border-bottom-color: rgba(0,0,0,0.9);\n}\n.flatpickr-current-month .numInputWrapper span.arrowDown:after {\n  border-top-color: rgba(0,0,0,0.9);\n}\n.flatpickr-current-month input.cur-year {\n  background: transparent;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: inherit;\n  cursor: text;\n  padding: 0 0 0 0.5ch;\n  margin: 0;\n  display: inline-block;\n  font-size: inherit;\n  font-family: inherit;\n  font-weight: 300;\n  line-height: inherit;\n  height: auto;\n  border: 0;\n  border-radius: 0;\n  vertical-align: initial;\n}\n.flatpickr-current-month input.cur-year:focus {\n  outline: 0;\n}\n.flatpickr-current-month input.cur-year[disabled],\n.flatpickr-current-month input.cur-year[disabled]:hover {\n  font-size: 100%;\n  color: rgba(0,0,0,0.5);\n  background: transparent;\n  pointer-events: none;\n}\n.flatpickr-weekdays {\n  background: transparent;\n  text-align: center;\n  overflow: hidden;\n  width: 100%;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  height: 28px;\n}\n.flatpickr-weekdays .flatpickr-weekdaycontainer {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\nspan.flatpickr-weekday {\n  cursor: default;\n  font-size: 90%;\n  background: transparent;\n  color: rgba(0,0,0,0.54);\n  line-height: 1;\n  margin: 0;\n  text-align: center;\n  display: block;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  font-weight: bolder;\n}\n.dayContainer,\n.flatpickr-weeks {\n  padding: 1px 0 0 0;\n}\n.flatpickr-days {\n  position: relative;\n  overflow: hidden;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: start;\n  -webkit-align-items: flex-start;\n      -ms-flex-align: start;\n          align-items: flex-start;\n  width: 307.875px;\n}\n.flatpickr-days:focus {\n  outline: 0;\n}\n.dayContainer {\n  padding: 0;\n  outline: 0;\n  text-align: left;\n  width: 307.875px;\n  min-width: 307.875px;\n  max-width: 307.875px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  display: inline-block;\n  display: -ms-flexbox;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: flex;\n  -webkit-flex-wrap: wrap;\n          flex-wrap: wrap;\n  -ms-flex-wrap: wrap;\n  -ms-flex-pack: justify;\n  -webkit-justify-content: space-around;\n          justify-content: space-around;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n  opacity: 1;\n}\n.dayContainer + .dayContainer {\n  -webkit-box-shadow: -1px 0 0 #e6e6e6;\n          box-shadow: -1px 0 0 #e6e6e6;\n}\n.flatpickr-day {\n  background: none;\n  border: 1px solid transparent;\n  border-radius: 150px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: #393939;\n  cursor: pointer;\n  font-weight: 400;\n  width: 14.2857143%;\n  -webkit-flex-basis: 14.2857143%;\n      -ms-flex-preferred-size: 14.2857143%;\n          flex-basis: 14.2857143%;\n  max-width: 39px;\n  height: 39px;\n  line-height: 39px;\n  margin: 0;\n  display: inline-block;\n  position: relative;\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  text-align: center;\n}\n.flatpickr-day.inRange,\n.flatpickr-day.prevMonthDay.inRange,\n.flatpickr-day.nextMonthDay.inRange,\n.flatpickr-day.today.inRange,\n.flatpickr-day.prevMonthDay.today.inRange,\n.flatpickr-day.nextMonthDay.today.inRange,\n.flatpickr-day:hover,\n.flatpickr-day.prevMonthDay:hover,\n.flatpickr-day.nextMonthDay:hover,\n.flatpickr-day:focus,\n.flatpickr-day.prevMonthDay:focus,\n.flatpickr-day.nextMonthDay:focus {\n  cursor: pointer;\n  outline: 0;\n  background: #e6e6e6;\n  border-color: #e6e6e6;\n}\n.flatpickr-day.today {\n  border-color: #959ea9;\n}\n.flatpickr-day.today:hover,\n.flatpickr-day.today:focus {\n  border-color: #959ea9;\n  background: #959ea9;\n  color: #fff;\n}\n.flatpickr-day.selected,\n.flatpickr-day.startRange,\n.flatpickr-day.endRange,\n.flatpickr-day.selected.inRange,\n.flatpickr-day.startRange.inRange,\n.flatpickr-day.endRange.inRange,\n.flatpickr-day.selected:focus,\n.flatpickr-day.startRange:focus,\n.flatpickr-day.endRange:focus,\n.flatpickr-day.selected:hover,\n.flatpickr-day.startRange:hover,\n.flatpickr-day.endRange:hover,\n.flatpickr-day.selected.prevMonthDay,\n.flatpickr-day.startRange.prevMonthDay,\n.flatpickr-day.endRange.prevMonthDay,\n.flatpickr-day.selected.nextMonthDay,\n.flatpickr-day.startRange.nextMonthDay,\n.flatpickr-day.endRange.nextMonthDay {\n  background: #569ff7;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  color: #fff;\n  border-color: #569ff7;\n}\n.flatpickr-day.selected.startRange,\n.flatpickr-day.startRange.startRange,\n.flatpickr-day.endRange.startRange {\n  border-radius: 50px 0 0 50px;\n}\n.flatpickr-day.selected.endRange,\n.flatpickr-day.startRange.endRange,\n.flatpickr-day.endRange.endRange {\n  border-radius: 0 50px 50px 0;\n}\n.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)),\n.flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)),\n.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)) {\n  -webkit-box-shadow: -10px 0 0 #569ff7;\n          box-shadow: -10px 0 0 #569ff7;\n}\n.flatpickr-day.selected.startRange.endRange,\n.flatpickr-day.startRange.startRange.endRange,\n.flatpickr-day.endRange.startRange.endRange {\n  border-radius: 50px;\n}\n.flatpickr-day.inRange {\n  border-radius: 0;\n  -webkit-box-shadow: -5px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n          box-shadow: -5px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover,\n.flatpickr-day.prevMonthDay,\n.flatpickr-day.nextMonthDay,\n.flatpickr-day.notAllowed,\n.flatpickr-day.notAllowed.prevMonthDay,\n.flatpickr-day.notAllowed.nextMonthDay {\n  color: rgba(57,57,57,0.3);\n  background: transparent;\n  border-color: transparent;\n  cursor: default;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover {\n  cursor: not-allowed;\n  color: rgba(57,57,57,0.1);\n}\n.flatpickr-day.week.selected {\n  border-radius: 0;\n  -webkit-box-shadow: -5px 0 0 #569ff7, 5px 0 0 #569ff7;\n          box-shadow: -5px 0 0 #569ff7, 5px 0 0 #569ff7;\n}\n.flatpickr-day.hidden {\n  visibility: hidden;\n}\n.rangeMode .flatpickr-day {\n  margin-top: 1px;\n}\n.flatpickr-weekwrapper {\n  display: inline-block;\n  float: left;\n}\n.flatpickr-weekwrapper .flatpickr-weeks {\n  padding: 0 12px;\n  -webkit-box-shadow: 1px 0 0 #e6e6e6;\n          box-shadow: 1px 0 0 #e6e6e6;\n}\n.flatpickr-weekwrapper .flatpickr-weekday {\n  float: none;\n  width: 100%;\n  line-height: 28px;\n}\n.flatpickr-weekwrapper span.flatpickr-day,\n.flatpickr-weekwrapper span.flatpickr-day:hover {\n  display: block;\n  width: 100%;\n  max-width: none;\n  color: rgba(57,57,57,0.3);\n  background: transparent;\n  cursor: default;\n  border: none;\n}\n.flatpickr-innerContainer {\n  display: block;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  overflow: hidden;\n}\n.flatpickr-rContainer {\n  display: inline-block;\n  padding: 0;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.flatpickr-time {\n  text-align: center;\n  outline: 0;\n  display: block;\n  height: 0;\n  line-height: 40px;\n  max-height: 40px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  overflow: hidden;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n.flatpickr-time:after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n.flatpickr-time .numInputWrapper {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  width: 40%;\n  height: 40px;\n  float: left;\n}\n.flatpickr-time .numInputWrapper span.arrowUp:after {\n  border-bottom-color: #393939;\n}\n.flatpickr-time .numInputWrapper span.arrowDown:after {\n  border-top-color: #393939;\n}\n.flatpickr-time.hasSeconds .numInputWrapper {\n  width: 26%;\n}\n.flatpickr-time.time24hr .numInputWrapper {\n  width: 49%;\n}\n.flatpickr-time input {\n  background: transparent;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  border: 0;\n  border-radius: 0;\n  text-align: center;\n  margin: 0;\n  padding: 0;\n  height: inherit;\n  line-height: inherit;\n  color: #393939;\n  font-size: 14px;\n  position: relative;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.flatpickr-time input.flatpickr-hour {\n  font-weight: bold;\n}\n.flatpickr-time input.flatpickr-minute,\n.flatpickr-time input.flatpickr-second {\n  font-weight: 400;\n}\n.flatpickr-time input:focus {\n  outline: 0;\n  border: 0;\n}\n.flatpickr-time .flatpickr-time-separator,\n.flatpickr-time .flatpickr-am-pm {\n  height: inherit;\n  display: inline-block;\n  float: left;\n  line-height: inherit;\n  color: #393939;\n  font-weight: bold;\n  width: 2%;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  -webkit-align-self: center;\n      -ms-flex-item-align: center;\n          align-self: center;\n}\n.flatpickr-time .flatpickr-am-pm {\n  outline: 0;\n  width: 18%;\n  cursor: pointer;\n  text-align: center;\n  font-weight: 400;\n}\n.flatpickr-time input:hover,\n.flatpickr-time .flatpickr-am-pm:hover,\n.flatpickr-time input:focus,\n.flatpickr-time .flatpickr-am-pm:focus {\n  background: #f3f3f3;\n}\n.flatpickr-input[readonly] {\n  cursor: pointer;\n}\n@-webkit-keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n"; });
+define('text!flatpickr/themes/dark.css', ['module'], function(module) { module.exports = ".flatpickr-calendar {\n  background: transparent;\n  opacity: 0;\n  display: none;\n  text-align: center;\n  visibility: hidden;\n  padding: 0;\n  -webkit-animation: none;\n          animation: none;\n  direction: ltr;\n  border: 0;\n  font-size: 14px;\n  line-height: 24px;\n  border-radius: 5px;\n  position: absolute;\n  width: 307.875px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n  background: #3f4458;\n  -webkit-box-shadow: 1px 0 0 #20222c, -1px 0 0 #20222c, 0 1px 0 #20222c, 0 -1px 0 #20222c, 0 3px 13px rgba(0,0,0,0.08);\n          box-shadow: 1px 0 0 #20222c, -1px 0 0 #20222c, 0 1px 0 #20222c, 0 -1px 0 #20222c, 0 3px 13px rgba(0,0,0,0.08);\n}\n.flatpickr-calendar.open,\n.flatpickr-calendar.inline {\n  opacity: 1;\n  max-height: 640px;\n  visibility: visible;\n}\n.flatpickr-calendar.open {\n  display: inline-block;\n  z-index: 99999;\n}\n.flatpickr-calendar.animate.open {\n  -webkit-animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.inline {\n  display: block;\n  position: relative;\n  top: 2px;\n}\n.flatpickr-calendar.static {\n  position: absolute;\n  top: calc(100% + 2px);\n}\n.flatpickr-calendar.static.open {\n  z-index: 999;\n  display: block;\n}\n.flatpickr-calendar.multiMonth .flatpickr-days .dayContainer:nth-child(n+1) .flatpickr-day.inRange:nth-child(7n+7) {\n  -webkit-box-shadow: none !important;\n          box-shadow: none !important;\n}\n.flatpickr-calendar.multiMonth .flatpickr-days .dayContainer:nth-child(n+2) .flatpickr-day.inRange:nth-child(7n+1) {\n  -webkit-box-shadow: -2px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n          box-shadow: -2px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n}\n.flatpickr-calendar .hasWeeks .dayContainer,\n.flatpickr-calendar .hasTime .dayContainer {\n  border-bottom: 0;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.flatpickr-calendar .hasWeeks .dayContainer {\n  border-left: 0;\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\n  height: 40px;\n  border-top: 1px solid #20222c;\n}\n.flatpickr-calendar.noCalendar.hasTime .flatpickr-time {\n  height: auto;\n}\n.flatpickr-calendar:before,\n.flatpickr-calendar:after {\n  position: absolute;\n  display: block;\n  pointer-events: none;\n  border: solid transparent;\n  content: '';\n  height: 0;\n  width: 0;\n  left: 22px;\n}\n.flatpickr-calendar.rightMost:before,\n.flatpickr-calendar.rightMost:after {\n  left: auto;\n  right: 22px;\n}\n.flatpickr-calendar:before {\n  border-width: 5px;\n  margin: 0 -5px;\n}\n.flatpickr-calendar:after {\n  border-width: 4px;\n  margin: 0 -4px;\n}\n.flatpickr-calendar.arrowTop:before,\n.flatpickr-calendar.arrowTop:after {\n  bottom: 100%;\n}\n.flatpickr-calendar.arrowTop:before {\n  border-bottom-color: #20222c;\n}\n.flatpickr-calendar.arrowTop:after {\n  border-bottom-color: #3f4458;\n}\n.flatpickr-calendar.arrowBottom:before,\n.flatpickr-calendar.arrowBottom:after {\n  top: 100%;\n}\n.flatpickr-calendar.arrowBottom:before {\n  border-top-color: #20222c;\n}\n.flatpickr-calendar.arrowBottom:after {\n  border-top-color: #3f4458;\n}\n.flatpickr-calendar:focus {\n  outline: 0;\n}\n.flatpickr-wrapper {\n  position: relative;\n  display: inline-block;\n}\n.flatpickr-months {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n.flatpickr-months .flatpickr-month {\n  background: transparent;\n  color: #fff;\n  fill: #fff;\n  height: 28px;\n  line-height: 1;\n  text-align: center;\n  position: relative;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  overflow: hidden;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\n.flatpickr-months .flatpickr-prev-month,\n.flatpickr-months .flatpickr-next-month {\n  text-decoration: none;\n  cursor: pointer;\n  position: absolute;\n  top: 0px;\n  line-height: 16px;\n  height: 28px;\n  padding: 10px;\n  z-index: 3;\n  color: #fff;\n  fill: #fff;\n}\n.flatpickr-months .flatpickr-prev-month.disabled,\n.flatpickr-months .flatpickr-next-month.disabled {\n  display: none;\n}\n.flatpickr-months .flatpickr-prev-month i,\n.flatpickr-months .flatpickr-next-month i {\n  position: relative;\n}\n.flatpickr-months .flatpickr-prev-month.flatpickr-prev-month,\n.flatpickr-months .flatpickr-next-month.flatpickr-prev-month {\n/*\n      /*rtl:begin:ignore*/\n/*\n      */\n  left: 0;\n/*\n      /*rtl:end:ignore*/\n/*\n      */\n}\n/*\n      /*rtl:begin:ignore*/\n/*\n      /*rtl:end:ignore*/\n.flatpickr-months .flatpickr-prev-month.flatpickr-next-month,\n.flatpickr-months .flatpickr-next-month.flatpickr-next-month {\n/*\n      /*rtl:begin:ignore*/\n/*\n      */\n  right: 0;\n/*\n      /*rtl:end:ignore*/\n/*\n      */\n}\n/*\n      /*rtl:begin:ignore*/\n/*\n      /*rtl:end:ignore*/\n.flatpickr-months .flatpickr-prev-month:hover,\n.flatpickr-months .flatpickr-next-month:hover {\n  color: #eee;\n}\n.flatpickr-months .flatpickr-prev-month:hover svg,\n.flatpickr-months .flatpickr-next-month:hover svg {\n  fill: #f64747;\n}\n.flatpickr-months .flatpickr-prev-month svg,\n.flatpickr-months .flatpickr-next-month svg {\n  width: 14px;\n  height: 14px;\n}\n.flatpickr-months .flatpickr-prev-month svg path,\n.flatpickr-months .flatpickr-next-month svg path {\n  -webkit-transition: fill 0.1s;\n  transition: fill 0.1s;\n  fill: inherit;\n}\n.numInputWrapper {\n  position: relative;\n  height: auto;\n}\n.numInputWrapper input,\n.numInputWrapper span {\n  display: inline-block;\n}\n.numInputWrapper input {\n  width: 100%;\n}\n.numInputWrapper input::-ms-clear {\n  display: none;\n}\n.numInputWrapper span {\n  position: absolute;\n  right: 0;\n  width: 14px;\n  padding: 0 4px 0 2px;\n  height: 50%;\n  line-height: 50%;\n  opacity: 0;\n  cursor: pointer;\n  border: 1px solid rgba(255,255,255,0.15);\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.numInputWrapper span:hover {\n  background: rgba(192,187,167,0.1);\n}\n.numInputWrapper span:active {\n  background: rgba(192,187,167,0.2);\n}\n.numInputWrapper span:after {\n  display: block;\n  content: \"\";\n  position: absolute;\n}\n.numInputWrapper span.arrowUp {\n  top: 0;\n  border-bottom: 0;\n}\n.numInputWrapper span.arrowUp:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-bottom: 4px solid rgba(255,255,255,0.6);\n  top: 26%;\n}\n.numInputWrapper span.arrowDown {\n  top: 50%;\n}\n.numInputWrapper span.arrowDown:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-top: 4px solid rgba(255,255,255,0.6);\n  top: 40%;\n}\n.numInputWrapper span svg {\n  width: inherit;\n  height: auto;\n}\n.numInputWrapper span svg path {\n  fill: rgba(255,255,255,0.5);\n}\n.numInputWrapper:hover {\n  background: rgba(192,187,167,0.05);\n}\n.numInputWrapper:hover span {\n  opacity: 1;\n}\n.flatpickr-current-month {\n  font-size: 135%;\n  line-height: inherit;\n  font-weight: 300;\n  color: inherit;\n  position: absolute;\n  width: 75%;\n  left: 12.5%;\n  padding: 6.16px 0 0 0;\n  line-height: 1;\n  height: 28px;\n  display: inline-block;\n  text-align: center;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n}\n.flatpickr-current-month span.cur-month {\n  font-family: inherit;\n  font-weight: 700;\n  color: inherit;\n  display: inline-block;\n  margin-left: 0.5ch;\n  padding: 0;\n}\n.flatpickr-current-month span.cur-month:hover {\n  background: rgba(192,187,167,0.05);\n}\n.flatpickr-current-month .numInputWrapper {\n  width: 6ch;\n  width: 7ch\\0;\n  display: inline-block;\n}\n.flatpickr-current-month .numInputWrapper span.arrowUp:after {\n  border-bottom-color: #fff;\n}\n.flatpickr-current-month .numInputWrapper span.arrowDown:after {\n  border-top-color: #fff;\n}\n.flatpickr-current-month input.cur-year {\n  background: transparent;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: inherit;\n  cursor: text;\n  padding: 0 0 0 0.5ch;\n  margin: 0;\n  display: inline-block;\n  font-size: inherit;\n  font-family: inherit;\n  font-weight: 300;\n  line-height: inherit;\n  height: auto;\n  border: 0;\n  border-radius: 0;\n  vertical-align: initial;\n}\n.flatpickr-current-month input.cur-year:focus {\n  outline: 0;\n}\n.flatpickr-current-month input.cur-year[disabled],\n.flatpickr-current-month input.cur-year[disabled]:hover {\n  font-size: 100%;\n  color: rgba(255,255,255,0.5);\n  background: transparent;\n  pointer-events: none;\n}\n.flatpickr-weekdays {\n  background: transparent;\n  text-align: center;\n  overflow: hidden;\n  width: 100%;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  height: 28px;\n}\n.flatpickr-weekdays .flatpickr-weekdaycontainer {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\nspan.flatpickr-weekday {\n  cursor: default;\n  font-size: 90%;\n  background: transparent;\n  color: #fff;\n  line-height: 1;\n  margin: 0;\n  text-align: center;\n  display: block;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  font-weight: bolder;\n}\n.dayContainer,\n.flatpickr-weeks {\n  padding: 1px 0 0 0;\n}\n.flatpickr-days {\n  position: relative;\n  overflow: hidden;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: start;\n  -webkit-align-items: flex-start;\n      -ms-flex-align: start;\n          align-items: flex-start;\n  width: 307.875px;\n}\n.flatpickr-days:focus {\n  outline: 0;\n}\n.dayContainer {\n  padding: 0;\n  outline: 0;\n  text-align: left;\n  width: 307.875px;\n  min-width: 307.875px;\n  max-width: 307.875px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  display: inline-block;\n  display: -ms-flexbox;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: flex;\n  -webkit-flex-wrap: wrap;\n          flex-wrap: wrap;\n  -ms-flex-wrap: wrap;\n  -ms-flex-pack: justify;\n  -webkit-justify-content: space-around;\n          justify-content: space-around;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n  opacity: 1;\n}\n.dayContainer + .dayContainer {\n  -webkit-box-shadow: -1px 0 0 #20222c;\n          box-shadow: -1px 0 0 #20222c;\n}\n.flatpickr-day {\n  background: none;\n  border: 1px solid transparent;\n  border-radius: 150px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: rgba(255,255,255,0.95);\n  cursor: pointer;\n  font-weight: 400;\n  width: 14.2857143%;\n  -webkit-flex-basis: 14.2857143%;\n      -ms-flex-preferred-size: 14.2857143%;\n          flex-basis: 14.2857143%;\n  max-width: 39px;\n  height: 39px;\n  line-height: 39px;\n  margin: 0;\n  display: inline-block;\n  position: relative;\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  text-align: center;\n}\n.flatpickr-day.inRange,\n.flatpickr-day.prevMonthDay.inRange,\n.flatpickr-day.nextMonthDay.inRange,\n.flatpickr-day.today.inRange,\n.flatpickr-day.prevMonthDay.today.inRange,\n.flatpickr-day.nextMonthDay.today.inRange,\n.flatpickr-day:hover,\n.flatpickr-day.prevMonthDay:hover,\n.flatpickr-day.nextMonthDay:hover,\n.flatpickr-day:focus,\n.flatpickr-day.prevMonthDay:focus,\n.flatpickr-day.nextMonthDay:focus {\n  cursor: pointer;\n  outline: 0;\n  background: #646c8c;\n  border-color: #646c8c;\n}\n.flatpickr-day.today {\n  border-color: #eee;\n}\n.flatpickr-day.today:hover,\n.flatpickr-day.today:focus {\n  border-color: #eee;\n  background: #eee;\n  color: #3f4458;\n}\n.flatpickr-day.selected,\n.flatpickr-day.startRange,\n.flatpickr-day.endRange,\n.flatpickr-day.selected.inRange,\n.flatpickr-day.startRange.inRange,\n.flatpickr-day.endRange.inRange,\n.flatpickr-day.selected:focus,\n.flatpickr-day.startRange:focus,\n.flatpickr-day.endRange:focus,\n.flatpickr-day.selected:hover,\n.flatpickr-day.startRange:hover,\n.flatpickr-day.endRange:hover,\n.flatpickr-day.selected.prevMonthDay,\n.flatpickr-day.startRange.prevMonthDay,\n.flatpickr-day.endRange.prevMonthDay,\n.flatpickr-day.selected.nextMonthDay,\n.flatpickr-day.startRange.nextMonthDay,\n.flatpickr-day.endRange.nextMonthDay {\n  background: #80cbc4;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  color: #fff;\n  border-color: #80cbc4;\n}\n.flatpickr-day.selected.startRange,\n.flatpickr-day.startRange.startRange,\n.flatpickr-day.endRange.startRange {\n  border-radius: 50px 0 0 50px;\n}\n.flatpickr-day.selected.endRange,\n.flatpickr-day.startRange.endRange,\n.flatpickr-day.endRange.endRange {\n  border-radius: 0 50px 50px 0;\n}\n.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)),\n.flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)),\n.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)) {\n  -webkit-box-shadow: -10px 0 0 #80cbc4;\n          box-shadow: -10px 0 0 #80cbc4;\n}\n.flatpickr-day.selected.startRange.endRange,\n.flatpickr-day.startRange.startRange.endRange,\n.flatpickr-day.endRange.startRange.endRange {\n  border-radius: 50px;\n}\n.flatpickr-day.inRange {\n  border-radius: 0;\n  -webkit-box-shadow: -5px 0 0 #646c8c, 5px 0 0 #646c8c;\n          box-shadow: -5px 0 0 #646c8c, 5px 0 0 #646c8c;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover,\n.flatpickr-day.prevMonthDay,\n.flatpickr-day.nextMonthDay,\n.flatpickr-day.notAllowed,\n.flatpickr-day.notAllowed.prevMonthDay,\n.flatpickr-day.notAllowed.nextMonthDay {\n  color: rgba(255,255,255,0.3);\n  background: transparent;\n  border-color: transparent;\n  cursor: default;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover {\n  cursor: not-allowed;\n  color: rgba(255,255,255,0.1);\n}\n.flatpickr-day.week.selected {\n  border-radius: 0;\n  -webkit-box-shadow: -5px 0 0 #80cbc4, 5px 0 0 #80cbc4;\n          box-shadow: -5px 0 0 #80cbc4, 5px 0 0 #80cbc4;\n}\n.flatpickr-day.hidden {\n  visibility: hidden;\n}\n.rangeMode .flatpickr-day {\n  margin-top: 1px;\n}\n.flatpickr-weekwrapper {\n  display: inline-block;\n  float: left;\n}\n.flatpickr-weekwrapper .flatpickr-weeks {\n  padding: 0 12px;\n  -webkit-box-shadow: 1px 0 0 #20222c;\n          box-shadow: 1px 0 0 #20222c;\n}\n.flatpickr-weekwrapper .flatpickr-weekday {\n  float: none;\n  width: 100%;\n  line-height: 28px;\n}\n.flatpickr-weekwrapper span.flatpickr-day,\n.flatpickr-weekwrapper span.flatpickr-day:hover {\n  display: block;\n  width: 100%;\n  max-width: none;\n  color: rgba(255,255,255,0.3);\n  background: transparent;\n  cursor: default;\n  border: none;\n}\n.flatpickr-innerContainer {\n  display: block;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  overflow: hidden;\n}\n.flatpickr-rContainer {\n  display: inline-block;\n  padding: 0;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.flatpickr-time {\n  text-align: center;\n  outline: 0;\n  display: block;\n  height: 0;\n  line-height: 40px;\n  max-height: 40px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  overflow: hidden;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n.flatpickr-time:after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n.flatpickr-time .numInputWrapper {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  width: 40%;\n  height: 40px;\n  float: left;\n}\n.flatpickr-time .numInputWrapper span.arrowUp:after {\n  border-bottom-color: rgba(255,255,255,0.95);\n}\n.flatpickr-time .numInputWrapper span.arrowDown:after {\n  border-top-color: rgba(255,255,255,0.95);\n}\n.flatpickr-time.hasSeconds .numInputWrapper {\n  width: 26%;\n}\n.flatpickr-time.time24hr .numInputWrapper {\n  width: 49%;\n}\n.flatpickr-time input {\n  background: transparent;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  border: 0;\n  border-radius: 0;\n  text-align: center;\n  margin: 0;\n  padding: 0;\n  height: inherit;\n  line-height: inherit;\n  color: rgba(255,255,255,0.95);\n  font-size: 14px;\n  position: relative;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.flatpickr-time input.flatpickr-hour {\n  font-weight: bold;\n}\n.flatpickr-time input.flatpickr-minute,\n.flatpickr-time input.flatpickr-second {\n  font-weight: 400;\n}\n.flatpickr-time input:focus {\n  outline: 0;\n  border: 0;\n}\n.flatpickr-time .flatpickr-time-separator,\n.flatpickr-time .flatpickr-am-pm {\n  height: inherit;\n  display: inline-block;\n  float: left;\n  line-height: inherit;\n  color: rgba(255,255,255,0.95);\n  font-weight: bold;\n  width: 2%;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  -webkit-align-self: center;\n      -ms-flex-item-align: center;\n          align-self: center;\n}\n.flatpickr-time .flatpickr-am-pm {\n  outline: 0;\n  width: 18%;\n  cursor: pointer;\n  text-align: center;\n  font-weight: 400;\n}\n.flatpickr-time input:hover,\n.flatpickr-time .flatpickr-am-pm:hover,\n.flatpickr-time input:focus,\n.flatpickr-time .flatpickr-am-pm:focus {\n  background: #707999;\n}\n.flatpickr-input[readonly] {\n  cursor: pointer;\n}\n@-webkit-keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n"; });
+define('text!flatpickr/themes/material_blue.css', ['module'], function(module) { module.exports = ".flatpickr-calendar {\n  background: transparent;\n  opacity: 0;\n  display: none;\n  text-align: center;\n  visibility: hidden;\n  padding: 0;\n  -webkit-animation: none;\n          animation: none;\n  direction: ltr;\n  border: 0;\n  font-size: 14px;\n  line-height: 24px;\n  border-radius: 5px;\n  position: absolute;\n  width: 307.875px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n  -webkit-box-shadow: 0 3px 13px rgba(0,0,0,0.08);\n          box-shadow: 0 3px 13px rgba(0,0,0,0.08);\n}\n.flatpickr-calendar.open,\n.flatpickr-calendar.inline {\n  opacity: 1;\n  max-height: 640px;\n  visibility: visible;\n}\n.flatpickr-calendar.open {\n  display: inline-block;\n  z-index: 99999;\n}\n.flatpickr-calendar.animate.open {\n  -webkit-animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.inline {\n  display: block;\n  position: relative;\n  top: 2px;\n}\n.flatpickr-calendar.static {\n  position: absolute;\n  top: calc(100% + 2px);\n}\n.flatpickr-calendar.static.open {\n  z-index: 999;\n  display: block;\n}\n.flatpickr-calendar.multiMonth .flatpickr-days .dayContainer:nth-child(n+1) .flatpickr-day.inRange:nth-child(7n+7) {\n  -webkit-box-shadow: none !important;\n          box-shadow: none !important;\n}\n.flatpickr-calendar.multiMonth .flatpickr-days .dayContainer:nth-child(n+2) .flatpickr-day.inRange:nth-child(7n+1) {\n  -webkit-box-shadow: -2px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n          box-shadow: -2px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n}\n.flatpickr-calendar .hasWeeks .dayContainer,\n.flatpickr-calendar .hasTime .dayContainer {\n  border-bottom: 0;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.flatpickr-calendar .hasWeeks .dayContainer {\n  border-left: 0;\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\n  height: 40px;\n  border-top: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-innerContainer {\n  border-bottom: 0;\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\n  border: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-calendar.noCalendar.hasTime .flatpickr-time {\n  height: auto;\n}\n.flatpickr-calendar:before,\n.flatpickr-calendar:after {\n  position: absolute;\n  display: block;\n  pointer-events: none;\n  border: solid transparent;\n  content: '';\n  height: 0;\n  width: 0;\n  left: 22px;\n}\n.flatpickr-calendar.rightMost:before,\n.flatpickr-calendar.rightMost:after {\n  left: auto;\n  right: 22px;\n}\n.flatpickr-calendar:before {\n  border-width: 5px;\n  margin: 0 -5px;\n}\n.flatpickr-calendar:after {\n  border-width: 4px;\n  margin: 0 -4px;\n}\n.flatpickr-calendar.arrowTop:before,\n.flatpickr-calendar.arrowTop:after {\n  bottom: 100%;\n}\n.flatpickr-calendar.arrowTop:before {\n  border-bottom-color: rgba(72,72,72,0.2);\n}\n.flatpickr-calendar.arrowTop:after {\n  border-bottom-color: #42a5f5;\n}\n.flatpickr-calendar.arrowBottom:before,\n.flatpickr-calendar.arrowBottom:after {\n  top: 100%;\n}\n.flatpickr-calendar.arrowBottom:before {\n  border-top-color: rgba(72,72,72,0.2);\n}\n.flatpickr-calendar.arrowBottom:after {\n  border-top-color: #42a5f5;\n}\n.flatpickr-calendar:focus {\n  outline: 0;\n}\n.flatpickr-wrapper {\n  position: relative;\n  display: inline-block;\n}\n.flatpickr-months {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n.flatpickr-months .flatpickr-month {\n  border-radius: 5px 5px 0 0;\n  background: #42a5f5;\n  color: #fff;\n  fill: #fff;\n  height: 28px;\n  line-height: 1;\n  text-align: center;\n  position: relative;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  overflow: hidden;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\n.flatpickr-months .flatpickr-prev-month,\n.flatpickr-months .flatpickr-next-month {\n  text-decoration: none;\n  cursor: pointer;\n  position: absolute;\n  top: 0px;\n  line-height: 16px;\n  height: 28px;\n  padding: 10px;\n  z-index: 3;\n  color: #fff;\n  fill: #fff;\n}\n.flatpickr-months .flatpickr-prev-month.disabled,\n.flatpickr-months .flatpickr-next-month.disabled {\n  display: none;\n}\n.flatpickr-months .flatpickr-prev-month i,\n.flatpickr-months .flatpickr-next-month i {\n  position: relative;\n}\n.flatpickr-months .flatpickr-prev-month.flatpickr-prev-month,\n.flatpickr-months .flatpickr-next-month.flatpickr-prev-month {\n/*\n      /*rtl:begin:ignore*/\n/*\n      */\n  left: 0;\n/*\n      /*rtl:end:ignore*/\n/*\n      */\n}\n/*\n      /*rtl:begin:ignore*/\n/*\n      /*rtl:end:ignore*/\n.flatpickr-months .flatpickr-prev-month.flatpickr-next-month,\n.flatpickr-months .flatpickr-next-month.flatpickr-next-month {\n/*\n      /*rtl:begin:ignore*/\n/*\n      */\n  right: 0;\n/*\n      /*rtl:end:ignore*/\n/*\n      */\n}\n/*\n      /*rtl:begin:ignore*/\n/*\n      /*rtl:end:ignore*/\n.flatpickr-months .flatpickr-prev-month:hover,\n.flatpickr-months .flatpickr-next-month:hover {\n  color: #bbb;\n}\n.flatpickr-months .flatpickr-prev-month:hover svg,\n.flatpickr-months .flatpickr-next-month:hover svg {\n  fill: #f64747;\n}\n.flatpickr-months .flatpickr-prev-month svg,\n.flatpickr-months .flatpickr-next-month svg {\n  width: 14px;\n  height: 14px;\n}\n.flatpickr-months .flatpickr-prev-month svg path,\n.flatpickr-months .flatpickr-next-month svg path {\n  -webkit-transition: fill 0.1s;\n  transition: fill 0.1s;\n  fill: inherit;\n}\n.numInputWrapper {\n  position: relative;\n  height: auto;\n}\n.numInputWrapper input,\n.numInputWrapper span {\n  display: inline-block;\n}\n.numInputWrapper input {\n  width: 100%;\n}\n.numInputWrapper input::-ms-clear {\n  display: none;\n}\n.numInputWrapper span {\n  position: absolute;\n  right: 0;\n  width: 14px;\n  padding: 0 4px 0 2px;\n  height: 50%;\n  line-height: 50%;\n  opacity: 0;\n  cursor: pointer;\n  border: 1px solid rgba(72,72,72,0.15);\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.numInputWrapper span:hover {\n  background: rgba(0,0,0,0.1);\n}\n.numInputWrapper span:active {\n  background: rgba(0,0,0,0.2);\n}\n.numInputWrapper span:after {\n  display: block;\n  content: \"\";\n  position: absolute;\n}\n.numInputWrapper span.arrowUp {\n  top: 0;\n  border-bottom: 0;\n}\n.numInputWrapper span.arrowUp:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-bottom: 4px solid rgba(72,72,72,0.6);\n  top: 26%;\n}\n.numInputWrapper span.arrowDown {\n  top: 50%;\n}\n.numInputWrapper span.arrowDown:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-top: 4px solid rgba(72,72,72,0.6);\n  top: 40%;\n}\n.numInputWrapper span svg {\n  width: inherit;\n  height: auto;\n}\n.numInputWrapper span svg path {\n  fill: rgba(255,255,255,0.5);\n}\n.numInputWrapper:hover {\n  background: rgba(0,0,0,0.05);\n}\n.numInputWrapper:hover span {\n  opacity: 1;\n}\n.flatpickr-current-month {\n  font-size: 135%;\n  line-height: inherit;\n  font-weight: 300;\n  color: inherit;\n  position: absolute;\n  width: 75%;\n  left: 12.5%;\n  padding: 6.16px 0 0 0;\n  line-height: 1;\n  height: 28px;\n  display: inline-block;\n  text-align: center;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n}\n.flatpickr-current-month span.cur-month {\n  font-family: inherit;\n  font-weight: 700;\n  color: inherit;\n  display: inline-block;\n  margin-left: 0.5ch;\n  padding: 0;\n}\n.flatpickr-current-month span.cur-month:hover {\n  background: rgba(0,0,0,0.05);\n}\n.flatpickr-current-month .numInputWrapper {\n  width: 6ch;\n  width: 7ch\\0;\n  display: inline-block;\n}\n.flatpickr-current-month .numInputWrapper span.arrowUp:after {\n  border-bottom-color: #fff;\n}\n.flatpickr-current-month .numInputWrapper span.arrowDown:after {\n  border-top-color: #fff;\n}\n.flatpickr-current-month input.cur-year {\n  background: transparent;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: inherit;\n  cursor: text;\n  padding: 0 0 0 0.5ch;\n  margin: 0;\n  display: inline-block;\n  font-size: inherit;\n  font-family: inherit;\n  font-weight: 300;\n  line-height: inherit;\n  height: auto;\n  border: 0;\n  border-radius: 0;\n  vertical-align: initial;\n}\n.flatpickr-current-month input.cur-year:focus {\n  outline: 0;\n}\n.flatpickr-current-month input.cur-year[disabled],\n.flatpickr-current-month input.cur-year[disabled]:hover {\n  font-size: 100%;\n  color: rgba(255,255,255,0.5);\n  background: transparent;\n  pointer-events: none;\n}\n.flatpickr-weekdays {\n  background: #42a5f5;\n  text-align: center;\n  overflow: hidden;\n  width: 100%;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  height: 28px;\n}\n.flatpickr-weekdays .flatpickr-weekdaycontainer {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\nspan.flatpickr-weekday {\n  cursor: default;\n  font-size: 90%;\n  background: #42a5f5;\n  color: rgba(0,0,0,0.54);\n  line-height: 1;\n  margin: 0;\n  text-align: center;\n  display: block;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  font-weight: bolder;\n}\n.dayContainer,\n.flatpickr-weeks {\n  padding: 1px 0 0 0;\n}\n.flatpickr-days {\n  position: relative;\n  overflow: hidden;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: start;\n  -webkit-align-items: flex-start;\n      -ms-flex-align: start;\n          align-items: flex-start;\n  width: 307.875px;\n  border-left: 1px solid rgba(72,72,72,0.2);\n  border-right: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-days:focus {\n  outline: 0;\n}\n.dayContainer {\n  padding: 0;\n  outline: 0;\n  text-align: left;\n  width: 307.875px;\n  min-width: 307.875px;\n  max-width: 307.875px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  display: inline-block;\n  display: -ms-flexbox;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: flex;\n  -webkit-flex-wrap: wrap;\n          flex-wrap: wrap;\n  -ms-flex-wrap: wrap;\n  -ms-flex-pack: justify;\n  -webkit-justify-content: space-around;\n          justify-content: space-around;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n  opacity: 1;\n}\n.dayContainer + .dayContainer {\n  -webkit-box-shadow: -1px 0 0 rgba(72,72,72,0.2);\n          box-shadow: -1px 0 0 rgba(72,72,72,0.2);\n}\n.flatpickr-day {\n  background: none;\n  border: 1px solid transparent;\n  border-radius: 150px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: #484848;\n  cursor: pointer;\n  font-weight: 400;\n  width: 14.2857143%;\n  -webkit-flex-basis: 14.2857143%;\n      -ms-flex-preferred-size: 14.2857143%;\n          flex-basis: 14.2857143%;\n  max-width: 39px;\n  height: 39px;\n  line-height: 39px;\n  margin: 0;\n  display: inline-block;\n  position: relative;\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  text-align: center;\n}\n.flatpickr-day.inRange,\n.flatpickr-day.prevMonthDay.inRange,\n.flatpickr-day.nextMonthDay.inRange,\n.flatpickr-day.today.inRange,\n.flatpickr-day.prevMonthDay.today.inRange,\n.flatpickr-day.nextMonthDay.today.inRange,\n.flatpickr-day:hover,\n.flatpickr-day.prevMonthDay:hover,\n.flatpickr-day.nextMonthDay:hover,\n.flatpickr-day:focus,\n.flatpickr-day.prevMonthDay:focus,\n.flatpickr-day.nextMonthDay:focus {\n  cursor: pointer;\n  outline: 0;\n  background: #e2e2e2;\n  border-color: #e2e2e2;\n}\n.flatpickr-day.today {\n  border-color: #bbb;\n}\n.flatpickr-day.today:hover,\n.flatpickr-day.today:focus {\n  border-color: #bbb;\n  background: #bbb;\n  color: #fff;\n}\n.flatpickr-day.selected,\n.flatpickr-day.startRange,\n.flatpickr-day.endRange,\n.flatpickr-day.selected.inRange,\n.flatpickr-day.startRange.inRange,\n.flatpickr-day.endRange.inRange,\n.flatpickr-day.selected:focus,\n.flatpickr-day.startRange:focus,\n.flatpickr-day.endRange:focus,\n.flatpickr-day.selected:hover,\n.flatpickr-day.startRange:hover,\n.flatpickr-day.endRange:hover,\n.flatpickr-day.selected.prevMonthDay,\n.flatpickr-day.startRange.prevMonthDay,\n.flatpickr-day.endRange.prevMonthDay,\n.flatpickr-day.selected.nextMonthDay,\n.flatpickr-day.startRange.nextMonthDay,\n.flatpickr-day.endRange.nextMonthDay {\n  background: #42a5f5;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  color: #fff;\n  border-color: #42a5f5;\n}\n.flatpickr-day.selected.startRange,\n.flatpickr-day.startRange.startRange,\n.flatpickr-day.endRange.startRange {\n  border-radius: 50px 0 0 50px;\n}\n.flatpickr-day.selected.endRange,\n.flatpickr-day.startRange.endRange,\n.flatpickr-day.endRange.endRange {\n  border-radius: 0 50px 50px 0;\n}\n.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)),\n.flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)),\n.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)) {\n  -webkit-box-shadow: -10px 0 0 #42a5f5;\n          box-shadow: -10px 0 0 #42a5f5;\n}\n.flatpickr-day.selected.startRange.endRange,\n.flatpickr-day.startRange.startRange.endRange,\n.flatpickr-day.endRange.startRange.endRange {\n  border-radius: 50px;\n}\n.flatpickr-day.inRange {\n  border-radius: 0;\n  -webkit-box-shadow: -5px 0 0 #e2e2e2, 5px 0 0 #e2e2e2;\n          box-shadow: -5px 0 0 #e2e2e2, 5px 0 0 #e2e2e2;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover,\n.flatpickr-day.prevMonthDay,\n.flatpickr-day.nextMonthDay,\n.flatpickr-day.notAllowed,\n.flatpickr-day.notAllowed.prevMonthDay,\n.flatpickr-day.notAllowed.nextMonthDay {\n  color: rgba(72,72,72,0.3);\n  background: transparent;\n  border-color: transparent;\n  cursor: default;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover {\n  cursor: not-allowed;\n  color: rgba(72,72,72,0.1);\n}\n.flatpickr-day.week.selected {\n  border-radius: 0;\n  -webkit-box-shadow: -5px 0 0 #42a5f5, 5px 0 0 #42a5f5;\n          box-shadow: -5px 0 0 #42a5f5, 5px 0 0 #42a5f5;\n}\n.flatpickr-day.hidden {\n  visibility: hidden;\n}\n.rangeMode .flatpickr-day {\n  margin-top: 1px;\n}\n.flatpickr-weekwrapper {\n  display: inline-block;\n  float: left;\n}\n.flatpickr-weekwrapper .flatpickr-weeks {\n  padding: 0 12px;\n  border-left: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-weekwrapper .flatpickr-weekday {\n  float: none;\n  width: 100%;\n  line-height: 28px;\n}\n.flatpickr-weekwrapper span.flatpickr-day,\n.flatpickr-weekwrapper span.flatpickr-day:hover {\n  display: block;\n  width: 100%;\n  max-width: none;\n  color: rgba(72,72,72,0.3);\n  background: transparent;\n  cursor: default;\n  border: none;\n}\n.flatpickr-innerContainer {\n  display: block;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  overflow: hidden;\n  background: #fff;\n  border-bottom: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-rContainer {\n  display: inline-block;\n  padding: 0;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.flatpickr-time {\n  text-align: center;\n  outline: 0;\n  display: block;\n  height: 0;\n  line-height: 40px;\n  max-height: 40px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  overflow: hidden;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  background: #fff;\n  border-radius: 0 0 5px 5px;\n}\n.flatpickr-time:after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n.flatpickr-time .numInputWrapper {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  width: 40%;\n  height: 40px;\n  float: left;\n}\n.flatpickr-time .numInputWrapper span.arrowUp:after {\n  border-bottom-color: #484848;\n}\n.flatpickr-time .numInputWrapper span.arrowDown:after {\n  border-top-color: #484848;\n}\n.flatpickr-time.hasSeconds .numInputWrapper {\n  width: 26%;\n}\n.flatpickr-time.time24hr .numInputWrapper {\n  width: 49%;\n}\n.flatpickr-time input {\n  background: transparent;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  border: 0;\n  border-radius: 0;\n  text-align: center;\n  margin: 0;\n  padding: 0;\n  height: inherit;\n  line-height: inherit;\n  color: #484848;\n  font-size: 14px;\n  position: relative;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.flatpickr-time input.flatpickr-hour {\n  font-weight: bold;\n}\n.flatpickr-time input.flatpickr-minute,\n.flatpickr-time input.flatpickr-second {\n  font-weight: 400;\n}\n.flatpickr-time input:focus {\n  outline: 0;\n  border: 0;\n}\n.flatpickr-time .flatpickr-time-separator,\n.flatpickr-time .flatpickr-am-pm {\n  height: inherit;\n  display: inline-block;\n  float: left;\n  line-height: inherit;\n  color: #484848;\n  font-weight: bold;\n  width: 2%;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  -webkit-align-self: center;\n      -ms-flex-item-align: center;\n          align-self: center;\n}\n.flatpickr-time .flatpickr-am-pm {\n  outline: 0;\n  width: 18%;\n  cursor: pointer;\n  text-align: center;\n  font-weight: 400;\n}\n.flatpickr-time input:hover,\n.flatpickr-time .flatpickr-am-pm:hover,\n.flatpickr-time input:focus,\n.flatpickr-time .flatpickr-am-pm:focus {\n  background: #efefef;\n}\n.flatpickr-input[readonly] {\n  cursor: pointer;\n}\n@-webkit-keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n"; });
 /**
  * Super simple wysiwyg editor v0.8.10
  * https://summernote.org
@@ -48441,2185 +49401,6 @@ $$1.summernote = $$1.extend($$1.summernote, {
 ;define('summernote', ['summernote/summernote'], function (main) { return main; });
 
 define('text!summernote/summernote.css', ['module'], function(module) { module.exports = "@font-face{font-family:\"summernote\";font-style:normal;font-weight:normal;src:url(\"./font/summernote.eot?dbafe969167589eda84514394d126413\");src:url(\"./font/summernote.eot?#iefix\") format(\"embedded-opentype\"),url(\"./font/summernote.woff?dbafe969167589eda84514394d126413\") format(\"woff\"),url(\"./font/summernote.ttf?dbafe969167589eda84514394d126413\") format(\"truetype\")}[class^=\"note-icon-\"]:before,[class*=\" note-icon-\"]:before{display:inline-block;font:normal normal normal 14px summernote;font-size:inherit;-webkit-font-smoothing:antialiased;text-decoration:inherit;text-rendering:auto;text-transform:none;vertical-align:middle;speak:none;-moz-osx-font-smoothing:grayscale}.note-icon-align-center:before,.note-icon-align-indent:before,.note-icon-align-justify:before,.note-icon-align-left:before,.note-icon-align-outdent:before,.note-icon-align-right:before,.note-icon-align:before,.note-icon-arrow-circle-down:before,.note-icon-arrow-circle-left:before,.note-icon-arrow-circle-right:before,.note-icon-arrow-circle-up:before,.note-icon-arrows-alt:before,.note-icon-arrows-h:before,.note-icon-arrows-v:before,.note-icon-bold:before,.note-icon-caret:before,.note-icon-chain-broken:before,.note-icon-circle:before,.note-icon-close:before,.note-icon-code:before,.note-icon-col-after:before,.note-icon-col-before:before,.note-icon-col-remove:before,.note-icon-eraser:before,.note-icon-font:before,.note-icon-frame:before,.note-icon-italic:before,.note-icon-link:before,.note-icon-magic:before,.note-icon-menu-check:before,.note-icon-minus:before,.note-icon-orderedlist:before,.note-icon-pencil:before,.note-icon-picture:before,.note-icon-question:before,.note-icon-redo:before,.note-icon-row-above:before,.note-icon-row-below:before,.note-icon-row-remove:before,.note-icon-special-character:before,.note-icon-square:before,.note-icon-strikethrough:before,.note-icon-subscript:before,.note-icon-summernote:before,.note-icon-superscript:before,.note-icon-table:before,.note-icon-text-height:before,.note-icon-trash:before,.note-icon-underline:before,.note-icon-undo:before,.note-icon-unorderedlist:before,.note-icon-video:before{display:inline-block;font-family:\"summernote\";font-style:normal;font-weight:normal;text-decoration:inherit}.note-icon-align-center:before{content:\"\\f101\"}.note-icon-align-indent:before{content:\"\\f102\"}.note-icon-align-justify:before{content:\"\\f103\"}.note-icon-align-left:before{content:\"\\f104\"}.note-icon-align-outdent:before{content:\"\\f105\"}.note-icon-align-right:before{content:\"\\f106\"}.note-icon-align:before{content:\"\\f107\"}.note-icon-arrow-circle-down:before{content:\"\\f108\"}.note-icon-arrow-circle-left:before{content:\"\\f109\"}.note-icon-arrow-circle-right:before{content:\"\\f10a\"}.note-icon-arrow-circle-up:before{content:\"\\f10b\"}.note-icon-arrows-alt:before{content:\"\\f10c\"}.note-icon-arrows-h:before{content:\"\\f10d\"}.note-icon-arrows-v:before{content:\"\\f10e\"}.note-icon-bold:before{content:\"\\f10f\"}.note-icon-caret:before{content:\"\\f110\"}.note-icon-chain-broken:before{content:\"\\f111\"}.note-icon-circle:before{content:\"\\f112\"}.note-icon-close:before{content:\"\\f113\"}.note-icon-code:before{content:\"\\f114\"}.note-icon-col-after:before{content:\"\\f115\"}.note-icon-col-before:before{content:\"\\f116\"}.note-icon-col-remove:before{content:\"\\f117\"}.note-icon-eraser:before{content:\"\\f118\"}.note-icon-font:before{content:\"\\f119\"}.note-icon-frame:before{content:\"\\f11a\"}.note-icon-italic:before{content:\"\\f11b\"}.note-icon-link:before{content:\"\\f11c\"}.note-icon-magic:before{content:\"\\f11d\"}.note-icon-menu-check:before{content:\"\\f11e\"}.note-icon-minus:before{content:\"\\f11f\"}.note-icon-orderedlist:before{content:\"\\f120\"}.note-icon-pencil:before{content:\"\\f121\"}.note-icon-picture:before{content:\"\\f122\"}.note-icon-question:before{content:\"\\f123\"}.note-icon-redo:before{content:\"\\f124\"}.note-icon-row-above:before{content:\"\\f125\"}.note-icon-row-below:before{content:\"\\f126\"}.note-icon-row-remove:before{content:\"\\f127\"}.note-icon-special-character:before{content:\"\\f128\"}.note-icon-square:before{content:\"\\f129\"}.note-icon-strikethrough:before{content:\"\\f12a\"}.note-icon-subscript:before{content:\"\\f12b\"}.note-icon-summernote:before{content:\"\\f12c\"}.note-icon-superscript:before{content:\"\\f12d\"}.note-icon-table:before{content:\"\\f12e\"}.note-icon-text-height:before{content:\"\\f12f\"}.note-icon-trash:before{content:\"\\f130\"}.note-icon-underline:before{content:\"\\f131\"}.note-icon-undo:before{content:\"\\f132\"}.note-icon-unorderedlist:before{content:\"\\f133\"}.note-icon-video:before{content:\"\\f134\"}.note-editor{position:relative}.note-editor .note-dropzone{position:absolute;z-index:100;display:none;color:#87cefa;background-color:#fff;opacity:.95}.note-editor .note-dropzone .note-dropzone-message{display:table-cell;font-size:28px;font-weight:700;text-align:center;vertical-align:middle}.note-editor .note-dropzone.hover{color:#098ddf}.note-editor.dragover .note-dropzone{display:table}.note-editor .note-editing-area{position:relative}.note-editor .note-editing-area .note-editable{outline:0}.note-editor .note-editing-area .note-editable sup{vertical-align:super}.note-editor .note-editing-area .note-editable sub{vertical-align:sub}.note-editor .note-editing-area img.note-float-left{margin-right:10px}.note-editor .note-editing-area img.note-float-right{margin-left:10px}.note-editor.note-frame{border:1px solid #a9a9a9}.note-editor.note-frame.codeview .note-editing-area .note-editable{display:none}.note-editor.note-frame.codeview .note-editing-area .note-codable{display:block}.note-editor.note-frame .note-editing-area{overflow:hidden}.note-editor.note-frame .note-editing-area .note-editable{padding:10px;overflow:auto;color:#000;word-wrap:break-word;background-color:#fff}.note-editor.note-frame .note-editing-area .note-editable[contenteditable=\"false\"]{background-color:#e5e5e5}.note-editor.note-frame .note-editing-area .note-codable{display:none;width:100%;padding:10px;margin-bottom:0;font-family:Menlo,Monaco,monospace,sans-serif;font-size:14px;color:#ccc;background-color:#222;border:0;-webkit-border-radius:0;-moz-border-radius:0;border-radius:0;box-shadow:none;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;resize:none}.note-editor.note-frame.fullscreen{position:fixed;top:0;left:0;z-index:1050;width:100%!important}.note-editor.note-frame.fullscreen .note-editable{background-color:#fff}.note-editor.note-frame.fullscreen .note-resizebar{display:none}.note-editor.note-frame .note-status-output{display:block;width:100%;height:20px;margin-bottom:0;font-size:14px;line-height:1.42857143;color:#000;border:0;border-top:1px solid #e2e2e2}.note-editor.note-frame .note-status-output:empty{height:0;border-top:0 solid transparent}.note-editor.note-frame .note-status-output .pull-right{float:right!important}.note-editor.note-frame .note-status-output .text-muted{color:#777}.note-editor.note-frame .note-status-output .text-primary{color:#286090}.note-editor.note-frame .note-status-output .text-success{color:#3c763d}.note-editor.note-frame .note-status-output .text-info{color:#31708f}.note-editor.note-frame .note-status-output .text-warning{color:#8a6d3b}.note-editor.note-frame .note-status-output .text-danger{color:#a94442}.note-editor.note-frame .note-status-output .alert{padding:7px 10px 2px 10px;margin:-7px 0 0 0;color:#000;background-color:#f5f5f5;border-radius:0}.note-editor.note-frame .note-status-output .alert .note-icon{margin-right:5px}.note-editor.note-frame .note-status-output .alert-success{color:#3c763d!important;background-color:#dff0d8!important}.note-editor.note-frame .note-status-output .alert-info{color:#31708f!important;background-color:#d9edf7!important}.note-editor.note-frame .note-status-output .alert-warning{color:#8a6d3b!important;background-color:#fcf8e3!important}.note-editor.note-frame .note-status-output .alert-danger{color:#a94442!important;background-color:#f2dede!important}.note-editor.note-frame .note-statusbar{background-color:#f5f5f5;border-top:1px solid #ddd;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.note-editor.note-frame .note-statusbar .note-resizebar{width:100%;height:9px;padding-top:1px;cursor:ns-resize}.note-editor.note-frame .note-statusbar .note-resizebar .note-icon-bar{width:20px;margin:1px auto;border-top:1px solid #a9a9a9}.note-editor.note-frame .note-statusbar.locked .note-resizebar{cursor:default}.note-editor.note-frame .note-statusbar.locked .note-resizebar .note-icon-bar{display:none}.note-editor.note-frame .note-placeholder{padding:10px}.note-popover.popover{max-width:none}.note-popover.popover .popover-content a{display:inline-block;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}.note-popover.popover .arrow{left:20px!important}.note-toolbar{position:relative;z-index:500}.note-popover .popover-content,.panel-heading.note-toolbar{padding:0 0 5px 5px;margin:0}.note-popover .popover-content>.btn-group,.panel-heading.note-toolbar>.btn-group{margin-top:5px;margin-right:5px;margin-left:0}.note-popover .popover-content .btn-group .note-table,.panel-heading.note-toolbar .btn-group .note-table{min-width:0;padding:5px}.note-popover .popover-content .btn-group .note-table .note-dimension-picker,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker{font-size:18px}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-mousecatcher,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-mousecatcher{position:absolute!important;z-index:3;width:10em;height:10em;cursor:pointer}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-unhighlighted,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-unhighlighted{position:relative!important;z-index:1;width:5em;height:5em;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIj4+Pjp6ekKlAqjAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKhmnaJzPAAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat}.note-popover .popover-content .btn-group .note-table .note-dimension-picker .note-dimension-picker-highlighted,.panel-heading.note-toolbar .btn-group .note-table .note-dimension-picker .note-dimension-picker-highlighted{position:absolute!important;z-index:2;width:1em;height:1em;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIjd6vvD2f9LKLW+AAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKwNDEVT0AAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat}.note-popover .popover-content .note-style .dropdown-style blockquote,.panel-heading.note-toolbar .note-style .dropdown-style blockquote,.note-popover .popover-content .note-style .dropdown-style pre,.panel-heading.note-toolbar .note-style .dropdown-style pre{padding:5px 10px;margin:0}.note-popover .popover-content .note-style .dropdown-style h1,.panel-heading.note-toolbar .note-style .dropdown-style h1,.note-popover .popover-content .note-style .dropdown-style h2,.panel-heading.note-toolbar .note-style .dropdown-style h2,.note-popover .popover-content .note-style .dropdown-style h3,.panel-heading.note-toolbar .note-style .dropdown-style h3,.note-popover .popover-content .note-style .dropdown-style h4,.panel-heading.note-toolbar .note-style .dropdown-style h4,.note-popover .popover-content .note-style .dropdown-style h5,.panel-heading.note-toolbar .note-style .dropdown-style h5,.note-popover .popover-content .note-style .dropdown-style h6,.panel-heading.note-toolbar .note-style .dropdown-style h6,.note-popover .popover-content .note-style .dropdown-style p,.panel-heading.note-toolbar .note-style .dropdown-style p{padding:0;margin:0}.note-popover .popover-content .note-color .dropdown-toggle,.panel-heading.note-toolbar .note-color .dropdown-toggle{width:20px;padding-left:5px}.note-popover .popover-content .note-color .dropdown-menu,.panel-heading.note-toolbar .note-color .dropdown-menu{min-width:337px}.note-popover .popover-content .note-color .dropdown-menu .note-palette,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette{display:inline-block;width:160px;margin:0}.note-popover .popover-content .note-color .dropdown-menu .note-palette:first-child,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette:first-child{margin:0 5px}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-palette-title,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-palette-title{margin:2px 7px;font-size:12px;text-align:center;border-bottom:1px solid #eee}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset{width:100%;padding:0 3px;margin:3px;font-size:11px;cursor:pointer;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-row,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-row{height:20px}.note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-reset:hover,.panel-heading.note-toolbar .note-color .dropdown-menu .note-palette .note-color-reset:hover{background:#eee}.note-popover .popover-content .note-para .dropdown-menu,.panel-heading.note-toolbar .note-para .dropdown-menu{min-width:216px;padding:5px}.note-popover .popover-content .note-para .dropdown-menu>div:first-child,.panel-heading.note-toolbar .note-para .dropdown-menu>div:first-child{margin-right:5px}.note-popover .popover-content .dropdown-menu,.panel-heading.note-toolbar .dropdown-menu{min-width:90px}.note-popover .popover-content .dropdown-menu.right,.panel-heading.note-toolbar .dropdown-menu.right{right:0;left:auto}.note-popover .popover-content .dropdown-menu.right::before,.panel-heading.note-toolbar .dropdown-menu.right::before{right:9px;left:auto!important}.note-popover .popover-content .dropdown-menu.right::after,.panel-heading.note-toolbar .dropdown-menu.right::after{right:10px;left:auto!important}.note-popover .popover-content .dropdown-menu.note-check li a i,.panel-heading.note-toolbar .dropdown-menu.note-check li a i{color:deepskyblue;visibility:hidden}.note-popover .popover-content .dropdown-menu.note-check li a.checked i,.panel-heading.note-toolbar .dropdown-menu.note-check li a.checked i{visibility:visible}.note-popover .popover-content .note-fontsize-10,.panel-heading.note-toolbar .note-fontsize-10{font-size:10px}.note-popover .popover-content .note-color-palette,.panel-heading.note-toolbar .note-color-palette{line-height:1}.note-popover .popover-content .note-color-palette div .note-color-btn,.panel-heading.note-toolbar .note-color-palette div .note-color-btn{width:20px;height:20px;padding:0;margin:0;border:1px solid #fff}.note-popover .popover-content .note-color-palette div .note-color-btn:hover,.panel-heading.note-toolbar .note-color-palette div .note-color-btn:hover{border:1px solid #000}.note-dialog>div{display:none}.note-dialog .form-group{margin-right:0;margin-left:0}.note-dialog .note-modal-form{margin:0}.note-dialog .note-image-dialog .note-dropzone{min-height:100px;margin-bottom:10px;font-size:30px;line-height:4;color:lightgray;text-align:center;border:4px dashed lightgray}@-moz-document url-prefix(){.note-image-input{height:auto}}.note-placeholder{position:absolute;display:none;color:gray}.note-handle .note-control-selection{position:absolute;display:none;border:1px solid #000}.note-handle .note-control-selection>div{position:absolute}.note-handle .note-control-selection .note-control-selection-bg{width:100%;height:100%;background-color:#000;-webkit-opacity:.3;-khtml-opacity:.3;-moz-opacity:.3;opacity:.3;-ms-filter:alpha(opacity=30);filter:alpha(opacity=30)}.note-handle .note-control-selection .note-control-handle{width:7px;height:7px;border:1px solid #000}.note-handle .note-control-selection .note-control-holder{width:7px;height:7px;border:1px solid #000}.note-handle .note-control-selection .note-control-sizing{width:7px;height:7px;background-color:#fff;border:1px solid #000}.note-handle .note-control-selection .note-control-nw{top:-5px;left:-5px;border-right:0;border-bottom:0}.note-handle .note-control-selection .note-control-ne{top:-5px;right:-5px;border-bottom:0;border-left:none}.note-handle .note-control-selection .note-control-sw{bottom:-5px;left:-5px;border-top:0;border-right:0}.note-handle .note-control-selection .note-control-se{right:-5px;bottom:-5px;cursor:se-resize}.note-handle .note-control-selection .note-control-se.note-control-holder{cursor:default;border-top:0;border-left:none}.note-handle .note-control-selection .note-control-selection-info{right:0;bottom:0;padding:5px;margin:5px;font-size:12px;color:#fff;background-color:#000;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;-webkit-opacity:.7;-khtml-opacity:.7;-moz-opacity:.7;opacity:.7;-ms-filter:alpha(opacity=70);filter:alpha(opacity=70)}.note-hint-popover{min-width:100px;padding:2px}.note-hint-popover .popover-content{max-height:150px;padding:3px;overflow:auto}.note-hint-popover .popover-content .note-hint-group .note-hint-item{display:block!important;padding:3px}.note-hint-popover .popover-content .note-hint-group .note-hint-item.active,.note-hint-popover .popover-content .note-hint-group .note-hint-item:hover{display:block;clear:both;font-weight:400;line-height:1.4;color:#fff;text-decoration:none;white-space:nowrap;cursor:pointer;background-color:#428bca;outline:0}"; });
-/* flatpickr v4.5.2, @license MIT */
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define('flatpickr/flatpickr',factory) :
-    (global.flatpickr = factory());
-}(this, (function () { 'use strict';
-
-    var pad = function pad(number) {
-      return ("0" + number).slice(-2);
-    };
-    var int = function int(bool) {
-      return bool === true ? 1 : 0;
-    };
-    function debounce(func, wait, immediate) {
-      if (immediate === void 0) {
-        immediate = false;
-      }
-
-      var timeout;
-      return function () {
-        var context = this,
-            args = arguments;
-        timeout !== null && clearTimeout(timeout);
-        timeout = window.setTimeout(function () {
-          timeout = null;
-          if (!immediate) func.apply(context, args);
-        }, wait);
-        if (immediate && !timeout) func.apply(context, args);
-      };
-    }
-    var arrayify = function arrayify(obj) {
-      return obj instanceof Array ? obj : [obj];
-    };
-
-    var do_nothing = function do_nothing() {
-      return undefined;
-    };
-
-    var monthToStr = function monthToStr(monthNumber, shorthand, locale) {
-      return locale.months[shorthand ? "shorthand" : "longhand"][monthNumber];
-    };
-    var revFormat = {
-      D: do_nothing,
-      F: function F(dateObj, monthName, locale) {
-        dateObj.setMonth(locale.months.longhand.indexOf(monthName));
-      },
-      G: function G(dateObj, hour) {
-        dateObj.setHours(parseFloat(hour));
-      },
-      H: function H(dateObj, hour) {
-        dateObj.setHours(parseFloat(hour));
-      },
-      J: function J(dateObj, day) {
-        dateObj.setDate(parseFloat(day));
-      },
-      K: function K(dateObj, amPM, locale) {
-        dateObj.setHours(dateObj.getHours() % 12 + 12 * int(new RegExp(locale.amPM[1], "i").test(amPM)));
-      },
-      M: function M(dateObj, shortMonth, locale) {
-        dateObj.setMonth(locale.months.shorthand.indexOf(shortMonth));
-      },
-      S: function S(dateObj, seconds) {
-        dateObj.setSeconds(parseFloat(seconds));
-      },
-      U: function U(_, unixSeconds) {
-        return new Date(parseFloat(unixSeconds) * 1000);
-      },
-      W: function W(dateObj, weekNum) {
-        var weekNumber = parseInt(weekNum);
-        return new Date(dateObj.getFullYear(), 0, 2 + (weekNumber - 1) * 7, 0, 0, 0, 0);
-      },
-      Y: function Y(dateObj, year) {
-        dateObj.setFullYear(parseFloat(year));
-      },
-      Z: function Z(_, ISODate) {
-        return new Date(ISODate);
-      },
-      d: function d(dateObj, day) {
-        dateObj.setDate(parseFloat(day));
-      },
-      h: function h(dateObj, hour) {
-        dateObj.setHours(parseFloat(hour));
-      },
-      i: function i(dateObj, minutes) {
-        dateObj.setMinutes(parseFloat(minutes));
-      },
-      j: function j(dateObj, day) {
-        dateObj.setDate(parseFloat(day));
-      },
-      l: do_nothing,
-      m: function m(dateObj, month) {
-        dateObj.setMonth(parseFloat(month) - 1);
-      },
-      n: function n(dateObj, month) {
-        dateObj.setMonth(parseFloat(month) - 1);
-      },
-      s: function s(dateObj, seconds) {
-        dateObj.setSeconds(parseFloat(seconds));
-      },
-      w: do_nothing,
-      y: function y(dateObj, year) {
-        dateObj.setFullYear(2000 + parseFloat(year));
-      }
-    };
-    var tokenRegex = {
-      D: "(\\w+)",
-      F: "(\\w+)",
-      G: "(\\d\\d|\\d)",
-      H: "(\\d\\d|\\d)",
-      J: "(\\d\\d|\\d)\\w+",
-      K: "",
-      M: "(\\w+)",
-      S: "(\\d\\d|\\d)",
-      U: "(.+)",
-      W: "(\\d\\d|\\d)",
-      Y: "(\\d{4})",
-      Z: "(.+)",
-      d: "(\\d\\d|\\d)",
-      h: "(\\d\\d|\\d)",
-      i: "(\\d\\d|\\d)",
-      j: "(\\d\\d|\\d)",
-      l: "(\\w+)",
-      m: "(\\d\\d|\\d)",
-      n: "(\\d\\d|\\d)",
-      s: "(\\d\\d|\\d)",
-      w: "(\\d\\d|\\d)",
-      y: "(\\d{2})"
-    };
-    var formats = {
-      Z: function Z(date) {
-        return date.toISOString();
-      },
-      D: function D(date, locale, options) {
-        return locale.weekdays.shorthand[formats.w(date, locale, options)];
-      },
-      F: function F(date, locale, options) {
-        return monthToStr(formats.n(date, locale, options) - 1, false, locale);
-      },
-      G: function G(date, locale, options) {
-        return pad(formats.h(date, locale, options));
-      },
-      H: function H(date) {
-        return pad(date.getHours());
-      },
-      J: function J(date, locale) {
-        return locale.ordinal !== undefined ? date.getDate() + locale.ordinal(date.getDate()) : date.getDate();
-      },
-      K: function K(date, locale) {
-        return locale.amPM[int(date.getHours() > 11)];
-      },
-      M: function M(date, locale) {
-        return monthToStr(date.getMonth(), true, locale);
-      },
-      S: function S(date) {
-        return pad(date.getSeconds());
-      },
-      U: function U(date) {
-        return date.getTime() / 1000;
-      },
-      W: function W(date, _, options) {
-        return options.getWeek(date);
-      },
-      Y: function Y(date) {
-        return date.getFullYear();
-      },
-      d: function d(date) {
-        return pad(date.getDate());
-      },
-      h: function h(date) {
-        return date.getHours() % 12 ? date.getHours() % 12 : 12;
-      },
-      i: function i(date) {
-        return pad(date.getMinutes());
-      },
-      j: function j(date) {
-        return date.getDate();
-      },
-      l: function l(date, locale) {
-        return locale.weekdays.longhand[date.getDay()];
-      },
-      m: function m(date) {
-        return pad(date.getMonth() + 1);
-      },
-      n: function n(date) {
-        return date.getMonth() + 1;
-      },
-      s: function s(date) {
-        return date.getSeconds();
-      },
-      w: function w(date) {
-        return date.getDay();
-      },
-      y: function y(date) {
-        return String(date.getFullYear()).substring(2);
-      }
-    };
-
-    var english = {
-      weekdays: {
-        shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-        longhand: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-      },
-      months: {
-        shorthand: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        longhand: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-      },
-      daysInMonth: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-      firstDayOfWeek: 0,
-      ordinal: function ordinal(nth) {
-        var s = nth % 100;
-        if (s > 3 && s < 21) return "th";
-
-        switch (s % 10) {
-          case 1:
-            return "st";
-
-          case 2:
-            return "nd";
-
-          case 3:
-            return "rd";
-
-          default:
-            return "th";
-        }
-      },
-      rangeSeparator: " to ",
-      weekAbbreviation: "Wk",
-      scrollTitle: "Scroll to increment",
-      toggleTitle: "Click to toggle",
-      amPM: ["AM", "PM"],
-      yearAriaLabel: "Year"
-    };
-
-    var createDateFormatter = function createDateFormatter(_ref) {
-      var _ref$config = _ref.config,
-          config = _ref$config === void 0 ? defaults : _ref$config,
-          _ref$l10n = _ref.l10n,
-          l10n = _ref$l10n === void 0 ? english : _ref$l10n;
-      return function (dateObj, frmt, overrideLocale) {
-        var locale = overrideLocale || l10n;
-
-        if (config.formatDate !== undefined) {
-          return config.formatDate(dateObj, frmt, locale);
-        }
-
-        return frmt.split("").map(function (c, i, arr) {
-          return formats[c] && arr[i - 1] !== "\\" ? formats[c](dateObj, locale, config) : c !== "\\" ? c : "";
-        }).join("");
-      };
-    };
-    var createDateParser = function createDateParser(_ref2) {
-      var _ref2$config = _ref2.config,
-          config = _ref2$config === void 0 ? defaults : _ref2$config,
-          _ref2$l10n = _ref2.l10n,
-          l10n = _ref2$l10n === void 0 ? english : _ref2$l10n;
-      return function (date, givenFormat, timeless, customLocale) {
-        if (date !== 0 && !date) return undefined;
-        var locale = customLocale || l10n;
-        var parsedDate;
-        var date_orig = date;
-        if (date instanceof Date) parsedDate = new Date(date.getTime());else if (typeof date !== "string" && date.toFixed !== undefined) parsedDate = new Date(date);else if (typeof date === "string") {
-          var format = givenFormat || (config || defaults).dateFormat;
-          var datestr = String(date).trim();
-
-          if (datestr === "today") {
-            parsedDate = new Date();
-            timeless = true;
-          } else if (/Z$/.test(datestr) || /GMT$/.test(datestr)) parsedDate = new Date(date);else if (config && config.parseDate) parsedDate = config.parseDate(date, format);else {
-            parsedDate = !config || !config.noCalendar ? new Date(new Date().getFullYear(), 0, 1, 0, 0, 0, 0) : new Date(new Date().setHours(0, 0, 0, 0));
-            var matched,
-                ops = [];
-
-            for (var i = 0, matchIndex = 0, regexStr = ""; i < format.length; i++) {
-              var token = format[i];
-              var isBackSlash = token === "\\";
-              var escaped = format[i - 1] === "\\" || isBackSlash;
-
-              if (tokenRegex[token] && !escaped) {
-                regexStr += tokenRegex[token];
-                var match = new RegExp(regexStr).exec(date);
-
-                if (match && (matched = true)) {
-                  ops[token !== "Y" ? "push" : "unshift"]({
-                    fn: revFormat[token],
-                    val: match[++matchIndex]
-                  });
-                }
-              } else if (!isBackSlash) regexStr += ".";
-
-              ops.forEach(function (_ref3) {
-                var fn = _ref3.fn,
-                    val = _ref3.val;
-                return parsedDate = fn(parsedDate, val, locale) || parsedDate;
-              });
-            }
-
-            parsedDate = matched ? parsedDate : undefined;
-          }
-        }
-
-        if (!(parsedDate instanceof Date && !isNaN(parsedDate.getTime()))) {
-          config.errorHandler(new Error("Invalid date provided: " + date_orig));
-          return undefined;
-        }
-
-        if (timeless === true) parsedDate.setHours(0, 0, 0, 0);
-        return parsedDate;
-      };
-    };
-    function compareDates(date1, date2, timeless) {
-      if (timeless === void 0) {
-        timeless = true;
-      }
-
-      if (timeless !== false) {
-        return new Date(date1.getTime()).setHours(0, 0, 0, 0) - new Date(date2.getTime()).setHours(0, 0, 0, 0);
-      }
-
-      return date1.getTime() - date2.getTime();
-    }
-    var getWeek = function getWeek(givenDate) {
-      var date = new Date(givenDate.getTime());
-      date.setHours(0, 0, 0, 0);
-      date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-      var week1 = new Date(date.getFullYear(), 0, 4);
-      return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
-    };
-    var isBetween = function isBetween(ts, ts1, ts2) {
-      return ts > Math.min(ts1, ts2) && ts < Math.max(ts1, ts2);
-    };
-    var duration = {
-      DAY: 86400000
-    };
-
-    var HOOKS = ["onChange", "onClose", "onDayCreate", "onDestroy", "onKeyDown", "onMonthChange", "onOpen", "onParseConfig", "onReady", "onValueUpdate", "onYearChange", "onPreCalendarPosition"];
-    var defaults = {
-      _disable: [],
-      _enable: [],
-      allowInput: false,
-      altFormat: "F j, Y",
-      altInput: false,
-      altInputClass: "form-control input",
-      animate: typeof window === "object" && window.navigator.userAgent.indexOf("MSIE") === -1,
-      ariaDateFormat: "F j, Y",
-      clickOpens: true,
-      closeOnSelect: true,
-      conjunction: ", ",
-      dateFormat: "Y-m-d",
-      defaultHour: 12,
-      defaultMinute: 0,
-      defaultSeconds: 0,
-      disable: [],
-      disableMobile: false,
-      enable: [],
-      enableSeconds: false,
-      enableTime: false,
-      errorHandler: function errorHandler(err) {
-        return typeof console !== "undefined" && console.warn(err);
-      },
-      getWeek: getWeek,
-      hourIncrement: 1,
-      ignoredFocusElements: [],
-      inline: false,
-      locale: "default",
-      minuteIncrement: 5,
-      mode: "single",
-      nextArrow: "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 17 17'><g></g><path d='M13.207 8.472l-7.854 7.854-0.707-0.707 7.146-7.146-7.146-7.148 0.707-0.707 7.854 7.854z' /></svg>",
-      noCalendar: false,
-      now: new Date(),
-      onChange: [],
-      onClose: [],
-      onDayCreate: [],
-      onDestroy: [],
-      onKeyDown: [],
-      onMonthChange: [],
-      onOpen: [],
-      onParseConfig: [],
-      onReady: [],
-      onValueUpdate: [],
-      onYearChange: [],
-      onPreCalendarPosition: [],
-      plugins: [],
-      position: "auto",
-      positionElement: undefined,
-      prevArrow: "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 17 17'><g></g><path d='M5.207 8.471l7.146 7.147-0.707 0.707-7.853-7.854 7.854-7.853 0.707 0.707-7.147 7.146z' /></svg>",
-      shorthandCurrentMonth: false,
-      showMonths: 1,
-      static: false,
-      time_24hr: false,
-      weekNumbers: false,
-      wrap: false
-    };
-
-    function toggleClass(elem, className, bool) {
-      if (bool === true) return elem.classList.add(className);
-      elem.classList.remove(className);
-    }
-    function createElement(tag, className, content) {
-      var e = window.document.createElement(tag);
-      className = className || "";
-      content = content || "";
-      e.className = className;
-      if (content !== undefined) e.textContent = content;
-      return e;
-    }
-    function clearNode(node) {
-      while (node.firstChild) {
-        node.removeChild(node.firstChild);
-      }
-    }
-    function findParent(node, condition) {
-      if (condition(node)) return node;else if (node.parentNode) return findParent(node.parentNode, condition);
-      return undefined;
-    }
-    function createNumberInput(inputClassName, opts) {
-      var wrapper = createElement("div", "numInputWrapper"),
-          numInput = createElement("input", "numInput " + inputClassName),
-          arrowUp = createElement("span", "arrowUp"),
-          arrowDown = createElement("span", "arrowDown");
-      numInput.type = "text";
-      numInput.pattern = "\\d*";
-      if (opts !== undefined) for (var key in opts) {
-        numInput.setAttribute(key, opts[key]);
-      }
-      wrapper.appendChild(numInput);
-      wrapper.appendChild(arrowUp);
-      wrapper.appendChild(arrowDown);
-      return wrapper;
-    }
-
-    if (typeof Object.assign !== "function") {
-      Object.assign = function (target) {
-        if (!target) {
-          throw TypeError("Cannot convert undefined or null to object");
-        }
-
-        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
-
-        var _loop = function _loop() {
-          var source = args[_i];
-
-          if (source) {
-            Object.keys(source).forEach(function (key) {
-              return target[key] = source[key];
-            });
-          }
-        };
-
-        for (var _i = 0; _i < args.length; _i++) {
-          _loop();
-        }
-
-        return target;
-      };
-    }
-
-    var DEBOUNCED_CHANGE_MS = 300;
-
-    function FlatpickrInstance(element, instanceConfig) {
-      var self = {
-        config: Object.assign({}, flatpickr.defaultConfig),
-        l10n: english
-      };
-      self.parseDate = createDateParser({
-        config: self.config,
-        l10n: self.l10n
-      });
-      self._handlers = [];
-      self._bind = bind;
-      self._setHoursFromDate = setHoursFromDate;
-      self._positionCalendar = positionCalendar;
-      self.changeMonth = changeMonth;
-      self.changeYear = changeYear;
-      self.clear = clear;
-      self.close = close;
-      self._createElement = createElement;
-      self.destroy = destroy;
-      self.isEnabled = isEnabled;
-      self.jumpToDate = jumpToDate;
-      self.open = open;
-      self.redraw = redraw;
-      self.set = set;
-      self.setDate = setDate;
-      self.toggle = toggle;
-
-      function setupHelperFunctions() {
-        self.utils = {
-          getDaysInMonth: function getDaysInMonth(month, yr) {
-            if (month === void 0) {
-              month = self.currentMonth;
-            }
-
-            if (yr === void 0) {
-              yr = self.currentYear;
-            }
-
-            if (month === 1 && (yr % 4 === 0 && yr % 100 !== 0 || yr % 400 === 0)) return 29;
-            return self.l10n.daysInMonth[month];
-          }
-        };
-      }
-
-      function init() {
-        self.element = self.input = element;
-        self.isOpen = false;
-        parseConfig();
-        setupLocale();
-        setupInputs();
-        setupDates();
-        setupHelperFunctions();
-        if (!self.isMobile) build();
-        bindEvents();
-
-        if (self.selectedDates.length || self.config.noCalendar) {
-          if (self.config.enableTime) {
-            setHoursFromDate(self.config.noCalendar ? self.latestSelectedDateObj || self.config.minDate : undefined);
-          }
-
-          updateValue(false);
-        }
-
-        setCalendarWidth();
-        self.showTimeInput = self.selectedDates.length > 0 || self.config.noCalendar;
-        var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-        if (!self.isMobile && isSafari) {
-          positionCalendar();
-        }
-
-        triggerEvent("onReady");
-      }
-
-      function bindToInstance(fn) {
-        return fn.bind(self);
-      }
-
-      function setCalendarWidth() {
-        var config = self.config;
-        if (config.weekNumbers === false && config.showMonths === 1) return;else if (config.noCalendar !== true) {
-          window.requestAnimationFrame(function () {
-            self.calendarContainer.style.visibility = "hidden";
-            self.calendarContainer.style.display = "block";
-
-            if (self.daysContainer !== undefined) {
-              var daysWidth = (self.days.offsetWidth + 1) * config.showMonths;
-              self.daysContainer.style.width = daysWidth + "px";
-              self.calendarContainer.style.width = daysWidth + (self.weekWrapper !== undefined ? self.weekWrapper.offsetWidth : 0) + "px";
-              self.calendarContainer.style.removeProperty("visibility");
-              self.calendarContainer.style.removeProperty("display");
-            }
-          });
-        }
-      }
-
-      function updateTime(e) {
-        if (self.selectedDates.length === 0) return;
-
-        if (e !== undefined && e.type !== "blur") {
-          timeWrapper(e);
-        }
-
-        var prevValue = self._input.value;
-        setHoursFromInputs();
-        updateValue();
-
-        if (self._input.value !== prevValue) {
-          self._debouncedChange();
-        }
-      }
-
-      function ampm2military(hour, amPM) {
-        return hour % 12 + 12 * int(amPM === self.l10n.amPM[1]);
-      }
-
-      function military2ampm(hour) {
-        switch (hour % 24) {
-          case 0:
-          case 12:
-            return 12;
-
-          default:
-            return hour % 12;
-        }
-      }
-
-      function setHoursFromInputs() {
-        if (self.hourElement === undefined || self.minuteElement === undefined) return;
-        var hours = (parseInt(self.hourElement.value.slice(-2), 10) || 0) % 24,
-            minutes = (parseInt(self.minuteElement.value, 10) || 0) % 60,
-            seconds = self.secondElement !== undefined ? (parseInt(self.secondElement.value, 10) || 0) % 60 : 0;
-
-        if (self.amPM !== undefined) {
-          hours = ampm2military(hours, self.amPM.textContent);
-        }
-
-        var limitMinHours = self.config.minTime !== undefined || self.config.minDate && self.minDateHasTime && self.latestSelectedDateObj && compareDates(self.latestSelectedDateObj, self.config.minDate, true) === 0;
-        var limitMaxHours = self.config.maxTime !== undefined || self.config.maxDate && self.maxDateHasTime && self.latestSelectedDateObj && compareDates(self.latestSelectedDateObj, self.config.maxDate, true) === 0;
-
-        if (limitMaxHours) {
-          var maxTime = self.config.maxTime !== undefined ? self.config.maxTime : self.config.maxDate;
-          hours = Math.min(hours, maxTime.getHours());
-          if (hours === maxTime.getHours()) minutes = Math.min(minutes, maxTime.getMinutes());
-          if (minutes === maxTime.getMinutes()) seconds = Math.min(seconds, maxTime.getSeconds());
-        }
-
-        if (limitMinHours) {
-          var minTime = self.config.minTime !== undefined ? self.config.minTime : self.config.minDate;
-          hours = Math.max(hours, minTime.getHours());
-          if (hours === minTime.getHours()) minutes = Math.max(minutes, minTime.getMinutes());
-          if (minutes === minTime.getMinutes()) seconds = Math.max(seconds, minTime.getSeconds());
-        }
-
-        setHours(hours, minutes, seconds);
-      }
-
-      function setHoursFromDate(dateObj) {
-        var date = dateObj || self.latestSelectedDateObj;
-        if (date) setHours(date.getHours(), date.getMinutes(), date.getSeconds());
-      }
-
-      function setDefaultHours() {
-        var hours = self.config.defaultHour;
-        var minutes = self.config.defaultMinute;
-        var seconds = self.config.defaultSeconds;
-
-        if (self.config.minDate !== undefined) {
-          var min_hr = self.config.minDate.getHours();
-          var min_minutes = self.config.minDate.getMinutes();
-          hours = Math.max(hours, min_hr);
-          if (hours === min_hr) minutes = Math.max(min_minutes, minutes);
-          if (hours === min_hr && minutes === min_minutes) seconds = self.config.minDate.getSeconds();
-        }
-
-        if (self.config.maxDate !== undefined) {
-          var max_hr = self.config.maxDate.getHours();
-          var max_minutes = self.config.maxDate.getMinutes();
-          hours = Math.min(hours, max_hr);
-          if (hours === max_hr) minutes = Math.min(max_minutes, minutes);
-          if (hours === max_hr && minutes === max_minutes) seconds = self.config.maxDate.getSeconds();
-        }
-
-        setHours(hours, minutes, seconds);
-      }
-
-      function setHours(hours, minutes, seconds) {
-        if (self.latestSelectedDateObj !== undefined) {
-          self.latestSelectedDateObj.setHours(hours % 24, minutes, seconds || 0, 0);
-        }
-
-        if (!self.hourElement || !self.minuteElement || self.isMobile) return;
-        self.hourElement.value = pad(!self.config.time_24hr ? (12 + hours) % 12 + 12 * int(hours % 12 === 0) : hours);
-        self.minuteElement.value = pad(minutes);
-        if (self.amPM !== undefined) self.amPM.textContent = self.l10n.amPM[int(hours >= 12)];
-        if (self.secondElement !== undefined) self.secondElement.value = pad(seconds);
-      }
-
-      function onYearInput(event) {
-        var year = parseInt(event.target.value) + (event.delta || 0);
-
-        if (year / 1000 > 1 || event.key === "Enter" && !/[^\d]/.test(year.toString())) {
-          changeYear(year);
-        }
-      }
-
-      function bind(element, event, handler, options) {
-        if (event instanceof Array) return event.forEach(function (ev) {
-          return bind(element, ev, handler, options);
-        });
-        if (element instanceof Array) return element.forEach(function (el) {
-          return bind(el, event, handler, options);
-        });
-        element.addEventListener(event, handler, options);
-
-        self._handlers.push({
-          element: element,
-          event: event,
-          handler: handler,
-          options: options
-        });
-      }
-
-      function onClick(handler) {
-        return function (evt) {
-          evt.which === 1 && handler(evt);
-        };
-      }
-
-      function triggerChange() {
-        triggerEvent("onChange");
-      }
-
-      function bindEvents() {
-        if (self.config.wrap) {
-          ["open", "close", "toggle", "clear"].forEach(function (evt) {
-            Array.prototype.forEach.call(self.element.querySelectorAll("[data-" + evt + "]"), function (el) {
-              return bind(el, "click", self[evt]);
-            });
-          });
-        }
-
-        if (self.isMobile) {
-          setupMobile();
-          return;
-        }
-
-        var debouncedResize = debounce(onResize, 50);
-        self._debouncedChange = debounce(triggerChange, DEBOUNCED_CHANGE_MS);
-        if (self.daysContainer && !/iPhone|iPad|iPod/i.test(navigator.userAgent)) bind(self.daysContainer, "mouseover", function (e) {
-          if (self.config.mode === "range") onMouseOver(e.target);
-        });
-        bind(window.document.body, "keydown", onKeyDown);
-        if (!self.config.static) bind(self._input, "keydown", onKeyDown);
-        if (!self.config.inline && !self.config.static) bind(window, "resize", debouncedResize);
-        if (window.ontouchstart !== undefined) bind(window.document, "click", documentClick);else bind(window.document, "mousedown", onClick(documentClick));
-        bind(window.document, "focus", documentClick, {
-          capture: true
-        });
-
-        if (self.config.clickOpens === true) {
-          bind(self._input, "focus", self.open);
-          bind(self._input, "mousedown", onClick(self.open));
-        }
-
-        if (self.daysContainer !== undefined) {
-          bind(self.monthNav, "mousedown", onClick(onMonthNavClick));
-          bind(self.monthNav, ["keyup", "increment"], onYearInput);
-          bind(self.daysContainer, "mousedown", onClick(selectDate));
-        }
-
-        if (self.timeContainer !== undefined && self.minuteElement !== undefined && self.hourElement !== undefined) {
-          var selText = function selText(e) {
-            return e.target.select();
-          };
-
-          bind(self.timeContainer, ["increment"], updateTime);
-          bind(self.timeContainer, "blur", updateTime, {
-            capture: true
-          });
-          bind(self.timeContainer, "mousedown", onClick(timeIncrement));
-          bind([self.hourElement, self.minuteElement], ["focus", "click"], selText);
-          if (self.secondElement !== undefined) bind(self.secondElement, "focus", function () {
-            return self.secondElement && self.secondElement.select();
-          });
-
-          if (self.amPM !== undefined) {
-            bind(self.amPM, "mousedown", onClick(function (e) {
-              updateTime(e);
-              triggerChange();
-            }));
-          }
-        }
-      }
-
-      function jumpToDate(jumpDate) {
-        var jumpTo = jumpDate !== undefined ? self.parseDate(jumpDate) : self.latestSelectedDateObj || (self.config.minDate && self.config.minDate > self.now ? self.config.minDate : self.config.maxDate && self.config.maxDate < self.now ? self.config.maxDate : self.now);
-
-        try {
-          if (jumpTo !== undefined) {
-            self.currentYear = jumpTo.getFullYear();
-            self.currentMonth = jumpTo.getMonth();
-          }
-        } catch (e) {
-          e.message = "Invalid date supplied: " + jumpTo;
-          self.config.errorHandler(e);
-        }
-
-        self.redraw();
-      }
-
-      function timeIncrement(e) {
-        if (~e.target.className.indexOf("arrow")) incrementNumInput(e, e.target.classList.contains("arrowUp") ? 1 : -1);
-      }
-
-      function incrementNumInput(e, delta, inputElem) {
-        var target = e && e.target;
-        var input = inputElem || target && target.parentNode && target.parentNode.firstChild;
-        var event = createEvent("increment");
-        event.delta = delta;
-        input && input.dispatchEvent(event);
-      }
-
-      function build() {
-        var fragment = window.document.createDocumentFragment();
-        self.calendarContainer = createElement("div", "flatpickr-calendar");
-        self.calendarContainer.tabIndex = -1;
-
-        if (!self.config.noCalendar) {
-          fragment.appendChild(buildMonthNav());
-          self.innerContainer = createElement("div", "flatpickr-innerContainer");
-
-          if (self.config.weekNumbers) {
-            var _buildWeeks = buildWeeks(),
-                weekWrapper = _buildWeeks.weekWrapper,
-                weekNumbers = _buildWeeks.weekNumbers;
-
-            self.innerContainer.appendChild(weekWrapper);
-            self.weekNumbers = weekNumbers;
-            self.weekWrapper = weekWrapper;
-          }
-
-          self.rContainer = createElement("div", "flatpickr-rContainer");
-          self.rContainer.appendChild(buildWeekdays());
-
-          if (!self.daysContainer) {
-            self.daysContainer = createElement("div", "flatpickr-days");
-            self.daysContainer.tabIndex = -1;
-          }
-
-          buildDays();
-          self.rContainer.appendChild(self.daysContainer);
-          self.innerContainer.appendChild(self.rContainer);
-          fragment.appendChild(self.innerContainer);
-        }
-
-        if (self.config.enableTime) {
-          fragment.appendChild(buildTime());
-        }
-
-        toggleClass(self.calendarContainer, "rangeMode", self.config.mode === "range");
-        toggleClass(self.calendarContainer, "animate", self.config.animate === true);
-        toggleClass(self.calendarContainer, "multiMonth", self.config.showMonths > 1);
-        self.calendarContainer.appendChild(fragment);
-        var customAppend = self.config.appendTo !== undefined && self.config.appendTo.nodeType !== undefined;
-
-        if (self.config.inline || self.config.static) {
-          self.calendarContainer.classList.add(self.config.inline ? "inline" : "static");
-
-          if (self.config.inline) {
-            if (!customAppend && self.element.parentNode) self.element.parentNode.insertBefore(self.calendarContainer, self._input.nextSibling);else if (self.config.appendTo !== undefined) self.config.appendTo.appendChild(self.calendarContainer);
-          }
-
-          if (self.config.static) {
-            var wrapper = createElement("div", "flatpickr-wrapper");
-            if (self.element.parentNode) self.element.parentNode.insertBefore(wrapper, self.element);
-            wrapper.appendChild(self.element);
-            if (self.altInput) wrapper.appendChild(self.altInput);
-            wrapper.appendChild(self.calendarContainer);
-          }
-        }
-
-        if (!self.config.static && !self.config.inline) (self.config.appendTo !== undefined ? self.config.appendTo : window.document.body).appendChild(self.calendarContainer);
-      }
-
-      function createDay(className, date, dayNumber, i) {
-        var dateIsEnabled = isEnabled(date, true),
-            dayElement = createElement("span", "flatpickr-day " + className, date.getDate().toString());
-        dayElement.dateObj = date;
-        dayElement.$i = i;
-        dayElement.setAttribute("aria-label", self.formatDate(date, self.config.ariaDateFormat));
-
-        if (className.indexOf("hidden") === -1 && compareDates(date, self.now) === 0) {
-          self.todayDateElem = dayElement;
-          dayElement.classList.add("today");
-          dayElement.setAttribute("aria-current", "date");
-        }
-
-        if (dateIsEnabled) {
-          dayElement.tabIndex = -1;
-
-          if (isDateSelected(date)) {
-            dayElement.classList.add("selected");
-            self.selectedDateElem = dayElement;
-
-            if (self.config.mode === "range") {
-              toggleClass(dayElement, "startRange", self.selectedDates[0] && compareDates(date, self.selectedDates[0], true) === 0);
-              toggleClass(dayElement, "endRange", self.selectedDates[1] && compareDates(date, self.selectedDates[1], true) === 0);
-              if (className === "nextMonthDay") dayElement.classList.add("inRange");
-            }
-          }
-        } else {
-          dayElement.classList.add("disabled");
-        }
-
-        if (self.config.mode === "range") {
-          if (isDateInRange(date) && !isDateSelected(date)) dayElement.classList.add("inRange");
-        }
-
-        if (self.weekNumbers && self.config.showMonths === 1 && className !== "prevMonthDay" && dayNumber % 7 === 1) {
-          self.weekNumbers.insertAdjacentHTML("beforeend", "<span class='flatpickr-day'>" + self.config.getWeek(date) + "</span>");
-        }
-
-        triggerEvent("onDayCreate", dayElement);
-        return dayElement;
-      }
-
-      function focusOnDayElem(targetNode) {
-        targetNode.focus();
-        if (self.config.mode === "range") onMouseOver(targetNode);
-      }
-
-      function getFirstAvailableDay(delta) {
-        var startMonth = delta > 0 ? 0 : self.config.showMonths - 1;
-        var endMonth = delta > 0 ? self.config.showMonths : -1;
-
-        for (var m = startMonth; m != endMonth; m += delta) {
-          var month = self.daysContainer.children[m];
-          var startIndex = delta > 0 ? 0 : month.children.length - 1;
-          var endIndex = delta > 0 ? month.children.length : -1;
-
-          for (var i = startIndex; i != endIndex; i += delta) {
-            var c = month.children[i];
-            if (c.className.indexOf("hidden") === -1 && isEnabled(c.dateObj)) return c;
-          }
-        }
-
-        return undefined;
-      }
-
-      function getNextAvailableDay(current, delta) {
-        var givenMonth = current.className.indexOf("Month") === -1 ? current.dateObj.getMonth() : self.currentMonth;
-        var endMonth = delta > 0 ? self.config.showMonths : -1;
-        var loopDelta = delta > 0 ? 1 : -1;
-
-        for (var m = givenMonth - self.currentMonth; m != endMonth; m += loopDelta) {
-          var month = self.daysContainer.children[m];
-          var startIndex = givenMonth - self.currentMonth === m ? current.$i + delta : delta < 0 ? month.children.length - 1 : 0;
-          var numMonthDays = month.children.length;
-
-          for (var i = startIndex; i >= 0 && i < numMonthDays && i != (delta > 0 ? numMonthDays : -1); i += loopDelta) {
-            var c = month.children[i];
-            if (c.className.indexOf("hidden") === -1 && isEnabled(c.dateObj) && Math.abs(current.$i - i) >= Math.abs(delta)) return focusOnDayElem(c);
-          }
-        }
-
-        self.changeMonth(loopDelta);
-        focusOnDay(getFirstAvailableDay(loopDelta), 0);
-        return undefined;
-      }
-
-      function focusOnDay(current, offset) {
-        var dayFocused = isInView(document.activeElement || document.body);
-        var startElem = current !== undefined ? current : dayFocused ? document.activeElement : self.selectedDateElem !== undefined && isInView(self.selectedDateElem) ? self.selectedDateElem : self.todayDateElem !== undefined && isInView(self.todayDateElem) ? self.todayDateElem : getFirstAvailableDay(offset > 0 ? 1 : -1);
-        if (startElem === undefined) return self._input.focus();
-        if (!dayFocused) return focusOnDayElem(startElem);
-        getNextAvailableDay(startElem, offset);
-      }
-
-      function buildMonthDays(year, month) {
-        var firstOfMonth = (new Date(year, month, 1).getDay() - self.l10n.firstDayOfWeek + 7) % 7;
-        var prevMonthDays = self.utils.getDaysInMonth((month - 1 + 12) % 12);
-        var daysInMonth = self.utils.getDaysInMonth(month),
-            days = window.document.createDocumentFragment(),
-            isMultiMonth = self.config.showMonths > 1,
-            prevMonthDayClass = isMultiMonth ? "prevMonthDay hidden" : "prevMonthDay",
-            nextMonthDayClass = isMultiMonth ? "nextMonthDay hidden" : "nextMonthDay";
-        var dayNumber = prevMonthDays + 1 - firstOfMonth,
-            dayIndex = 0;
-
-        for (; dayNumber <= prevMonthDays; dayNumber++, dayIndex++) {
-          days.appendChild(createDay(prevMonthDayClass, new Date(year, month - 1, dayNumber), dayNumber, dayIndex));
-        }
-
-        for (dayNumber = 1; dayNumber <= daysInMonth; dayNumber++, dayIndex++) {
-          days.appendChild(createDay("", new Date(year, month, dayNumber), dayNumber, dayIndex));
-        }
-
-        for (var dayNum = daysInMonth + 1; dayNum <= 42 - firstOfMonth && (self.config.showMonths === 1 || dayIndex % 7 !== 0); dayNum++, dayIndex++) {
-          days.appendChild(createDay(nextMonthDayClass, new Date(year, month + 1, dayNum % daysInMonth), dayNum, dayIndex));
-        }
-
-        var dayContainer = createElement("div", "dayContainer");
-        dayContainer.appendChild(days);
-        return dayContainer;
-      }
-
-      function buildDays() {
-        if (self.daysContainer === undefined) {
-          return;
-        }
-
-        clearNode(self.daysContainer);
-        if (self.weekNumbers) clearNode(self.weekNumbers);
-        var frag = document.createDocumentFragment();
-
-        for (var i = 0; i < self.config.showMonths; i++) {
-          var d = new Date(self.currentYear, self.currentMonth, 1);
-          d.setMonth(self.currentMonth + i);
-          frag.appendChild(buildMonthDays(d.getFullYear(), d.getMonth()));
-        }
-
-        self.daysContainer.appendChild(frag);
-        self.days = self.daysContainer.firstChild;
-
-        if (self.config.mode === "range" && self.selectedDates.length === 1) {
-          onMouseOver();
-        }
-      }
-
-      function buildMonth() {
-        var container = createElement("div", "flatpickr-month");
-        var monthNavFragment = window.document.createDocumentFragment();
-        var monthElement = createElement("span", "cur-month");
-        var yearInput = createNumberInput("cur-year", {
-          tabindex: "-1"
-        });
-        var yearElement = yearInput.getElementsByTagName("input")[0];
-        yearElement.setAttribute("aria-label", self.l10n.yearAriaLabel);
-        if (self.config.minDate) yearElement.setAttribute("data-min", self.config.minDate.getFullYear().toString());
-
-        if (self.config.maxDate) {
-          yearElement.setAttribute("data-max", self.config.maxDate.getFullYear().toString());
-          yearElement.disabled = !!self.config.minDate && self.config.minDate.getFullYear() === self.config.maxDate.getFullYear();
-        }
-
-        var currentMonth = createElement("div", "flatpickr-current-month");
-        currentMonth.appendChild(monthElement);
-        currentMonth.appendChild(yearInput);
-        monthNavFragment.appendChild(currentMonth);
-        container.appendChild(monthNavFragment);
-        return {
-          container: container,
-          yearElement: yearElement,
-          monthElement: monthElement
-        };
-      }
-
-      function buildMonths() {
-        clearNode(self.monthNav);
-        self.monthNav.appendChild(self.prevMonthNav);
-
-        for (var m = self.config.showMonths; m--;) {
-          var month = buildMonth();
-          self.yearElements.push(month.yearElement);
-          self.monthElements.push(month.monthElement);
-          self.monthNav.appendChild(month.container);
-        }
-
-        self.monthNav.appendChild(self.nextMonthNav);
-      }
-
-      function buildMonthNav() {
-        self.monthNav = createElement("div", "flatpickr-months");
-        self.yearElements = [];
-        self.monthElements = [];
-        self.prevMonthNav = createElement("span", "flatpickr-prev-month");
-        self.prevMonthNav.innerHTML = self.config.prevArrow;
-        self.nextMonthNav = createElement("span", "flatpickr-next-month");
-        self.nextMonthNav.innerHTML = self.config.nextArrow;
-        buildMonths();
-        Object.defineProperty(self, "_hidePrevMonthArrow", {
-          get: function get() {
-            return self.__hidePrevMonthArrow;
-          },
-          set: function set(bool) {
-            if (self.__hidePrevMonthArrow !== bool) {
-              toggleClass(self.prevMonthNav, "disabled", bool);
-              self.__hidePrevMonthArrow = bool;
-            }
-          }
-        });
-        Object.defineProperty(self, "_hideNextMonthArrow", {
-          get: function get() {
-            return self.__hideNextMonthArrow;
-          },
-          set: function set(bool) {
-            if (self.__hideNextMonthArrow !== bool) {
-              toggleClass(self.nextMonthNav, "disabled", bool);
-              self.__hideNextMonthArrow = bool;
-            }
-          }
-        });
-        self.currentYearElement = self.yearElements[0];
-        updateNavigationCurrentMonth();
-        return self.monthNav;
-      }
-
-      function buildTime() {
-        self.calendarContainer.classList.add("hasTime");
-        if (self.config.noCalendar) self.calendarContainer.classList.add("noCalendar");
-        self.timeContainer = createElement("div", "flatpickr-time");
-        self.timeContainer.tabIndex = -1;
-        var separator = createElement("span", "flatpickr-time-separator", ":");
-        var hourInput = createNumberInput("flatpickr-hour");
-        self.hourElement = hourInput.getElementsByTagName("input")[0];
-        var minuteInput = createNumberInput("flatpickr-minute");
-        self.minuteElement = minuteInput.getElementsByTagName("input")[0];
-        self.hourElement.tabIndex = self.minuteElement.tabIndex = -1;
-        self.hourElement.value = pad(self.latestSelectedDateObj ? self.latestSelectedDateObj.getHours() : self.config.time_24hr ? self.config.defaultHour : military2ampm(self.config.defaultHour));
-        self.minuteElement.value = pad(self.latestSelectedDateObj ? self.latestSelectedDateObj.getMinutes() : self.config.defaultMinute);
-        self.hourElement.setAttribute("data-step", self.config.hourIncrement.toString());
-        self.minuteElement.setAttribute("data-step", self.config.minuteIncrement.toString());
-        self.hourElement.setAttribute("data-min", self.config.time_24hr ? "0" : "1");
-        self.hourElement.setAttribute("data-max", self.config.time_24hr ? "23" : "12");
-        self.minuteElement.setAttribute("data-min", "0");
-        self.minuteElement.setAttribute("data-max", "59");
-        self.timeContainer.appendChild(hourInput);
-        self.timeContainer.appendChild(separator);
-        self.timeContainer.appendChild(minuteInput);
-        if (self.config.time_24hr) self.timeContainer.classList.add("time24hr");
-
-        if (self.config.enableSeconds) {
-          self.timeContainer.classList.add("hasSeconds");
-          var secondInput = createNumberInput("flatpickr-second");
-          self.secondElement = secondInput.getElementsByTagName("input")[0];
-          self.secondElement.value = pad(self.latestSelectedDateObj ? self.latestSelectedDateObj.getSeconds() : self.config.defaultSeconds);
-          self.secondElement.setAttribute("data-step", self.minuteElement.getAttribute("data-step"));
-          self.secondElement.setAttribute("data-min", self.minuteElement.getAttribute("data-min"));
-          self.secondElement.setAttribute("data-max", self.minuteElement.getAttribute("data-max"));
-          self.timeContainer.appendChild(createElement("span", "flatpickr-time-separator", ":"));
-          self.timeContainer.appendChild(secondInput);
-        }
-
-        if (!self.config.time_24hr) {
-          self.amPM = createElement("span", "flatpickr-am-pm", self.l10n.amPM[int((self.latestSelectedDateObj ? self.hourElement.value : self.config.defaultHour) > 11)]);
-          self.amPM.title = self.l10n.toggleTitle;
-          self.amPM.tabIndex = -1;
-          self.timeContainer.appendChild(self.amPM);
-        }
-
-        return self.timeContainer;
-      }
-
-      function buildWeekdays() {
-        if (!self.weekdayContainer) self.weekdayContainer = createElement("div", "flatpickr-weekdays");else clearNode(self.weekdayContainer);
-
-        for (var i = self.config.showMonths; i--;) {
-          var container = createElement("div", "flatpickr-weekdaycontainer");
-          self.weekdayContainer.appendChild(container);
-        }
-
-        updateWeekdays();
-        return self.weekdayContainer;
-      }
-
-      function updateWeekdays() {
-        var firstDayOfWeek = self.l10n.firstDayOfWeek;
-        var weekdays = self.l10n.weekdays.shorthand.concat();
-
-        if (firstDayOfWeek > 0 && firstDayOfWeek < weekdays.length) {
-          weekdays = weekdays.splice(firstDayOfWeek, weekdays.length).concat(weekdays.splice(0, firstDayOfWeek));
-        }
-
-        for (var i = self.config.showMonths; i--;) {
-          self.weekdayContainer.children[i].innerHTML = "\n      <span class=flatpickr-weekday>\n        " + weekdays.join("</span><span class=flatpickr-weekday>") + "\n      </span>\n      ";
-        }
-      }
-
-      function buildWeeks() {
-        self.calendarContainer.classList.add("hasWeeks");
-        var weekWrapper = createElement("div", "flatpickr-weekwrapper");
-        weekWrapper.appendChild(createElement("span", "flatpickr-weekday", self.l10n.weekAbbreviation));
-        var weekNumbers = createElement("div", "flatpickr-weeks");
-        weekWrapper.appendChild(weekNumbers);
-        return {
-          weekWrapper: weekWrapper,
-          weekNumbers: weekNumbers
-        };
-      }
-
-      function changeMonth(value, is_offset) {
-        if (is_offset === void 0) {
-          is_offset = true;
-        }
-
-        var delta = is_offset ? value : value - self.currentMonth;
-        if (delta < 0 && self._hidePrevMonthArrow === true || delta > 0 && self._hideNextMonthArrow === true) return;
-        self.currentMonth += delta;
-
-        if (self.currentMonth < 0 || self.currentMonth > 11) {
-          self.currentYear += self.currentMonth > 11 ? 1 : -1;
-          self.currentMonth = (self.currentMonth + 12) % 12;
-          triggerEvent("onYearChange");
-        }
-
-        buildDays();
-        triggerEvent("onMonthChange");
-        updateNavigationCurrentMonth();
-      }
-
-      function clear(triggerChangeEvent) {
-        if (triggerChangeEvent === void 0) {
-          triggerChangeEvent = true;
-        }
-
-        self.input.value = "";
-        if (self.altInput !== undefined) self.altInput.value = "";
-        if (self.mobileInput !== undefined) self.mobileInput.value = "";
-        self.selectedDates = [];
-        self.latestSelectedDateObj = undefined;
-        self.showTimeInput = false;
-
-        if (self.config.enableTime === true) {
-          setDefaultHours();
-        }
-
-        self.redraw();
-        if (triggerChangeEvent) triggerEvent("onChange");
-      }
-
-      function close() {
-        self.isOpen = false;
-
-        if (!self.isMobile) {
-          self.calendarContainer.classList.remove("open");
-
-          self._input.classList.remove("active");
-        }
-
-        triggerEvent("onClose");
-      }
-
-      function destroy() {
-        if (self.config !== undefined) triggerEvent("onDestroy");
-
-        for (var i = self._handlers.length; i--;) {
-          var h = self._handlers[i];
-          h.element.removeEventListener(h.event, h.handler, h.options);
-        }
-
-        self._handlers = [];
-
-        if (self.mobileInput) {
-          if (self.mobileInput.parentNode) self.mobileInput.parentNode.removeChild(self.mobileInput);
-          self.mobileInput = undefined;
-        } else if (self.calendarContainer && self.calendarContainer.parentNode) {
-          if (self.config.static && self.calendarContainer.parentNode) {
-            var wrapper = self.calendarContainer.parentNode;
-            wrapper.lastChild && wrapper.removeChild(wrapper.lastChild);
-
-            if (wrapper.parentNode) {
-              while (wrapper.firstChild) {
-                wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
-              }
-
-              wrapper.parentNode.removeChild(wrapper);
-            }
-          } else self.calendarContainer.parentNode.removeChild(self.calendarContainer);
-        }
-
-        if (self.altInput) {
-          self.input.type = "text";
-          if (self.altInput.parentNode) self.altInput.parentNode.removeChild(self.altInput);
-          delete self.altInput;
-        }
-
-        if (self.input) {
-          self.input.type = self.input._type;
-          self.input.classList.remove("flatpickr-input");
-          self.input.removeAttribute("readonly");
-          self.input.value = "";
-        }
-
-        ["_showTimeInput", "latestSelectedDateObj", "_hideNextMonthArrow", "_hidePrevMonthArrow", "__hideNextMonthArrow", "__hidePrevMonthArrow", "isMobile", "isOpen", "selectedDateElem", "minDateHasTime", "maxDateHasTime", "days", "daysContainer", "_input", "_positionElement", "innerContainer", "rContainer", "monthNav", "todayDateElem", "calendarContainer", "weekdayContainer", "prevMonthNav", "nextMonthNav", "currentMonthElement", "currentYearElement", "navigationCurrentMonth", "selectedDateElem", "config"].forEach(function (k) {
-          try {
-            delete self[k];
-          } catch (_) {}
-        });
-      }
-
-      function isCalendarElem(elem) {
-        if (self.config.appendTo && self.config.appendTo.contains(elem)) return true;
-        return self.calendarContainer.contains(elem);
-      }
-
-      function documentClick(e) {
-        if (self.isOpen && !self.config.inline) {
-          var isCalendarElement = isCalendarElem(e.target);
-          var isInput = e.target === self.input || e.target === self.altInput || self.element.contains(e.target) || e.path && e.path.indexOf && (~e.path.indexOf(self.input) || ~e.path.indexOf(self.altInput));
-          var lostFocus = e.type === "blur" ? isInput && e.relatedTarget && !isCalendarElem(e.relatedTarget) : !isInput && !isCalendarElement;
-          var isIgnored = !self.config.ignoredFocusElements.some(function (elem) {
-            return elem.contains(e.target);
-          });
-
-          if (lostFocus && isIgnored) {
-            self.close();
-
-            if (self.config.mode === "range" && self.selectedDates.length === 1) {
-              self.clear(false);
-              self.redraw();
-            }
-          }
-        }
-      }
-
-      function changeYear(newYear) {
-        if (!newYear || self.config.minDate && newYear < self.config.minDate.getFullYear() || self.config.maxDate && newYear > self.config.maxDate.getFullYear()) return;
-        var newYearNum = newYear,
-            isNewYear = self.currentYear !== newYearNum;
-        self.currentYear = newYearNum || self.currentYear;
-
-        if (self.config.maxDate && self.currentYear === self.config.maxDate.getFullYear()) {
-          self.currentMonth = Math.min(self.config.maxDate.getMonth(), self.currentMonth);
-        } else if (self.config.minDate && self.currentYear === self.config.minDate.getFullYear()) {
-          self.currentMonth = Math.max(self.config.minDate.getMonth(), self.currentMonth);
-        }
-
-        if (isNewYear) {
-          self.redraw();
-          triggerEvent("onYearChange");
-        }
-      }
-
-      function isEnabled(date, timeless) {
-        if (timeless === void 0) {
-          timeless = true;
-        }
-
-        var dateToCheck = self.parseDate(date, undefined, timeless);
-        if (self.config.minDate && dateToCheck && compareDates(dateToCheck, self.config.minDate, timeless !== undefined ? timeless : !self.minDateHasTime) < 0 || self.config.maxDate && dateToCheck && compareDates(dateToCheck, self.config.maxDate, timeless !== undefined ? timeless : !self.maxDateHasTime) > 0) return false;
-        if (self.config.enable.length === 0 && self.config.disable.length === 0) return true;
-        if (dateToCheck === undefined) return false;
-        var bool = self.config.enable.length > 0,
-            array = bool ? self.config.enable : self.config.disable;
-
-        for (var i = 0, d; i < array.length; i++) {
-          d = array[i];
-          if (typeof d === "function" && d(dateToCheck)) return bool;else if (d instanceof Date && dateToCheck !== undefined && d.getTime() === dateToCheck.getTime()) return bool;else if (typeof d === "string" && dateToCheck !== undefined) {
-            var parsed = self.parseDate(d, undefined, true);
-            return parsed && parsed.getTime() === dateToCheck.getTime() ? bool : !bool;
-          } else if (typeof d === "object" && dateToCheck !== undefined && d.from && d.to && dateToCheck.getTime() >= d.from.getTime() && dateToCheck.getTime() <= d.to.getTime()) return bool;
-        }
-
-        return !bool;
-      }
-
-      function isInView(elem) {
-        if (self.daysContainer !== undefined) return elem.className.indexOf("hidden") === -1 && self.daysContainer.contains(elem);
-        return false;
-      }
-
-      function onKeyDown(e) {
-        var isInput = e.target === self._input;
-        var allowInput = self.config.allowInput;
-        var allowKeydown = self.isOpen && (!allowInput || !isInput);
-        var allowInlineKeydown = self.config.inline && isInput && !allowInput;
-
-        if (e.keyCode === 13 && isInput) {
-          if (allowInput) {
-            self.setDate(self._input.value, true, e.target === self.altInput ? self.config.altFormat : self.config.dateFormat);
-            return e.target.blur();
-          } else self.open();
-        } else if (isCalendarElem(e.target) || allowKeydown || allowInlineKeydown) {
-          var isTimeObj = !!self.timeContainer && self.timeContainer.contains(e.target);
-
-          switch (e.keyCode) {
-            case 13:
-              if (isTimeObj) updateTime();else selectDate(e);
-              break;
-
-            case 27:
-              e.preventDefault();
-              focusAndClose();
-              break;
-
-            case 8:
-            case 46:
-              if (isInput && !self.config.allowInput) {
-                e.preventDefault();
-                self.clear();
-              }
-
-              break;
-
-            case 37:
-            case 39:
-              if (!isTimeObj) {
-                e.preventDefault();
-
-                if (self.daysContainer !== undefined && (allowInput === false || isInView(document.activeElement))) {
-                  var _delta = e.keyCode === 39 ? 1 : -1;
-
-                  if (!e.ctrlKey) focusOnDay(undefined, _delta);else {
-                    changeMonth(_delta);
-                    focusOnDay(getFirstAvailableDay(1), 0);
-                  }
-                }
-              } else if (self.hourElement) self.hourElement.focus();
-
-              break;
-
-            case 38:
-            case 40:
-              e.preventDefault();
-              var delta = e.keyCode === 40 ? 1 : -1;
-
-              if (self.daysContainer && e.target.$i !== undefined) {
-                if (e.ctrlKey) {
-                  changeYear(self.currentYear - delta);
-                  focusOnDay(getFirstAvailableDay(1), 0);
-                } else if (!isTimeObj) focusOnDay(undefined, delta * 7);
-              } else if (self.config.enableTime) {
-                if (!isTimeObj && self.hourElement) self.hourElement.focus();
-                updateTime(e);
-
-                self._debouncedChange();
-              }
-
-              break;
-
-            case 9:
-              if (!isTimeObj) {
-                self.element.focus();
-                break;
-              }
-
-              var elems = [self.hourElement, self.minuteElement, self.secondElement, self.amPM].filter(function (x) {
-                return x;
-              });
-              var i = elems.indexOf(e.target);
-
-              if (i !== -1) {
-                var target = elems[i + (e.shiftKey ? -1 : 1)];
-
-                if (target !== undefined) {
-                  e.preventDefault();
-                  target.focus();
-                } else {
-                  self.element.focus();
-                }
-              }
-
-              break;
-
-            default:
-              break;
-          }
-        }
-
-        if (self.amPM !== undefined && e.target === self.amPM) {
-          switch (e.key) {
-            case self.l10n.amPM[0].charAt(0):
-            case self.l10n.amPM[0].charAt(0).toLowerCase():
-              self.amPM.textContent = self.l10n.amPM[0];
-              setHoursFromInputs();
-              updateValue();
-              break;
-
-            case self.l10n.amPM[1].charAt(0):
-            case self.l10n.amPM[1].charAt(0).toLowerCase():
-              self.amPM.textContent = self.l10n.amPM[1];
-              setHoursFromInputs();
-              updateValue();
-              break;
-          }
-        }
-
-        triggerEvent("onKeyDown", e);
-      }
-
-      function onMouseOver(elem) {
-        if (self.selectedDates.length !== 1 || elem && (!elem.classList.contains("flatpickr-day") || elem.classList.contains("disabled"))) return;
-        var hoverDate = elem ? elem.dateObj.getTime() : self.days.firstElementChild.dateObj.getTime(),
-            initialDate = self.parseDate(self.selectedDates[0], undefined, true).getTime(),
-            rangeStartDate = Math.min(hoverDate, self.selectedDates[0].getTime()),
-            rangeEndDate = Math.max(hoverDate, self.selectedDates[0].getTime()),
-            lastDate = self.daysContainer.lastChild.lastChild.dateObj.getTime();
-        var containsDisabled = false;
-        var minRange = 0,
-            maxRange = 0;
-
-        for (var t = rangeStartDate; t < lastDate; t += duration.DAY) {
-          if (!isEnabled(new Date(t), true)) {
-            containsDisabled = containsDisabled || t > rangeStartDate && t < rangeEndDate;
-            if (t < initialDate && (!minRange || t > minRange)) minRange = t;else if (t > initialDate && (!maxRange || t < maxRange)) maxRange = t;
-          }
-        }
-
-        for (var m = 0; m < self.config.showMonths; m++) {
-          var month = self.daysContainer.children[m];
-          var prevMonth = self.daysContainer.children[m - 1];
-
-          var _loop = function _loop(i, l) {
-            var dayElem = month.children[i],
-                date = dayElem.dateObj;
-            var timestamp = date.getTime();
-            var outOfRange = minRange > 0 && timestamp < minRange || maxRange > 0 && timestamp > maxRange;
-
-            if (outOfRange) {
-              dayElem.classList.add("notAllowed");
-              ["inRange", "startRange", "endRange"].forEach(function (c) {
-                dayElem.classList.remove(c);
-              });
-              return "continue";
-            } else if (containsDisabled && !outOfRange) return "continue";
-
-            ["startRange", "inRange", "endRange", "notAllowed"].forEach(function (c) {
-              dayElem.classList.remove(c);
-            });
-
-            if (elem !== undefined) {
-              elem.classList.add(hoverDate < self.selectedDates[0].getTime() ? "startRange" : "endRange");
-
-              if (month.contains(elem) || !(m > 0 && prevMonth && prevMonth.lastChild.dateObj.getTime() >= timestamp)) {
-                if (initialDate < hoverDate && timestamp === initialDate) dayElem.classList.add("startRange");else if (initialDate > hoverDate && timestamp === initialDate) dayElem.classList.add("endRange");
-                if (timestamp >= minRange && (maxRange === 0 || timestamp <= maxRange) && isBetween(timestamp, initialDate, hoverDate)) dayElem.classList.add("inRange");
-              }
-            }
-          };
-
-          for (var i = 0, l = month.children.length; i < l; i++) {
-            var _ret = _loop(i, l);
-
-            if (_ret === "continue") continue;
-          }
-        }
-      }
-
-      function onResize() {
-        if (self.isOpen && !self.config.static && !self.config.inline) positionCalendar();
-      }
-
-      function open(e, positionElement) {
-        if (positionElement === void 0) {
-          positionElement = self._positionElement;
-        }
-
-        if (self.isMobile === true) {
-          if (e) {
-            e.preventDefault();
-            e.target && e.target.blur();
-          }
-
-          if (self.mobileInput !== undefined) {
-            self.mobileInput.focus();
-            self.mobileInput.click();
-          }
-
-          triggerEvent("onOpen");
-          return;
-        }
-
-        if (self._input.disabled || self.config.inline) return;
-        var wasOpen = self.isOpen;
-        self.isOpen = true;
-
-        if (!wasOpen) {
-          self.calendarContainer.classList.add("open");
-
-          self._input.classList.add("active");
-
-          triggerEvent("onOpen");
-          positionCalendar(positionElement);
-        }
-
-        if (self.config.enableTime === true && self.config.noCalendar === true) {
-          if (self.selectedDates.length === 0) {
-            self.setDate(self.config.minDate !== undefined ? new Date(self.config.minDate.getTime()) : new Date(), false);
-            setDefaultHours();
-            updateValue();
-          }
-
-          if (self.config.allowInput === false && (e === undefined || !self.timeContainer.contains(e.relatedTarget))) {
-            setTimeout(function () {
-              return self.hourElement.select();
-            }, 50);
-          }
-        }
-      }
-
-      function minMaxDateSetter(type) {
-        return function (date) {
-          var dateObj = self.config["_" + type + "Date"] = self.parseDate(date, self.config.dateFormat);
-          var inverseDateObj = self.config["_" + (type === "min" ? "max" : "min") + "Date"];
-
-          if (dateObj !== undefined) {
-            self[type === "min" ? "minDateHasTime" : "maxDateHasTime"] = dateObj.getHours() > 0 || dateObj.getMinutes() > 0 || dateObj.getSeconds() > 0;
-          }
-
-          if (self.selectedDates) {
-            self.selectedDates = self.selectedDates.filter(function (d) {
-              return isEnabled(d);
-            });
-            if (!self.selectedDates.length && type === "min") setHoursFromDate(dateObj);
-            updateValue();
-          }
-
-          if (self.daysContainer) {
-            redraw();
-            if (dateObj !== undefined) self.currentYearElement[type] = dateObj.getFullYear().toString();else self.currentYearElement.removeAttribute(type);
-            self.currentYearElement.disabled = !!inverseDateObj && dateObj !== undefined && inverseDateObj.getFullYear() === dateObj.getFullYear();
-          }
-        };
-      }
-
-      function parseConfig() {
-        var boolOpts = ["wrap", "weekNumbers", "allowInput", "clickOpens", "time_24hr", "enableTime", "noCalendar", "altInput", "shorthandCurrentMonth", "inline", "static", "enableSeconds", "disableMobile"];
-        var userConfig = Object.assign({}, instanceConfig, JSON.parse(JSON.stringify(element.dataset || {})));
-        var formats$$1 = {};
-        self.config.parseDate = userConfig.parseDate;
-        self.config.formatDate = userConfig.formatDate;
-        Object.defineProperty(self.config, "enable", {
-          get: function get() {
-            return self.config._enable;
-          },
-          set: function set(dates) {
-            self.config._enable = parseDateRules(dates);
-          }
-        });
-        Object.defineProperty(self.config, "disable", {
-          get: function get() {
-            return self.config._disable;
-          },
-          set: function set(dates) {
-            self.config._disable = parseDateRules(dates);
-          }
-        });
-        var timeMode = userConfig.mode === "time";
-
-        if (!userConfig.dateFormat && (userConfig.enableTime || timeMode)) {
-          formats$$1.dateFormat = userConfig.noCalendar || timeMode ? "H:i" + (userConfig.enableSeconds ? ":S" : "") : flatpickr.defaultConfig.dateFormat + " H:i" + (userConfig.enableSeconds ? ":S" : "");
-        }
-
-        if (userConfig.altInput && (userConfig.enableTime || timeMode) && !userConfig.altFormat) {
-          formats$$1.altFormat = userConfig.noCalendar || timeMode ? "h:i" + (userConfig.enableSeconds ? ":S K" : " K") : flatpickr.defaultConfig.altFormat + (" h:i" + (userConfig.enableSeconds ? ":S" : "") + " K");
-        }
-
-        Object.defineProperty(self.config, "minDate", {
-          get: function get() {
-            return self.config._minDate;
-          },
-          set: minMaxDateSetter("min")
-        });
-        Object.defineProperty(self.config, "maxDate", {
-          get: function get() {
-            return self.config._maxDate;
-          },
-          set: minMaxDateSetter("max")
-        });
-
-        var minMaxTimeSetter = function minMaxTimeSetter(type) {
-          return function (val) {
-            self.config[type === "min" ? "_minTime" : "_maxTime"] = self.parseDate(val, "H:i");
-          };
-        };
-
-        Object.defineProperty(self.config, "minTime", {
-          get: function get() {
-            return self.config._minTime;
-          },
-          set: minMaxTimeSetter("min")
-        });
-        Object.defineProperty(self.config, "maxTime", {
-          get: function get() {
-            return self.config._maxTime;
-          },
-          set: minMaxTimeSetter("max")
-        });
-
-        if (userConfig.mode === "time") {
-          self.config.noCalendar = true;
-          self.config.enableTime = true;
-        }
-
-        Object.assign(self.config, formats$$1, userConfig);
-
-        for (var i = 0; i < boolOpts.length; i++) {
-          self.config[boolOpts[i]] = self.config[boolOpts[i]] === true || self.config[boolOpts[i]] === "true";
-        }
-
-        HOOKS.filter(function (hook) {
-          return self.config[hook] !== undefined;
-        }).forEach(function (hook) {
-          self.config[hook] = arrayify(self.config[hook] || []).map(bindToInstance);
-        });
-        self.isMobile = !self.config.disableMobile && !self.config.inline && self.config.mode === "single" && !self.config.disable.length && !self.config.enable.length && !self.config.weekNumbers && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-        for (var _i = 0; _i < self.config.plugins.length; _i++) {
-          var pluginConf = self.config.plugins[_i](self) || {};
-
-          for (var key in pluginConf) {
-            if (HOOKS.indexOf(key) > -1) {
-              self.config[key] = arrayify(pluginConf[key]).map(bindToInstance).concat(self.config[key]);
-            } else if (typeof userConfig[key] === "undefined") self.config[key] = pluginConf[key];
-          }
-        }
-
-        triggerEvent("onParseConfig");
-      }
-
-      function setupLocale() {
-        if (typeof self.config.locale !== "object" && typeof flatpickr.l10ns[self.config.locale] === "undefined") self.config.errorHandler(new Error("flatpickr: invalid locale " + self.config.locale));
-        self.l10n = Object.assign({}, flatpickr.l10ns.default, typeof self.config.locale === "object" ? self.config.locale : self.config.locale !== "default" ? flatpickr.l10ns[self.config.locale] : undefined);
-        tokenRegex.K = "(" + self.l10n.amPM[0] + "|" + self.l10n.amPM[1] + "|" + self.l10n.amPM[0].toLowerCase() + "|" + self.l10n.amPM[1].toLowerCase() + ")";
-        self.formatDate = createDateFormatter(self);
-        self.parseDate = createDateParser({
-          config: self.config,
-          l10n: self.l10n
-        });
-      }
-
-      function positionCalendar(customPositionElement) {
-        if (self.calendarContainer === undefined) return;
-        triggerEvent("onPreCalendarPosition");
-        var positionElement = customPositionElement || self._positionElement;
-        var calendarHeight = Array.prototype.reduce.call(self.calendarContainer.children, function (acc, child) {
-          return acc + child.offsetHeight;
-        }, 0),
-            calendarWidth = self.calendarContainer.offsetWidth,
-            configPos = self.config.position.split(" "),
-            configPosVertical = configPos[0],
-            configPosHorizontal = configPos.length > 1 ? configPos[1] : null,
-            inputBounds = positionElement.getBoundingClientRect(),
-            distanceFromBottom = window.innerHeight - inputBounds.bottom,
-            showOnTop = configPosVertical === "above" || configPosVertical !== "below" && distanceFromBottom < calendarHeight && inputBounds.top > calendarHeight;
-        var top = window.pageYOffset + inputBounds.top + (!showOnTop ? positionElement.offsetHeight + 2 : -calendarHeight - 2);
-        toggleClass(self.calendarContainer, "arrowTop", !showOnTop);
-        toggleClass(self.calendarContainer, "arrowBottom", showOnTop);
-        if (self.config.inline) return;
-        var left = window.pageXOffset + inputBounds.left - (configPosHorizontal != null && configPosHorizontal === "center" ? (calendarWidth - inputBounds.width) / 2 : 0);
-        var right = window.document.body.offsetWidth - inputBounds.right;
-        var rightMost = left + calendarWidth > window.document.body.offsetWidth;
-        toggleClass(self.calendarContainer, "rightMost", rightMost);
-        if (self.config.static) return;
-        self.calendarContainer.style.top = top + "px";
-
-        if (!rightMost) {
-          self.calendarContainer.style.left = left + "px";
-          self.calendarContainer.style.right = "auto";
-        } else {
-          self.calendarContainer.style.left = "auto";
-          self.calendarContainer.style.right = right + "px";
-        }
-      }
-
-      function redraw() {
-        if (self.config.noCalendar || self.isMobile) return;
-        updateNavigationCurrentMonth();
-        buildDays();
-      }
-
-      function focusAndClose() {
-        self._input.focus();
-
-        if (window.navigator.userAgent.indexOf("MSIE") !== -1 || navigator.msMaxTouchPoints !== undefined) {
-          setTimeout(self.close, 0);
-        } else {
-          self.close();
-        }
-      }
-
-      function selectDate(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        var isSelectable = function isSelectable(day) {
-          return day.classList && day.classList.contains("flatpickr-day") && !day.classList.contains("disabled") && !day.classList.contains("notAllowed");
-        };
-
-        var t = findParent(e.target, isSelectable);
-        if (t === undefined) return;
-        var target = t;
-        var selectedDate = self.latestSelectedDateObj = new Date(target.dateObj.getTime());
-        var shouldChangeMonth = (selectedDate.getMonth() < self.currentMonth || selectedDate.getMonth() > self.currentMonth + self.config.showMonths - 1) && self.config.mode !== "range";
-        self.selectedDateElem = target;
-        if (self.config.mode === "single") self.selectedDates = [selectedDate];else if (self.config.mode === "multiple") {
-          var selectedIndex = isDateSelected(selectedDate);
-          if (selectedIndex) self.selectedDates.splice(parseInt(selectedIndex), 1);else self.selectedDates.push(selectedDate);
-        } else if (self.config.mode === "range") {
-          if (self.selectedDates.length === 2) self.clear(false);
-          self.selectedDates.push(selectedDate);
-          if (compareDates(selectedDate, self.selectedDates[0], true) !== 0) self.selectedDates.sort(function (a, b) {
-            return a.getTime() - b.getTime();
-          });
-        }
-        setHoursFromInputs();
-
-        if (shouldChangeMonth) {
-          var isNewYear = self.currentYear !== selectedDate.getFullYear();
-          self.currentYear = selectedDate.getFullYear();
-          self.currentMonth = selectedDate.getMonth();
-          if (isNewYear) triggerEvent("onYearChange");
-          triggerEvent("onMonthChange");
-        }
-
-        updateNavigationCurrentMonth();
-        buildDays();
-        updateValue();
-        if (self.config.enableTime) setTimeout(function () {
-          return self.showTimeInput = true;
-        }, 50);
-        if (!shouldChangeMonth && self.config.mode !== "range" && self.config.showMonths === 1) focusOnDayElem(target);else self.selectedDateElem && self.selectedDateElem.focus();
-        if (self.hourElement !== undefined) setTimeout(function () {
-          return self.hourElement !== undefined && self.hourElement.select();
-        }, 451);
-
-        if (self.config.closeOnSelect) {
-          var single = self.config.mode === "single" && !self.config.enableTime;
-          var range = self.config.mode === "range" && self.selectedDates.length === 2 && !self.config.enableTime;
-
-          if (single || range) {
-            focusAndClose();
-          }
-        }
-
-        triggerChange();
-      }
-
-      var CALLBACKS = {
-        locale: [setupLocale, updateWeekdays],
-        showMonths: [buildMonths, setCalendarWidth, buildWeekdays]
-      };
-
-      function set(option, value) {
-        if (option !== null && typeof option === "object") Object.assign(self.config, option);else {
-          self.config[option] = value;
-          if (CALLBACKS[option] !== undefined) CALLBACKS[option].forEach(function (x) {
-            return x();
-          });else if (HOOKS.indexOf(option) > -1) self.config[option] = arrayify(value);
-        }
-        self.redraw();
-        jumpToDate();
-        updateValue(false);
-      }
-
-      function setSelectedDate(inputDate, format) {
-        var dates = [];
-        if (inputDate instanceof Array) dates = inputDate.map(function (d) {
-          return self.parseDate(d, format);
-        });else if (inputDate instanceof Date || typeof inputDate === "number") dates = [self.parseDate(inputDate, format)];else if (typeof inputDate === "string") {
-          switch (self.config.mode) {
-            case "single":
-            case "time":
-              dates = [self.parseDate(inputDate, format)];
-              break;
-
-            case "multiple":
-              dates = inputDate.split(self.config.conjunction).map(function (date) {
-                return self.parseDate(date, format);
-              });
-              break;
-
-            case "range":
-              dates = inputDate.split(self.l10n.rangeSeparator).map(function (date) {
-                return self.parseDate(date, format);
-              });
-              break;
-
-            default:
-              break;
-          }
-        } else self.config.errorHandler(new Error("Invalid date supplied: " + JSON.stringify(inputDate)));
-        self.selectedDates = dates.filter(function (d) {
-          return d instanceof Date && isEnabled(d, false);
-        });
-        if (self.config.mode === "range") self.selectedDates.sort(function (a, b) {
-          return a.getTime() - b.getTime();
-        });
-      }
-
-      function setDate(date, triggerChange, format) {
-        if (triggerChange === void 0) {
-          triggerChange = false;
-        }
-
-        if (format === void 0) {
-          format = self.config.dateFormat;
-        }
-
-        if (date !== 0 && !date || date instanceof Array && date.length === 0) return self.clear(triggerChange);
-        setSelectedDate(date, format);
-        self.showTimeInput = self.selectedDates.length > 0;
-        self.latestSelectedDateObj = self.selectedDates[0];
-        self.redraw();
-        jumpToDate();
-        setHoursFromDate();
-        updateValue(triggerChange);
-        if (triggerChange) triggerEvent("onChange");
-      }
-
-      function parseDateRules(arr) {
-        return arr.slice().map(function (rule) {
-          if (typeof rule === "string" || typeof rule === "number" || rule instanceof Date) {
-            return self.parseDate(rule, undefined, true);
-          } else if (rule && typeof rule === "object" && rule.from && rule.to) return {
-            from: self.parseDate(rule.from, undefined),
-            to: self.parseDate(rule.to, undefined)
-          };
-
-          return rule;
-        }).filter(function (x) {
-          return x;
-        });
-      }
-
-      function setupDates() {
-        self.selectedDates = [];
-        self.now = self.parseDate(self.config.now) || new Date();
-        var preloadedDate = self.config.defaultDate || ((self.input.nodeName === "INPUT" || self.input.nodeName === "TEXTAREA") && self.input.placeholder && self.input.value === self.input.placeholder ? null : self.input.value);
-        if (preloadedDate) setSelectedDate(preloadedDate, self.config.dateFormat);
-        var initialDate = self.selectedDates.length > 0 ? self.selectedDates[0] : self.config.minDate && self.config.minDate.getTime() > self.now.getTime() ? self.config.minDate : self.config.maxDate && self.config.maxDate.getTime() < self.now.getTime() ? self.config.maxDate : self.now;
-        self.currentYear = initialDate.getFullYear();
-        self.currentMonth = initialDate.getMonth();
-        if (self.selectedDates.length > 0) self.latestSelectedDateObj = self.selectedDates[0];
-        if (self.config.minTime !== undefined) self.config.minTime = self.parseDate(self.config.minTime, "H:i");
-        if (self.config.maxTime !== undefined) self.config.maxTime = self.parseDate(self.config.maxTime, "H:i");
-        self.minDateHasTime = !!self.config.minDate && (self.config.minDate.getHours() > 0 || self.config.minDate.getMinutes() > 0 || self.config.minDate.getSeconds() > 0);
-        self.maxDateHasTime = !!self.config.maxDate && (self.config.maxDate.getHours() > 0 || self.config.maxDate.getMinutes() > 0 || self.config.maxDate.getSeconds() > 0);
-        Object.defineProperty(self, "showTimeInput", {
-          get: function get() {
-            return self._showTimeInput;
-          },
-          set: function set(bool) {
-            self._showTimeInput = bool;
-            if (self.calendarContainer) toggleClass(self.calendarContainer, "showTimeInput", bool);
-            self.isOpen && positionCalendar();
-          }
-        });
-      }
-
-      function setupInputs() {
-        self.input = self.config.wrap ? element.querySelector("[data-input]") : element;
-
-        if (!self.input) {
-          self.config.errorHandler(new Error("Invalid input element specified"));
-          return;
-        }
-
-        self.input._type = self.input.type;
-        self.input.type = "text";
-        self.input.classList.add("flatpickr-input");
-        self._input = self.input;
-
-        if (self.config.altInput) {
-          self.altInput = createElement(self.input.nodeName, self.input.className + " " + self.config.altInputClass);
-          self._input = self.altInput;
-          self.altInput.placeholder = self.input.placeholder;
-          self.altInput.disabled = self.input.disabled;
-          self.altInput.required = self.input.required;
-          self.altInput.tabIndex = self.input.tabIndex;
-          self.altInput.type = "text";
-          self.input.setAttribute("type", "hidden");
-          if (!self.config.static && self.input.parentNode) self.input.parentNode.insertBefore(self.altInput, self.input.nextSibling);
-        }
-
-        if (!self.config.allowInput) self._input.setAttribute("readonly", "readonly");
-        self._positionElement = self.config.positionElement || self._input;
-      }
-
-      function setupMobile() {
-        var inputType = self.config.enableTime ? self.config.noCalendar ? "time" : "datetime-local" : "date";
-        self.mobileInput = createElement("input", self.input.className + " flatpickr-mobile");
-        self.mobileInput.step = self.input.getAttribute("step") || "any";
-        self.mobileInput.tabIndex = 1;
-        self.mobileInput.type = inputType;
-        self.mobileInput.disabled = self.input.disabled;
-        self.mobileInput.required = self.input.required;
-        self.mobileInput.placeholder = self.input.placeholder;
-        self.mobileFormatStr = inputType === "datetime-local" ? "Y-m-d\\TH:i:S" : inputType === "date" ? "Y-m-d" : "H:i:S";
-
-        if (self.selectedDates.length > 0) {
-          self.mobileInput.defaultValue = self.mobileInput.value = self.formatDate(self.selectedDates[0], self.mobileFormatStr);
-        }
-
-        if (self.config.minDate) self.mobileInput.min = self.formatDate(self.config.minDate, "Y-m-d");
-        if (self.config.maxDate) self.mobileInput.max = self.formatDate(self.config.maxDate, "Y-m-d");
-        self.input.type = "hidden";
-        if (self.altInput !== undefined) self.altInput.type = "hidden";
-
-        try {
-          if (self.input.parentNode) self.input.parentNode.insertBefore(self.mobileInput, self.input.nextSibling);
-        } catch (_a) {}
-
-        bind(self.mobileInput, "change", function (e) {
-          self.setDate(e.target.value, false, self.mobileFormatStr);
-          triggerEvent("onChange");
-          triggerEvent("onClose");
-        });
-      }
-
-      function toggle(e) {
-        if (self.isOpen === true) return self.close();
-        self.open(e);
-      }
-
-      function triggerEvent(event, data) {
-        if (self.config === undefined) return;
-        var hooks = self.config[event];
-
-        if (hooks !== undefined && hooks.length > 0) {
-          for (var i = 0; hooks[i] && i < hooks.length; i++) {
-            hooks[i](self.selectedDates, self.input.value, self, data);
-          }
-        }
-
-        if (event === "onChange") {
-          self.input.dispatchEvent(createEvent("change"));
-          self.input.dispatchEvent(createEvent("input"));
-        }
-      }
-
-      function createEvent(name) {
-        var e = document.createEvent("Event");
-        e.initEvent(name, true, true);
-        return e;
-      }
-
-      function isDateSelected(date) {
-        for (var i = 0; i < self.selectedDates.length; i++) {
-          if (compareDates(self.selectedDates[i], date) === 0) return "" + i;
-        }
-
-        return false;
-      }
-
-      function isDateInRange(date) {
-        if (self.config.mode !== "range" || self.selectedDates.length < 2) return false;
-        return compareDates(date, self.selectedDates[0]) >= 0 && compareDates(date, self.selectedDates[1]) <= 0;
-      }
-
-      function updateNavigationCurrentMonth() {
-        if (self.config.noCalendar || self.isMobile || !self.monthNav) return;
-        self.yearElements.forEach(function (yearElement, i) {
-          var d = new Date(self.currentYear, self.currentMonth, 1);
-          d.setMonth(self.currentMonth + i);
-          self.monthElements[i].textContent = monthToStr(d.getMonth(), self.config.shorthandCurrentMonth, self.l10n) + " ";
-          yearElement.value = d.getFullYear().toString();
-        });
-        self._hidePrevMonthArrow = self.config.minDate !== undefined && (self.currentYear === self.config.minDate.getFullYear() ? self.currentMonth <= self.config.minDate.getMonth() : self.currentYear < self.config.minDate.getFullYear());
-        self._hideNextMonthArrow = self.config.maxDate !== undefined && (self.currentYear === self.config.maxDate.getFullYear() ? self.currentMonth + 1 > self.config.maxDate.getMonth() : self.currentYear > self.config.maxDate.getFullYear());
-      }
-
-      function getDateStr(format) {
-        return self.selectedDates.map(function (dObj) {
-          return self.formatDate(dObj, format);
-        }).filter(function (d, i, arr) {
-          return self.config.mode !== "range" || self.config.enableTime || arr.indexOf(d) === i;
-        }).join(self.config.mode !== "range" ? self.config.conjunction : self.l10n.rangeSeparator);
-      }
-
-      function updateValue(triggerChange) {
-        if (triggerChange === void 0) {
-          triggerChange = true;
-        }
-
-        if (self.selectedDates.length === 0) return self.clear(triggerChange);
-
-        if (self.mobileInput !== undefined && self.mobileFormatStr) {
-          self.mobileInput.value = self.latestSelectedDateObj !== undefined ? self.formatDate(self.latestSelectedDateObj, self.mobileFormatStr) : "";
-        }
-
-        self.input.value = getDateStr(self.config.dateFormat);
-
-        if (self.altInput !== undefined) {
-          self.altInput.value = getDateStr(self.config.altFormat);
-        }
-
-        if (triggerChange !== false) triggerEvent("onValueUpdate");
-      }
-
-      function onMonthNavClick(e) {
-        e.preventDefault();
-        var isPrevMonth = self.prevMonthNav.contains(e.target);
-        var isNextMonth = self.nextMonthNav.contains(e.target);
-
-        if (isPrevMonth || isNextMonth) {
-          changeMonth(isPrevMonth ? -1 : 1);
-        } else if (self.yearElements.indexOf(e.target) >= 0) {
-          e.target.select();
-        } else if (e.target.classList.contains("arrowUp")) {
-          self.changeYear(self.currentYear + 1);
-        } else if (e.target.classList.contains("arrowDown")) {
-          self.changeYear(self.currentYear - 1);
-        }
-      }
-
-      function timeWrapper(e) {
-        e.preventDefault();
-        var isKeyDown = e.type === "keydown",
-            input = e.target;
-
-        if (self.amPM !== undefined && e.target === self.amPM) {
-          self.amPM.textContent = self.l10n.amPM[int(self.amPM.textContent === self.l10n.amPM[0])];
-        }
-
-        var min = parseFloat(input.getAttribute("data-min")),
-            max = parseFloat(input.getAttribute("data-max")),
-            step = parseFloat(input.getAttribute("data-step")),
-            curValue = parseInt(input.value, 10),
-            delta = e.delta || (isKeyDown ? e.which === 38 ? 1 : -1 : 0);
-        var newValue = curValue + step * delta;
-
-        if (typeof input.value !== "undefined" && input.value.length === 2) {
-          var isHourElem = input === self.hourElement,
-              isMinuteElem = input === self.minuteElement;
-
-          if (newValue < min) {
-            newValue = max + newValue + int(!isHourElem) + (int(isHourElem) && int(!self.amPM));
-            if (isMinuteElem) incrementNumInput(undefined, -1, self.hourElement);
-          } else if (newValue > max) {
-            newValue = input === self.hourElement ? newValue - max - int(!self.amPM) : min;
-            if (isMinuteElem) incrementNumInput(undefined, 1, self.hourElement);
-          }
-
-          if (self.amPM && isHourElem && (step === 1 ? newValue + curValue === 23 : Math.abs(newValue - curValue) > step)) {
-            self.amPM.textContent = self.l10n.amPM[int(self.amPM.textContent === self.l10n.amPM[0])];
-          }
-
-          input.value = pad(newValue);
-        }
-      }
-
-      init();
-      return self;
-    }
-
-    function _flatpickr(nodeList, config) {
-      var nodes = Array.prototype.slice.call(nodeList);
-      var instances = [];
-
-      for (var i = 0; i < nodes.length; i++) {
-        var node = nodes[i];
-
-        try {
-          if (node.getAttribute("data-fp-omit") !== null) continue;
-
-          if (node._flatpickr !== undefined) {
-            node._flatpickr.destroy();
-
-            node._flatpickr = undefined;
-          }
-
-          node._flatpickr = FlatpickrInstance(node, config || {});
-          instances.push(node._flatpickr);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-
-      return instances.length === 1 ? instances[0] : instances;
-    }
-
-    if (typeof HTMLElement !== "undefined") {
-      HTMLCollection.prototype.flatpickr = NodeList.prototype.flatpickr = function (config) {
-        return _flatpickr(this, config);
-      };
-
-      HTMLElement.prototype.flatpickr = function (config) {
-        return _flatpickr([this], config);
-      };
-    }
-
-    var flatpickr = function flatpickr(selector, config) {
-      if (selector instanceof NodeList) return _flatpickr(selector, config);else if (typeof selector === "string") return _flatpickr(window.document.querySelectorAll(selector), config);
-      return _flatpickr([selector], config);
-    };
-
-    flatpickr.defaultConfig = defaults;
-    flatpickr.l10ns = {
-      en: Object.assign({}, english),
-      default: Object.assign({}, english)
-    };
-
-    flatpickr.localize = function (l10n) {
-      flatpickr.l10ns.default = Object.assign({}, flatpickr.l10ns.default, l10n);
-    };
-
-    flatpickr.setDefaults = function (config) {
-      flatpickr.defaultConfig = Object.assign({}, flatpickr.defaultConfig, config);
-    };
-
-    flatpickr.parseDate = createDateParser({});
-    flatpickr.formatDate = createDateFormatter({});
-    flatpickr.compareDates = compareDates;
-
-    if (typeof jQuery !== "undefined") {
-      jQuery.fn.flatpickr = function (config) {
-        return _flatpickr(this, config);
-      };
-    }
-
-    Date.prototype.fp_incr = function (days) {
-      return new Date(this.getFullYear(), this.getMonth(), this.getDate() + (typeof days === "string" ? parseInt(days, 10) : days));
-    };
-
-    if (typeof window !== "undefined") {
-      window.flatpickr = flatpickr;
-    }
-
-    return flatpickr;
-
-})));
-;define('flatpickr', ['flatpickr/flatpickr'], function (main) { return main; });
-
-define('text!flatpickr/flatpickr.css', ['module'], function(module) { module.exports = ".flatpickr-calendar {\n  background: transparent;\n  opacity: 0;\n  display: none;\n  text-align: center;\n  visibility: hidden;\n  padding: 0;\n  -webkit-animation: none;\n          animation: none;\n  direction: ltr;\n  border: 0;\n  font-size: 14px;\n  line-height: 24px;\n  border-radius: 5px;\n  position: absolute;\n  width: 307.875px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n  background: #fff;\n  -webkit-box-shadow: 1px 0 0 #e6e6e6, -1px 0 0 #e6e6e6, 0 1px 0 #e6e6e6, 0 -1px 0 #e6e6e6, 0 3px 13px rgba(0,0,0,0.08);\n          box-shadow: 1px 0 0 #e6e6e6, -1px 0 0 #e6e6e6, 0 1px 0 #e6e6e6, 0 -1px 0 #e6e6e6, 0 3px 13px rgba(0,0,0,0.08);\n}\n.flatpickr-calendar.open,\n.flatpickr-calendar.inline {\n  opacity: 1;\n  max-height: 640px;\n  visibility: visible;\n}\n.flatpickr-calendar.open {\n  display: inline-block;\n  z-index: 99999;\n}\n.flatpickr-calendar.animate.open {\n  -webkit-animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.inline {\n  display: block;\n  position: relative;\n  top: 2px;\n}\n.flatpickr-calendar.static {\n  position: absolute;\n  top: calc(100% + 2px);\n}\n.flatpickr-calendar.static.open {\n  z-index: 999;\n  display: block;\n}\n.flatpickr-calendar.multiMonth .flatpickr-days .dayContainer:nth-child(n+1) .flatpickr-day.inRange:nth-child(7n+7) {\n  -webkit-box-shadow: none !important;\n          box-shadow: none !important;\n}\n.flatpickr-calendar.multiMonth .flatpickr-days .dayContainer:nth-child(n+2) .flatpickr-day.inRange:nth-child(7n+1) {\n  -webkit-box-shadow: -2px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n          box-shadow: -2px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n}\n.flatpickr-calendar .hasWeeks .dayContainer,\n.flatpickr-calendar .hasTime .dayContainer {\n  border-bottom: 0;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.flatpickr-calendar .hasWeeks .dayContainer {\n  border-left: 0;\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\n  height: 40px;\n  border-top: 1px solid #e6e6e6;\n}\n.flatpickr-calendar.noCalendar.hasTime .flatpickr-time {\n  height: auto;\n}\n.flatpickr-calendar:before,\n.flatpickr-calendar:after {\n  position: absolute;\n  display: block;\n  pointer-events: none;\n  border: solid transparent;\n  content: '';\n  height: 0;\n  width: 0;\n  left: 22px;\n}\n.flatpickr-calendar.rightMost:before,\n.flatpickr-calendar.rightMost:after {\n  left: auto;\n  right: 22px;\n}\n.flatpickr-calendar:before {\n  border-width: 5px;\n  margin: 0 -5px;\n}\n.flatpickr-calendar:after {\n  border-width: 4px;\n  margin: 0 -4px;\n}\n.flatpickr-calendar.arrowTop:before,\n.flatpickr-calendar.arrowTop:after {\n  bottom: 100%;\n}\n.flatpickr-calendar.arrowTop:before {\n  border-bottom-color: #e6e6e6;\n}\n.flatpickr-calendar.arrowTop:after {\n  border-bottom-color: #fff;\n}\n.flatpickr-calendar.arrowBottom:before,\n.flatpickr-calendar.arrowBottom:after {\n  top: 100%;\n}\n.flatpickr-calendar.arrowBottom:before {\n  border-top-color: #e6e6e6;\n}\n.flatpickr-calendar.arrowBottom:after {\n  border-top-color: #fff;\n}\n.flatpickr-calendar:focus {\n  outline: 0;\n}\n.flatpickr-wrapper {\n  position: relative;\n  display: inline-block;\n}\n.flatpickr-months {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n.flatpickr-months .flatpickr-month {\n  background: transparent;\n  color: rgba(0,0,0,0.9);\n  fill: rgba(0,0,0,0.9);\n  height: 28px;\n  line-height: 1;\n  text-align: center;\n  position: relative;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  overflow: hidden;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\n.flatpickr-months .flatpickr-prev-month,\n.flatpickr-months .flatpickr-next-month {\n  text-decoration: none;\n  cursor: pointer;\n  position: absolute;\n  top: 0px;\n  line-height: 16px;\n  height: 28px;\n  padding: 10px;\n  z-index: 3;\n  color: rgba(0,0,0,0.9);\n  fill: rgba(0,0,0,0.9);\n}\n.flatpickr-months .flatpickr-prev-month.disabled,\n.flatpickr-months .flatpickr-next-month.disabled {\n  display: none;\n}\n.flatpickr-months .flatpickr-prev-month i,\n.flatpickr-months .flatpickr-next-month i {\n  position: relative;\n}\n.flatpickr-months .flatpickr-prev-month.flatpickr-prev-month,\n.flatpickr-months .flatpickr-next-month.flatpickr-prev-month {\n/*\n      /*rtl:begin:ignore*/\n/*\n      */\n  left: 0;\n/*\n      /*rtl:end:ignore*/\n/*\n      */\n}\n/*\n      /*rtl:begin:ignore*/\n/*\n      /*rtl:end:ignore*/\n.flatpickr-months .flatpickr-prev-month.flatpickr-next-month,\n.flatpickr-months .flatpickr-next-month.flatpickr-next-month {\n/*\n      /*rtl:begin:ignore*/\n/*\n      */\n  right: 0;\n/*\n      /*rtl:end:ignore*/\n/*\n      */\n}\n/*\n      /*rtl:begin:ignore*/\n/*\n      /*rtl:end:ignore*/\n.flatpickr-months .flatpickr-prev-month:hover,\n.flatpickr-months .flatpickr-next-month:hover {\n  color: #959ea9;\n}\n.flatpickr-months .flatpickr-prev-month:hover svg,\n.flatpickr-months .flatpickr-next-month:hover svg {\n  fill: #f64747;\n}\n.flatpickr-months .flatpickr-prev-month svg,\n.flatpickr-months .flatpickr-next-month svg {\n  width: 14px;\n  height: 14px;\n}\n.flatpickr-months .flatpickr-prev-month svg path,\n.flatpickr-months .flatpickr-next-month svg path {\n  -webkit-transition: fill 0.1s;\n  transition: fill 0.1s;\n  fill: inherit;\n}\n.numInputWrapper {\n  position: relative;\n  height: auto;\n}\n.numInputWrapper input,\n.numInputWrapper span {\n  display: inline-block;\n}\n.numInputWrapper input {\n  width: 100%;\n}\n.numInputWrapper input::-ms-clear {\n  display: none;\n}\n.numInputWrapper span {\n  position: absolute;\n  right: 0;\n  width: 14px;\n  padding: 0 4px 0 2px;\n  height: 50%;\n  line-height: 50%;\n  opacity: 0;\n  cursor: pointer;\n  border: 1px solid rgba(57,57,57,0.15);\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.numInputWrapper span:hover {\n  background: rgba(0,0,0,0.1);\n}\n.numInputWrapper span:active {\n  background: rgba(0,0,0,0.2);\n}\n.numInputWrapper span:after {\n  display: block;\n  content: \"\";\n  position: absolute;\n}\n.numInputWrapper span.arrowUp {\n  top: 0;\n  border-bottom: 0;\n}\n.numInputWrapper span.arrowUp:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-bottom: 4px solid rgba(57,57,57,0.6);\n  top: 26%;\n}\n.numInputWrapper span.arrowDown {\n  top: 50%;\n}\n.numInputWrapper span.arrowDown:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-top: 4px solid rgba(57,57,57,0.6);\n  top: 40%;\n}\n.numInputWrapper span svg {\n  width: inherit;\n  height: auto;\n}\n.numInputWrapper span svg path {\n  fill: rgba(0,0,0,0.5);\n}\n.numInputWrapper:hover {\n  background: rgba(0,0,0,0.05);\n}\n.numInputWrapper:hover span {\n  opacity: 1;\n}\n.flatpickr-current-month {\n  font-size: 135%;\n  line-height: inherit;\n  font-weight: 300;\n  color: inherit;\n  position: absolute;\n  width: 75%;\n  left: 12.5%;\n  padding: 6.16px 0 0 0;\n  line-height: 1;\n  height: 28px;\n  display: inline-block;\n  text-align: center;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n}\n.flatpickr-current-month span.cur-month {\n  font-family: inherit;\n  font-weight: 700;\n  color: inherit;\n  display: inline-block;\n  margin-left: 0.5ch;\n  padding: 0;\n}\n.flatpickr-current-month span.cur-month:hover {\n  background: rgba(0,0,0,0.05);\n}\n.flatpickr-current-month .numInputWrapper {\n  width: 6ch;\n  width: 7ch\\0;\n  display: inline-block;\n}\n.flatpickr-current-month .numInputWrapper span.arrowUp:after {\n  border-bottom-color: rgba(0,0,0,0.9);\n}\n.flatpickr-current-month .numInputWrapper span.arrowDown:after {\n  border-top-color: rgba(0,0,0,0.9);\n}\n.flatpickr-current-month input.cur-year {\n  background: transparent;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: inherit;\n  cursor: text;\n  padding: 0 0 0 0.5ch;\n  margin: 0;\n  display: inline-block;\n  font-size: inherit;\n  font-family: inherit;\n  font-weight: 300;\n  line-height: inherit;\n  height: auto;\n  border: 0;\n  border-radius: 0;\n  vertical-align: initial;\n}\n.flatpickr-current-month input.cur-year:focus {\n  outline: 0;\n}\n.flatpickr-current-month input.cur-year[disabled],\n.flatpickr-current-month input.cur-year[disabled]:hover {\n  font-size: 100%;\n  color: rgba(0,0,0,0.5);\n  background: transparent;\n  pointer-events: none;\n}\n.flatpickr-weekdays {\n  background: transparent;\n  text-align: center;\n  overflow: hidden;\n  width: 100%;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  height: 28px;\n}\n.flatpickr-weekdays .flatpickr-weekdaycontainer {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\nspan.flatpickr-weekday {\n  cursor: default;\n  font-size: 90%;\n  background: transparent;\n  color: rgba(0,0,0,0.54);\n  line-height: 1;\n  margin: 0;\n  text-align: center;\n  display: block;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  font-weight: bolder;\n}\n.dayContainer,\n.flatpickr-weeks {\n  padding: 1px 0 0 0;\n}\n.flatpickr-days {\n  position: relative;\n  overflow: hidden;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: start;\n  -webkit-align-items: flex-start;\n      -ms-flex-align: start;\n          align-items: flex-start;\n  width: 307.875px;\n}\n.flatpickr-days:focus {\n  outline: 0;\n}\n.dayContainer {\n  padding: 0;\n  outline: 0;\n  text-align: left;\n  width: 307.875px;\n  min-width: 307.875px;\n  max-width: 307.875px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  display: inline-block;\n  display: -ms-flexbox;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: flex;\n  -webkit-flex-wrap: wrap;\n          flex-wrap: wrap;\n  -ms-flex-wrap: wrap;\n  -ms-flex-pack: justify;\n  -webkit-justify-content: space-around;\n          justify-content: space-around;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n  opacity: 1;\n}\n.dayContainer + .dayContainer {\n  -webkit-box-shadow: -1px 0 0 #e6e6e6;\n          box-shadow: -1px 0 0 #e6e6e6;\n}\n.flatpickr-day {\n  background: none;\n  border: 1px solid transparent;\n  border-radius: 150px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: #393939;\n  cursor: pointer;\n  font-weight: 400;\n  width: 14.2857143%;\n  -webkit-flex-basis: 14.2857143%;\n      -ms-flex-preferred-size: 14.2857143%;\n          flex-basis: 14.2857143%;\n  max-width: 39px;\n  height: 39px;\n  line-height: 39px;\n  margin: 0;\n  display: inline-block;\n  position: relative;\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  text-align: center;\n}\n.flatpickr-day.inRange,\n.flatpickr-day.prevMonthDay.inRange,\n.flatpickr-day.nextMonthDay.inRange,\n.flatpickr-day.today.inRange,\n.flatpickr-day.prevMonthDay.today.inRange,\n.flatpickr-day.nextMonthDay.today.inRange,\n.flatpickr-day:hover,\n.flatpickr-day.prevMonthDay:hover,\n.flatpickr-day.nextMonthDay:hover,\n.flatpickr-day:focus,\n.flatpickr-day.prevMonthDay:focus,\n.flatpickr-day.nextMonthDay:focus {\n  cursor: pointer;\n  outline: 0;\n  background: #e6e6e6;\n  border-color: #e6e6e6;\n}\n.flatpickr-day.today {\n  border-color: #959ea9;\n}\n.flatpickr-day.today:hover,\n.flatpickr-day.today:focus {\n  border-color: #959ea9;\n  background: #959ea9;\n  color: #fff;\n}\n.flatpickr-day.selected,\n.flatpickr-day.startRange,\n.flatpickr-day.endRange,\n.flatpickr-day.selected.inRange,\n.flatpickr-day.startRange.inRange,\n.flatpickr-day.endRange.inRange,\n.flatpickr-day.selected:focus,\n.flatpickr-day.startRange:focus,\n.flatpickr-day.endRange:focus,\n.flatpickr-day.selected:hover,\n.flatpickr-day.startRange:hover,\n.flatpickr-day.endRange:hover,\n.flatpickr-day.selected.prevMonthDay,\n.flatpickr-day.startRange.prevMonthDay,\n.flatpickr-day.endRange.prevMonthDay,\n.flatpickr-day.selected.nextMonthDay,\n.flatpickr-day.startRange.nextMonthDay,\n.flatpickr-day.endRange.nextMonthDay {\n  background: #569ff7;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  color: #fff;\n  border-color: #569ff7;\n}\n.flatpickr-day.selected.startRange,\n.flatpickr-day.startRange.startRange,\n.flatpickr-day.endRange.startRange {\n  border-radius: 50px 0 0 50px;\n}\n.flatpickr-day.selected.endRange,\n.flatpickr-day.startRange.endRange,\n.flatpickr-day.endRange.endRange {\n  border-radius: 0 50px 50px 0;\n}\n.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)),\n.flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)),\n.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)) {\n  -webkit-box-shadow: -10px 0 0 #569ff7;\n          box-shadow: -10px 0 0 #569ff7;\n}\n.flatpickr-day.selected.startRange.endRange,\n.flatpickr-day.startRange.startRange.endRange,\n.flatpickr-day.endRange.startRange.endRange {\n  border-radius: 50px;\n}\n.flatpickr-day.inRange {\n  border-radius: 0;\n  -webkit-box-shadow: -5px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n          box-shadow: -5px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover,\n.flatpickr-day.prevMonthDay,\n.flatpickr-day.nextMonthDay,\n.flatpickr-day.notAllowed,\n.flatpickr-day.notAllowed.prevMonthDay,\n.flatpickr-day.notAllowed.nextMonthDay {\n  color: rgba(57,57,57,0.3);\n  background: transparent;\n  border-color: transparent;\n  cursor: default;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover {\n  cursor: not-allowed;\n  color: rgba(57,57,57,0.1);\n}\n.flatpickr-day.week.selected {\n  border-radius: 0;\n  -webkit-box-shadow: -5px 0 0 #569ff7, 5px 0 0 #569ff7;\n          box-shadow: -5px 0 0 #569ff7, 5px 0 0 #569ff7;\n}\n.flatpickr-day.hidden {\n  visibility: hidden;\n}\n.rangeMode .flatpickr-day {\n  margin-top: 1px;\n}\n.flatpickr-weekwrapper {\n  display: inline-block;\n  float: left;\n}\n.flatpickr-weekwrapper .flatpickr-weeks {\n  padding: 0 12px;\n  -webkit-box-shadow: 1px 0 0 #e6e6e6;\n          box-shadow: 1px 0 0 #e6e6e6;\n}\n.flatpickr-weekwrapper .flatpickr-weekday {\n  float: none;\n  width: 100%;\n  line-height: 28px;\n}\n.flatpickr-weekwrapper span.flatpickr-day,\n.flatpickr-weekwrapper span.flatpickr-day:hover {\n  display: block;\n  width: 100%;\n  max-width: none;\n  color: rgba(57,57,57,0.3);\n  background: transparent;\n  cursor: default;\n  border: none;\n}\n.flatpickr-innerContainer {\n  display: block;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  overflow: hidden;\n}\n.flatpickr-rContainer {\n  display: inline-block;\n  padding: 0;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.flatpickr-time {\n  text-align: center;\n  outline: 0;\n  display: block;\n  height: 0;\n  line-height: 40px;\n  max-height: 40px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  overflow: hidden;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n.flatpickr-time:after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n.flatpickr-time .numInputWrapper {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  width: 40%;\n  height: 40px;\n  float: left;\n}\n.flatpickr-time .numInputWrapper span.arrowUp:after {\n  border-bottom-color: #393939;\n}\n.flatpickr-time .numInputWrapper span.arrowDown:after {\n  border-top-color: #393939;\n}\n.flatpickr-time.hasSeconds .numInputWrapper {\n  width: 26%;\n}\n.flatpickr-time.time24hr .numInputWrapper {\n  width: 49%;\n}\n.flatpickr-time input {\n  background: transparent;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  border: 0;\n  border-radius: 0;\n  text-align: center;\n  margin: 0;\n  padding: 0;\n  height: inherit;\n  line-height: inherit;\n  color: #393939;\n  font-size: 14px;\n  position: relative;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.flatpickr-time input.flatpickr-hour {\n  font-weight: bold;\n}\n.flatpickr-time input.flatpickr-minute,\n.flatpickr-time input.flatpickr-second {\n  font-weight: 400;\n}\n.flatpickr-time input:focus {\n  outline: 0;\n  border: 0;\n}\n.flatpickr-time .flatpickr-time-separator,\n.flatpickr-time .flatpickr-am-pm {\n  height: inherit;\n  display: inline-block;\n  float: left;\n  line-height: inherit;\n  color: #393939;\n  font-weight: bold;\n  width: 2%;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  -webkit-align-self: center;\n      -ms-flex-item-align: center;\n          align-self: center;\n}\n.flatpickr-time .flatpickr-am-pm {\n  outline: 0;\n  width: 18%;\n  cursor: pointer;\n  text-align: center;\n  font-weight: 400;\n}\n.flatpickr-time input:hover,\n.flatpickr-time .flatpickr-am-pm:hover,\n.flatpickr-time input:focus,\n.flatpickr-time .flatpickr-am-pm:focus {\n  background: #f3f3f3;\n}\n.flatpickr-input[readonly] {\n  cursor: pointer;\n}\n@-webkit-keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n"; });
-define('text!flatpickr/themes/dark.css', ['module'], function(module) { module.exports = ".flatpickr-calendar {\n  background: transparent;\n  opacity: 0;\n  display: none;\n  text-align: center;\n  visibility: hidden;\n  padding: 0;\n  -webkit-animation: none;\n          animation: none;\n  direction: ltr;\n  border: 0;\n  font-size: 14px;\n  line-height: 24px;\n  border-radius: 5px;\n  position: absolute;\n  width: 307.875px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n  background: #3f4458;\n  -webkit-box-shadow: 1px 0 0 #20222c, -1px 0 0 #20222c, 0 1px 0 #20222c, 0 -1px 0 #20222c, 0 3px 13px rgba(0,0,0,0.08);\n          box-shadow: 1px 0 0 #20222c, -1px 0 0 #20222c, 0 1px 0 #20222c, 0 -1px 0 #20222c, 0 3px 13px rgba(0,0,0,0.08);\n}\n.flatpickr-calendar.open,\n.flatpickr-calendar.inline {\n  opacity: 1;\n  max-height: 640px;\n  visibility: visible;\n}\n.flatpickr-calendar.open {\n  display: inline-block;\n  z-index: 99999;\n}\n.flatpickr-calendar.animate.open {\n  -webkit-animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.inline {\n  display: block;\n  position: relative;\n  top: 2px;\n}\n.flatpickr-calendar.static {\n  position: absolute;\n  top: calc(100% + 2px);\n}\n.flatpickr-calendar.static.open {\n  z-index: 999;\n  display: block;\n}\n.flatpickr-calendar.multiMonth .flatpickr-days .dayContainer:nth-child(n+1) .flatpickr-day.inRange:nth-child(7n+7) {\n  -webkit-box-shadow: none !important;\n          box-shadow: none !important;\n}\n.flatpickr-calendar.multiMonth .flatpickr-days .dayContainer:nth-child(n+2) .flatpickr-day.inRange:nth-child(7n+1) {\n  -webkit-box-shadow: -2px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n          box-shadow: -2px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n}\n.flatpickr-calendar .hasWeeks .dayContainer,\n.flatpickr-calendar .hasTime .dayContainer {\n  border-bottom: 0;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.flatpickr-calendar .hasWeeks .dayContainer {\n  border-left: 0;\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\n  height: 40px;\n  border-top: 1px solid #20222c;\n}\n.flatpickr-calendar.noCalendar.hasTime .flatpickr-time {\n  height: auto;\n}\n.flatpickr-calendar:before,\n.flatpickr-calendar:after {\n  position: absolute;\n  display: block;\n  pointer-events: none;\n  border: solid transparent;\n  content: '';\n  height: 0;\n  width: 0;\n  left: 22px;\n}\n.flatpickr-calendar.rightMost:before,\n.flatpickr-calendar.rightMost:after {\n  left: auto;\n  right: 22px;\n}\n.flatpickr-calendar:before {\n  border-width: 5px;\n  margin: 0 -5px;\n}\n.flatpickr-calendar:after {\n  border-width: 4px;\n  margin: 0 -4px;\n}\n.flatpickr-calendar.arrowTop:before,\n.flatpickr-calendar.arrowTop:after {\n  bottom: 100%;\n}\n.flatpickr-calendar.arrowTop:before {\n  border-bottom-color: #20222c;\n}\n.flatpickr-calendar.arrowTop:after {\n  border-bottom-color: #3f4458;\n}\n.flatpickr-calendar.arrowBottom:before,\n.flatpickr-calendar.arrowBottom:after {\n  top: 100%;\n}\n.flatpickr-calendar.arrowBottom:before {\n  border-top-color: #20222c;\n}\n.flatpickr-calendar.arrowBottom:after {\n  border-top-color: #3f4458;\n}\n.flatpickr-calendar:focus {\n  outline: 0;\n}\n.flatpickr-wrapper {\n  position: relative;\n  display: inline-block;\n}\n.flatpickr-months {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n.flatpickr-months .flatpickr-month {\n  background: transparent;\n  color: #fff;\n  fill: #fff;\n  height: 28px;\n  line-height: 1;\n  text-align: center;\n  position: relative;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  overflow: hidden;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\n.flatpickr-months .flatpickr-prev-month,\n.flatpickr-months .flatpickr-next-month {\n  text-decoration: none;\n  cursor: pointer;\n  position: absolute;\n  top: 0px;\n  line-height: 16px;\n  height: 28px;\n  padding: 10px;\n  z-index: 3;\n  color: #fff;\n  fill: #fff;\n}\n.flatpickr-months .flatpickr-prev-month.disabled,\n.flatpickr-months .flatpickr-next-month.disabled {\n  display: none;\n}\n.flatpickr-months .flatpickr-prev-month i,\n.flatpickr-months .flatpickr-next-month i {\n  position: relative;\n}\n.flatpickr-months .flatpickr-prev-month.flatpickr-prev-month,\n.flatpickr-months .flatpickr-next-month.flatpickr-prev-month {\n/*\n      /*rtl:begin:ignore*/\n/*\n      */\n  left: 0;\n/*\n      /*rtl:end:ignore*/\n/*\n      */\n}\n/*\n      /*rtl:begin:ignore*/\n/*\n      /*rtl:end:ignore*/\n.flatpickr-months .flatpickr-prev-month.flatpickr-next-month,\n.flatpickr-months .flatpickr-next-month.flatpickr-next-month {\n/*\n      /*rtl:begin:ignore*/\n/*\n      */\n  right: 0;\n/*\n      /*rtl:end:ignore*/\n/*\n      */\n}\n/*\n      /*rtl:begin:ignore*/\n/*\n      /*rtl:end:ignore*/\n.flatpickr-months .flatpickr-prev-month:hover,\n.flatpickr-months .flatpickr-next-month:hover {\n  color: #eee;\n}\n.flatpickr-months .flatpickr-prev-month:hover svg,\n.flatpickr-months .flatpickr-next-month:hover svg {\n  fill: #f64747;\n}\n.flatpickr-months .flatpickr-prev-month svg,\n.flatpickr-months .flatpickr-next-month svg {\n  width: 14px;\n  height: 14px;\n}\n.flatpickr-months .flatpickr-prev-month svg path,\n.flatpickr-months .flatpickr-next-month svg path {\n  -webkit-transition: fill 0.1s;\n  transition: fill 0.1s;\n  fill: inherit;\n}\n.numInputWrapper {\n  position: relative;\n  height: auto;\n}\n.numInputWrapper input,\n.numInputWrapper span {\n  display: inline-block;\n}\n.numInputWrapper input {\n  width: 100%;\n}\n.numInputWrapper input::-ms-clear {\n  display: none;\n}\n.numInputWrapper span {\n  position: absolute;\n  right: 0;\n  width: 14px;\n  padding: 0 4px 0 2px;\n  height: 50%;\n  line-height: 50%;\n  opacity: 0;\n  cursor: pointer;\n  border: 1px solid rgba(255,255,255,0.15);\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.numInputWrapper span:hover {\n  background: rgba(192,187,167,0.1);\n}\n.numInputWrapper span:active {\n  background: rgba(192,187,167,0.2);\n}\n.numInputWrapper span:after {\n  display: block;\n  content: \"\";\n  position: absolute;\n}\n.numInputWrapper span.arrowUp {\n  top: 0;\n  border-bottom: 0;\n}\n.numInputWrapper span.arrowUp:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-bottom: 4px solid rgba(255,255,255,0.6);\n  top: 26%;\n}\n.numInputWrapper span.arrowDown {\n  top: 50%;\n}\n.numInputWrapper span.arrowDown:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-top: 4px solid rgba(255,255,255,0.6);\n  top: 40%;\n}\n.numInputWrapper span svg {\n  width: inherit;\n  height: auto;\n}\n.numInputWrapper span svg path {\n  fill: rgba(255,255,255,0.5);\n}\n.numInputWrapper:hover {\n  background: rgba(192,187,167,0.05);\n}\n.numInputWrapper:hover span {\n  opacity: 1;\n}\n.flatpickr-current-month {\n  font-size: 135%;\n  line-height: inherit;\n  font-weight: 300;\n  color: inherit;\n  position: absolute;\n  width: 75%;\n  left: 12.5%;\n  padding: 6.16px 0 0 0;\n  line-height: 1;\n  height: 28px;\n  display: inline-block;\n  text-align: center;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n}\n.flatpickr-current-month span.cur-month {\n  font-family: inherit;\n  font-weight: 700;\n  color: inherit;\n  display: inline-block;\n  margin-left: 0.5ch;\n  padding: 0;\n}\n.flatpickr-current-month span.cur-month:hover {\n  background: rgba(192,187,167,0.05);\n}\n.flatpickr-current-month .numInputWrapper {\n  width: 6ch;\n  width: 7ch\\0;\n  display: inline-block;\n}\n.flatpickr-current-month .numInputWrapper span.arrowUp:after {\n  border-bottom-color: #fff;\n}\n.flatpickr-current-month .numInputWrapper span.arrowDown:after {\n  border-top-color: #fff;\n}\n.flatpickr-current-month input.cur-year {\n  background: transparent;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: inherit;\n  cursor: text;\n  padding: 0 0 0 0.5ch;\n  margin: 0;\n  display: inline-block;\n  font-size: inherit;\n  font-family: inherit;\n  font-weight: 300;\n  line-height: inherit;\n  height: auto;\n  border: 0;\n  border-radius: 0;\n  vertical-align: initial;\n}\n.flatpickr-current-month input.cur-year:focus {\n  outline: 0;\n}\n.flatpickr-current-month input.cur-year[disabled],\n.flatpickr-current-month input.cur-year[disabled]:hover {\n  font-size: 100%;\n  color: rgba(255,255,255,0.5);\n  background: transparent;\n  pointer-events: none;\n}\n.flatpickr-weekdays {\n  background: transparent;\n  text-align: center;\n  overflow: hidden;\n  width: 100%;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  height: 28px;\n}\n.flatpickr-weekdays .flatpickr-weekdaycontainer {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\nspan.flatpickr-weekday {\n  cursor: default;\n  font-size: 90%;\n  background: transparent;\n  color: #fff;\n  line-height: 1;\n  margin: 0;\n  text-align: center;\n  display: block;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  font-weight: bolder;\n}\n.dayContainer,\n.flatpickr-weeks {\n  padding: 1px 0 0 0;\n}\n.flatpickr-days {\n  position: relative;\n  overflow: hidden;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: start;\n  -webkit-align-items: flex-start;\n      -ms-flex-align: start;\n          align-items: flex-start;\n  width: 307.875px;\n}\n.flatpickr-days:focus {\n  outline: 0;\n}\n.dayContainer {\n  padding: 0;\n  outline: 0;\n  text-align: left;\n  width: 307.875px;\n  min-width: 307.875px;\n  max-width: 307.875px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  display: inline-block;\n  display: -ms-flexbox;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: flex;\n  -webkit-flex-wrap: wrap;\n          flex-wrap: wrap;\n  -ms-flex-wrap: wrap;\n  -ms-flex-pack: justify;\n  -webkit-justify-content: space-around;\n          justify-content: space-around;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n  opacity: 1;\n}\n.dayContainer + .dayContainer {\n  -webkit-box-shadow: -1px 0 0 #20222c;\n          box-shadow: -1px 0 0 #20222c;\n}\n.flatpickr-day {\n  background: none;\n  border: 1px solid transparent;\n  border-radius: 150px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: rgba(255,255,255,0.95);\n  cursor: pointer;\n  font-weight: 400;\n  width: 14.2857143%;\n  -webkit-flex-basis: 14.2857143%;\n      -ms-flex-preferred-size: 14.2857143%;\n          flex-basis: 14.2857143%;\n  max-width: 39px;\n  height: 39px;\n  line-height: 39px;\n  margin: 0;\n  display: inline-block;\n  position: relative;\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  text-align: center;\n}\n.flatpickr-day.inRange,\n.flatpickr-day.prevMonthDay.inRange,\n.flatpickr-day.nextMonthDay.inRange,\n.flatpickr-day.today.inRange,\n.flatpickr-day.prevMonthDay.today.inRange,\n.flatpickr-day.nextMonthDay.today.inRange,\n.flatpickr-day:hover,\n.flatpickr-day.prevMonthDay:hover,\n.flatpickr-day.nextMonthDay:hover,\n.flatpickr-day:focus,\n.flatpickr-day.prevMonthDay:focus,\n.flatpickr-day.nextMonthDay:focus {\n  cursor: pointer;\n  outline: 0;\n  background: #646c8c;\n  border-color: #646c8c;\n}\n.flatpickr-day.today {\n  border-color: #eee;\n}\n.flatpickr-day.today:hover,\n.flatpickr-day.today:focus {\n  border-color: #eee;\n  background: #eee;\n  color: #3f4458;\n}\n.flatpickr-day.selected,\n.flatpickr-day.startRange,\n.flatpickr-day.endRange,\n.flatpickr-day.selected.inRange,\n.flatpickr-day.startRange.inRange,\n.flatpickr-day.endRange.inRange,\n.flatpickr-day.selected:focus,\n.flatpickr-day.startRange:focus,\n.flatpickr-day.endRange:focus,\n.flatpickr-day.selected:hover,\n.flatpickr-day.startRange:hover,\n.flatpickr-day.endRange:hover,\n.flatpickr-day.selected.prevMonthDay,\n.flatpickr-day.startRange.prevMonthDay,\n.flatpickr-day.endRange.prevMonthDay,\n.flatpickr-day.selected.nextMonthDay,\n.flatpickr-day.startRange.nextMonthDay,\n.flatpickr-day.endRange.nextMonthDay {\n  background: #80cbc4;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  color: #fff;\n  border-color: #80cbc4;\n}\n.flatpickr-day.selected.startRange,\n.flatpickr-day.startRange.startRange,\n.flatpickr-day.endRange.startRange {\n  border-radius: 50px 0 0 50px;\n}\n.flatpickr-day.selected.endRange,\n.flatpickr-day.startRange.endRange,\n.flatpickr-day.endRange.endRange {\n  border-radius: 0 50px 50px 0;\n}\n.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)),\n.flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)),\n.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)) {\n  -webkit-box-shadow: -10px 0 0 #80cbc4;\n          box-shadow: -10px 0 0 #80cbc4;\n}\n.flatpickr-day.selected.startRange.endRange,\n.flatpickr-day.startRange.startRange.endRange,\n.flatpickr-day.endRange.startRange.endRange {\n  border-radius: 50px;\n}\n.flatpickr-day.inRange {\n  border-radius: 0;\n  -webkit-box-shadow: -5px 0 0 #646c8c, 5px 0 0 #646c8c;\n          box-shadow: -5px 0 0 #646c8c, 5px 0 0 #646c8c;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover,\n.flatpickr-day.prevMonthDay,\n.flatpickr-day.nextMonthDay,\n.flatpickr-day.notAllowed,\n.flatpickr-day.notAllowed.prevMonthDay,\n.flatpickr-day.notAllowed.nextMonthDay {\n  color: rgba(255,255,255,0.3);\n  background: transparent;\n  border-color: transparent;\n  cursor: default;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover {\n  cursor: not-allowed;\n  color: rgba(255,255,255,0.1);\n}\n.flatpickr-day.week.selected {\n  border-radius: 0;\n  -webkit-box-shadow: -5px 0 0 #80cbc4, 5px 0 0 #80cbc4;\n          box-shadow: -5px 0 0 #80cbc4, 5px 0 0 #80cbc4;\n}\n.flatpickr-day.hidden {\n  visibility: hidden;\n}\n.rangeMode .flatpickr-day {\n  margin-top: 1px;\n}\n.flatpickr-weekwrapper {\n  display: inline-block;\n  float: left;\n}\n.flatpickr-weekwrapper .flatpickr-weeks {\n  padding: 0 12px;\n  -webkit-box-shadow: 1px 0 0 #20222c;\n          box-shadow: 1px 0 0 #20222c;\n}\n.flatpickr-weekwrapper .flatpickr-weekday {\n  float: none;\n  width: 100%;\n  line-height: 28px;\n}\n.flatpickr-weekwrapper span.flatpickr-day,\n.flatpickr-weekwrapper span.flatpickr-day:hover {\n  display: block;\n  width: 100%;\n  max-width: none;\n  color: rgba(255,255,255,0.3);\n  background: transparent;\n  cursor: default;\n  border: none;\n}\n.flatpickr-innerContainer {\n  display: block;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  overflow: hidden;\n}\n.flatpickr-rContainer {\n  display: inline-block;\n  padding: 0;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.flatpickr-time {\n  text-align: center;\n  outline: 0;\n  display: block;\n  height: 0;\n  line-height: 40px;\n  max-height: 40px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  overflow: hidden;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n.flatpickr-time:after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n.flatpickr-time .numInputWrapper {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  width: 40%;\n  height: 40px;\n  float: left;\n}\n.flatpickr-time .numInputWrapper span.arrowUp:after {\n  border-bottom-color: rgba(255,255,255,0.95);\n}\n.flatpickr-time .numInputWrapper span.arrowDown:after {\n  border-top-color: rgba(255,255,255,0.95);\n}\n.flatpickr-time.hasSeconds .numInputWrapper {\n  width: 26%;\n}\n.flatpickr-time.time24hr .numInputWrapper {\n  width: 49%;\n}\n.flatpickr-time input {\n  background: transparent;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  border: 0;\n  border-radius: 0;\n  text-align: center;\n  margin: 0;\n  padding: 0;\n  height: inherit;\n  line-height: inherit;\n  color: rgba(255,255,255,0.95);\n  font-size: 14px;\n  position: relative;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.flatpickr-time input.flatpickr-hour {\n  font-weight: bold;\n}\n.flatpickr-time input.flatpickr-minute,\n.flatpickr-time input.flatpickr-second {\n  font-weight: 400;\n}\n.flatpickr-time input:focus {\n  outline: 0;\n  border: 0;\n}\n.flatpickr-time .flatpickr-time-separator,\n.flatpickr-time .flatpickr-am-pm {\n  height: inherit;\n  display: inline-block;\n  float: left;\n  line-height: inherit;\n  color: rgba(255,255,255,0.95);\n  font-weight: bold;\n  width: 2%;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  -webkit-align-self: center;\n      -ms-flex-item-align: center;\n          align-self: center;\n}\n.flatpickr-time .flatpickr-am-pm {\n  outline: 0;\n  width: 18%;\n  cursor: pointer;\n  text-align: center;\n  font-weight: 400;\n}\n.flatpickr-time input:hover,\n.flatpickr-time .flatpickr-am-pm:hover,\n.flatpickr-time input:focus,\n.flatpickr-time .flatpickr-am-pm:focus {\n  background: #707999;\n}\n.flatpickr-input[readonly] {\n  cursor: pointer;\n}\n@-webkit-keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n"; });
-define('text!flatpickr/themes/material_blue.css', ['module'], function(module) { module.exports = ".flatpickr-calendar {\n  background: transparent;\n  opacity: 0;\n  display: none;\n  text-align: center;\n  visibility: hidden;\n  padding: 0;\n  -webkit-animation: none;\n          animation: none;\n  direction: ltr;\n  border: 0;\n  font-size: 14px;\n  line-height: 24px;\n  border-radius: 5px;\n  position: absolute;\n  width: 307.875px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n  -webkit-box-shadow: 0 3px 13px rgba(0,0,0,0.08);\n          box-shadow: 0 3px 13px rgba(0,0,0,0.08);\n}\n.flatpickr-calendar.open,\n.flatpickr-calendar.inline {\n  opacity: 1;\n  max-height: 640px;\n  visibility: visible;\n}\n.flatpickr-calendar.open {\n  display: inline-block;\n  z-index: 99999;\n}\n.flatpickr-calendar.animate.open {\n  -webkit-animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.inline {\n  display: block;\n  position: relative;\n  top: 2px;\n}\n.flatpickr-calendar.static {\n  position: absolute;\n  top: calc(100% + 2px);\n}\n.flatpickr-calendar.static.open {\n  z-index: 999;\n  display: block;\n}\n.flatpickr-calendar.multiMonth .flatpickr-days .dayContainer:nth-child(n+1) .flatpickr-day.inRange:nth-child(7n+7) {\n  -webkit-box-shadow: none !important;\n          box-shadow: none !important;\n}\n.flatpickr-calendar.multiMonth .flatpickr-days .dayContainer:nth-child(n+2) .flatpickr-day.inRange:nth-child(7n+1) {\n  -webkit-box-shadow: -2px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n          box-shadow: -2px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n}\n.flatpickr-calendar .hasWeeks .dayContainer,\n.flatpickr-calendar .hasTime .dayContainer {\n  border-bottom: 0;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.flatpickr-calendar .hasWeeks .dayContainer {\n  border-left: 0;\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\n  height: 40px;\n  border-top: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-innerContainer {\n  border-bottom: 0;\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\n  border: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-calendar.noCalendar.hasTime .flatpickr-time {\n  height: auto;\n}\n.flatpickr-calendar:before,\n.flatpickr-calendar:after {\n  position: absolute;\n  display: block;\n  pointer-events: none;\n  border: solid transparent;\n  content: '';\n  height: 0;\n  width: 0;\n  left: 22px;\n}\n.flatpickr-calendar.rightMost:before,\n.flatpickr-calendar.rightMost:after {\n  left: auto;\n  right: 22px;\n}\n.flatpickr-calendar:before {\n  border-width: 5px;\n  margin: 0 -5px;\n}\n.flatpickr-calendar:after {\n  border-width: 4px;\n  margin: 0 -4px;\n}\n.flatpickr-calendar.arrowTop:before,\n.flatpickr-calendar.arrowTop:after {\n  bottom: 100%;\n}\n.flatpickr-calendar.arrowTop:before {\n  border-bottom-color: rgba(72,72,72,0.2);\n}\n.flatpickr-calendar.arrowTop:after {\n  border-bottom-color: #42a5f5;\n}\n.flatpickr-calendar.arrowBottom:before,\n.flatpickr-calendar.arrowBottom:after {\n  top: 100%;\n}\n.flatpickr-calendar.arrowBottom:before {\n  border-top-color: rgba(72,72,72,0.2);\n}\n.flatpickr-calendar.arrowBottom:after {\n  border-top-color: #42a5f5;\n}\n.flatpickr-calendar:focus {\n  outline: 0;\n}\n.flatpickr-wrapper {\n  position: relative;\n  display: inline-block;\n}\n.flatpickr-months {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n.flatpickr-months .flatpickr-month {\n  border-radius: 5px 5px 0 0;\n  background: #42a5f5;\n  color: #fff;\n  fill: #fff;\n  height: 28px;\n  line-height: 1;\n  text-align: center;\n  position: relative;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  overflow: hidden;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\n.flatpickr-months .flatpickr-prev-month,\n.flatpickr-months .flatpickr-next-month {\n  text-decoration: none;\n  cursor: pointer;\n  position: absolute;\n  top: 0px;\n  line-height: 16px;\n  height: 28px;\n  padding: 10px;\n  z-index: 3;\n  color: #fff;\n  fill: #fff;\n}\n.flatpickr-months .flatpickr-prev-month.disabled,\n.flatpickr-months .flatpickr-next-month.disabled {\n  display: none;\n}\n.flatpickr-months .flatpickr-prev-month i,\n.flatpickr-months .flatpickr-next-month i {\n  position: relative;\n}\n.flatpickr-months .flatpickr-prev-month.flatpickr-prev-month,\n.flatpickr-months .flatpickr-next-month.flatpickr-prev-month {\n/*\n      /*rtl:begin:ignore*/\n/*\n      */\n  left: 0;\n/*\n      /*rtl:end:ignore*/\n/*\n      */\n}\n/*\n      /*rtl:begin:ignore*/\n/*\n      /*rtl:end:ignore*/\n.flatpickr-months .flatpickr-prev-month.flatpickr-next-month,\n.flatpickr-months .flatpickr-next-month.flatpickr-next-month {\n/*\n      /*rtl:begin:ignore*/\n/*\n      */\n  right: 0;\n/*\n      /*rtl:end:ignore*/\n/*\n      */\n}\n/*\n      /*rtl:begin:ignore*/\n/*\n      /*rtl:end:ignore*/\n.flatpickr-months .flatpickr-prev-month:hover,\n.flatpickr-months .flatpickr-next-month:hover {\n  color: #bbb;\n}\n.flatpickr-months .flatpickr-prev-month:hover svg,\n.flatpickr-months .flatpickr-next-month:hover svg {\n  fill: #f64747;\n}\n.flatpickr-months .flatpickr-prev-month svg,\n.flatpickr-months .flatpickr-next-month svg {\n  width: 14px;\n  height: 14px;\n}\n.flatpickr-months .flatpickr-prev-month svg path,\n.flatpickr-months .flatpickr-next-month svg path {\n  -webkit-transition: fill 0.1s;\n  transition: fill 0.1s;\n  fill: inherit;\n}\n.numInputWrapper {\n  position: relative;\n  height: auto;\n}\n.numInputWrapper input,\n.numInputWrapper span {\n  display: inline-block;\n}\n.numInputWrapper input {\n  width: 100%;\n}\n.numInputWrapper input::-ms-clear {\n  display: none;\n}\n.numInputWrapper span {\n  position: absolute;\n  right: 0;\n  width: 14px;\n  padding: 0 4px 0 2px;\n  height: 50%;\n  line-height: 50%;\n  opacity: 0;\n  cursor: pointer;\n  border: 1px solid rgba(72,72,72,0.15);\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.numInputWrapper span:hover {\n  background: rgba(0,0,0,0.1);\n}\n.numInputWrapper span:active {\n  background: rgba(0,0,0,0.2);\n}\n.numInputWrapper span:after {\n  display: block;\n  content: \"\";\n  position: absolute;\n}\n.numInputWrapper span.arrowUp {\n  top: 0;\n  border-bottom: 0;\n}\n.numInputWrapper span.arrowUp:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-bottom: 4px solid rgba(72,72,72,0.6);\n  top: 26%;\n}\n.numInputWrapper span.arrowDown {\n  top: 50%;\n}\n.numInputWrapper span.arrowDown:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-top: 4px solid rgba(72,72,72,0.6);\n  top: 40%;\n}\n.numInputWrapper span svg {\n  width: inherit;\n  height: auto;\n}\n.numInputWrapper span svg path {\n  fill: rgba(255,255,255,0.5);\n}\n.numInputWrapper:hover {\n  background: rgba(0,0,0,0.05);\n}\n.numInputWrapper:hover span {\n  opacity: 1;\n}\n.flatpickr-current-month {\n  font-size: 135%;\n  line-height: inherit;\n  font-weight: 300;\n  color: inherit;\n  position: absolute;\n  width: 75%;\n  left: 12.5%;\n  padding: 6.16px 0 0 0;\n  line-height: 1;\n  height: 28px;\n  display: inline-block;\n  text-align: center;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n}\n.flatpickr-current-month span.cur-month {\n  font-family: inherit;\n  font-weight: 700;\n  color: inherit;\n  display: inline-block;\n  margin-left: 0.5ch;\n  padding: 0;\n}\n.flatpickr-current-month span.cur-month:hover {\n  background: rgba(0,0,0,0.05);\n}\n.flatpickr-current-month .numInputWrapper {\n  width: 6ch;\n  width: 7ch\\0;\n  display: inline-block;\n}\n.flatpickr-current-month .numInputWrapper span.arrowUp:after {\n  border-bottom-color: #fff;\n}\n.flatpickr-current-month .numInputWrapper span.arrowDown:after {\n  border-top-color: #fff;\n}\n.flatpickr-current-month input.cur-year {\n  background: transparent;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: inherit;\n  cursor: text;\n  padding: 0 0 0 0.5ch;\n  margin: 0;\n  display: inline-block;\n  font-size: inherit;\n  font-family: inherit;\n  font-weight: 300;\n  line-height: inherit;\n  height: auto;\n  border: 0;\n  border-radius: 0;\n  vertical-align: initial;\n}\n.flatpickr-current-month input.cur-year:focus {\n  outline: 0;\n}\n.flatpickr-current-month input.cur-year[disabled],\n.flatpickr-current-month input.cur-year[disabled]:hover {\n  font-size: 100%;\n  color: rgba(255,255,255,0.5);\n  background: transparent;\n  pointer-events: none;\n}\n.flatpickr-weekdays {\n  background: #42a5f5;\n  text-align: center;\n  overflow: hidden;\n  width: 100%;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  height: 28px;\n}\n.flatpickr-weekdays .flatpickr-weekdaycontainer {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\nspan.flatpickr-weekday {\n  cursor: default;\n  font-size: 90%;\n  background: #42a5f5;\n  color: rgba(0,0,0,0.54);\n  line-height: 1;\n  margin: 0;\n  text-align: center;\n  display: block;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  font-weight: bolder;\n}\n.dayContainer,\n.flatpickr-weeks {\n  padding: 1px 0 0 0;\n}\n.flatpickr-days {\n  position: relative;\n  overflow: hidden;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: start;\n  -webkit-align-items: flex-start;\n      -ms-flex-align: start;\n          align-items: flex-start;\n  width: 307.875px;\n  border-left: 1px solid rgba(72,72,72,0.2);\n  border-right: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-days:focus {\n  outline: 0;\n}\n.dayContainer {\n  padding: 0;\n  outline: 0;\n  text-align: left;\n  width: 307.875px;\n  min-width: 307.875px;\n  max-width: 307.875px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  display: inline-block;\n  display: -ms-flexbox;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: flex;\n  -webkit-flex-wrap: wrap;\n          flex-wrap: wrap;\n  -ms-flex-wrap: wrap;\n  -ms-flex-pack: justify;\n  -webkit-justify-content: space-around;\n          justify-content: space-around;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n  opacity: 1;\n}\n.dayContainer + .dayContainer {\n  -webkit-box-shadow: -1px 0 0 rgba(72,72,72,0.2);\n          box-shadow: -1px 0 0 rgba(72,72,72,0.2);\n}\n.flatpickr-day {\n  background: none;\n  border: 1px solid transparent;\n  border-radius: 150px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: #484848;\n  cursor: pointer;\n  font-weight: 400;\n  width: 14.2857143%;\n  -webkit-flex-basis: 14.2857143%;\n      -ms-flex-preferred-size: 14.2857143%;\n          flex-basis: 14.2857143%;\n  max-width: 39px;\n  height: 39px;\n  line-height: 39px;\n  margin: 0;\n  display: inline-block;\n  position: relative;\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  text-align: center;\n}\n.flatpickr-day.inRange,\n.flatpickr-day.prevMonthDay.inRange,\n.flatpickr-day.nextMonthDay.inRange,\n.flatpickr-day.today.inRange,\n.flatpickr-day.prevMonthDay.today.inRange,\n.flatpickr-day.nextMonthDay.today.inRange,\n.flatpickr-day:hover,\n.flatpickr-day.prevMonthDay:hover,\n.flatpickr-day.nextMonthDay:hover,\n.flatpickr-day:focus,\n.flatpickr-day.prevMonthDay:focus,\n.flatpickr-day.nextMonthDay:focus {\n  cursor: pointer;\n  outline: 0;\n  background: #e2e2e2;\n  border-color: #e2e2e2;\n}\n.flatpickr-day.today {\n  border-color: #bbb;\n}\n.flatpickr-day.today:hover,\n.flatpickr-day.today:focus {\n  border-color: #bbb;\n  background: #bbb;\n  color: #fff;\n}\n.flatpickr-day.selected,\n.flatpickr-day.startRange,\n.flatpickr-day.endRange,\n.flatpickr-day.selected.inRange,\n.flatpickr-day.startRange.inRange,\n.flatpickr-day.endRange.inRange,\n.flatpickr-day.selected:focus,\n.flatpickr-day.startRange:focus,\n.flatpickr-day.endRange:focus,\n.flatpickr-day.selected:hover,\n.flatpickr-day.startRange:hover,\n.flatpickr-day.endRange:hover,\n.flatpickr-day.selected.prevMonthDay,\n.flatpickr-day.startRange.prevMonthDay,\n.flatpickr-day.endRange.prevMonthDay,\n.flatpickr-day.selected.nextMonthDay,\n.flatpickr-day.startRange.nextMonthDay,\n.flatpickr-day.endRange.nextMonthDay {\n  background: #42a5f5;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  color: #fff;\n  border-color: #42a5f5;\n}\n.flatpickr-day.selected.startRange,\n.flatpickr-day.startRange.startRange,\n.flatpickr-day.endRange.startRange {\n  border-radius: 50px 0 0 50px;\n}\n.flatpickr-day.selected.endRange,\n.flatpickr-day.startRange.endRange,\n.flatpickr-day.endRange.endRange {\n  border-radius: 0 50px 50px 0;\n}\n.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)),\n.flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)),\n.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)) {\n  -webkit-box-shadow: -10px 0 0 #42a5f5;\n          box-shadow: -10px 0 0 #42a5f5;\n}\n.flatpickr-day.selected.startRange.endRange,\n.flatpickr-day.startRange.startRange.endRange,\n.flatpickr-day.endRange.startRange.endRange {\n  border-radius: 50px;\n}\n.flatpickr-day.inRange {\n  border-radius: 0;\n  -webkit-box-shadow: -5px 0 0 #e2e2e2, 5px 0 0 #e2e2e2;\n          box-shadow: -5px 0 0 #e2e2e2, 5px 0 0 #e2e2e2;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover,\n.flatpickr-day.prevMonthDay,\n.flatpickr-day.nextMonthDay,\n.flatpickr-day.notAllowed,\n.flatpickr-day.notAllowed.prevMonthDay,\n.flatpickr-day.notAllowed.nextMonthDay {\n  color: rgba(72,72,72,0.3);\n  background: transparent;\n  border-color: transparent;\n  cursor: default;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover {\n  cursor: not-allowed;\n  color: rgba(72,72,72,0.1);\n}\n.flatpickr-day.week.selected {\n  border-radius: 0;\n  -webkit-box-shadow: -5px 0 0 #42a5f5, 5px 0 0 #42a5f5;\n          box-shadow: -5px 0 0 #42a5f5, 5px 0 0 #42a5f5;\n}\n.flatpickr-day.hidden {\n  visibility: hidden;\n}\n.rangeMode .flatpickr-day {\n  margin-top: 1px;\n}\n.flatpickr-weekwrapper {\n  display: inline-block;\n  float: left;\n}\n.flatpickr-weekwrapper .flatpickr-weeks {\n  padding: 0 12px;\n  border-left: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-weekwrapper .flatpickr-weekday {\n  float: none;\n  width: 100%;\n  line-height: 28px;\n}\n.flatpickr-weekwrapper span.flatpickr-day,\n.flatpickr-weekwrapper span.flatpickr-day:hover {\n  display: block;\n  width: 100%;\n  max-width: none;\n  color: rgba(72,72,72,0.3);\n  background: transparent;\n  cursor: default;\n  border: none;\n}\n.flatpickr-innerContainer {\n  display: block;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  overflow: hidden;\n  background: #fff;\n  border-bottom: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-rContainer {\n  display: inline-block;\n  padding: 0;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.flatpickr-time {\n  text-align: center;\n  outline: 0;\n  display: block;\n  height: 0;\n  line-height: 40px;\n  max-height: 40px;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  overflow: hidden;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  background: #fff;\n  border-radius: 0 0 5px 5px;\n}\n.flatpickr-time:after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n.flatpickr-time .numInputWrapper {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  width: 40%;\n  height: 40px;\n  float: left;\n}\n.flatpickr-time .numInputWrapper span.arrowUp:after {\n  border-bottom-color: #484848;\n}\n.flatpickr-time .numInputWrapper span.arrowDown:after {\n  border-top-color: #484848;\n}\n.flatpickr-time.hasSeconds .numInputWrapper {\n  width: 26%;\n}\n.flatpickr-time.time24hr .numInputWrapper {\n  width: 49%;\n}\n.flatpickr-time input {\n  background: transparent;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  border: 0;\n  border-radius: 0;\n  text-align: center;\n  margin: 0;\n  padding: 0;\n  height: inherit;\n  line-height: inherit;\n  color: #484848;\n  font-size: 14px;\n  position: relative;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.flatpickr-time input.flatpickr-hour {\n  font-weight: bold;\n}\n.flatpickr-time input.flatpickr-minute,\n.flatpickr-time input.flatpickr-second {\n  font-weight: 400;\n}\n.flatpickr-time input:focus {\n  outline: 0;\n  border: 0;\n}\n.flatpickr-time .flatpickr-time-separator,\n.flatpickr-time .flatpickr-am-pm {\n  height: inherit;\n  display: inline-block;\n  float: left;\n  line-height: inherit;\n  color: #484848;\n  font-weight: bold;\n  width: 2%;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  -webkit-align-self: center;\n      -ms-flex-item-align: center;\n          align-self: center;\n}\n.flatpickr-time .flatpickr-am-pm {\n  outline: 0;\n  width: 18%;\n  cursor: pointer;\n  text-align: center;\n  font-weight: 400;\n}\n.flatpickr-time input:hover,\n.flatpickr-time .flatpickr-am-pm:hover,\n.flatpickr-time input:focus,\n.flatpickr-time .flatpickr-am-pm:focus {\n  background: #efefef;\n}\n.flatpickr-input[readonly] {\n  cursor: pointer;\n}\n@-webkit-keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n"; });
 define('extend',['require','exports','module'],function (require, exports, module) {'use strict';
 
 var hasOwn = Object.prototype.hasOwnProperty;
@@ -70374,432 +69155,195 @@ define('text!fullcalendar/fullcalendar.css', ['module'], function(module) { modu
  */
 !function(t){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=t();else if("function"==typeof define&&define.amd)define('chart.js/Chart.min',[],t);else{("undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:this).Chart=t()}}(function(){return function o(r,s,l){function u(e,t){if(!s[e]){if(!r[e]){var i="function"==typeof require&&require;if(!t&&i)return i(e,!0);if(d)return d(e,!0);var n=new Error("Cannot find module '"+e+"'");throw n.code="MODULE_NOT_FOUND",n}var a=s[e]={exports:{}};r[e][0].call(a.exports,function(t){return u(r[e][1][t]||t)},a,a.exports,o,r,s,l)}return s[e].exports}for(var d="function"==typeof require&&require,t=0;t<l.length;t++)u(l[t]);return u}({1:[function(t,e,i){},{}],2:[function(t,e,i){var o=t(6);function n(t){if(t){var e=[0,0,0],i=1,n=t.match(/^#([a-fA-F0-9]{3})$/i);if(n){n=n[1];for(var a=0;a<e.length;a++)e[a]=parseInt(n[a]+n[a],16)}else if(n=t.match(/^#([a-fA-F0-9]{6})$/i)){n=n[1];for(a=0;a<e.length;a++)e[a]=parseInt(n.slice(2*a,2*a+2),16)}else if(n=t.match(/^rgba?\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*(?:,\s*([+-]?[\d\.]+)\s*)?\)$/i)){for(a=0;a<e.length;a++)e[a]=parseInt(n[a+1]);i=parseFloat(n[4])}else if(n=t.match(/^rgba?\(\s*([+-]?[\d\.]+)\%\s*,\s*([+-]?[\d\.]+)\%\s*,\s*([+-]?[\d\.]+)\%\s*(?:,\s*([+-]?[\d\.]+)\s*)?\)$/i)){for(a=0;a<e.length;a++)e[a]=Math.round(2.55*parseFloat(n[a+1]));i=parseFloat(n[4])}else if(n=t.match(/(\w+)/)){if("transparent"==n[1])return[0,0,0,0];if(!(e=o[n[1]]))return}for(a=0;a<e.length;a++)e[a]=d(e[a],0,255);return i=i||0==i?d(i,0,1):1,e[3]=i,e}}function a(t){if(t){var e=t.match(/^hsla?\(\s*([+-]?\d+)(?:deg)?\s*,\s*([+-]?[\d\.]+)%\s*,\s*([+-]?[\d\.]+)%\s*(?:,\s*([+-]?[\d\.]+)\s*)?\)/);if(e){var i=parseFloat(e[4]);return[d(parseInt(e[1]),0,360),d(parseFloat(e[2]),0,100),d(parseFloat(e[3]),0,100),d(isNaN(i)?1:i,0,1)]}}}function r(t){if(t){var e=t.match(/^hwb\(\s*([+-]?\d+)(?:deg)?\s*,\s*([+-]?[\d\.]+)%\s*,\s*([+-]?[\d\.]+)%\s*(?:,\s*([+-]?[\d\.]+)\s*)?\)/);if(e){var i=parseFloat(e[4]);return[d(parseInt(e[1]),0,360),d(parseFloat(e[2]),0,100),d(parseFloat(e[3]),0,100),d(isNaN(i)?1:i,0,1)]}}}function s(t,e){return void 0===e&&(e=void 0!==t[3]?t[3]:1),"rgba("+t[0]+", "+t[1]+", "+t[2]+", "+e+")"}function l(t,e){return"rgba("+Math.round(t[0]/255*100)+"%, "+Math.round(t[1]/255*100)+"%, "+Math.round(t[2]/255*100)+"%, "+(e||t[3]||1)+")"}function u(t,e){return void 0===e&&(e=void 0!==t[3]?t[3]:1),"hsla("+t[0]+", "+t[1]+"%, "+t[2]+"%, "+e+")"}function d(t,e,i){return Math.min(Math.max(e,t),i)}function c(t){var e=t.toString(16).toUpperCase();return e.length<2?"0"+e:e}e.exports={getRgba:n,getHsla:a,getRgb:function(t){var e=n(t);return e&&e.slice(0,3)},getHsl:function(t){var e=a(t);return e&&e.slice(0,3)},getHwb:r,getAlpha:function(t){var e=n(t);{if(e)return e[3];if(e=a(t))return e[3];if(e=r(t))return e[3]}},hexString:function(t){return"#"+c(t[0])+c(t[1])+c(t[2])},rgbString:function(t,e){if(e<1||t[3]&&t[3]<1)return s(t,e);return"rgb("+t[0]+", "+t[1]+", "+t[2]+")"},rgbaString:s,percentString:function(t,e){if(e<1||t[3]&&t[3]<1)return l(t,e);var i=Math.round(t[0]/255*100),n=Math.round(t[1]/255*100),a=Math.round(t[2]/255*100);return"rgb("+i+"%, "+n+"%, "+a+"%)"},percentaString:l,hslString:function(t,e){if(e<1||t[3]&&t[3]<1)return u(t,e);return"hsl("+t[0]+", "+t[1]+"%, "+t[2]+"%)"},hslaString:u,hwbString:function(t,e){void 0===e&&(e=void 0!==t[3]?t[3]:1);return"hwb("+t[0]+", "+t[1]+"%, "+t[2]+"%"+(void 0!==e&&1!==e?", "+e:"")+")"},keyword:function(t){return h[t.slice(0,3)]}};var h={};for(var f in o)h[o[f]]=f},{6:6}],3:[function(t,e,i){var d=t(5),n=t(2),r=function(t){return t instanceof r?t:this instanceof r?(this.valid=!1,this.values={rgb:[0,0,0],hsl:[0,0,0],hsv:[0,0,0],hwb:[0,0,0],cmyk:[0,0,0,0],alpha:1},void("string"==typeof t?(e=n.getRgba(t))?this.setValues("rgb",e):(e=n.getHsla(t))?this.setValues("hsl",e):(e=n.getHwb(t))&&this.setValues("hwb",e):"object"==typeof t&&(void 0!==(e=t).r||void 0!==e.red?this.setValues("rgb",e):void 0!==e.l||void 0!==e.lightness?this.setValues("hsl",e):void 0!==e.v||void 0!==e.value?this.setValues("hsv",e):void 0!==e.w||void 0!==e.whiteness?this.setValues("hwb",e):void 0===e.c&&void 0===e.cyan||this.setValues("cmyk",e)))):new r(t);var e};r.prototype={isValid:function(){return this.valid},rgb:function(){return this.setSpace("rgb",arguments)},hsl:function(){return this.setSpace("hsl",arguments)},hsv:function(){return this.setSpace("hsv",arguments)},hwb:function(){return this.setSpace("hwb",arguments)},cmyk:function(){return this.setSpace("cmyk",arguments)},rgbArray:function(){return this.values.rgb},hslArray:function(){return this.values.hsl},hsvArray:function(){return this.values.hsv},hwbArray:function(){var t=this.values;return 1!==t.alpha?t.hwb.concat([t.alpha]):t.hwb},cmykArray:function(){return this.values.cmyk},rgbaArray:function(){var t=this.values;return t.rgb.concat([t.alpha])},hslaArray:function(){var t=this.values;return t.hsl.concat([t.alpha])},alpha:function(t){return void 0===t?this.values.alpha:(this.setValues("alpha",t),this)},red:function(t){return this.setChannel("rgb",0,t)},green:function(t){return this.setChannel("rgb",1,t)},blue:function(t){return this.setChannel("rgb",2,t)},hue:function(t){return t&&(t=(t%=360)<0?360+t:t),this.setChannel("hsl",0,t)},saturation:function(t){return this.setChannel("hsl",1,t)},lightness:function(t){return this.setChannel("hsl",2,t)},saturationv:function(t){return this.setChannel("hsv",1,t)},whiteness:function(t){return this.setChannel("hwb",1,t)},blackness:function(t){return this.setChannel("hwb",2,t)},value:function(t){return this.setChannel("hsv",2,t)},cyan:function(t){return this.setChannel("cmyk",0,t)},magenta:function(t){return this.setChannel("cmyk",1,t)},yellow:function(t){return this.setChannel("cmyk",2,t)},black:function(t){return this.setChannel("cmyk",3,t)},hexString:function(){return n.hexString(this.values.rgb)},rgbString:function(){return n.rgbString(this.values.rgb,this.values.alpha)},rgbaString:function(){return n.rgbaString(this.values.rgb,this.values.alpha)},percentString:function(){return n.percentString(this.values.rgb,this.values.alpha)},hslString:function(){return n.hslString(this.values.hsl,this.values.alpha)},hslaString:function(){return n.hslaString(this.values.hsl,this.values.alpha)},hwbString:function(){return n.hwbString(this.values.hwb,this.values.alpha)},keyword:function(){return n.keyword(this.values.rgb,this.values.alpha)},rgbNumber:function(){var t=this.values.rgb;return t[0]<<16|t[1]<<8|t[2]},luminosity:function(){for(var t=this.values.rgb,e=[],i=0;i<t.length;i++){var n=t[i]/255;e[i]=n<=.03928?n/12.92:Math.pow((n+.055)/1.055,2.4)}return.2126*e[0]+.7152*e[1]+.0722*e[2]},contrast:function(t){var e=this.luminosity(),i=t.luminosity();return i<e?(e+.05)/(i+.05):(i+.05)/(e+.05)},level:function(t){var e=this.contrast(t);return 7.1<=e?"AAA":4.5<=e?"AA":""},dark:function(){var t=this.values.rgb;return(299*t[0]+587*t[1]+114*t[2])/1e3<128},light:function(){return!this.dark()},negate:function(){for(var t=[],e=0;e<3;e++)t[e]=255-this.values.rgb[e];return this.setValues("rgb",t),this},lighten:function(t){var e=this.values.hsl;return e[2]+=e[2]*t,this.setValues("hsl",e),this},darken:function(t){var e=this.values.hsl;return e[2]-=e[2]*t,this.setValues("hsl",e),this},saturate:function(t){var e=this.values.hsl;return e[1]+=e[1]*t,this.setValues("hsl",e),this},desaturate:function(t){var e=this.values.hsl;return e[1]-=e[1]*t,this.setValues("hsl",e),this},whiten:function(t){var e=this.values.hwb;return e[1]+=e[1]*t,this.setValues("hwb",e),this},blacken:function(t){var e=this.values.hwb;return e[2]+=e[2]*t,this.setValues("hwb",e),this},greyscale:function(){var t=this.values.rgb,e=.3*t[0]+.59*t[1]+.11*t[2];return this.setValues("rgb",[e,e,e]),this},clearer:function(t){var e=this.values.alpha;return this.setValues("alpha",e-e*t),this},opaquer:function(t){var e=this.values.alpha;return this.setValues("alpha",e+e*t),this},rotate:function(t){var e=this.values.hsl,i=(e[0]+t)%360;return e[0]=i<0?360+i:i,this.setValues("hsl",e),this},mix:function(t,e){var i=this,n=t,a=void 0===e?.5:e,o=2*a-1,r=i.alpha()-n.alpha(),s=((o*r==-1?o:(o+r)/(1+o*r))+1)/2,l=1-s;return this.rgb(s*i.red()+l*n.red(),s*i.green()+l*n.green(),s*i.blue()+l*n.blue()).alpha(i.alpha()*a+n.alpha()*(1-a))},toJSON:function(){return this.rgb()},clone:function(){var t,e,i=new r,n=this.values,a=i.values;for(var o in n)n.hasOwnProperty(o)&&(t=n[o],"[object Array]"===(e={}.toString.call(t))?a[o]=t.slice(0):"[object Number]"===e?a[o]=t:console.error("unexpected color value:",t));return i}},r.prototype.spaces={rgb:["red","green","blue"],hsl:["hue","saturation","lightness"],hsv:["hue","saturation","value"],hwb:["hue","whiteness","blackness"],cmyk:["cyan","magenta","yellow","black"]},r.prototype.maxes={rgb:[255,255,255],hsl:[360,100,100],hsv:[360,100,100],hwb:[360,100,100],cmyk:[100,100,100,100]},r.prototype.getValues=function(t){for(var e=this.values,i={},n=0;n<t.length;n++)i[t.charAt(n)]=e[t][n];return 1!==e.alpha&&(i.a=e.alpha),i},r.prototype.setValues=function(t,e){var i,n,a=this.values,o=this.spaces,r=this.maxes,s=1;if(this.valid=!0,"alpha"===t)s=e;else if(e.length)a[t]=e.slice(0,t.length),s=e[t.length];else if(void 0!==e[t.charAt(0)]){for(i=0;i<t.length;i++)a[t][i]=e[t.charAt(i)];s=e.a}else if(void 0!==e[o[t][0]]){var l=o[t];for(i=0;i<t.length;i++)a[t][i]=e[l[i]];s=e.alpha}if(a.alpha=Math.max(0,Math.min(1,void 0===s?a.alpha:s)),"alpha"===t)return!1;for(i=0;i<t.length;i++)n=Math.max(0,Math.min(r[t][i],a[t][i])),a[t][i]=Math.round(n);for(var u in o)u!==t&&(a[u]=d[t][u](a[t]));return!0},r.prototype.setSpace=function(t,e){var i=e[0];return void 0===i?this.getValues(t):("number"==typeof i&&(i=Array.prototype.slice.call(e)),this.setValues(t,i),this)},r.prototype.setChannel=function(t,e,i){var n=this.values[t];return void 0===i?n[e]:(i===n[e]||(n[e]=i,this.setValues(t,n)),this)},"undefined"!=typeof window&&(window.Color=r),e.exports=r},{2:2,5:5}],4:[function(t,e,i){function a(t){var e,i,n=t[0]/255,a=t[1]/255,o=t[2]/255,r=Math.min(n,a,o),s=Math.max(n,a,o),l=s-r;return s==r?e=0:n==s?e=(a-o)/l:a==s?e=2+(o-n)/l:o==s&&(e=4+(n-a)/l),(e=Math.min(60*e,360))<0&&(e+=360),i=(r+s)/2,[e,100*(s==r?0:i<=.5?l/(s+r):l/(2-s-r)),100*i]}function n(t){var e,i,n=t[0],a=t[1],o=t[2],r=Math.min(n,a,o),s=Math.max(n,a,o),l=s-r;return i=0==s?0:l/s*1e3/10,s==r?e=0:n==s?e=(a-o)/l:a==s?e=2+(o-n)/l:o==s&&(e=4+(n-a)/l),(e=Math.min(60*e,360))<0&&(e+=360),[e,i,s/255*1e3/10]}function o(t){var e=t[0],i=t[1],n=t[2];return[a(t)[0],100*(1/255*Math.min(e,Math.min(i,n))),100*(n=1-1/255*Math.max(e,Math.max(i,n)))]}function s(t){var e,i=t[0]/255,n=t[1]/255,a=t[2]/255;return[100*((1-i-(e=Math.min(1-i,1-n,1-a)))/(1-e)||0),100*((1-n-e)/(1-e)||0),100*((1-a-e)/(1-e)||0),100*e]}function l(t){return S[JSON.stringify(t)]}function u(t){var e=t[0]/255,i=t[1]/255,n=t[2]/255;return[100*(.4124*(e=.04045<e?Math.pow((e+.055)/1.055,2.4):e/12.92)+.3576*(i=.04045<i?Math.pow((i+.055)/1.055,2.4):i/12.92)+.1805*(n=.04045<n?Math.pow((n+.055)/1.055,2.4):n/12.92)),100*(.2126*e+.7152*i+.0722*n),100*(.0193*e+.1192*i+.9505*n)]}function d(t){var e=u(t),i=e[0],n=e[1],a=e[2];return n/=100,a/=108.883,i=.008856<(i/=95.047)?Math.pow(i,1/3):7.787*i+16/116,[116*(n=.008856<n?Math.pow(n,1/3):7.787*n+16/116)-16,500*(i-n),200*(n-(a=.008856<a?Math.pow(a,1/3):7.787*a+16/116))]}function c(t){var e,i,n,a,o,r=t[0]/360,s=t[1]/100,l=t[2]/100;if(0==s)return[o=255*l,o,o];e=2*l-(i=l<.5?l*(1+s):l+s-l*s),a=[0,0,0];for(var u=0;u<3;u++)(n=r+1/3*-(u-1))<0&&n++,1<n&&n--,o=6*n<1?e+6*(i-e)*n:2*n<1?i:3*n<2?e+(i-e)*(2/3-n)*6:e,a[u]=255*o;return a}function h(t){var e=t[0]/60,i=t[1]/100,n=t[2]/100,a=Math.floor(e)%6,o=e-Math.floor(e),r=255*n*(1-i),s=255*n*(1-i*o),l=255*n*(1-i*(1-o));n*=255;switch(a){case 0:return[n,l,r];case 1:return[s,n,r];case 2:return[r,n,l];case 3:return[r,s,n];case 4:return[l,r,n];case 5:return[n,r,s]}}function f(t){var e,i,n,a,o=t[0]/360,s=t[1]/100,l=t[2]/100,u=s+l;switch(1<u&&(s/=u,l/=u),n=6*o-(e=Math.floor(6*o)),0!=(1&e)&&(n=1-n),a=s+n*((i=1-l)-s),e){default:case 6:case 0:r=i,g=a,b=s;break;case 1:r=a,g=i,b=s;break;case 2:r=s,g=i,b=a;break;case 3:r=s,g=a,b=i;break;case 4:r=a,g=s,b=i;break;case 5:r=i,g=s,b=a}return[255*r,255*g,255*b]}function p(t){var e=t[0]/100,i=t[1]/100,n=t[2]/100,a=t[3]/100;return[255*(1-Math.min(1,e*(1-a)+a)),255*(1-Math.min(1,i*(1-a)+a)),255*(1-Math.min(1,n*(1-a)+a))]}function m(t){var e,i,n,a=t[0]/100,o=t[1]/100,r=t[2]/100;return i=-.9689*a+1.8758*o+.0415*r,n=.0557*a+-.204*o+1.057*r,e=.0031308<(e=3.2406*a+-1.5372*o+-.4986*r)?1.055*Math.pow(e,1/2.4)-.055:e*=12.92,i=.0031308<i?1.055*Math.pow(i,1/2.4)-.055:i*=12.92,n=.0031308<n?1.055*Math.pow(n,1/2.4)-.055:n*=12.92,[255*(e=Math.min(Math.max(0,e),1)),255*(i=Math.min(Math.max(0,i),1)),255*(n=Math.min(Math.max(0,n),1))]}function v(t){var e=t[0],i=t[1],n=t[2];return i/=100,n/=108.883,e=.008856<(e/=95.047)?Math.pow(e,1/3):7.787*e+16/116,[116*(i=.008856<i?Math.pow(i,1/3):7.787*i+16/116)-16,500*(e-i),200*(i-(n=.008856<n?Math.pow(n,1/3):7.787*n+16/116))]}function x(t){var e,i,n,a,o=t[0],r=t[1],s=t[2];return a=o<=8?(i=100*o/903.3)/100*7.787+16/116:(i=100*Math.pow((o+16)/116,3),Math.pow(i/100,1/3)),[e=e/95.047<=.008856?e=95.047*(r/500+a-16/116)/7.787:95.047*Math.pow(r/500+a,3),i,n=n/108.883<=.008859?n=108.883*(a-s/200-16/116)/7.787:108.883*Math.pow(a-s/200,3)]}function y(t){var e,i=t[0],n=t[1],a=t[2];return(e=360*Math.atan2(a,n)/2/Math.PI)<0&&(e+=360),[i,Math.sqrt(n*n+a*a),e]}function k(t){return m(x(t))}function M(t){var e,i=t[0],n=t[1];return e=t[2]/360*2*Math.PI,[i,n*Math.cos(e),n*Math.sin(e)]}function w(t){return C[t]}e.exports={rgb2hsl:a,rgb2hsv:n,rgb2hwb:o,rgb2cmyk:s,rgb2keyword:l,rgb2xyz:u,rgb2lab:d,rgb2lch:function(t){return y(d(t))},hsl2rgb:c,hsl2hsv:function(t){var e=t[0],i=t[1]/100,n=t[2]/100;return 0!==n?[e,100*(2*(i*=(n*=2)<=1?n:2-n)/(n+i)),100*((n+i)/2)]:[0,0,0]},hsl2hwb:function(t){return o(c(t))},hsl2cmyk:function(t){return s(c(t))},hsl2keyword:function(t){return l(c(t))},hsv2rgb:h,hsv2hsl:function(t){var e,i,n=t[0],a=t[1]/100,o=t[2]/100;return e=a*o,[n,100*(e=(e/=(i=(2-a)*o)<=1?i:2-i)||0),100*(i/=2)]},hsv2hwb:function(t){return o(h(t))},hsv2cmyk:function(t){return s(h(t))},hsv2keyword:function(t){return l(h(t))},hwb2rgb:f,hwb2hsl:function(t){return a(f(t))},hwb2hsv:function(t){return n(f(t))},hwb2cmyk:function(t){return s(f(t))},hwb2keyword:function(t){return l(f(t))},cmyk2rgb:p,cmyk2hsl:function(t){return a(p(t))},cmyk2hsv:function(t){return n(p(t))},cmyk2hwb:function(t){return o(p(t))},cmyk2keyword:function(t){return l(p(t))},keyword2rgb:w,keyword2hsl:function(t){return a(w(t))},keyword2hsv:function(t){return n(w(t))},keyword2hwb:function(t){return o(w(t))},keyword2cmyk:function(t){return s(w(t))},keyword2lab:function(t){return d(w(t))},keyword2xyz:function(t){return u(w(t))},xyz2rgb:m,xyz2lab:v,xyz2lch:function(t){return y(v(t))},lab2xyz:x,lab2rgb:k,lab2lch:y,lch2lab:M,lch2xyz:function(t){return x(M(t))},lch2rgb:function(t){return k(M(t))}};var C={aliceblue:[240,248,255],antiquewhite:[250,235,215],aqua:[0,255,255],aquamarine:[127,255,212],azure:[240,255,255],beige:[245,245,220],bisque:[255,228,196],black:[0,0,0],blanchedalmond:[255,235,205],blue:[0,0,255],blueviolet:[138,43,226],brown:[165,42,42],burlywood:[222,184,135],cadetblue:[95,158,160],chartreuse:[127,255,0],chocolate:[210,105,30],coral:[255,127,80],cornflowerblue:[100,149,237],cornsilk:[255,248,220],crimson:[220,20,60],cyan:[0,255,255],darkblue:[0,0,139],darkcyan:[0,139,139],darkgoldenrod:[184,134,11],darkgray:[169,169,169],darkgreen:[0,100,0],darkgrey:[169,169,169],darkkhaki:[189,183,107],darkmagenta:[139,0,139],darkolivegreen:[85,107,47],darkorange:[255,140,0],darkorchid:[153,50,204],darkred:[139,0,0],darksalmon:[233,150,122],darkseagreen:[143,188,143],darkslateblue:[72,61,139],darkslategray:[47,79,79],darkslategrey:[47,79,79],darkturquoise:[0,206,209],darkviolet:[148,0,211],deeppink:[255,20,147],deepskyblue:[0,191,255],dimgray:[105,105,105],dimgrey:[105,105,105],dodgerblue:[30,144,255],firebrick:[178,34,34],floralwhite:[255,250,240],forestgreen:[34,139,34],fuchsia:[255,0,255],gainsboro:[220,220,220],ghostwhite:[248,248,255],gold:[255,215,0],goldenrod:[218,165,32],gray:[128,128,128],green:[0,128,0],greenyellow:[173,255,47],grey:[128,128,128],honeydew:[240,255,240],hotpink:[255,105,180],indianred:[205,92,92],indigo:[75,0,130],ivory:[255,255,240],khaki:[240,230,140],lavender:[230,230,250],lavenderblush:[255,240,245],lawngreen:[124,252,0],lemonchiffon:[255,250,205],lightblue:[173,216,230],lightcoral:[240,128,128],lightcyan:[224,255,255],lightgoldenrodyellow:[250,250,210],lightgray:[211,211,211],lightgreen:[144,238,144],lightgrey:[211,211,211],lightpink:[255,182,193],lightsalmon:[255,160,122],lightseagreen:[32,178,170],lightskyblue:[135,206,250],lightslategray:[119,136,153],lightslategrey:[119,136,153],lightsteelblue:[176,196,222],lightyellow:[255,255,224],lime:[0,255,0],limegreen:[50,205,50],linen:[250,240,230],magenta:[255,0,255],maroon:[128,0,0],mediumaquamarine:[102,205,170],mediumblue:[0,0,205],mediumorchid:[186,85,211],mediumpurple:[147,112,219],mediumseagreen:[60,179,113],mediumslateblue:[123,104,238],mediumspringgreen:[0,250,154],mediumturquoise:[72,209,204],mediumvioletred:[199,21,133],midnightblue:[25,25,112],mintcream:[245,255,250],mistyrose:[255,228,225],moccasin:[255,228,181],navajowhite:[255,222,173],navy:[0,0,128],oldlace:[253,245,230],olive:[128,128,0],olivedrab:[107,142,35],orange:[255,165,0],orangered:[255,69,0],orchid:[218,112,214],palegoldenrod:[238,232,170],palegreen:[152,251,152],paleturquoise:[175,238,238],palevioletred:[219,112,147],papayawhip:[255,239,213],peachpuff:[255,218,185],peru:[205,133,63],pink:[255,192,203],plum:[221,160,221],powderblue:[176,224,230],purple:[128,0,128],rebeccapurple:[102,51,153],red:[255,0,0],rosybrown:[188,143,143],royalblue:[65,105,225],saddlebrown:[139,69,19],salmon:[250,128,114],sandybrown:[244,164,96],seagreen:[46,139,87],seashell:[255,245,238],sienna:[160,82,45],silver:[192,192,192],skyblue:[135,206,235],slateblue:[106,90,205],slategray:[112,128,144],slategrey:[112,128,144],snow:[255,250,250],springgreen:[0,255,127],steelblue:[70,130,180],tan:[210,180,140],teal:[0,128,128],thistle:[216,191,216],tomato:[255,99,71],turquoise:[64,224,208],violet:[238,130,238],wheat:[245,222,179],white:[255,255,255],whitesmoke:[245,245,245],yellow:[255,255,0],yellowgreen:[154,205,50]},S={};for(var _ in C)S[JSON.stringify(C[_])]=_},{}],5:[function(t,e,i){var a=t(4),o=function(){return new u};for(var n in a){o[n+"Raw"]=function(e){return function(t){return"number"==typeof t&&(t=Array.prototype.slice.call(arguments)),a[e](t)}}(n);var r=/(\w+)2(\w+)/.exec(n),s=r[1],l=r[2];(o[s]=o[s]||{})[l]=o[n]=function(n){return function(t){"number"==typeof t&&(t=Array.prototype.slice.call(arguments));var e=a[n](t);if("string"==typeof e||void 0===e)return e;for(var i=0;i<e.length;i++)e[i]=Math.round(e[i]);return e}}(n)}var u=function(){this.convs={}};u.prototype.routeSpace=function(t,e){var i=e[0];return void 0===i?this.getValues(t):("number"==typeof i&&(i=Array.prototype.slice.call(e)),this.setValues(t,i))},u.prototype.setValues=function(t,e){return this.space=t,this.convs={},this.convs[t]=e,this},u.prototype.getValues=function(t){var e=this.convs[t];if(!e){var i=this.space,n=this.convs[i];e=o[i][t](n),this.convs[t]=e}return e},["rgb","hsl","hsv","cmyk","keyword"].forEach(function(e){u.prototype[e]=function(t){return this.routeSpace(e,arguments)}}),e.exports=o},{4:4}],6:[function(t,e,i){"use strict";e.exports={aliceblue:[240,248,255],antiquewhite:[250,235,215],aqua:[0,255,255],aquamarine:[127,255,212],azure:[240,255,255],beige:[245,245,220],bisque:[255,228,196],black:[0,0,0],blanchedalmond:[255,235,205],blue:[0,0,255],blueviolet:[138,43,226],brown:[165,42,42],burlywood:[222,184,135],cadetblue:[95,158,160],chartreuse:[127,255,0],chocolate:[210,105,30],coral:[255,127,80],cornflowerblue:[100,149,237],cornsilk:[255,248,220],crimson:[220,20,60],cyan:[0,255,255],darkblue:[0,0,139],darkcyan:[0,139,139],darkgoldenrod:[184,134,11],darkgray:[169,169,169],darkgreen:[0,100,0],darkgrey:[169,169,169],darkkhaki:[189,183,107],darkmagenta:[139,0,139],darkolivegreen:[85,107,47],darkorange:[255,140,0],darkorchid:[153,50,204],darkred:[139,0,0],darksalmon:[233,150,122],darkseagreen:[143,188,143],darkslateblue:[72,61,139],darkslategray:[47,79,79],darkslategrey:[47,79,79],darkturquoise:[0,206,209],darkviolet:[148,0,211],deeppink:[255,20,147],deepskyblue:[0,191,255],dimgray:[105,105,105],dimgrey:[105,105,105],dodgerblue:[30,144,255],firebrick:[178,34,34],floralwhite:[255,250,240],forestgreen:[34,139,34],fuchsia:[255,0,255],gainsboro:[220,220,220],ghostwhite:[248,248,255],gold:[255,215,0],goldenrod:[218,165,32],gray:[128,128,128],green:[0,128,0],greenyellow:[173,255,47],grey:[128,128,128],honeydew:[240,255,240],hotpink:[255,105,180],indianred:[205,92,92],indigo:[75,0,130],ivory:[255,255,240],khaki:[240,230,140],lavender:[230,230,250],lavenderblush:[255,240,245],lawngreen:[124,252,0],lemonchiffon:[255,250,205],lightblue:[173,216,230],lightcoral:[240,128,128],lightcyan:[224,255,255],lightgoldenrodyellow:[250,250,210],lightgray:[211,211,211],lightgreen:[144,238,144],lightgrey:[211,211,211],lightpink:[255,182,193],lightsalmon:[255,160,122],lightseagreen:[32,178,170],lightskyblue:[135,206,250],lightslategray:[119,136,153],lightslategrey:[119,136,153],lightsteelblue:[176,196,222],lightyellow:[255,255,224],lime:[0,255,0],limegreen:[50,205,50],linen:[250,240,230],magenta:[255,0,255],maroon:[128,0,0],mediumaquamarine:[102,205,170],mediumblue:[0,0,205],mediumorchid:[186,85,211],mediumpurple:[147,112,219],mediumseagreen:[60,179,113],mediumslateblue:[123,104,238],mediumspringgreen:[0,250,154],mediumturquoise:[72,209,204],mediumvioletred:[199,21,133],midnightblue:[25,25,112],mintcream:[245,255,250],mistyrose:[255,228,225],moccasin:[255,228,181],navajowhite:[255,222,173],navy:[0,0,128],oldlace:[253,245,230],olive:[128,128,0],olivedrab:[107,142,35],orange:[255,165,0],orangered:[255,69,0],orchid:[218,112,214],palegoldenrod:[238,232,170],palegreen:[152,251,152],paleturquoise:[175,238,238],palevioletred:[219,112,147],papayawhip:[255,239,213],peachpuff:[255,218,185],peru:[205,133,63],pink:[255,192,203],plum:[221,160,221],powderblue:[176,224,230],purple:[128,0,128],rebeccapurple:[102,51,153],red:[255,0,0],rosybrown:[188,143,143],royalblue:[65,105,225],saddlebrown:[139,69,19],salmon:[250,128,114],sandybrown:[244,164,96],seagreen:[46,139,87],seashell:[255,245,238],sienna:[160,82,45],silver:[192,192,192],skyblue:[135,206,235],slateblue:[106,90,205],slategray:[112,128,144],slategrey:[112,128,144],snow:[255,250,250],springgreen:[0,255,127],steelblue:[70,130,180],tan:[210,180,140],teal:[0,128,128],thistle:[216,191,216],tomato:[255,99,71],turquoise:[64,224,208],violet:[238,130,238],wheat:[245,222,179],white:[255,255,255],whitesmoke:[245,245,245],yellow:[255,255,0],yellowgreen:[154,205,50]}},{}],7:[function(t,e,i){var n=t(30)();n.helpers=t(46),t(28)(n),n.Animation=t(22),n.animationService=t(23),n.defaults=t(26),n.Element=t(27),n.elements=t(41),n.Interaction=t(29),n.layouts=t(31),n.platform=t(49),n.plugins=t(32),n.Scale=t(33),n.scaleService=t(34),n.Ticks=t(35),n.Tooltip=t(36),t(24)(n),t(25)(n),t(56)(n),t(54)(n),t(55)(n),t(57)(n),t(58)(n),t(59)(n),t(15)(n),t(16)(n),t(17)(n),t(18)(n),t(19)(n),t(20)(n),t(21)(n),t(8)(n),t(9)(n),t(10)(n),t(11)(n),t(12)(n),t(13)(n),t(14)(n);var a=t(50);for(var o in a)a.hasOwnProperty(o)&&n.plugins.register(a[o]);n.platform.initialize(),e.exports=n,"undefined"!=typeof window&&(window.Chart=n),n.Legend=a.legend._element,n.Title=a.title._element,n.pluginService=n.plugins,n.PluginBase=n.Element.extend({}),n.canvasHelpers=n.helpers.canvas,n.layoutService=n.layouts},{10:10,11:11,12:12,13:13,14:14,15:15,16:16,17:17,18:18,19:19,20:20,21:21,22:22,23:23,24:24,25:25,26:26,27:27,28:28,29:29,30:30,31:31,32:32,33:33,34:34,35:35,36:36,41:41,46:46,49:49,50:50,54:54,55:55,56:56,57:57,58:58,59:59,8:8,9:9}],8:[function(t,e,i){"use strict";e.exports=function(i){i.Bar=function(t,e){return e.type="bar",new i(t,e)}}},{}],9:[function(t,e,i){"use strict";e.exports=function(i){i.Bubble=function(t,e){return e.type="bubble",new i(t,e)}}},{}],10:[function(t,e,i){"use strict";e.exports=function(i){i.Doughnut=function(t,e){return e.type="doughnut",new i(t,e)}}},{}],11:[function(t,e,i){"use strict";e.exports=function(i){i.Line=function(t,e){return e.type="line",new i(t,e)}}},{}],12:[function(t,e,i){"use strict";e.exports=function(i){i.PolarArea=function(t,e){return e.type="polarArea",new i(t,e)}}},{}],13:[function(t,e,i){"use strict";e.exports=function(i){i.Radar=function(t,e){return e.type="radar",new i(t,e)}}},{}],14:[function(t,e,i){"use strict";e.exports=function(i){i.Scatter=function(t,e){return e.type="scatter",new i(t,e)}}},{}],15:[function(t,e,i){"use strict";var n=t(26),a=t(41),S=t(46);n._set("bar",{hover:{mode:"label"},scales:{xAxes:[{type:"category",categoryPercentage:.8,barPercentage:.9,offset:!0,gridLines:{offsetGridLines:!0}}],yAxes:[{type:"linear"}]}}),n._set("horizontalBar",{hover:{mode:"index",axis:"y"},scales:{xAxes:[{type:"linear",position:"bottom"}],yAxes:[{position:"left",type:"category",categoryPercentage:.8,barPercentage:.9,offset:!0,gridLines:{offsetGridLines:!0}}]},elements:{rectangle:{borderSkipped:"left"}},tooltips:{callbacks:{title:function(t,e){var i="";return 0<t.length&&(t[0].yLabel?i=t[0].yLabel:0<e.labels.length&&t[0].index<e.labels.length&&(i=e.labels[t[0].index])),i},label:function(t,e){return(e.datasets[t.datasetIndex].label||"")+": "+t.xLabel}},mode:"index",axis:"y"}}),e.exports=function(e){e.controllers.bar=e.DatasetController.extend({dataElementType:a.Rectangle,initialize:function(){var t;e.DatasetController.prototype.initialize.apply(this,arguments),(t=this.getMeta()).stack=this.getDataset().stack,t.bar=!0},update:function(t){var e,i,n=this.getMeta().data;for(this._ruler=this.getRuler(),e=0,i=n.length;e<i;++e)this.updateElement(n[e],e,t)},updateElement:function(t,e,i){var n=this,a=n.chart,o=n.getMeta(),r=n.getDataset(),s=t.custom||{},l=a.options.elements.rectangle;t._xScale=n.getScaleForId(o.xAxisID),t._yScale=n.getScaleForId(o.yAxisID),t._datasetIndex=n.index,t._index=e,t._model={datasetLabel:r.label,label:a.data.labels[e],borderSkipped:s.borderSkipped?s.borderSkipped:l.borderSkipped,backgroundColor:s.backgroundColor?s.backgroundColor:S.valueAtIndexOrDefault(r.backgroundColor,e,l.backgroundColor),borderColor:s.borderColor?s.borderColor:S.valueAtIndexOrDefault(r.borderColor,e,l.borderColor),borderWidth:s.borderWidth?s.borderWidth:S.valueAtIndexOrDefault(r.borderWidth,e,l.borderWidth)},n.updateElementGeometry(t,e,i),t.pivot()},updateElementGeometry:function(t,e,i){var n=this,a=t._model,o=n.getValueScale(),r=o.getBasePixel(),s=o.isHorizontal(),l=n._ruler||n.getRuler(),u=n.calculateBarValuePixels(n.index,e),d=n.calculateBarIndexPixels(n.index,e,l);a.horizontal=s,a.base=i?r:u.base,a.x=s?i?r:u.head:d.center,a.y=s?d.center:i?r:u.head,a.height=s?d.size:void 0,a.width=s?void 0:d.size},getValueScaleId:function(){return this.getMeta().yAxisID},getIndexScaleId:function(){return this.getMeta().xAxisID},getValueScale:function(){return this.getScaleForId(this.getValueScaleId())},getIndexScale:function(){return this.getScaleForId(this.getIndexScaleId())},_getStacks:function(t){var e,i,n=this.chart,a=this.getIndexScale().options.stacked,o=void 0===t?n.data.datasets.length:t+1,r=[];for(e=0;e<o;++e)(i=n.getDatasetMeta(e)).bar&&n.isDatasetVisible(e)&&(!1===a||!0===a&&-1===r.indexOf(i.stack)||void 0===a&&(void 0===i.stack||-1===r.indexOf(i.stack)))&&r.push(i.stack);return r},getStackCount:function(){return this._getStacks().length},getStackIndex:function(t,e){var i=this._getStacks(t),n=void 0!==e?i.indexOf(e):-1;return-1===n?i.length-1:n},getRuler:function(){var t,e,i=this.getIndexScale(),n=this.getStackCount(),a=this.index,o=i.isHorizontal(),r=o?i.left:i.top,s=r+(o?i.width:i.height),l=[];for(t=0,e=this.getMeta().data.length;t<e;++t)l.push(i.getPixelForValue(null,t,a));return{min:S.isNullOrUndef(i.options.barThickness)?function(t,e){var i,n,a,o,r=t.isHorizontal()?t.width:t.height,s=t.getTicks();for(a=1,o=e.length;a<o;++a)r=Math.min(r,e[a]-e[a-1]);for(a=0,o=s.length;a<o;++a)n=t.getPixelForTick(a),r=0<a?Math.min(r,n-i):r,i=n;return r}(i,l):-1,pixels:l,start:r,end:s,stackCount:n,scale:i}},calculateBarValuePixels:function(t,e){var i,n,a,o,r,s,l=this.chart,u=this.getMeta(),d=this.getValueScale(),c=l.data.datasets,h=d.getRightValue(c[t].data[e]),f=d.options.stacked,g=u.stack,p=0;if(f||void 0===f&&void 0!==g)for(i=0;i<t;++i)(n=l.getDatasetMeta(i)).bar&&n.stack===g&&n.controller.getValueScaleId()===d.id&&l.isDatasetVisible(i)&&(a=d.getRightValue(c[i].data[e]),(h<0&&a<0||0<=h&&0<a)&&(p+=a));return o=d.getPixelForValue(p),{size:s=((r=d.getPixelForValue(p+h))-o)/2,base:o,head:r,center:r+s/2}},calculateBarIndexPixels:function(t,e,i){var n,a,o,r,s,l,u,d,c,h,f,g,p,m,v,b,x,y=i.scale.options,k="flex"===y.barThickness?(c=e,f=y,p=(h=i).pixels,m=p[c],v=0<c?p[c-1]:null,b=c<p.length-1?p[c+1]:null,x=f.categoryPercentage,null===v&&(v=m-(null===b?h.end-m:b-m)),null===b&&(b=m+m-v),g=m-(m-v)/2*x,{chunk:(b-v)/2*x/h.stackCount,ratio:f.barPercentage,start:g}):(n=e,a=i,l=(o=y).barThickness,u=a.stackCount,d=a.pixels[n],s=S.isNullOrUndef(l)?(r=a.min*o.categoryPercentage,o.barPercentage):(r=l*u,1),{chunk:r/u,ratio:s,start:d-r/2}),M=this.getStackIndex(t,this.getMeta().stack),w=k.start+k.chunk*M+k.chunk/2,C=Math.min(S.valueOrDefault(y.maxBarThickness,1/0),k.chunk*k.ratio);return{base:w-C/2,head:w+C/2,center:w,size:C}},draw:function(){var t=this.chart,e=this.getValueScale(),i=this.getMeta().data,n=this.getDataset(),a=i.length,o=0;for(S.canvas.clipArea(t.ctx,t.chartArea);o<a;++o)isNaN(e.getRightValue(n.data[o]))||i[o].draw();S.canvas.unclipArea(t.ctx)}}),e.controllers.horizontalBar=e.controllers.bar.extend({getValueScaleId:function(){return this.getMeta().xAxisID},getIndexScaleId:function(){return this.getMeta().yAxisID}})}},{26:26,41:41,46:46}],16:[function(t,e,i){"use strict";var n=t(26),a=t(41),g=t(46);n._set("bubble",{hover:{mode:"single"},scales:{xAxes:[{type:"linear",position:"bottom",id:"x-axis-0"}],yAxes:[{type:"linear",position:"left",id:"y-axis-0"}]},tooltips:{callbacks:{title:function(){return""},label:function(t,e){var i=e.datasets[t.datasetIndex].label||"",n=e.datasets[t.datasetIndex].data[t.index];return i+": ("+t.xLabel+", "+t.yLabel+", "+n.r+")"}}}}),e.exports=function(t){t.controllers.bubble=t.DatasetController.extend({dataElementType:a.Point,update:function(i){var n=this,t=n.getMeta().data;g.each(t,function(t,e){n.updateElement(t,e,i)})},updateElement:function(t,e,i){var n=this,a=n.getMeta(),o=t.custom||{},r=n.getScaleForId(a.xAxisID),s=n.getScaleForId(a.yAxisID),l=n._resolveElementOptions(t,e),u=n.getDataset().data[e],d=n.index,c=i?r.getPixelForDecimal(.5):r.getPixelForValue("object"==typeof u?u:NaN,e,d),h=i?s.getBasePixel():s.getPixelForValue(u,e,d);t._xScale=r,t._yScale=s,t._options=l,t._datasetIndex=d,t._index=e,t._model={backgroundColor:l.backgroundColor,borderColor:l.borderColor,borderWidth:l.borderWidth,hitRadius:l.hitRadius,pointStyle:l.pointStyle,rotation:l.rotation,radius:i?0:l.radius,skip:o.skip||isNaN(c)||isNaN(h),x:c,y:h},t.pivot()},setHoverStyle:function(t){var e=t._model,i=t._options;t.$previousStyle={backgroundColor:e.backgroundColor,borderColor:e.borderColor,borderWidth:e.borderWidth,radius:e.radius},e.backgroundColor=g.valueOrDefault(i.hoverBackgroundColor,g.getHoverColor(i.backgroundColor)),e.borderColor=g.valueOrDefault(i.hoverBorderColor,g.getHoverColor(i.borderColor)),e.borderWidth=g.valueOrDefault(i.hoverBorderWidth,i.borderWidth),e.radius=i.radius+i.hoverRadius},_resolveElementOptions:function(t,e){var i,n,a,o=this.chart,r=o.data.datasets[this.index],s=t.custom||{},l=o.options.elements.point,u=g.options.resolve,d=r.data[e],c={},h={chart:o,dataIndex:e,dataset:r,datasetIndex:this.index},f=["backgroundColor","borderColor","borderWidth","hoverBackgroundColor","hoverBorderColor","hoverBorderWidth","hoverRadius","hitRadius","pointStyle","rotation"];for(i=0,n=f.length;i<n;++i)c[a=f[i]]=u([s[a],r[a],l[a]],h,e);return c.radius=u([s.radius,d?d.r:void 0,r.radius,l.radius],h,e),c}})}},{26:26,41:41,46:46}],17:[function(t,e,i){"use strict";var n=t(26),a=t(41),A=t(46);n._set("doughnut",{animation:{animateRotate:!0,animateScale:!1},hover:{mode:"single"},legendCallback:function(t){var e=[];e.push('<ul class="'+t.id+'-legend">');var i=t.data,n=i.datasets,a=i.labels;if(n.length)for(var o=0;o<n[0].data.length;++o)e.push('<li><span style="background-color:'+n[0].backgroundColor[o]+'"></span>'),a[o]&&e.push(a[o]),e.push("</li>");return e.push("</ul>"),e.join("")},legend:{labels:{generateLabels:function(l){var u=l.data;return u.labels.length&&u.datasets.length?u.labels.map(function(t,e){var i=l.getDatasetMeta(0),n=u.datasets[0],a=i.data[e],o=a&&a.custom||{},r=A.valueAtIndexOrDefault,s=l.options.elements.arc;return{text:t,fillStyle:o.backgroundColor?o.backgroundColor:r(n.backgroundColor,e,s.backgroundColor),strokeStyle:o.borderColor?o.borderColor:r(n.borderColor,e,s.borderColor),lineWidth:o.borderWidth?o.borderWidth:r(n.borderWidth,e,s.borderWidth),hidden:isNaN(n.data[e])||i.data[e].hidden,index:e}}):[]}},onClick:function(t,e){var i,n,a,o=e.index,r=this.chart;for(i=0,n=(r.data.datasets||[]).length;i<n;++i)(a=r.getDatasetMeta(i)).data[o]&&(a.data[o].hidden=!a.data[o].hidden);r.update()}},cutoutPercentage:50,rotation:-.5*Math.PI,circumference:2*Math.PI,tooltips:{callbacks:{title:function(){return""},label:function(t,e){var i=e.labels[t.index],n=": "+e.datasets[t.datasetIndex].data[t.index];return A.isArray(i)?(i=i.slice())[0]+=n:i+=n,i}}}}),n._set("pie",A.clone(n.doughnut)),n._set("pie",{cutoutPercentage:0}),e.exports=function(t){t.controllers.doughnut=t.controllers.pie=t.DatasetController.extend({dataElementType:a.Arc,linkScales:A.noop,getRingIndex:function(t){for(var e=0,i=0;i<t;++i)this.chart.isDatasetVisible(i)&&++e;return e},update:function(i){var n=this,t=n.chart,e=t.chartArea,a=t.options,o=a.elements.arc,r=e.right-e.left-o.borderWidth,s=e.bottom-e.top-o.borderWidth,l=Math.min(r,s),u={x:0,y:0},d=n.getMeta(),c=a.cutoutPercentage,h=a.circumference;if(h<2*Math.PI){var f=a.rotation%(2*Math.PI),g=(f+=2*Math.PI*(f>=Math.PI?-1:f<-Math.PI?1:0))+h,p=Math.cos(f),m=Math.sin(f),v=Math.cos(g),b=Math.sin(g),x=f<=0&&0<=g||f<=2*Math.PI&&2*Math.PI<=g,y=f<=.5*Math.PI&&.5*Math.PI<=g||f<=2.5*Math.PI&&2.5*Math.PI<=g,k=f<=-Math.PI&&-Math.PI<=g||f<=Math.PI&&Math.PI<=g,M=f<=.5*-Math.PI&&.5*-Math.PI<=g||f<=1.5*Math.PI&&1.5*Math.PI<=g,w=c/100,C=k?-1:Math.min(p*(p<0?1:w),v*(v<0?1:w)),S=M?-1:Math.min(m*(m<0?1:w),b*(b<0?1:w)),_=x?1:Math.max(p*(0<p?1:w),v*(0<v?1:w)),D=y?1:Math.max(m*(0<m?1:w),b*(0<b?1:w)),P=.5*(_-C),I=.5*(D-S);l=Math.min(r/P,s/I),u={x:-.5*(_+C),y:-.5*(D+S)}}t.borderWidth=n.getMaxBorderWidth(d.data),t.outerRadius=Math.max((l-t.borderWidth)/2,0),t.innerRadius=Math.max(c?t.outerRadius/100*c:0,0),t.radiusLength=(t.outerRadius-t.innerRadius)/t.getVisibleDatasetCount(),t.offsetX=u.x*t.outerRadius,t.offsetY=u.y*t.outerRadius,d.total=n.calculateTotal(),n.outerRadius=t.outerRadius-t.radiusLength*n.getRingIndex(n.index),n.innerRadius=Math.max(n.outerRadius-t.radiusLength,0),A.each(d.data,function(t,e){n.updateElement(t,e,i)})},updateElement:function(t,e,i){var n=this,a=n.chart,o=a.chartArea,r=a.options,s=r.animation,l=(o.left+o.right)/2,u=(o.top+o.bottom)/2,d=r.rotation,c=r.rotation,h=n.getDataset(),f=i&&s.animateRotate?0:t.hidden?0:n.calculateCircumference(h.data[e])*(r.circumference/(2*Math.PI)),g=i&&s.animateScale?0:n.innerRadius,p=i&&s.animateScale?0:n.outerRadius,m=A.valueAtIndexOrDefault;A.extend(t,{_datasetIndex:n.index,_index:e,_model:{x:l+a.offsetX,y:u+a.offsetY,startAngle:d,endAngle:c,circumference:f,outerRadius:p,innerRadius:g,label:m(h.label,e,a.data.labels[e])}});var v=t._model,b=t.custom||{},x=A.valueAtIndexOrDefault,y=this.chart.options.elements.arc;v.backgroundColor=b.backgroundColor?b.backgroundColor:x(h.backgroundColor,e,y.backgroundColor),v.borderColor=b.borderColor?b.borderColor:x(h.borderColor,e,y.borderColor),v.borderWidth=b.borderWidth?b.borderWidth:x(h.borderWidth,e,y.borderWidth),i&&s.animateRotate||(v.startAngle=0===e?r.rotation:n.getMeta().data[e-1]._model.endAngle,v.endAngle=v.startAngle+v.circumference),t.pivot()},calculateTotal:function(){var i,n=this.getDataset(),t=this.getMeta(),a=0;return A.each(t.data,function(t,e){i=n.data[e],isNaN(i)||t.hidden||(a+=Math.abs(i))}),a},calculateCircumference:function(t){var e=this.getMeta().total;return 0<e&&!isNaN(t)?2*Math.PI*(Math.abs(t)/e):0},getMaxBorderWidth:function(t){for(var e,i,n=0,a=this.index,o=t.length,r=0;r<o;r++)n=(n=n<(e=t[r]._model?t[r]._model.borderWidth:0)?e:n)<(i=t[r]._chart?t[r]._chart.config.data.datasets[a].hoverBorderWidth:0)?i:n;return n}})}},{26:26,41:41,46:46}],18:[function(t,e,i){"use strict";var n=t(26),a=t(41),g=t(46);n._set("line",{showLines:!0,spanGaps:!1,hover:{mode:"label"},scales:{xAxes:[{type:"category",id:"x-axis-0"}],yAxes:[{type:"linear",id:"y-axis-0"}]}}),e.exports=function(t){function f(t,e){return g.valueOrDefault(t.showLine,e.showLines)}t.controllers.line=t.DatasetController.extend({datasetElementType:a.Line,dataElementType:a.Point,update:function(t){var e,i,n,a=this,o=a.getMeta(),r=o.dataset,s=o.data||[],l=a.chart.options,u=l.elements.line,d=a.getScaleForId(o.yAxisID),c=a.getDataset(),h=f(c,l);for(h&&(n=r.custom||{},void 0!==c.tension&&void 0===c.lineTension&&(c.lineTension=c.tension),r._scale=d,r._datasetIndex=a.index,r._children=s,r._model={spanGaps:c.spanGaps?c.spanGaps:l.spanGaps,tension:n.tension?n.tension:g.valueOrDefault(c.lineTension,u.tension),backgroundColor:n.backgroundColor?n.backgroundColor:c.backgroundColor||u.backgroundColor,borderWidth:n.borderWidth?n.borderWidth:c.borderWidth||u.borderWidth,borderColor:n.borderColor?n.borderColor:c.borderColor||u.borderColor,borderCapStyle:n.borderCapStyle?n.borderCapStyle:c.borderCapStyle||u.borderCapStyle,borderDash:n.borderDash?n.borderDash:c.borderDash||u.borderDash,borderDashOffset:n.borderDashOffset?n.borderDashOffset:c.borderDashOffset||u.borderDashOffset,borderJoinStyle:n.borderJoinStyle?n.borderJoinStyle:c.borderJoinStyle||u.borderJoinStyle,fill:n.fill?n.fill:void 0!==c.fill?c.fill:u.fill,steppedLine:n.steppedLine?n.steppedLine:g.valueOrDefault(c.steppedLine,u.stepped),cubicInterpolationMode:n.cubicInterpolationMode?n.cubicInterpolationMode:g.valueOrDefault(c.cubicInterpolationMode,u.cubicInterpolationMode)},r.pivot()),e=0,i=s.length;e<i;++e)a.updateElement(s[e],e,t);for(h&&0!==r._model.tension&&a.updateBezierControlPoints(),e=0,i=s.length;e<i;++e)s[e].pivot()},getPointBackgroundColor:function(t,e){var i=this.chart.options.elements.point.backgroundColor,n=this.getDataset(),a=t.custom||{};return a.backgroundColor?i=a.backgroundColor:n.pointBackgroundColor?i=g.valueAtIndexOrDefault(n.pointBackgroundColor,e,i):n.backgroundColor&&(i=n.backgroundColor),i},getPointBorderColor:function(t,e){var i=this.chart.options.elements.point.borderColor,n=this.getDataset(),a=t.custom||{};return a.borderColor?i=a.borderColor:n.pointBorderColor?i=g.valueAtIndexOrDefault(n.pointBorderColor,e,i):n.borderColor&&(i=n.borderColor),i},getPointBorderWidth:function(t,e){var i=this.chart.options.elements.point.borderWidth,n=this.getDataset(),a=t.custom||{};return isNaN(a.borderWidth)?!isNaN(n.pointBorderWidth)||g.isArray(n.pointBorderWidth)?i=g.valueAtIndexOrDefault(n.pointBorderWidth,e,i):isNaN(n.borderWidth)||(i=n.borderWidth):i=a.borderWidth,i},getPointRotation:function(t,e){var i=this.chart.options.elements.point.rotation,n=this.getDataset(),a=t.custom||{};return isNaN(a.rotation)?isNaN(n.pointRotation)&&!g.isArray(n.pointRotation)||(i=g.valueAtIndexOrDefault(n.pointRotation,e,i)):i=a.rotation,i},updateElement:function(t,e,i){var n,a,o=this,r=o.getMeta(),s=t.custom||{},l=o.getDataset(),u=o.index,d=l.data[e],c=o.getScaleForId(r.yAxisID),h=o.getScaleForId(r.xAxisID),f=o.chart.options.elements.point;void 0!==l.radius&&void 0===l.pointRadius&&(l.pointRadius=l.radius),void 0!==l.hitRadius&&void 0===l.pointHitRadius&&(l.pointHitRadius=l.hitRadius),n=h.getPixelForValue("object"==typeof d?d:NaN,e,u),a=i?c.getBasePixel():o.calculatePointY(d,e,u),t._xScale=h,t._yScale=c,t._datasetIndex=u,t._index=e,t._model={x:n,y:a,skip:s.skip||isNaN(n)||isNaN(a),radius:s.radius||g.valueAtIndexOrDefault(l.pointRadius,e,f.radius),pointStyle:s.pointStyle||g.valueAtIndexOrDefault(l.pointStyle,e,f.pointStyle),rotation:o.getPointRotation(t,e),backgroundColor:o.getPointBackgroundColor(t,e),borderColor:o.getPointBorderColor(t,e),borderWidth:o.getPointBorderWidth(t,e),tension:r.dataset._model?r.dataset._model.tension:0,steppedLine:!!r.dataset._model&&r.dataset._model.steppedLine,hitRadius:s.hitRadius||g.valueAtIndexOrDefault(l.pointHitRadius,e,f.hitRadius)}},calculatePointY:function(t,e,i){var n,a,o,r=this.chart,s=this.getMeta(),l=this.getScaleForId(s.yAxisID),u=0,d=0;if(l.options.stacked){for(n=0;n<i;n++)if(a=r.data.datasets[n],"line"===(o=r.getDatasetMeta(n)).type&&o.yAxisID===l.id&&r.isDatasetVisible(n)){var c=Number(l.getRightValue(a.data[e]));c<0?d+=c||0:u+=c||0}var h=Number(l.getRightValue(t));return h<0?l.getPixelForValue(d+h):l.getPixelForValue(u+h)}return l.getPixelForValue(t)},updateBezierControlPoints:function(){var t,e,i,n,a=this.getMeta(),o=this.chart.chartArea,r=a.data||[];function s(t,e,i){return Math.max(Math.min(t,i),e)}if(a.dataset._model.spanGaps&&(r=r.filter(function(t){return!t._model.skip})),"monotone"===a.dataset._model.cubicInterpolationMode)g.splineCurveMonotone(r);else for(t=0,e=r.length;t<e;++t)i=r[t]._model,n=g.splineCurve(g.previousItem(r,t)._model,i,g.nextItem(r,t)._model,a.dataset._model.tension),i.controlPointPreviousX=n.previous.x,i.controlPointPreviousY=n.previous.y,i.controlPointNextX=n.next.x,i.controlPointNextY=n.next.y;if(this.chart.options.elements.line.capBezierPoints)for(t=0,e=r.length;t<e;++t)(i=r[t]._model).controlPointPreviousX=s(i.controlPointPreviousX,o.left,o.right),i.controlPointPreviousY=s(i.controlPointPreviousY,o.top,o.bottom),i.controlPointNextX=s(i.controlPointNextX,o.left,o.right),i.controlPointNextY=s(i.controlPointNextY,o.top,o.bottom)},draw:function(){var t,e=this.chart,i=this.getMeta(),n=i.data||[],a=e.chartArea,o=n.length,r=0;for(f(this.getDataset(),e.options)&&(t=(i.dataset._model.borderWidth||0)/2,g.canvas.clipArea(e.ctx,{left:a.left,right:a.right,top:a.top-t,bottom:a.bottom+t}),i.dataset.draw(),g.canvas.unclipArea(e.ctx));r<o;++r)n[r].draw(a)},setHoverStyle:function(t){var e=this.chart.data.datasets[t._datasetIndex],i=t._index,n=t.custom||{},a=t._model;t.$previousStyle={backgroundColor:a.backgroundColor,borderColor:a.borderColor,borderWidth:a.borderWidth,radius:a.radius},a.backgroundColor=n.hoverBackgroundColor||g.valueAtIndexOrDefault(e.pointHoverBackgroundColor,i,g.getHoverColor(a.backgroundColor)),a.borderColor=n.hoverBorderColor||g.valueAtIndexOrDefault(e.pointHoverBorderColor,i,g.getHoverColor(a.borderColor)),a.borderWidth=n.hoverBorderWidth||g.valueAtIndexOrDefault(e.pointHoverBorderWidth,i,a.borderWidth),a.radius=n.hoverRadius||g.valueAtIndexOrDefault(e.pointHoverRadius,i,this.chart.options.elements.point.hoverRadius)}})}},{26:26,41:41,46:46}],19:[function(t,e,i){"use strict";var n=t(26),a=t(41),k=t(46);n._set("polarArea",{scale:{type:"radialLinear",angleLines:{display:!1},gridLines:{circular:!0},pointLabels:{display:!1},ticks:{beginAtZero:!0}},animation:{animateRotate:!0,animateScale:!0},startAngle:-.5*Math.PI,legendCallback:function(t){var e=[];e.push('<ul class="'+t.id+'-legend">');var i=t.data,n=i.datasets,a=i.labels;if(n.length)for(var o=0;o<n[0].data.length;++o)e.push('<li><span style="background-color:'+n[0].backgroundColor[o]+'"></span>'),a[o]&&e.push(a[o]),e.push("</li>");return e.push("</ul>"),e.join("")},legend:{labels:{generateLabels:function(s){var l=s.data;return l.labels.length&&l.datasets.length?l.labels.map(function(t,e){var i=s.getDatasetMeta(0),n=l.datasets[0],a=i.data[e].custom||{},o=k.valueAtIndexOrDefault,r=s.options.elements.arc;return{text:t,fillStyle:a.backgroundColor?a.backgroundColor:o(n.backgroundColor,e,r.backgroundColor),strokeStyle:a.borderColor?a.borderColor:o(n.borderColor,e,r.borderColor),lineWidth:a.borderWidth?a.borderWidth:o(n.borderWidth,e,r.borderWidth),hidden:isNaN(n.data[e])||i.data[e].hidden,index:e}}):[]}},onClick:function(t,e){var i,n,a,o=e.index,r=this.chart;for(i=0,n=(r.data.datasets||[]).length;i<n;++i)(a=r.getDatasetMeta(i)).data[o].hidden=!a.data[o].hidden;r.update()}},tooltips:{callbacks:{title:function(){return""},label:function(t,e){return e.labels[t.index]+": "+t.yLabel}}}}),e.exports=function(t){t.controllers.polarArea=t.DatasetController.extend({dataElementType:a.Arc,linkScales:k.noop,update:function(i){var t,e,n,a=this,o=a.getDataset(),r=a.getMeta(),s=a.chart.options.startAngle||0,l=a._starts=[],u=a._angles=[];for(a._updateRadius(),r.count=a.countVisibleElements(),t=0,e=o.data.length;t<e;t++)l[t]=s,n=a._computeAngle(t),s+=u[t]=n;k.each(r.data,function(t,e){a.updateElement(t,e,i)})},_updateRadius:function(){var t=this,e=t.chart,i=e.chartArea,n=e.options,a=n.elements.arc,o=Math.min(i.right-i.left,i.bottom-i.top);e.outerRadius=Math.max((o-a.borderWidth/2)/2,0),e.innerRadius=Math.max(n.cutoutPercentage?e.outerRadius/100*n.cutoutPercentage:1,0),e.radiusLength=(e.outerRadius-e.innerRadius)/e.getVisibleDatasetCount(),t.outerRadius=e.outerRadius-e.radiusLength*t.index,t.innerRadius=t.outerRadius-e.radiusLength},updateElement:function(t,e,i){var n=this,a=n.chart,o=n.getDataset(),r=a.options,s=r.animation,l=a.scale,u=a.data.labels,d=l.xCenter,c=l.yCenter,h=r.startAngle,f=t.hidden?0:l.getDistanceFromCenterForValue(o.data[e]),g=n._starts[e],p=g+(t.hidden?0:n._angles[e]),m=s.animateScale?0:l.getDistanceFromCenterForValue(o.data[e]);k.extend(t,{_datasetIndex:n.index,_index:e,_scale:l,_model:{x:d,y:c,innerRadius:0,outerRadius:i?m:f,startAngle:i&&s.animateRotate?h:g,endAngle:i&&s.animateRotate?h:p,label:k.valueAtIndexOrDefault(u,e,u[e])}});var v=this.chart.options.elements.arc,b=t.custom||{},x=k.valueAtIndexOrDefault,y=t._model;y.backgroundColor=b.backgroundColor?b.backgroundColor:x(o.backgroundColor,e,v.backgroundColor),y.borderColor=b.borderColor?b.borderColor:x(o.borderColor,e,v.borderColor),y.borderWidth=b.borderWidth?b.borderWidth:x(o.borderWidth,e,v.borderWidth),t.pivot()},countVisibleElements:function(){var i=this.getDataset(),t=this.getMeta(),n=0;return k.each(t.data,function(t,e){isNaN(i.data[e])||t.hidden||n++}),n},_computeAngle:function(t){var e=this,i=this.getMeta().count,n=e.getDataset(),a=e.getMeta();if(isNaN(n.data[t])||a.data[t].hidden)return 0;var o={chart:e.chart,dataIndex:t,dataset:n,datasetIndex:e.index};return k.options.resolve([e.chart.options.elements.arc.angle,2*Math.PI/i],o,t)}})}},{26:26,41:41,46:46}],20:[function(t,e,i){"use strict";var n=t(26),a=t(41),u=t(46);n._set("radar",{scale:{type:"radialLinear"},elements:{line:{tension:0}}}),e.exports=function(t){t.controllers.radar=t.DatasetController.extend({datasetElementType:a.Line,dataElementType:a.Point,linkScales:u.noop,update:function(i){var n=this,t=n.getMeta(),e=t.dataset,a=t.data,o=e.custom||{},r=n.getDataset(),s=n.chart.options.elements.line,l=n.chart.scale;void 0!==r.tension&&void 0===r.lineTension&&(r.lineTension=r.tension),u.extend(t.dataset,{_datasetIndex:n.index,_scale:l,_children:a,_loop:!0,_model:{tension:o.tension?o.tension:u.valueOrDefault(r.lineTension,s.tension),backgroundColor:o.backgroundColor?o.backgroundColor:r.backgroundColor||s.backgroundColor,borderWidth:o.borderWidth?o.borderWidth:r.borderWidth||s.borderWidth,borderColor:o.borderColor?o.borderColor:r.borderColor||s.borderColor,fill:o.fill?o.fill:void 0!==r.fill?r.fill:s.fill,borderCapStyle:o.borderCapStyle?o.borderCapStyle:r.borderCapStyle||s.borderCapStyle,borderDash:o.borderDash?o.borderDash:r.borderDash||s.borderDash,borderDashOffset:o.borderDashOffset?o.borderDashOffset:r.borderDashOffset||s.borderDashOffset,borderJoinStyle:o.borderJoinStyle?o.borderJoinStyle:r.borderJoinStyle||s.borderJoinStyle}}),t.dataset.pivot(),u.each(a,function(t,e){n.updateElement(t,e,i)},n),n.updateBezierControlPoints()},updateElement:function(t,e,i){var n=this,a=t.custom||{},o=n.getDataset(),r=n.chart.scale,s=n.chart.options.elements.point,l=r.getPointPositionForValue(e,o.data[e]);void 0!==o.radius&&void 0===o.pointRadius&&(o.pointRadius=o.radius),void 0!==o.hitRadius&&void 0===o.pointHitRadius&&(o.pointHitRadius=o.hitRadius),u.extend(t,{_datasetIndex:n.index,_index:e,_scale:r,_model:{x:i?r.xCenter:l.x,y:i?r.yCenter:l.y,tension:a.tension?a.tension:u.valueOrDefault(o.lineTension,n.chart.options.elements.line.tension),radius:a.radius?a.radius:u.valueAtIndexOrDefault(o.pointRadius,e,s.radius),backgroundColor:a.backgroundColor?a.backgroundColor:u.valueAtIndexOrDefault(o.pointBackgroundColor,e,s.backgroundColor),borderColor:a.borderColor?a.borderColor:u.valueAtIndexOrDefault(o.pointBorderColor,e,s.borderColor),borderWidth:a.borderWidth?a.borderWidth:u.valueAtIndexOrDefault(o.pointBorderWidth,e,s.borderWidth),pointStyle:a.pointStyle?a.pointStyle:u.valueAtIndexOrDefault(o.pointStyle,e,s.pointStyle),rotation:a.rotation?a.rotation:u.valueAtIndexOrDefault(o.pointRotation,e,s.rotation),hitRadius:a.hitRadius?a.hitRadius:u.valueAtIndexOrDefault(o.pointHitRadius,e,s.hitRadius)}}),t._model.skip=a.skip?a.skip:isNaN(t._model.x)||isNaN(t._model.y)},updateBezierControlPoints:function(){var a=this.chart.chartArea,o=this.getMeta();u.each(o.data,function(t,e){var i=t._model,n=u.splineCurve(u.previousItem(o.data,e,!0)._model,i,u.nextItem(o.data,e,!0)._model,i.tension);i.controlPointPreviousX=Math.max(Math.min(n.previous.x,a.right),a.left),i.controlPointPreviousY=Math.max(Math.min(n.previous.y,a.bottom),a.top),i.controlPointNextX=Math.max(Math.min(n.next.x,a.right),a.left),i.controlPointNextY=Math.max(Math.min(n.next.y,a.bottom),a.top),t.pivot()})},setHoverStyle:function(t){var e=this.chart.data.datasets[t._datasetIndex],i=t.custom||{},n=t._index,a=t._model;t.$previousStyle={backgroundColor:a.backgroundColor,borderColor:a.borderColor,borderWidth:a.borderWidth,radius:a.radius},a.radius=i.hoverRadius?i.hoverRadius:u.valueAtIndexOrDefault(e.pointHoverRadius,n,this.chart.options.elements.point.hoverRadius),a.backgroundColor=i.hoverBackgroundColor?i.hoverBackgroundColor:u.valueAtIndexOrDefault(e.pointHoverBackgroundColor,n,u.getHoverColor(a.backgroundColor)),a.borderColor=i.hoverBorderColor?i.hoverBorderColor:u.valueAtIndexOrDefault(e.pointHoverBorderColor,n,u.getHoverColor(a.borderColor)),a.borderWidth=i.hoverBorderWidth?i.hoverBorderWidth:u.valueAtIndexOrDefault(e.pointHoverBorderWidth,n,a.borderWidth)}})}},{26:26,41:41,46:46}],21:[function(t,e,i){"use strict";t(26)._set("scatter",{hover:{mode:"single"},scales:{xAxes:[{id:"x-axis-1",type:"linear",position:"bottom"}],yAxes:[{id:"y-axis-1",type:"linear",position:"left"}]},showLines:!1,tooltips:{callbacks:{title:function(){return""},label:function(t){return"("+t.xLabel+", "+t.yLabel+")"}}}}),e.exports=function(t){t.controllers.scatter=t.controllers.line}},{26:26}],22:[function(t,e,i){"use strict";var n=t(27);i=e.exports=n.extend({chart:null,currentStep:0,numSteps:60,easing:"",render:null,onAnimationProgress:null,onAnimationComplete:null});Object.defineProperty(i.prototype,"animationObject",{get:function(){return this}}),Object.defineProperty(i.prototype,"chartInstance",{get:function(){return this.chart},set:function(t){this.chart=t}})},{27:27}],23:[function(t,e,i){"use strict";var n=t(26),o=t(46);n._set("global",{animation:{duration:1e3,easing:"easeOutQuart",onProgress:o.noop,onComplete:o.noop}}),e.exports={frameDuration:17,animations:[],dropFrames:0,request:null,addAnimation:function(t,e,i,n){var a,o,r=this.animations;for(e.chart=t,n||(t.animating=!0),a=0,o=r.length;a<o;++a)if(r[a].chart===t)return void(r[a]=e);r.push(e),1===r.length&&this.requestAnimationFrame()},cancelAnimation:function(e){var t=o.findIndex(this.animations,function(t){return t.chart===e});-1!==t&&(this.animations.splice(t,1),e.animating=!1)},requestAnimationFrame:function(){var t=this;null===t.request&&(t.request=o.requestAnimFrame.call(window,function(){t.request=null,t.startDigest()}))},startDigest:function(){var t=this,e=Date.now(),i=0;1<t.dropFrames&&(i=Math.floor(t.dropFrames),t.dropFrames=t.dropFrames%1),t.advance(1+i);var n=Date.now();t.dropFrames+=(n-e)/t.frameDuration,0<t.animations.length&&t.requestAnimationFrame()},advance:function(t){for(var e,i,n=this.animations,a=0;a<n.length;)i=(e=n[a]).chart,e.currentStep=(e.currentStep||0)+t,e.currentStep=Math.min(e.currentStep,e.numSteps),o.callback(e.render,[i,e],i),o.callback(e.onAnimationProgress,[e],i),e.currentStep>=e.numSteps?(o.callback(e.onAnimationComplete,[e],i),i.animating=!1,n.splice(a,1)):++a}}},{26:26,46:46}],24:[function(t,e,i){"use strict";var s=t(22),l=t(23),c=t(26),h=t(46),a=t(29),o=t(31),f=t(49),g=t(32),p=t(34),n=t(36);e.exports=function(u){function d(t){return"top"===t||"bottom"===t}u.types={},u.instances={},u.controllers={},h.extend(u.prototype,{construct:function(t,e){var i,n,a=this;(n=(i=(i=e)||{}).data=i.data||{}).datasets=n.datasets||[],n.labels=n.labels||[],i.options=h.configMerge(c.global,c[i.type],i.options||{}),e=i;var o=f.acquireContext(t,e),r=o&&o.canvas,s=r&&r.height,l=r&&r.width;a.id=h.uid(),a.ctx=o,a.canvas=r,a.config=e,a.width=l,a.height=s,a.aspectRatio=s?l/s:null,a.options=e.options,a._bufferedRender=!1,(a.chart=a).controller=a,u.instances[a.id]=a,Object.defineProperty(a,"data",{get:function(){return a.config.data},set:function(t){a.config.data=t}}),o&&r?(a.initialize(),a.update()):console.error("Failed to create chart: can't acquire context from the given item")},initialize:function(){var t=this;return g.notify(t,"beforeInit"),h.retinaScale(t,t.options.devicePixelRatio),t.bindEvents(),t.options.responsive&&t.resize(!0),t.ensureScalesHaveIDs(),t.buildOrUpdateScales(),t.initToolTip(),g.notify(t,"afterInit"),t},clear:function(){return h.canvas.clear(this),this},stop:function(){return l.cancelAnimation(this),this},resize:function(t){var e=this,i=e.options,n=e.canvas,a=i.maintainAspectRatio&&e.aspectRatio||null,o=Math.max(0,Math.floor(h.getMaximumWidth(n))),r=Math.max(0,Math.floor(a?o/a:h.getMaximumHeight(n)));if((e.width!==o||e.height!==r)&&(n.width=e.width=o,n.height=e.height=r,n.style.width=o+"px",n.style.height=r+"px",h.retinaScale(e,i.devicePixelRatio),!t)){var s={width:o,height:r};g.notify(e,"resize",[s]),e.options.onResize&&e.options.onResize(e,s),e.stop(),e.update({duration:e.options.responsiveAnimationDuration})}},ensureScalesHaveIDs:function(){var t=this.options,e=t.scales||{},i=t.scale;h.each(e.xAxes,function(t,e){t.id=t.id||"x-axis-"+e}),h.each(e.yAxes,function(t,e){t.id=t.id||"y-axis-"+e}),i&&(i.id=i.id||"scale")},buildOrUpdateScales:function(){var r=this,t=r.options,s=r.scales||{},e=[],l=Object.keys(s).reduce(function(t,e){return t[e]=!1,t},{});t.scales&&(e=e.concat((t.scales.xAxes||[]).map(function(t){return{options:t,dtype:"category",dposition:"bottom"}}),(t.scales.yAxes||[]).map(function(t){return{options:t,dtype:"linear",dposition:"left"}}))),t.scale&&e.push({options:t.scale,dtype:"radialLinear",isDefault:!0,dposition:"chartArea"}),h.each(e,function(t){var e=t.options,i=e.id,n=h.valueOrDefault(e.type,t.dtype);d(e.position)!==d(t.dposition)&&(e.position=t.dposition),l[i]=!0;var a=null;if(i in s&&s[i].type===n)(a=s[i]).options=e,a.ctx=r.ctx,a.chart=r;else{var o=p.getScaleConstructor(n);if(!o)return;a=new o({id:i,type:n,options:e,ctx:r.ctx,chart:r}),s[a.id]=a}a.mergeTicksOptions(),t.isDefault&&(r.scale=a)}),h.each(l,function(t,e){t||delete s[e]}),r.scales=s,p.addScalesToLayout(this)},buildOrUpdateControllers:function(){var o=this,r=[],s=[];return h.each(o.data.datasets,function(t,e){var i=o.getDatasetMeta(e),n=t.type||o.config.type;if(i.type&&i.type!==n&&(o.destroyDatasetMeta(e),i=o.getDatasetMeta(e)),i.type=n,r.push(i.type),i.controller)i.controller.updateIndex(e),i.controller.linkScales();else{var a=u.controllers[i.type];if(void 0===a)throw new Error('"'+i.type+'" is not a chart type.');i.controller=new a(o,e),s.push(i.controller)}},o),s},resetElements:function(){var i=this;h.each(i.data.datasets,function(t,e){i.getDatasetMeta(e).controller.reset()},i)},reset:function(){this.resetElements(),this.tooltip.initialize()},update:function(t){var e,i,n=this;if(t&&"object"==typeof t||(t={duration:t,lazy:arguments[1]}),i=(e=n).options,h.each(e.scales,function(t){o.removeBox(e,t)}),i=h.configMerge(u.defaults.global,u.defaults[e.config.type],i),e.options=e.config.options=i,e.ensureScalesHaveIDs(),e.buildOrUpdateScales(),e.tooltip._options=i.tooltips,e.tooltip.initialize(),g._invalidate(n),!1!==g.notify(n,"beforeUpdate")){n.tooltip._data=n.data;var a=n.buildOrUpdateControllers();h.each(n.data.datasets,function(t,e){n.getDatasetMeta(e).controller.buildOrUpdateElements()},n),n.updateLayout(),n.options.animation&&n.options.animation.duration&&h.each(a,function(t){t.reset()}),n.updateDatasets(),n.tooltip.initialize(),n.lastActive=[],g.notify(n,"afterUpdate"),n._bufferedRender?n._bufferedRequest={duration:t.duration,easing:t.easing,lazy:t.lazy}:n.render(t)}},updateLayout:function(){!1!==g.notify(this,"beforeLayout")&&(o.update(this,this.width,this.height),g.notify(this,"afterScaleUpdate"),g.notify(this,"afterLayout"))},updateDatasets:function(){if(!1!==g.notify(this,"beforeDatasetsUpdate")){for(var t=0,e=this.data.datasets.length;t<e;++t)this.updateDataset(t);g.notify(this,"afterDatasetsUpdate")}},updateDataset:function(t){var e=this.getDatasetMeta(t),i={meta:e,index:t};!1!==g.notify(this,"beforeDatasetUpdate",[i])&&(e.controller.update(),g.notify(this,"afterDatasetUpdate",[i]))},render:function(t){var e=this;t&&"object"==typeof t||(t={duration:t,lazy:arguments[1]});var i=t.duration,n=t.lazy;if(!1!==g.notify(e,"beforeRender")){var a=e.options.animation,o=function(t){g.notify(e,"afterRender"),h.callback(a&&a.onComplete,[t],e)};if(a&&(void 0!==i&&0!==i||void 0===i&&0!==a.duration)){var r=new s({numSteps:(i||a.duration)/16.66,easing:t.easing||a.easing,render:function(t,e){var i=h.easing.effects[e.easing],n=e.currentStep,a=n/e.numSteps;t.draw(i(a),a,n)},onAnimationProgress:a.onProgress,onAnimationComplete:o});l.addAnimation(e,r,i,n)}else e.draw(),o(new s({numSteps:0,chart:e}));return e}},draw:function(t){var e=this;e.clear(),h.isNullOrUndef(t)&&(t=1),e.transition(t),e.width<=0||e.height<=0||!1!==g.notify(e,"beforeDraw",[t])&&(h.each(e.boxes,function(t){t.draw(e.chartArea)},e),e.scale&&e.scale.draw(),e.drawDatasets(t),e._drawTooltip(t),g.notify(e,"afterDraw",[t]))},transition:function(t){for(var e=0,i=(this.data.datasets||[]).length;e<i;++e)this.isDatasetVisible(e)&&this.getDatasetMeta(e).controller.transition(t);this.tooltip.transition(t)},drawDatasets:function(t){var e=this;if(!1!==g.notify(e,"beforeDatasetsDraw",[t])){for(var i=(e.data.datasets||[]).length-1;0<=i;--i)e.isDatasetVisible(i)&&e.drawDataset(i,t);g.notify(e,"afterDatasetsDraw",[t])}},drawDataset:function(t,e){var i=this.getDatasetMeta(t),n={meta:i,index:t,easingValue:e};!1!==g.notify(this,"beforeDatasetDraw",[n])&&(i.controller.draw(e),g.notify(this,"afterDatasetDraw",[n]))},_drawTooltip:function(t){var e=this.tooltip,i={tooltip:e,easingValue:t};!1!==g.notify(this,"beforeTooltipDraw",[i])&&(e.draw(),g.notify(this,"afterTooltipDraw",[i]))},getElementAtEvent:function(t){return a.modes.single(this,t)},getElementsAtEvent:function(t){return a.modes.label(this,t,{intersect:!0})},getElementsAtXAxis:function(t){return a.modes["x-axis"](this,t,{intersect:!0})},getElementsAtEventForMode:function(t,e,i){var n=a.modes[e];return"function"==typeof n?n(this,t,i):[]},getDatasetAtEvent:function(t){return a.modes.dataset(this,t,{intersect:!0})},getDatasetMeta:function(t){var e=this.data.datasets[t];e._meta||(e._meta={});var i=e._meta[this.id];return i||(i=e._meta[this.id]={type:null,data:[],dataset:null,controller:null,hidden:null,xAxisID:null,yAxisID:null}),i},getVisibleDatasetCount:function(){for(var t=0,e=0,i=this.data.datasets.length;e<i;++e)this.isDatasetVisible(e)&&t++;return t},isDatasetVisible:function(t){var e=this.getDatasetMeta(t);return"boolean"==typeof e.hidden?!e.hidden:!this.data.datasets[t].hidden},generateLegend:function(){return this.options.legendCallback(this)},destroyDatasetMeta:function(t){var e=this.id,i=this.data.datasets[t],n=i._meta&&i._meta[e];n&&(n.controller.destroy(),delete i._meta[e])},destroy:function(){var t,e,i=this,n=i.canvas;for(i.stop(),t=0,e=i.data.datasets.length;t<e;++t)i.destroyDatasetMeta(t);n&&(i.unbindEvents(),h.canvas.clear(i),f.releaseContext(i.ctx),i.canvas=null,i.ctx=null),g.notify(i,"destroy"),delete u.instances[i.id]},toBase64Image:function(){return this.canvas.toDataURL.apply(this.canvas,arguments)},initToolTip:function(){var t=this;t.tooltip=new n({_chart:t,_chartInstance:t,_data:t.data,_options:t.options.tooltips},t)},bindEvents:function(){var e=this,i=e._listeners={},n=function(){e.eventHandler.apply(e,arguments)};h.each(e.options.events,function(t){f.addEventListener(e,t,n),i[t]=n}),e.options.responsive&&(n=function(){e.resize()},f.addEventListener(e,"resize",n),i.resize=n)},unbindEvents:function(){var i=this,t=i._listeners;t&&(delete i._listeners,h.each(t,function(t,e){f.removeEventListener(i,e,t)}))},updateHoverStyle:function(t,e,i){var n,a,o,r=i?"setHoverStyle":"removeHoverStyle";for(a=0,o=t.length;a<o;++a)(n=t[a])&&this.getDatasetMeta(n._datasetIndex).controller[r](n)},eventHandler:function(t){var e=this,i=e.tooltip;if(!1!==g.notify(e,"beforeEvent",[t])){e._bufferedRender=!0,e._bufferedRequest=null;var n=e.handleEvent(t);i&&(n=i._start?i.handleEvent(t):n|i.handleEvent(t)),g.notify(e,"afterEvent",[t]);var a=e._bufferedRequest;return a?e.render(a):n&&!e.animating&&(e.stop(),e.render({duration:e.options.hover.animationDuration,lazy:!0})),e._bufferedRender=!1,e._bufferedRequest=null,e}},handleEvent:function(t){var e,i=this,n=i.options||{},a=n.hover;return i.lastActive=i.lastActive||[],"mouseout"===t.type?i.active=[]:i.active=i.getElementsAtEventForMode(t,a.mode,a),h.callback(n.onHover||n.hover.onHover,[t.native,i.active],i),"mouseup"!==t.type&&"click"!==t.type||n.onClick&&n.onClick.call(i,t.native,i.active),i.lastActive.length&&i.updateHoverStyle(i.lastActive,a.mode,!1),i.active.length&&a.mode&&i.updateHoverStyle(i.active,a.mode,!0),e=!h.arrayEquals(i.active,i.lastActive),i.lastActive=i.active,e}}),u.Controller=u}},{22:22,23:23,26:26,29:29,31:31,32:32,34:34,36:36,46:46,49:49}],25:[function(t,e,i){"use strict";var s=t(46);e.exports=function(t){var o=["push","pop","shift","splice","unshift"];function r(e,t){var i=e._chartjs;if(i){var n=i.listeners,a=n.indexOf(t);-1!==a&&n.splice(a,1),0<n.length||(o.forEach(function(t){delete e[t]}),delete e._chartjs)}}t.DatasetController=function(t,e){this.initialize(t,e)},s.extend(t.DatasetController.prototype,{datasetElementType:null,dataElementType:null,initialize:function(t,e){this.chart=t,this.index=e,this.linkScales(),this.addElements()},updateIndex:function(t){this.index=t},linkScales:function(){var t=this,e=t.getMeta(),i=t.getDataset();null!==e.xAxisID&&e.xAxisID in t.chart.scales||(e.xAxisID=i.xAxisID||t.chart.options.scales.xAxes[0].id),null!==e.yAxisID&&e.yAxisID in t.chart.scales||(e.yAxisID=i.yAxisID||t.chart.options.scales.yAxes[0].id)},getDataset:function(){return this.chart.data.datasets[this.index]},getMeta:function(){return this.chart.getDatasetMeta(this.index)},getScaleForId:function(t){return this.chart.scales[t]},reset:function(){this.update(!0)},destroy:function(){this._data&&r(this._data,this)},createMetaDataset:function(){var t=this.datasetElementType;return t&&new t({_chart:this.chart,_datasetIndex:this.index})},createMetaData:function(t){var e=this.dataElementType;return e&&new e({_chart:this.chart,_datasetIndex:this.index,_index:t})},addElements:function(){var t,e,i=this.getMeta(),n=this.getDataset().data||[],a=i.data;for(t=0,e=n.length;t<e;++t)a[t]=a[t]||this.createMetaData(t);i.dataset=i.dataset||this.createMetaDataset()},addElementAndReset:function(t){var e=this.createMetaData(t);this.getMeta().data.splice(t,0,e),this.updateElement(e,t,!0)},buildOrUpdateElements:function(){var a,t,e=this,i=e.getDataset(),n=i.data||(i.data=[]);e._data!==n&&(e._data&&r(e._data,e),t=e,(a=n)._chartjs?a._chartjs.listeners.push(t):(Object.defineProperty(a,"_chartjs",{configurable:!0,enumerable:!1,value:{listeners:[t]}}),o.forEach(function(t){var i="onData"+t.charAt(0).toUpperCase()+t.slice(1),n=a[t];Object.defineProperty(a,t,{configurable:!0,enumerable:!1,value:function(){var e=Array.prototype.slice.call(arguments),t=n.apply(this,e);return s.each(a._chartjs.listeners,function(t){"function"==typeof t[i]&&t[i].apply(t,e)}),t}})})),e._data=n),e.resyncElements()},update:s.noop,transition:function(t){for(var e=this.getMeta(),i=e.data||[],n=i.length,a=0;a<n;++a)i[a].transition(t);e.dataset&&e.dataset.transition(t)},draw:function(){var t=this.getMeta(),e=t.data||[],i=e.length,n=0;for(t.dataset&&t.dataset.draw();n<i;++n)e[n].draw()},removeHoverStyle:function(t){s.merge(t._model,t.$previousStyle||{}),delete t.$previousStyle},setHoverStyle:function(t){var e=this.chart.data.datasets[t._datasetIndex],i=t._index,n=t.custom||{},a=s.valueAtIndexOrDefault,o=s.getHoverColor,r=t._model;t.$previousStyle={backgroundColor:r.backgroundColor,borderColor:r.borderColor,borderWidth:r.borderWidth},r.backgroundColor=n.hoverBackgroundColor?n.hoverBackgroundColor:a(e.hoverBackgroundColor,i,o(r.backgroundColor)),r.borderColor=n.hoverBorderColor?n.hoverBorderColor:a(e.hoverBorderColor,i,o(r.borderColor)),r.borderWidth=n.hoverBorderWidth?n.hoverBorderWidth:a(e.hoverBorderWidth,i,r.borderWidth)},resyncElements:function(){var t=this.getMeta(),e=this.getDataset().data,i=t.data.length,n=e.length;n<i?t.data.splice(n,i-n):i<n&&this.insertElements(i,n-i)},insertElements:function(t,e){for(var i=0;i<e;++i)this.addElementAndReset(t+i)},onDataPush:function(){this.insertElements(this.getDataset().data.length-1,arguments.length)},onDataPop:function(){this.getMeta().data.pop()},onDataShift:function(){this.getMeta().data.shift()},onDataSplice:function(t,e){this.getMeta().data.splice(t,e),this.insertElements(t,arguments.length-2)},onDataUnshift:function(){this.insertElements(0,arguments.length)}}),t.DatasetController.extend=s.inherits}},{46:46}],26:[function(t,e,i){"use strict";var n=t(46);e.exports={_set:function(t,e){return n.merge(this[t]||(this[t]={}),e)}}},{46:46}],27:[function(t,e,i){"use strict";var g=t(3),n=t(46);var a=function(t){n.extend(this,t),this.initialize.apply(this,arguments)};n.extend(a.prototype,{initialize:function(){this.hidden=!1},pivot:function(){var t=this;return t._view||(t._view=n.clone(t._model)),t._start={},t},transition:function(t){var e=this,i=e._model,n=e._start,a=e._view;return i&&1!==t?(a||(a=e._view={}),n||(n=e._start={}),function(t,e,i,n){var a,o,r,s,l,u,d,c,h,f=Object.keys(i);for(a=0,o=f.length;a<o;++a)if(u=i[r=f[a]],e.hasOwnProperty(r)||(e[r]=u),(s=e[r])!==u&&"_"!==r[0]){if(t.hasOwnProperty(r)||(t[r]=s),(d=typeof u)==typeof(l=t[r]))if("string"===d){if((c=g(l)).valid&&(h=g(u)).valid){e[r]=h.mix(c,n).rgbString();continue}}else if("number"===d&&isFinite(l)&&isFinite(u)){e[r]=l+(u-l)*n;continue}e[r]=u}}(n,a,i,t)):(e._view=i,e._start=null),e},tooltipPosition:function(){return{x:this._model.x,y:this._model.y}},hasValue:function(){return n.isNumber(this._model.x)&&n.isNumber(this._model.y)}}),a.extend=n.inherits,e.exports=a},{3:3,46:46}],28:[function(t,e,i){"use strict";var n=t(3),a=t(26),g=t(46),l=t(34);e.exports=function(){function d(t,e,i){var n;return"string"==typeof t?(n=parseInt(t,10),-1!==t.indexOf("%")&&(n=n/100*e.parentNode[i])):n=t,n}function c(t){return null!=t&&"none"!==t}function e(t,e,i){var n=document.defaultView,a=g._getParentNode(t),o=n.getComputedStyle(t)[e],r=n.getComputedStyle(a)[e],s=c(o),l=c(r),u=Number.POSITIVE_INFINITY;return s||l?Math.min(s?d(o,t,i):u,l?d(r,a,i):u):"none"}g.configMerge=function(){return g.merge(g.clone(arguments[0]),[].slice.call(arguments,1),{merger:function(t,e,i,n){var a=e[t]||{},o=i[t];"scales"===t?e[t]=g.scaleMerge(a,o):"scale"===t?e[t]=g.merge(a,[l.getScaleDefaults(o.type),o]):g._merger(t,e,i,n)}})},g.scaleMerge=function(){return g.merge(g.clone(arguments[0]),[].slice.call(arguments,1),{merger:function(t,e,i,n){if("xAxes"===t||"yAxes"===t){var a,o,r,s=i[t].length;for(e[t]||(e[t]=[]),a=0;a<s;++a)r=i[t][a],o=g.valueOrDefault(r.type,"xAxes"===t?"category":"linear"),a>=e[t].length&&e[t].push({}),!e[t][a].type||r.type&&r.type!==e[t][a].type?g.merge(e[t][a],[l.getScaleDefaults(o),r]):g.merge(e[t][a],r)}else g._merger(t,e,i,n)}})},g.where=function(t,e){if(g.isArray(t)&&Array.prototype.filter)return t.filter(e);var i=[];return g.each(t,function(t){e(t)&&i.push(t)}),i},g.findIndex=Array.prototype.findIndex?function(t,e,i){return t.findIndex(e,i)}:function(t,e,i){i=void 0===i?t:i;for(var n=0,a=t.length;n<a;++n)if(e.call(i,t[n],n,t))return n;return-1},g.findNextWhere=function(t,e,i){g.isNullOrUndef(i)&&(i=-1);for(var n=i+1;n<t.length;n++){var a=t[n];if(e(a))return a}},g.findPreviousWhere=function(t,e,i){g.isNullOrUndef(i)&&(i=t.length);for(var n=i-1;0<=n;n--){var a=t[n];if(e(a))return a}},g.isNumber=function(t){return!isNaN(parseFloat(t))&&isFinite(t)},g.almostEquals=function(t,e,i){return Math.abs(t-e)<i},g.almostWhole=function(t,e){var i=Math.round(t);return i-e<t&&t<i+e},g.max=function(t){return t.reduce(function(t,e){return isNaN(e)?t:Math.max(t,e)},Number.NEGATIVE_INFINITY)},g.min=function(t){return t.reduce(function(t,e){return isNaN(e)?t:Math.min(t,e)},Number.POSITIVE_INFINITY)},g.sign=Math.sign?function(t){return Math.sign(t)}:function(t){return 0===(t=+t)||isNaN(t)?t:0<t?1:-1},g.log10=Math.log10?function(t){return Math.log10(t)}:function(t){var e=Math.log(t)*Math.LOG10E,i=Math.round(e);return t===Math.pow(10,i)?i:e},g.toRadians=function(t){return t*(Math.PI/180)},g.toDegrees=function(t){return t*(180/Math.PI)},g.getAngleFromPoint=function(t,e){var i=e.x-t.x,n=e.y-t.y,a=Math.sqrt(i*i+n*n),o=Math.atan2(n,i);return o<-.5*Math.PI&&(o+=2*Math.PI),{angle:o,distance:a}},g.distanceBetweenPoints=function(t,e){return Math.sqrt(Math.pow(e.x-t.x,2)+Math.pow(e.y-t.y,2))},g.aliasPixel=function(t){return t%2==0?0:.5},g.splineCurve=function(t,e,i,n){var a=t.skip?e:t,o=e,r=i.skip?e:i,s=Math.sqrt(Math.pow(o.x-a.x,2)+Math.pow(o.y-a.y,2)),l=Math.sqrt(Math.pow(r.x-o.x,2)+Math.pow(r.y-o.y,2)),u=s/(s+l),d=l/(s+l),c=n*(u=isNaN(u)?0:u),h=n*(d=isNaN(d)?0:d);return{previous:{x:o.x-c*(r.x-a.x),y:o.y-c*(r.y-a.y)},next:{x:o.x+h*(r.x-a.x),y:o.y+h*(r.y-a.y)}}},g.EPSILON=Number.EPSILON||1e-14,g.splineCurveMonotone=function(t){var e,i,n,a,o,r,s,l,u,d=(t||[]).map(function(t){return{model:t._model,deltaK:0,mK:0}}),c=d.length;for(e=0;e<c;++e)if(!(n=d[e]).model.skip){if(i=0<e?d[e-1]:null,(a=e<c-1?d[e+1]:null)&&!a.model.skip){var h=a.model.x-n.model.x;n.deltaK=0!==h?(a.model.y-n.model.y)/h:0}!i||i.model.skip?n.mK=n.deltaK:!a||a.model.skip?n.mK=i.deltaK:this.sign(i.deltaK)!==this.sign(n.deltaK)?n.mK=0:n.mK=(i.deltaK+n.deltaK)/2}for(e=0;e<c-1;++e)n=d[e],a=d[e+1],n.model.skip||a.model.skip||(g.almostEquals(n.deltaK,0,this.EPSILON)?n.mK=a.mK=0:(o=n.mK/n.deltaK,r=a.mK/n.deltaK,(l=Math.pow(o,2)+Math.pow(r,2))<=9||(s=3/Math.sqrt(l),n.mK=o*s*n.deltaK,a.mK=r*s*n.deltaK)));for(e=0;e<c;++e)(n=d[e]).model.skip||(i=0<e?d[e-1]:null,a=e<c-1?d[e+1]:null,i&&!i.model.skip&&(u=(n.model.x-i.model.x)/3,n.model.controlPointPreviousX=n.model.x-u,n.model.controlPointPreviousY=n.model.y-u*n.mK),a&&!a.model.skip&&(u=(a.model.x-n.model.x)/3,n.model.controlPointNextX=n.model.x+u,n.model.controlPointNextY=n.model.y+u*n.mK))},g.nextItem=function(t,e,i){return i?e>=t.length-1?t[0]:t[e+1]:e>=t.length-1?t[t.length-1]:t[e+1]},g.previousItem=function(t,e,i){return i?e<=0?t[t.length-1]:t[e-1]:e<=0?t[0]:t[e-1]},g.niceNum=function(t,e){var i=Math.floor(g.log10(t)),n=t/Math.pow(10,i);return(e?n<1.5?1:n<3?2:n<7?5:10:n<=1?1:n<=2?2:n<=5?5:10)*Math.pow(10,i)},g.requestAnimFrame="undefined"==typeof window?function(t){t()}:window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||window.oRequestAnimationFrame||window.msRequestAnimationFrame||function(t){return window.setTimeout(t,1e3/60)},g.getRelativePosition=function(t,e){var i,n,a=t.originalEvent||t,o=t.target||t.srcElement,r=o.getBoundingClientRect(),s=a.touches;n=s&&0<s.length?(i=s[0].clientX,s[0].clientY):(i=a.clientX,a.clientY);var l=parseFloat(g.getStyle(o,"padding-left")),u=parseFloat(g.getStyle(o,"padding-top")),d=parseFloat(g.getStyle(o,"padding-right")),c=parseFloat(g.getStyle(o,"padding-bottom")),h=r.right-r.left-l-d,f=r.bottom-r.top-u-c;return{x:i=Math.round((i-r.left-l)/h*o.width/e.currentDevicePixelRatio),y:n=Math.round((n-r.top-u)/f*o.height/e.currentDevicePixelRatio)}},g.getConstraintWidth=function(t){return e(t,"max-width","clientWidth")},g.getConstraintHeight=function(t){return e(t,"max-height","clientHeight")},g._calculatePadding=function(t,e,i){return-1<(e=g.getStyle(t,e)).indexOf("%")?i/parseInt(e,10):parseInt(e,10)},g._getParentNode=function(t){var e=t.parentNode;return e&&e.host&&(e=e.host),e},g.getMaximumWidth=function(t){var e=g._getParentNode(t);if(!e)return t.clientWidth;var i=e.clientWidth,n=i-g._calculatePadding(e,"padding-left",i)-g._calculatePadding(e,"padding-right",i),a=g.getConstraintWidth(t);return isNaN(a)?n:Math.min(n,a)},g.getMaximumHeight=function(t){var e=g._getParentNode(t);if(!e)return t.clientHeight;var i=e.clientHeight,n=i-g._calculatePadding(e,"padding-top",i)-g._calculatePadding(e,"padding-bottom",i),a=g.getConstraintHeight(t);return isNaN(a)?n:Math.min(n,a)},g.getStyle=function(t,e){return t.currentStyle?t.currentStyle[e]:document.defaultView.getComputedStyle(t,null).getPropertyValue(e)},g.retinaScale=function(t,e){var i=t.currentDevicePixelRatio=e||"undefined"!=typeof window&&window.devicePixelRatio||1;if(1!==i){var n=t.canvas,a=t.height,o=t.width;n.height=a*i,n.width=o*i,t.ctx.scale(i,i),n.style.height||n.style.width||(n.style.height=a+"px",n.style.width=o+"px")}},g.fontString=function(t,e,i){return e+" "+t+"px "+i},g.longestText=function(e,t,i,n){var a=(n=n||{}).data=n.data||{},o=n.garbageCollect=n.garbageCollect||[];n.font!==t&&(a=n.data={},o=n.garbageCollect=[],n.font=t),e.font=t;var r=0;g.each(i,function(t){null!=t&&!0!==g.isArray(t)?r=g.measureText(e,a,o,r,t):g.isArray(t)&&g.each(t,function(t){null==t||g.isArray(t)||(r=g.measureText(e,a,o,r,t))})});var s=o.length/2;if(s>i.length){for(var l=0;l<s;l++)delete a[o[l]];o.splice(0,s)}return r},g.measureText=function(t,e,i,n,a){var o=e[a];return o||(o=e[a]=t.measureText(a).width,i.push(a)),n<o&&(n=o),n},g.numberOfLabelLines=function(t){var e=1;return g.each(t,function(t){g.isArray(t)&&t.length>e&&(e=t.length)}),e},g.color=n?function(t){return t instanceof CanvasGradient&&(t=a.global.defaultColor),n(t)}:function(t){return console.error("Color.js not found!"),t},g.getHoverColor=function(t){return t instanceof CanvasPattern?t:g.color(t).saturate(.5).darken(.1).rgbString()}}},{26:26,3:3,34:34,46:46}],29:[function(t,e,i){"use strict";var n=t(46);function s(t,e){return t.native?{x:t.x,y:t.y}:n.getRelativePosition(t,e)}function l(t,e){var i,n,a,o,r;for(n=0,o=t.data.datasets.length;n<o;++n)if(t.isDatasetVisible(n))for(a=0,r=(i=t.getDatasetMeta(n)).data.length;a<r;++a){var s=i.data[a];s._view.skip||e(s)}}function u(t,e){var i=[];return l(t,function(t){t.inRange(e.x,e.y)&&i.push(t)}),i}function d(t,n,a,o){var r=Number.POSITIVE_INFINITY,s=[];return l(t,function(t){if(!a||t.inRange(n.x,n.y)){var e=t.getCenterPoint(),i=o(n,e);i<r?(s=[t],r=i):i===r&&s.push(t)}}),s}function c(t){var a=-1!==t.indexOf("x"),o=-1!==t.indexOf("y");return function(t,e){var i=a?Math.abs(t.x-e.x):0,n=o?Math.abs(t.y-e.y):0;return Math.sqrt(Math.pow(i,2)+Math.pow(n,2))}}function a(n,t,e){var i=s(t,n);e.axis=e.axis||"x";var a=c(e.axis),o=e.intersect?u(n,i):d(n,i,!1,a),r=[];return o.length?(n.data.datasets.forEach(function(t,e){if(n.isDatasetVisible(e)){var i=n.getDatasetMeta(e).data[o[0]._index];i&&!i._view.skip&&r.push(i)}}),r):[]}e.exports={modes:{single:function(t,e){var i=s(e,t),n=[];return l(t,function(t){if(t.inRange(i.x,i.y))return n.push(t),n}),n.slice(0,1)},label:a,index:a,dataset:function(t,e,i){var n=s(e,t);i.axis=i.axis||"xy";var a=c(i.axis),o=i.intersect?u(t,n):d(t,n,!1,a);return 0<o.length&&(o=t.getDatasetMeta(o[0]._datasetIndex).data),o},"x-axis":function(t,e){return a(t,e,{intersect:!1})},point:function(t,e){return u(t,s(e,t))},nearest:function(t,e,i){var n=s(e,t);i.axis=i.axis||"xy";var a=c(i.axis),o=d(t,n,i.intersect,a);return 1<o.length&&o.sort(function(t,e){var i=t.getArea()-e.getArea();return 0===i&&(i=t._datasetIndex-e._datasetIndex),i}),o.slice(0,1)},x:function(t,e,i){var n=s(e,t),a=[],o=!1;return l(t,function(t){t.inXRange(n.x)&&a.push(t),t.inRange(n.x,n.y)&&(o=!0)}),i.intersect&&!o&&(a=[]),a},y:function(t,e,i){var n=s(e,t),a=[],o=!1;return l(t,function(t){t.inYRange(n.y)&&a.push(t),t.inRange(n.x,n.y)&&(o=!0)}),i.intersect&&!o&&(a=[]),a}}}},{46:46}],30:[function(t,e,i){"use strict";t(26)._set("global",{responsive:!0,responsiveAnimationDuration:0,maintainAspectRatio:!0,events:["mousemove","mouseout","click","touchstart","touchmove"],hover:{onHover:null,mode:"nearest",intersect:!0,animationDuration:400},onClick:null,defaultColor:"rgba(0,0,0,0.1)",defaultFontColor:"#666",defaultFontFamily:"'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",defaultFontSize:12,defaultFontStyle:"normal",showLines:!0,elements:{},layout:{padding:{top:0,right:0,bottom:0,left:0}}}),e.exports=function(){var t=function(t,e){return this.construct(t,e),this};return t.Chart=t}},{26:26}],31:[function(t,e,i){"use strict";var B=t(46);function W(t,e){return B.where(t,function(t){return t.position===e})}function V(t,a){t.forEach(function(t,e){return t._tmpIndex_=e,t}),t.sort(function(t,e){var i=a?e:t,n=a?t:e;return i.weight===n.weight?i._tmpIndex_-n._tmpIndex_:i.weight-n.weight}),t.forEach(function(t){delete t._tmpIndex_})}e.exports={defaults:{},addBox:function(t,e){t.boxes||(t.boxes=[]),e.fullWidth=e.fullWidth||!1,e.position=e.position||"top",e.weight=e.weight||0,t.boxes.push(e)},removeBox:function(t,e){var i=t.boxes?t.boxes.indexOf(e):-1;-1!==i&&t.boxes.splice(i,1)},configure:function(t,e,i){for(var n,a=["fullWidth","position","weight"],o=a.length,r=0;r<o;++r)n=a[r],i.hasOwnProperty(n)&&(e[n]=i[n])},update:function(e,i,t){if(e){var n=e.options.layout||{},a=B.options.toPadding(n.padding),o=a.left,r=a.right,s=a.top,l=a.bottom,u=W(e.boxes,"left"),d=W(e.boxes,"right"),c=W(e.boxes,"top"),h=W(e.boxes,"bottom"),f=W(e.boxes,"chartArea");V(u,!0),V(d,!1),V(c,!0),V(h,!1);var g=i-o-r,p=t-s-l,m=p/2,v=(i-g/2)/(u.length+d.length),b=(t-m)/(c.length+h.length),x=g,y=p,k=[];B.each(u.concat(d,c,h),function(t){var e,i=t.isHorizontal();i?(e=t.update(t.fullWidth?g:x,b),y-=e.height):(e=t.update(v,y),x-=e.width),k.push({horizontal:i,minSize:e,box:t})});var M=0,w=0,C=0,S=0;B.each(c.concat(h),function(t){if(t.getPadding){var e=t.getPadding();M=Math.max(M,e.left),w=Math.max(w,e.right)}}),B.each(u.concat(d),function(t){if(t.getPadding){var e=t.getPadding();C=Math.max(C,e.top),S=Math.max(S,e.bottom)}});var _=o,D=r,P=s,I=l;B.each(u.concat(d),z),B.each(u,function(t){_+=t.width}),B.each(d,function(t){D+=t.width}),B.each(c.concat(h),z),B.each(c,function(t){P+=t.height}),B.each(h,function(t){I+=t.height}),B.each(u.concat(d),function(e){var t=B.findNextWhere(k,function(t){return t.box===e}),i={left:0,right:0,top:P,bottom:I};t&&e.update(t.minSize.width,y,i)}),_=o,D=r,P=s,I=l,B.each(u,function(t){_+=t.width}),B.each(d,function(t){D+=t.width}),B.each(c,function(t){P+=t.height}),B.each(h,function(t){I+=t.height});var A=Math.max(M-_,0);_+=A,D+=Math.max(w-D,0);var T=Math.max(C-P,0);P+=T,I+=Math.max(S-I,0);var F=t-P-I,O=i-_-D;O===x&&F===y||(B.each(u,function(t){t.height=F}),B.each(d,function(t){t.height=F}),B.each(c,function(t){t.fullWidth||(t.width=O)}),B.each(h,function(t){t.fullWidth||(t.width=O)}),y=F,x=O);var R=o+A,L=s+T;B.each(u.concat(c),N),R+=x,L+=y,B.each(d,N),B.each(h,N),e.chartArea={left:_,top:P,right:_+x,bottom:P+y},B.each(f,function(t){t.left=e.chartArea.left,t.top=e.chartArea.top,t.right=e.chartArea.right,t.bottom=e.chartArea.bottom,t.update(x,y)})}function z(e){var t=B.findNextWhere(k,function(t){return t.box===e});if(t)if(e.isHorizontal()){var i={left:Math.max(_,M),right:Math.max(D,w),top:0,bottom:0};e.update(e.fullWidth?g:x,p/2,i)}else e.update(t.minSize.width,y)}function N(t){t.isHorizontal()?(t.left=t.fullWidth?o:_,t.right=t.fullWidth?i-r:_+x,t.top=L,t.bottom=L+t.height,L=t.bottom):(t.left=R,t.right=R+t.width,t.top=P,t.bottom=P+y,R=t.right)}}}},{46:46}],32:[function(t,e,i){"use strict";var r=t(26),s=t(46);r._set("global",{plugins:{}}),e.exports={_plugins:[],_cacheId:0,register:function(t){var e=this._plugins;[].concat(t).forEach(function(t){-1===e.indexOf(t)&&e.push(t)}),this._cacheId++},unregister:function(t){var i=this._plugins;[].concat(t).forEach(function(t){var e=i.indexOf(t);-1!==e&&i.splice(e,1)}),this._cacheId++},clear:function(){this._plugins=[],this._cacheId++},count:function(){return this._plugins.length},getAll:function(){return this._plugins},notify:function(t,e,i){var n,a,o,r,s,l=this.descriptors(t),u=l.length;for(n=0;n<u;++n)if("function"==typeof(s=(o=(a=l[n]).plugin)[e])&&((r=[t].concat(i||[])).push(a.options),!1===s.apply(o,r)))return!1;return!0},descriptors:function(t){var e=t.$plugins||(t.$plugins={});if(e.id===this._cacheId)return e.descriptors;var n=[],a=[],i=t&&t.config||{},o=i.options&&i.options.plugins||{};return this._plugins.concat(i.plugins||[]).forEach(function(t){if(-1===n.indexOf(t)){var e=t.id,i=o[e];!1!==i&&(!0===i&&(i=s.clone(r.global.plugins[e])),n.push(t),a.push({plugin:t,options:i||{}}))}}),e.descriptors=a,e.id=this._cacheId,a},_invalidate:function(t){delete t.$plugins}}},{26:26,46:46}],33:[function(t,e,i){"use strict";var y=t(26),n=t(27),H=t(46),a=t(35);function k(t){var e,i,n=[];for(e=0,i=t.length;e<i;++e)n.push(t[e].label);return n}function j(t,e,i){var n=t.getPixelForTick(e);return i&&(n-=0===e?(t.getPixelForTick(1)-n)/2:(n-t.getPixelForTick(e-1))/2),n}function M(t,e,i){return H.isArray(e)?H.longestText(t,i,e):t.measureText(e).width}function w(t){var e=H.valueOrDefault,i=y.global,n=e(t.fontSize,i.defaultFontSize),a=e(t.fontStyle,i.defaultFontStyle),o=e(t.fontFamily,i.defaultFontFamily);return{size:n,style:a,family:o,font:H.fontString(n,a,o)}}function C(t){return H.options.toLineHeight(H.valueOrDefault(t.lineHeight,1.2),H.valueOrDefault(t.fontSize,y.global.defaultFontSize))}y._set("scale",{display:!0,position:"left",offset:!1,gridLines:{display:!0,color:"rgba(0, 0, 0, 0.1)",lineWidth:1,drawBorder:!0,drawOnChartArea:!0,drawTicks:!0,tickMarkLength:10,zeroLineWidth:1,zeroLineColor:"rgba(0,0,0,0.25)",zeroLineBorderDash:[],zeroLineBorderDashOffset:0,offsetGridLines:!1,borderDash:[],borderDashOffset:0},scaleLabel:{display:!1,labelString:"",lineHeight:1.2,padding:{top:4,bottom:4}},ticks:{beginAtZero:!1,minRotation:0,maxRotation:50,mirror:!1,padding:0,reverse:!1,display:!0,autoSkip:!0,autoSkipPadding:0,labelOffset:0,callback:a.formatters.values,minor:{},major:{}}}),e.exports=n.extend({getPadding:function(){return{left:this.paddingLeft||0,top:this.paddingTop||0,right:this.paddingRight||0,bottom:this.paddingBottom||0}},getTicks:function(){return this._ticks},mergeTicksOptions:function(){var t=this.options.ticks;for(var e in!1===t.minor&&(t.minor={display:!1}),!1===t.major&&(t.major={display:!1}),t)"major"!==e&&"minor"!==e&&(void 0===t.minor[e]&&(t.minor[e]=t[e]),void 0===t.major[e]&&(t.major[e]=t[e]))},beforeUpdate:function(){H.callback(this.options.beforeUpdate,[this])},update:function(t,e,i){var n,a,o,r,s,l,u=this;for(u.beforeUpdate(),u.maxWidth=t,u.maxHeight=e,u.margins=H.extend({left:0,right:0,top:0,bottom:0},i),u.longestTextCache=u.longestTextCache||{},u.beforeSetDimensions(),u.setDimensions(),u.afterSetDimensions(),u.beforeDataLimits(),u.determineDataLimits(),u.afterDataLimits(),u.beforeBuildTicks(),s=u.buildTicks()||[],u.afterBuildTicks(),u.beforeTickToLabelConversion(),o=u.convertTicksToLabels(s)||u.ticks,u.afterTickToLabelConversion(),n=0,a=(u.ticks=o).length;n<a;++n)r=o[n],(l=s[n])?l.label=r:s.push(l={label:r,major:!1});return u._ticks=s,u.beforeCalculateTickRotation(),u.calculateTickRotation(),u.afterCalculateTickRotation(),u.beforeFit(),u.fit(),u.afterFit(),u.afterUpdate(),u.minSize},afterUpdate:function(){H.callback(this.options.afterUpdate,[this])},beforeSetDimensions:function(){H.callback(this.options.beforeSetDimensions,[this])},setDimensions:function(){var t=this;t.isHorizontal()?(t.width=t.maxWidth,t.left=0,t.right=t.width):(t.height=t.maxHeight,t.top=0,t.bottom=t.height),t.paddingLeft=0,t.paddingTop=0,t.paddingRight=0,t.paddingBottom=0},afterSetDimensions:function(){H.callback(this.options.afterSetDimensions,[this])},beforeDataLimits:function(){H.callback(this.options.beforeDataLimits,[this])},determineDataLimits:H.noop,afterDataLimits:function(){H.callback(this.options.afterDataLimits,[this])},beforeBuildTicks:function(){H.callback(this.options.beforeBuildTicks,[this])},buildTicks:H.noop,afterBuildTicks:function(){H.callback(this.options.afterBuildTicks,[this])},beforeTickToLabelConversion:function(){H.callback(this.options.beforeTickToLabelConversion,[this])},convertTicksToLabels:function(){var t=this.options.ticks;this.ticks=this.ticks.map(t.userCallback||t.callback,this)},afterTickToLabelConversion:function(){H.callback(this.options.afterTickToLabelConversion,[this])},beforeCalculateTickRotation:function(){H.callback(this.options.beforeCalculateTickRotation,[this])},calculateTickRotation:function(){var t=this,e=t.ctx,i=t.options.ticks,n=k(t._ticks),a=w(i);e.font=a.font;var o=i.minRotation||0;if(n.length&&t.options.display&&t.isHorizontal())for(var r,s=H.longestText(e,a.font,n,t.longestTextCache),l=s,u=t.getPixelForTick(1)-t.getPixelForTick(0)-6;u<l&&o<i.maxRotation;){var d=H.toRadians(o);if(r=Math.cos(d),Math.sin(d)*s>t.maxHeight){o--;break}o++,l=r*s}t.labelRotation=o},afterCalculateTickRotation:function(){H.callback(this.options.afterCalculateTickRotation,[this])},beforeFit:function(){H.callback(this.options.beforeFit,[this])},fit:function(){var t=this,e=t.minSize={width:0,height:0},i=k(t._ticks),n=t.options,a=n.ticks,o=n.scaleLabel,r=n.gridLines,s=n.display,l=t.isHorizontal(),u=w(a),d=n.gridLines.tickMarkLength;if(e.width=l?t.isFullWidth()?t.maxWidth-t.margins.left-t.margins.right:t.maxWidth:s&&r.drawTicks?d:0,e.height=l?s&&r.drawTicks?d:0:t.maxHeight,o.display&&s){var c=C(o)+H.options.toPadding(o.padding).height;l?e.height+=c:e.width+=c}if(a.display&&s){var h=H.longestText(t.ctx,u.font,i,t.longestTextCache),f=H.numberOfLabelLines(i),g=.5*u.size,p=t.options.ticks.padding;if(l){t.longestLabelWidth=h;var m=H.toRadians(t.labelRotation),v=Math.cos(m),b=Math.sin(m)*h+u.size*f+g*(f-1)+g;e.height=Math.min(t.maxHeight,e.height+b+p),t.ctx.font=u.font;var x=M(t.ctx,i[0],u.font),y=M(t.ctx,i[i.length-1],u.font);0!==t.labelRotation?(t.paddingLeft="bottom"===n.position?v*x+3:v*g+3,t.paddingRight="bottom"===n.position?v*g+3:v*y+3):(t.paddingLeft=x/2+3,t.paddingRight=y/2+3)}else a.mirror?h=0:h+=p+g,e.width=Math.min(t.maxWidth,e.width+h),t.paddingTop=u.size/2,t.paddingBottom=u.size/2}t.handleMargins(),t.width=e.width,t.height=e.height},handleMargins:function(){var t=this;t.margins&&(t.paddingLeft=Math.max(t.paddingLeft-t.margins.left,0),t.paddingTop=Math.max(t.paddingTop-t.margins.top,0),t.paddingRight=Math.max(t.paddingRight-t.margins.right,0),t.paddingBottom=Math.max(t.paddingBottom-t.margins.bottom,0))},afterFit:function(){H.callback(this.options.afterFit,[this])},isHorizontal:function(){return"top"===this.options.position||"bottom"===this.options.position},isFullWidth:function(){return this.options.fullWidth},getRightValue:function(t){if(H.isNullOrUndef(t))return NaN;if("number"==typeof t&&!isFinite(t))return NaN;if(t)if(this.isHorizontal()){if(void 0!==t.x)return this.getRightValue(t.x)}else if(void 0!==t.y)return this.getRightValue(t.y);return t},getLabelForIndex:H.noop,getPixelForValue:H.noop,getValueForPixel:H.noop,getPixelForTick:function(t){var e=this,i=e.options.offset;if(e.isHorizontal()){var n=(e.width-(e.paddingLeft+e.paddingRight))/Math.max(e._ticks.length-(i?0:1),1),a=n*t+e.paddingLeft;i&&(a+=n/2);var o=e.left+Math.round(a);return o+=e.isFullWidth()?e.margins.left:0}var r=e.height-(e.paddingTop+e.paddingBottom);return e.top+t*(r/(e._ticks.length-1))},getPixelForDecimal:function(t){var e=this;if(e.isHorizontal()){var i=(e.width-(e.paddingLeft+e.paddingRight))*t+e.paddingLeft,n=e.left+Math.round(i);return n+=e.isFullWidth()?e.margins.left:0}return e.top+t*e.height},getBasePixel:function(){return this.getPixelForValue(this.getBaseValue())},getBaseValue:function(){var t=this.min,e=this.max;return this.beginAtZero?0:t<0&&e<0?e:0<t&&0<e?t:0},_autoSkip:function(t){var e,i,n,a,o=this,r=o.isHorizontal(),s=o.options.ticks.minor,l=t.length,u=H.toRadians(o.labelRotation),d=Math.cos(u),c=o.longestLabelWidth*d,h=[];for(s.maxTicksLimit&&(a=s.maxTicksLimit),r&&(e=!1,(c+s.autoSkipPadding)*l>o.width-(o.paddingLeft+o.paddingRight)&&(e=1+Math.floor((c+s.autoSkipPadding)*l/(o.width-(o.paddingLeft+o.paddingRight)))),a&&a<l&&(e=Math.max(e,Math.floor(l/a)))),i=0;i<l;i++)n=t[i],(1<e&&0<i%e||i%e==0&&l<=i+e)&&i!==l-1&&delete n.label,h.push(n);return h},draw:function(S){var _=this,D=_.options;if(D.display){var r=_.ctx,P=y.global,I=D.ticks.minor,t=D.ticks.major||I,A=D.gridLines,e=D.scaleLabel,T=0!==_.labelRotation,F=_.isHorizontal(),O=I.autoSkip?_._autoSkip(_.getTicks()):_.getTicks(),s=H.valueOrDefault(I.fontColor,P.defaultFontColor),l=w(I),u=H.valueOrDefault(t.fontColor,P.defaultFontColor),d=w(t),R=A.drawTicks?A.tickMarkLength:0,i=H.valueOrDefault(e.fontColor,P.defaultFontColor),n=w(e),a=H.options.toPadding(e.padding),L=H.toRadians(_.labelRotation),z=[],N=_.options.gridLines.lineWidth,B="right"===D.position?_.left:_.right-N-R,W="right"===D.position?_.left+R:_.right,V="bottom"===D.position?_.top+N:_.bottom-R-N,E="bottom"===D.position?_.top+N+R:_.bottom+N;if(H.each(O,function(t,e){if(!H.isNullOrUndef(t.label)){var i,n,a,o,r,s,l,u,d,c,h,f,g,p,m=t.label;o=e===_.zeroLineIndex&&D.offset===A.offsetGridLines?(i=A.zeroLineWidth,n=A.zeroLineColor,a=A.zeroLineBorderDash,A.zeroLineBorderDashOffset):(i=H.valueAtIndexOrDefault(A.lineWidth,e),n=H.valueAtIndexOrDefault(A.color,e),a=H.valueOrDefault(A.borderDash,P.borderDash),H.valueOrDefault(A.borderDashOffset,P.borderDashOffset));var v="middle",b="middle",x=I.padding;if(F){var y=R+x;p="bottom"===D.position?(b=T?"middle":"top",v=T?"right":"center",_.top+y):(b=T?"middle":"bottom",v=T?"left":"center",_.bottom-y);var k=j(_,e,A.offsetGridLines&&1<O.length);k<_.left&&(n="rgba(0,0,0,0)"),k+=H.aliasPixel(i),g=_.getPixelForTick(e)+I.labelOffset,r=l=d=h=k,s=V,u=E,c=S.top,f=S.bottom+N}else{var M,w="left"===D.position;M=I.mirror?(v=w?"left":"right",x):(v=w?"right":"left",R+x),g=w?_.right-M:_.left+M;var C=j(_,e,A.offsetGridLines&&1<O.length);C<_.top&&(n="rgba(0,0,0,0)"),C+=H.aliasPixel(i),p=_.getPixelForTick(e)+I.labelOffset,r=B,l=W,d=S.left,h=S.right+N,s=u=c=f=C}z.push({tx1:r,ty1:s,tx2:l,ty2:u,x1:d,y1:c,x2:h,y2:f,labelX:g,labelY:p,glWidth:i,glColor:n,glBorderDash:a,glBorderDashOffset:o,rotation:-1*L,label:m,major:t.major,textBaseline:b,textAlign:v})}}),H.each(z,function(t){if(A.display&&(r.save(),r.lineWidth=t.glWidth,r.strokeStyle=t.glColor,r.setLineDash&&(r.setLineDash(t.glBorderDash),r.lineDashOffset=t.glBorderDashOffset),r.beginPath(),A.drawTicks&&(r.moveTo(t.tx1,t.ty1),r.lineTo(t.tx2,t.ty2)),A.drawOnChartArea&&(r.moveTo(t.x1,t.y1),r.lineTo(t.x2,t.y2)),r.stroke(),r.restore()),I.display){r.save(),r.translate(t.labelX,t.labelY),r.rotate(t.rotation),r.font=t.major?d.font:l.font,r.fillStyle=t.major?u:s,r.textBaseline=t.textBaseline,r.textAlign=t.textAlign;var e=t.label;if(H.isArray(e))for(var i=e.length,n=1.5*l.size,a=_.isHorizontal()?0:-n*(i-1)/2,o=0;o<i;++o)r.fillText(""+e[o],0,a),a+=n;else r.fillText(e,0,0);r.restore()}}),e.display){var o,c,h=0,f=C(e)/2;if(F)o=_.left+(_.right-_.left)/2,c="bottom"===D.position?_.bottom-f-a.bottom:_.top+f+a.top;else{var g="left"===D.position;o=g?_.left+f+a.top:_.right-f-a.top,c=_.top+(_.bottom-_.top)/2,h=g?-.5*Math.PI:.5*Math.PI}r.save(),r.translate(o,c),r.rotate(h),r.textAlign="center",r.textBaseline="middle",r.fillStyle=i,r.font=n.font,r.fillText(e.labelString,0,0),r.restore()}if(A.drawBorder){r.lineWidth=H.valueAtIndexOrDefault(A.lineWidth,0),r.strokeStyle=H.valueAtIndexOrDefault(A.color,0);var p=_.left,m=_.right+N,v=_.top,b=_.bottom+N,x=H.aliasPixel(r.lineWidth);F?(v=b="top"===D.position?_.bottom:_.top,v+=x,b+=x):(p=m="left"===D.position?_.right:_.left,p+=x,m+=x),r.beginPath(),r.moveTo(p,v),r.lineTo(m,b),r.stroke()}}}})},{26:26,27:27,35:35,46:46}],34:[function(t,e,i){"use strict";var n=t(26),a=t(46),o=t(31);e.exports={constructors:{},defaults:{},registerScaleType:function(t,e,i){this.constructors[t]=e,this.defaults[t]=a.clone(i)},getScaleConstructor:function(t){return this.constructors.hasOwnProperty(t)?this.constructors[t]:void 0},getScaleDefaults:function(t){return this.defaults.hasOwnProperty(t)?a.merge({},[n.scale,this.defaults[t]]):{}},updateScaleDefaults:function(t,e){this.defaults.hasOwnProperty(t)&&(this.defaults[t]=a.extend(this.defaults[t],e))},addScalesToLayout:function(e){a.each(e.scales,function(t){t.fullWidth=t.options.fullWidth,t.position=t.options.position,t.weight=t.options.weight,o.addBox(e,t)})}}},{26:26,31:31,46:46}],35:[function(t,e,i){"use strict";var l=t(46);e.exports={formatters:{values:function(t){return l.isArray(t)?t:""+t},linear:function(t,e,i){var n=3<i.length?i[2]-i[1]:i[1]-i[0];1<Math.abs(n)&&t!==Math.floor(t)&&(n=t-Math.floor(t));var a=l.log10(Math.abs(n)),o="";if(0!==t)if(Math.max(Math.abs(i[0]),Math.abs(i[i.length-1]))<1e-4){var r=l.log10(Math.abs(t));o=t.toExponential(Math.floor(r)-Math.floor(a))}else{var s=-1*Math.floor(a);s=Math.max(Math.min(s,20),0),o=t.toFixed(s)}else o="0";return o},logarithmic:function(t,e,i){var n=t/Math.pow(10,Math.floor(l.log10(t)));return 0===t?"0":1===n||2===n||5===n||0===e||e===i.length-1?t.toExponential():""}}}},{46:46}],36:[function(t,e,i){"use strict";var n=t(26),a=t(27),R=t(46);n._set("global",{tooltips:{enabled:!0,custom:null,mode:"nearest",position:"average",intersect:!0,backgroundColor:"rgba(0,0,0,0.8)",titleFontStyle:"bold",titleSpacing:2,titleMarginBottom:6,titleFontColor:"#fff",titleAlign:"left",bodySpacing:2,bodyFontColor:"#fff",bodyAlign:"left",footerFontStyle:"bold",footerSpacing:2,footerMarginTop:6,footerFontColor:"#fff",footerAlign:"left",yPadding:6,xPadding:6,caretPadding:2,caretSize:5,cornerRadius:6,multiKeyBackground:"#fff",displayColors:!0,borderColor:"rgba(0,0,0,0)",borderWidth:0,callbacks:{beforeTitle:R.noop,title:function(t,e){var i="",n=e.labels,a=n?n.length:0;if(0<t.length){var o=t[0];o.xLabel?i=o.xLabel:0<a&&o.index<a&&(i=n[o.index])}return i},afterTitle:R.noop,beforeBody:R.noop,beforeLabel:R.noop,label:function(t,e){var i=e.datasets[t.datasetIndex].label||"";return i&&(i+=": "),i+=t.yLabel},labelColor:function(t,e){var i=e.getDatasetMeta(t.datasetIndex).data[t.index]._view;return{borderColor:i.borderColor,backgroundColor:i.backgroundColor}},labelTextColor:function(){return this._options.bodyFontColor},afterLabel:R.noop,afterBody:R.noop,beforeFooter:R.noop,footer:R.noop,afterFooter:R.noop}}});var L={average:function(t){if(!t.length)return!1;var e,i,n=0,a=0,o=0;for(e=0,i=t.length;e<i;++e){var r=t[e];if(r&&r.hasValue()){var s=r.tooltipPosition();n+=s.x,a+=s.y,++o}}return{x:Math.round(n/o),y:Math.round(a/o)}},nearest:function(t,e){var i,n,a,o=e.x,r=e.y,s=Number.POSITIVE_INFINITY;for(i=0,n=t.length;i<n;++i){var l=t[i];if(l&&l.hasValue()){var u=l.getCenterPoint(),d=R.distanceBetweenPoints(e,u);d<s&&(s=d,a=l)}}if(a){var c=a.tooltipPosition();o=c.x,r=c.y}return{x:o,y:r}}};function h(t,e){var i=R.color(t);return i.alpha(e*i.alpha()).rgbaString()}function r(t,e){return e&&(R.isArray(e)?Array.prototype.push.apply(t,e):t.push(e)),t}function s(t){return("string"==typeof t||t instanceof String)&&-1<t.indexOf("\n")?t.split("\n"):t}function z(t){var e=n.global,i=R.valueOrDefault;return{xPadding:t.xPadding,yPadding:t.yPadding,xAlign:t.xAlign,yAlign:t.yAlign,bodyFontColor:t.bodyFontColor,_bodyFontFamily:i(t.bodyFontFamily,e.defaultFontFamily),_bodyFontStyle:i(t.bodyFontStyle,e.defaultFontStyle),_bodyAlign:t.bodyAlign,bodyFontSize:i(t.bodyFontSize,e.defaultFontSize),bodySpacing:t.bodySpacing,titleFontColor:t.titleFontColor,_titleFontFamily:i(t.titleFontFamily,e.defaultFontFamily),_titleFontStyle:i(t.titleFontStyle,e.defaultFontStyle),titleFontSize:i(t.titleFontSize,e.defaultFontSize),_titleAlign:t.titleAlign,titleSpacing:t.titleSpacing,titleMarginBottom:t.titleMarginBottom,footerFontColor:t.footerFontColor,_footerFontFamily:i(t.footerFontFamily,e.defaultFontFamily),_footerFontStyle:i(t.footerFontStyle,e.defaultFontStyle),footerFontSize:i(t.footerFontSize,e.defaultFontSize),_footerAlign:t.footerAlign,footerSpacing:t.footerSpacing,footerMarginTop:t.footerMarginTop,caretSize:t.caretSize,cornerRadius:t.cornerRadius,backgroundColor:t.backgroundColor,opacity:0,legendColorBackground:t.multiKeyBackground,displayColors:t.displayColors,borderColor:t.borderColor,borderWidth:t.borderWidth}}function o(t){return r([],s(t))}(e.exports=a.extend({initialize:function(){this._model=z(this._options),this._lastActive=[]},getTitle:function(){var t=this._options.callbacks,e=t.beforeTitle.apply(this,arguments),i=t.title.apply(this,arguments),n=t.afterTitle.apply(this,arguments),a=[];return a=r(a=r(a=r(a,s(e)),s(i)),s(n))},getBeforeBody:function(){return o(this._options.callbacks.beforeBody.apply(this,arguments))},getBody:function(t,i){var n=this,a=n._options.callbacks,o=[];return R.each(t,function(t){var e={before:[],lines:[],after:[]};r(e.before,s(a.beforeLabel.call(n,t,i))),r(e.lines,a.label.call(n,t,i)),r(e.after,s(a.afterLabel.call(n,t,i))),o.push(e)}),o},getAfterBody:function(){return o(this._options.callbacks.afterBody.apply(this,arguments))},getFooter:function(){var t=this._options.callbacks,e=t.beforeFooter.apply(this,arguments),i=t.footer.apply(this,arguments),n=t.afterFooter.apply(this,arguments),a=[];return a=r(a=r(a=r(a,s(e)),s(i)),s(n))},update:function(t){var e,i,n,a,o,r,s,l,u,d,c,h,f,g,p,m,v,b,x,y,k=this,M=k._options,w=k._model,C=k._model=z(M),S=k._active,_=k._data,D={xAlign:w.xAlign,yAlign:w.yAlign},P={x:w.x,y:w.y},I={width:w.width,height:w.height},A={x:w.caretX,y:w.caretY};if(S.length){C.opacity=1;var T=[],F=[];A=L[M.position].call(k,S,k._eventPosition);var O=[];for(e=0,i=S.length;e<i;++e)O.push((m=S[e],b=v=void 0,v=m._xScale,b=m._yScale||m._scale,x=m._index,y=m._datasetIndex,{xLabel:v?v.getLabelForIndex(x,y):"",yLabel:b?b.getLabelForIndex(x,y):"",index:x,datasetIndex:y,x:m._model.x,y:m._model.y}));M.filter&&(O=O.filter(function(t){return M.filter(t,_)})),M.itemSort&&(O=O.sort(function(t,e){return M.itemSort(t,e,_)})),R.each(O,function(t){T.push(M.callbacks.labelColor.call(k,t,k._chart)),F.push(M.callbacks.labelTextColor.call(k,t,k._chart))}),C.title=k.getTitle(O,_),C.beforeBody=k.getBeforeBody(O,_),C.body=k.getBody(O,_),C.afterBody=k.getAfterBody(O,_),C.footer=k.getFooter(O,_),C.x=Math.round(A.x),C.y=Math.round(A.y),C.caretPadding=M.caretPadding,C.labelColors=T,C.labelTextColors=F,C.dataPoints=O,D=function(t,e){var i,n,a,o,r,s=t._model,l=t._chart,u=t._chart.chartArea,d="center",c="center";s.y<e.height?c="top":s.y>l.height-e.height&&(c="bottom");var h=(u.left+u.right)/2,f=(u.top+u.bottom)/2;n="center"===c?(i=function(t){return t<=h},function(t){return h<t}):(i=function(t){return t<=e.width/2},function(t){return t>=l.width-e.width/2}),a=function(t){return t+e.width+s.caretSize+s.caretPadding>l.width},o=function(t){return t-e.width-s.caretSize-s.caretPadding<0},r=function(t){return t<=f?"top":"bottom"},i(s.x)?(d="left",a(s.x)&&(d="center",c=r(s.y))):n(s.x)&&(d="right",o(s.x)&&(d="center",c=r(s.y)));var g=t._options;return{xAlign:g.xAlign?g.xAlign:d,yAlign:g.yAlign?g.yAlign:c}}(this,I=function(t,e){var i=t._chart.ctx,n=2*e.yPadding,a=0,o=e.body,r=o.reduce(function(t,e){return t+e.before.length+e.lines.length+e.after.length},0);r+=e.beforeBody.length+e.afterBody.length;var s=e.title.length,l=e.footer.length,u=e.titleFontSize,d=e.bodyFontSize,c=e.footerFontSize;n+=s*u,n+=s?(s-1)*e.titleSpacing:0,n+=s?e.titleMarginBottom:0,n+=r*d,n+=r?(r-1)*e.bodySpacing:0,n+=l?e.footerMarginTop:0,n+=l*c,n+=l?(l-1)*e.footerSpacing:0;var h=0,f=function(t){a=Math.max(a,i.measureText(t).width+h)};return i.font=R.fontString(u,e._titleFontStyle,e._titleFontFamily),R.each(e.title,f),i.font=R.fontString(d,e._bodyFontStyle,e._bodyFontFamily),R.each(e.beforeBody.concat(e.afterBody),f),h=e.displayColors?d+2:0,R.each(o,function(t){R.each(t.before,f),R.each(t.lines,f),R.each(t.after,f)}),h=0,i.font=R.fontString(c,e._footerFontStyle,e._footerFontFamily),R.each(e.footer,f),{width:a+=2*e.xPadding,height:n}}(this,C)),n=C,a=I,o=D,r=k._chart,s=n.x,l=n.y,u=n.caretSize,d=n.caretPadding,c=n.cornerRadius,h=o.xAlign,f=o.yAlign,g=u+d,p=c+d,"right"===h?s-=a.width:"center"===h&&((s-=a.width/2)+a.width>r.width&&(s=r.width-a.width),s<0&&(s=0)),"top"===f?l+=g:l-="bottom"===f?a.height+g:a.height/2,"center"===f?"left"===h?s+=g:"right"===h&&(s-=g):"left"===h?s-=p:"right"===h&&(s+=p),P={x:s,y:l}}else C.opacity=0;return C.xAlign=D.xAlign,C.yAlign=D.yAlign,C.x=P.x,C.y=P.y,C.width=I.width,C.height=I.height,C.caretX=A.x,C.caretY=A.y,k._model=C,t&&M.custom&&M.custom.call(k,C),k},drawCaret:function(t,e){var i=this._chart.ctx,n=this._view,a=this.getCaretPosition(t,e,n);i.lineTo(a.x1,a.y1),i.lineTo(a.x2,a.y2),i.lineTo(a.x3,a.y3)},getCaretPosition:function(t,e,i){var n,a,o,r,s,l,u=i.caretSize,d=i.cornerRadius,c=i.xAlign,h=i.yAlign,f=t.x,g=t.y,p=e.width,m=e.height;if("center"===h)s=g+m/2,l="left"===c?(a=(n=f)-u,o=n,r=s+u,s-u):(a=(n=f+p)+u,o=n,r=s-u,s+u);else if(o=(n="left"===c?(a=f+d+u)-u:"right"===c?(a=f+p-d-u)-u:(a=i.caretX)-u,a+u),"top"===h)s=(r=g)-u,l=r;else{s=(r=g+m)+u,l=r;var v=o;o=n,n=v}return{x1:n,x2:a,x3:o,y1:r,y2:s,y3:l}},drawTitle:function(t,e,i,n){var a=e.title;if(a.length){i.textAlign=e._titleAlign,i.textBaseline="top";var o,r,s=e.titleFontSize,l=e.titleSpacing;for(i.fillStyle=h(e.titleFontColor,n),i.font=R.fontString(s,e._titleFontStyle,e._titleFontFamily),o=0,r=a.length;o<r;++o)i.fillText(a[o],t.x,t.y),t.y+=s+l,o+1===a.length&&(t.y+=e.titleMarginBottom-l)}},drawBody:function(n,a,o,r){var s=a.bodyFontSize,e=a.bodySpacing,t=a.body;o.textAlign=a._bodyAlign,o.textBaseline="top",o.font=R.fontString(s,a._bodyFontStyle,a._bodyFontFamily);var i=0,l=function(t){o.fillText(t,n.x+i,n.y),n.y+=s+e};o.fillStyle=h(a.bodyFontColor,r),R.each(a.beforeBody,l);var u=a.displayColors;i=u?s+2:0,R.each(t,function(t,e){var i=h(a.labelTextColors[e],r);o.fillStyle=i,R.each(t.before,l),R.each(t.lines,function(t){u&&(o.fillStyle=h(a.legendColorBackground,r),o.fillRect(n.x,n.y,s,s),o.lineWidth=1,o.strokeStyle=h(a.labelColors[e].borderColor,r),o.strokeRect(n.x,n.y,s,s),o.fillStyle=h(a.labelColors[e].backgroundColor,r),o.fillRect(n.x+1,n.y+1,s-2,s-2),o.fillStyle=i),l(t)}),R.each(t.after,l)}),i=0,R.each(a.afterBody,l),n.y-=e},drawFooter:function(e,i,n,t){var a=i.footer;a.length&&(e.y+=i.footerMarginTop,n.textAlign=i._footerAlign,n.textBaseline="top",n.fillStyle=h(i.footerFontColor,t),n.font=R.fontString(i.footerFontSize,i._footerFontStyle,i._footerFontFamily),R.each(a,function(t){n.fillText(t,e.x,e.y),e.y+=i.footerFontSize+i.footerSpacing}))},drawBackground:function(t,e,i,n,a){i.fillStyle=h(e.backgroundColor,a),i.strokeStyle=h(e.borderColor,a),i.lineWidth=e.borderWidth;var o=e.xAlign,r=e.yAlign,s=t.x,l=t.y,u=n.width,d=n.height,c=e.cornerRadius;i.beginPath(),i.moveTo(s+c,l),"top"===r&&this.drawCaret(t,n),i.lineTo(s+u-c,l),i.quadraticCurveTo(s+u,l,s+u,l+c),"center"===r&&"right"===o&&this.drawCaret(t,n),i.lineTo(s+u,l+d-c),i.quadraticCurveTo(s+u,l+d,s+u-c,l+d),"bottom"===r&&this.drawCaret(t,n),i.lineTo(s+c,l+d),i.quadraticCurveTo(s,l+d,s,l+d-c),"center"===r&&"left"===o&&this.drawCaret(t,n),i.lineTo(s,l+c),i.quadraticCurveTo(s,l,s+c,l),i.closePath(),i.fill(),0<e.borderWidth&&i.stroke()},draw:function(){var t=this._chart.ctx,e=this._view;if(0!==e.opacity){var i={width:e.width,height:e.height},n={x:e.x,y:e.y},a=Math.abs(e.opacity<.001)?0:e.opacity,o=e.title.length||e.beforeBody.length||e.body.length||e.afterBody.length||e.footer.length;this._options.enabled&&o&&(this.drawBackground(n,e,t,i,a),n.x+=e.xPadding,n.y+=e.yPadding,this.drawTitle(n,e,t,a),this.drawBody(n,e,t,a),this.drawFooter(n,e,t,a))}},handleEvent:function(t){var e,i=this,n=i._options;return i._lastActive=i._lastActive||[],"mouseout"===t.type?i._active=[]:i._active=i._chart.getElementsAtEventForMode(t,n.mode,n),(e=!R.arrayEquals(i._active,i._lastActive))&&(i._lastActive=i._active,(n.enabled||n.custom)&&(i._eventPosition={x:t.x,y:t.y},i.update(!0),i.pivot())),e}})).positioners=L},{26:26,27:27,46:46}],37:[function(t,e,i){"use strict";var n=t(26),a=t(27),d=t(46);n._set("global",{elements:{arc:{backgroundColor:n.global.defaultColor,borderColor:"#fff",borderWidth:2}}}),e.exports=a.extend({inLabelRange:function(t){var e=this._view;return!!e&&Math.pow(t-e.x,2)<Math.pow(e.radius+e.hoverRadius,2)},inRange:function(t,e){var i=this._view;if(i){for(var n=d.getAngleFromPoint(i,{x:t,y:e}),a=n.angle,o=n.distance,r=i.startAngle,s=i.endAngle;s<r;)s+=2*Math.PI;for(;s<a;)a-=2*Math.PI;for(;a<r;)a+=2*Math.PI;var l=r<=a&&a<=s,u=o>=i.innerRadius&&o<=i.outerRadius;return l&&u}return!1},getCenterPoint:function(){var t=this._view,e=(t.startAngle+t.endAngle)/2,i=(t.innerRadius+t.outerRadius)/2;return{x:t.x+Math.cos(e)*i,y:t.y+Math.sin(e)*i}},getArea:function(){var t=this._view;return Math.PI*((t.endAngle-t.startAngle)/(2*Math.PI))*(Math.pow(t.outerRadius,2)-Math.pow(t.innerRadius,2))},tooltipPosition:function(){var t=this._view,e=t.startAngle+(t.endAngle-t.startAngle)/2,i=(t.outerRadius-t.innerRadius)/2+t.innerRadius;return{x:t.x+Math.cos(e)*i,y:t.y+Math.sin(e)*i}},draw:function(){var t=this._chart.ctx,e=this._view,i=e.startAngle,n=e.endAngle;t.beginPath(),t.arc(e.x,e.y,e.outerRadius,i,n),t.arc(e.x,e.y,e.innerRadius,n,i,!0),t.closePath(),t.strokeStyle=e.borderColor,t.lineWidth=e.borderWidth,t.fillStyle=e.backgroundColor,t.fill(),t.lineJoin="bevel",e.borderWidth&&t.stroke()}})},{26:26,27:27,46:46}],38:[function(t,e,i){"use strict";var n=t(26),a=t(27),d=t(46),c=n.global;n._set("global",{elements:{line:{tension:.4,backgroundColor:c.defaultColor,borderWidth:3,borderColor:c.defaultColor,borderCapStyle:"butt",borderDash:[],borderDashOffset:0,borderJoinStyle:"miter",capBezierPoints:!0,fill:!0}}}),e.exports=a.extend({draw:function(){var t,e,i,n,a=this._view,o=this._chart.ctx,r=a.spanGaps,s=this._children.slice(),l=c.elements.line,u=-1;for(this._loop&&s.length&&s.push(s[0]),o.save(),o.lineCap=a.borderCapStyle||l.borderCapStyle,o.setLineDash&&o.setLineDash(a.borderDash||l.borderDash),o.lineDashOffset=a.borderDashOffset||l.borderDashOffset,o.lineJoin=a.borderJoinStyle||l.borderJoinStyle,o.lineWidth=a.borderWidth||l.borderWidth,o.strokeStyle=a.borderColor||c.defaultColor,o.beginPath(),u=-1,t=0;t<s.length;++t)e=s[t],i=d.previousItem(s,t),n=e._view,0===t?n.skip||(o.moveTo(n.x,n.y),u=t):(i=-1===u?i:s[u],n.skip||(u!==t-1&&!r||-1===u?o.moveTo(n.x,n.y):d.canvas.lineTo(o,i._view,e._view),u=t));o.stroke(),o.restore()}})},{26:26,27:27,46:46}],39:[function(t,e,i){"use strict";var u=t(26),n=t(27),d=t(46),c=u.global.defaultColor;function a(t){var e=this._view;return!!e&&Math.abs(t-e.x)<e.radius+e.hitRadius}u._set("global",{elements:{point:{radius:3,pointStyle:"circle",backgroundColor:c,borderColor:c,borderWidth:1,hitRadius:1,hoverRadius:4,hoverBorderWidth:1}}}),e.exports=n.extend({inRange:function(t,e){var i=this._view;return!!i&&Math.pow(t-i.x,2)+Math.pow(e-i.y,2)<Math.pow(i.hitRadius+i.radius,2)},inLabelRange:a,inXRange:a,inYRange:function(t){var e=this._view;return!!e&&Math.abs(t-e.y)<e.radius+e.hitRadius},getCenterPoint:function(){var t=this._view;return{x:t.x,y:t.y}},getArea:function(){return Math.PI*Math.pow(this._view.radius,2)},tooltipPosition:function(){var t=this._view;return{x:t.x,y:t.y,padding:t.radius+t.borderWidth}},draw:function(t){var e=this._view,i=this._model,n=this._chart.ctx,a=e.pointStyle,o=e.rotation,r=e.radius,s=e.x,l=e.y;e.skip||(void 0===t||i.x>=t.left&&1.01*t.right>=i.x&&i.y>=t.top&&1.01*t.bottom>=i.y)&&(n.strokeStyle=e.borderColor||c,n.lineWidth=d.valueOrDefault(e.borderWidth,u.global.elements.point.borderWidth),n.fillStyle=e.backgroundColor||c,d.canvas.drawPoint(n,a,r,s,l,o))}})},{26:26,27:27,46:46}],40:[function(t,e,i){"use strict";var n=t(26),a=t(27);function l(t){return void 0!==t._view.width}function o(t){var e,i,n,a,o=t._view;if(l(t)){var r=o.width/2;e=o.x-r,i=o.x+r,n=Math.min(o.y,o.base),a=Math.max(o.y,o.base)}else{var s=o.height/2;e=Math.min(o.x,o.base),i=Math.max(o.x,o.base),n=o.y-s,a=o.y+s}return{left:e,top:n,right:i,bottom:a}}n._set("global",{elements:{rectangle:{backgroundColor:n.global.defaultColor,borderColor:n.global.defaultColor,borderSkipped:"bottom",borderWidth:0}}}),e.exports=a.extend({draw:function(){var t,e,i,n,a,o,r,s=this._chart.ctx,l=this._view,u=l.borderWidth;if(r=l.horizontal?(t=l.base,e=l.x,i=l.y-l.height/2,n=l.y+l.height/2,a=t<e?1:-1,o=1,l.borderSkipped||"left"):(t=l.x-l.width/2,e=l.x+l.width/2,a=1,o=(i=l.y)<(n=l.base)?1:-1,l.borderSkipped||"bottom"),u){var d=Math.min(Math.abs(t-e),Math.abs(i-n)),c=(u=d<u?d:u)/2,h=t+("left"!==r?c*a:0),f=e+("right"!==r?-c*a:0),g=i+("top"!==r?c*o:0),p=n+("bottom"!==r?-c*o:0);h!==f&&(i=g,n=p),g!==p&&(t=h,e=f)}s.beginPath(),s.fillStyle=l.backgroundColor,s.strokeStyle=l.borderColor,s.lineWidth=u;var m=[[t,n],[t,i],[e,i],[e,n]],v=["bottom","left","top","right"].indexOf(r,0);function b(t){return m[(v+t)%4]}-1===v&&(v=0);var x=b(0);s.moveTo(x[0],x[1]);for(var y=1;y<4;y++)x=b(y),s.lineTo(x[0],x[1]);s.fill(),u&&s.stroke()},height:function(){var t=this._view;return t.base-t.y},inRange:function(t,e){var i=!1;if(this._view){var n=o(this);i=t>=n.left&&t<=n.right&&e>=n.top&&e<=n.bottom}return i},inLabelRange:function(t,e){if(!this._view)return!1;var i=o(this);return l(this)?t>=i.left&&t<=i.right:e>=i.top&&e<=i.bottom},inXRange:function(t){var e=o(this);return t>=e.left&&t<=e.right},inYRange:function(t){var e=o(this);return t>=e.top&&t<=e.bottom},getCenterPoint:function(){var t,e,i=this._view;return e=l(this)?(t=i.x,(i.y+i.base)/2):(t=(i.x+i.base)/2,i.y),{x:t,y:e}},getArea:function(){var t=this._view;return t.width*Math.abs(t.y-t.base)},tooltipPosition:function(){var t=this._view;return{x:t.x,y:t.y}}})},{26:26,27:27}],41:[function(t,e,i){"use strict";e.exports={},e.exports.Arc=t(37),e.exports.Line=t(38),e.exports.Point=t(39),e.exports.Rectangle=t(40)},{37:37,38:38,39:39,40:40}],42:[function(t,e,i){"use strict";var n=t(43);i=e.exports={clear:function(t){t.ctx.clearRect(0,0,t.width,t.height)},roundedRect:function(t,e,i,n,a,o){if(o){var r=Math.min(o,a/2-1e-7,n/2-1e-7);t.moveTo(e+r,i),t.lineTo(e+n-r,i),t.arcTo(e+n,i,e+n,i+r,r),t.lineTo(e+n,i+a-r),t.arcTo(e+n,i+a,e+n-r,i+a,r),t.lineTo(e+r,i+a),t.arcTo(e,i+a,e,i+a-r,r),t.lineTo(e,i+r),t.arcTo(e,i,e+r,i,r),t.closePath(),t.moveTo(e,i)}else t.rect(e,i,n,a)},drawPoint:function(t,e,i,n,a,o){var r,s,l,u,d,c;if(o=o||0,!e||"object"!=typeof e||"[object HTMLImageElement]"!==(r=e.toString())&&"[object HTMLCanvasElement]"!==r){if(!(isNaN(i)||i<=0)){switch(t.save(),t.translate(n,a),t.rotate(o*Math.PI/180),t.beginPath(),e){default:t.arc(0,0,i,0,2*Math.PI),t.closePath();break;case"triangle":d=(s=3*i/Math.sqrt(3))*Math.sqrt(3)/2,t.moveTo(-s/2,d/3),t.lineTo(s/2,d/3),t.lineTo(0,-2*d/3),t.closePath();break;case"rect":c=1/Math.SQRT2*i,t.rect(-c,-c,2*c,2*c);break;case"rectRounded":var h=i/Math.SQRT2,f=-h,g=-h,p=Math.SQRT2*i;this.roundedRect(t,f,g,p,p,.425*i);break;case"rectRot":c=1/Math.SQRT2*i,t.moveTo(-c,0),t.lineTo(0,c),t.lineTo(c,0),t.lineTo(0,-c),t.closePath();break;case"cross":t.moveTo(0,i),t.lineTo(0,-i),t.moveTo(-i,0),t.lineTo(i,0);break;case"crossRot":l=Math.cos(Math.PI/4)*i,u=Math.sin(Math.PI/4)*i,t.moveTo(-l,-u),t.lineTo(l,u),t.moveTo(-l,u),t.lineTo(l,-u);break;case"star":t.moveTo(0,i),t.lineTo(0,-i),t.moveTo(-i,0),t.lineTo(i,0),l=Math.cos(Math.PI/4)*i,u=Math.sin(Math.PI/4)*i,t.moveTo(-l,-u),t.lineTo(l,u),t.moveTo(-l,u),t.lineTo(l,-u);break;case"line":t.moveTo(-i,0),t.lineTo(i,0);break;case"dash":t.moveTo(0,0),t.lineTo(i,0)}t.fill(),t.stroke(),t.restore()}}else t.drawImage(e,n-e.width/2,a-e.height/2,e.width,e.height)},clipArea:function(t,e){t.save(),t.beginPath(),t.rect(e.left,e.top,e.right-e.left,e.bottom-e.top),t.clip()},unclipArea:function(t){t.restore()},lineTo:function(t,e,i,n){if(i.steppedLine)return"after"===i.steppedLine&&!n||"after"!==i.steppedLine&&n?t.lineTo(e.x,i.y):t.lineTo(i.x,e.y),void t.lineTo(i.x,i.y);i.tension?t.bezierCurveTo(n?e.controlPointPreviousX:e.controlPointNextX,n?e.controlPointPreviousY:e.controlPointNextY,n?i.controlPointNextX:i.controlPointPreviousX,n?i.controlPointNextY:i.controlPointPreviousY,i.x,i.y):t.lineTo(i.x,i.y)}};n.clear=i.clear,n.drawRoundedRectangle=function(t){t.beginPath(),i.roundedRect.apply(i,arguments)}},{43:43}],43:[function(t,e,i){"use strict";var n,d={noop:function(){},uid:(n=0,function(){return n++}),isNullOrUndef:function(t){return null==t},isArray:Array.isArray?Array.isArray:function(t){return"[object Array]"===Object.prototype.toString.call(t)},isObject:function(t){return null!==t&&"[object Object]"===Object.prototype.toString.call(t)},valueOrDefault:function(t,e){return void 0===t?e:t},valueAtIndexOrDefault:function(t,e,i){return d.valueOrDefault(d.isArray(t)?t[e]:t,i)},callback:function(t,e,i){if(t&&"function"==typeof t.call)return t.apply(i,e)},each:function(t,e,i,n){var a,o,r;if(d.isArray(t))if(o=t.length,n)for(a=o-1;0<=a;a--)e.call(i,t[a],a);else for(a=0;a<o;a++)e.call(i,t[a],a);else if(d.isObject(t))for(o=(r=Object.keys(t)).length,a=0;a<o;a++)e.call(i,t[r[a]],r[a])},arrayEquals:function(t,e){var i,n,a,o;if(!t||!e||t.length!==e.length)return!1;for(i=0,n=t.length;i<n;++i)if(a=t[i],o=e[i],a instanceof Array&&o instanceof Array){if(!d.arrayEquals(a,o))return!1}else if(a!==o)return!1;return!0},clone:function(t){if(d.isArray(t))return t.map(d.clone);if(d.isObject(t)){for(var e={},i=Object.keys(t),n=i.length,a=0;a<n;++a)e[i[a]]=d.clone(t[i[a]]);return e}return t},_merger:function(t,e,i,n){var a=e[t],o=i[t];d.isObject(a)&&d.isObject(o)?d.merge(a,o,n):e[t]=d.clone(o)},_mergerIf:function(t,e,i){var n=e[t],a=i[t];d.isObject(n)&&d.isObject(a)?d.mergeIf(n,a):e.hasOwnProperty(t)||(e[t]=d.clone(a))},merge:function(t,e,i){var n,a,o,r,s,l=d.isArray(e)?e:[e],u=l.length;if(!d.isObject(t))return t;for(n=(i=i||{}).merger||d._merger,a=0;a<u;++a)if(e=l[a],d.isObject(e))for(s=0,r=(o=Object.keys(e)).length;s<r;++s)n(o[s],t,e,i);return t},mergeIf:function(t,e){return d.merge(t,e,{merger:d._mergerIf})},extend:function(i){for(var t=function(t,e){i[e]=t},e=1,n=arguments.length;e<n;++e)d.each(arguments[e],t);return i},inherits:function(t){var e=this,i=t&&t.hasOwnProperty("constructor")?t.constructor:function(){return e.apply(this,arguments)},n=function(){this.constructor=i};return n.prototype=e.prototype,i.prototype=new n,i.extend=d.inherits,t&&d.extend(i.prototype,t),i.__super__=e.prototype,i}};(e.exports=d).callCallback=d.callback,d.indexOf=function(t,e,i){return Array.prototype.indexOf.call(t,e,i)},d.getValueOrDefault=d.valueOrDefault,d.getValueAtIndexOrDefault=d.valueAtIndexOrDefault},{}],44:[function(t,e,i){"use strict";var n=t(43),a={linear:function(t){return t},easeInQuad:function(t){return t*t},easeOutQuad:function(t){return-t*(t-2)},easeInOutQuad:function(t){return(t/=.5)<1?.5*t*t:-.5*(--t*(t-2)-1)},easeInCubic:function(t){return t*t*t},easeOutCubic:function(t){return(t-=1)*t*t+1},easeInOutCubic:function(t){return(t/=.5)<1?.5*t*t*t:.5*((t-=2)*t*t+2)},easeInQuart:function(t){return t*t*t*t},easeOutQuart:function(t){return-((t-=1)*t*t*t-1)},easeInOutQuart:function(t){return(t/=.5)<1?.5*t*t*t*t:-.5*((t-=2)*t*t*t-2)},easeInQuint:function(t){return t*t*t*t*t},easeOutQuint:function(t){return(t-=1)*t*t*t*t+1},easeInOutQuint:function(t){return(t/=.5)<1?.5*t*t*t*t*t:.5*((t-=2)*t*t*t*t+2)},easeInSine:function(t){return 1-Math.cos(t*(Math.PI/2))},easeOutSine:function(t){return Math.sin(t*(Math.PI/2))},easeInOutSine:function(t){return-.5*(Math.cos(Math.PI*t)-1)},easeInExpo:function(t){return 0===t?0:Math.pow(2,10*(t-1))},easeOutExpo:function(t){return 1===t?1:1-Math.pow(2,-10*t)},easeInOutExpo:function(t){return 0===t?0:1===t?1:(t/=.5)<1?.5*Math.pow(2,10*(t-1)):.5*(2-Math.pow(2,-10*--t))},easeInCirc:function(t){return 1<=t?t:-(Math.sqrt(1-t*t)-1)},easeOutCirc:function(t){return Math.sqrt(1-(t-=1)*t)},easeInOutCirc:function(t){return(t/=.5)<1?-.5*(Math.sqrt(1-t*t)-1):.5*(Math.sqrt(1-(t-=2)*t)+1)},easeInElastic:function(t){var e=1.70158,i=0,n=1;return 0===t?0:1===t?1:(i||(i=.3),e=n<1?(n=1,i/4):i/(2*Math.PI)*Math.asin(1/n),-n*Math.pow(2,10*(t-=1))*Math.sin((t-e)*(2*Math.PI)/i))},easeOutElastic:function(t){var e=1.70158,i=0,n=1;return 0===t?0:1===t?1:(i||(i=.3),e=n<1?(n=1,i/4):i/(2*Math.PI)*Math.asin(1/n),n*Math.pow(2,-10*t)*Math.sin((t-e)*(2*Math.PI)/i)+1)},easeInOutElastic:function(t){var e=1.70158,i=0,n=1;return 0===t?0:2==(t/=.5)?1:(i||(i=.45),e=n<1?(n=1,i/4):i/(2*Math.PI)*Math.asin(1/n),t<1?n*Math.pow(2,10*(t-=1))*Math.sin((t-e)*(2*Math.PI)/i)*-.5:n*Math.pow(2,-10*(t-=1))*Math.sin((t-e)*(2*Math.PI)/i)*.5+1)},easeInBack:function(t){return t*t*(2.70158*t-1.70158)},easeOutBack:function(t){return(t-=1)*t*(2.70158*t+1.70158)+1},easeInOutBack:function(t){var e=1.70158;return(t/=.5)<1?t*t*((1+(e*=1.525))*t-e)*.5:.5*((t-=2)*t*((1+(e*=1.525))*t+e)+2)},easeInBounce:function(t){return 1-a.easeOutBounce(1-t)},easeOutBounce:function(t){return t<1/2.75?7.5625*t*t:t<2/2.75?7.5625*(t-=1.5/2.75)*t+.75:t<2.5/2.75?7.5625*(t-=2.25/2.75)*t+.9375:7.5625*(t-=2.625/2.75)*t+.984375},easeInOutBounce:function(t){return t<.5?.5*a.easeInBounce(2*t):.5*a.easeOutBounce(2*t-1)+.5}};e.exports={effects:a},n.easingEffects=a},{43:43}],45:[function(t,e,i){"use strict";var r=t(43);e.exports={toLineHeight:function(t,e){var i=(""+t).match(/^(normal|(\d+(?:\.\d+)?)(px|em|%)?)$/);if(!i||"normal"===i[1])return 1.2*e;switch(t=+i[2],i[3]){case"px":return t;case"%":t/=100}return e*t},toPadding:function(t){var e,i,n,a;return r.isObject(t)?(e=+t.top||0,i=+t.right||0,n=+t.bottom||0,a=+t.left||0):e=i=n=a=+t||0,{top:e,right:i,bottom:n,left:a,height:e+n,width:a+i}},resolve:function(t,e,i){var n,a,o;for(n=0,a=t.length;n<a;++n)if(void 0!==(o=t[n])&&(void 0!==e&&"function"==typeof o&&(o=o(e)),void 0!==i&&r.isArray(o)&&(o=o[i]),void 0!==o))return o}}},{43:43}],46:[function(t,e,i){"use strict";e.exports=t(43),e.exports.easing=t(44),e.exports.canvas=t(42),e.exports.options=t(45)},{42:42,43:43,44:44,45:45}],47:[function(t,e,i){e.exports={acquireContext:function(t){return t&&t.canvas&&(t=t.canvas),t&&t.getContext("2d")||null}}},{}],48:[function(t,e,i){"use strict";var f=t(46),g="$chartjs",p="chartjs-",m=p+"render-monitor",v=p+"render-animation",b=["animationstart","webkitAnimationStart"],s={touchstart:"mousedown",touchmove:"mousemove",touchend:"mouseup",pointerenter:"mouseenter",pointerdown:"mousedown",pointermove:"mousemove",pointerup:"mouseup",pointerleave:"mouseout",pointerout:"mouseout"};function l(t,e){var i=f.getStyle(t,e),n=i&&i.match(/^(\d+)(\.\d+)?px$/);return n?Number(n[1]):void 0}var n=!!function(){var t=!1;try{var e=Object.defineProperty({},"passive",{get:function(){t=!0}});window.addEventListener("e",null,e)}catch(t){}return t}()&&{passive:!0};function x(t,e,i){t.addEventListener(e,i,n)}function r(t,e,i){t.removeEventListener(e,i,n)}function y(t,e,i,n,a){return{type:t,chart:e,native:a||null,x:void 0!==i?i:null,y:void 0!==n?n:null}}function a(e,t,i){var n,a,o,r,s,l,u,d,c=e[g]||(e[g]={}),h=c.resizer=function(t){var e=document.createElement("div"),i=p+"size-monitor",n="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;";e.style.cssText=n,e.className=i,e.innerHTML='<div class="'+i+'-expand" style="'+n+'"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="'+i+'-shrink" style="'+n+'"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div>';var a=e.childNodes[0],o=e.childNodes[1];e._reset=function(){a.scrollLeft=1e6,a.scrollTop=1e6,o.scrollLeft=1e6,o.scrollTop=1e6};var r=function(){e._reset(),t()};return x(a,"scroll",r.bind(a,"expand")),x(o,"scroll",r.bind(o,"shrink")),e}((o=!(n=function(){if(c.resizer)return t(y("resize",i))}),r=[],function(){r=Array.prototype.slice.call(arguments),a=a||this,o||(o=!0,f.requestAnimFrame.call(window,function(){o=!1,n.apply(a,r)}))}));l=function(){if(c.resizer){var t=e.parentNode;t&&t!==h.parentNode&&t.insertBefore(h,t.firstChild),h._reset()}},u=(s=e)[g]||(s[g]={}),d=u.renderProxy=function(t){t.animationName===v&&l()},f.each(b,function(t){x(s,t,d)}),u.reflow=!!s.offsetParent,s.classList.add(m)}function o(t){var e,i,n,a=t[g]||{},o=a.resizer;delete a.resizer,i=(e=t)[g]||{},(n=i.renderProxy)&&(f.each(b,function(t){r(e,t,n)}),delete i.renderProxy),e.classList.remove(m),o&&o.parentNode&&o.parentNode.removeChild(o)}e.exports={_enabled:"undefined"!=typeof window&&"undefined"!=typeof document,initialize:function(){var t,e,i,n="from{opacity:0.99}to{opacity:1}";e="@-webkit-keyframes "+v+"{"+n+"}@keyframes "+v+"{"+n+"}."+m+"{-webkit-animation:"+v+" 0.001s;animation:"+v+" 0.001s;}",i=(t=this)._style||document.createElement("style"),t._style||(e="/* Chart.js */\n"+e,(t._style=i).setAttribute("type","text/css"),document.getElementsByTagName("head")[0].appendChild(i)),i.appendChild(document.createTextNode(e))},acquireContext:function(t,e){"string"==typeof t?t=document.getElementById(t):t.length&&(t=t[0]),t&&t.canvas&&(t=t.canvas);var i=t&&t.getContext&&t.getContext("2d");return i&&i.canvas===t?(function(t,e){var i=t.style,n=t.getAttribute("height"),a=t.getAttribute("width");if(t[g]={initial:{height:n,width:a,style:{display:i.display,height:i.height,width:i.width}}},i.display=i.display||"block",null===a||""===a){var o=l(t,"width");void 0!==o&&(t.width=o)}if(null===n||""===n)if(""===t.style.height)t.height=t.width/(e.options.aspectRatio||2);else{var r=l(t,"height");void 0!==o&&(t.height=r)}}(t,e),i):null},releaseContext:function(t){var i=t.canvas;if(i[g]){var n=i[g].initial;["height","width"].forEach(function(t){var e=n[t];f.isNullOrUndef(e)?i.removeAttribute(t):i.setAttribute(t,e)}),f.each(n.style||{},function(t,e){i.style[e]=t}),i.width=i.width,delete i[g]}},addEventListener:function(o,t,r){var e=o.canvas;if("resize"!==t){var i=r[g]||(r[g]={});x(e,t,(i.proxies||(i.proxies={}))[o.id+"_"+t]=function(t){var e,i,n,a;r((i=o,n=s[(e=t).type]||e.type,a=f.getRelativePosition(e,i),y(n,i,a.x,a.y,e)))})}else a(e,r,o)},removeEventListener:function(t,e,i){var n=t.canvas;if("resize"!==e){var a=((i[g]||{}).proxies||{})[t.id+"_"+e];a&&r(n,e,a)}else o(n)}},f.addEvent=x,f.removeEvent=r},{46:46}],49:[function(t,e,i){"use strict";var n=t(46),a=t(47),o=t(48),r=o._enabled?o:a;e.exports=n.extend({initialize:function(){},acquireContext:function(){},releaseContext:function(){},addEventListener:function(){},removeEventListener:function(){}},r)},{46:46,47:47,48:48}],50:[function(t,e,i){"use strict";e.exports={},e.exports.filler=t(51),e.exports.legend=t(52),e.exports.title=t(53)},{51:51,52:52,53:53}],51:[function(t,e,i){"use strict";var u=t(26),h=t(41),d=t(46);u._set("global",{plugins:{filler:{propagate:!0}}});var f={dataset:function(t){var e=t.fill,i=t.chart,n=i.getDatasetMeta(e),a=n&&i.isDatasetVisible(e)&&n.dataset._children||[],o=a.length||0;return o?function(t,e){return e<o&&a[e]._view||null}:null},boundary:function(t){var e=t.boundary,i=e?e.x:null,n=e?e.y:null;return function(t){return{x:null===i?t.x:i,y:null===n?t.y:n}}}};function g(t,e,i){var n,a=t._model||{},o=a.fill;if(void 0===o&&(o=!!a.backgroundColor),!1===o||null===o)return!1;if(!0===o)return"origin";if(n=parseFloat(o,10),isFinite(n)&&Math.floor(n)===n)return"-"!==o[0]&&"+"!==o[0]||(n=e+n),!(n===e||n<0||i<=n)&&n;switch(o){case"bottom":return"start";case"top":return"end";case"zero":return"origin";case"origin":case"start":case"end":return o;default:return!1}}function p(t){var e,i=t.el._model||{},n=t.el._scale||{},a=t.fill,o=null;if(isFinite(a))return null;if("start"===a?o=void 0===i.scaleBottom?n.bottom:i.scaleBottom:"end"===a?o=void 0===i.scaleTop?n.top:i.scaleTop:void 0!==i.scaleZero?o=i.scaleZero:n.getBasePosition?o=n.getBasePosition():n.getBasePixel&&(o=n.getBasePixel()),null!=o){if(void 0!==o.x&&void 0!==o.y)return o;if("number"==typeof o&&isFinite(o))return{x:(e=n.isHorizontal())?o:null,y:e?null:o}}return null}function m(t,e,i){var n,a=t[e].fill,o=[e];if(!i)return a;for(;!1!==a&&-1===o.indexOf(a);){if(!isFinite(a))return a;if(!(n=t[a]))return!1;if(n.visible)return a;o.push(a),a=n.fill}return!1}function x(t){return t&&!t.skip}function y(t,e,i,n,a){var o;if(n&&a){for(t.moveTo(e[0].x,e[0].y),o=1;o<n;++o)d.canvas.lineTo(t,e[o-1],e[o]);for(t.lineTo(i[a-1].x,i[a-1].y),o=a-1;0<o;--o)d.canvas.lineTo(t,i[o],i[o-1],!0)}}e.exports={id:"filler",afterDatasetsUpdate:function(t,e){var i,n,a,o,r,s,l,u=(t.data.datasets||[]).length,d=e.propagate,c=[];for(n=0;n<u;++n)o=null,(a=(i=t.getDatasetMeta(n)).dataset)&&a._model&&a instanceof h.Line&&(o={visible:t.isDatasetVisible(n),fill:g(a,n,u),chart:t,el:a}),i.$filler=o,c.push(o);for(n=0;n<u;++n)(o=c[n])&&(o.fill=m(c,n,d),o.boundary=p(o),o.mapper=(l=void 0,s=(r=o).fill,!(l="dataset")===s?null:(isFinite(s)||(l="boundary"),f[l](r))))},beforeDatasetDraw:function(t,e){var i=e.meta.$filler;if(i){var n=t.ctx,a=i.el,o=a._view,r=a._children||[],s=i.mapper,l=o.backgroundColor||u.global.defaultColor;s&&l&&r.length&&(d.canvas.clipArea(n,t.chartArea),function(t,e,i,n,a,o){var r,s,l,u,d,c,h,f=e.length,g=n.spanGaps,p=[],m=[],v=0,b=0;for(t.beginPath(),r=0,s=f+!!o;r<s;++r)d=i(u=e[l=r%f]._view,l,n),c=x(u),h=x(d),c&&h?(v=p.push(u),b=m.push(d)):v&&b&&(g?(c&&p.push(u),h&&m.push(d)):(y(t,p,m,v,b),v=b=0,p=[],m=[]));y(t,p,m,v,b),t.closePath(),t.fillStyle=a,t.fill()}(n,r,s,o,l,a._loop),d.canvas.unclipArea(n))}}}},{26:26,41:41,46:46}],52:[function(t,e,i){"use strict";var _=t(26),n=t(27),D=t(46),a=t(31),o=D.noop;function P(t,e){return t.usePointStyle?e*Math.SQRT2:t.boxWidth}_._set("global",{legend:{display:!0,position:"top",fullWidth:!0,reverse:!1,weight:1e3,onClick:function(t,e){var i=e.datasetIndex,n=this.chart,a=n.getDatasetMeta(i);a.hidden=null===a.hidden?!n.data.datasets[i].hidden:null,n.update()},onHover:null,labels:{boxWidth:40,padding:10,generateLabels:function(i){var t=i.data;return D.isArray(t.datasets)?t.datasets.map(function(t,e){return{text:t.label,fillStyle:D.isArray(t.backgroundColor)?t.backgroundColor[0]:t.backgroundColor,hidden:!i.isDatasetVisible(e),lineCap:t.borderCapStyle,lineDash:t.borderDash,lineDashOffset:t.borderDashOffset,lineJoin:t.borderJoinStyle,lineWidth:t.borderWidth,strokeStyle:t.borderColor,pointStyle:t.pointStyle,datasetIndex:e}},this):[]}}},legendCallback:function(t){var e=[];e.push('<ul class="'+t.id+'-legend">');for(var i=0;i<t.data.datasets.length;i++)e.push('<li><span style="background-color:'+t.data.datasets[i].backgroundColor+'"></span>'),t.data.datasets[i].label&&e.push(t.data.datasets[i].label),e.push("</li>");return e.push("</ul>"),e.join("")}});var r=n.extend({initialize:function(t){D.extend(this,t),this.legendHitBoxes=[],this.doughnutMode=!1},beforeUpdate:o,update:function(t,e,i){var n=this;return n.beforeUpdate(),n.maxWidth=t,n.maxHeight=e,n.margins=i,n.beforeSetDimensions(),n.setDimensions(),n.afterSetDimensions(),n.beforeBuildLabels(),n.buildLabels(),n.afterBuildLabels(),n.beforeFit(),n.fit(),n.afterFit(),n.afterUpdate(),n.minSize},afterUpdate:o,beforeSetDimensions:o,setDimensions:function(){var t=this;t.isHorizontal()?(t.width=t.maxWidth,t.left=0,t.right=t.width):(t.height=t.maxHeight,t.top=0,t.bottom=t.height),t.paddingLeft=0,t.paddingTop=0,t.paddingRight=0,t.paddingBottom=0,t.minSize={width:0,height:0}},afterSetDimensions:o,beforeBuildLabels:o,buildLabels:function(){var e=this,i=e.options.labels||{},t=D.callback(i.generateLabels,[e.chart],e)||[];i.filter&&(t=t.filter(function(t){return i.filter(t,e.chart.data)})),e.options.reverse&&t.reverse(),e.legendItems=t},afterBuildLabels:o,beforeFit:o,fit:function(){var n=this,t=n.options,a=t.labels,e=t.display,o=n.ctx,i=_.global,r=D.valueOrDefault,s=r(a.fontSize,i.defaultFontSize),l=r(a.fontStyle,i.defaultFontStyle),u=r(a.fontFamily,i.defaultFontFamily),d=D.fontString(s,l,u),c=n.legendHitBoxes=[],h=n.minSize,f=n.isHorizontal();if(h.height=f?(h.width=n.maxWidth,e?10:0):(h.width=e?10:0,n.maxHeight),e)if(o.font=d,f){var g=n.lineWidths=[0],p=n.legendItems.length?s+a.padding:0;o.textAlign="left",o.textBaseline="top",D.each(n.legendItems,function(t,e){var i=P(a,s)+s/2+o.measureText(t.text).width;g[g.length-1]+i+a.padding>=n.width&&(p+=s+a.padding,g[g.length]=n.left),c[e]={left:0,top:0,width:i,height:s},g[g.length-1]+=i+a.padding}),h.height+=p}else{var m=a.padding,v=n.columnWidths=[],b=a.padding,x=0,y=0,k=s+m;D.each(n.legendItems,function(t,e){var i=P(a,s)+s/2+o.measureText(t.text).width;y+k>h.height&&(b+=x+a.padding,v.push(x),y=x=0),x=Math.max(x,i),y+=k,c[e]={left:0,top:0,width:i,height:s}}),b+=x,v.push(x),h.width+=b}n.width=h.width,n.height=h.height},afterFit:o,isHorizontal:function(){return"top"===this.options.position||"bottom"===this.options.position},draw:function(){var c=this,h=c.options,f=h.labels,g=_.global,p=g.elements.line,m=c.width,v=c.lineWidths;if(h.display){var b,x=c.ctx,y=D.valueOrDefault,t=y(f.fontColor,g.defaultFontColor),k=y(f.fontSize,g.defaultFontSize),e=y(f.fontStyle,g.defaultFontStyle),i=y(f.fontFamily,g.defaultFontFamily),n=D.fontString(k,e,i);x.textAlign="left",x.textBaseline="middle",x.lineWidth=.5,x.strokeStyle=t,x.fillStyle=t,x.font=n;var M=P(f,k),w=c.legendHitBoxes,C=c.isHorizontal();b=C?{x:c.left+(m-v[0])/2,y:c.top+f.padding,line:0}:{x:c.left+f.padding,y:c.top+f.padding,line:0};var S=k+f.padding;D.each(c.legendItems,function(t,e){var i,n,a,o,r,s=x.measureText(t.text).width,l=M+k/2+s,u=b.x,d=b.y;C?m<=u+l&&(d=b.y+=S,b.line++,u=b.x=c.left+(m-v[b.line])/2):d+S>c.bottom&&(u=b.x=u+c.columnWidths[b.line]+f.padding,d=b.y=c.top+f.padding,b.line++),function(t,e,i){if(!(isNaN(M)||M<=0)){x.save(),x.fillStyle=y(i.fillStyle,g.defaultColor),x.lineCap=y(i.lineCap,p.borderCapStyle),x.lineDashOffset=y(i.lineDashOffset,p.borderDashOffset),x.lineJoin=y(i.lineJoin,p.borderJoinStyle),x.lineWidth=y(i.lineWidth,p.borderWidth),x.strokeStyle=y(i.strokeStyle,g.defaultColor);var n=0===y(i.lineWidth,p.borderWidth);if(x.setLineDash&&x.setLineDash(y(i.lineDash,p.borderDash)),h.labels&&h.labels.usePointStyle){var a=k*Math.SQRT2/2,o=a/Math.SQRT2,r=t+o,s=e+o;D.canvas.drawPoint(x,i.pointStyle,a,r,s)}else n||x.strokeRect(t,e,M,k),x.fillRect(t,e,M,k);x.restore()}}(u,d,t),w[e].left=u,w[e].top=d,i=t,n=s,o=M+(a=k/2)+u,r=d+a,x.fillText(i.text,o,r),i.hidden&&(x.beginPath(),x.lineWidth=2,x.moveTo(o,r),x.lineTo(o+n,r),x.stroke()),C?b.x+=l+f.padding:b.y+=S})}},handleEvent:function(t){var e=this,i=e.options,n="mouseup"===t.type?"click":t.type,a=!1;if("mousemove"===n){if(!i.onHover)return}else{if("click"!==n)return;if(!i.onClick)return}var o=t.x,r=t.y;if(o>=e.left&&o<=e.right&&r>=e.top&&r<=e.bottom)for(var s=e.legendHitBoxes,l=0;l<s.length;++l){var u=s[l];if(o>=u.left&&o<=u.left+u.width&&r>=u.top&&r<=u.top+u.height){if("click"===n){i.onClick.call(e,t.native,e.legendItems[l]),a=!0;break}if("mousemove"===n){i.onHover.call(e,t.native,e.legendItems[l]),a=!0;break}}}return a}});function s(t,e){var i=new r({ctx:t.ctx,options:e,chart:t});a.configure(t,i,e),a.addBox(t,i),t.legend=i}e.exports={id:"legend",_element:r,beforeInit:function(t){var e=t.options.legend;e&&s(t,e)},beforeUpdate:function(t){var e=t.options.legend,i=t.legend;e?(D.mergeIf(e,_.global.legend),i?(a.configure(t,i,e),i.options=e):s(t,e)):i&&(a.removeBox(t,i),delete t.legend)},afterEvent:function(t,e){var i=t.legend;i&&i.handleEvent(e)}}},{26:26,27:27,31:31,46:46}],53:[function(t,e,i){"use strict";var M=t(26),n=t(27),w=t(46),a=t(31),o=w.noop;M._set("global",{title:{display:!1,fontStyle:"bold",fullWidth:!0,lineHeight:1.2,padding:10,position:"top",text:"",weight:2e3}});var r=n.extend({initialize:function(t){w.extend(this,t),this.legendHitBoxes=[]},beforeUpdate:o,update:function(t,e,i){var n=this;return n.beforeUpdate(),n.maxWidth=t,n.maxHeight=e,n.margins=i,n.beforeSetDimensions(),n.setDimensions(),n.afterSetDimensions(),n.beforeBuildLabels(),n.buildLabels(),n.afterBuildLabels(),n.beforeFit(),n.fit(),n.afterFit(),n.afterUpdate(),n.minSize},afterUpdate:o,beforeSetDimensions:o,setDimensions:function(){var t=this;t.isHorizontal()?(t.width=t.maxWidth,t.left=0,t.right=t.width):(t.height=t.maxHeight,t.top=0,t.bottom=t.height),t.paddingLeft=0,t.paddingTop=0,t.paddingRight=0,t.paddingBottom=0,t.minSize={width:0,height:0}},afterSetDimensions:o,beforeBuildLabels:o,buildLabels:o,afterBuildLabels:o,beforeFit:o,fit:function(){var t=this,e=w.valueOrDefault,i=t.options,n=i.display,a=e(i.fontSize,M.global.defaultFontSize),o=t.minSize,r=w.isArray(i.text)?i.text.length:1,s=w.options.toLineHeight(i.lineHeight,a),l=n?r*s+2*i.padding:0;t.isHorizontal()?(o.width=t.maxWidth,o.height=l):(o.width=l,o.height=t.maxHeight),t.width=o.width,t.height=o.height},afterFit:o,isHorizontal:function(){var t=this.options.position;return"top"===t||"bottom"===t},draw:function(){var t=this,e=t.ctx,i=w.valueOrDefault,n=t.options,a=M.global;if(n.display){var o,r,s,l=i(n.fontSize,a.defaultFontSize),u=i(n.fontStyle,a.defaultFontStyle),d=i(n.fontFamily,a.defaultFontFamily),c=w.fontString(l,u,d),h=w.options.toLineHeight(n.lineHeight,l),f=h/2+n.padding,g=0,p=t.top,m=t.left,v=t.bottom,b=t.right;e.fillStyle=i(n.fontColor,a.defaultFontColor),e.font=c,t.isHorizontal()?(r=m+(b-m)/2,s=p+f,o=b-m):(r="left"===n.position?m+f:b-f,s=p+(v-p)/2,o=v-p,g=Math.PI*("left"===n.position?-.5:.5)),e.save(),e.translate(r,s),e.rotate(g),e.textAlign="center",e.textBaseline="middle";var x=n.text;if(w.isArray(x))for(var y=0,k=0;k<x.length;++k)e.fillText(x[k],0,y,o),y+=h;else e.fillText(x,0,0,o);e.restore()}}});function s(t,e){var i=new r({ctx:t.ctx,options:e,chart:t});a.configure(t,i,e),a.addBox(t,i),t.titleBlock=i}e.exports={id:"title",_element:r,beforeInit:function(t){var e=t.options.title;e&&s(t,e)},beforeUpdate:function(t){var e=t.options.title,i=t.titleBlock;e?(w.mergeIf(e,M.global.title),i?(a.configure(t,i,e),i.options=e):s(t,e)):i&&(a.removeBox(t,i),delete t.titleBlock)}}},{26:26,27:27,31:31,46:46}],54:[function(t,e,i){"use strict";var n=t(33),a=t(34);e.exports=function(){var t=n.extend({getLabels:function(){var t=this.chart.data;return this.options.labels||(this.isHorizontal()?t.xLabels:t.yLabels)||t.labels},determineDataLimits:function(){var t,e=this,i=e.getLabels();e.minIndex=0,e.maxIndex=i.length-1,void 0!==e.options.ticks.min&&(t=i.indexOf(e.options.ticks.min),e.minIndex=-1!==t?t:e.minIndex),void 0!==e.options.ticks.max&&(t=i.indexOf(e.options.ticks.max),e.maxIndex=-1!==t?t:e.maxIndex),e.min=i[e.minIndex],e.max=i[e.maxIndex]},buildTicks:function(){var t=this,e=t.getLabels();t.ticks=0===t.minIndex&&t.maxIndex===e.length-1?e:e.slice(t.minIndex,t.maxIndex+1)},getLabelForIndex:function(t,e){var i=this,n=i.chart.data,a=i.isHorizontal();return n.yLabels&&!a?i.getRightValue(n.datasets[e].data[t]):i.ticks[t-i.minIndex]},getPixelForValue:function(t,e){var i,n=this,a=n.options.offset,o=Math.max(n.maxIndex+1-n.minIndex-(a?0:1),1);if(null!=t&&(i=n.isHorizontal()?t.x:t.y),void 0!==i||void 0!==t&&isNaN(e)){t=i||t;var r=n.getLabels().indexOf(t);e=-1!==r?r:e}if(n.isHorizontal()){var s=n.width/o,l=s*(e-n.minIndex);return a&&(l+=s/2),n.left+Math.round(l)}var u=n.height/o,d=u*(e-n.minIndex);return a&&(d+=u/2),n.top+Math.round(d)},getPixelForTick:function(t){return this.getPixelForValue(this.ticks[t],t+this.minIndex,null)},getValueForPixel:function(t){var e=this,i=e.options.offset,n=Math.max(e._ticks.length-(i?0:1),1),a=e.isHorizontal(),o=(a?e.width:e.height)/n;return t-=a?e.left:e.top,i&&(t-=o/2),(t<=0?0:Math.round(t/o))+e.minIndex},getBasePixel:function(){return this.bottom}});a.registerScaleType("category",t,{position:"bottom"})}},{33:33,34:34}],55:[function(t,e,i){"use strict";var n=t(26),c=t(46),a=t(34),o=t(35);e.exports=function(t){var e={position:"left",ticks:{callback:o.formatters.linear}},i=t.LinearScaleBase.extend({determineDataLimits:function(){var r=this,s=r.options,l=r.chart,t=l.data.datasets,e=r.isHorizontal();function u(t){return e?t.xAxisID===r.id:t.yAxisID===r.id}r.min=null,r.max=null;var n=s.stacked;if(void 0===n&&c.each(t,function(t,e){if(!n){var i=l.getDatasetMeta(e);l.isDatasetVisible(e)&&u(i)&&void 0!==i.stack&&(n=!0)}}),s.stacked||n){var d={};c.each(t,function(t,e){var n=l.getDatasetMeta(e),i=[n.type,void 0===s.stacked&&void 0===n.stack?e:"",n.stack].join(".");void 0===d[i]&&(d[i]={positiveValues:[],negativeValues:[]});var a=d[i].positiveValues,o=d[i].negativeValues;l.isDatasetVisible(e)&&u(n)&&c.each(t.data,function(t,e){var i=+r.getRightValue(t);isNaN(i)||n.data[e].hidden||(a[e]=a[e]||0,o[e]=o[e]||0,s.relativePoints?a[e]=100:i<0?o[e]+=i:a[e]+=i)})}),c.each(d,function(t){var e=t.positiveValues.concat(t.negativeValues),i=c.min(e),n=c.max(e);r.min=null===r.min?i:Math.min(r.min,i),r.max=null===r.max?n:Math.max(r.max,n)})}else c.each(t,function(t,e){var n=l.getDatasetMeta(e);l.isDatasetVisible(e)&&u(n)&&c.each(t.data,function(t,e){var i=+r.getRightValue(t);isNaN(i)||n.data[e].hidden||(null===r.min?r.min=i:i<r.min&&(r.min=i),null===r.max?r.max=i:i>r.max&&(r.max=i))})});r.min=isFinite(r.min)&&!isNaN(r.min)?r.min:0,r.max=isFinite(r.max)&&!isNaN(r.max)?r.max:1,this.handleTickRangeOptions()},getTickLimit:function(){var t,e=this.options.ticks;if(this.isHorizontal())t=Math.min(e.maxTicksLimit?e.maxTicksLimit:11,Math.ceil(this.width/50));else{var i=c.valueOrDefault(e.fontSize,n.global.defaultFontSize);t=Math.min(e.maxTicksLimit?e.maxTicksLimit:11,Math.ceil(this.height/(2*i)))}return t},handleDirectionalChanges:function(){this.isHorizontal()||this.ticks.reverse()},getLabelForIndex:function(t,e){return+this.getRightValue(this.chart.data.datasets[e].data[t])},getPixelForValue:function(t){var e=this,i=e.start,n=+e.getRightValue(t),a=e.end-i;return e.isHorizontal()?e.left+e.width/a*(n-i):e.bottom-e.height/a*(n-i)},getValueForPixel:function(t){var e=this,i=e.isHorizontal(),n=i?e.width:e.height,a=(i?t-e.left:e.bottom-t)/n;return e.start+(e.end-e.start)*a},getPixelForTick:function(t){return this.getPixelForValue(this.ticksAsNumbers[t])}});a.registerScaleType("linear",i,e)}},{26:26,34:34,35:35,46:46}],56:[function(t,e,i){"use strict";var c=t(46),n=t(33);e.exports=function(t){var e=c.noop;t.LinearScaleBase=n.extend({getRightValue:function(t){return"string"==typeof t?+t:n.prototype.getRightValue.call(this,t)},handleTickRangeOptions:function(){var t=this,e=t.options.ticks;if(e.beginAtZero){var i=c.sign(t.min),n=c.sign(t.max);i<0&&n<0?t.max=0:0<i&&0<n&&(t.min=0)}var a=void 0!==e.min||void 0!==e.suggestedMin,o=void 0!==e.max||void 0!==e.suggestedMax;void 0!==e.min?t.min=e.min:void 0!==e.suggestedMin&&(null===t.min?t.min=e.suggestedMin:t.min=Math.min(t.min,e.suggestedMin)),void 0!==e.max?t.max=e.max:void 0!==e.suggestedMax&&(null===t.max?t.max=e.suggestedMax:t.max=Math.max(t.max,e.suggestedMax)),a!==o&&t.min>=t.max&&(a?t.max=t.min+1:t.min=t.max-1),t.min===t.max&&(t.max++,e.beginAtZero||t.min--)},getTickLimit:e,handleDirectionalChanges:e,buildTicks:function(){var t=this,e=t.options.ticks,i=t.getTickLimit(),n={maxTicks:i=Math.max(2,i),min:e.min,max:e.max,precision:e.precision,stepSize:c.valueOrDefault(e.fixedStepSize,e.stepSize)},a=t.ticks=function(t,e){var i,n,a,o=[];if(t.stepSize&&0<t.stepSize)a=t.stepSize;else{var r=c.niceNum(e.max-e.min,!1);a=c.niceNum(r/(t.maxTicks-1),!0),void 0!==(n=t.precision)&&(i=Math.pow(10,n),a=Math.ceil(a*i)/i)}var s=Math.floor(e.min/a)*a,l=Math.ceil(e.max/a)*a;c.isNullOrUndef(t.min)||c.isNullOrUndef(t.max)||!t.stepSize||c.almostWhole((t.max-t.min)/t.stepSize,a/1e3)&&(s=t.min,l=t.max);var u=(l-s)/a;u=c.almostEquals(u,Math.round(u),a/1e3)?Math.round(u):Math.ceil(u),a<(n=1)&&(n=Math.pow(10,1-Math.floor(c.log10(a))),s=Math.round(s*n)/n,l=Math.round(l*n)/n),o.push(void 0!==t.min?t.min:s);for(var d=1;d<u;++d)o.push(Math.round((s+d*a)*n)/n);return o.push(void 0!==t.max?t.max:l),o}(n,t);t.handleDirectionalChanges(),t.max=c.max(a),t.min=c.min(a),e.reverse?(a.reverse(),t.start=t.max,t.end=t.min):(t.start=t.min,t.end=t.max)},convertTicksToLabels:function(){var t=this;t.ticksAsNumbers=t.ticks.slice(),t.zeroLineIndex=t.ticks.indexOf(0),n.prototype.convertTicksToLabels.call(t)}})}},{33:33,46:46}],57:[function(t,e,i){"use strict";var h=t(46),n=t(33),a=t(34),o=t(35);e.exports=function(c){var t={position:"left",ticks:{callback:o.formatters.logarithmic}},e=n.extend({determineDataLimits:function(){var r=this,i=r.options,s=r.chart,t=s.data.datasets,e=r.isHorizontal();function l(t){return e?t.xAxisID===r.id:t.yAxisID===r.id}r.min=null,r.max=null,r.minNotZero=null;var n=i.stacked;if(void 0===n&&h.each(t,function(t,e){if(!n){var i=s.getDatasetMeta(e);s.isDatasetVisible(e)&&l(i)&&void 0!==i.stack&&(n=!0)}}),i.stacked||n){var u={};h.each(t,function(t,e){var a=s.getDatasetMeta(e),o=[a.type,void 0===i.stacked&&void 0===a.stack?e:"",a.stack].join(".");s.isDatasetVisible(e)&&l(a)&&(void 0===u[o]&&(u[o]=[]),h.each(t.data,function(t,e){var i=u[o],n=+r.getRightValue(t);isNaN(n)||a.data[e].hidden||n<0||(i[e]=i[e]||0,i[e]+=n)}))}),h.each(u,function(t){if(0<t.length){var e=h.min(t),i=h.max(t);r.min=null===r.min?e:Math.min(r.min,e),r.max=null===r.max?i:Math.max(r.max,i)}})}else h.each(t,function(t,e){var n=s.getDatasetMeta(e);s.isDatasetVisible(e)&&l(n)&&h.each(t.data,function(t,e){var i=+r.getRightValue(t);isNaN(i)||n.data[e].hidden||i<0||(null===r.min?r.min=i:i<r.min&&(r.min=i),null===r.max?r.max=i:i>r.max&&(r.max=i),0!==i&&(null===r.minNotZero||i<r.minNotZero)&&(r.minNotZero=i))})});this.handleTickRangeOptions()},handleTickRangeOptions:function(){var t=this,e=t.options.ticks,i=h.valueOrDefault;t.min=i(e.min,t.min),t.max=i(e.max,t.max),t.min===t.max&&(0!==t.min&&null!==t.min?(t.min=Math.pow(10,Math.floor(h.log10(t.min))-1),t.max=Math.pow(10,Math.floor(h.log10(t.max))+1)):(t.min=1,t.max=10)),null===t.min&&(t.min=Math.pow(10,Math.floor(h.log10(t.max))-1)),null===t.max&&(t.max=0!==t.min?Math.pow(10,Math.floor(h.log10(t.min))+1):10),null===t.minNotZero&&(0<t.min?t.minNotZero=t.min:t.max<1?t.minNotZero=Math.pow(10,Math.floor(h.log10(t.max))):t.minNotZero=1)},buildTicks:function(){var t=this,e=t.options.ticks,i=!t.isHorizontal(),n={min:e.min,max:e.max},a=t.ticks=function(t,e){var i,n,a=[],o=h.valueOrDefault,r=o(t.min,Math.pow(10,Math.floor(h.log10(e.min)))),s=Math.floor(h.log10(e.max)),l=Math.ceil(e.max/Math.pow(10,s));0===r?(i=Math.floor(h.log10(e.minNotZero)),n=Math.floor(e.minNotZero/Math.pow(10,i)),a.push(r),r=n*Math.pow(10,i)):(i=Math.floor(h.log10(r)),n=Math.floor(r/Math.pow(10,i)));for(var u=i<0?Math.pow(10,Math.abs(i)):1;a.push(r),10==++n&&(n=1,u=0<=++i?1:u),r=Math.round(n*Math.pow(10,i)*u)/u,i<s||i===s&&n<l;);var d=o(t.max,r);return a.push(d),a}(n,t);t.max=h.max(a),t.min=h.min(a),e.reverse?(i=!i,t.start=t.max,t.end=t.min):(t.start=t.min,t.end=t.max),i&&a.reverse()},convertTicksToLabels:function(){this.tickValues=this.ticks.slice(),n.prototype.convertTicksToLabels.call(this)},getLabelForIndex:function(t,e){return+this.getRightValue(this.chart.data.datasets[e].data[t])},getPixelForTick:function(t){return this.getPixelForValue(this.tickValues[t])},_getFirstTickValue:function(t){var e=Math.floor(h.log10(t));return Math.floor(t/Math.pow(10,e))*Math.pow(10,e)},getPixelForValue:function(t){var e,i,n,a,o,r=this,s=r.options.ticks.reverse,l=h.log10,u=r._getFirstTickValue(r.minNotZero),d=0;return t=+r.getRightValue(t),o=s?(n=r.end,a=r.start,-1):(n=r.start,a=r.end,1),i=r.isHorizontal()?(e=r.width,s?r.right:r.left):(e=r.height,o*=-1,s?r.top:r.bottom),t!==n&&(0===n&&(e-=d=h.getValueOrDefault(r.options.ticks.fontSize,c.defaults.global.defaultFontSize),n=u),0!==t&&(d+=e/(l(a)-l(n))*(l(t)-l(n))),i+=o*d),i},getValueForPixel:function(t){var e,i,n,a,o=this,r=o.options.ticks.reverse,s=h.log10,l=o._getFirstTickValue(o.minNotZero);if(n=r?(i=o.end,o.start):(i=o.start,o.end),(a=o.isHorizontal()?(e=o.width,r?o.right-t:t-o.left):(e=o.height,r?t-o.top:o.bottom-t))!==i){if(0===i){var u=h.getValueOrDefault(o.options.ticks.fontSize,c.defaults.global.defaultFontSize);a-=u,e-=u,i=l}a*=s(n)-s(i),a/=e,a=Math.pow(10,s(i)+a)}return a}});a.registerScaleType("logarithmic",e,t)}},{33:33,34:34,35:35,46:46}],58:[function(t,e,i){"use strict";var n=t(26),k=t(46),a=t(34),o=t(35);e.exports=function(e){var v=n.global,t={display:!0,animate:!0,position:"chartArea",angleLines:{display:!0,color:"rgba(0, 0, 0, 0.1)",lineWidth:1},gridLines:{circular:!1},ticks:{showLabelBackdrop:!0,backdropColor:"rgba(255,255,255,0.75)",backdropPaddingY:2,backdropPaddingX:2,callback:o.formatters.linear},pointLabels:{display:!0,fontSize:10,callback:function(t){return t}}};function b(t){var e=t.options;return e.angleLines.display||e.pointLabels.display?t.chart.data.labels.length:0}function x(t){var e=t.options.pointLabels,i=k.valueOrDefault(e.fontSize,v.defaultFontSize),n=k.valueOrDefault(e.fontStyle,v.defaultFontStyle),a=k.valueOrDefault(e.fontFamily,v.defaultFontFamily);return{size:i,style:n,family:a,font:k.fontString(i,n,a)}}function m(t,e,i,n,a){return t===n||t===a?{start:e-i/2,end:e+i/2}:t<n||a<t?{start:e-i-5,end:e}:{start:e,end:e+i+5}}function y(t,e,i,n){if(k.isArray(e))for(var a=i.y,o=1.5*n,r=0;r<e.length;++r)t.fillText(e[r],i.x,a),a+=o;else t.fillText(e,i.x,i.y)}function s(t){return k.isNumber(t)?t:0}var i=e.LinearScaleBase.extend({setDimensions:function(){var t=this,e=t.options,i=e.ticks;t.width=t.maxWidth,t.height=t.maxHeight,t.xCenter=Math.round(t.width/2),t.yCenter=Math.round(t.height/2);var n=k.min([t.height,t.width]),a=k.valueOrDefault(i.fontSize,v.defaultFontSize);t.drawingArea=e.display?n/2-(a/2+i.backdropPaddingY):n/2},determineDataLimits:function(){var a=this,i=a.chart,o=Number.POSITIVE_INFINITY,r=Number.NEGATIVE_INFINITY;k.each(i.data.datasets,function(t,e){if(i.isDatasetVisible(e)){var n=i.getDatasetMeta(e);k.each(t.data,function(t,e){var i=+a.getRightValue(t);isNaN(i)||n.data[e].hidden||(o=Math.min(i,o),r=Math.max(i,r))})}}),a.min=o===Number.POSITIVE_INFINITY?0:o,a.max=r===Number.NEGATIVE_INFINITY?0:r,a.handleTickRangeOptions()},getTickLimit:function(){var t=this.options.ticks,e=k.valueOrDefault(t.fontSize,v.defaultFontSize);return Math.min(t.maxTicksLimit?t.maxTicksLimit:11,Math.ceil(this.drawingArea/(1.5*e)))},convertTicksToLabels:function(){var t=this;e.LinearScaleBase.prototype.convertTicksToLabels.call(t),t.pointLabels=t.chart.data.labels.map(t.options.pointLabels.callback,t)},getLabelForIndex:function(t,e){return+this.getRightValue(this.chart.data.datasets[e].data[t])},fit:function(){var t,e;this.options.pointLabels.display?function(t){var e,i,n,a=x(t),o=Math.min(t.height/2,t.width/2),r={r:t.width,l:0,t:t.height,b:0},s={};t.ctx.font=a.font,t._pointLabelSizes=[];var l,u,d,c=b(t);for(e=0;e<c;e++){n=t.getPointPosition(e,o),l=t.ctx,u=a.size,d=t.pointLabels[e]||"",i=k.isArray(d)?{w:k.longestText(l,l.font,d),h:d.length*u+1.5*(d.length-1)*u}:{w:l.measureText(d).width,h:u},t._pointLabelSizes[e]=i;var h=t.getIndexAngle(e),f=k.toDegrees(h)%360,g=m(f,n.x,i.w,0,180),p=m(f,n.y,i.h,90,270);g.start<r.l&&(r.l=g.start,s.l=h),g.end>r.r&&(r.r=g.end,s.r=h),p.start<r.t&&(r.t=p.start,s.t=h),p.end>r.b&&(r.b=p.end,s.b=h)}t.setReductions(o,r,s)}(this):(t=this,e=Math.min(t.height/2,t.width/2),t.drawingArea=Math.round(e),t.setCenterPoint(0,0,0,0))},setReductions:function(t,e,i){var n=e.l/Math.sin(i.l),a=Math.max(e.r-this.width,0)/Math.sin(i.r),o=-e.t/Math.cos(i.t),r=-Math.max(e.b-this.height,0)/Math.cos(i.b);n=s(n),a=s(a),o=s(o),r=s(r),this.drawingArea=Math.min(Math.round(t-(n+a)/2),Math.round(t-(o+r)/2)),this.setCenterPoint(n,a,o,r)},setCenterPoint:function(t,e,i,n){var a=this,o=a.width-e-a.drawingArea,r=t+a.drawingArea,s=i+a.drawingArea,l=a.height-n-a.drawingArea;a.xCenter=Math.round((r+o)/2+a.left),a.yCenter=Math.round((s+l)/2+a.top)},getIndexAngle:function(t){return t*(2*Math.PI/b(this))+(this.chart.options&&this.chart.options.startAngle?this.chart.options.startAngle:0)*Math.PI*2/360},getDistanceFromCenterForValue:function(t){var e=this;if(null===t)return 0;var i=e.drawingArea/(e.max-e.min);return e.options.ticks.reverse?(e.max-t)*i:(t-e.min)*i},getPointPosition:function(t,e){var i=this.getIndexAngle(t)-Math.PI/2;return{x:Math.round(Math.cos(i)*e)+this.xCenter,y:Math.round(Math.sin(i)*e)+this.yCenter}},getPointPositionForValue:function(t,e){return this.getPointPosition(t,this.getDistanceFromCenterForValue(e))},getBasePosition:function(){var t=this.min,e=this.max;return this.getPointPositionForValue(0,this.beginAtZero?0:t<0&&e<0?e:0<t&&0<e?t:0)},draw:function(){var o=this,t=o.options,r=t.gridLines,s=t.ticks,l=k.valueOrDefault;if(t.display){var u=o.ctx,d=this.getIndexAngle(0),c=l(s.fontSize,v.defaultFontSize),e=l(s.fontStyle,v.defaultFontStyle),i=l(s.fontFamily,v.defaultFontFamily),h=k.fontString(c,e,i);k.each(o.ticks,function(t,e){if(0<e||s.reverse){var i=o.getDistanceFromCenterForValue(o.ticksAsNumbers[e]);if(r.display&&0!==e&&function(t,e,i,n){var a=t.ctx;if(a.strokeStyle=k.valueAtIndexOrDefault(e.color,n-1),a.lineWidth=k.valueAtIndexOrDefault(e.lineWidth,n-1),t.options.gridLines.circular)a.beginPath(),a.arc(t.xCenter,t.yCenter,i,0,2*Math.PI),a.closePath(),a.stroke();else{var o=b(t);if(0===o)return;a.beginPath();var r=t.getPointPosition(0,i);a.moveTo(r.x,r.y);for(var s=1;s<o;s++)r=t.getPointPosition(s,i),a.lineTo(r.x,r.y);a.closePath(),a.stroke()}}(o,r,i,e),s.display){var n=l(s.fontColor,v.defaultFontColor);if(u.font=h,u.save(),u.translate(o.xCenter,o.yCenter),u.rotate(d),s.showLabelBackdrop){var a=u.measureText(t).width;u.fillStyle=s.backdropColor,u.fillRect(-a/2-s.backdropPaddingX,-i-c/2-s.backdropPaddingY,a+2*s.backdropPaddingX,c+2*s.backdropPaddingY)}u.textAlign="center",u.textBaseline="middle",u.fillStyle=n,u.fillText(t,0,-i),u.restore()}}}),(t.angleLines.display||t.pointLabels.display)&&function(t){var e=t.ctx,i=t.options,n=i.angleLines,a=i.pointLabels;e.lineWidth=n.lineWidth,e.strokeStyle=n.color;var o,r,s,l,u=t.getDistanceFromCenterForValue(i.ticks.reverse?t.min:t.max),d=x(t);e.textBaseline="top";for(var c=b(t)-1;0<=c;c--){if(n.display){var h=t.getPointPosition(c,u);e.beginPath(),e.moveTo(t.xCenter,t.yCenter),e.lineTo(h.x,h.y),e.stroke(),e.closePath()}if(a.display){var f=t.getPointPosition(c,u+5),g=k.valueAtIndexOrDefault(a.fontColor,c,v.defaultFontColor);e.font=d.font,e.fillStyle=g;var p=t.getIndexAngle(c),m=k.toDegrees(p);e.textAlign=0===(l=m)||180===l?"center":l<180?"left":"right",o=m,r=t._pointLabelSizes[c],s=f,90===o||270===o?s.y-=r.h/2:(270<o||o<90)&&(s.y-=r.h),y(e,t.pointLabels[c]||"",f,d.size)}}}(o)}}});a.registerScaleType("radialLinear",i,t)}},{26:26,34:34,35:35,46:46}],59:[function(t,e,i){"use strict";var x=t(1);x="function"==typeof x?x:window.moment;var r=t(26),m=t(46),n=t(33),a=t(34),p=Number.MIN_SAFE_INTEGER||-9007199254740991,v=Number.MAX_SAFE_INTEGER||9007199254740991,y={millisecond:{common:!0,size:1,steps:[1,2,5,10,20,50,100,250,500]},second:{common:!0,size:1e3,steps:[1,2,5,10,15,30]},minute:{common:!0,size:6e4,steps:[1,2,5,10,15,30]},hour:{common:!0,size:36e5,steps:[1,2,3,6,12]},day:{common:!0,size:864e5,steps:[1,2,5]},week:{common:!1,size:6048e5,steps:[1,2,3,4]},month:{common:!0,size:2628e6,steps:[1,2,3]},quarter:{common:!1,size:7884e6,steps:[1,2,3,4]},year:{common:!0,size:3154e7}},k=Object.keys(y);function b(t,e){return t-e}function M(t){var e,i,n,a={},o=[];for(e=0,i=t.length;e<i;++e)a[n=t[e]]||(a[n]=!0,o.push(n));return o}function w(t,e,i,n){var a=function(t,e,i){for(var n,a,o,r=0,s=t.length-1;0<=r&&r<=s;){if(a=t[(n=r+s>>1)-1]||null,o=t[n],!a)return{lo:null,hi:o};if(o[e]<i)r=n+1;else{if(!(a[e]>i))return{lo:a,hi:o};s=n-1}}return{lo:o,hi:null}}(t,e,i),o=a.lo?a.hi?a.lo:t[t.length-2]:t[0],r=a.lo?a.hi?a.hi:t[t.length-1]:t[1],s=r[e]-o[e],l=s?(i-o[e])/s:0,u=(r[n]-o[n])*l;return o[n]+u}function C(t,e){var i=e.parser,n=e.parser||e.format;return"function"==typeof i?i(t):"string"==typeof t&&"string"==typeof n?x(t,n):(t instanceof x||(t=x(t)),t.isValid()?t:"function"==typeof n?n(t):t)}function S(t,e){if(m.isNullOrUndef(t))return null;var i=e.options.time,n=C(e.getRightValue(t),i);return n.isValid()?(i.round&&n.startOf(i.round),n.valueOf()):null}function _(t){for(var e=k.indexOf(t)+1,i=k.length;e<i;++e)if(y[k[e]].common)return k[e]}function D(t,e,i,n){var a,o=n.time,r=o.unit||function(t,e,i,n){var a,o,r,s=k.length;for(a=k.indexOf(t);a<s-1;++a)if(r=(o=y[k[a]]).steps?o.steps[o.steps.length-1]:v,o.common&&Math.ceil((i-e)/(r*o.size))<=n)return k[a];return k[s-1]}(o.minUnit,t,e,i),s=_(r),l=m.valueOrDefault(o.stepSize,o.unitStepSize),u="week"===r&&o.isoWeekday,d=n.ticks.major.enabled,c=y[r],h=x(t),f=x(e),g=[];for(l||(l=function(t,e,i,n){var a,o,r,s=e-t,l=y[i],u=l.size,d=l.steps;if(!d)return Math.ceil(s/(n*u));for(a=0,o=d.length;a<o&&(r=d[a],!(Math.ceil(s/(u*r))<=n));++a);return r}(t,e,r,i)),u&&(h=h.isoWeekday(u),f=f.isoWeekday(u)),h=h.startOf(u?"day":r),(f=f.startOf(u?"day":r))<e&&f.add(1,r),a=x(h),d&&s&&!u&&!o.round&&(a.startOf(s),a.add(~~((h-a)/(c.size*l))*l,r));a<f;a.add(l,r))g.push(+a);return g.push(+a),g}e.exports=function(){var t=n.extend({initialize:function(){if(!x)throw new Error("Chart.js - Moment.js could not be found! You must include it before Chart.js to use the time scale. Download at https://momentjs.com");this.mergeTicksOptions(),n.prototype.initialize.call(this)},update:function(){var t=this.options;return t.time&&t.time.format&&console.warn("options.time.format is deprecated and replaced by options.time.parser."),n.prototype.update.apply(this,arguments)},getRightValue:function(t){return t&&void 0!==t.t&&(t=t.t),n.prototype.getRightValue.call(this,t)},determineDataLimits:function(){var t,e,i,n,a,o,r=this,s=r.chart,l=r.options.time,u=l.unit||"day",d=v,c=p,h=[],f=[],g=[];for(t=0,i=s.data.labels.length;t<i;++t)g.push(S(s.data.labels[t],r));for(t=0,i=(s.data.datasets||[]).length;t<i;++t)if(s.isDatasetVisible(t))if(a=s.data.datasets[t].data,m.isObject(a[0]))for(f[t]=[],e=0,n=a.length;e<n;++e)o=S(a[e],r),h.push(o),f[t][e]=o;else h.push.apply(h,g),f[t]=g.slice(0);else f[t]=[];g.length&&(g=M(g).sort(b),d=Math.min(d,g[0]),c=Math.max(c,g[g.length-1])),h.length&&(h=M(h).sort(b),d=Math.min(d,h[0]),c=Math.max(c,h[h.length-1])),d=S(l.min,r)||d,c=S(l.max,r)||c,d=d===v?+x().startOf(u):d,c=c===p?+x().endOf(u)+1:c,r.min=Math.min(d,c),r.max=Math.max(d+1,c),r._horizontal=r.isHorizontal(),r._table=[],r._timestamps={data:h,datasets:f,labels:g}},buildTicks:function(){var t,e,i,n,a,o,r,s,l,u,d,c,h=this,f=h.min,g=h.max,p=h.options,m=p.time,v=[],b=[];switch(p.ticks.source){case"data":v=h._timestamps.data;break;case"labels":v=h._timestamps.labels;break;case"auto":default:v=D(f,g,h.getLabelCapacity(f),p)}for("ticks"===p.bounds&&v.length&&(f=v[0],g=v[v.length-1]),f=S(m.min,h)||f,g=S(m.max,h)||g,t=0,e=v.length;t<e;++t)f<=(i=v[t])&&i<=g&&b.push(i);return h.min=f,h.max=g,h._unit=m.unit||function(t,e,i,n){var a,o,r=x.duration(x(n).diff(x(i)));for(a=k.length-1;a>=k.indexOf(e);a--)if(o=k[a],y[o].common&&r.as(o)>=t.length)return o;return k[e?k.indexOf(e):0]}(b,m.minUnit,h.min,h.max),h._majorUnit=_(h._unit),h._table=function(t,e,i,n){if("linear"===n||!t.length)return[{time:e,pos:0},{time:i,pos:1}];var a,o,r,s,l,u=[],d=[e];for(a=0,o=t.length;a<o;++a)e<(s=t[a])&&s<i&&d.push(s);for(d.push(i),a=0,o=d.length;a<o;++a)l=d[a+1],r=d[a-1],s=d[a],void 0!==r&&void 0!==l&&Math.round((l+r)/2)===s||u.push({time:s,pos:a/(o-1)});return u}(h._timestamps.data,f,g,p.distribution),h._offsets=(n=h._table,a=b,o=f,r=g,c=d=0,(s=p).offset&&a.length&&(s.time.min||(l=1<a.length?a[1]:r,u=a[0],d=(w(n,"time",l,"pos")-w(n,"time",u,"pos"))/2),s.time.max||(l=a[a.length-1],u=1<a.length?a[a.length-2]:o,c=(w(n,"time",l,"pos")-w(n,"time",u,"pos"))/2)),{left:d,right:c}),h._labelFormat=function(t,e){var i,n,a,o=t.length;for(i=0;i<o;i++){if(0!==(n=C(t[i],e)).millisecond())return"MMM D, YYYY h:mm:ss.SSS a";0===n.second()&&0===n.minute()&&0===n.hour()||(a=!0)}return a?"MMM D, YYYY h:mm:ss a":"MMM D, YYYY"}(h._timestamps.data,m),function(t,e){var i,n,a,o,r=[];for(i=0,n=t.length;i<n;++i)a=t[i],o=!!e&&a===+x(a).startOf(e),r.push({value:a,major:o});return r}(b,h._majorUnit)},getLabelForIndex:function(t,e){var i=this.chart.data,n=this.options.time,a=i.labels&&t<i.labels.length?i.labels[t]:"",o=i.datasets[e].data[t];return m.isObject(o)&&(a=this.getRightValue(o)),n.tooltipFormat?C(a,n).format(n.tooltipFormat):"string"==typeof a?a:C(a,n).format(this._labelFormat)},tickFormatFunction:function(t,e,i,n){var a=this.options,o=t.valueOf(),r=a.time.displayFormats,s=r[this._unit],l=this._majorUnit,u=r[l],d=t.clone().startOf(l).valueOf(),c=a.ticks.major,h=c.enabled&&l&&u&&o===d,f=t.format(n||(h?u:s)),g=h?c:a.ticks.minor,p=m.valueOrDefault(g.callback,g.userCallback);return p?p(f,e,i):f},convertTicksToLabels:function(t){var e,i,n=[];for(e=0,i=t.length;e<i;++e)n.push(this.tickFormatFunction(x(t[e].value),e,t));return n},getPixelForOffset:function(t){var e=this,i=e._horizontal?e.width:e.height,n=e._horizontal?e.left:e.top,a=w(e._table,"time",t,"pos");return n+i*(e._offsets.left+a)/(e._offsets.left+1+e._offsets.right)},getPixelForValue:function(t,e,i){var n=null;if(void 0!==e&&void 0!==i&&(n=this._timestamps.datasets[i][e]),null===n&&(n=S(t,this)),null!==n)return this.getPixelForOffset(n)},getPixelForTick:function(t){var e=this.getTicks();return 0<=t&&t<e.length?this.getPixelForOffset(e[t].value):null},getValueForPixel:function(t){var e=this,i=e._horizontal?e.width:e.height,n=e._horizontal?e.left:e.top,a=(i?(t-n)/i:0)*(e._offsets.left+1+e._offsets.left)-e._offsets.right,o=w(e._table,"pos",a,"time");return x(o)},getLabelWidth:function(t){var e=this.options.ticks,i=this.ctx.measureText(t).width,n=m.toRadians(e.maxRotation),a=Math.cos(n),o=Math.sin(n);return i*a+m.valueOrDefault(e.fontSize,r.global.defaultFontSize)*o},getLabelCapacity:function(t){var e=this.options.time.displayFormats.millisecond,i=this.tickFormatFunction(x(t),0,[],e),n=this.getLabelWidth(i),a=this.isHorizontal()?this.width:this.height,o=Math.floor(a/n);return 0<o?o:1}});a.registerScaleType("time",t,{position:"bottom",distribution:"linear",bounds:"data",time:{parser:!1,format:!1,unit:!1,round:!1,displayFormat:!1,isoWeekday:!1,minUnit:"millisecond",displayFormats:{millisecond:"h:mm:ss.SSS a",second:"h:mm:ss a",minute:"h:mm a",hour:"hA",day:"MMM D",week:"ll",month:"MMM YYYY",quarter:"[Q]Q - YYYY",year:"YYYY"}},ticks:{autoSkip:!1,source:"auto",major:{enabled:!1}}})}},{1:1,26:26,33:33,34:34,46:46}]},{},[7])(7)});;define('chart.js', ['chart.js/Chart.min'], function (main) { return main; });
 
-define('aurelia-chart/index',["exports", "./observers/model-observer"], function (exports, _observersModelObserver) {
+define('aurelia-dialog/aurelia-dialog',["require", "exports", "./dialog-configuration", "./dialog-settings", "./dialog-configuration", "./renderer", "./dialog-cancel-error", "./dialog-service", "./dialog-controller"], function (require, exports, dialog_configuration_1, dialog_settings_1, dialog_configuration_2, renderer_1, dialog_cancel_error_1, dialog_service_1, dialog_controller_1) {
     "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
+    function __export(m) {
+        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+    }
+    Object.defineProperty(exports, "__esModule", { value: true });
+    function configure(frameworkConfig, callback) {
+        var applyConfig = null;
+        var config = new dialog_configuration_1.DialogConfiguration(frameworkConfig, function (apply) { applyConfig = apply; });
+        if (typeof callback === 'function') {
+            callback(config);
+        }
+        else {
+            config.useDefaults();
+        }
+        return applyConfig();
+    }
     exports.configure = configure;
+    __export(dialog_settings_1);
+    __export(dialog_configuration_2);
+    __export(renderer_1);
+    __export(dialog_cancel_error_1);
+    __export(dialog_service_1);
+    __export(dialog_controller_1);
+});
+;define('aurelia-dialog', ['aurelia-dialog/aurelia-dialog'], function (main) { return main; });
 
-    function configure(aurelia) {
-        aurelia.globalResources("./elements/chart-element", "./attributes/chart-attribute");
-
-        aurelia.container.registerTransient(_observersModelObserver.ModelObserver);
-    }
-});;define('aurelia-chart', ['aurelia-chart/index'], function (main) { return main; });
-
-define('aurelia-chart/observers/model-observer',["exports", "aurelia-framework"], function (exports, _aureliaFramework) {
+define('aurelia-dialog/resources/attach-focus',["require", "exports", "aurelia-pal"], function (require, exports, aurelia_pal_1) {
     "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-
-    var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-    function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-    var ModelObserver = (function () {
-        function ModelObserver(bindingEngine, observerLocator) {
-            var _this = this;
-
-            _classCallCheck(this, _ModelObserver);
-
-            this.throttle = 100;
-            this._throttleTimeout = 0;
-            this._activeSubscriptions = [];
-
-            this.observe = function (model, onChange) {
-                var subscriptions = [];
-                _this._getAllSubscriptions(model, subscriptions);
-
-                var throttledHandler = function throttledHandler(args) {
-                    if (_this.throttle <= 0) {
-                        return onChange();
-                    }
-
-                    if (!_this._throttleTimeout) {
-                        _this._throttleTimeout = setTimeout(function () {
-                            _this._throttleTimeout = null;
-                            onChange();
-                        }, _this.throttle);
-                    }
-                };
-
-                for (var i = 0; i < subscriptions.length; i++) {
-                    var outstandingSubscription = subscriptions[i](throttledHandler);
-                    _this._activeSubscriptions.push(outstandingSubscription);
-                }
-            };
-
-            this.unsubscribe = function () {
-                for (var i = 0; i < _this._activeSubscriptions.length; i++) {
-                    _this._activeSubscriptions[i].dispose();
-                }
-
-                _this._activeSubscriptions = [];
-            };
-
-            this.bindingEngine = bindingEngine;
-            this.observerLocator = observerLocator;
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var AttachFocus = /** @class */ (function () {
+        function AttachFocus(element) {
+            this.element = element;
+            this.value = true;
         }
-
-        _createClass(ModelObserver, [{
-            key: "_getObjectType",
-            value: function _getObjectType(obj) {
-                if (obj && typeof obj === "object" && obj.constructor == new Date().constructor) return "date";
-                return typeof obj;
-            }
-        }, {
-            key: "_getAllSubscriptions",
-            value: function _getAllSubscriptions(model, subscriptions) {
-                var _this2 = this;
-
-                if (Array.isArray(model)) {
-                    var subscription = this.bindingEngine.collectionObserver(model).subscribe;
-                    subscriptions.push(subscription);
-                }
-
-                for (var property in model) {
-                    var typeOfData = this._getObjectType(model[property]);
-                    switch (typeOfData) {
-                        case "object":
-                            {
-                                this._getAllSubscriptions(model[property], subscriptions);
-                            }
-                            break;
-                        case "array":
-                            {
-                                var underlyingArray = model[property]();
-                                underlyingArray.forEach(function (entry, index) {
-                                    _this2._getAllSubscriptions(underlyingArray[index], subscriptions);
-                                });
-
-                                var arraySubscription = this.bindingEngine.propertyObserver(model, property).subscribe;
-                                if (arraySubscription) {
-                                    subscriptions.push(arraySubscription);
-                                }
-                            }
-                            break;
-
-                        default:
-                            {
-                                var subscription = this.bindingEngine.propertyObserver(model, property).subscribe;
-                                if (subscription) {
-                                    subscriptions.push(subscription);
-                                }
-                            }
-                            break;
-                    }
-                }
-            }
-        }]);
-
-        var _ModelObserver = ModelObserver;
-        ModelObserver = (0, _aureliaFramework.inject)(_aureliaFramework.BindingEngine)(ModelObserver) || ModelObserver;
-        return ModelObserver;
-    })();
-
-    exports.ModelObserver = ModelObserver;
-});
-define('text!aurelia-chart/elements/chart-element.html', ['module'], function(module) { module.exports = "<template>\r\n    <canvas ref=\"canvasElement\"></canvas>\r\n</template>"; });
-define('aurelia-chart/elements/chart-element',["exports", "aurelia-framework", "../observers/model-observer", "chart.js"], function (exports, _aureliaFramework, _observersModelObserver, _chartJs) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _createDecoratedClass = (function () { function defineProperties(target, descriptors, initializers) { for (var i = 0; i < descriptors.length; i++) { var descriptor = descriptors[i]; var decorators = descriptor.decorators; var key = descriptor.key; delete descriptor.key; delete descriptor.decorators; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor || descriptor.initializer) descriptor.writable = true; if (decorators) { for (var f = 0; f < decorators.length; f++) { var decorator = decorators[f]; if (typeof decorator === "function") { descriptor = decorator(target, key, descriptor) || descriptor; } else { throw new TypeError("The decorator for method " + descriptor.key + " is of the invalid type " + typeof decorator); } } if (descriptor.initializer !== undefined) { initializers[key] = descriptor; continue; } } Object.defineProperty(target, key, descriptor); } } return function (Constructor, protoProps, staticProps, protoInitializers, staticInitializers) { if (protoProps) defineProperties(Constructor.prototype, protoProps, protoInitializers); if (staticProps) defineProperties(Constructor, staticProps, staticInitializers); return Constructor; }; })();
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-  function _defineDecoratedPropertyDescriptor(target, key, descriptors) { var _descriptor = descriptors[key]; if (!_descriptor) return; var descriptor = {}; for (var _key in _descriptor) descriptor[_key] = _descriptor[_key]; descriptor.value = descriptor.initializer ? descriptor.initializer.call(target) : undefined; Object.defineProperty(target, key, descriptor); }
-
-  var _Chart = _interopRequireDefault(_chartJs);
-
-  var ChartElement = (function () {
-    var _instanceInitializers = {};
-    var _instanceInitializers = {};
-
-    _createDecoratedClass(ChartElement, [{
-      key: "type",
-      decorators: [_aureliaFramework.bindable],
-      initializer: null,
-      enumerable: true
-    }, {
-      key: "data",
-      decorators: [_aureliaFramework.bindable],
-      initializer: null,
-      enumerable: true
-    }, {
-      key: "shouldUpdate",
-      decorators: [_aureliaFramework.bindable],
-      initializer: null,
-      enumerable: true
-    }, {
-      key: "throttle",
-      decorators: [_aureliaFramework.bindable],
-      initializer: null,
-      enumerable: true
-    }, {
-      key: "nativeOptions",
-      decorators: [(0, _aureliaFramework.bindable)({ defaultBindingMode: _aureliaFramework.bindingMode.twoWay })],
-      initializer: function initializer() {
-        return {};
-      },
-      enumerable: true
-    }, {
-      key: "canvasElement",
-      decorators: [_aureliaFramework.bindable],
-      initializer: null,
-      enumerable: true
-    }], null, _instanceInitializers);
-
-    function ChartElement(modelObserver) {
-      var _this = this;
-
-      _classCallCheck(this, _ChartElement);
-
-      _defineDecoratedPropertyDescriptor(this, "type", _instanceInitializers);
-
-      _defineDecoratedPropertyDescriptor(this, "data", _instanceInitializers);
-
-      _defineDecoratedPropertyDescriptor(this, "shouldUpdate", _instanceInitializers);
-
-      _defineDecoratedPropertyDescriptor(this, "throttle", _instanceInitializers);
-
-      _defineDecoratedPropertyDescriptor(this, "nativeOptions", _instanceInitializers);
-
-      _defineDecoratedPropertyDescriptor(this, "canvasElement", _instanceInitializers);
-
-      this._isSetup = false;
-
-      this.propertyChanged = function (propertyName, newValue, oldValue) {
-        if (_this._isSetup && _this._isObserving) {
-          _this.refreshChart();
-          _this._modelObserver.unsubscribe();
-          _this.subscribeToChanges();
-        }
-      };
-
-      this.refreshChart = function () {
-        _this._chartData.data = _this._clonedData;
-        _this._activeChart.update();
-        _this._activeChart.resize();
-      };
-
-      this._modelObserver = modelObserver;
-    }
-
-    _createDecoratedClass(ChartElement, [{
-      key: "attached",
-      value: function attached() {
-        this.createChart();
-        this._isSetup = true;
-
-        if (this._isObserving) {
-          this.subscribeToChanges();
-        }
-      }
-    }, {
-      key: "detached",
-      value: function detached() {
-        if (this._isObserving) {
-          this._modelObserver.unsubscribe();
-        }
-
-        this._activeChart.destroy();
-        this._isSetup = false;
-      }
-    }, {
-      key: "createChart",
-      value: function createChart() {
-        this._chartData = {
-          type: this.type,
-          data: this._clonedData,
-          options: this.nativeOptions
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        AttachFocus.inject = function () {
+            return [aurelia_pal_1.DOM.Element];
         };
-
-        this._activeChart = new _Chart["default"](this.canvasElement, this._chartData);
-        this.nativeOptions = this._activeChart.options;
-        this.refreshChart();
-      }
-    }, {
-      key: "subscribeToChanges",
-      value: function subscribeToChanges() {
-        this._modelObserver.throttle = this.throttle || 100;
-        this._modelObserver.observe(this.data.datasets, this.refreshChart);
-      }
-    }, {
-      key: "_isObserving",
-      get: function get() {
-        return this.shouldUpdate == true || this.shouldUpdate == "true";
-      }
-    }, {
-      key: "_clonedData",
-      get: function get() {
-        return JSON.parse(JSON.stringify(this.data));
-      }
-    }], null, _instanceInitializers);
-
-    var _ChartElement = ChartElement;
-    ChartElement = (0, _aureliaFramework.useView)("./chart-element.html")(ChartElement) || ChartElement;
-    ChartElement = (0, _aureliaFramework.inject)(_observersModelObserver.ModelObserver)(ChartElement) || ChartElement;
-    ChartElement = (0, _aureliaFramework.customElement)('chart')(ChartElement) || ChartElement;
-    return ChartElement;
-  })();
-
-  exports.ChartElement = ChartElement;
-});
-define('aurelia-chart/attributes/chart-attribute',["exports", "aurelia-framework", "../observers/model-observer", "chart.js"], function (exports, _aureliaFramework, _observersModelObserver, _chartJs) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _createDecoratedClass = (function () { function defineProperties(target, descriptors, initializers) { for (var i = 0; i < descriptors.length; i++) { var descriptor = descriptors[i]; var decorators = descriptor.decorators; var key = descriptor.key; delete descriptor.key; delete descriptor.decorators; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor || descriptor.initializer) descriptor.writable = true; if (decorators) { for (var f = 0; f < decorators.length; f++) { var decorator = decorators[f]; if (typeof decorator === "function") { descriptor = decorator(target, key, descriptor) || descriptor; } else { throw new TypeError("The decorator for method " + descriptor.key + " is of the invalid type " + typeof decorator); } } if (descriptor.initializer !== undefined) { initializers[key] = descriptor; continue; } } Object.defineProperty(target, key, descriptor); } } return function (Constructor, protoProps, staticProps, protoInitializers, staticInitializers) { if (protoProps) defineProperties(Constructor.prototype, protoProps, protoInitializers); if (staticProps) defineProperties(Constructor, staticProps, staticInitializers); return Constructor; }; })();
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-  function _defineDecoratedPropertyDescriptor(target, key, descriptors) { var _descriptor = descriptors[key]; if (!_descriptor) return; var descriptor = {}; for (var _key in _descriptor) descriptor[_key] = _descriptor[_key]; descriptor.value = descriptor.initializer ? descriptor.initializer.call(target) : undefined; Object.defineProperty(target, key, descriptor); }
-
-  var _Chart = _interopRequireDefault(_chartJs);
-
-  var ChartAttribute = (function () {
-    var _instanceInitializers = {};
-    var _instanceInitializers = {};
-
-    _createDecoratedClass(ChartAttribute, [{
-      key: "type",
-      decorators: [_aureliaFramework.bindable],
-      initializer: null,
-      enumerable: true
-    }, {
-      key: "data",
-      decorators: [_aureliaFramework.bindable],
-      initializer: null,
-      enumerable: true
-    }, {
-      key: "shouldUpdate",
-      decorators: [_aureliaFramework.bindable],
-      initializer: null,
-      enumerable: true
-    }, {
-      key: "throttle",
-      decorators: [_aureliaFramework.bindable],
-      initializer: null,
-      enumerable: true
-    }, {
-      key: "nativeOptions",
-      decorators: [(0, _aureliaFramework.bindable)({ defaultBindingMode: _aureliaFramework.bindingMode.twoWay })],
-      initializer: function initializer() {
-        return {};
-      },
-      enumerable: true
-    }], null, _instanceInitializers);
-
-    function ChartAttribute(element, modelObserver) {
-      var _this = this;
-
-      _classCallCheck(this, _ChartAttribute);
-
-      _defineDecoratedPropertyDescriptor(this, "type", _instanceInitializers);
-
-      _defineDecoratedPropertyDescriptor(this, "data", _instanceInitializers);
-
-      _defineDecoratedPropertyDescriptor(this, "shouldUpdate", _instanceInitializers);
-
-      _defineDecoratedPropertyDescriptor(this, "throttle", _instanceInitializers);
-
-      _defineDecoratedPropertyDescriptor(this, "nativeOptions", _instanceInitializers);
-
-      this._isSetup = false;
-
-      this.propertyChanged = function (propertyName, newValue, oldValue) {
-        if (_this._isSetup && _this._isObserving) {
-          _this.refreshChart();
-          _this._modelObserver.unsubscribe();
-          _this.subscribeToChanges();
-        }
-      };
-
-      this.refreshChart = function () {
-        _this._chartData.data = _this._clonedData;
-        _this._activeChart.update();
-        _this._activeChart.resize();
-      };
-
-      this.element = element;
-      this._modelObserver = modelObserver;
-    }
-
-    _createDecoratedClass(ChartAttribute, [{
-      key: "attached",
-      value: function attached() {
-        this.createChart();
-        this._isSetup = true;
-
-        if (this._isObserving) {
-          this.subscribeToChanges();
-        }
-      }
-    }, {
-      key: "detached",
-      value: function detached() {
-        if (this.shouldUpdate == true) {
-          this._modelObserver.unsubscribe();
-        }
-
-        this._activeChart.destroy();
-
-        this._isSetup = false;
-      }
-    }, {
-      key: "createChart",
-      value: function createChart() {
-        this._chartData = {
-          type: this.type,
-          data: this._clonedData,
-          options: this.nativeOptions
+        AttachFocus.prototype.attached = function () {
+            if (this.value === '' || (this.value && this.value !== 'false')) {
+                this.element.focus();
+            }
         };
-
-        this._activeChart = new _Chart["default"](this.element, this._chartData);
-        this.nativeOptions = this._activeChart.options;
-        this.refreshChart();
-      }
-    }, {
-      key: "subscribeToChanges",
-      value: function subscribeToChanges() {
-        this._modelObserver.throttle = this.throttle || 100;
-        this._modelObserver.observe(this.data, this.refreshChart);
-      }
-    }, {
-      key: "_isObserving",
-      get: function get() {
-        return this.shouldUpdate == true || this.shouldUpdate == "true";
-      }
-    }, {
-      key: "_clonedData",
-      get: function get() {
-        return JSON.parse(JSON.stringify(this.data));
-      }
-    }], null, _instanceInitializers);
-
-    var _ChartAttribute = ChartAttribute;
-    ChartAttribute = (0, _aureliaFramework.inject)(Element, _observersModelObserver.ModelObserver)(ChartAttribute) || ChartAttribute;
-    ChartAttribute = (0, _aureliaFramework.customAttribute)('chart')(ChartAttribute) || ChartAttribute;
-    return ChartAttribute;
-  })();
-
-  exports.ChartAttribute = ChartAttribute;
+        /**
+         * @internal
+         */
+        AttachFocus.$resource = {
+            type: 'attribute',
+            name: 'attach-focus'
+        };
+        return AttachFocus;
+    }());
+    exports.AttachFocus = AttachFocus;
 });
+
+define('aurelia-dialog/resources/ux-dialog-body',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var UxDialogBody = /** @class */ (function () {
+        function UxDialogBody() {
+        }
+        /**
+         * @internal
+         */
+        UxDialogBody.$view = "<template><slot></slot></template>";
+        /**
+         * @internal
+         */
+        UxDialogBody.$resource = 'ux-dialog-body';
+        return UxDialogBody;
+    }());
+    exports.UxDialogBody = UxDialogBody;
+});
+
+define('aurelia-dialog/resources/ux-dialog-footer',["require", "exports", "../dialog-controller"], function (require, exports, dialog_controller_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * View-model for footer of Dialog.
+     */
+    var UxDialogFooter = /** @class */ (function () {
+        function UxDialogFooter(controller) {
+            this.controller = controller;
+            /**
+             * @bindable
+             */
+            this.buttons = [];
+            /**
+             * @bindable
+             */
+            this.useDefaultButtons = false;
+        }
+        UxDialogFooter.isCancelButton = function (value) {
+            return value === 'Cancel';
+        };
+        UxDialogFooter.prototype.close = function (buttonValue) {
+            if (UxDialogFooter.isCancelButton(buttonValue)) {
+                this.controller.cancel(buttonValue);
+            }
+            else {
+                this.controller.ok(buttonValue);
+            }
+        };
+        UxDialogFooter.prototype.useDefaultButtonsChanged = function (newValue) {
+            if (newValue) {
+                this.buttons = ['Cancel', 'Ok'];
+            }
+        };
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        UxDialogFooter.inject = [dialog_controller_1.DialogController];
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        UxDialogFooter.$view = "<template>\n    <slot></slot>\n    <template if.bind=\"buttons.length > 0\">\n      <button type=\"button\"\n        class=\"btn btn-default\"\n        repeat.for=\"button of buttons\"\n        click.trigger=\"close(button)\">\n        ${button}\n      </button>\n    </template>\n  </template>";
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        UxDialogFooter.$resource = {
+            name: 'ux-dialog-footer',
+            bindables: ['buttons', 'useDefaultButtons']
+        };
+        return UxDialogFooter;
+    }());
+    exports.UxDialogFooter = UxDialogFooter;
+});
+
+define('aurelia-dialog/resources/ux-dialog-header',["require", "exports", "../dialog-controller"], function (require, exports, dialog_controller_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var UxDialogHeader = /** @class */ (function () {
+        function UxDialogHeader(controller) {
+            this.controller = controller;
+        }
+        UxDialogHeader.prototype.bind = function () {
+            if (typeof this.showCloseButton !== 'boolean') {
+                this.showCloseButton = !this.controller.settings.lock;
+            }
+        };
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        UxDialogHeader.inject = [dialog_controller_1.DialogController];
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        UxDialogHeader.$view = "<template>\n    <button\n      type=\"button\"\n      class=\"dialog-close\"\n      aria-label=\"Close\"\n      if.bind=\"showCloseButton\"\n      click.trigger=\"controller.cancel()\">\n      <span aria-hidden=\"true\">&times;</span>\n    </button>\n\n    <div class=\"dialog-header-content\">\n      <slot></slot>\n    </div>\n  </template>";
+        /**
+         * @internal
+         */
+        // tslint:disable-next-line:member-ordering
+        UxDialogHeader.$resource = {
+            name: 'ux-dialog-header',
+            bindables: ['showCloseButton']
+        };
+        return UxDialogHeader;
+    }());
+    exports.UxDialogHeader = UxDialogHeader;
+});
+
+define('aurelia-dialog/resources/ux-dialog',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var UxDialog = /** @class */ (function () {
+        function UxDialog() {
+        }
+        /**
+         * @internal
+         */
+        UxDialog.$view = "<template><slot></slot></template>";
+        /**
+         * @internal
+         */
+        UxDialog.$resource = 'ux-dialog';
+        return UxDialog;
+    }());
+    exports.UxDialog = UxDialog;
+});
+
 /*!
  * Bootstrap-select v1.13.5 (https://developer.snapappointments.com/bootstrap-select)
  *
@@ -73708,6 +72252,110 @@ define('aurelia-chart/attributes/chart-attribute',["exports", "aurelia-framework
 ;define('bootstrap-select', ['bootstrap-select/js/bootstrap-select'], function (main) { return main; });
 
 define('text!bootstrap-select/css/bootstrap-select.css', ['module'], function(module) { module.exports = "/*!\r\n * Bootstrap-select v1.13.5 (https://developer.snapappointments.com/bootstrap-select)\r\n *\r\n * Copyright 2012-2018 SnapAppointments, LLC\r\n * Licensed under MIT (https://github.com/snapappointments/bootstrap-select/blob/master/LICENSE)\r\n */\r\n\r\nselect.bs-select-hidden,\n.bootstrap-select > select.bs-select-hidden,\nselect.selectpicker {\n  display: none !important;\n}\n.bootstrap-select {\n  width: 220px \\0;\n  /*IE9 and below*/\n  vertical-align: middle;\n}\n.bootstrap-select > .dropdown-toggle {\n  position: relative;\n  width: 100%;\n  z-index: 1;\n  text-align: right;\n  white-space: nowrap;\n}\n.bootstrap-select > .dropdown-toggle.bs-placeholder,\n.bootstrap-select > .dropdown-toggle.bs-placeholder:hover,\n.bootstrap-select > .dropdown-toggle.bs-placeholder:focus,\n.bootstrap-select > .dropdown-toggle.bs-placeholder:active {\n  color: #999;\n}\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-primary,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-secondary,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-success,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-danger,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-info,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-dark,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-primary:hover,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-secondary:hover,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-success:hover,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-danger:hover,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-info:hover,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-dark:hover,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-primary:focus,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-secondary:focus,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-success:focus,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-danger:focus,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-info:focus,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-dark:focus,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-primary:active,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-secondary:active,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-success:active,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-danger:active,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-info:active,\n.bootstrap-select > .dropdown-toggle.bs-placeholder.btn-dark:active {\n  color: rgba(255, 255, 255, 0.5);\n}\n.bootstrap-select > select {\n  position: absolute !important;\n  bottom: 0;\n  left: 50%;\n  display: block !important;\n  width: 0.5px !important;\n  height: 100% !important;\n  padding: 0 !important;\n  opacity: 0 !important;\n  border: none;\n}\n.bootstrap-select > select.mobile-device {\n  top: 0;\n  left: 0;\n  display: block !important;\n  width: 100% !important;\n  z-index: 2;\n}\n.has-error .bootstrap-select .dropdown-toggle,\n.error .bootstrap-select .dropdown-toggle,\n.bootstrap-select.is-invalid .dropdown-toggle,\n.was-validated .bootstrap-select .selectpicker:invalid + .dropdown-toggle {\n  border-color: #b94a48;\n}\n.bootstrap-select.is-valid .dropdown-toggle,\n.was-validated .bootstrap-select .selectpicker:valid + .dropdown-toggle {\n  border-color: #28a745;\n}\n.bootstrap-select.fit-width {\n  width: auto !important;\n}\n.bootstrap-select:not([class*=\"col-\"]):not([class*=\"form-control\"]):not(.input-group-btn) {\n  width: 220px;\n}\n.bootstrap-select > select.mobile-device:focus + .dropdown-toggle,\n.bootstrap-select .dropdown-toggle:focus {\n  outline: thin dotted #333333 !important;\n  outline: 5px auto -webkit-focus-ring-color !important;\n  outline-offset: -2px;\n}\n.bootstrap-select.form-control {\n  margin-bottom: 0;\n  padding: 0;\n  border: none;\n}\n:not(.input-group) > .bootstrap-select.form-control:not([class*=\"col-\"]) {\n  width: 100%;\n}\n.bootstrap-select.form-control.input-group-btn {\n  z-index: auto;\n}\n.bootstrap-select.form-control.input-group-btn:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n.bootstrap-select:not(.input-group-btn),\n.bootstrap-select[class*=\"col-\"] {\n  float: none;\n  display: inline-block;\n  margin-left: 0;\n}\n.bootstrap-select.dropdown-menu-right,\n.bootstrap-select[class*=\"col-\"].dropdown-menu-right,\n.row .bootstrap-select[class*=\"col-\"].dropdown-menu-right {\n  float: right;\n}\n.form-inline .bootstrap-select,\n.form-horizontal .bootstrap-select,\n.form-group .bootstrap-select {\n  margin-bottom: 0;\n}\n.form-group-lg .bootstrap-select.form-control,\n.form-group-sm .bootstrap-select.form-control {\n  padding: 0;\n}\n.form-group-lg .bootstrap-select.form-control .dropdown-toggle,\n.form-group-sm .bootstrap-select.form-control .dropdown-toggle {\n  height: 100%;\n  font-size: inherit;\n  line-height: inherit;\n  border-radius: inherit;\n}\n.bootstrap-select.form-control-sm .dropdown-toggle,\n.bootstrap-select.form-control-lg .dropdown-toggle {\n  font-size: inherit;\n  line-height: inherit;\n  border-radius: inherit;\n}\n.bootstrap-select.form-control-sm .dropdown-toggle {\n  padding: 0.25rem 0.5rem;\n}\n.bootstrap-select.form-control-lg .dropdown-toggle {\n  padding: 0.5rem 1rem;\n}\n.form-inline .bootstrap-select .form-control {\n  width: 100%;\n}\n.bootstrap-select.disabled,\n.bootstrap-select > .disabled {\n  cursor: not-allowed;\n}\n.bootstrap-select.disabled:focus,\n.bootstrap-select > .disabled:focus {\n  outline: none !important;\n}\n.bootstrap-select.bs-container {\n  position: absolute;\n  top: 0;\n  left: 0;\n  height: 0 !important;\n  padding: 0 !important;\n}\n.bootstrap-select.bs-container .dropdown-menu {\n  z-index: 1060;\n}\n.bootstrap-select .dropdown-toggle:before {\n  content: '';\n  display: inline-block;\n}\n.bootstrap-select .dropdown-toggle .filter-option {\n  position: absolute;\n  top: 0;\n  left: 0;\n  padding-top: inherit;\n  padding-right: inherit;\n  padding-bottom: inherit;\n  padding-left: inherit;\n  height: 100%;\n  width: 100%;\n  text-align: left;\n}\n.bootstrap-select .dropdown-toggle .filter-option-inner {\n  padding-right: inherit;\n}\n.bootstrap-select .dropdown-toggle .filter-option-inner-inner {\n  overflow: hidden;\n}\n.bootstrap-select .dropdown-toggle .caret {\n  position: absolute;\n  top: 50%;\n  right: 12px;\n  margin-top: -2px;\n  vertical-align: middle;\n}\n.input-group .bootstrap-select.form-control .dropdown-toggle {\n  border-radius: inherit;\n}\n.bootstrap-select[class*=\"col-\"] .dropdown-toggle {\n  width: 100%;\n}\n.bootstrap-select .dropdown-menu {\n  min-width: 100%;\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.bootstrap-select .dropdown-menu > .inner:focus {\n  outline: none !important;\n}\n.bootstrap-select .dropdown-menu.inner {\n  position: static;\n  float: none;\n  border: 0;\n  padding: 0;\n  margin: 0;\n  border-radius: 0;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n}\n.bootstrap-select .dropdown-menu li {\n  position: relative;\n}\n.bootstrap-select .dropdown-menu li.active small {\n  color: rgba(255, 255, 255, 0.5) !important;\n}\n.bootstrap-select .dropdown-menu li.disabled a {\n  cursor: not-allowed;\n}\n.bootstrap-select .dropdown-menu li a {\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n}\n.bootstrap-select .dropdown-menu li a.opt {\n  position: relative;\n  padding-left: 2.25em;\n}\n.bootstrap-select .dropdown-menu li a span.check-mark {\n  display: none;\n}\n.bootstrap-select .dropdown-menu li a span.text {\n  display: inline-block;\n}\n.bootstrap-select .dropdown-menu li small {\n  padding-left: 0.5em;\n}\n.bootstrap-select .dropdown-menu .notify {\n  position: absolute;\n  bottom: 5px;\n  width: 96%;\n  margin: 0 2%;\n  min-height: 26px;\n  padding: 3px 5px;\n  background: #f5f5f5;\n  border: 1px solid #e3e3e3;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);\n  pointer-events: none;\n  opacity: 0.9;\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.bootstrap-select .no-results {\n  padding: 3px;\n  background: #f5f5f5;\n  margin: 0 5px;\n  white-space: nowrap;\n}\n.bootstrap-select.fit-width .dropdown-toggle .filter-option {\n  position: static;\n  display: inline;\n  padding: 0;\n}\n.bootstrap-select.fit-width .dropdown-toggle .filter-option-inner,\n.bootstrap-select.fit-width .dropdown-toggle .filter-option-inner-inner {\n  display: inline;\n}\n.bootstrap-select.fit-width .dropdown-toggle .caret {\n  position: static;\n  top: auto;\n  margin-top: -1px;\n}\n.bootstrap-select.show-tick .dropdown-menu .selected span.check-mark {\n  position: absolute;\n  display: inline-block;\n  right: 15px;\n  top: 5px;\n}\n.bootstrap-select.show-tick .dropdown-menu li a span.text {\n  margin-right: 34px;\n}\n.bootstrap-select .bs-ok-default:after {\n  content: '';\n  display: block;\n  width: 0.5em;\n  height: 1em;\n  border-style: solid;\n  border-width: 0 0.26em 0.26em 0;\n  -webkit-transform: rotate(45deg);\n      -ms-transform: rotate(45deg);\n       -o-transform: rotate(45deg);\n          transform: rotate(45deg);\n}\n.bootstrap-select.show-menu-arrow.open > .dropdown-toggle,\n.bootstrap-select.show-menu-arrow.show > .dropdown-toggle {\n  z-index: 1061;\n}\n.bootstrap-select.show-menu-arrow .dropdown-toggle .filter-option:before {\n  content: '';\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-bottom: 7px solid rgba(204, 204, 204, 0.2);\n  position: absolute;\n  bottom: -4px;\n  left: 9px;\n  display: none;\n}\n.bootstrap-select.show-menu-arrow .dropdown-toggle .filter-option:after {\n  content: '';\n  border-left: 6px solid transparent;\n  border-right: 6px solid transparent;\n  border-bottom: 6px solid white;\n  position: absolute;\n  bottom: -4px;\n  left: 10px;\n  display: none;\n}\n.bootstrap-select.show-menu-arrow.dropup .dropdown-toggle .filter-option:before {\n  bottom: auto;\n  top: -4px;\n  border-top: 7px solid rgba(204, 204, 204, 0.2);\n  border-bottom: 0;\n}\n.bootstrap-select.show-menu-arrow.dropup .dropdown-toggle .filter-option:after {\n  bottom: auto;\n  top: -4px;\n  border-top: 6px solid white;\n  border-bottom: 0;\n}\n.bootstrap-select.show-menu-arrow.pull-right .dropdown-toggle .filter-option:before {\n  right: 12px;\n  left: auto;\n}\n.bootstrap-select.show-menu-arrow.pull-right .dropdown-toggle .filter-option:after {\n  right: 13px;\n  left: auto;\n}\n.bootstrap-select.show-menu-arrow.open > .dropdown-toggle .filter-option:before,\n.bootstrap-select.show-menu-arrow.show > .dropdown-toggle .filter-option:before,\n.bootstrap-select.show-menu-arrow.open > .dropdown-toggle .filter-option:after,\n.bootstrap-select.show-menu-arrow.show > .dropdown-toggle .filter-option:after {\n  display: block;\n}\n.bs-searchbox,\n.bs-actionsbox,\n.bs-donebutton {\n  padding: 4px 8px;\n}\n.bs-actionsbox {\n  width: 100%;\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.bs-actionsbox .btn-group button {\n  width: 50%;\n}\n.bs-donebutton {\n  float: left;\n  width: 100%;\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.bs-donebutton .btn-group button {\n  width: 100%;\n}\n.bs-searchbox + .bs-actionsbox {\n  padding: 0 8px 4px;\n}\n.bs-searchbox .form-control {\n  margin-bottom: 0;\n  width: 100%;\n  float: none;\n}\n/*# sourceMappingURL=bootstrap-select.css.map */"; });
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define('deepmerge',factory) :
+	(global.deepmerge = factory());
+}(this, (function () { 'use strict';
+
+var isMergeableObject = function isMergeableObject(value) {
+	return isNonNullObject(value)
+		&& !isSpecial(value)
+};
+
+function isNonNullObject(value) {
+	return !!value && typeof value === 'object'
+}
+
+function isSpecial(value) {
+	var stringValue = Object.prototype.toString.call(value);
+
+	return stringValue === '[object RegExp]'
+		|| stringValue === '[object Date]'
+		|| isReactElement(value)
+}
+
+// see https://github.com/facebook/react/blob/b5ac963fb791d1298e7f396236383bc955f916c1/src/isomorphic/classic/element/ReactElement.js#L21-L25
+var canUseSymbol = typeof Symbol === 'function' && Symbol.for;
+var REACT_ELEMENT_TYPE = canUseSymbol ? Symbol.for('react.element') : 0xeac7;
+
+function isReactElement(value) {
+	return value.$$typeof === REACT_ELEMENT_TYPE
+}
+
+function emptyTarget(val) {
+    return Array.isArray(val) ? [] : {}
+}
+
+function cloneIfNecessary(value, optionsArgument) {
+    var clone = optionsArgument && optionsArgument.clone === true;
+    return (clone && isMergeableObject(value)) ? deepmerge(emptyTarget(value), value, optionsArgument) : value
+}
+
+function defaultArrayMerge(target, source, optionsArgument) {
+    var destination = target.slice();
+    source.forEach(function(e, i) {
+        if (typeof destination[i] === 'undefined') {
+            destination[i] = cloneIfNecessary(e, optionsArgument);
+        } else if (isMergeableObject(e)) {
+            destination[i] = deepmerge(target[i], e, optionsArgument);
+        } else if (target.indexOf(e) === -1) {
+            destination.push(cloneIfNecessary(e, optionsArgument));
+        }
+    });
+    return destination
+}
+
+function mergeObject(target, source, optionsArgument) {
+    var destination = {};
+    if (isMergeableObject(target)) {
+        Object.keys(target).forEach(function(key) {
+            destination[key] = cloneIfNecessary(target[key], optionsArgument);
+        });
+    }
+    Object.keys(source).forEach(function(key) {
+        if (!isMergeableObject(source[key]) || !target[key]) {
+            destination[key] = cloneIfNecessary(source[key], optionsArgument);
+        } else {
+            destination[key] = deepmerge(target[key], source[key], optionsArgument);
+        }
+    });
+    return destination
+}
+
+function deepmerge(target, source, optionsArgument) {
+    var sourceIsArray = Array.isArray(source);
+    var targetIsArray = Array.isArray(target);
+    var options = optionsArgument || { arrayMerge: defaultArrayMerge };
+    var sourceAndTargetTypesMatch = sourceIsArray === targetIsArray;
+
+    if (!sourceAndTargetTypesMatch) {
+        return cloneIfNecessary(source, optionsArgument)
+    } else if (sourceIsArray) {
+        var arrayMerge = options.arrayMerge || defaultArrayMerge;
+        return arrayMerge(target, source, optionsArgument)
+    } else {
+        return mergeObject(target, source, optionsArgument)
+    }
+}
+
+deepmerge.all = function deepmergeAll(array, optionsArgument) {
+    if (!Array.isArray(array) || array.length < 2) {
+        throw new Error('first argument should be an array with at least two elements')
+    }
+
+    // we are sure there are at least 2 values, so it is safe to have no initial value
+    return array.reduce(function(prev, next) {
+        return deepmerge(prev, next, optionsArgument)
+    })
+};
+
+var deepmerge_1 = deepmerge;
+
+return deepmerge_1;
+
+})));
+
 define('aurelia-google-analytics/index',['exports', './analytics'], function (exports, _analytics) {
 	'use strict';
 
@@ -73998,108 +72646,1460 @@ define('aurelia-google-analytics/analytics',['exports', 'aurelia-dependency-inje
 		return Analytics;
 	}()) || _class);
 });
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define('deepmerge',factory) :
-	(global.deepmerge = factory());
-}(this, (function () { 'use strict';
+define('aurelia-chart/index',["exports", "./observers/model-observer"], function (exports, _observersModelObserver) {
+    "use strict";
 
-var isMergeableObject = function isMergeableObject(value) {
-	return isNonNullObject(value)
-		&& !isSpecial(value)
-};
-
-function isNonNullObject(value) {
-	return !!value && typeof value === 'object'
-}
-
-function isSpecial(value) {
-	var stringValue = Object.prototype.toString.call(value);
-
-	return stringValue === '[object RegExp]'
-		|| stringValue === '[object Date]'
-		|| isReactElement(value)
-}
-
-// see https://github.com/facebook/react/blob/b5ac963fb791d1298e7f396236383bc955f916c1/src/isomorphic/classic/element/ReactElement.js#L21-L25
-var canUseSymbol = typeof Symbol === 'function' && Symbol.for;
-var REACT_ELEMENT_TYPE = canUseSymbol ? Symbol.for('react.element') : 0xeac7;
-
-function isReactElement(value) {
-	return value.$$typeof === REACT_ELEMENT_TYPE
-}
-
-function emptyTarget(val) {
-    return Array.isArray(val) ? [] : {}
-}
-
-function cloneIfNecessary(value, optionsArgument) {
-    var clone = optionsArgument && optionsArgument.clone === true;
-    return (clone && isMergeableObject(value)) ? deepmerge(emptyTarget(value), value, optionsArgument) : value
-}
-
-function defaultArrayMerge(target, source, optionsArgument) {
-    var destination = target.slice();
-    source.forEach(function(e, i) {
-        if (typeof destination[i] === 'undefined') {
-            destination[i] = cloneIfNecessary(e, optionsArgument);
-        } else if (isMergeableObject(e)) {
-            destination[i] = deepmerge(target[i], e, optionsArgument);
-        } else if (target.indexOf(e) === -1) {
-            destination.push(cloneIfNecessary(e, optionsArgument));
-        }
+    Object.defineProperty(exports, "__esModule", {
+        value: true
     });
-    return destination
-}
+    exports.configure = configure;
 
-function mergeObject(target, source, optionsArgument) {
-    var destination = {};
-    if (isMergeableObject(target)) {
-        Object.keys(target).forEach(function(key) {
-            destination[key] = cloneIfNecessary(target[key], optionsArgument);
-        });
+    function configure(aurelia) {
+        aurelia.globalResources("./elements/chart-element", "./attributes/chart-attribute");
+
+        aurelia.container.registerTransient(_observersModelObserver.ModelObserver);
     }
-    Object.keys(source).forEach(function(key) {
-        if (!isMergeableObject(source[key]) || !target[key]) {
-            destination[key] = cloneIfNecessary(source[key], optionsArgument);
+});;define('aurelia-chart', ['aurelia-chart/index'], function (main) { return main; });
+
+define('aurelia-chart/observers/model-observer',["exports", "aurelia-framework"], function (exports, _aureliaFramework) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+
+    var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+    function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+    var ModelObserver = (function () {
+        function ModelObserver(bindingEngine, observerLocator) {
+            var _this = this;
+
+            _classCallCheck(this, _ModelObserver);
+
+            this.throttle = 100;
+            this._throttleTimeout = 0;
+            this._activeSubscriptions = [];
+
+            this.observe = function (model, onChange) {
+                var subscriptions = [];
+                _this._getAllSubscriptions(model, subscriptions);
+
+                var throttledHandler = function throttledHandler(args) {
+                    if (_this.throttle <= 0) {
+                        return onChange();
+                    }
+
+                    if (!_this._throttleTimeout) {
+                        _this._throttleTimeout = setTimeout(function () {
+                            _this._throttleTimeout = null;
+                            onChange();
+                        }, _this.throttle);
+                    }
+                };
+
+                for (var i = 0; i < subscriptions.length; i++) {
+                    var outstandingSubscription = subscriptions[i](throttledHandler);
+                    _this._activeSubscriptions.push(outstandingSubscription);
+                }
+            };
+
+            this.unsubscribe = function () {
+                for (var i = 0; i < _this._activeSubscriptions.length; i++) {
+                    _this._activeSubscriptions[i].dispose();
+                }
+
+                _this._activeSubscriptions = [];
+            };
+
+            this.bindingEngine = bindingEngine;
+            this.observerLocator = observerLocator;
+        }
+
+        _createClass(ModelObserver, [{
+            key: "_getObjectType",
+            value: function _getObjectType(obj) {
+                if (obj && typeof obj === "object" && obj.constructor == new Date().constructor) return "date";
+                return typeof obj;
+            }
+        }, {
+            key: "_getAllSubscriptions",
+            value: function _getAllSubscriptions(model, subscriptions) {
+                var _this2 = this;
+
+                if (Array.isArray(model)) {
+                    var subscription = this.bindingEngine.collectionObserver(model).subscribe;
+                    subscriptions.push(subscription);
+                }
+
+                for (var property in model) {
+                    var typeOfData = this._getObjectType(model[property]);
+                    switch (typeOfData) {
+                        case "object":
+                            {
+                                this._getAllSubscriptions(model[property], subscriptions);
+                            }
+                            break;
+                        case "array":
+                            {
+                                var underlyingArray = model[property]();
+                                underlyingArray.forEach(function (entry, index) {
+                                    _this2._getAllSubscriptions(underlyingArray[index], subscriptions);
+                                });
+
+                                var arraySubscription = this.bindingEngine.propertyObserver(model, property).subscribe;
+                                if (arraySubscription) {
+                                    subscriptions.push(arraySubscription);
+                                }
+                            }
+                            break;
+
+                        default:
+                            {
+                                var subscription = this.bindingEngine.propertyObserver(model, property).subscribe;
+                                if (subscription) {
+                                    subscriptions.push(subscription);
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+        }]);
+
+        var _ModelObserver = ModelObserver;
+        ModelObserver = (0, _aureliaFramework.inject)(_aureliaFramework.BindingEngine)(ModelObserver) || ModelObserver;
+        return ModelObserver;
+    })();
+
+    exports.ModelObserver = ModelObserver;
+});
+define('text!aurelia-chart/elements/chart-element.html', ['module'], function(module) { module.exports = "<template>\r\n    <canvas ref=\"canvasElement\"></canvas>\r\n</template>"; });
+define('aurelia-chart/elements/chart-element',["exports", "aurelia-framework", "../observers/model-observer", "chart.js"], function (exports, _aureliaFramework, _observersModelObserver, _chartJs) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _createDecoratedClass = (function () { function defineProperties(target, descriptors, initializers) { for (var i = 0; i < descriptors.length; i++) { var descriptor = descriptors[i]; var decorators = descriptor.decorators; var key = descriptor.key; delete descriptor.key; delete descriptor.decorators; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor || descriptor.initializer) descriptor.writable = true; if (decorators) { for (var f = 0; f < decorators.length; f++) { var decorator = decorators[f]; if (typeof decorator === "function") { descriptor = decorator(target, key, descriptor) || descriptor; } else { throw new TypeError("The decorator for method " + descriptor.key + " is of the invalid type " + typeof decorator); } } if (descriptor.initializer !== undefined) { initializers[key] = descriptor; continue; } } Object.defineProperty(target, key, descriptor); } } return function (Constructor, protoProps, staticProps, protoInitializers, staticInitializers) { if (protoProps) defineProperties(Constructor.prototype, protoProps, protoInitializers); if (staticProps) defineProperties(Constructor, staticProps, staticInitializers); return Constructor; }; })();
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+  function _defineDecoratedPropertyDescriptor(target, key, descriptors) { var _descriptor = descriptors[key]; if (!_descriptor) return; var descriptor = {}; for (var _key in _descriptor) descriptor[_key] = _descriptor[_key]; descriptor.value = descriptor.initializer ? descriptor.initializer.call(target) : undefined; Object.defineProperty(target, key, descriptor); }
+
+  var _Chart = _interopRequireDefault(_chartJs);
+
+  var ChartElement = (function () {
+    var _instanceInitializers = {};
+    var _instanceInitializers = {};
+
+    _createDecoratedClass(ChartElement, [{
+      key: "type",
+      decorators: [_aureliaFramework.bindable],
+      initializer: null,
+      enumerable: true
+    }, {
+      key: "data",
+      decorators: [_aureliaFramework.bindable],
+      initializer: null,
+      enumerable: true
+    }, {
+      key: "shouldUpdate",
+      decorators: [_aureliaFramework.bindable],
+      initializer: null,
+      enumerable: true
+    }, {
+      key: "throttle",
+      decorators: [_aureliaFramework.bindable],
+      initializer: null,
+      enumerable: true
+    }, {
+      key: "nativeOptions",
+      decorators: [(0, _aureliaFramework.bindable)({ defaultBindingMode: _aureliaFramework.bindingMode.twoWay })],
+      initializer: function initializer() {
+        return {};
+      },
+      enumerable: true
+    }, {
+      key: "canvasElement",
+      decorators: [_aureliaFramework.bindable],
+      initializer: null,
+      enumerable: true
+    }], null, _instanceInitializers);
+
+    function ChartElement(modelObserver) {
+      var _this = this;
+
+      _classCallCheck(this, _ChartElement);
+
+      _defineDecoratedPropertyDescriptor(this, "type", _instanceInitializers);
+
+      _defineDecoratedPropertyDescriptor(this, "data", _instanceInitializers);
+
+      _defineDecoratedPropertyDescriptor(this, "shouldUpdate", _instanceInitializers);
+
+      _defineDecoratedPropertyDescriptor(this, "throttle", _instanceInitializers);
+
+      _defineDecoratedPropertyDescriptor(this, "nativeOptions", _instanceInitializers);
+
+      _defineDecoratedPropertyDescriptor(this, "canvasElement", _instanceInitializers);
+
+      this._isSetup = false;
+
+      this.propertyChanged = function (propertyName, newValue, oldValue) {
+        if (_this._isSetup && _this._isObserving) {
+          _this.refreshChart();
+          _this._modelObserver.unsubscribe();
+          _this.subscribeToChanges();
+        }
+      };
+
+      this.refreshChart = function () {
+        _this._chartData.data = _this._clonedData;
+        _this._activeChart.update();
+        _this._activeChart.resize();
+      };
+
+      this._modelObserver = modelObserver;
+    }
+
+    _createDecoratedClass(ChartElement, [{
+      key: "attached",
+      value: function attached() {
+        this.createChart();
+        this._isSetup = true;
+
+        if (this._isObserving) {
+          this.subscribeToChanges();
+        }
+      }
+    }, {
+      key: "detached",
+      value: function detached() {
+        if (this._isObserving) {
+          this._modelObserver.unsubscribe();
+        }
+
+        this._activeChart.destroy();
+        this._isSetup = false;
+      }
+    }, {
+      key: "createChart",
+      value: function createChart() {
+        this._chartData = {
+          type: this.type,
+          data: this._clonedData,
+          options: this.nativeOptions
+        };
+
+        this._activeChart = new _Chart["default"](this.canvasElement, this._chartData);
+        this.nativeOptions = this._activeChart.options;
+        this.refreshChart();
+      }
+    }, {
+      key: "subscribeToChanges",
+      value: function subscribeToChanges() {
+        this._modelObserver.throttle = this.throttle || 100;
+        this._modelObserver.observe(this.data.datasets, this.refreshChart);
+      }
+    }, {
+      key: "_isObserving",
+      get: function get() {
+        return this.shouldUpdate == true || this.shouldUpdate == "true";
+      }
+    }, {
+      key: "_clonedData",
+      get: function get() {
+        return JSON.parse(JSON.stringify(this.data));
+      }
+    }], null, _instanceInitializers);
+
+    var _ChartElement = ChartElement;
+    ChartElement = (0, _aureliaFramework.useView)("./chart-element.html")(ChartElement) || ChartElement;
+    ChartElement = (0, _aureliaFramework.inject)(_observersModelObserver.ModelObserver)(ChartElement) || ChartElement;
+    ChartElement = (0, _aureliaFramework.customElement)('chart')(ChartElement) || ChartElement;
+    return ChartElement;
+  })();
+
+  exports.ChartElement = ChartElement;
+});
+define('aurelia-chart/attributes/chart-attribute',["exports", "aurelia-framework", "../observers/model-observer", "chart.js"], function (exports, _aureliaFramework, _observersModelObserver, _chartJs) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _createDecoratedClass = (function () { function defineProperties(target, descriptors, initializers) { for (var i = 0; i < descriptors.length; i++) { var descriptor = descriptors[i]; var decorators = descriptor.decorators; var key = descriptor.key; delete descriptor.key; delete descriptor.decorators; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor || descriptor.initializer) descriptor.writable = true; if (decorators) { for (var f = 0; f < decorators.length; f++) { var decorator = decorators[f]; if (typeof decorator === "function") { descriptor = decorator(target, key, descriptor) || descriptor; } else { throw new TypeError("The decorator for method " + descriptor.key + " is of the invalid type " + typeof decorator); } } if (descriptor.initializer !== undefined) { initializers[key] = descriptor; continue; } } Object.defineProperty(target, key, descriptor); } } return function (Constructor, protoProps, staticProps, protoInitializers, staticInitializers) { if (protoProps) defineProperties(Constructor.prototype, protoProps, protoInitializers); if (staticProps) defineProperties(Constructor, staticProps, staticInitializers); return Constructor; }; })();
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+  function _defineDecoratedPropertyDescriptor(target, key, descriptors) { var _descriptor = descriptors[key]; if (!_descriptor) return; var descriptor = {}; for (var _key in _descriptor) descriptor[_key] = _descriptor[_key]; descriptor.value = descriptor.initializer ? descriptor.initializer.call(target) : undefined; Object.defineProperty(target, key, descriptor); }
+
+  var _Chart = _interopRequireDefault(_chartJs);
+
+  var ChartAttribute = (function () {
+    var _instanceInitializers = {};
+    var _instanceInitializers = {};
+
+    _createDecoratedClass(ChartAttribute, [{
+      key: "type",
+      decorators: [_aureliaFramework.bindable],
+      initializer: null,
+      enumerable: true
+    }, {
+      key: "data",
+      decorators: [_aureliaFramework.bindable],
+      initializer: null,
+      enumerable: true
+    }, {
+      key: "shouldUpdate",
+      decorators: [_aureliaFramework.bindable],
+      initializer: null,
+      enumerable: true
+    }, {
+      key: "throttle",
+      decorators: [_aureliaFramework.bindable],
+      initializer: null,
+      enumerable: true
+    }, {
+      key: "nativeOptions",
+      decorators: [(0, _aureliaFramework.bindable)({ defaultBindingMode: _aureliaFramework.bindingMode.twoWay })],
+      initializer: function initializer() {
+        return {};
+      },
+      enumerable: true
+    }], null, _instanceInitializers);
+
+    function ChartAttribute(element, modelObserver) {
+      var _this = this;
+
+      _classCallCheck(this, _ChartAttribute);
+
+      _defineDecoratedPropertyDescriptor(this, "type", _instanceInitializers);
+
+      _defineDecoratedPropertyDescriptor(this, "data", _instanceInitializers);
+
+      _defineDecoratedPropertyDescriptor(this, "shouldUpdate", _instanceInitializers);
+
+      _defineDecoratedPropertyDescriptor(this, "throttle", _instanceInitializers);
+
+      _defineDecoratedPropertyDescriptor(this, "nativeOptions", _instanceInitializers);
+
+      this._isSetup = false;
+
+      this.propertyChanged = function (propertyName, newValue, oldValue) {
+        if (_this._isSetup && _this._isObserving) {
+          _this.refreshChart();
+          _this._modelObserver.unsubscribe();
+          _this.subscribeToChanges();
+        }
+      };
+
+      this.refreshChart = function () {
+        _this._chartData.data = _this._clonedData;
+        _this._activeChart.update();
+        _this._activeChart.resize();
+      };
+
+      this.element = element;
+      this._modelObserver = modelObserver;
+    }
+
+    _createDecoratedClass(ChartAttribute, [{
+      key: "attached",
+      value: function attached() {
+        this.createChart();
+        this._isSetup = true;
+
+        if (this._isObserving) {
+          this.subscribeToChanges();
+        }
+      }
+    }, {
+      key: "detached",
+      value: function detached() {
+        if (this.shouldUpdate == true) {
+          this._modelObserver.unsubscribe();
+        }
+
+        this._activeChart.destroy();
+
+        this._isSetup = false;
+      }
+    }, {
+      key: "createChart",
+      value: function createChart() {
+        this._chartData = {
+          type: this.type,
+          data: this._clonedData,
+          options: this.nativeOptions
+        };
+
+        this._activeChart = new _Chart["default"](this.element, this._chartData);
+        this.nativeOptions = this._activeChart.options;
+        this.refreshChart();
+      }
+    }, {
+      key: "subscribeToChanges",
+      value: function subscribeToChanges() {
+        this._modelObserver.throttle = this.throttle || 100;
+        this._modelObserver.observe(this.data, this.refreshChart);
+      }
+    }, {
+      key: "_isObserving",
+      get: function get() {
+        return this.shouldUpdate == true || this.shouldUpdate == "true";
+      }
+    }, {
+      key: "_clonedData",
+      get: function get() {
+        return JSON.parse(JSON.stringify(this.data));
+      }
+    }], null, _instanceInitializers);
+
+    var _ChartAttribute = ChartAttribute;
+    ChartAttribute = (0, _aureliaFramework.inject)(Element, _observersModelObserver.ModelObserver)(ChartAttribute) || ChartAttribute;
+    ChartAttribute = (0, _aureliaFramework.customAttribute)('chart')(ChartAttribute) || ChartAttribute;
+    return ChartAttribute;
+  })();
+
+  exports.ChartAttribute = ChartAttribute;
+});
+define('aurelia-http-client/aurelia-http-client',['exports', 'aurelia-path', 'aurelia-pal'], function (exports, _aureliaPath, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.HttpClient = exports.RequestBuilder = exports.ErrorHttpResponseMessage = exports.HttpRequestMessage = exports.JSONPRequestMessage = exports.RequestMessageProcessor = exports.mimeTypes = exports.HttpResponseMessage = exports.RequestMessage = exports.Headers = undefined;
+  exports.timeoutTransformer = timeoutTransformer;
+  exports.callbackParameterNameTransformer = callbackParameterNameTransformer;
+  exports.credentialsTransformer = credentialsTransformer;
+  exports.progressTransformer = progressTransformer;
+  exports.downloadProgressTransformer = downloadProgressTransformer;
+  exports.responseTypeTransformer = responseTypeTransformer;
+  exports.headerTransformer = headerTransformer;
+  exports.contentTransformer = contentTransformer;
+  exports.createJSONPRequestMessageProcessor = createJSONPRequestMessageProcessor;
+  exports.createHttpRequestMessageProcessor = createHttpRequestMessageProcessor;
+
+  function _possibleConstructorReturn(self, call) {
+    if (!self) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+
+    return call && (typeof call === "object" || typeof call === "function") ? call : self;
+  }
+
+  function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  }
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  
+
+  var Headers = exports.Headers = function () {
+    function Headers() {
+      var headers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      
+
+      this.headers = {};
+
+      for (var _key in headers) {
+        this.headers[_key.toLowerCase()] = { key: _key, value: headers[_key] };
+      }
+    }
+
+    Headers.prototype.add = function add(key, value) {
+      this.headers[key.toLowerCase()] = { key: key, value: value };
+    };
+
+    Headers.prototype.get = function get(key) {
+      var header = this.headers[key.toLowerCase()];
+      return header ? header.value : undefined;
+    };
+
+    Headers.prototype.clear = function clear() {
+      this.headers = {};
+    };
+
+    Headers.prototype.has = function has(header) {
+      return this.headers.hasOwnProperty(header.toLowerCase());
+    };
+
+    Headers.prototype.configureXHR = function configureXHR(xhr) {
+      for (var name in this.headers) {
+        if (this.headers.hasOwnProperty(name)) {
+          xhr.setRequestHeader(this.headers[name].key, this.headers[name].value);
+        }
+      }
+    };
+
+    Headers.parse = function parse(headerStr) {
+      var headers = new Headers();
+      if (!headerStr) {
+        return headers;
+      }
+
+      var headerPairs = headerStr.split('\r\n');
+      for (var i = 0; i < headerPairs.length; i++) {
+        var headerPair = headerPairs[i];
+
+        var index = headerPair.indexOf(': ');
+        if (index > 0) {
+          var _key2 = headerPair.substring(0, index);
+          var val = headerPair.substring(index + 2);
+          headers.add(_key2, val);
+        }
+      }
+
+      return headers;
+    };
+
+    return Headers;
+  }();
+
+  var RequestMessage = exports.RequestMessage = function () {
+    function RequestMessage(method, url, content, headers) {
+      
+
+      this.method = method;
+      this.url = url;
+      this.content = content;
+      this.headers = headers || new Headers();
+      this.baseUrl = '';
+    }
+
+    RequestMessage.prototype.buildFullUrl = function buildFullUrl() {
+      var absoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
+      var url = absoluteUrl.test(this.url) ? this.url : (0, _aureliaPath.join)(this.baseUrl, this.url);
+
+      if (this.params) {
+        var qs = (0, _aureliaPath.buildQueryString)(this.params, this.traditional);
+        url = qs ? url + (this.url.indexOf('?') < 0 ? '?' : '&') + qs : url;
+      }
+
+      return url;
+    };
+
+    return RequestMessage;
+  }();
+
+  var HttpResponseMessage = exports.HttpResponseMessage = function () {
+    function HttpResponseMessage(requestMessage, xhr, responseType, reviver) {
+      
+
+      this.requestMessage = requestMessage;
+      this.statusCode = xhr.status;
+      this.response = xhr.response || xhr.responseText;
+      this.isSuccess = xhr.status >= 200 && xhr.status < 400;
+      this.statusText = xhr.statusText;
+      this.reviver = reviver;
+      this.mimeType = null;
+
+      if (xhr.getAllResponseHeaders) {
+        this.headers = Headers.parse(xhr.getAllResponseHeaders());
+      } else {
+        this.headers = new Headers();
+      }
+
+      var contentType = void 0;
+
+      if (this.headers && this.headers.headers) {
+        contentType = this.headers.get('Content-Type');
+      }
+
+      if (contentType) {
+        this.mimeType = responseType = contentType.split(';')[0].trim();
+        if (mimeTypes.hasOwnProperty(this.mimeType)) responseType = mimeTypes[this.mimeType];
+      }
+
+      this.responseType = responseType;
+    }
+
+    _createClass(HttpResponseMessage, [{
+      key: 'content',
+      get: function get() {
+        try {
+          if (this._content !== undefined) {
+            return this._content;
+          }
+
+          if (this.response === undefined || this.response === null || this.response === '') {
+            this._content = this.response;
+            return this._content;
+          }
+
+          if (this.responseType === 'json') {
+            this._content = JSON.parse(this.response, this.reviver);
+            return this._content;
+          }
+
+          if (this.reviver) {
+            this._content = this.reviver(this.response);
+            return this._content;
+          }
+
+          this._content = this.response;
+          return this._content;
+        } catch (e) {
+          if (this.isSuccess) {
+            throw e;
+          }
+
+          this._content = null;
+          return this._content;
+        }
+      }
+    }]);
+
+    return HttpResponseMessage;
+  }();
+
+  var mimeTypes = exports.mimeTypes = {
+    'text/html': 'html',
+    'text/javascript': 'js',
+    'application/javascript': 'js',
+    'text/json': 'json',
+    'application/json': 'json',
+    'application/rss+xml': 'rss',
+    'application/atom+xml': 'atom',
+    'application/xhtml+xml': 'xhtml',
+    'text/markdown': 'md',
+    'text/xml': 'xml',
+    'text/mathml': 'mml',
+    'application/xml': 'xml',
+    'text/yml': 'yml',
+    'text/csv': 'csv',
+    'text/css': 'css',
+    'text/less': 'less',
+    'text/stylus': 'styl',
+    'text/scss': 'scss',
+    'text/sass': 'sass',
+    'text/plain': 'txt'
+  };
+
+  function applyXhrTransformers(xhrTransformers, client, processor, message, xhr) {
+    var i = void 0;
+    var ii = void 0;
+
+    for (i = 0, ii = xhrTransformers.length; i < ii; ++i) {
+      xhrTransformers[i](client, processor, message, xhr);
+    }
+  }
+
+  var RequestMessageProcessor = exports.RequestMessageProcessor = function () {
+    function RequestMessageProcessor(xhrType, xhrTransformers) {
+      
+
+      this.XHRType = xhrType;
+      this.xhrTransformers = xhrTransformers;
+      this.isAborted = false;
+    }
+
+    RequestMessageProcessor.prototype.abort = function abort() {
+      if (this.xhr && this.xhr.readyState !== _aureliaPal.PLATFORM.XMLHttpRequest.UNSENT) {
+        this.xhr.abort();
+      }
+
+      this.isAborted = true;
+    };
+
+    RequestMessageProcessor.prototype.process = function process(client, requestMessage) {
+      var _this = this;
+
+      var promise = new Promise(function (resolve, reject) {
+        var rejectResponse = void 0;
+        if (client.rejectPromiseWithErrorObject) {
+          rejectResponse = function rejectResponse(resp) {
+            var errorResp = new ErrorHttpResponseMessage(resp);
+            reject(errorResp);
+          };
         } else {
-            destination[key] = deepmerge(target[key], source[key], optionsArgument);
+          rejectResponse = function rejectResponse(resp) {
+            reject(resp);
+          };
         }
-    });
-    return destination
-}
 
-function deepmerge(target, source, optionsArgument) {
-    var sourceIsArray = Array.isArray(source);
-    var targetIsArray = Array.isArray(target);
-    var options = optionsArgument || { arrayMerge: defaultArrayMerge };
-    var sourceAndTargetTypesMatch = sourceIsArray === targetIsArray;
+        var xhr = _this.xhr = new _this.XHRType();
+        xhr.onload = function (e) {
+          var response = new HttpResponseMessage(requestMessage, xhr, requestMessage.responseType, requestMessage.reviver);
+          if (response.isSuccess) {
+            resolve(response);
+          } else {
+            rejectResponse(response);
+          }
+        };
 
-    if (!sourceAndTargetTypesMatch) {
-        return cloneIfNecessary(source, optionsArgument)
-    } else if (sourceIsArray) {
-        var arrayMerge = options.arrayMerge || defaultArrayMerge;
-        return arrayMerge(target, source, optionsArgument)
-    } else {
-        return mergeObject(target, source, optionsArgument)
+        xhr.ontimeout = function (e) {
+          rejectResponse(new HttpResponseMessage(requestMessage, {
+            response: e,
+            status: xhr.status,
+            statusText: xhr.statusText
+          }, 'timeout'));
+        };
+
+        xhr.onerror = function (e) {
+          rejectResponse(new HttpResponseMessage(requestMessage, {
+            response: e,
+            status: xhr.status,
+            statusText: xhr.statusText
+          }, 'error'));
+        };
+
+        xhr.onabort = function (e) {
+          rejectResponse(new HttpResponseMessage(requestMessage, {
+            response: e,
+            status: xhr.status,
+            statusText: xhr.statusText
+          }, 'abort'));
+        };
+      });
+
+      return Promise.resolve(requestMessage).then(function (message) {
+        var processRequest = function processRequest() {
+          if (_this.isAborted) {
+            _this.xhr.abort();
+          } else {
+            _this.xhr.open(message.method, message.buildFullUrl(), true, message.user, message.password);
+            applyXhrTransformers(_this.xhrTransformers, client, _this, message, _this.xhr);
+            if (typeof message.content === 'undefined') {
+              _this.xhr.send();
+            } else {
+              _this.xhr.send(message.content);
+            }
+          }
+
+          return promise;
+        };
+
+        var chain = [[processRequest, undefined]];
+
+        var interceptors = message.interceptors || [];
+        interceptors.forEach(function (interceptor) {
+          if (interceptor.request || interceptor.requestError) {
+            chain.unshift([interceptor.request ? interceptor.request.bind(interceptor) : undefined, interceptor.requestError ? interceptor.requestError.bind(interceptor) : undefined]);
+          }
+
+          if (interceptor.response || interceptor.responseError) {
+            chain.push([interceptor.response ? interceptor.response.bind(interceptor) : undefined, interceptor.responseError ? interceptor.responseError.bind(interceptor) : undefined]);
+          }
+        });
+
+        var interceptorsPromise = Promise.resolve(message);
+
+        while (chain.length) {
+          var _interceptorsPromise;
+
+          interceptorsPromise = (_interceptorsPromise = interceptorsPromise).then.apply(_interceptorsPromise, chain.shift());
+        }
+
+        return interceptorsPromise;
+      });
+    };
+
+    return RequestMessageProcessor;
+  }();
+
+  function timeoutTransformer(client, processor, message, xhr) {
+    if (message.timeout !== undefined) {
+      xhr.timeout = message.timeout;
     }
-}
+  }
 
-deepmerge.all = function deepmergeAll(array, optionsArgument) {
-    if (!Array.isArray(array) || array.length < 2) {
-        throw new Error('first argument should be an array with at least two elements')
+  function callbackParameterNameTransformer(client, processor, message, xhr) {
+    if (message.callbackParameterName !== undefined) {
+      xhr.callbackParameterName = message.callbackParameterName;
+    }
+  }
+
+  function credentialsTransformer(client, processor, message, xhr) {
+    if (message.withCredentials !== undefined) {
+      xhr.withCredentials = message.withCredentials;
+    }
+  }
+
+  function progressTransformer(client, processor, message, xhr) {
+    if (message.progressCallback) {
+      xhr.upload.onprogress = message.progressCallback;
+    }
+  }
+
+  function downloadProgressTransformer(client, processor, message, xhr) {
+    if (message.downloadProgressCallback) {
+      xhr.onprogress = message.downloadProgressCallback;
+    }
+  }
+
+  function responseTypeTransformer(client, processor, message, xhr) {
+    var responseType = message.responseType;
+
+    if (responseType === 'json') {
+      responseType = 'text';
     }
 
-    // we are sure there are at least 2 values, so it is safe to have no initial value
-    return array.reduce(function(prev, next) {
-        return deepmerge(prev, next, optionsArgument)
-    })
-};
+    xhr.responseType = responseType;
+  }
 
-var deepmerge_1 = deepmerge;
+  function headerTransformer(client, processor, message, xhr) {
+    message.headers.configureXHR(xhr);
+  }
 
-return deepmerge_1;
+  function contentTransformer(client, processor, message, xhr) {
+    if (message.skipContentProcessing) {
+      return;
+    }
 
-})));
+    if (_aureliaPal.PLATFORM.global.FormData && message.content instanceof FormData) {
+      return;
+    }
 
-function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","text":"../node_modules\\text\\text","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","aurelia-notification":"../node_modules\\aurelia-notification\\dist\\amd\\aurelia-notification","jquery":"../node_modules\\jquery\\dist\\jquery","extend":"../node_modules\\extend\\index","moment":"../node_modules\\moment\\moment","deepmerge":"../node_modules\\deepmerge\\dist\\umd","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-http-client","location":"../node_modules/aurelia-http-client/dist/amd","main":"aurelia-http-client"},{"name":"humane-js","location":"../node_modules/humane-js","main":"humane"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr.js"},{"name":"i18next","location":"../node_modules/i18next/dist/commonjs","main":"index"},{"name":"aurelia-i18n","location":"../node_modules/aurelia-i18n/dist/amd","main":"aurelia-i18n"},{"name":"regenerator-runtime","location":"../node_modules/regenerator-runtime","main":"runtime"},{"name":"aurelia-dialog","location":"../node_modules/aurelia-dialog/dist/amd","main":"aurelia-dialog"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr"},{"name":"nprogress","location":"../node_modules/nprogress","main":"nprogress"},{"name":"bootstrap","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min"},{"name":"aurelia-mask","location":"../node_modules/aurelia-mask/dist","main":"masked-input"},{"name":"summernote","location":"../node_modules/summernote/dist/","main":"summernote"},{"name":"flatpickr","location":"../node_modules/flatpickr/dist","main":"flatpickr"},{"name":"fuelux","location":"../node_modules/fuelux/dist","main":"js/fuelux.min"},{"name":"fullcalendar","location":"../node_modules/fullcalendar/dist","main":"fullcalendar"},{"name":"chart.js","location":"../node_modules/chart.js/dist","main":"Chart.min.js"},{"name":"aurelia-chart","location":"../node_modules/aurelia-chart/dist/amd","main":"index"},{"name":"bootstrap-select","location":"../node_modules/bootstrap-select/dist/","main":"js/bootstrap-select"},{"name":"aurelia-google-analytics","location":"../node_modules/aurelia-google-analytics/dist/amd","main":"index"}],"stubModules":["text"],"shim":{"bootstrap":{"deps":["jquery"],"exports":"$"},"aurelia-chart":{"deps":["chart.js"]}},"bundles":{"app-bundle":["app","environment","main","config/appConfig","config/routerConfig","resources/index","resources/charts/bar-chart","resources/charts/chart-data","resources/charts/chart-element","resources/charts/doughnut-chart","resources/data/admin","resources/data/apjClientRequests","resources/data/auth","resources/data/chapters","resources/data/clientRequests","resources/data/config","resources/data/curriculum","resources/data/dataServices","resources/data/documents","resources/data/downloads","resources/data/events","resources/data/helpTickets","resources/data/inventory","resources/data/is4ua","resources/data/people","resources/data/products","resources/data/sessionData","resources/data/sessions","resources/data/siteInfo","resources/data/social","resources/data/systems","resources/dialogs/common-dialogs","resources/dialogs/confirm-dialog","resources/dialogs/document-dialog","resources/dialogs/email-dialog","resources/dialogs/event-dialog","resources/dialogs/helpTicket-dialog","resources/dialogs/input-dialog","resources/dialogs/message-dialog","resources/dialogs/note-dialog","resources/dialogs/password-dialog","resources/editor/editor","resources/editor/styles","resources/elements/add-systems","resources/elements/calendar","resources/elements/flat-picker","resources/elements/loading-indicator","resources/elements/multiselect","resources/elements/nav-bar","resources/elements/rate-it","resources/elements/submenu","resources/elements/table-navigation-bar","resources/elements/tree-node","resources/utils/dataTable","resources/utils/utils","resources/utils/validation","resources/value-converters/activate-button","resources/value-converters/arrow","resources/value-converters/check-box","resources/value-converters/course-name","resources/value-converters/date-format","resources/value-converters/file-type","resources/value-converters/filter-apjrequestdetails","resources/value-converters/filter-array","resources/value-converters/filter-clients","resources/value-converters/filter-sessions","resources/value-converters/format-digits","resources/value-converters/format-number","resources/value-converters/format-phone","resources/value-converters/get-array-value","resources/value-converters/gravatar-url-id","resources/value-converters/gravatar-url","resources/value-converters/help-ticket-statuses","resources/value-converters/help-ticket-subtypes","resources/value-converters/help-ticket-type","resources/value-converters/idsRequested","resources/value-converters/info-filter","resources/value-converters/lookup-ht-status","resources/value-converters/lookup-value","resources/value-converters/onoff-switch","resources/value-converters/overlap","resources/value-converters/parse-apjassignments","resources/value-converters/parse-assignments","resources/value-converters/person-status-button","resources/value-converters/phone-number","resources/value-converters/request-status-class","resources/value-converters/sandbox","resources/value-converters/session-name","resources/value-converters/session-status-button","resources/value-converters/session-systems","resources/value-converters/session-type","resources/value-converters/session","resources/value-converters/sort-array","resources/value-converters/sort-date-time","resources/value-converters/stat-value","resources/value-converters/system-list","resources/value-converters/to-uppercase","resources/value-converters/translate-status","resources/value-converters/ucc-staff","resources/value-converters/ucc-title","modules/acc/accCreateInvoice","modules/acc/accCreateRequest","modules/acc/accHT","modules/acc/accInstitute","modules/acc/accInstitutions","modules/acc/accInvoice","modules/acc/accPeople","modules/acc/accRequests","modules/acc/accViewInvoice","modules/acc/apjAssignments","modules/acc/createHTs","modules/acc/viewHTs","modules/acc/viewUserRequests","modules/analytics/analytics","modules/analytics/clientRequests","modules/analytics/helpTickets","modules/analytics/institutions","modules/facco/editPeople","modules/facco/facco","modules/facco/viewAssignments","modules/facco/viewRequests","modules/home/about","modules/home/contact","modules/home/home","modules/home/institutions","modules/home/products","modules/home/register","modules/social/chapterList","modules/social/chapters","modules/social/editBlog","modules/social/social","modules/social/viewBlogs","modules/social/viewForums","modules/social/writeBlog","modules/techNotes/editCheckLists","modules/techNotes/editSystemUpdates","modules/techNotes/editTechNotes","modules/techNotes/techNotes","modules/user/profile","modules/user/resetPassword","modules/user/user","modules/admin/Customers/bulkEmails","modules/admin/Customers/customers","modules/admin/Customers/editInstitutions","modules/admin/Customers/editPeople","modules/admin/documents/documents","modules/admin/inventory/editInventory","modules/admin/notes/editCalendar","modules/admin/notes/editNotes","modules/admin/notes/notes","modules/admin/site/admin","modules/admin/site/editConfig","modules/admin/site/editCurriculum","modules/admin/site/editDownloads","modules/admin/site/editHelpTickets","modules/admin/site/editMessages","modules/admin/site/editNews","modules/admin/site/site","modules/admin/system/editChanges","modules/admin/system/editProduct","modules/admin/system/editSession","modules/admin/system/editSystem","modules/admin/system/system","modules/tech/requests/apjRequests","modules/tech/requests/archiveClientRequests","modules/tech/requests/assignments","modules/tech/requests/createRequest","modules/tech/requests/techRequests","modules/tech/requests/viewUserRequests","modules/tech/support/archiveHelpTickets","modules/tech/support/createHelpTickets","modules/tech/support/support","modules/tech/support/viewHelpTickets","modules/techNotes/notes/techNotes","modules/user/requests/clientRequests","modules/user/requests/createRequests","modules/user/requests/viewProducts","modules/user/requests/viewRequests","modules/user/support/createHelpTickets.2","modules/user/support/createHelpTickets","modules/user/support/createHelpTicketsWiz","modules/user/support/curriculum","modules/user/support/downloads","modules/user/support/links","modules/user/support/support","modules/user/support/viewHelpTickets","node_modules/chart.js/dist/Chart.js","aurelia-templating-resources/compose","aurelia-templating-resources/if","aurelia-templating-resources/if-core","aurelia-templating-resources/else","aurelia-templating-resources/with","aurelia-templating-resources/repeat","aurelia-templating-resources/repeat-strategy-locator","aurelia-templating-resources/null-repeat-strategy","aurelia-templating-resources/array-repeat-strategy","aurelia-templating-resources/repeat-utilities","aurelia-templating-resources/map-repeat-strategy","aurelia-templating-resources/set-repeat-strategy","aurelia-templating-resources/number-repeat-strategy","aurelia-templating-resources/analyze-view-factory","aurelia-templating-resources/abstract-repeater","aurelia-templating-resources/show","aurelia-templating-resources/aurelia-hide-style","aurelia-templating-resources/hide","aurelia-templating-resources/sanitize-html","aurelia-templating-resources/html-sanitizer","aurelia-templating-resources/replaceable","aurelia-templating-resources/focus","aurelia-templating-resources/css-resource","aurelia-templating-resources/attr-binding-behavior","aurelia-templating-resources/binding-mode-behaviors","aurelia-templating-resources/throttle-binding-behavior","aurelia-templating-resources/debounce-binding-behavior","aurelia-templating-resources/self-binding-behavior","aurelia-templating-resources/signal-binding-behavior","aurelia-templating-resources/binding-signaler","aurelia-templating-resources/update-trigger-binding-behavior","aurelia-templating-resources/html-resource-plugin","aurelia-templating-resources/dynamic-element","aurelia-i18n/i18n","i18next/i18next","i18next/logger","i18next/EventEmitter","i18next/ResourceStore","i18next/utils","i18next/Translator","i18next/postProcessor","i18next/compatibility/v1","i18next/LanguageUtils","i18next/PluralResolver","i18next/Interpolator","i18next/BackendConnector","i18next/CacheConnector","i18next/defaults","aurelia-i18n/relativeTime","aurelia-i18n/defaultTranslations/relative.time","aurelia-i18n/df","aurelia-i18n/utils","aurelia-i18n/nf","aurelia-i18n/rt","aurelia-i18n/t","aurelia-i18n/base-i18n","aurelia-i18n/aurelia-i18n-loader","aurelia-dialog/dialog-configuration","aurelia-dialog/renderer","aurelia-dialog/dialog-settings","aurelia-dialog/dialog-renderer","aurelia-dialog/dialog-cancel-error","aurelia-dialog/dialog-service","aurelia-dialog/lifecycle","aurelia-dialog/dialog-controller","aurelia-dialog/dialog-close-error","resources/css/fullcalendar","resources/css/OLDsummernote","resources/css/styles","resources/css/summernote","resources/editor/skins/moono-lisa/dialog","resources/editor/skins/moono-lisa/dialog_ie","resources/editor/skins/moono-lisa/dialog_ie8","resources/editor/skins/moono-lisa/dialog_iequirks","resources/editor/skins/moono-lisa/editor","resources/editor/skins/moono-lisa/editor_gecko","resources/editor/skins/moono-lisa/editor_ie","resources/editor/skins/moono-lisa/editor_ie8","resources/editor/skins/moono-lisa/editor_iequirks","modules/user/user.1","resources/dialogs/documentForm","resources/dialogs/documentsTable","resources/htTimeline/response","resources/htTimeline/timeline","modules/acc/components/Address","modules/acc/components/assignmentDetails","modules/acc/components/assignRequestTable","modules/acc/components/Audit","modules/acc/components/bo","modules/acc/components/Courses.1","modules/acc/components/Courses","modules/acc/components/createInvoiceToolbar","modules/acc/components/editInvoiceDates","modules/acc/components/editRequestsForm","modules/acc/components/Email","modules/acc/components/erp","modules/acc/components/hana","modules/acc/components/instAddress","modules/acc/components/instIs4ua","modules/acc/components/institutionDetails","modules/acc/components/institutionPanels","modules/acc/components/institutionsForm","modules/acc/components/institutionsTable","modules/acc/components/instPeople","modules/acc/components/invoicePanel","modules/acc/components/invoicePanelForView","modules/acc/components/Log","modules/acc/components/Password","modules/acc/components/peopleForm","modules/acc/components/peopleTable","modules/acc/components/requestDetails","modules/acc/components/requestForm","modules/acc/components/Requests","modules/acc/components/requestsTable","modules/acc/components/Roles","modules/acc/components/viewAssignmentForm","modules/acc/components/viewInvoicePanel","modules/acc/components/viewInvoicesTable","modules/acc/components/viewRequestsTable","modules/admin/site/downloadForm","modules/admin/site/downloadTable","modules/analytics/components/countryInstitutionProductRequestsTable","modules/analytics/components/countryProductRequestsTable","modules/analytics/components/curriculumHTChart","modules/analytics/components/curriculumHTTable","modules/analytics/components/helpTicketsByCurriculum","modules/analytics/components/helpTicketsByInstitution","modules/analytics/components/helpTicketsByPeople","modules/analytics/components/helpTicketsByStatus","modules/analytics/components/helpTicketsByType","modules/analytics/components/institutionHTChart","modules/analytics/components/institutionHTTable","modules/analytics/components/institutionRequestsDetail","modules/analytics/components/institutionsCharts","modules/analytics/components/institutionsTable","modules/analytics/components/peopleHTChart","modules/analytics/components/peopleHTTable","modules/analytics/components/productRequestsDetail","modules/analytics/components/productRequestsTable","modules/analytics/components/requestsByCountry","modules/analytics/components/requestsByInstitution","modules/analytics/components/requestsByInstitutionCountry","modules/analytics/components/requestsByProducts","modules/analytics/components/requestsInstitutionChart","modules/analytics/components/requestsProductChart","modules/analytics/components/requestsSAPProductChart","modules/analytics/components/requestsTable","modules/analytics/components/statusHTChart","modules/analytics/components/statusHTTable","modules/analytics/components/typeHTChart","modules/analytics/components/typeHTTable","modules/facco/components/assignmentsTable","modules/facco/components/peopleTable","modules/facco/components/requestDetailDetails","modules/facco/components/requestsTable","modules/facco/components/viewAssignmentsTable","modules/facco/components/viewRequestsTable","modules/home/components/homeContent","modules/home/components/homePageLinks","modules/home/components/newsItem","modules/home/components/uccInformation","modules/social/components/blogForm","modules/social/components/blogList","modules/social/components/blogListUCC","modules/social/components/blogPage","modules/social/components/blogPageUCC","modules/social/components/chapterList","modules/social/components/forumList","modules/social/components/forumPage","modules/social/components/writeBlogList","modules/techNotes/components/notesForm","modules/techNotes/components/notesTable","modules/techNotes/components/Systems","modules/user/components/banner","modules/user/components/carousel","modules/user/components/homePageLinks","modules/user/components/newsItem","modules/user/components/uccInformation","modules/admin/Customers/components/Address","modules/admin/Customers/components/Audit","modules/admin/Customers/components/composeEmail","modules/admin/Customers/components/Courses","modules/admin/Customers/components/Email","modules/admin/Customers/components/emailTable","modules/admin/Customers/components/instAddress","modules/admin/Customers/components/instIs4ua","modules/admin/Customers/components/institutionDetails","modules/admin/Customers/components/institutionPanels","modules/admin/Customers/components/institutionsForm","modules/admin/Customers/components/institutionsTable","modules/admin/Customers/components/instPeople","modules/admin/Customers/components/is4ua","modules/admin/Customers/components/Log","modules/admin/Customers/components/Password","modules/admin/Customers/components/peopleForm","modules/admin/Customers/components/peopleTable","modules/admin/Customers/components/Roles","modules/admin/Customers/components/selectionForm","modules/admin/Customers/components/selectionPanel","modules/admin/documents/components/documentForm","modules/admin/documents/components/documentsTable","modules/admin/inventory/components/documentForm","modules/admin/inventory/components/Documents","modules/admin/inventory/components/documentsTable","modules/admin/inventory/components/History","modules/admin/inventory/components/inventoryDetails","modules/admin/inventory/components/inventoryForm","modules/admin/inventory/components/inventoryPanels","modules/admin/inventory/components/inventoryTable","modules/admin/inventory/components/Maintenance","modules/admin/inventory/components/Purchase","modules/admin/inventory/components/Technical","modules/admin/notes/components/ArchiveRequestsForm","modules/admin/notes/components/helpTicket","modules/admin/notes/components/notesForm","modules/admin/notes/components/notesTable","modules/admin/site/components/configForm","modules/admin/site/components/configTable","modules/admin/site/components/curriculumForm","modules/admin/site/components/curriculumTable","modules/admin/site/components/document","modules/admin/site/components/documentForm","modules/admin/site/components/documentsTable","modules/admin/site/components/downloadForm","modules/admin/site/components/downloadTable","modules/admin/site/components/foreverLogs","modules/admin/site/components/htTypeForm","modules/admin/site/components/htTypeTable","modules/admin/site/components/logFileTable","modules/admin/site/components/messageForm","modules/admin/site/components/messageTable","modules/admin/site/components/newsForm","modules/admin/site/components/newsTable","modules/admin/site/components/uploadedFilesTable","modules/admin/system/components/Assignments","modules/admin/system/components/changesForm","modules/admin/system/components/changesTable","modules/admin/system/components/Description","modules/admin/system/components/documentForm","modules/admin/system/components/Documents","modules/admin/system/components/documentsTable","modules/admin/system/components/edit-client-form","modules/admin/system/components/is4ua","modules/admin/system/components/Notes","modules/admin/system/components/productForm","modules/admin/system/components/productFormHeader","modules/admin/system/components/productFormToolbar","modules/admin/system/components/productTable","modules/admin/system/components/sessionConfigTable","modules/admin/system/components/sessionForm","modules/admin/system/components/sessionTable","modules/admin/system/components/systemForm","modules/admin/system/components/Systems","modules/admin/system/components/systemTable","modules/tech/requests/components/apjRequestsTable","modules/tech/requests/components/ArchiveRequestsForm","modules/tech/requests/components/ArchiveRequestsTable","modules/tech/requests/components/archiveTable","modules/tech/requests/components/assignmentDetails","modules/tech/requests/components/bo","modules/tech/requests/components/bulkEmailForm","modules/tech/requests/components/Courses","modules/tech/requests/components/editRequestsForm","modules/tech/requests/components/erp","modules/tech/requests/components/hana","modules/tech/requests/components/requestDetailDetails","modules/tech/requests/components/requestDetails","modules/tech/requests/components/requestsTable","modules/tech/requests/components/userAssignmentDetails","modules/tech/requests/components/userRequestDetails","modules/tech/requests/components/viewAssignmentForm","modules/tech/requests/components/viewRequestsForm","modules/tech/requests/components/viewRequestsTable","modules/tech/requests/components/viewUserRequestsForm","modules/tech/requests/components/viewUserRequestsTable","modules/tech/support/components/additiontalInfo","modules/tech/support/components/assignmentDetails","modules/tech/support/components/bo","modules/tech/support/components/documentForm","modules/tech/support/components/Documents","modules/tech/support/components/documentsTable","modules/tech/support/components/erp","modules/tech/support/components/hana","modules/tech/support/components/helpTicketDetails","modules/tech/support/components/helpTicketType","modules/tech/support/components/requestDetails","modules/tech/support/components/Requests","modules/tech/support/components/searchHTForm","modules/tech/support/components/selectProduct","modules/tech/support/components/viewArchiveHTForm","modules/tech/support/components/viewAssignmentForm","modules/tech/support/components/viewHelpTicketTableFilters","modules/tech/support/components/viewHoverProfile","modules/tech/support/components/viewHTForm","modules/tech/support/components/viewHTSearchResults","modules/tech/support/components/viewHTTable","modules/tech/support/components/viewRequestsPanel","modules/tech/support/components/viewToolbarButtons","modules/user/requests/components/assignmentDetails","modules/user/requests/components/bo","modules/user/requests/components/client-request-step1","modules/user/requests/components/client-request-step2","modules/user/requests/components/client-request-step3","modules/user/requests/components/client-request-step4","modules/user/requests/components/Courses","modules/user/requests/components/erp","modules/user/requests/components/hana","modules/user/requests/components/requestDetails","modules/user/requests/components/viewRequestsForm","modules/user/requests/components/viewRequestsTable","modules/user/support/components/comment","modules/user/support/components/help-ticket-step1","modules/user/support/components/help-ticket-step2","modules/user/support/components/help-ticket-step3","modules/user/support/components/help-ticket-step4","modules/user/support/components/help-ticket-step5","modules/user/support/components/helpTicketDetails","modules/user/support/components/helpTicketType","modules/user/support/components/helpTicketWizard","modules/user/support/components/inputForm-0-0","modules/user/support/components/inputForm-1-0","modules/user/support/components/Requests","modules/user/support/components/viewHTForm","modules/user/support/components/viewHTTable"]}})}
+    if (_aureliaPal.PLATFORM.global.Blob && message.content instanceof Blob) {
+      return;
+    }
+
+    if (_aureliaPal.PLATFORM.global.ArrayBuffer && message.content instanceof ArrayBuffer) {
+      return;
+    }
+
+    if (message.content instanceof Document) {
+      return;
+    }
+
+    if (typeof message.content === 'string') {
+      return;
+    }
+
+    if (message.content === null || message.content === undefined) {
+      return;
+    }
+
+    message.content = JSON.stringify(message.content, message.replacer);
+
+    if (!message.headers.has('Content-Type')) {
+      message.headers.add('Content-Type', 'application/json');
+    }
+  }
+
+  var JSONPRequestMessage = exports.JSONPRequestMessage = function (_RequestMessage) {
+    _inherits(JSONPRequestMessage, _RequestMessage);
+
+    function JSONPRequestMessage(url, callbackParameterName) {
+      
+
+      var _this2 = _possibleConstructorReturn(this, _RequestMessage.call(this, 'JSONP', url));
+
+      _this2.responseType = 'jsonp';
+      _this2.callbackParameterName = callbackParameterName;
+      return _this2;
+    }
+
+    return JSONPRequestMessage;
+  }(RequestMessage);
+
+  var JSONPXHR = function () {
+    function JSONPXHR() {
+      
+    }
+
+    JSONPXHR.prototype.open = function open(method, url) {
+      this.method = method;
+      this.url = url;
+      this.callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+    };
+
+    JSONPXHR.prototype.send = function send() {
+      var _this3 = this;
+
+      var url = this.url + (this.url.indexOf('?') >= 0 ? '&' : '?') + encodeURIComponent(this.callbackParameterName) + '=' + this.callbackName;
+      var script = _aureliaPal.DOM.createElement('script');
+
+      script.src = url;
+      script.onerror = function (e) {
+        cleanUp();
+
+        _this3.status = 0;
+        _this3.onerror(new Error('error'));
+      };
+
+      var cleanUp = function cleanUp() {
+        delete _aureliaPal.PLATFORM.global[_this3.callbackName];
+        _aureliaPal.DOM.removeNode(script);
+      };
+
+      _aureliaPal.PLATFORM.global[this.callbackName] = function (data) {
+        cleanUp();
+
+        if (_this3.status === undefined) {
+          _this3.status = 200;
+          _this3.statusText = 'OK';
+          _this3.response = data;
+          _this3.onload(_this3);
+        }
+      };
+
+      _aureliaPal.DOM.appendNode(script);
+
+      if (this.timeout !== undefined) {
+        setTimeout(function () {
+          if (_this3.status === undefined) {
+            _this3.status = 0;
+            _this3.ontimeout(new Error('timeout'));
+          }
+        }, this.timeout);
+      }
+    };
+
+    JSONPXHR.prototype.abort = function abort() {
+      if (this.status === undefined) {
+        this.status = 0;
+        this.onabort(new Error('abort'));
+      }
+    };
+
+    JSONPXHR.prototype.setRequestHeader = function setRequestHeader() {};
+
+    return JSONPXHR;
+  }();
+
+  function createJSONPRequestMessageProcessor() {
+    return new RequestMessageProcessor(JSONPXHR, [timeoutTransformer, callbackParameterNameTransformer]);
+  }
+
+  var HttpRequestMessage = exports.HttpRequestMessage = function (_RequestMessage2) {
+    _inherits(HttpRequestMessage, _RequestMessage2);
+
+    function HttpRequestMessage(method, url, content, headers) {
+      
+
+      var _this4 = _possibleConstructorReturn(this, _RequestMessage2.call(this, method, url, content, headers));
+
+      _this4.responseType = 'json';return _this4;
+    }
+
+    return HttpRequestMessage;
+  }(RequestMessage);
+
+  function createHttpRequestMessageProcessor() {
+    return new RequestMessageProcessor(_aureliaPal.PLATFORM.XMLHttpRequest, [timeoutTransformer, credentialsTransformer, progressTransformer, downloadProgressTransformer, responseTypeTransformer, contentTransformer, headerTransformer]);
+  }
+
+  var ErrorHttpResponseMessage = exports.ErrorHttpResponseMessage = function (_HttpResponseMessage) {
+    _inherits(ErrorHttpResponseMessage, _HttpResponseMessage);
+
+    function ErrorHttpResponseMessage(responseMessage) {
+      
+
+      var _this5 = _possibleConstructorReturn(this, _HttpResponseMessage.call(this, responseMessage.requestMessage, {
+        response: responseMessage.response,
+        status: responseMessage.statusCode,
+        statusText: responseMessage.statusText
+      }, responseMessage.responseType));
+
+      _this5.name = responseMessage.responseType;
+      _this5.message = 'Error: ' + responseMessage.statusCode + ' Status: ' + responseMessage.statusText;
+      return _this5;
+    }
+
+    return ErrorHttpResponseMessage;
+  }(HttpResponseMessage);
+
+  var RequestBuilder = exports.RequestBuilder = function () {
+    function RequestBuilder(client) {
+      
+
+      this.client = client;
+      this.transformers = client.requestTransformers.slice(0);
+      this.useJsonp = false;
+    }
+
+    RequestBuilder.prototype.asDelete = function asDelete() {
+      return this._addTransformer(function (client, processor, message) {
+        message.method = 'DELETE';
+      });
+    };
+
+    RequestBuilder.prototype.asGet = function asGet() {
+      return this._addTransformer(function (client, processor, message) {
+        message.method = 'GET';
+      });
+    };
+
+    RequestBuilder.prototype.asHead = function asHead() {
+      return this._addTransformer(function (client, processor, message) {
+        message.method = 'HEAD';
+      });
+    };
+
+    RequestBuilder.prototype.asOptions = function asOptions() {
+      return this._addTransformer(function (client, processor, message) {
+        message.method = 'OPTIONS';
+      });
+    };
+
+    RequestBuilder.prototype.asPatch = function asPatch() {
+      return this._addTransformer(function (client, processor, message) {
+        message.method = 'PATCH';
+      });
+    };
+
+    RequestBuilder.prototype.asPost = function asPost() {
+      return this._addTransformer(function (client, processor, message) {
+        message.method = 'POST';
+      });
+    };
+
+    RequestBuilder.prototype.asPut = function asPut() {
+      return this._addTransformer(function (client, processor, message) {
+        message.method = 'PUT';
+      });
+    };
+
+    RequestBuilder.prototype.asJsonp = function asJsonp(callbackParameterName) {
+      this.useJsonp = true;
+      return this._addTransformer(function (client, processor, message) {
+        message.callbackParameterName = callbackParameterName;
+      });
+    };
+
+    RequestBuilder.prototype.withUrl = function withUrl(url) {
+      return this._addTransformer(function (client, processor, message) {
+        message.url = url;
+      });
+    };
+
+    RequestBuilder.prototype.withContent = function withContent(content) {
+      return this._addTransformer(function (client, processor, message) {
+        message.content = content;
+      });
+    };
+
+    RequestBuilder.prototype.withBaseUrl = function withBaseUrl(baseUrl) {
+      return this._addTransformer(function (client, processor, message) {
+        message.baseUrl = baseUrl;
+      });
+    };
+
+    RequestBuilder.prototype.withParams = function withParams(params, traditional) {
+      return this._addTransformer(function (client, processor, message) {
+        message.traditional = traditional;
+        message.params = params;
+      });
+    };
+
+    RequestBuilder.prototype.withResponseType = function withResponseType(responseType) {
+      return this._addTransformer(function (client, processor, message) {
+        message.responseType = responseType;
+      });
+    };
+
+    RequestBuilder.prototype.withTimeout = function withTimeout(timeout) {
+      return this._addTransformer(function (client, processor, message) {
+        message.timeout = timeout;
+      });
+    };
+
+    RequestBuilder.prototype.withHeader = function withHeader(key, value) {
+      return this._addTransformer(function (client, processor, message) {
+        message.headers.add(key, value);
+      });
+    };
+
+    RequestBuilder.prototype.withCredentials = function withCredentials(value) {
+      return this._addTransformer(function (client, processor, message) {
+        message.withCredentials = value;
+      });
+    };
+
+    RequestBuilder.prototype.withLogin = function withLogin(user, password) {
+      return this._addTransformer(function (client, processor, message) {
+        message.user = user;message.password = password;
+      });
+    };
+
+    RequestBuilder.prototype.withReviver = function withReviver(reviver) {
+      return this._addTransformer(function (client, processor, message) {
+        message.reviver = reviver;
+      });
+    };
+
+    RequestBuilder.prototype.withReplacer = function withReplacer(replacer) {
+      return this._addTransformer(function (client, processor, message) {
+        message.replacer = replacer;
+      });
+    };
+
+    RequestBuilder.prototype.withProgressCallback = function withProgressCallback(progressCallback) {
+      return this._addTransformer(function (client, processor, message) {
+        message.progressCallback = progressCallback;
+      });
+    };
+
+    RequestBuilder.prototype.withDownloadProgressCallback = function withDownloadProgressCallback(downloadProgressCallback) {
+      return this._addTransformer(function (client, processor, message) {
+        message.downloadProgressCallback = downloadProgressCallback;
+      });
+    };
+
+    RequestBuilder.prototype.withCallbackParameterName = function withCallbackParameterName(callbackParameterName) {
+      return this._addTransformer(function (client, processor, message) {
+        message.callbackParameterName = callbackParameterName;
+      });
+    };
+
+    RequestBuilder.prototype.withInterceptor = function withInterceptor(interceptor) {
+      return this._addTransformer(function (client, processor, message) {
+        message.interceptors = message.interceptors || [];
+        message.interceptors.unshift(interceptor);
+      });
+    };
+
+    RequestBuilder.prototype.skipContentProcessing = function skipContentProcessing() {
+      return this._addTransformer(function (client, processor, message) {
+        message.skipContentProcessing = true;
+      });
+    };
+
+    RequestBuilder.prototype._addTransformer = function _addTransformer(fn) {
+      this.transformers.push(fn);
+      return this;
+    };
+
+    RequestBuilder.addHelper = function addHelper(name, fn) {
+      RequestBuilder.prototype[name] = function () {
+        return this._addTransformer(fn.apply(this, arguments));
+      };
+    };
+
+    RequestBuilder.prototype.send = function send() {
+      var message = this.useJsonp ? new JSONPRequestMessage() : new HttpRequestMessage();
+      return this.client.send(message, this.transformers);
+    };
+
+    return RequestBuilder;
+  }();
+
+  function trackRequestStart(client, processor) {
+    client.pendingRequests.push(processor);
+    client.isRequesting = true;
+  }
+
+  function trackRequestEnd(client, processor) {
+    var index = client.pendingRequests.indexOf(processor);
+
+    client.pendingRequests.splice(index, 1);
+    client.isRequesting = client.pendingRequests.length > 0;
+
+    if (!client.isRequesting) {
+      var evt = _aureliaPal.DOM.createCustomEvent('aurelia-http-client-requests-drained', { bubbles: true, cancelable: true });
+      setTimeout(function () {
+        return _aureliaPal.DOM.dispatchEvent(evt);
+      }, 1);
+    }
+  }
+
+  var HttpClient = exports.HttpClient = function () {
+    function HttpClient() {
+      
+
+      this.isRequesting = false;
+
+      this.rejectPromiseWithErrorObject = false;
+      this.requestTransformers = [];
+      this.requestProcessorFactories = new Map();
+      this.requestProcessorFactories.set(HttpRequestMessage, createHttpRequestMessageProcessor);
+      this.requestProcessorFactories.set(JSONPRequestMessage, createJSONPRequestMessageProcessor);
+      this.pendingRequests = [];
+    }
+
+    HttpClient.prototype.configure = function configure(fn) {
+      var builder = new RequestBuilder(this);
+      fn(builder);
+      this.requestTransformers = builder.transformers;
+      return this;
+    };
+
+    HttpClient.prototype.createRequest = function createRequest(url) {
+      var builder = new RequestBuilder(this);
+
+      if (url) {
+        builder.withUrl(url);
+      }
+
+      return builder;
+    };
+
+    HttpClient.prototype.send = function send(requestMessage, transformers) {
+      var _this6 = this;
+
+      var createProcessor = this.requestProcessorFactories.get(requestMessage.constructor);
+      var processor = void 0;
+      var promise = void 0;
+      var i = void 0;
+      var ii = void 0;
+
+      if (!createProcessor) {
+        throw new Error('No request message processor factory for ' + requestMessage.constructor + '.');
+      }
+
+      processor = createProcessor();
+      trackRequestStart(this, processor);
+
+      transformers = transformers || this.requestTransformers;
+
+      promise = Promise.resolve(requestMessage).then(function (message) {
+        for (i = 0, ii = transformers.length; i < ii; ++i) {
+          transformers[i](_this6, processor, message);
+        }
+
+        return processor.process(_this6, message).then(function (response) {
+          trackRequestEnd(_this6, processor);
+          return response;
+        }).catch(function (response) {
+          trackRequestEnd(_this6, processor);
+          throw response;
+        });
+      });
+
+      promise.abort = promise.cancel = function () {
+        processor.abort();
+      };
+
+      return promise;
+    };
+
+    HttpClient.prototype.delete = function _delete(url) {
+      return this.createRequest(url).asDelete().send();
+    };
+
+    HttpClient.prototype.get = function get(url, params, traditional) {
+      var req = this.createRequest(url).asGet();
+
+      if (params) {
+        return req.withParams(params, traditional).send();
+      }
+
+      return req.send();
+    };
+
+    HttpClient.prototype.head = function head(url) {
+      return this.createRequest(url).asHead().send();
+    };
+
+    HttpClient.prototype.jsonp = function jsonp(url) {
+      var callbackParameterName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'jsoncallback';
+
+      return this.createRequest(url).asJsonp(callbackParameterName).send();
+    };
+
+    HttpClient.prototype.options = function options(url) {
+      return this.createRequest(url).asOptions().send();
+    };
+
+    HttpClient.prototype.put = function put(url, content) {
+      return this.createRequest(url).asPut().withContent(content).send();
+    };
+
+    HttpClient.prototype.patch = function patch(url, content) {
+      return this.createRequest(url).asPatch().withContent(content).send();
+    };
+
+    HttpClient.prototype.post = function post(url, content) {
+      return this.createRequest(url).asPost().withContent(content).send();
+    };
+
+    return HttpClient;
+  }();
+});;define('aurelia-http-client', ['aurelia-http-client/aurelia-http-client'], function (main) { return main; });
+
+define('aurelia-loader',['exports', 'aurelia-path', 'aurelia-metadata'], function (exports, _aureliaPath, _aureliaMetadata) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Loader = exports.TemplateRegistryEntry = exports.TemplateDependency = undefined;
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  
+
+  var TemplateDependency = exports.TemplateDependency = function TemplateDependency(src, name) {
+    
+
+    this.src = src;
+    this.name = name;
+  };
+
+  var TemplateRegistryEntry = exports.TemplateRegistryEntry = function () {
+    function TemplateRegistryEntry(address) {
+      
+
+      this.templateIsLoaded = false;
+      this.factoryIsReady = false;
+      this.resources = null;
+      this.dependencies = null;
+
+      this.address = address;
+      this.onReady = null;
+      this._template = null;
+      this._factory = null;
+    }
+
+    TemplateRegistryEntry.prototype.addDependency = function addDependency(src, name) {
+      var finalSrc = typeof src === 'string' ? (0, _aureliaPath.relativeToFile)(src, this.address) : _aureliaMetadata.Origin.get(src).moduleId;
+
+      this.dependencies.push(new TemplateDependency(finalSrc, name));
+    };
+
+    _createClass(TemplateRegistryEntry, [{
+      key: 'template',
+      get: function get() {
+        return this._template;
+      },
+      set: function set(value) {
+        var address = this.address;
+        var requires = void 0;
+        var current = void 0;
+        var src = void 0;
+        var dependencies = void 0;
+
+        this._template = value;
+        this.templateIsLoaded = true;
+
+        requires = value.content.querySelectorAll('require');
+        dependencies = this.dependencies = new Array(requires.length);
+
+        for (var i = 0, ii = requires.length; i < ii; ++i) {
+          current = requires[i];
+          src = current.getAttribute('from');
+
+          if (!src) {
+            throw new Error('<require> element in ' + address + ' has no "from" attribute.');
+          }
+
+          dependencies[i] = new TemplateDependency((0, _aureliaPath.relativeToFile)(src, address), current.getAttribute('as'));
+
+          if (current.parentNode) {
+            current.parentNode.removeChild(current);
+          }
+        }
+      }
+    }, {
+      key: 'factory',
+      get: function get() {
+        return this._factory;
+      },
+      set: function set(value) {
+        this._factory = value;
+        this.factoryIsReady = true;
+      }
+    }]);
+
+    return TemplateRegistryEntry;
+  }();
+
+  var Loader = exports.Loader = function () {
+    function Loader() {
+      
+
+      this.templateRegistry = {};
+    }
+
+    Loader.prototype.map = function map(id, source) {
+      throw new Error('Loaders must implement map(id, source).');
+    };
+
+    Loader.prototype.normalizeSync = function normalizeSync(moduleId, relativeTo) {
+      throw new Error('Loaders must implement normalizeSync(moduleId, relativeTo).');
+    };
+
+    Loader.prototype.normalize = function normalize(moduleId, relativeTo) {
+      throw new Error('Loaders must implement normalize(moduleId: string, relativeTo: string): Promise<string>.');
+    };
+
+    Loader.prototype.loadModule = function loadModule(id) {
+      throw new Error('Loaders must implement loadModule(id).');
+    };
+
+    Loader.prototype.loadAllModules = function loadAllModules(ids) {
+      throw new Error('Loader must implement loadAllModules(ids).');
+    };
+
+    Loader.prototype.loadTemplate = function loadTemplate(url) {
+      throw new Error('Loader must implement loadTemplate(url).');
+    };
+
+    Loader.prototype.loadText = function loadText(url) {
+      throw new Error('Loader must implement loadText(url).');
+    };
+
+    Loader.prototype.applyPluginToUrl = function applyPluginToUrl(url, pluginName) {
+      throw new Error('Loader must implement applyPluginToUrl(url, pluginName).');
+    };
+
+    Loader.prototype.addPlugin = function addPlugin(pluginName, implementation) {
+      throw new Error('Loader must implement addPlugin(pluginName, implementation).');
+    };
+
+    Loader.prototype.getOrCreateTemplateRegistryEntry = function getOrCreateTemplateRegistryEntry(address) {
+      return this.templateRegistry[address] || (this.templateRegistry[address] = new TemplateRegistryEntry(address));
+    };
+
+    return Loader;
+  }();
+});
+function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","text":"../node_modules\\text\\text","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-notification":"../node_modules\\aurelia-notification\\dist\\amd\\aurelia-notification","aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","jquery":"../node_modules\\jquery\\dist\\jquery","extend":"../node_modules\\extend\\index","moment":"../node_modules\\moment\\moment","deepmerge":"../node_modules\\deepmerge\\dist\\umd","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr.js"},{"name":"humane-js","location":"../node_modules/humane-js","main":"humane"},{"name":"aurelia-i18n","location":"../node_modules/aurelia-i18n/dist/amd","main":"aurelia-i18n"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr"},{"name":"i18next","location":"../node_modules/i18next/dist/commonjs","main":"index"},{"name":"regenerator-runtime","location":"../node_modules/regenerator-runtime","main":"runtime"},{"name":"nprogress","location":"../node_modules/nprogress","main":"nprogress"},{"name":"bootstrap","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min"},{"name":"aurelia-mask","location":"../node_modules/aurelia-mask/dist","main":"masked-input"},{"name":"flatpickr","location":"../node_modules/flatpickr/dist","main":"flatpickr"},{"name":"summernote","location":"../node_modules/summernote/dist/","main":"summernote"},{"name":"fuelux","location":"../node_modules/fuelux/dist","main":"js/fuelux.min"},{"name":"fullcalendar","location":"../node_modules/fullcalendar/dist","main":"fullcalendar"},{"name":"chart.js","location":"../node_modules/chart.js/dist","main":"Chart.min.js"},{"name":"aurelia-dialog","location":"../node_modules/aurelia-dialog/dist/amd","main":"aurelia-dialog"},{"name":"bootstrap-select","location":"../node_modules/bootstrap-select/dist/","main":"js/bootstrap-select"},{"name":"aurelia-google-analytics","location":"../node_modules/aurelia-google-analytics/dist/amd","main":"index"},{"name":"aurelia-chart","location":"../node_modules/aurelia-chart/dist/amd","main":"index"},{"name":"aurelia-http-client","location":"../node_modules/aurelia-http-client/dist/amd","main":"aurelia-http-client"}],"stubModules":["text"],"shim":{"bootstrap":{"deps":["jquery"],"exports":"$"},"aurelia-chart":{"deps":["chart.js"]}},"bundles":{"app-bundle":["app","environment","main","config/appConfig","config/routerConfig","resources/index","modules/acc/accCreateInvoice","modules/acc/accCreateRequest","modules/acc/accHT","modules/acc/accInstitute","modules/acc/accInstitutions","modules/acc/accInvoice","modules/acc/accPeople","modules/acc/accRequests","modules/acc/accViewInvoice","modules/acc/apjAssignments","modules/acc/createHTs","modules/acc/viewHTs","modules/acc/viewUserRequests","modules/facco/editPeople","modules/facco/facco","modules/facco/viewAssignments","modules/facco/viewRequests","modules/analytics/analytics","modules/analytics/clientRequests","modules/analytics/helpTickets","modules/analytics/institutions","modules/home/about","modules/home/contact","modules/home/home","modules/home/institutions","modules/home/products","modules/home/register","modules/social/chapterList","modules/social/chapters","modules/social/editBlog","modules/social/social","modules/social/viewBlogs","modules/social/viewForums","modules/social/writeBlog","modules/techNotes/editCheckLists","modules/techNotes/editSystemUpdates","modules/techNotes/editTechNotes","modules/techNotes/techNotes","modules/user/profile","modules/user/resetPassword","modules/user/user","resources/charts/bar-chart","resources/charts/chart-data","resources/charts/chart-element","resources/charts/doughnut-chart","resources/data/admin","resources/data/apjClientRequests","resources/data/auth","resources/data/chapters","resources/data/clientRequests","resources/data/config","resources/data/curriculum","resources/data/dataServices","resources/data/documents","resources/data/downloads","resources/data/events","resources/data/helpTickets","resources/data/inventory","resources/data/is4ua","resources/data/people","resources/data/products","resources/data/sessionData","resources/data/sessions","resources/data/siteInfo","resources/data/social","resources/data/systems","resources/dialogs/common-dialogs","resources/dialogs/confirm-dialog","resources/dialogs/document-dialog","resources/dialogs/email-dialog","resources/dialogs/event-dialog","resources/dialogs/helpTicket-dialog","resources/dialogs/input-dialog","resources/dialogs/message-dialog","resources/dialogs/note-dialog","resources/dialogs/password-dialog","resources/editor/editor","resources/editor/styles","resources/elements/add-systems","resources/elements/calendar","resources/elements/flat-picker","resources/elements/loading-indicator","resources/elements/multiselect","resources/elements/nav-bar","resources/elements/rate-it","resources/elements/submenu","resources/elements/table-navigation-bar","resources/elements/tree-node","resources/utils/dataTable","resources/utils/utils","resources/utils/validation","resources/value-converters/activate-button","resources/value-converters/arrow","resources/value-converters/check-box","resources/value-converters/course-name","resources/value-converters/date-format","resources/value-converters/file-type","resources/value-converters/filter-apjrequestdetails","resources/value-converters/filter-array","resources/value-converters/filter-clients","resources/value-converters/filter-sessions","resources/value-converters/format-digits","resources/value-converters/format-number","resources/value-converters/format-phone","resources/value-converters/get-array-value","resources/value-converters/gravatar-url-id","resources/value-converters/gravatar-url","resources/value-converters/help-ticket-statuses","resources/value-converters/help-ticket-subtypes","resources/value-converters/help-ticket-type","resources/value-converters/idsRequested","resources/value-converters/info-filter","resources/value-converters/lookup-ht-status","resources/value-converters/lookup-value","resources/value-converters/onoff-switch","resources/value-converters/overlap","resources/value-converters/parse-apjassignments","resources/value-converters/parse-assignments","resources/value-converters/person-status-button","resources/value-converters/phone-number","resources/value-converters/request-status-class","resources/value-converters/sandbox","resources/value-converters/session-name","resources/value-converters/session-status-button","resources/value-converters/session-systems","resources/value-converters/session-type","resources/value-converters/session","resources/value-converters/sort-array","resources/value-converters/sort-date-time","resources/value-converters/stat-value","resources/value-converters/system-list","resources/value-converters/to-uppercase","resources/value-converters/translate-status","resources/value-converters/ucc-staff","resources/value-converters/ucc-title","modules/admin/Customers/bulkEmails","modules/admin/Customers/customers","modules/admin/Customers/editInstitutions","modules/admin/Customers/editPeople","modules/admin/documents/documents","modules/admin/inventory/editInventory","modules/admin/notes/editCalendar","modules/admin/notes/editNotes","modules/admin/notes/notes","modules/admin/site/admin","modules/admin/site/editConfig","modules/admin/site/editCurriculum","modules/admin/site/editDownloads","modules/admin/site/editHelpTickets","modules/admin/site/editMessages","modules/admin/site/editNews","modules/admin/site/site","modules/admin/system/editChanges","modules/admin/system/editProduct","modules/admin/system/editSession","modules/admin/system/editSystem","modules/admin/system/system","modules/tech/requests/apjRequests","modules/tech/requests/archiveClientRequests","modules/tech/requests/assignments","modules/tech/requests/createRequest","modules/tech/requests/techRequests","modules/tech/requests/viewUserRequests","modules/tech/support/archiveHelpTickets","modules/tech/support/createHelpTickets","modules/tech/support/support","modules/tech/support/viewHelpTickets","modules/techNotes/notes/techNotes","modules/user/requests/clientRequests","modules/user/requests/createRequests","modules/user/requests/viewProducts","modules/user/requests/viewRequests","modules/user/support/createHelpTickets.2","modules/user/support/createHelpTickets","modules/user/support/createHelpTicketsWiz","modules/user/support/curriculum","modules/user/support/downloads","modules/user/support/links","modules/user/support/support","modules/user/support/viewHelpTickets","aurelia-templating-resources/compose","aurelia-templating-resources/if","aurelia-templating-resources/if-core","aurelia-templating-resources/else","aurelia-templating-resources/with","aurelia-templating-resources/repeat","aurelia-templating-resources/repeat-strategy-locator","aurelia-templating-resources/null-repeat-strategy","aurelia-templating-resources/array-repeat-strategy","aurelia-templating-resources/repeat-utilities","aurelia-templating-resources/map-repeat-strategy","aurelia-templating-resources/set-repeat-strategy","aurelia-templating-resources/number-repeat-strategy","aurelia-templating-resources/analyze-view-factory","aurelia-templating-resources/abstract-repeater","aurelia-templating-resources/show","aurelia-templating-resources/aurelia-hide-style","aurelia-templating-resources/hide","aurelia-templating-resources/sanitize-html","aurelia-templating-resources/html-sanitizer","aurelia-templating-resources/replaceable","aurelia-templating-resources/focus","aurelia-templating-resources/css-resource","aurelia-templating-resources/attr-binding-behavior","aurelia-templating-resources/binding-mode-behaviors","aurelia-templating-resources/throttle-binding-behavior","aurelia-templating-resources/debounce-binding-behavior","aurelia-templating-resources/self-binding-behavior","aurelia-templating-resources/signal-binding-behavior","aurelia-templating-resources/binding-signaler","aurelia-templating-resources/update-trigger-binding-behavior","aurelia-templating-resources/html-resource-plugin","aurelia-templating-resources/dynamic-element","aurelia-i18n/i18n","i18next/i18next","i18next/logger","i18next/EventEmitter","i18next/ResourceStore","i18next/utils","i18next/Translator","i18next/postProcessor","i18next/compatibility/v1","i18next/LanguageUtils","i18next/PluralResolver","i18next/Interpolator","i18next/BackendConnector","i18next/CacheConnector","i18next/defaults","aurelia-i18n/relativeTime","aurelia-i18n/defaultTranslations/relative.time","aurelia-i18n/df","aurelia-i18n/utils","aurelia-i18n/nf","aurelia-i18n/rt","aurelia-i18n/t","aurelia-i18n/base-i18n","aurelia-i18n/aurelia-i18n-loader","aurelia-dialog/dialog-configuration","aurelia-dialog/renderer","aurelia-dialog/dialog-settings","aurelia-dialog/dialog-renderer","aurelia-dialog/dialog-cancel-error","aurelia-dialog/dialog-service","aurelia-dialog/lifecycle","aurelia-dialog/dialog-controller","aurelia-dialog/dialog-close-error","node_modules/chart.js/dist/Chart.js","resources/css/fullcalendar","resources/css/OLDsummernote","resources/css/styles","resources/css/summernote","resources/editor/skins/moono-lisa/dialog","resources/editor/skins/moono-lisa/dialog_ie","resources/editor/skins/moono-lisa/dialog_ie8","resources/editor/skins/moono-lisa/dialog_iequirks","resources/editor/skins/moono-lisa/editor","resources/editor/skins/moono-lisa/editor_gecko","resources/editor/skins/moono-lisa/editor_ie","resources/editor/skins/moono-lisa/editor_ie8","resources/editor/skins/moono-lisa/editor_iequirks","modules/user/user.1","resources/dialogs/documentForm","resources/dialogs/documentsTable","resources/htTimeline/response","resources/htTimeline/timeline","modules/acc/components/Address","modules/acc/components/assignmentDetails","modules/acc/components/assignRequestTable","modules/acc/components/Audit","modules/acc/components/bo","modules/acc/components/Courses.1","modules/acc/components/Courses","modules/acc/components/createInvoiceToolbar","modules/acc/components/editInvoiceDates","modules/acc/components/editRequestsForm","modules/acc/components/Email","modules/acc/components/erp","modules/acc/components/hana","modules/acc/components/instAddress","modules/acc/components/instIs4ua","modules/acc/components/institutionDetails","modules/acc/components/institutionPanels","modules/acc/components/institutionsForm","modules/acc/components/institutionsTable","modules/acc/components/instPeople","modules/acc/components/invoicePanel","modules/acc/components/invoicePanelForView","modules/acc/components/Log","modules/acc/components/Password","modules/acc/components/peopleForm","modules/acc/components/peopleTable","modules/acc/components/requestDetails","modules/acc/components/requestForm","modules/acc/components/Requests","modules/acc/components/requestsTable","modules/acc/components/Roles","modules/acc/components/viewAssignmentForm","modules/acc/components/viewInvoicePanel","modules/acc/components/viewInvoicesTable","modules/acc/components/viewRequestsTable","modules/admin/site/downloadForm","modules/admin/site/downloadTable","modules/analytics/components/countryInstitutionProductRequestsTable","modules/analytics/components/countryProductRequestsTable","modules/analytics/components/curriculumHTChart","modules/analytics/components/curriculumHTTable","modules/analytics/components/helpTicketsByCurriculum","modules/analytics/components/helpTicketsByInstitution","modules/analytics/components/helpTicketsByPeople","modules/analytics/components/helpTicketsByStatus","modules/analytics/components/helpTicketsByType","modules/analytics/components/institutionHTChart","modules/analytics/components/institutionHTTable","modules/analytics/components/institutionRequestsDetail","modules/analytics/components/institutionsCharts","modules/analytics/components/institutionsTable","modules/analytics/components/peopleHTChart","modules/analytics/components/peopleHTTable","modules/analytics/components/productRequestsDetail","modules/analytics/components/productRequestsTable","modules/analytics/components/requestsByCountry","modules/analytics/components/requestsByInstitution","modules/analytics/components/requestsByInstitutionCountry","modules/analytics/components/requestsByProducts","modules/analytics/components/requestsInstitutionChart","modules/analytics/components/requestsProductChart","modules/analytics/components/requestsSAPProductChart","modules/analytics/components/requestsTable","modules/analytics/components/statusHTChart","modules/analytics/components/statusHTTable","modules/analytics/components/typeHTChart","modules/analytics/components/typeHTTable","modules/facco/components/assignmentsTable","modules/facco/components/peopleTable","modules/facco/components/requestDetailDetails","modules/facco/components/requestsTable","modules/facco/components/viewAssignmentsTable","modules/facco/components/viewRequestsTable","modules/home/components/homeContent","modules/home/components/homePageLinks","modules/home/components/newsItem","modules/home/components/uccInformation","modules/social/components/blogForm","modules/social/components/blogList","modules/social/components/blogListUCC","modules/social/components/blogPage","modules/social/components/blogPageUCC","modules/social/components/chapterList","modules/social/components/forumList","modules/social/components/forumPage","modules/social/components/writeBlogList","modules/techNotes/components/notesForm","modules/techNotes/components/notesTable","modules/techNotes/components/Systems","modules/user/components/banner","modules/user/components/carousel","modules/user/components/homePageLinks","modules/user/components/newsItem","modules/user/components/uccInformation","modules/admin/documents/components/documentForm","modules/admin/documents/components/documentsTable","modules/admin/Customers/components/Address","modules/admin/Customers/components/Audit","modules/admin/Customers/components/composeEmail","modules/admin/Customers/components/Courses","modules/admin/Customers/components/Email","modules/admin/Customers/components/emailTable","modules/admin/Customers/components/instAddress","modules/admin/Customers/components/instIs4ua","modules/admin/Customers/components/institutionDetails","modules/admin/Customers/components/institutionPanels","modules/admin/Customers/components/institutionsForm","modules/admin/Customers/components/institutionsTable","modules/admin/Customers/components/instPeople","modules/admin/Customers/components/is4ua","modules/admin/Customers/components/Log","modules/admin/Customers/components/Password","modules/admin/Customers/components/peopleForm","modules/admin/Customers/components/peopleTable","modules/admin/Customers/components/Roles","modules/admin/Customers/components/selectionForm","modules/admin/Customers/components/selectionPanel","modules/admin/inventory/components/documentForm","modules/admin/inventory/components/Documents","modules/admin/inventory/components/documentsTable","modules/admin/inventory/components/History","modules/admin/inventory/components/inventoryDetails","modules/admin/inventory/components/inventoryForm","modules/admin/inventory/components/inventoryPanels","modules/admin/inventory/components/inventoryTable","modules/admin/inventory/components/Maintenance","modules/admin/inventory/components/Purchase","modules/admin/inventory/components/Technical","modules/admin/notes/components/ArchiveRequestsForm","modules/admin/notes/components/helpTicket","modules/admin/notes/components/notesForm","modules/admin/notes/components/notesTable","modules/admin/site/components/configForm","modules/admin/site/components/configTable","modules/admin/site/components/curriculumForm","modules/admin/site/components/curriculumTable","modules/admin/site/components/document","modules/admin/site/components/documentForm","modules/admin/site/components/documentsTable","modules/admin/site/components/downloadForm","modules/admin/site/components/downloadTable","modules/admin/site/components/foreverLogs","modules/admin/site/components/htTypeForm","modules/admin/site/components/htTypeTable","modules/admin/site/components/logFileTable","modules/admin/site/components/messageForm","modules/admin/site/components/messageTable","modules/admin/site/components/newsForm","modules/admin/site/components/newsTable","modules/admin/site/components/uploadedFilesTable","modules/admin/system/components/Assignments","modules/admin/system/components/changesForm","modules/admin/system/components/changesTable","modules/admin/system/components/Description","modules/admin/system/components/documentForm","modules/admin/system/components/Documents","modules/admin/system/components/documentsTable","modules/admin/system/components/edit-client-form","modules/admin/system/components/is4ua","modules/admin/system/components/Notes","modules/admin/system/components/productForm","modules/admin/system/components/productFormHeader","modules/admin/system/components/productFormToolbar","modules/admin/system/components/productTable","modules/admin/system/components/sessionConfigTable","modules/admin/system/components/sessionForm","modules/admin/system/components/sessionTable","modules/admin/system/components/systemForm","modules/admin/system/components/Systems","modules/admin/system/components/systemTable","modules/tech/requests/components/apjRequestsTable","modules/tech/requests/components/ArchiveRequestsForm","modules/tech/requests/components/ArchiveRequestsTable","modules/tech/requests/components/archiveTable","modules/tech/requests/components/assignmentDetails","modules/tech/requests/components/bo","modules/tech/requests/components/bulkEmailForm","modules/tech/requests/components/Courses","modules/tech/requests/components/editRequestsForm","modules/tech/requests/components/erp","modules/tech/requests/components/hana","modules/tech/requests/components/requestDetailDetails","modules/tech/requests/components/requestDetails","modules/tech/requests/components/requestsTable","modules/tech/requests/components/userAssignmentDetails","modules/tech/requests/components/userRequestDetails","modules/tech/requests/components/viewAssignmentForm","modules/tech/requests/components/viewRequestsForm","modules/tech/requests/components/viewRequestsTable","modules/tech/requests/components/viewUserRequestsForm","modules/tech/requests/components/viewUserRequestsTable","modules/tech/support/components/additiontalInfo","modules/tech/support/components/assignmentDetails","modules/tech/support/components/bo","modules/tech/support/components/documentForm","modules/tech/support/components/Documents","modules/tech/support/components/documentsTable","modules/tech/support/components/erp","modules/tech/support/components/hana","modules/tech/support/components/helpTicketDetails","modules/tech/support/components/helpTicketType","modules/tech/support/components/requestDetails","modules/tech/support/components/Requests","modules/tech/support/components/searchHTForm","modules/tech/support/components/selectProduct","modules/tech/support/components/viewArchiveHTForm","modules/tech/support/components/viewAssignmentForm","modules/tech/support/components/viewHelpTicketTableFilters","modules/tech/support/components/viewHoverProfile","modules/tech/support/components/viewHTForm","modules/tech/support/components/viewHTSearchResults","modules/tech/support/components/viewHTTable","modules/tech/support/components/viewRequestsPanel","modules/tech/support/components/viewToolbarButtons","modules/user/requests/components/assignmentDetails","modules/user/requests/components/bo","modules/user/requests/components/client-request-step1","modules/user/requests/components/client-request-step2","modules/user/requests/components/client-request-step3","modules/user/requests/components/client-request-step4","modules/user/requests/components/Courses","modules/user/requests/components/erp","modules/user/requests/components/hana","modules/user/requests/components/requestDetails","modules/user/requests/components/viewRequestsForm","modules/user/requests/components/viewRequestsTable","modules/user/support/components/comment","modules/user/support/components/help-ticket-step1","modules/user/support/components/help-ticket-step2","modules/user/support/components/help-ticket-step3","modules/user/support/components/help-ticket-step4","modules/user/support/components/help-ticket-step5","modules/user/support/components/helpTicketDetails","modules/user/support/components/helpTicketType","modules/user/support/components/helpTicketWizard","modules/user/support/components/inputForm-0-0","modules/user/support/components/inputForm-1-0","modules/user/support/components/Requests","modules/user/support/components/viewHTForm","modules/user/support/components/viewHTTable"]}})}

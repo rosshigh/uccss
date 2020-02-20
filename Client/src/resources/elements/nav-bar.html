@@ -102,7 +102,9 @@
                             <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="#/techRq">Product Requests</a></li>
-                            <li><a href="#/techHt">Help Tickets</a></li>
+                            <!-- route-href="route: contactdetail; params.bind: {id:contact.id}" -->
+                            <!-- <li><a href="#/techHt">Help Tickets</a></li> -->
+                            <li><a route-href="route: techHt; params.bind: {HTNumber: -1}">Help Tickets</a></li>
                             <li><a href="#/techNotes">Tech Notes</a></li>
                         </ul>
                     </li>
