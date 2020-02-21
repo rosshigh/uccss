@@ -358,7 +358,8 @@ export class Assignments {
         }
 
         for (let k = 0; k < this.selectedRequestDetail.assignments.length; k++) {
-            if (this.selectedRequestDetail.assignments[k].client == client.client) return;
+            if (this.selectedRequestDetail.assignments[k].client == client.client 
+              && this.selectedRequestDetail.assignments[k].systemId == client.systemId) return;
         }
 
         let message, okToProcess = true;
