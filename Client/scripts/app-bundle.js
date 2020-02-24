@@ -21049,6 +21049,7 @@ define('resources/data/products',['exports', 'aurelia-framework', './dataService
                     return;
                 }
             });
+            this.selectedProduct = this.emptyProduct();
             return null;
         };
 

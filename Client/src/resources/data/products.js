@@ -64,6 +64,7 @@ export class Products {
             return;
           }
         });
+        this.selectedProduct = this.emptyProduct();
         return null;
     }
 
