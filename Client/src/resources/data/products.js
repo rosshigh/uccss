@@ -58,13 +58,13 @@ export class Products {
     }
 
     selectedProductFromId(id){
+        this.selectedProduct = this.emptyProduct();
         this.productsArray.forEach((item) => {
           if(item._id === id){
             this.selectedProduct = this.utils.copyObject(item);
             return;
           }
         });
-        this.selectedProduct = this.emptyProduct();
         return null;
     }
 

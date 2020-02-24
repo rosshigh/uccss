@@ -21043,13 +21043,13 @@ define('resources/data/products',['exports', 'aurelia-framework', './dataService
         Products.prototype.selectedProductFromId = function selectedProductFromId(id) {
             var _this = this;
 
+            this.selectedProduct = this.emptyProduct();
             this.productsArray.forEach(function (item) {
                 if (item._id === id) {
                     _this.selectedProduct = _this.utils.copyObject(item);
                     return;
                 }
             });
-            this.selectedProduct = this.emptyProduct();
             return null;
         };
 
@@ -38188,21 +38188,22 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                                 this.provisionalAssignment = this.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
                                 this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
+                                this.productSystems = new Array();
 
                                 if (this.products.selectedProduct.systems[0]) {
-                                    _context7.next = 20;
+                                    _context7.next = 21;
                                     break;
                                 }
 
                                 this.utils.showNotification("You need to assign a system to this product before you can assign this request", 'warning');
-                                _context7.next = 22;
+                                _context7.next = 23;
                                 break;
 
-                            case 20:
-                                _context7.next = 22;
+                            case 21:
+                                _context7.next = 23;
                                 return this.getProductSystems();
 
-                            case 22:
+                            case 23:
 
                                 if (this.systemConfigured) {
                                     this.selectedSystemIndex = 0;
@@ -38217,7 +38218,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 this.selectedRow = $(el.target).closest('tr');
                                 this.selectedRow.children().addClass('info');
 
-                            case 27:
+                            case 28:
                             case 'end':
                                 return _context7.stop();
                         }

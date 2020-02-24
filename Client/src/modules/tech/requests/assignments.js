@@ -230,7 +230,7 @@ export class Assignments {
 
         this.provisionalAssignment = this.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
         this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
-
+        this.productSystems = new Array();
         if (!this.products.selectedProduct.systems[0]) {
             this.utils.showNotification("You need to assign a system to this product before you can assign this request",'warning');
         } else {
