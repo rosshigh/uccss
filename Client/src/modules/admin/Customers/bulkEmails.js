@@ -147,8 +147,7 @@ export class BulkEmails {
 
     downloadInstExcel(){
         let csvContent = "data:text/csv;charset=utf-8;,First Name,FullName,Last Name,Email,Phone,City,Region,Country,Roles,Institution\r\n";
-        this.dataTable.baseArray.forEach(item => {
-          
+        this.dataTable.baseArray.forEach((item,index) => {        
             csvContent += item.firstName + "," + item.lastName.replace(',',' ') + "," + item.firstName + " " + item.lastName.replace(',',' ') + "," + item.email + "," + item.phone + "," + item.institutionId.city + "," + item.institutionId.region + "," + item.institutionId.country + "," + item.roles.join(':') + "," + item.institutionId.name ;
             csvContent +=  "\r\n";
         })
