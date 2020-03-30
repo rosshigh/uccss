@@ -34714,363 +34714,364 @@ define('modules/admin/site/editMessages',['exports', 'aurelia-framework', '../..
     }()) || _class);
 });
 define('modules/admin/site/editNews',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/siteInfo', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/validation'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _siteInfo, _commonDialogs, _validation) {
-    'use strict';
+  'use strict';
 
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.EditNews = undefined;
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.EditNews = undefined;
 
-    var _validation2 = _interopRequireDefault(_validation);
+  var _validation2 = _interopRequireDefault(_validation);
 
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
 
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
 
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
             });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var EditNews = exports.EditNews = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _siteInfo.SiteInfo, _utils.Utils, _commonDialogs.CommonDialogs, _validation2.default, _appConfig.AppConfig), _dec(_class = function () {
-        function EditNews(datatable, siteinfo, utils, dialog, validation, config) {
-            _classCallCheck(this, EditNews);
-
-            this.newsItemSelected = false;
-            this.spinnerHTML = "";
-            this.isInformationItem = false;
-            this.isChecked = true;
-            this.toolbar = [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]];
-
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.siteinfo = siteinfo;
-            this.dialog = dialog;
-            this.config = config;
-            this.validation = validation;
-            this.validation.initialize(this);
-            this._setupValidation();
-
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+          }
         }
 
-        EditNews.prototype.attached = function attached() {
-            $('[data-toggle="tooltip"]').tooltip();
-        };
+        return step("next");
+      });
+    };
+  }
 
-        EditNews.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return this.siteinfo.getInfoArray(true, '?order=createdDate');
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
 
-                            case 2:
-                                _context.next = 4;
-                                return this.config.getConfig();
+  var _dec, _class;
 
-                            case 4:
-                                this.dataTable.updateArray(this.siteinfo.siteArray);
-                                this.filterOutExpired();
+  var EditNews = exports.EditNews = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _siteInfo.SiteInfo, _utils.Utils, _commonDialogs.CommonDialogs, _validation2.default, _appConfig.AppConfig), _dec(_class = function () {
+    function EditNews(datatable, siteinfo, utils, dialog, validation, config) {
+      _classCallCheck(this, EditNews);
 
-                            case 6:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
+      this.newsItemSelected = false;
+      this.spinnerHTML = "";
+      this.isInformationItem = false;
+      this.isChecked = true;
+      this.toolbar = [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]];
 
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
+      this.dataTable = datatable;
+      this.dataTable.initialize(this);
+      this.utils = utils;
+      this.siteinfo = siteinfo;
+      this.dialog = dialog;
+      this.config = config;
+      this.validation = validation;
+      this.validation.initialize(this);
+      this._setupValidation();
 
-            return activate;
-        }();
+      this.userObj = JSON.parse(sessionStorage.getItem('user'));
+    }
 
-        EditNews.prototype.refresh = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.siteinfo.getInfoArray(true);
+    EditNews.prototype.attached = function attached() {
+      $('[data-toggle="tooltip"]').tooltip();
+    };
 
-                            case 3:
-                                this.dataTable.updateArray(this.siteinfo.siteArray);
-                                this.spinnerHTML = "";
+    EditNews.prototype.activate = function () {
+      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return this.siteinfo.getInfoArray(true, '?order=createdDate');
 
-                            case 5:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
+              case 2:
+                _context.next = 4;
+                return this.config.getConfig();
 
-            function refresh() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        EditNews.prototype.new = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.editIndex = -1;
-                                this.siteinfo.selectSiteItem(this.editIndex);
-                                $("#editTitle").focus();
-                                this.newsItemSelected = true;
-
-                            case 4:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function _new() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return _new;
-        }();
-
-        EditNews.prototype.edit = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index, el, item) {
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                this.siteinfo.setSiteItem(item);
-                                this.originalSiteInfo = this.utils.copyObject(this.siteinfo.selectedItem);
-
-                                $("#editTitle").focus();
-
-                                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-                                this.selectedRow = $(el.target).closest('tr');
-                                this.selectedRow.children().addClass('info');
-                                document.body.scrollTop = document.documentElement.scrollTop = 0;
-                                this.newsItemSelected = true;
-
-                            case 8:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function edit(_x, _x2, _x3) {
-                return _ref4.apply(this, arguments);
-            }
-
-            return edit;
-        }();
-
-        EditNews.prototype.cancel = function cancel() {
-            if (this.editIndex == -1) {
-                this.new();
-            } else {
-                this.siteinfo.selectSiteItem(this.editIndex);
-            }
-        };
-
-        EditNews.prototype.save = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                if (!this.validation.validate(1)) {
-                                    _context5.next = 6;
-                                    break;
-                                }
-
-                                _context5.next = 3;
-                                return this.siteinfo.saveInfoItem();
-
-                            case 3:
-                                serverResponse = _context5.sent;
-
-                                if (!serverResponse.error) {
-                                    this.dataTable.updateArray(this.siteinfo.siteArray);
-                                    this.utils.showNotification("The item was saved");
-                                    if (this.filesToUpload && this.filesToUpload.length > 0) {
-                                        this.siteinfo.uploadFile(this.filesToUpload);
-                                    }
-                                } else {
-                                    this.utils.showNotification("There was a problem saving the item", 'error');
-                                }
-                                this._cleanUp();
-
-                            case 6:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function save() {
-                return _ref5.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        EditNews.prototype.changeFiles = function changeFiles() {
-            this.filesToUpload = new Array();
-            this.filesToUpload.push(this.files[0]);
-            this.siteinfo.selectedItem.url = this.config.DOWNLOAD_URL + '/site/' + this.filesToUpload[0].name;
-            this.siteinfo.selectedItem.file.fileName = this.filesToUpload[0].name;
-        };
-
-        EditNews.prototype.removeFile = function removeFile(index) {
-            this.filesToUpload.splice(index, 1);
-        };
-
-        EditNews.prototype.delete = function _delete() {
-            var _this = this;
-
-            return this.dialog.showMessage("Are you sure you want to delete the item?", "Delete Item", ['Yes', 'No']).whenClosed(function (response) {
-                if (!response.wasCancelled) {
-                    _this.deleteItem();
-                }
-            });
-        };
-
-        EditNews.prototype.deleteItem = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                _context6.next = 2;
-                                return this.siteinfo.deleteItem();
-
-                            case 2:
-                                serverResponse = _context6.sent;
-
-                                if (!serverResponse.error) {
-                                    this.dataTable.updateArray(this.siteinfo.siteArray);
-                                    this.utils.showNotification("The Item was deleted");
-                                }
-                                this.newsItemSelected = false;
-                                this.selectedFiles = undefined;
-                                this.files = undefined;
-
-                            case 7:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function deleteItem() {
-                return _ref6.apply(this, arguments);
-            }
-
-            return deleteItem;
-        }();
-
-        EditNews.prototype.back = function back() {
-            var _this2 = this;
-
-            var changes = this.siteinfo.isDirty(this.originalSiteInfo);
-            if (changes.length) {
-                return this.dialog.showMessage("The item has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
-                    if (!response.wasCancelled) {
-                        _this2.save();
-                    } else {
-                        _this2.newsItemSelected = false;
-                    }
-                });
-            } else {
-                this.newsItemSelected = false;
-            }
-        };
-
-        EditNews.prototype._cleanUp = function _cleanUp() {
-            this._cleanUpFilters();
-            this.filesToUpload = new Array();
-            this.selectedFiles = undefined;
-            this.files = undefined;
-            this.newsItemSelected = false;
-        };
-
-        EditNews.prototype._cleanUpFilters = function _cleanUpFilters() {
-            this.urlFilterValue = "";
-            this.itemTypeFilter = "";
-            this.expiredDateFilterValue = "";
-            this.createdDateFilterValue = "";
-            this.titleFilterValue = "";
-            this.urlFilterValue = "";
-            this.dataTable.updateArray(this.siteinfo.siteArray);
-        };
-
-        EditNews.prototype._setupValidation = function _setupValidation() {
-            this.validation.addRule(1, "editTitle", [{ "rule": "required", "message": "Title is required", "value": "siteinfo.selectedItem.title" }]);
-        };
-
-        EditNews.prototype.filterOutExpired = function filterOutExpired() {
-            this._cleanUpFilters();
-            if (this.isChecked) {
-                this.dataTable.filterList(new Date(), { type: 'date', filter: "expiredFilter", collectionProperty: 'expiredDate', compare: 'after' });
-            } else {
+              case 4:
                 this.dataTable.updateArray(this.siteinfo.siteArray);
-            }
-        };
+                this.filterOutExpired();
 
-        return EditNews;
-    }()) || _class);
+              case 6:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function activate() {
+        return _ref.apply(this, arguments);
+      }
+
+      return activate;
+    }();
+
+    EditNews.prototype.refresh = function () {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                _context2.next = 3;
+                return this.siteinfo.getInfoArray(true);
+
+              case 3:
+                this.dataTable.updateArray(this.siteinfo.siteArray);
+                this.spinnerHTML = "";
+
+              case 5:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function refresh() {
+        return _ref2.apply(this, arguments);
+      }
+
+      return refresh;
+    }();
+
+    EditNews.prototype.new = function () {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                this.editIndex = -1;
+                this.siteinfo.selectSiteItem(this.editIndex);
+                $("#editTitle").focus();
+                this.newsItemSelected = true;
+
+              case 4:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function _new() {
+        return _ref3.apply(this, arguments);
+      }
+
+      return _new;
+    }();
+
+    EditNews.prototype.edit = function () {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index, el, item) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                this.siteinfo.setSiteItem(item);
+                this.originalSiteInfo = this.utils.copyObject(this.siteinfo.selectedItem);
+
+                $("#editTitle").focus();
+
+                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                this.selectedRow = $(el.target).closest('tr');
+                this.selectedRow.children().addClass('info');
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+                this.newsItemSelected = true;
+
+              case 8:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function edit(_x, _x2, _x3) {
+        return _ref4.apply(this, arguments);
+      }
+
+      return edit;
+    }();
+
+    EditNews.prototype.cancel = function cancel() {
+      if (this.editIndex == -1) {
+        this.new();
+      } else {
+        this.siteinfo.selectSiteItem(this.editIndex);
+      }
+    };
+
+    EditNews.prototype.save = function () {
+      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+        var serverResponse;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                if (!this.validation.validate(1)) {
+                  _context5.next = 6;
+                  break;
+                }
+
+                _context5.next = 3;
+                return this.siteinfo.saveInfoItem();
+
+              case 3:
+                serverResponse = _context5.sent;
+
+                if (!serverResponse.error) {
+                  this.dataTable.updateArray(this.siteinfo.siteArray);
+                  this.utils.showNotification("The item was saved");
+                  if (this.filesToUpload && this.filesToUpload.length > 0) {
+                    this.siteinfo.uploadFile(this.filesToUpload);
+                  }
+                } else {
+                  this.utils.showNotification("There was a problem saving the item", 'error');
+                }
+                this._cleanUp();
+
+              case 6:
+              case 'end':
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function save() {
+        return _ref5.apply(this, arguments);
+      }
+
+      return save;
+    }();
+
+    EditNews.prototype.changeFiles = function changeFiles() {
+      this.filesToUpload = new Array();
+      this.filesToUpload.push(this.files[0]);
+      this.siteinfo.selectedItem.url = this.config.DOWNLOAD_URL + '/site/' + this.filesToUpload[0].name;
+      this.siteinfo.selectedItem.file.fileName = this.filesToUpload[0].name;
+    };
+
+    EditNews.prototype.removeFile = function removeFile(index) {
+      this.filesToUpload.splice(index, 1);
+    };
+
+    EditNews.prototype.delete = function _delete() {
+      var _this = this;
+
+      return this.dialog.showMessage("Are you sure you want to delete the item?", "Delete Item", ['Yes', 'No']).whenClosed(function (response) {
+        if (!response.wasCancelled) {
+          _this.deleteItem();
+        }
+      });
+    };
+
+    EditNews.prototype.deleteItem = function () {
+      var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+        var serverResponse;
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _context6.next = 2;
+                return this.siteinfo.deleteItem();
+
+              case 2:
+                serverResponse = _context6.sent;
+
+                if (!serverResponse.error) {
+                  this.dataTable.updateArray(this.siteinfo.siteArray);
+                  this.utils.showNotification("The Item was deleted");
+                }
+                this.newsItemSelected = false;
+                this.selectedFiles = undefined;
+                this.files = undefined;
+
+              case 7:
+              case 'end':
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function deleteItem() {
+        return _ref6.apply(this, arguments);
+      }
+
+      return deleteItem;
+    }();
+
+    EditNews.prototype.back = function back() {
+      var _this2 = this;
+
+      var changes = this.siteinfo.isDirty(this.originalSiteInfo);
+      if (changes.length) {
+        return this.dialog.showMessage("The item has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
+          if (!response.wasCancelled) {
+            _this2.save();
+          } else {
+            _this2.newsItemSelected = false;
+          }
+        });
+      } else {
+        this.newsItemSelected = false;
+      }
+    };
+
+    EditNews.prototype._cleanUp = function _cleanUp() {
+      this._cleanUpFilters();
+      this.filesToUpload = new Array();
+      this.selectedFiles = undefined;
+      this.files = undefined;
+      this.newsItemSelected = false;
+    };
+
+    EditNews.prototype._cleanUpFilters = function _cleanUpFilters() {
+      this.urlFilterValue = "";
+      this.itemTypeFilter = "";
+      this.expiredDateFilterValue = "";
+      this.createdDateFilterValue = "";
+      this.titleFilterValue = "";
+      this.urlFilterValue = "";
+      this.dataTable.updateArray(this.siteinfo.siteArray);
+      this.filterOutExpired();
+    };
+
+    EditNews.prototype._setupValidation = function _setupValidation() {
+      this.validation.addRule(1, "editTitle", [{ "rule": "required", "message": "Title is required", "value": "siteinfo.selectedItem.title" }]);
+    };
+
+    EditNews.prototype.filterOutExpired = function filterOutExpired() {
+      this._cleanUpFilters();
+      if (this.isChecked) {
+        this.dataTable.filterList(new Date(), { type: 'date', filter: "expiredFilter", collectionProperty: 'expiredDate', compare: 'after' });
+      } else {
+        this.dataTable.updateArray(this.siteinfo.siteArray);
+      }
+    };
+
+    return EditNews;
+  }()) || _class);
 });
 define('modules/admin/site/site',['exports', 'aurelia-framework', 'aurelia-router', '../../../config/appConfig'], function (exports, _aureliaFramework, _aureliaRouter, _appConfig) {
     'use strict';
