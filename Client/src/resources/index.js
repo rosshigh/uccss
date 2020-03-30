@@ -54,6 +54,7 @@ export function configure(config) {
     './value-converters/filter-sessions',
     './value-converters/session-systems',
     './value-converters/ucc-staff',
-    './value-converters/filter-apjrequestdetails'
+    './value-converters/filter-apjrequestdetails',
+    './value-converters/filter-notice'
   ]);
 }

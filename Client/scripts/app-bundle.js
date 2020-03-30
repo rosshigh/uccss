@@ -664,7 +664,7 @@ define('resources/index',['exports'], function (exports) {
   });
   exports.configure = configure;
   function configure(config) {
-    config.globalResources(['./editor/editor', './elements/calendar', './elements/multiselect', './elements/tree-node', './elements/submenu', './elements/nav-bar', './elements/rate-it', './elements/loading-indicator', './elements/table-navigation-bar', './elements/flat-picker', './elements/add-systems', './value-converters/info-filter', './value-converters/lookup-ht-status', './value-converters/arrow', './value-converters/request-status-class', './value-converters/course-name', './value-converters/parse-assignments', './value-converters/parse-apjassignments', './value-converters/format-number', './value-converters/session-name', './value-converters/session-type', './value-converters/date-format', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/ucc-title', './value-converters/phone-number', './value-converters/lookup-value', './value-converters/sandbox', './value-converters/idsRequested', './value-converters/person-status-button', './value-converters/session-status-button', './value-converters/translate-status', './value-converters/to-uppercase', './value-converters/sort-array', './value-converters/system-list', './value-converters/check-box', './value-converters/activate-button', './value-converters/help-ticket-type', './value-converters/help-ticket-subtypes', './value-converters/session', './value-converters/sort-date-time', './value-converters/file-type', './value-converters/format-digits', './value-converters/format-phone', './value-converters/onoff-switch', './value-converters/get-array-value', './value-converters/help-ticket-statuses', './value-converters/stat-value', './value-converters/filter-clients', './value-converters/overlap', './value-converters/filter-array', './value-converters/filter-sessions', './value-converters/session-systems', './value-converters/ucc-staff', './value-converters/filter-apjrequestdetails']);
+    config.globalResources(['./editor/editor', './elements/calendar', './elements/multiselect', './elements/tree-node', './elements/submenu', './elements/nav-bar', './elements/rate-it', './elements/loading-indicator', './elements/table-navigation-bar', './elements/flat-picker', './elements/add-systems', './value-converters/info-filter', './value-converters/lookup-ht-status', './value-converters/arrow', './value-converters/request-status-class', './value-converters/course-name', './value-converters/parse-assignments', './value-converters/parse-apjassignments', './value-converters/format-number', './value-converters/session-name', './value-converters/session-type', './value-converters/date-format', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/ucc-title', './value-converters/phone-number', './value-converters/lookup-value', './value-converters/sandbox', './value-converters/idsRequested', './value-converters/person-status-button', './value-converters/session-status-button', './value-converters/translate-status', './value-converters/to-uppercase', './value-converters/sort-array', './value-converters/system-list', './value-converters/check-box', './value-converters/activate-button', './value-converters/help-ticket-type', './value-converters/help-ticket-subtypes', './value-converters/session', './value-converters/sort-date-time', './value-converters/file-type', './value-converters/format-digits', './value-converters/format-phone', './value-converters/onoff-switch', './value-converters/get-array-value', './value-converters/help-ticket-statuses', './value-converters/stat-value', './value-converters/filter-clients', './value-converters/overlap', './value-converters/filter-array', './value-converters/filter-sessions', './value-converters/session-systems', './value-converters/ucc-staff', './value-converters/filter-apjrequestdetails', './value-converters/filter-notice']);
   }
 });
 define('modules/acc/accCreateInvoice',['exports', 'aurelia-framework', '../../resources/utils/dataTable', '../../resources/data/apjClientRequests', '../../resources/data/people', '../../config/appConfig', '../../resources/utils/utils', 'moment'], function (exports, _aureliaFramework, _dataTable, _apjClientRequests, _people, _appConfig, _utils, _moment) {
@@ -25255,402 +25255,453 @@ define('resources/elements/multiselect',['exports', 'aurelia-framework', 'bootst
   })), _class2)) || _class);
 });
 define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-event-aggregator', '../data/auth', '../../resources/utils/utils', '../../resources/data/people', '../../config/appConfig', '../dialogs/common-dialogs', '../../resources/data/apjClientRequests', 'moment', 'toastr', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaEventAggregator, _auth, _utils, _people, _appConfig, _commonDialogs, _apjClientRequests, _moment, _toastr, _jquery) {
-    'use strict';
+  'use strict';
 
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.NavBar = undefined;
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.NavBar = undefined;
 
-    var _moment2 = _interopRequireDefault(_moment);
+  var _moment2 = _interopRequireDefault(_moment);
 
-    var toastr = _interopRequireWildcard(_toastr);
+  var toastr = _interopRequireWildcard(_toastr);
 
-    var _jquery2 = _interopRequireDefault(_jquery);
+  var _jquery2 = _interopRequireDefault(_jquery);
 
-    function _interopRequireWildcard(obj) {
-        if (obj && obj.__esModule) {
-            return obj;
-        } else {
-            var newObj = {};
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
 
-            if (obj != null) {
-                for (var key in obj) {
-                    if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-                }
-            }
-
-            newObj.default = obj;
-            return newObj;
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
         }
+      }
+
+      newObj.default = obj;
+      return newObj;
     }
+  }
 
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
 
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
 
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
             });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var NavBar = exports.NavBar = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _aureliaEventAggregator.EventAggregator, _aureliaFramework.BindingEngine, _auth.Auth, _utils.Utils, _people.People, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _apjClientRequests.APJClientRequests), _dec(_class = function () {
-        function NavBar(router, eventAggregator, bindingEngine, auth, utils, people, config, dialog, apjRequests) {
-            _classCallCheck(this, NavBar);
-
-            this.isAuthenticated = false;
-            this.subscription = {};
-
-            this.eventAggregator = eventAggregator;
-            this.router = router;
-            this.bindingEngine = bindingEngine;
-            this.auth = auth;
-            this.utils = utils;
-            this.people = people;
-            this.config = config;
-            this.dialog = dialog;
-            this.apjRequests = apjRequests;
-
-            this.isAuthenticated = this.auth.isAuthenticated();
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+          }
         }
 
-        NavBar.prototype.attached = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var _this = this;
+        return step("next");
+      });
+    };
+  }
 
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                this.hideProfile();
-                                (0, _jquery2.default)(".dropdown-toggle").dropdown();
-                                if (this.userObj) this.people.getNotifications(this.userObj._id);
-                                setInterval(function () {
-                                    _this.people.getNotifications(_this.userObj._id);
-                                }, 10 * 60 * 1000);
-                                _context.next = 6;
-                                return this.apjRequests.getClientRequestsDetailsArray('?filter=requestStatus|eq|1', true);
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
 
-                            case 6:
-                                this.apjUnassignedRequests = this.apjRequests.requestsDetailsArray;
-                                console.log(this.apjUnassignedRequests);
+  var _dec, _class;
 
-                            case 8:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
+  var NavBar = exports.NavBar = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _aureliaEventAggregator.EventAggregator, _aureliaFramework.BindingEngine, _auth.Auth, _utils.Utils, _people.People, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _apjClientRequests.APJClientRequests), _dec(_class = function () {
+    function NavBar(router, eventAggregator, bindingEngine, auth, utils, people, config, dialog, apjRequests) {
+      _classCallCheck(this, NavBar);
 
-            function attached() {
-                return _ref.apply(this, arguments);
-            }
+      this.isAuthenticated = false;
+      this.subscription = {};
 
-            return attached;
-        }();
+      this.eventAggregator = eventAggregator;
+      this.router = router;
+      this.bindingEngine = bindingEngine;
+      this.auth = auth;
+      this.utils = utils;
+      this.people = people;
+      this.config = config;
+      this.dialog = dialog;
+      this.apjRequests = apjRequests;
 
-        NavBar.prototype.login = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                var response;
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                _context2.next = 2;
-                                return this.auth.login(this.email, this.password);
+      this.isAuthenticated = this.auth.isAuthenticated();
+      this.userObj = JSON.parse(sessionStorage.getItem('user'));
+    }
 
-                            case 2:
-                                response = _context2.sent;
+    NavBar.prototype.attached = function () {
+      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+        var _this = this;
 
-                                if (!response.error) {
-                                    sessionStorage.setItem('uccweather', JSON.stringify({ temp: response.temp, icon: response.icon }));
-                                    this.loginError = "";
-                                    this.loginSuccess();
-                                    this.isAuthenticated = this.auth.isAuthenticated();
-                                } else {
-                                    this.loginError = "Invalid credentials.";
-                                }
-
-                            case 4:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function login() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return login;
-        }();
-
-        NavBar.prototype.logout = function logout() {
-            if (this.userObj) this.auth.logout(this.userObj.email);
-            this.userObj = new Object();
-            this.isAuthenticated = this.auth.isAuthenticated();
-            this.router.navigate("home");
-        };
-
-        NavBar.prototype.loginSuccess = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var _this2 = this;
-
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.userObj = JSON.parse(sessionStorage.getItem('user'));
-
-                                if (!this.userObj) {
-                                    _context3.next = 16;
-                                    break;
-                                }
-
-                                if (!(this.userObj.institutionId.institutionStatus !== this.config.INSTITUTIONS_ACTIVE)) {
-                                    _context3.next = 7;
-                                    break;
-                                }
-
-                                this.utils.showNotification("You must belong to an active institution to access the web site");
-                                this.logout();
-                                _context3.next = 14;
-                                break;
-
-                            case 7:
-                                if (!(this.userObj.personStatus !== this.config.ACTIVE_PERSON)) {
-                                    _context3.next = 11;
-                                    break;
-                                }
-
-                                return _context3.abrupt('return', this.dialog.showMessage("You must have an active account to access the web site.  Contact your faculty coordinator to activate your account.", "Account Not Active", ['OK']).whenClosed(function (response) {
-                                    _this2.logout();
-                                }));
-
-                            case 11:
-                                if (!this.userObj.userRole) this.logout();
-                                sessionStorage.setItem('role', this.userObj.userRole);
-
-                                this.router.navigate("user");
-
-                            case 14:
-                                _context3.next = 18;
-                                break;
-
-                            case 16:
-                                this.utils.showNotification("There was a problem validating your account");
-                                this.router.navigate("home");
-
-                            case 18:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function loginSuccess() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return loginSuccess;
-        }();
-
-        NavBar.prototype.requestPasswordReset = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-                var response;
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                if (!this.email) {
-                                    _context4.next = 7;
-                                    break;
-                                }
-
-                                _context4.next = 3;
-                                return this.people.requestPasswordReset({ email: this.email });
-
-                            case 3:
-                                response = _context4.sent;
-
-                                if (response && !response.error) {
-                                    this.utils.showNotification("An email has been sent to the provided email address with a link you can use to reset your password");
-                                } else if (response.status = 404) {
-                                    this.utils.showNotification("There is no registered user with that email address");
-                                } else if (response.status = 401) {
-                                    this.utils.showNotification("The account with the provided address has been deactivated.  Please contact your faculty coordinator.");
-                                }
-                                _context4.next = 8;
-                                break;
-
-                            case 7:
-                                this.utils.showNotification("Please enter an email address");
-
-                            case 8:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function requestPasswordReset() {
-                return _ref4.apply(this, arguments);
-            }
-
-            return requestPasswordReset;
-        }();
-
-        NavBar.prototype.enterNote = function enterNote() {
-            var _this3 = this;
-
-            var note = { noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0 };
-            return this.dialog.showNote("Enter Note", note, ['Submit', 'Cancel']).whenClosed(function (response) {
-                if (!response.wasCancelled) {
-                    _this3.saveNote(response.output);
-                } else {
-                    console.log("Cancelled");
-                }
-            });
-        };
-
-        NavBar.prototype.saveNote = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(note) {
-                var response;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                this.people.selectNote();
-                                this.people.selectedNote.personId = this.userObj._id;
-                                this.people.selectedNote.category = this.userObj.noteCategories[note.selectedCategory];
-                                this.people.selectedNote.note = note.note.noteBody;
-                                _context5.next = 6;
-                                return this.people.saveNote();
-
-                            case 6:
-                                response = _context5.sent;
-
-                                if (!response.error) {
-                                    this.utils.showNotification('The note was saved');
-                                }
-
-                            case 8:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function saveNote(_x) {
-                return _ref5.apply(this, arguments);
-            }
-
-            return saveNote;
-        }();
-
-        NavBar.prototype.showProfile = function showProfile(el) {
-            this.toggleProfile = this.toggleProfile ? false : true;
-            if (this.toggleProfile) {
-                (0, _jquery2.default)(".noticeProfile").css("top", el.clientY + 25);
-                (0, _jquery2.default)(".noticeProfile").css("left", (0, _jquery2.default)("#noticeLabel")[0].offsetLeft);
-                (0, _jquery2.default)(".noticeProfile").css("display", "block");
-                (0, _jquery2.default)(".noticeProfile").css('position', 'fixed');
-            } else {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
                 this.hideProfile();
+                (0, _jquery2.default)(".dropdown-toggle").dropdown();
+                if (this.userObj) this.getNotices(this.userObj._id);
+                setInterval(function () {
+                  _this.getNotices(_this.userObj._id);
+                }, 10 * 60 * 1000);
+                _context.next = 6;
+                return this.apjRequests.getClientRequestsDetailsArray('?filter=requestStatus|eq|1', true);
+
+              case 6:
+                this.apjUnassignedRequests = this.apjRequests.requestsDetailsArray;
+                console.log(this.apjUnassignedRequests);
+
+              case 8:
+              case 'end':
+                return _context.stop();
             }
-        };
+          }
+        }, _callee, this);
+      }));
 
-        NavBar.prototype.hideProfile = function hideProfile() {
-            (0, _jquery2.default)(".noticeProfile").css("display", "none");
-        };
+      function attached() {
+        return _ref.apply(this, arguments);
+      }
 
-        NavBar.prototype.updateNotification = function updateNotification(notice, index) {
-            var htNumber = notice.notice.split(' ');
-            notice.checked = true;
-            this.people.saveNotification(notice);
-            this.people.notificationsArray.splice(index, 1);
-            if (htNumber[4] != 'closed') this.router.navigateToRoute('techHt', { HTNumber: htNumber[2] });
-        };
+      return attached;
+    }();
 
-        NavBar.prototype.events = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var _this4 = this;
+    NavBar.prototype.login = function () {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+        var response;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return this.auth.login(this.email, this.password);
 
-                var today;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                _context6.next = 2;
-                                return this.eventLayer.getEventsArray('', true);
+              case 2:
+                response = _context2.sent;
 
-                            case 2:
-                                today = new Date();
+                if (!response.error) {
+                  sessionStorage.setItem('uccweather', JSON.stringify({ temp: response.temp, icon: response.icon }));
+                  this.loginError = "";
+                  this.loginSuccess();
+                  this.isAuthenticated = this.auth.isAuthenticated();
+                } else {
+                  this.loginError = "Invalid credentials.";
+                }
 
-                                this.eventLayer.eventArray.forEach(function (item) {
-                                    if (item.personId === _this4.userObj._id || item.scope === 'u') {
-                                        if ((0, _moment2.default)(today).isBetween(item.start, item.end)) ;
-                                        _this4.events.push(item);
-                                    }
-                                });
-
-                            case 4:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function events() {
-                return _ref6.apply(this, arguments);
+              case 4:
+              case 'end':
+                return _context2.stop();
             }
+          }
+        }, _callee2, this);
+      }));
 
-            return events;
-        }();
+      function login() {
+        return _ref2.apply(this, arguments);
+      }
 
-        return NavBar;
-    }()) || _class);
+      return login;
+    }();
+
+    NavBar.prototype.logout = function logout() {
+      if (this.userObj) this.auth.logout(this.userObj.email);
+      this.userObj = new Object();
+      this.isAuthenticated = this.auth.isAuthenticated();
+      this.router.navigate("home");
+    };
+
+    NavBar.prototype.loginSuccess = function () {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+        var _this2 = this;
+
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                this.userObj = JSON.parse(sessionStorage.getItem('user'));
+
+                if (!this.userObj) {
+                  _context3.next = 16;
+                  break;
+                }
+
+                if (!(this.userObj.institutionId.institutionStatus !== this.config.INSTITUTIONS_ACTIVE)) {
+                  _context3.next = 7;
+                  break;
+                }
+
+                this.utils.showNotification("You must belong to an active institution to access the web site");
+                this.logout();
+                _context3.next = 14;
+                break;
+
+              case 7:
+                if (!(this.userObj.personStatus !== this.config.ACTIVE_PERSON)) {
+                  _context3.next = 11;
+                  break;
+                }
+
+                return _context3.abrupt('return', this.dialog.showMessage("You must have an active account to access the web site.  Contact your faculty coordinator to activate your account.", "Account Not Active", ['OK']).whenClosed(function (response) {
+                  _this2.logout();
+                }));
+
+              case 11:
+                if (!this.userObj.userRole) this.logout();
+                sessionStorage.setItem('role', this.userObj.userRole);
+
+                this.router.navigate("user");
+
+              case 14:
+                _context3.next = 18;
+                break;
+
+              case 16:
+                this.utils.showNotification("There was a problem validating your account");
+                this.router.navigate("home");
+
+              case 18:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function loginSuccess() {
+        return _ref3.apply(this, arguments);
+      }
+
+      return loginSuccess;
+    }();
+
+    NavBar.prototype.requestPasswordReset = function () {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+        var response;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                if (!this.email) {
+                  _context4.next = 7;
+                  break;
+                }
+
+                _context4.next = 3;
+                return this.people.requestPasswordReset({ email: this.email });
+
+              case 3:
+                response = _context4.sent;
+
+                if (response && !response.error) {
+                  this.utils.showNotification("An email has been sent to the provided email address with a link you can use to reset your password");
+                } else if (response.status = 404) {
+                  this.utils.showNotification("There is no registered user with that email address");
+                } else if (response.status = 401) {
+                  this.utils.showNotification("The account with the provided address has been deactivated.  Please contact your faculty coordinator.");
+                }
+                _context4.next = 8;
+                break;
+
+              case 7:
+                this.utils.showNotification("Please enter an email address");
+
+              case 8:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function requestPasswordReset() {
+        return _ref4.apply(this, arguments);
+      }
+
+      return requestPasswordReset;
+    }();
+
+    NavBar.prototype.enterNote = function enterNote() {
+      var _this3 = this;
+
+      var note = { noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0 };
+      return this.dialog.showNote("Enter Note", note, ['Submit', 'Cancel']).whenClosed(function (response) {
+        if (!response.wasCancelled) {
+          _this3.saveNote(response.output);
+        } else {
+          console.log("Cancelled");
+        }
+      });
+    };
+
+    NavBar.prototype.saveNote = function () {
+      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(note) {
+        var response;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                this.people.selectNote();
+                this.people.selectedNote.personId = this.userObj._id;
+                this.people.selectedNote.category = this.userObj.noteCategories[note.selectedCategory];
+                this.people.selectedNote.note = note.note.noteBody;
+                _context5.next = 6;
+                return this.people.saveNote();
+
+              case 6:
+                response = _context5.sent;
+
+                if (!response.error) {
+                  this.utils.showNotification('The note was saved');
+                }
+
+              case 8:
+              case 'end':
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function saveNote(_x) {
+        return _ref5.apply(this, arguments);
+      }
+
+      return saveNote;
+    }();
+
+    NavBar.prototype.showProfile = function showProfile(el) {
+      this.toggleProfile = this.toggleProfile ? false : true;
+      if (this.toggleProfile) {
+        (0, _jquery2.default)(".noticeProfile").css("top", el.clientY + 25);
+        (0, _jquery2.default)(".noticeProfile").css("left", (0, _jquery2.default)("#noticeLabel")[0].offsetLeft);
+        (0, _jquery2.default)(".noticeProfile").css("display", "block");
+        (0, _jquery2.default)(".noticeProfile").css('position', 'fixed');
+      } else {
+        this.hideProfile();
+      }
+    };
+
+    NavBar.prototype.hideProfile = function hideProfile() {
+      (0, _jquery2.default)(".noticeProfile").css("display", "none");
+    };
+
+    NavBar.prototype.filterNotifications = function filterNotifications() {
+      var _this4 = this;
+
+      this.noticeArray = [];
+      var updatedItems = 0;
+      this.people.notificationsArray.forEach(function (notice) {
+        if (notice.notice.indexOf('Closed') > -1) {
+          _this4.noticeArray.push(notice);
+        } else if (updatedItems < 5) {
+          _this4.noticeArray.push(notice);
+          updatedItems = updatedItems + 1;
+        }
+      });
+    };
+
+    NavBar.prototype.updateNotification = function updateNotification(notice, index) {
+      var htNumber = notice.notice.split(' ');
+      notice.checked = true;
+      this.people.saveNotification(notice);
+      this.people.notificationsArray.splice(index, 1);
+      if (htNumber[4] != 'closed') this.router.navigateToRoute('techHt', { HTNumber: htNumber[2] });
+      this.hideProfile();
+      this.filterNotifications();
+    };
+
+    NavBar.prototype.deleteNotice = function deleteNotice(notice, index) {
+      notice.checked = true;
+      this.people.saveNotification(notice);
+      this.people.notificationsArray.splice(index, 1);
+      this.filterNotifications();
+    };
+
+    NavBar.prototype.getNotices = function () {
+      var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(id) {
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _context6.next = 2;
+                return this.people.getNotifications(id);
+
+              case 2:
+                this.filterNotifications();
+
+              case 3:
+              case 'end':
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function getNotices(_x2) {
+        return _ref6.apply(this, arguments);
+      }
+
+      return getNotices;
+    }();
+
+    NavBar.prototype.events = function () {
+      var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+        var _this5 = this;
+
+        var today;
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                _context7.next = 2;
+                return this.eventLayer.getEventsArray('', true);
+
+              case 2:
+                today = new Date();
+
+                this.eventLayer.eventArray.forEach(function (item) {
+                  if (item.personId === _this5.userObj._id || item.scope === 'u') {
+                    if ((0, _moment2.default)(today).isBetween(item.start, item.end)) ;
+                    _this5.events.push(item);
+                  }
+                });
+
+              case 4:
+              case 'end':
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this);
+      }));
+
+      function events() {
+        return _ref7.apply(this, arguments);
+      }
+
+      return events;
+    }();
+
+    return NavBar;
+  }()) || _class);
 });
 define('resources/elements/rate-it',['exports', 'aurelia-framework', 'jquery'], function (exports, _aureliaFramework, _jquery) {
 	'use strict';
@@ -70078,6 +70129,85 @@ module.exports = function() {
 },{"1":1,"26":26,"33":33,"34":34,"46":46}]},{},[7])(7)
 });
 
+define('resources/value-converters/filter- notice',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var filterNoticeValueConverter = exports.filterNoticeValueConverter = function () {
+    function filterNoticeValueConverter() {
+      _classCallCheck(this, filterNoticeValueConverter);
+    }
+
+    filterNoticeValueConverter.prototype.toView = function toView(array) {
+      if (array) {
+        if (array.length > 5) {
+          var newArray = [];
+          var updatedItems = 0;
+          array.forEach(function (notice) {
+            if (notice.notice.inString('Closed') > -1) {
+              newArray.push(notice);
+            } else if (updatedItems < 5) {
+              newArray.push(notice);
+            }
+          });
+        } else if (array.length <= 5) {
+          return array;
+        }
+      }
+    };
+
+    return filterNoticeValueConverter;
+  }();
+});
+define('resources/value-converters/filter-notice',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var filterNoticeValueConverter = exports.filterNoticeValueConverter = function () {
+    function filterNoticeValueConverter() {
+      _classCallCheck(this, filterNoticeValueConverter);
+    }
+
+    filterNoticeValueConverter.prototype.toView = function toView(array) {
+      if (array) {
+        if (array.length > 5) {
+          var newArray = [];
+          var updatedItems = 0;
+          array.forEach(function (notice) {
+            if (notice.notice.indexOf('Closed') > -1) {
+              newArray.push(notice);
+            } else if (updatedItems < 5) {
+              newArray.push(notice);
+              updatedItems = updatedItems++;
+            }
+          });
+        } else if (array.length <= 5) {
+          return array;
+        }
+      }
+    };
+
+    return filterNoticeValueConverter;
+  }();
+});
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"resources/css/styles.css\"></require>\r\n  <require from=\"humane-js/themes/jackedup.css\"></require>\r\n  <require from=\"toastr/build/toastr.min.css\"></require>\r\n  <require from=\"bootstrap-select/css/bootstrap-select.css\"></require>\r\n  <nav-bar></nav-bar>\r\n  <div class=\"page-host\">\r\n    <loading-indicator progress.bind=\"data.progress\" loading.bind=\"router.isNavigating || data.isRequesting\"></loading-indicator>\r\n    <router-view></router-view>\r\n  </div>\r\n</template>"; });
 define('text!modules/acc/accCreateInvoice.html', ['module'], function(module) { module.exports = "<template>\n  <span id=\"loading\">\n    <ul class=\"bokeh\">\n      <li></li>\n      <li></li>\n      <li></li>\n    </ul>\n  </span>\n  <compose view=\"./components/createInvoiceToolbar.html\"></compose>\n\n  <div class=\"fluid-container\">\n    <div class=\"panel panel-default\" style=\"margin-top:50px;\">\n      <div class=\"panel-body\">\n        <div show.bind=\"openEditPanel\" class=\"row\">\n          <h1>Periods</h1>\n        </div>\n        <div show.bind=\"openInvoicePanel\" id=\"invoicePanel\" class=\"col-lg-offset-2 col-lg-8\">\n          <compose view=\"./components/invoicePanel.html\"></compose>\n        </div>\n      </div>\n      <div show.bind=\"openSelectionPanel\">\n        <div class=\"row\" style=\"margin-left:30px;\">\n          <div class=\" col-lg-3\">\n            <div class=\"form-group\">\n              <div class=\"col-sm-10\">\n                <label>Invoice Period</label>\n                <select value.bind=\"invoicePeriod\" id=\"editInvoicePeriod\" class=\"form-control\"\n                  change.trigger=\"periodChanged()\">\n                  <option model.bind=\"-1\">Select an option</option>\n                  <option repeat.for=\"period of apj.invoiceDataArray\" model.bind=\"$index\">\n                    ${period.invoicePeriod}</option>\n                </select>\n              </div>\n            </div>\n          </div>\n          <div show.bind=\"invoicePeriod > -1\" class=\"col-lg-3\">\n            <div class=\"form-group\">\n              <div class=\"col-sm-10\">\n                <label>Invoice Start Date</label>\n                <flat-picker controlid=\"invoiceStartDate\" change.trigger=\"periodChanged()\" config.bind=\"dateConfig\"\n                  value.bind=\"selectedInvoicePeriod.startDate\">\n                </flat-picker>\n              </div>\n            </div>\n          </div>\n          <div show.bind=\"invoicePeriod > -1\" class=\"col-lg-3\">\n            <div class=\"form-group\">\n              <div class=\"col-sm-10\">\n                <label>Invoice End Date</label>\n                <flat-picker controlid=\"invoiceEndDate\" change.trigger=\"periodChanged()\" config.bind=\"dateConfig\"\n                  value.bind=\"selectedInvoicePeriod.endDate\">\n                </flat-picker>\n              </div>\n            </div>\n          </div>\n          <div class=\"col-lg-2\">\n            <div class=\"form-group\">\n              <div class=\"col-sm-10\">\n                <label>Exchange Rate</label>\n                <input class=\"form-control\" type=\"number\" value.bind=\"exchangeRate\"\n                  change.trigger=\"checkExchangeRate()\" />\n              </div>\n            </div>\n          </div>\n        </div>\n        <div class=\"row\" style=\"margin-left:30px;margin-right:30px;border:1px;\">\n          <div class=\"col-lg-8\">\n            <div class=\"form-group\">\n              <div class=\"col-sm-10\">\n                <label>&nbsp;</label>\n                <h4>Today: ${formattedDate}</h4>\n              </div>\n            </div>\n          </div>\n          <div class=\"col-lg-3\">\n            <H3 class=\"leftMargin\">Total Invoice Amount: ${totalProductInvoiceAmount + totalInstitutionInvoiceAmount |\n              formatNumber}</H3>\n          </div>\n        </div>\n        <div class=\"row\" style=\"margin-left:30px;margin-right:30px;border:1px;\">\n          <div class=\"col-lg-3 backColorOne vertical-align\" style=\"height:40px;border:1px solid black;\">\n            Paid date in this session\n          </div>\n          <div class=\"col-lg-3 backColorTwo vertical-align\" style=\"height:40px;border:1px solid black;\">\n            Date started in this session\n          </div>\n          <div class=\"col-lg-3 backColorThree vertical-align\" style=\"height:40px;border:1px solid black;\">\n            Paid date over a year in past\n          </div>\n          <div class=\"col-lg-3 backColorFour vertical-align\" style=\"height:40px;border:1px solid black;\">\n            Invoice date is null\n          </div>\n        </div>\n        <div class=\"col-lg-5 topMargin\">\n\n          <h4>Institutions</h4>\n          <div class=\"well well2 overFlow\" style=\"height:800px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"addInsitution($index, institution)\" type=\"button\"\n                repeat.for=\"institution of classifyInstitutionsArray\" id=\"${institution.name}\"\n                class=\"list-group-item ${institution.category}\">\n                <span class=\"col-sm-7\">\n                  <h4>${institution.name}</h4>\n                </span>\n                <span class=\"col-sm-5\">\n                  <span class=\"col-sm-8\">\n                    <h5>${institution.packageId.packageId |\n                      lookupValue:people.packageArray:\"_id\":\"name\"} ${institution.invoiceAmount | formatNumber:2}\n                    </h5>\n                  </span>\n                  <span class=\"col-sm-4\">\n                    <span click.delegate=\"deleteClassifiedInvoiceInstitution($index)\" class=\"smallMarginRight\"\n                      bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                      data-original-title=\"Delete Institution\"><i class=\"fa fa-trash-o fa-lg fa-border text-danger\"\n                        aria-hidden=\"true\"></i></span>\n                  </span>\n                </span>\n                <span class=\"col-lg-12\">\n                  <h5>\n                    Start Date: ${institution.packageId.dateStarted | dateFormat:config.DATE_FORMAT_TABLE}\n                    <span style=\"margin-left:20px;\">Invoice Date: ${institution.packageId.dateInvoiced |\n                      dateFormat:config.DATE_FORMAT_TABLE}</span>\n                    <span style=\"margin-left:20px;\">Paid Date:${institution.packageId.datePaid |\n                      dateFormat:config.DATE_FORMAT_TABLE}</span>\n                  </h5>\n                </span>\n              </button>\n            </ul>\n          </div>\n        </div>\n        <div class=\"col-lg-1 topMargin\">\n          <span click.trigger=\"getInstitutionToBeInvoiced()\" class=\"smallMarginRight\" bootstrap-tooltip\n            data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n              class=\"fa fa-refresh fa-3x fa-border leftMargin\" aria-hidden=\"true\"></i></span>\n          <span click.trigger=\"invoiceAllInstitutions()\" class=\"smallMarginRight\" bootstrap-tooltip\n            data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n              class=\"fa fa-arrow-right fa-3x fa-border topMargin leftMargin\" aria-hidden=\"true\"></i></span>\n          <span click.trigger=\"invoiceNoInstitutions()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n            data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n              class=\"fa fa-arrow-left fa-3x fa-border topMargin leftMargin\" aria-hidden=\"true\"></i></span>\n        </div>\n        <div class=\"col-lg-5 topMargin\">\n          <h4>Total from Packages: ${totalInstitutionInvoiceAmount | formatNumber:2}\n            <span show.bind=\"institutionsToBeInvoiced.length\" click.delegate=\"downloadInstExcel()\"\n              class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n              data-original-title=\"Export to Excel\"><i class=\"fa fa-download\" aria-hidden=\"true\"></i></span></h4>\n          <div class=\"well well2 overFlow\" style=\"height:800px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"subtractInstitution($index, institution)\" type=\"button\"\n                repeat.for=\"institution of institutionsToBeInvoiced\" id=\"${institution.name}\"\n                class=\"list-group-item ${institution.category}\">\n                <span class=\"col-sm-7\">\n                  <h4>${institution.name}</h4>\n                </span>\n                <span class=\"col-sm-5\">\n                  <span class=\"col-sm-7\">\n                    <h5>${institution.packageId.packageId |\n                      lookupValue:people.packageArray:\"_id\":\"name\"} ${institution.invoiceAmount | formatNumber:2}</h5>\n                  </span>\n                  <span class=\"col-sm-5\">\n                    <span click.trigger=\"deleteInstitutionsToBeInvoiced($index)\" class=\"smallMarginRight\"\n                      bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                      data-original-title=\"Delete Institution\"><i class=\"fa fa-trash-o fa-lg fa-border text-danger\"\n                        aria-hidden=\"true\"></i></span>\n                  </span>\n                </span>\n                <span class=\"col-sm-7\">\n                  <h6>Start Date: ${institution.packageId.dateStarted | dateFormat:config.DATE_FORMAT_TABLE}</h6>\n                </span>\n              </button>\n            </ul>\n          </div>\n        </div>\n\n        <!-- <div class=\"col-lg-5 topMargin\">\n          <h4>Invoice Relevant Requests</h4>\n          <div class=\"well well2 overFlow\" style=\"height:800px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"addRequest($index, request)\" type=\"button\"\n                repeat.for=\"request of apj.requestsDetailsArray\" id=\"${request.requestId.InstitutionId.name}\"\n                class=\"list-group-item\">\n                <span class=\"col-sm-6\">\n                  <h4>${request.requestId.institutionId.name}</h4>\n                </span>\n                <span class=\"col-sm-6\">\n                  <h5>${request.productId.name}</h5>\n                  <span class=\"col-sm-4\">\n                    <span click.delegate=\"deleteInvoiceRelevantRequest($index)\" class=\"smallMarginRight\"\n                      bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                      data-original-title=\"Delete Institution\"><i class=\"fa fa-trash-o fa-lg fa-border text-danger\"\n                        aria-hidden=\"true\"></i></span>\n                  </span>\n                </span>\n                <span class=\"col-lg-12\">\n                  <h5>\n                    <span class=\"col-lg-5\">\n                      Created Date: ${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}\n                    </span>\n                    <span>\n                      Price: ${request.price | formatNumber}\n                    </span>\n                  </h5>\n                </span>\n              </button>\n            </ul>\n          </div>\n        </div>\n        <div class=\"col-lg-1 topMargin\">\n          <span click.trigger=\"getInstitutionToBeInvoiced()\" class=\"smallMarginRight\" bootstrap-tooltip\n            data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n              class=\"fa fa-refresh fa-3x fa-border leftMargin\" aria-hidden=\"true\"></i></span>\n          <span click.trigger=\"invoiceAllProducts()\" class=\"smallMarginRight\" bootstrap-tooltip\n            data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n              class=\"fa fa-arrow-right fa-3x fa-border topMargin leftMargin\" aria-hidden=\"true\"></i></span>\n          <span click.trigger=\"invoiceNoProducts()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n            data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i\n              class=\"fa fa-arrow-left fa-3x fa-border topMargin leftMargin\" aria-hidden=\"true\"></i></span>\n        </div> -->\n        <!-- <div class=\"col-lg-5 topMargin\">\n          <h4>Total from products: ${totalProductInvoiceAmount | formatNumber}</h4>\n          <div class=\"well well2 overFlow\" style=\"height:800px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"subtractRequest($index, request)\" type=\"button\"\n                repeat.for=\"request of invoiceRelevantRequests\" class=\"list-group-item\">\n                <span class=\"col-sm-6\">\n                  <h4>${request.requestId.institutionId.name}</h4>\n                </span>\n                <span class=\"col-sm-6\">\n                  <h5>${request.productId.name}</h5>\n                  <span class=\"col-sm-4\">\n                    <span click.delegate=\"deleteInvoicingRequest($index)\" class=\"smallMarginRight\" bootstrap-tooltip\n                      data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Institution\"><i\n                        class=\"fa fa-trash-o fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n                  </span>\n                </span>\n                <span class=\"col-lg-12\">\n                  <h5>\n                    <span class=\"col-lg-5\">\n                      Created Date: ${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}\n                    </span>\n                    <span>\n                      Price: ${request.price | formatNumber}\n                    </span>\n                  </h5>\n                </span>\n              </button>\n            </ul>\n          </div>\n        </div> -->\n      </div>\n    </div>\n  </div>\n  </div>\n\n</template>\n"; });
 define('text!resources/css/fullcalendar.css', ['module'], function(module) { module.exports = "/*!\r\n * FullCalendar v3.4.0 Stylesheet\r\n * Docs & License: https://fullcalendar.io/\r\n * (c) 2017 Adam Shaw\r\n */\r\n\r\n\r\n.fc {\r\n\tdirection: ltr;\r\n\ttext-align: left;\r\n}\r\n\r\n.fc-rtl {\r\n\ttext-align: right;\r\n}\r\n\r\nbody .fc { /* extra precedence to overcome jqui */\r\n\tfont-size: 1em;\r\n}\r\n\r\n\r\n/* Colors\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-unthemed th,\r\n.fc-unthemed td,\r\n.fc-unthemed thead,\r\n.fc-unthemed tbody,\r\n.fc-unthemed .fc-divider,\r\n.fc-unthemed .fc-row,\r\n.fc-unthemed .fc-content, /* for gutter border */\r\n.fc-unthemed .fc-popover,\r\n.fc-unthemed .fc-list-view,\r\n.fc-unthemed .fc-list-heading td {\r\n\tborder-color: #ddd;\r\n}\r\n\r\n.fc-unthemed .fc-popover {\r\n\tbackground-color: #fff;\r\n}\r\n\r\n.fc-unthemed .fc-divider,\r\n.fc-unthemed .fc-popover .fc-header,\r\n.fc-unthemed .fc-list-heading td {\r\n\tbackground: #eee;\r\n}\r\n\r\n.fc-unthemed .fc-popover .fc-header .fc-close {\r\n\tcolor: #666;\r\n}\r\n\r\n.fc-unthemed td.fc-today {\r\n\tbackground: #fcf8e3;\r\n}\r\n\r\n.fc-highlight { /* when user is selecting cells */\r\n\tbackground: #bce8f1;\r\n\topacity: .3;\r\n}\r\n\r\n.fc-bgevent { /* default look for background events */\r\n\tbackground: rgb(143, 223, 130);\r\n\topacity: .3;\r\n}\r\n\r\n.fc-nonbusiness { /* default look for non-business-hours areas */\r\n\t/* will inherit .fc-bgevent's styles */\r\n\tbackground: #d7d7d7;\r\n}\r\n\r\n.fc-unthemed .fc-disabled-day {\r\n\tbackground: #d7d7d7;\r\n\topacity: .3;\r\n}\r\n\r\n.ui-widget .fc-disabled-day { /* themed */\r\n\tbackground-image: none;\r\n}\r\n\r\n\r\n/* Icons (inline elements with styled text that mock arrow icons)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-icon {\r\n\tdisplay: inline-block;\r\n\theight: 1em;\r\n\tline-height: 1em;\r\n\tfont-size: 1em;\r\n\ttext-align: center;\r\n\toverflow: hidden;\r\n\tfont-family: \"Courier New\", Courier, monospace;\r\n\r\n\t/* don't allow browser text-selection */\r\n\t-webkit-touch-callout: none;\r\n\t-webkit-user-select: none;\r\n\t-khtml-user-select: none;\r\n\t-moz-user-select: none;\r\n\t-ms-user-select: none;\r\n\tuser-select: none;\r\n\t}\r\n\r\n/*\r\nAcceptable font-family overrides for individual icons:\r\n\t\"Arial\", sans-serif\r\n\t\"Times New Roman\", serif\r\n\r\nNOTE: use percentage font sizes or else old IE chokes\r\n*/\r\n\r\n.fc-icon:after {\r\n\tposition: relative;\r\n}\r\n\r\n.fc-icon-left-single-arrow:after {\r\n\tcontent: \"\\02039\";\r\n\tfont-weight: bold;\r\n\tfont-size: 200%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-right-single-arrow:after {\r\n\tcontent: \"\\0203A\";\r\n\tfont-weight: bold;\r\n\tfont-size: 200%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-left-double-arrow:after {\r\n\tcontent: \"\\000AB\";\r\n\tfont-size: 160%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-right-double-arrow:after {\r\n\tcontent: \"\\000BB\";\r\n\tfont-size: 160%;\r\n\ttop: -7%;\r\n}\r\n\r\n.fc-icon-left-triangle:after {\r\n\tcontent: \"\\25C4\";\r\n\tfont-size: 125%;\r\n\ttop: 3%;\r\n}\r\n\r\n.fc-icon-right-triangle:after {\r\n\tcontent: \"\\25BA\";\r\n\tfont-size: 125%;\r\n\ttop: 3%;\r\n}\r\n\r\n.fc-icon-down-triangle:after {\r\n\tcontent: \"\\25BC\";\r\n\tfont-size: 125%;\r\n\ttop: 2%;\r\n}\r\n\r\n.fc-icon-x:after {\r\n\tcontent: \"\\000D7\";\r\n\tfont-size: 200%;\r\n\ttop: 6%;\r\n}\r\n\r\n\r\n/* Buttons (styled <button> tags, normalized to work cross-browser)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc button {\r\n\t/* force height to include the border and padding */\r\n\t-moz-box-sizing: border-box;\r\n\t-webkit-box-sizing: border-box;\r\n\tbox-sizing: border-box;\r\n\r\n\t/* dimensions */\r\n\tmargin: 0;\r\n\theight: 2.1em;\r\n\tpadding: 0 .6em;\r\n\r\n\t/* text & cursor */\r\n\tfont-size: 1em; /* normalize */\r\n\twhite-space: nowrap;\r\n\tcursor: pointer;\r\n}\r\n\r\n/* Firefox has an annoying inner border */\r\n.fc button::-moz-focus-inner { margin: 0; padding: 0; }\r\n\t\r\n.fc-state-default { /* non-theme */\r\n\tborder: 1px solid;\r\n}\r\n\r\n.fc-state-default.fc-corner-left { /* non-theme */\r\n\tborder-top-left-radius: 4px;\r\n\tborder-bottom-left-radius: 4px;\r\n}\r\n\r\n.fc-state-default.fc-corner-right { /* non-theme */\r\n\tborder-top-right-radius: 4px;\r\n\tborder-bottom-right-radius: 4px;\r\n}\r\n\r\n/* icons in buttons */\r\n\r\n.fc button .fc-icon { /* non-theme */\r\n\tposition: relative;\r\n\ttop: -0.05em; /* seems to be a good adjustment across browsers */\r\n\tmargin: 0 .2em;\r\n\tvertical-align: middle;\r\n}\r\n\t\r\n/*\r\n  button states\r\n  borrowed from twitter bootstrap (http://twitter.github.com/bootstrap/)\r\n*/\r\n\r\n.fc-state-default {\r\n\tbackground-color: #f5f5f5;\r\n\tbackground-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);\r\n\tbackground-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));\r\n\tbackground-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);\r\n\tbackground-image: -o-linear-gradient(top, #ffffff, #e6e6e6);\r\n\tbackground-image: linear-gradient(to bottom, #ffffff, #e6e6e6);\r\n\tbackground-repeat: repeat-x;\r\n\tborder-color: #e6e6e6 #e6e6e6 #bfbfbf;\r\n\tborder-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);\r\n\tcolor: #333;\r\n\ttext-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);\r\n\tbox-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);\r\n}\r\n\r\n.fc-state-hover,\r\n.fc-state-down,\r\n.fc-state-active,\r\n.fc-state-disabled {\r\n\tcolor: #333333;\r\n\tbackground-color: #e6e6e6;\r\n}\r\n\r\n.fc-state-hover {\r\n\tcolor: #333333;\r\n\ttext-decoration: none;\r\n\tbackground-position: 0 -15px;\r\n\t-webkit-transition: background-position 0.1s linear;\r\n\t   -moz-transition: background-position 0.1s linear;\r\n\t     -o-transition: background-position 0.1s linear;\r\n\t        transition: background-position 0.1s linear;\r\n}\r\n\r\n.fc-state-down,\r\n.fc-state-active {\r\n\tbackground-color: #cccccc;\r\n\tbackground-image: none;\r\n\tbox-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);\r\n}\r\n\r\n.fc-state-disabled {\r\n\tcursor: default;\r\n\tbackground-image: none;\r\n\topacity: 0.65;\r\n\tbox-shadow: none;\r\n}\r\n\r\n\r\n/* Buttons Groups\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-button-group {\r\n\tdisplay: inline-block;\r\n}\r\n\r\n/*\r\nevery button that is not first in a button group should scootch over one pixel and cover the\r\nprevious button's border...\r\n*/\r\n\r\n.fc .fc-button-group > * { /* extra precedence b/c buttons have margin set to zero */\r\n\tfloat: left;\r\n\tmargin: 0 0 0 -1px;\r\n}\r\n\r\n.fc .fc-button-group > :first-child { /* same */\r\n\tmargin-left: 0;\r\n}\r\n\r\n\r\n/* Popover\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-popover {\r\n\tposition: absolute;\r\n\tbox-shadow: 0 2px 6px rgba(0,0,0,.15);\r\n}\r\n\r\n.fc-popover .fc-header { /* TODO: be more consistent with fc-head/fc-body */\r\n\tpadding: 2px 4px;\r\n}\r\n\r\n.fc-popover .fc-header .fc-title {\r\n\tmargin: 0 2px;\r\n}\r\n\r\n.fc-popover .fc-header .fc-close {\r\n\tcursor: pointer;\r\n}\r\n\r\n.fc-ltr .fc-popover .fc-header .fc-title,\r\n.fc-rtl .fc-popover .fc-header .fc-close {\r\n\tfloat: left;\r\n}\r\n\r\n.fc-rtl .fc-popover .fc-header .fc-title,\r\n.fc-ltr .fc-popover .fc-header .fc-close {\r\n\tfloat: right;\r\n}\r\n\r\n/* unthemed */\r\n\r\n.fc-unthemed .fc-popover {\r\n\tborder-width: 1px;\r\n\tborder-style: solid;\r\n}\r\n\r\n.fc-unthemed .fc-popover .fc-header .fc-close {\r\n\tfont-size: .9em;\r\n\tmargin-top: 2px;\r\n}\r\n\r\n/* jqui themed */\r\n\r\n.fc-popover > .ui-widget-header + .ui-widget-content {\r\n\tborder-top: 0; /* where they meet, let the header have the border */\r\n}\r\n\r\n\r\n/* Misc Reusable Components\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-divider {\r\n\tborder-style: solid;\r\n\tborder-width: 1px;\r\n}\r\n\r\nhr.fc-divider {\r\n\theight: 0;\r\n\tmargin: 0;\r\n\tpadding: 0 0 2px; /* height is unreliable across browsers, so use padding */\r\n\tborder-width: 1px 0;\r\n}\r\n\r\n.fc-clear {\r\n\tclear: both;\r\n}\r\n\r\n.fc-bg,\r\n.fc-bgevent-skeleton,\r\n.fc-highlight-skeleton,\r\n.fc-helper-skeleton {\r\n\t/* these element should always cling to top-left/right corners */\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n.fc-bg {\r\n\tbottom: 0; /* strech bg to bottom edge */\r\n}\r\n\r\n.fc-bg table {\r\n\theight: 100%; /* strech bg to bottom edge */\r\n}\r\n\r\n\r\n/* Tables\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc table {\r\n\twidth: 100%;\r\n\tbox-sizing: border-box; /* fix scrollbar issue in firefox */\r\n\ttable-layout: fixed;\r\n\tborder-collapse: collapse;\r\n\tborder-spacing: 0;\r\n\tfont-size: 1em; /* normalize cross-browser */\r\n}\r\n\r\n.fc th {\r\n\ttext-align: center;\r\n}\r\n\r\n.fc th,\r\n.fc td {\r\n\tborder-style: solid;\r\n\tborder-width: 1px;\r\n\tpadding: 0;\r\n\tvertical-align: top;\r\n}\r\n\r\n.fc td.fc-today {\r\n\tborder-style: double; /* overcome neighboring borders */\r\n}\r\n\r\n\r\n/* Internal Nav Links\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\na[data-goto] {\r\n\tcursor: pointer;\r\n}\r\n\r\na[data-goto]:hover {\r\n\ttext-decoration: underline;\r\n}\r\n\r\n\r\n/* Fake Table Rows\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc .fc-row { /* extra precedence to overcome themes w/ .ui-widget-content forcing a 1px border */\r\n\t/* no visible border by default. but make available if need be (scrollbar width compensation) */\r\n\tborder-style: solid;\r\n\tborder-width: 0;\r\n}\r\n\r\n.fc-row table {\r\n\t/* don't put left/right border on anything within a fake row.\r\n\t   the outer tbody will worry about this */\r\n\tborder-left: 0 hidden transparent;\r\n\tborder-right: 0 hidden transparent;\r\n\r\n\t/* no bottom borders on rows */\r\n\tborder-bottom: 0 hidden transparent; \r\n}\r\n\r\n.fc-row:first-child table {\r\n\tborder-top: 0 hidden transparent; /* no top border on first row */\r\n}\r\n\r\n\r\n/* Day Row (used within the header and the DayGrid)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-row {\r\n\tposition: relative;\r\n}\r\n\r\n.fc-row .fc-bg {\r\n\tz-index: 1;\r\n}\r\n\r\n/* highlighting cells & background event skeleton */\r\n\r\n.fc-row .fc-bgevent-skeleton,\r\n.fc-row .fc-highlight-skeleton {\r\n\tbottom: 0; /* stretch skeleton to bottom of row */\r\n}\r\n\r\n.fc-row .fc-bgevent-skeleton table,\r\n.fc-row .fc-highlight-skeleton table {\r\n\theight: 100%; /* stretch skeleton to bottom of row */\r\n}\r\n\r\n.fc-row .fc-highlight-skeleton td,\r\n.fc-row .fc-bgevent-skeleton td {\r\n\tborder-color: transparent;\r\n}\r\n\r\n.fc-row .fc-bgevent-skeleton {\r\n\tz-index: 2;\r\n\r\n}\r\n\r\n.fc-row .fc-highlight-skeleton {\r\n\tz-index: 3;\r\n}\r\n\r\n/*\r\nrow content (which contains day/week numbers and events) as well as \"helper\" (which contains\r\ntemporary rendered events).\r\n*/\r\n\r\n.fc-row .fc-content-skeleton {\r\n\tposition: relative;\r\n\tz-index: 4;\r\n\tpadding-bottom: 2px; /* matches the space above the events */\r\n}\r\n\r\n.fc-row .fc-helper-skeleton {\r\n\tz-index: 5;\r\n}\r\n\r\n.fc-row .fc-content-skeleton td,\r\n.fc-row .fc-helper-skeleton td {\r\n\t/* see-through to the background below */\r\n\tbackground: none; /* in case <td>s are globally styled */\r\n\tborder-color: transparent;\r\n\r\n\t/* don't put a border between events and/or the day number */\r\n\tborder-bottom: 0;\r\n}\r\n\r\n.fc-row .fc-content-skeleton tbody td, /* cells with events inside (so NOT the day number cell) */\r\n.fc-row .fc-helper-skeleton tbody td {\r\n\t/* don't put a border between event cells */\r\n\tborder-top: 0;\r\n}\r\n\r\n\r\n/* Scrolling Container\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-scroller {\r\n\t-webkit-overflow-scrolling: touch;\r\n}\r\n\r\n/* TODO: move to agenda/basic */\r\n.fc-scroller > .fc-day-grid,\r\n.fc-scroller > .fc-time-grid {\r\n\tposition: relative; /* re-scope all positions */\r\n\twidth: 100%; /* hack to force re-sizing this inner element when scrollbars appear/disappear */\r\n}\r\n\r\n\r\n/* Global Event Styles\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-event {\r\n\tposition: relative; /* for resize handle and other inner positioning */\r\n\tdisplay: block; /* make the <a> tag block */\r\n\tfont-size: .85em;\r\n\tline-height: 1.3;\r\n\tborder-radius: 3px;\r\n\tborder: 1px solid #3a87ad; /* default BORDER color */\r\n\tfont-weight: normal; /* undo jqui's ui-widget-header bold */\r\n}\r\n\r\n.fc-event,\r\n.fc-event-dot {\r\n\tbackground-color: #3a87ad; /* default BACKGROUND color */\r\n}\r\n\r\n/* overpower some of bootstrap's and jqui's styles on <a> tags */\r\n.fc-event,\r\n.fc-event:hover,\r\n.ui-widget .fc-event {\r\n\tcolor: #fff; /* default TEXT color */\r\n\ttext-decoration: none; /* if <a> has an href */\r\n}\r\n\r\n.fc-event[href],\r\n.fc-event.fc-draggable {\r\n\tcursor: pointer; /* give events with links and draggable events a hand mouse pointer */\r\n}\r\n\r\n.fc-not-allowed, /* causes a \"warning\" cursor. applied on body */\r\n.fc-not-allowed .fc-event { /* to override an event's custom cursor */\r\n\tcursor: not-allowed;\r\n}\r\n\r\n.fc-event .fc-bg { /* the generic .fc-bg already does position */\r\n\tz-index: 1;\r\n\tbackground: #fff;\r\n\topacity: .25;\r\n}\r\n\r\n.fc-event .fc-content {\r\n\tposition: relative;\r\n\tz-index: 2;\r\n}\r\n\r\n/* resizer (cursor AND touch devices) */\r\n\r\n.fc-event .fc-resizer {\r\n\tposition: absolute;\r\n\tz-index: 4;\r\n}\r\n\r\n/* resizer (touch devices) */\r\n\r\n.fc-event .fc-resizer {\r\n\tdisplay: none;\r\n}\r\n\r\n.fc-event.fc-allow-mouse-resize .fc-resizer,\r\n.fc-event.fc-selected .fc-resizer {\r\n\t/* only show when hovering or selected (with touch) */\r\n\tdisplay: block;\r\n}\r\n\r\n/* hit area */\r\n\r\n.fc-event.fc-selected .fc-resizer:before {\r\n\t/* 40x40 touch area */\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tz-index: 9999; /* user of this util can scope within a lower z-index */\r\n\ttop: 50%;\r\n\tleft: 50%;\r\n\twidth: 40px;\r\n\theight: 40px;\r\n\tmargin-left: -20px;\r\n\tmargin-top: -20px;\r\n}\r\n\r\n\r\n/* Event Selection (only for touch devices)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-event.fc-selected {\r\n\tz-index: 9999 !important; /* overcomes inline z-index */\r\n\tbox-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);\r\n}\r\n\r\n.fc-event.fc-selected.fc-dragging {\r\n\tbox-shadow: 0 2px 7px rgba(0, 0, 0, 0.3);\r\n}\r\n\r\n\r\n/* Horizontal Events\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* bigger touch area when selected */\r\n.fc-h-event.fc-selected:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tz-index: 3; /* below resizers */\r\n\ttop: -10px;\r\n\tbottom: -10px;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* events that are continuing to/from another week. kill rounded corners and butt up against edge */\r\n\r\n.fc-ltr .fc-h-event.fc-not-start,\r\n.fc-rtl .fc-h-event.fc-not-end {\r\n\tmargin-left: 0;\r\n\tborder-left-width: 0;\r\n\tpadding-left: 1px; /* replace the border with padding */\r\n\tborder-top-left-radius: 0;\r\n\tborder-bottom-left-radius: 0;\r\n}\r\n\r\n.fc-ltr .fc-h-event.fc-not-end,\r\n.fc-rtl .fc-h-event.fc-not-start {\r\n\tmargin-right: 0;\r\n\tborder-right-width: 0;\r\n\tpadding-right: 1px; /* replace the border with padding */\r\n\tborder-top-right-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n/* resizer (cursor AND touch devices) */\r\n\r\n/* left resizer  */\r\n.fc-ltr .fc-h-event .fc-start-resizer,\r\n.fc-rtl .fc-h-event .fc-end-resizer {\r\n\tcursor: w-resize;\r\n\tleft: -1px; /* overcome border */\r\n}\r\n\r\n/* right resizer */\r\n.fc-ltr .fc-h-event .fc-end-resizer,\r\n.fc-rtl .fc-h-event .fc-start-resizer {\r\n\tcursor: e-resize;\r\n\tright: -1px; /* overcome border */\r\n}\r\n\r\n/* resizer (mouse devices) */\r\n\r\n.fc-h-event.fc-allow-mouse-resize .fc-resizer {\r\n\twidth: 7px;\r\n\ttop: -1px; /* overcome top border */\r\n\tbottom: -1px; /* overcome bottom border */\r\n}\r\n\r\n/* resizer (touch devices) */\r\n\r\n.fc-h-event.fc-selected .fc-resizer {\r\n\t/* 8x8 little dot */\r\n\tborder-radius: 4px;\r\n\tborder-width: 1px;\r\n\twidth: 6px;\r\n\theight: 6px;\r\n\tborder-style: solid;\r\n\tborder-color: inherit;\r\n\tbackground: #fff;\r\n\t/* vertically center */\r\n\ttop: 50%;\r\n\tmargin-top: -4px;\r\n}\r\n\r\n/* left resizer  */\r\n.fc-ltr .fc-h-event.fc-selected .fc-start-resizer,\r\n.fc-rtl .fc-h-event.fc-selected .fc-end-resizer {\r\n\tmargin-left: -4px; /* centers the 8x8 dot on the left edge */\r\n}\r\n\r\n/* right resizer */\r\n.fc-ltr .fc-h-event.fc-selected .fc-end-resizer,\r\n.fc-rtl .fc-h-event.fc-selected .fc-start-resizer {\r\n\tmargin-right: -4px; /* centers the 8x8 dot on the right edge */\r\n}\r\n\r\n\r\n/* DayGrid events\r\n----------------------------------------------------------------------------------------------------\r\nWe use the full \"fc-day-grid-event\" class instead of using descendants because the event won't\r\nbe a descendant of the grid when it is being dragged.\r\n*/\r\n\r\n.fc-day-grid-event {\r\n\tmargin: 1px 2px 0; /* spacing between events and edges */\r\n\tpadding: 0 1px;\r\n}\r\n\r\ntr:first-child > td > .fc-day-grid-event {\r\n\tmargin-top: 2px; /* a little bit more space before the first event */\r\n}\r\n\r\n.fc-day-grid-event.fc-selected:after {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tz-index: 1; /* same z-index as fc-bg, behind text */\r\n\t/* overcome the borders */\r\n\ttop: -1px;\r\n\tright: -1px;\r\n\tbottom: -1px;\r\n\tleft: -1px;\r\n\t/* darkening effect */\r\n\tbackground: #000;\r\n\topacity: .25;\r\n}\r\n\r\n.fc-day-grid-event .fc-content { /* force events to be one-line tall */\r\n\twhite-space: nowrap;\r\n\toverflow: hidden;\r\n}\r\n\r\n.fc-day-grid-event .fc-time {\r\n\tfont-weight: bold;\r\n}\r\n\r\n/* resizer (cursor devices) */\r\n\r\n/* left resizer  */\r\n.fc-ltr .fc-day-grid-event.fc-allow-mouse-resize .fc-start-resizer,\r\n.fc-rtl .fc-day-grid-event.fc-allow-mouse-resize .fc-end-resizer {\r\n\tmargin-left: -2px; /* to the day cell's edge */\r\n}\r\n\r\n/* right resizer */\r\n.fc-ltr .fc-day-grid-event.fc-allow-mouse-resize .fc-end-resizer,\r\n.fc-rtl .fc-day-grid-event.fc-allow-mouse-resize .fc-start-resizer {\r\n\tmargin-right: -2px; /* to the day cell's edge */\r\n}\r\n\r\n\r\n/* Event Limiting\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* \"more\" link that represents hidden events */\r\n\r\na.fc-more {\r\n\tmargin: 1px 3px;\r\n\tfont-size: .85em;\r\n\tcursor: pointer;\r\n\ttext-decoration: none;\r\n}\r\n\r\na.fc-more:hover {\r\n\ttext-decoration: underline;\r\n}\r\n\r\n.fc-limited { /* rows and cells that are hidden because of a \"more\" link */\r\n\tdisplay: none;\r\n}\r\n\r\n/* popover that appears when \"more\" link is clicked */\r\n\r\n.fc-day-grid .fc-row {\r\n\tz-index: 1; /* make the \"more\" popover one higher than this */\r\n}\r\n\r\n.fc-more-popover {\r\n\tz-index: 2;\r\n\twidth: 220px;\r\n}\r\n\r\n.fc-more-popover .fc-event-container {\r\n\tpadding: 10px;\r\n}\r\n\r\n\r\n/* Now Indicator\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-now-indicator {\r\n\tposition: absolute;\r\n\tborder: 0 solid red;\r\n}\r\n\r\n\r\n/* Utilities\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-unselectable {\r\n\t-webkit-user-select: none;\r\n\t -khtml-user-select: none;\r\n\t   -moz-user-select: none;\r\n\t    -ms-user-select: none;\r\n\t        user-select: none;\r\n\t-webkit-touch-callout: none;\r\n\t-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\r\n}\r\n\r\n\r\n\r\n/* Toolbar\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-toolbar {\r\n\ttext-align: center;\r\n}\r\n\r\n.fc-toolbar.fc-header-toolbar {\r\n\tmargin-bottom: 1em;\r\n}\r\n\r\n.fc-toolbar.fc-footer-toolbar {\r\n\tmargin-top: 1em;\r\n}\r\n\r\n.fc-toolbar .fc-left {\r\n\tfloat: left;\r\n}\r\n\r\n.fc-toolbar .fc-right {\r\n\tfloat: right;\r\n}\r\n\r\n.fc-toolbar .fc-center {\r\n\tdisplay: inline-block;\r\n}\r\n\r\n/* the things within each left/right/center section */\r\n.fc .fc-toolbar > * > * { /* extra precedence to override button border margins */\r\n\tfloat: left;\r\n\tmargin-left: .75em;\r\n}\r\n\r\n/* the first thing within each left/center/right section */\r\n.fc .fc-toolbar > * > :first-child { /* extra precedence to override button border margins */\r\n\tmargin-left: 0;\r\n}\r\n\t\r\n/* title text */\r\n\r\n.fc-toolbar h2 {\r\n\tmargin: 0;\r\n}\r\n\r\n/* button layering (for border precedence) */\r\n\r\n.fc-toolbar button {\r\n\tposition: relative;\r\n}\r\n\r\n.fc-toolbar .fc-state-hover,\r\n.fc-toolbar .ui-state-hover {\r\n\tz-index: 2;\r\n}\r\n\t\r\n.fc-toolbar .fc-state-down {\r\n\tz-index: 3;\r\n}\r\n\r\n.fc-toolbar .fc-state-active,\r\n.fc-toolbar .ui-state-active {\r\n\tz-index: 4;\r\n}\r\n\r\n.fc-toolbar button:focus {\r\n\tz-index: 5;\r\n}\r\n\r\n\r\n/* View Structure\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* undo twitter bootstrap's box-sizing rules. normalizes positioning techniques */\r\n/* don't do this for the toolbar because we'll want bootstrap to style those buttons as some pt */\r\n.fc-view-container *,\r\n.fc-view-container *:before,\r\n.fc-view-container *:after {\r\n\t-webkit-box-sizing: content-box;\r\n\t   -moz-box-sizing: content-box;\r\n\t        box-sizing: content-box;\r\n}\r\n\r\n.fc-view, /* scope positioning and z-index's for everything within the view */\r\n.fc-view > table { /* so dragged elements can be above the view's main element */\r\n\tposition: relative;\r\n\tz-index: 1;\r\n}\r\n\r\n\r\n\r\n/* BasicView\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* day row structure */\r\n\r\n.fc-basicWeek-view .fc-content-skeleton,\r\n.fc-basicDay-view .fc-content-skeleton {\r\n\t/* there may be week numbers in these views, so no padding-top */\r\n\tpadding-bottom: 1em; /* ensure a space at bottom of cell for user selecting/clicking */\r\n}\r\n\r\n.fc-basic-view .fc-body .fc-row {\r\n\tmin-height: 4em; /* ensure that all rows are at least this tall */\r\n}\r\n\r\n/* a \"rigid\" row will take up a constant amount of height because content-skeleton is absolute */\r\n\r\n.fc-row.fc-rigid {\r\n\toverflow: hidden;\r\n}\r\n\r\n.fc-row.fc-rigid .fc-content-skeleton {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* week and day number styling */\r\n\r\n.fc-day-top.fc-other-month {\r\n\topacity: 0.3;\r\n}\r\n\r\n.fc-basic-view .fc-week-number,\r\n.fc-basic-view .fc-day-number {\r\n\tpadding: 2px;\r\n}\r\n\r\n.fc-basic-view th.fc-week-number,\r\n.fc-basic-view th.fc-day-number {\r\n\tpadding: 0 2px; /* column headers can't have as much v space */\r\n}\r\n\r\n.fc-ltr .fc-basic-view .fc-day-top .fc-day-number { float: right; }\r\n.fc-rtl .fc-basic-view .fc-day-top .fc-day-number { float: left; }\r\n\r\n.fc-ltr .fc-basic-view .fc-day-top .fc-week-number { float: left; border-radius: 0 0 3px 0; }\r\n.fc-rtl .fc-basic-view .fc-day-top .fc-week-number { float: right; border-radius: 0 0 0 3px; }\r\n\r\n.fc-basic-view .fc-day-top .fc-week-number {\r\n\tmin-width: 1.5em;\r\n\ttext-align: center;\r\n\tbackground-color: #f2f2f2;\r\n\tcolor: #808080;\r\n}\r\n\r\n/* when week/day number have own column */\r\n\r\n.fc-basic-view td.fc-week-number {\r\n\ttext-align: center;\r\n}\r\n\r\n.fc-basic-view td.fc-week-number > * {\r\n\t/* work around the way we do column resizing and ensure a minimum width */\r\n\tdisplay: inline-block;\r\n\tmin-width: 1.25em;\r\n}\r\n\r\n\r\n/* AgendaView all-day area\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-agenda-view .fc-day-grid {\r\n\tposition: relative;\r\n\tz-index: 2; /* so the \"more..\" popover will be over the time grid */\r\n}\r\n\r\n.fc-agenda-view .fc-day-grid .fc-row {\r\n\tmin-height: 3em; /* all-day section will never get shorter than this */\r\n}\r\n\r\n.fc-agenda-view .fc-day-grid .fc-row .fc-content-skeleton {\r\n\tpadding-bottom: 1em; /* give space underneath events for clicking/selecting days */\r\n}\r\n\r\n\r\n/* TimeGrid axis running down the side (for both the all-day area and the slot area)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc .fc-axis { /* .fc to overcome default cell styles */\r\n\tvertical-align: middle;\r\n\tpadding: 0 4px;\r\n\twhite-space: nowrap;\r\n}\r\n\r\n.fc-ltr .fc-axis {\r\n\ttext-align: right;\r\n}\r\n\r\n.fc-rtl .fc-axis {\r\n\ttext-align: left;\r\n}\r\n\r\n.ui-widget td.fc-axis {\r\n\tfont-weight: normal; /* overcome jqui theme making it bold */\r\n}\r\n\r\n\r\n/* TimeGrid Structure\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid-container, /* so scroll container's z-index is below all-day */\r\n.fc-time-grid { /* so slats/bg/content/etc positions get scoped within here */\r\n\tposition: relative;\r\n\tz-index: 1;\r\n}\r\n\r\n.fc-time-grid {\r\n\tmin-height: 100%; /* so if height setting is 'auto', .fc-bg stretches to fill height */\r\n}\r\n\r\n.fc-time-grid table { /* don't put outer borders on slats/bg/content/etc */\r\n\tborder: 0 hidden transparent;\r\n}\r\n\r\n.fc-time-grid > .fc-bg {\r\n\tz-index: 1;\r\n}\r\n\r\n.fc-time-grid .fc-slats,\r\n.fc-time-grid > hr { /* the <hr> AgendaView injects when grid is shorter than scroller */\r\n\tposition: relative;\r\n\tz-index: 2;\r\n}\r\n\r\n.fc-time-grid .fc-content-col {\r\n\tposition: relative; /* because now-indicator lives directly inside */\r\n}\r\n\r\n.fc-time-grid .fc-content-skeleton {\r\n\tposition: absolute;\r\n\tz-index: 3;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* divs within a cell within the fc-content-skeleton */\r\n\r\n.fc-time-grid .fc-business-container {\r\n\tposition: relative;\r\n\tz-index: 1;\r\n}\r\n\r\n.fc-time-grid .fc-bgevent-container {\r\n\tposition: relative;\r\n\tz-index: 2;\r\n}\r\n\r\n.fc-time-grid .fc-highlight-container {\r\n\tposition: relative;\r\n\tz-index: 3;\r\n}\r\n\r\n.fc-time-grid .fc-event-container {\r\n\tposition: relative;\r\n\tz-index: 4;\r\n}\r\n\r\n.fc-time-grid .fc-now-indicator-line {\r\n\tz-index: 5;\r\n}\r\n\r\n.fc-time-grid .fc-helper-container { /* also is fc-event-container */\r\n\tposition: relative;\r\n\tz-index: 6;\r\n}\r\n\r\n\r\n/* TimeGrid Slats (lines that run horizontally)\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid .fc-slats td {\r\n\theight: 1.5em;\r\n\tborder-bottom: 0; /* each cell is responsible for its top border */\r\n}\r\n\r\n.fc-time-grid .fc-slats .fc-minor td {\r\n\tborder-top-style: dotted;\r\n}\r\n\r\n.fc-time-grid .fc-slats .ui-widget-content { /* for jqui theme */\r\n\tbackground: none; /* see through to fc-bg */\r\n}\r\n\r\n\r\n/* TimeGrid Highlighting Slots\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid .fc-highlight-container { /* a div within a cell within the fc-highlight-skeleton */\r\n\tposition: relative; /* scopes the left/right of the fc-highlight to be in the column */\r\n}\r\n\r\n.fc-time-grid .fc-highlight {\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\tright: 0;\r\n\t/* top and bottom will be in by JS */\r\n}\r\n\r\n\r\n/* TimeGrid Event Containment\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-ltr .fc-time-grid .fc-event-container { /* space on the sides of events for LTR (default) */\r\n\tmargin: 0 2.5% 0 2px;\r\n}\r\n\r\n.fc-rtl .fc-time-grid .fc-event-container { /* space on the sides of events for RTL */\r\n\tmargin: 0 2px 0 2.5%;\r\n}\r\n\r\n.fc-time-grid .fc-event,\r\n.fc-time-grid .fc-bgevent {\r\n\tposition: absolute;\r\n\tz-index: 1; /* scope inner z-index's */\r\n}\r\n\r\n.fc-time-grid .fc-bgevent {\r\n\t/* background events always span full width */\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n\r\n/* Generic Vertical Event\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-v-event.fc-not-start { /* events that are continuing from another day */\r\n\t/* replace space made by the top border with padding */\r\n\tborder-top-width: 0;\r\n\tpadding-top: 1px;\r\n\r\n\t/* remove top rounded corners */\r\n\tborder-top-left-radius: 0;\r\n\tborder-top-right-radius: 0;\r\n}\r\n\r\n.fc-v-event.fc-not-end {\r\n\t/* replace space made by the top border with padding */\r\n\tborder-bottom-width: 0;\r\n\tpadding-bottom: 1px;\r\n\r\n\t/* remove bottom rounded corners */\r\n\tborder-bottom-left-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n\r\n/* TimeGrid Event Styling\r\n----------------------------------------------------------------------------------------------------\r\nWe use the full \"fc-time-grid-event\" class instead of using descendants because the event won't\r\nbe a descendant of the grid when it is being dragged.\r\n*/\r\n\r\n.fc-time-grid-event {\r\n\toverflow: hidden; /* don't let the bg flow over rounded corners */\r\n}\r\n\r\n.fc-time-grid-event.fc-selected {\r\n\t/* need to allow touch resizers to extend outside event's bounding box */\r\n\t/* common fc-selected styles hide the fc-bg, so don't need this anyway */\r\n\toverflow: visible;\r\n}\r\n\r\n.fc-time-grid-event.fc-selected .fc-bg {\r\n\tdisplay: none; /* hide semi-white background, to appear darker */\r\n}\r\n\r\n.fc-time-grid-event .fc-content {\r\n\toverflow: hidden; /* for when .fc-selected */\r\n}\r\n\r\n.fc-time-grid-event .fc-time,\r\n.fc-time-grid-event .fc-title {\r\n\tpadding: 0 1px;\r\n}\r\n\r\n.fc-time-grid-event .fc-time {\r\n\tfont-size: .85em;\r\n\twhite-space: nowrap;\r\n}\r\n\r\n/* short mode, where time and title are on the same line */\r\n\r\n.fc-time-grid-event.fc-short .fc-content {\r\n\t/* don't wrap to second line (now that contents will be inline) */\r\n\twhite-space: nowrap;\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time,\r\n.fc-time-grid-event.fc-short .fc-title {\r\n\t/* put the time and title on the same line */\r\n\tdisplay: inline-block;\r\n\tvertical-align: top;\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time span {\r\n\tdisplay: none; /* don't display the full time text... */\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time:before {\r\n\tcontent: attr(data-start); /* ...instead, display only the start time */\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-time:after {\r\n\tcontent: \"\\000A0-\\000A0\"; /* seperate with a dash, wrapped in nbsp's */\r\n}\r\n\r\n.fc-time-grid-event.fc-short .fc-title {\r\n\tfont-size: .85em; /* make the title text the same size as the time */\r\n\tpadding: 0; /* undo padding from above */\r\n}\r\n\r\n/* resizer (cursor device) */\r\n\r\n.fc-time-grid-event.fc-allow-mouse-resize .fc-resizer {\r\n\tleft: 0;\r\n\tright: 0;\r\n\tbottom: 0;\r\n\theight: 8px;\r\n\toverflow: hidden;\r\n\tline-height: 8px;\r\n\tfont-size: 11px;\r\n\tfont-family: monospace;\r\n\ttext-align: center;\r\n\tcursor: s-resize;\r\n}\r\n\r\n.fc-time-grid-event.fc-allow-mouse-resize .fc-resizer:after {\r\n\tcontent: \"=\";\r\n}\r\n\r\n/* resizer (touch device) */\r\n\r\n.fc-time-grid-event.fc-selected .fc-resizer {\r\n\t/* 10x10 dot */\r\n\tborder-radius: 5px;\r\n\tborder-width: 1px;\r\n\twidth: 8px;\r\n\theight: 8px;\r\n\tborder-style: solid;\r\n\tborder-color: inherit;\r\n\tbackground: #fff;\r\n\t/* horizontally center */\r\n\tleft: 50%;\r\n\tmargin-left: -5px;\r\n\t/* center on the bottom edge */\r\n\tbottom: -5px;\r\n}\r\n\r\n\r\n/* Now Indicator\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n.fc-time-grid .fc-now-indicator-line {\r\n\tborder-top-width: 1px;\r\n\tleft: 0;\r\n\tright: 0;\r\n}\r\n\r\n/* arrow on axis */\r\n\r\n.fc-time-grid .fc-now-indicator-arrow {\r\n\tmargin-top: -5px; /* vertically center on top coordinate */\r\n}\r\n\r\n.fc-ltr .fc-time-grid .fc-now-indicator-arrow {\r\n\tleft: 0;\r\n\t/* triangle pointing right... */\r\n\tborder-width: 5px 0 5px 6px;\r\n\tborder-top-color: transparent;\r\n\tborder-bottom-color: transparent;\r\n}\r\n\r\n.fc-rtl .fc-time-grid .fc-now-indicator-arrow {\r\n\tright: 0;\r\n\t/* triangle pointing left... */\r\n\tborder-width: 5px 6px 5px 0;\r\n\tborder-top-color: transparent;\r\n\tborder-bottom-color: transparent;\r\n}\r\n\r\n\r\n\r\n/* List View\r\n--------------------------------------------------------------------------------------------------*/\r\n\r\n/* possibly reusable */\r\n\r\n.fc-event-dot {\r\n\tdisplay: inline-block;\r\n\twidth: 10px;\r\n\theight: 10px;\r\n\tborder-radius: 5px;\r\n}\r\n\r\n/* view wrapper */\r\n\r\n.fc-rtl .fc-list-view {\r\n\tdirection: rtl; /* unlike core views, leverage browser RTL */\r\n}\r\n\r\n.fc-list-view {\r\n\tborder-width: 1px;\r\n\tborder-style: solid;\r\n}\r\n\r\n/* table resets */\r\n\r\n.fc .fc-list-table {\r\n\ttable-layout: auto; /* for shrinkwrapping cell content */\r\n}\r\n\r\n.fc-list-table td {\r\n\tborder-width: 1px 0 0;\r\n\tpadding: 8px 14px;\r\n}\r\n\r\n.fc-list-table tr:first-child td {\r\n\tborder-top-width: 0;\r\n}\r\n\r\n/* day headings with the list */\r\n\r\n.fc-list-heading {\r\n\tborder-bottom-width: 1px;\r\n}\r\n\r\n.fc-list-heading td {\r\n\tfont-weight: bold;\r\n}\r\n\r\n.fc-ltr .fc-list-heading-main { float: left; }\r\n.fc-ltr .fc-list-heading-alt { float: right; }\r\n\r\n.fc-rtl .fc-list-heading-main { float: right; }\r\n.fc-rtl .fc-list-heading-alt { float: left; }\r\n\r\n/* event list items */\r\n\r\n.fc-list-item.fc-has-url {\r\n\tcursor: pointer; /* whole row will be clickable */\r\n}\r\n\r\n.fc-list-item:hover td {\r\n\tbackground-color: #f5f5f5;\r\n}\r\n\r\n.fc-list-item-marker,\r\n.fc-list-item-time {\r\n\twhite-space: nowrap;\r\n\twidth: 1px;\r\n}\r\n\r\n/* make the dot closer to the event title */\r\n.fc-ltr .fc-list-item-marker { padding-right: 0; }\r\n.fc-rtl .fc-list-item-marker { padding-left: 0; }\r\n\r\n.fc-list-item-title a {\r\n\t/* every event title cell has an <a> tag */\r\n\ttext-decoration: none;\r\n\tcolor: inherit;\r\n}\r\n\r\n.fc-list-item-title a[href]:hover {\r\n\t/* hover effect only on titles with hrefs */\r\n\ttext-decoration: underline;\r\n}\r\n\r\n/* message when no events */\r\n\r\n.fc-list-empty-wrap2 {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tright: 0;\r\n\tbottom: 0;\r\n}\r\n\r\n.fc-list-empty-wrap1 {\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tdisplay: table;\r\n}\r\n\r\n.fc-list-empty {\r\n\tdisplay: table-cell;\r\n\tvertical-align: middle;\r\n\ttext-align: center;\r\n}\r\n\r\n.fc-unthemed .fc-list-empty { /* theme will provide own background */\r\n\tbackground-color: #eee;\r\n}\r\n"; });
@@ -70150,7 +70280,7 @@ define('text!resources/editor/editor.html', ['module'], function(module) { modul
 define('text!resources/elements/add-systems.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"col-lg-12\">\r\n    <form>\r\n      <div class=\"col-lg-10\">\r\n\t\t\t\t<div class=\"checkbox\">\r\n\t\t\t\t<label>\r\n\t\t\t\t\t<input checked.bind=\"enable\" type=\"checkbox\"> Enable editing\r\n\t\t\t\t</label>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n      <div class=\"col-md-5 topMargin\">\r\n        <label>Available Systems</label>\r\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter systems\"/>\r\n            <ul class=\"list-group\">\r\n              <button click.trigger=\"selectSystem($event, system)\" type=\"button\" repeat.for=\"system of filteredsystemsarray\" id=\"${system._id}\"\r\n                      class=\"list-group-item\">${system.sid}</button>\r\n            </ul>\r\n        </div>\r\n      </div>\r\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\r\n        <label>Assigned Systems</label>\r\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n          <ul class=\"list-group\">\r\n            <button click.trigger=\"removeSystem($event, system)\" type=\"button\" repeat.for=\"system of selectedproduct.systems\" id=\"${system._id}\"\r\n                    class=\"list-group-item\">${system.sid}</button>\r\n          </ul>\r\n        </div>\r\n      </div>\r\n    </form>\r\n  </div>\r\n</template>\r\n"; });
 define('text!resources/elements/flat-picker.html', ['module'], function(module) { module.exports = "<template>\r\n    <style>\r\n      .enable {\r\n        background-color: white;\r\n      }\r\n      .disable{\r\n        background-color: #eeeeee;\r\n      }\r\n    </style>\r\n    <require from=\"flatpickr/flatpickr.css\"></require>\r\n     <div class=\"input-group aurelia-flatpickr\">\r\n      <input type=\"text\" class=\"aurelia-flatpickr form-control enable\" placeholder=\"Select date\" data-input>\r\n      <span class=\"input-group-btn\">\r\n        <button style=\"height:39px;\" class=\"btn btn-default\" type=\"button\" data-clear><i class=\"fa fa-trash fa-border\"></i></button>\r\n      </span>\r\n  </div>\r\n</template>"; });
 define('text!resources/elements/multiselect.html', ['module'], function(module) { module.exports = "<template>\r\n\t<label>${label}</label><br/>\r\n\t<select style=\"background-color:white;\" value.bind=\"value\" multiple ref=\"select\" class=\"selectpicker form-control\">\r\n    \t<option repeat.for=\"option of options\" value.bind=\"option.code\">${option.description}</option>\r\n  \t</select>\r\n</template>"; });
-define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <style>\n       \n        .accAlert {\n          color: ${config.MENU_COLOR};\n          background-color:${config.SUBMENU_BACKGROUND};\n        }\n        \n        .navbar-default {\n            color: $ {\n                config.MENU_COLOR\n            }\n\n            ;\n\n            background-color:$ {\n                config.MENU_BACKGROUND\n            }\n        }\n\n        .navbar-inverse .navbar-nav>.active>a,\n        .navbar-inverse .navbar-nav>.active>a:hover,\n        .navbar-inverse .navbar-nav>.active>a:focus {\n            color: $ {\n                config.ACTIVE_MENU_COLOR\n            }\n\n            ;\n\n            background-color:$ {\n                config.MENU_BACKGROUND\n            }\n        }\n    </style>\n    <div class=\"noticeProfile\" style=\"z-index:1001;\" class=\"noticeProfile\">\n        <ul class=\"list-group\">\n            <li class=\"list-group-item sortable\" click.trigger=\"updateNotification(notice, $index)\"\n                style=\"background-color:Cyan;\" repeat.for=\"notice of people.notificationsArray\">\n                <span style=\"font-weight:bold;\">${notice.notice}</span><br />\n                by ${notice.personId.fullName} on ${notice.dateCreated | dateFormat:config.DATE_FORMAT_TABLE:false}\n            </li>\n        </ul>\n    </div>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\"\n                    data-target=\"#bs-example-navbar-collapse-1\" aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n\n                <span>\n                    <a if.bind=\"config.NAVBAR_LOGO && config.NAVBAR_LOGO.length>0 && isAuthenticated\"\n                        class=\"navbar-brand\" href=\"#/user\"><img src=\"/img/${config.NAVBAR_LOGO}\"></a>\n                    <a if.bind=\"config.NAVBAR_LOGO && config.NAVBAR_LOGO.length>0 && !isAuthenticated\"\n                        class=\"navbar-brand\" href=\"#/home\"><img src=\"/img/${config.NAVBAR_LOGO}\"></a>\n                </span>\n                <span>\n                    <a if.bind=\"(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && isAuthenticated\"\n                        class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n                    <a if.bind=\"(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && !isAuthenticated\"\n                        class=\"navbar-brand\" href=\"#/home\"><i class=\"fa fa-home\"></i> UCCSS</a>\n                </span>\n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated && !passwordReset\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\"\n                            placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\"\n                            placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"requestPasswordReset()\">Forgot password</button>\n                    <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\"\n                            data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\"\n                            aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                            <li><a href=\"#/inventory\">Inventory</a></li>\n                        </ul>\n                    </li>\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_TECH_ROLE\" href=\"#\" class=\"dropdown-toggle\"\n                            data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical\n                            <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <!-- route-href=\"route: contactdetail; params.bind: {id:contact.id}\" -->\n                            <!-- <li><a href=\"#/techHt\">Help Tickets</a></li> -->\n                            <li><a route-href=\"route: techHt; params.bind: {HTNumber: -1}\">Help Tickets</a></li>\n                            <li><a href=\"#/techNotes\">Tech Notes</a></li>\n                        </ul>\n                    </li>\n                    <!-- <li class=\"hidden-sm hidden-md\" if.bind=\"isAuthenticated\"><a href=\"#/chapters\">Chapters</a></li> -->\n                    <li class=\"hidden-sm\" if.bind=\"userObj.userRole >= config.USER_ROLE\"><a href=\"#/facco\">Faculty\n                            Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li class=\"hidden-sm hidden-md\" if.bind=\"isAuthenticated && userObj.userRole >= config.UA_ROLE\"><a\n                            href=\"#/analytics\">Analytics</a></li>\n                    <li class=\"dropdown\">\n                        <a  if.bind=\"userObj.userRole >= config.ACC_ROLE\" href=\"#\" class=\"dropdown-toggle ${apjUnassignedRequests.length ? 'accAlert' : ''}\"\n                            data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">ACC <span\n                                class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/accinstitutions\">Customers</a></li>\n                            <li><a href=\"#/accprodrequests\">Product Requests</a></li>\n                            <li><a href=\"#/acchelptickets\">Help Tickets</a></li>\n                            <li><a href=\"#/accinvoices\">Invoices</a></li>\n                        </ul>\n                    </li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                    <li id=\"noticeLabel\" class=\"sortable\" click.trigger=\"showProfile($event)\"\n                        if.bind=\"people.notificationsArray.length\"><a class=\"rightMargin\"\n                            style=\"text-decoration: none;\">Notifications\n                            <span class=\"badge\">${people.notificationsArray.length}</span></a></li>\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\"\n                            data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Notes<span\n                                class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a click.trigger=\"enterNote()\" href=\"#\">Enter Note</a></li>\n                            <li><a href=\"#/notes\">Notes</a></li>\n                        </ul>\n                    </li>\n\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li class=\"hidden-sm hidden-md\" if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li class=\"hidden-sm hidden-md\"><a href=\"#/about\">About the UCC</a></li>\n\n                    <li class=\"dropdown hidden-md\">\n                        <a href=\"#\" class=\"dropdown-toggle hidden-lg\" data-toggle=\"dropdown\">More <b\n                                class=\"caret\"></b></a>\n                        <ul class=\"dropdown-menu\">\n                            <li class=\"hidden-lg\" if.bind=\"isAuthenticated\"><a href=\"#/social\">Social</a></li>\n                            <li class=\"hidden-lg\" if.bind=\"userObj.userRole >= config.USER_ROLE\"><a\n                                    href=\"#/facco\">Faculty\n                                    Coordinator</a></li>\n                            <li class=\"hidden-lg\" if.bind=\"isAuthenticated && userObj.userRole >= config.UA_ROLE\"><a\n                                    href=\"#/analytics\">Analytics</a></li>\n                            <li class=\"hidden-lg\" if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                            <li class=\"hidden-lg\"><a href=\"#/about\">About the UCC</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n\n            </div>\n        </div>\n    </nav>\n</template>\n"; });
+define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <style>\n       \n        .accAlert {\n          color: ${config.MENU_COLOR};\n          background-color:${config.SUBMENU_BACKGROUND};\n        }\n        \n        .navbar-default {\n            color: $ {\n                config.MENU_COLOR\n            }\n\n            ;\n\n            background-color:$ {\n                config.MENU_BACKGROUND\n            }\n        }\n\n        .navbar-inverse .navbar-nav>.active>a,\n        .navbar-inverse .navbar-nav>.active>a:hover,\n        .navbar-inverse .navbar-nav>.active>a:focus {\n            color: $ {\n                config.ACTIVE_MENU_COLOR\n            }\n\n            ;\n\n            background-color:$ {\n                config.MENU_BACKGROUND\n            }\n        }\n    </style>\n    <div class=\"noticeProfile\" style=\"z-index:1001;\" class=\"noticeProfile\">\n        <ul class=\"list-group\">\n            <li class=\"list-group-item sortable\"\n                style=\"background-color:Cyan;\" repeat.for=\"notice of noticeArray\">\n                <span style=\"font-weight:bold;\" click.trigger=\"updateNotification(notice, $index)\">${notice.notice}</span><br />\n                by ${notice.personId.fullName} on ${notice.dateCreated | dateFormat:config.DATE_FORMAT_TABLE:false}\n                <span click.delegate=\"deleteNotice(notice, $index)\"\n                class=\"smallMarginRight\" bootstrap-tooltip\n                data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Delete Client\"><i class=\"fa fa-trash\"\n                  aria-hidden=\"true\"></i></span>\n            </li>\n        </ul>\n    </div>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\"\n                    data-target=\"#bs-example-navbar-collapse-1\" aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n\n                <span>\n                    <a if.bind=\"config.NAVBAR_LOGO && config.NAVBAR_LOGO.length>0 && isAuthenticated\"\n                        class=\"navbar-brand\" href=\"#/user\"><img src=\"/img/${config.NAVBAR_LOGO}\"></a>\n                    <a if.bind=\"config.NAVBAR_LOGO && config.NAVBAR_LOGO.length>0 && !isAuthenticated\"\n                        class=\"navbar-brand\" href=\"#/home\"><img src=\"/img/${config.NAVBAR_LOGO}\"></a>\n                </span>\n                <span>\n                    <a if.bind=\"(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && isAuthenticated\"\n                        class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n                    <a if.bind=\"(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && !isAuthenticated\"\n                        class=\"navbar-brand\" href=\"#/home\"><i class=\"fa fa-home\"></i> UCCSS</a>\n                </span>\n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated && !passwordReset\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\"\n                            placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\"\n                            placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"requestPasswordReset()\">Forgot password</button>\n                    <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\"\n                            data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\"\n                            aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                            <li><a href=\"#/inventory\">Inventory</a></li>\n                        </ul>\n                    </li>\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_TECH_ROLE\" href=\"#\" class=\"dropdown-toggle\"\n                            data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical\n                            <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <!-- route-href=\"route: contactdetail; params.bind: {id:contact.id}\" -->\n                            <!-- <li><a href=\"#/techHt\">Help Tickets</a></li> -->\n                            <li><a route-href=\"route: techHt; params.bind: {HTNumber: -1}\">Help Tickets</a></li>\n                            <li><a href=\"#/techNotes\">Tech Notes</a></li>\n                        </ul>\n                    </li>\n                    <!-- <li class=\"hidden-sm hidden-md\" if.bind=\"isAuthenticated\"><a href=\"#/chapters\">Chapters</a></li> -->\n                    <li class=\"hidden-sm\" if.bind=\"userObj.userRole >= config.USER_ROLE\"><a href=\"#/facco\">Faculty\n                            Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li class=\"hidden-sm hidden-md\" if.bind=\"isAuthenticated && userObj.userRole >= config.UA_ROLE\"><a\n                            href=\"#/analytics\">Analytics</a></li>\n                    <li class=\"dropdown\">\n                        <a  if.bind=\"userObj.userRole >= config.ACC_ROLE\" href=\"#\" class=\"dropdown-toggle ${apjUnassignedRequests.length ? 'accAlert' : ''}\"\n                            data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">ACC <span\n                                class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/accinstitutions\">Customers</a></li>\n                            <li><a href=\"#/accprodrequests\">Product Requests</a></li>\n                            <li><a href=\"#/acchelptickets\">Help Tickets</a></li>\n                            <li><a href=\"#/accinvoices\">Invoices</a></li>\n                        </ul>\n                    </li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                    <li id=\"noticeLabel\" class=\"sortable\" click.trigger=\"showProfile($event)\"\n                        if.bind=\"noticeArray.length\"><a class=\"rightMargin\"\n                            style=\"text-decoration: none;\">Notifications\n                            <span class=\"badge\">${noticeArray.length}</span></a></li>\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\"\n                            data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Notes<span\n                                class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a click.trigger=\"enterNote()\" href=\"#\">Enter Note</a></li>\n                            <li><a href=\"#/notes\">Notes</a></li>\n                        </ul>\n                    </li>\n\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li class=\"hidden-sm hidden-md\" if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li class=\"hidden-sm hidden-md\"><a href=\"#/about\">About the UCC</a></li>\n\n                    <li class=\"dropdown hidden-md\">\n                        <a href=\"#\" class=\"dropdown-toggle hidden-lg\" data-toggle=\"dropdown\">More <b\n                                class=\"caret\"></b></a>\n                        <ul class=\"dropdown-menu\">\n                            <li class=\"hidden-lg\" if.bind=\"isAuthenticated\"><a href=\"#/social\">Social</a></li>\n                            <li class=\"hidden-lg\" if.bind=\"userObj.userRole >= config.USER_ROLE\"><a\n                                    href=\"#/facco\">Faculty\n                                    Coordinator</a></li>\n                            <li class=\"hidden-lg\" if.bind=\"isAuthenticated && userObj.userRole >= config.UA_ROLE\"><a\n                                    href=\"#/analytics\">Analytics</a></li>\n                            <li class=\"hidden-lg\" if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                            <li class=\"hidden-lg\"><a href=\"#/about\">About the UCC</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n\n            </div>\n        </div>\n    </nav>\n</template>\n"; });
 define('text!resources/elements/rate-it.html', ['module'], function(module) { module.exports = "<template>\r\n    <fieldset class=\"rating\">\r\n\t\t<span repeat.for=\"rate of rates\" >\r\n\t\t\t<input  type=\"radio\" name=\"${rate.name}\" id=\"${rate.id}\" title=\"${rate.title}\" />\r\n\t\t\t<label click.delegate=\"rateIt(rate.value, $index)\" class=\"${rate.class}\" for=\"${rate.title}\" title=\"${rate.title}\"></label>\r\n\t\t</span>\r\n    </fieldset>\r\n</template>"; });
 define('text!resources/elements/submenu.html', ['module'], function(module) { module.exports = "<template>\r\n\t<style>\r\n\t\t.navbar-inverse .navbar-brand {\r\n\t\t\tcolor: ${config.SUBMENU_COLOR};\r\n\t\t}\r\n\t\t.navbar-inverse .navbar-nav>li>a {\r\n\t\t\tcolor: ${config.SUBMENU_COLOR};\r\n\t\t}\r\n\t\t.navbar-inverse {\r\n\t\t\tcolor: ${config.SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\r\n\t\t}\r\n\t\t.navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:hover, .navbar-inverse .navbar-nav>.active>a:focus {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\r\n\t\t}\r\n\t\t.navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {\r\n\t\t\tbackground-color: ${config.HOVER_SUBMENU_BACKGROUND};;\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t}\r\n\t</style>\r\n    <div class=\"subMenu-container\" style=\"z-index:1000;\"> \r\n        <nav class=\"navbar navbar-inverse subMenu\">\r\n            <div class=\"navbar-header\">\r\n\t\t\t\t<button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-2\"\r\n                aria-expanded=\"false\">\r\n                    <span class=\"sr-only\">Toggle navigation</span>\r\n                    <span class=\"icon-bar\"></span>\r\n                    <span class=\"icon-bar\"></span>\r\n                    <span class=\"icon-bar\"></span>\r\n                </button>\r\n                <a class=\"navbar-brand\">${title}</a>\r\n            </div>\r\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-2\">\r\n                <ul class=\"nav navbar-nav\">\r\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\r\n                </ul>\r\n            </div>\r\n        </nav>\r\n    </div>\r\n</template>"; });
 define('text!resources/elements/table-navigation-bar.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class=\"col-lg-2\">\r\n            <label style=\"padding-left:15px;\" class=\"pull-left\">Records ${dataTable.firstVisible} - ${dataTable.lastVisible}/${dataTable.displayLength}</label>\r\n        </div>\r\n        <div class=\"col-lg-8 text-center\">\r\n            <div  class=\"center-block\">\r\n                <span show.bind=\"dataTable.pageButtons.length > 1\">\r\n                    <ul class=\"pagination\" id=\"${navControl}\">\r\n                        <li click.trigger=\"dataTable.backward()\"><a href=\"#!\"><i class=\"fa fa-chevron-left\"></i></a></li>\r\n                            <li click.trigger=\"dataTable.pageButton($index, $event)\" class=\"hidden-xs hidden-sm waves-effect ${$first ? 'active' : ''}\" repeat.for=\"page of dataTable.pageButtons\"><a>${page}</a></li>\r\n                        <li click.trigger=\"dataTable.forward()\"><a href=\"#!\"><i class=\"fa fa-chevron-right\"></i></a></li>\r\n                    </ul>\r\n                </span>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-lg-2\">\r\n            <div class=\"input-field col-sm-12 hidden-xs hidden-sm\">\r\n                <label>Rows</label>\r\n                <select id=\"rowsShownSelect\" value.bind=\"dataTable.numRowsShown\" change.delegate=\"dataTable.updateTake()\" class=\"pull-right form-control\"\r\n                    style=\"width:100px;margin-left:5px;\">\r\n                    <option repeat.for=\"rows of dataTable.rowOptions\" value.bind=\"rows\">${rows}</option>\r\n                </select>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });

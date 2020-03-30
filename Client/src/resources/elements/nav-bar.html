@@ -34,10 +34,15 @@
     </style>
     <div class="noticeProfile" style="z-index:1001;" class="noticeProfile">
         <ul class="list-group">
-            <li class="list-group-item sortable" click.trigger="updateNotification(notice, $index)"
-                style="background-color:Cyan;" repeat.for="notice of people.notificationsArray">
-                <span style="font-weight:bold;">${notice.notice}</span><br />
+            <li class="list-group-item sortable"
+                style="background-color:Cyan;" repeat.for="notice of noticeArray">
+                <span style="font-weight:bold;" click.trigger="updateNotification(notice, $index)">${notice.notice}</span><br />
                 by ${notice.personId.fullName} on ${notice.dateCreated | dateFormat:config.DATE_FORMAT_TABLE:false}
+                <span click.delegate="deleteNotice(notice, $index)"
+                class="smallMarginRight" bootstrap-tooltip
+                data-toggle="tooltip" data-placement="bottom" title=""
+                data-original-title="Delete Client"><i class="fa fa-trash"
+                  aria-hidden="true"></i></span>
             </li>
         </ul>
     </div>
@@ -130,9 +135,9 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     <li id="noticeLabel" class="sortable" click.trigger="showProfile($event)"
-                        if.bind="people.notificationsArray.length"><a class="rightMargin"
+                        if.bind="noticeArray.length"><a class="rightMargin"
                             style="text-decoration: none;">Notifications
-                            <span class="badge">${people.notificationsArray.length}</span></a></li>
+                            <span class="badge">${noticeArray.length}</span></a></li>
                     <li class="dropdown">
                         <a if.bind="userObj.userRole >= config.UCC_ROLE" href="#" class="dropdown-toggle"
                             data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Notes<span
