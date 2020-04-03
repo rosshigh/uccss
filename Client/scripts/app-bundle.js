@@ -35113,7 +35113,6 @@ define('modules/admin/site/editNews',['exports', 'aurelia-framework', '../../../
     };
 
     EditNews.prototype.filterOutExpired = function filterOutExpired() {
-      this._cleanUpFilters();
       if (this.isChecked) {
         this.dataTable.filterList(new Date(), { type: 'date', filter: "expiredFilter", collectionProperty: 'expiredDate', compare: 'after' });
       } else {

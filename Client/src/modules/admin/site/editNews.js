@@ -178,7 +178,7 @@ export class EditNews {
 
   //TODO: Fix This
   filterOutExpired() {
-    this._cleanUpFilters();
+    // this._cleanUpFilters();
     if (this.isChecked) {
       this.dataTable.filterList(new Date(), { type: 'date', filter: "expiredFilter", collectionProperty: 'expiredDate', compare: 'after' });
     } else {
