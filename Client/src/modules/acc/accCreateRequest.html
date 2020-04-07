@@ -77,17 +77,17 @@
               </div>
               <div class="col-md-5 col-md-offset-1 topMargin">
                 <label id="requestProductsLabel">Requested Products</label>
-                <div class="well well2 overflow" style="height:400px;">
+                <div class=" overflow well well2" style="height:400px;overflow-y: scroll;">
                   <ul class="list-group">
                     <li click.trigger="removeProduct($index)"
                       repeat.for="product of requestDetails" id="${product.productId}"
                       class="${product.assignments.length ? 'assignedColor list-group-item dropbtn' : 'list-group-item dropbtn'}">
-                      <div class="row">
-                      <div class="col-sm-12">
+                      <!-- <div class="row">
+                      <div class="col-sm-12"> -->
                         <h4>${product.productId | lookupValue:products.productsArray:"_id":"name"}
                         </h4>
-                      </div>
-                    </div>
+                      <!-- </div>
+                    </div> -->
                     </li>
                   </ul>
                 </div>

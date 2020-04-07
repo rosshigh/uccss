@@ -16,7 +16,7 @@ export class AppConfig {
     // IMG_DOWNLOAD_URL = "http://localhost/img/";   
 
     BASE_URL = this.HOST + "/api/";
-    IMG_DOWNLOAD_URL = this.HOST + '/img/'  
+    IMG_DOWNLOAD_URL = this.HOST + '/img/';  
 
     isMobile = false; 
 
