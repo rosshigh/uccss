@@ -400,6 +400,19 @@ module.exports = function (app, config) {
 
   });
 
+  router.get('/api/helpTickets/owner/:id', requireAuth, function(req, res, next){
+    logger.log('info','Get owner');
+    Model.findOne({ _id: req.params.id },'owner')
+    .populate('owner.personId', 'firstName lastName _id')
+    .exec()
+    .then(result => {
+      res.status(200).json(result);
+    })
+    .catch(error => {
+      return next(error);
+    })
+  });
+
   router.put('/api/helpTickets/owner/:id', requireAuth, function (req, res, next) {
     logger.log('info', 'Update HelpTicket owner');
 

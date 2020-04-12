@@ -119,7 +119,6 @@ export class ViewHelpTickets {
   }
 
   async showHT(HTNumber) {
-    console.log(HTNumber);
     this.tableMargin = "margin-top:0px;"
     //Make the selected help ticket the selected help ticket
     await this.helpTickets.getHelpTicketByNumber(HTNumber);
@@ -265,6 +264,10 @@ export class ViewHelpTickets {
     //Make the selected help ticket the selected help ticket
     this.editIndex = this.dataTable.getOriginalIndex(index);
     await this.helpTickets.getHelpTicket(helpTicket._id);
+    this.proceedWithSelect(el);
+  }
+
+  proceedWithSelect(el) {
     this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
     this.openHelpTicket();
     let indices = this.getIndex();
@@ -391,17 +394,60 @@ export class ViewHelpTickets {
   /*****************************************************************************************
   * Open the response form and create an empty help ticket content object
   *****************************************************************************************/
-  respond() {
+  async respond() {
     if (!this.enterResponse) {
-      this.sendMailDisable = false;
-      // this.responseMessage = "<p></p>";
-      this.responseMessage = "";
-      this.helpTickets.selectHelpTicketContent();
-      this.enterResponse = true;
-      this.enableButton = true;
-      window.scrollTo(0, 0);
-      setTimeout(() => { $(".note-editable").focus().scroll(); }, 500);
+      let owner = await this.helpTickets.getOwner(this.helpTickets.selectedHelpTicket._id);
+      if (this.helpTickets.selectedHelpTicket.owner[0].personId == null) {
+        await this.noOwnerRespond();
+      } else if (owner.owner[0].personId._id != this.userObj._id) {
+        await this.dontOwnItRespond(owner);
+      } else {
+        this.proceedWithResponse();
+      }
     }
+  }
+
+  async noOwnerRespond() {
+    this.dialog.showMessage(
+      "Please take ownership of this help ticket before responding. Press OK to take ownership or Cancel to return to the list.",
+      "Continue",
+      ['OK', 'Cancel']
+    ).whenClosed(response => {
+      if (!response.wasCancelled) {
+        this.ownAndRespond()
+      } else {
+        this.back();
+      }
+    });
+  }
+
+  async ownAndRespond() {
+    var obj = { status: this.config.REVIEW_HELPTICKET_STATUS, personId: this.userObj._id };
+    let serverResponse = await this.helpTickets.updateOwner(obj);
+    this.proceedWithResponse();
+  }
+
+  async dontOwnItRespond(owner) {
+    this.dialog.showMessage(
+      "This help ticket is owned by " + owner.owner[0].personId.firstName + " " + owner.owner[0].personId.lastName + ".  If you continue you're response may conflict their efforts.",
+      "Continue",
+      ['Proceed', 'Cancel']
+    ).whenClosed(response => {
+      if (!response.wasCancelled) {
+        this.proceedWithResponse();
+      }
+    });
+  }
+
+  proceedWithResponse() {
+    this.sendMailDisable = false;
+    // this.responseMessage = "<p></p>";
+    this.responseMessage = "";
+    this.helpTickets.selectHelpTicketContent();
+    this.enterResponse = true;
+    this.enableButton = true;
+    window.scrollTo(0, 0);
+    setTimeout(() => { $(".note-editable").focus().scroll(); }, 500);
   }
 
   cancelResponse() {
@@ -514,8 +560,8 @@ export class ViewHelpTickets {
     if (helpTicket) {
       this.helpTickets.selectHelpTicketByID(helpTicket._id);
     }
-
-    if (this.helpTickets.selectedHelpTicket.owner[0].personId !== "b1b1b1b1b1b1b1b1b1b1b1b1" && this.helpTickets.selectedHelpTicket.owner[0].personId != null) {
+    if(this.helpTickets.selectedHelpTicket.owner[0].personId == this.userObj._id) return;
+    if (this.helpTickets.selectedHelpTicket.owner[0].personId !== this.userObj._id && this.helpTickets.selectedHelpTicket.owner[0].personId != null) {
       this.dialog.showMessage(
         "Are you sure you want to change ownership of this help ticket",
         "Save Changes",

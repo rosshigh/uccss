@@ -806,6 +806,9 @@ module.exports = function (app, config) {
          if(!object || object.length === 0){          
             res.status(200).json({"message": "No notifications Found"});
           } else {
+            
+
+
             res.status(200).json(object);
           }
       })

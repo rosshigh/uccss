@@ -244,6 +244,11 @@ export class HelpTickets {
 
     }
 
+    async getOwner(id){
+      let serverResponse = await this.data.get(this.HELP_TICKET_SERVICES + '/owner/' + id);
+      return serverResponse;
+    }
+
     async updateOwner(obj) {
         if (!this.selectedHelpTicket) {
             return;
