@@ -490,12 +490,13 @@ export class EditSystem {
 
     _setupValidation(){
         this.validation.addRule(1,"editSid",[{"rule":"required","message":"SID is required", "value": "systems.selectedSystem.sid"},
-        {"rule":"custom", "message":"A system with that SID already exists",
+        {"rule":"custom", "message":"A system with that SID and description already exists",
             "valFunction":function(context){
                 if(!context.systems.selectedSystem._id){
                     var found = false;
                     for(var i = 0; i < context.systems.systemsArray.length; i++){
-                        if( context.systems.systemsArray[i].sid.toUpperCase() === context.systems.selectedSystem.sid.toUpperCase()){
+                        if( context.systems.systemsArray[i].sid.toUpperCase() === context.systems.selectedSystem.sid.toUpperCase() &&
+                            context.systems.systemsArray[i].description.toUpperCase() === context.systems.selectedSystem.description.toUpperCase()){
                             if(context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id){
                                 found = true;
                             } else if (!context.systems.selectedSystem._id){

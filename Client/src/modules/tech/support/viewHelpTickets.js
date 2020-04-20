@@ -429,7 +429,7 @@ export class ViewHelpTickets {
 
   async dontOwnItRespond(owner) {
     this.dialog.showMessage(
-      "This help ticket is owned by " + owner.owner[0].personId.firstName + " " + owner.owner[0].personId.lastName + ".  If you continue you're response may conflict their efforts.",
+      "This help ticket is owned by " + owner.owner[0].personId.firstName + " " + owner.owner[0].personId.lastName + ".  If you continue your response may conflict with their efforts.",
       "Continue",
       ['Proceed', 'Cancel']
     ).whenClosed(response => {
