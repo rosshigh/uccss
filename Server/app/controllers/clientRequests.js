@@ -10,6 +10,7 @@ var express = require('express'),
   Course = mongoose.model('Course'),
   Person = mongoose.model('Person'),
   Product = mongoose.model('Product'),
+  Session = mongoose.model('Session'),
   passport = require('passport'),
   Promise = require('bluebird'),
   ClientRequestLock = mongoose.model('ClientRequestLock'),
@@ -17,187 +18,187 @@ var express = require('express'),
   EmailLog = mongoose.model('EmailLog'),
   ObjectId = require('mongodb').ObjectID;
 
-  var requireAuth = passport.authenticate('jwt', { session: false });  
+var requireAuth = passport.authenticate('jwt', { session: false });
 
-  var ASSIGNED_REQUEST_CODE = '2';
-  var CUSTOMER_ACTION_REQUEST_CODE = "4";
+var ASSIGNED_REQUEST_CODE = '2';
+var CUSTOMER_ACTION_REQUEST_CODE = "4";
 
 module.exports = function (app) {
   app.use('/', router);
 
-  router.get('/api/clientRequests', requireAuth, function(req, res, next){
-    logger.log('info','Get clientRequests');
+  router.get('/api/clientRequests', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get clientRequests');
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
-      .populate({path: 'requestDetails', model: 'ClientRequestDetail'} )
-      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone ext mobile email institutionId file country'})
-      .populate({ path: 'courseId', model: 'Course', select: 'number name'})
+      .populate({ path: 'requestDetails', model: 'ClientRequestDetail' })
+      .populate({ path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone ext mobile email institutionId file country' })
+      .populate({ path: 'courseId', model: 'Course', select: 'number name' })
       .exec()
       .then(object => {
-        if(object){
+        if (object) {
           res.status(200).json(object);
         } else {
-          res.status(200).json({message: "No requests were found"});
+          res.status(200).json({ message: "No requests were found" });
         }
-      })
-      .catch(err => {
-          return next(err);
-      })
-  });
-
-  router.get('/api/clientRequestsP', requireAuth, function(req, res, next){
-    logger.log('info','Get clientRequests');
-    var query = buildQuery(req.query, Model.find());
-    query.sort(req.query.order)
-      .populate('requestDetails')
-      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone ext mobile email institutionId file country'})
-       .populate({ path: 'requestDetails', model: 'ClientRequestDetail', populate: {path: 'productId', model: 'Product', select: 'name'}})
-      .exec()
-      .then(object => {
-        if(object){
-          res.status(200).json(object);
-        } else {
-          res.status(200).json({message: "No requests were found"});
-        }
-      })
-      .catch(err => {
-          return next(err);
-      })
-  });
-
-  router.get('/api/clientRequests/current/count', requireAuth, function(req, res, next){
-    logger.log('info','Get helpTicket');
-    var query = buildQuery(req.query, ClientRequestDetail.find({ $or:[ {'requestStatus':1}, {'requestStatus':3}, {'requestStatus':4} ]}))
-      query.sort(req.query.order)
-      .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          if(object){
-            res.status(200).json(object);
-          } else {
-            res.status(404).json({message: "No requests were found"});
-          }
-        }
-      });
-  });
-
-  router.get('/api/clientRequests/:id/:sessions', requireAuth, function(req, res, next){
-    logger.log('info','Get customers active clientRequests');
-     var activeSessions = req.params.sessions.split(":");
-     for(let i = 0; i < activeSessions.length; i++){
-       activeSessions[i] = ObjectId(activeSessions[i]);
-     }
-    Model.find()
-      .where('personId').eq(req.params.id)
-      .where('sessionId').in(activeSessions)
-      .sort(req.query.order)
-      .populate({ path: 'requestDetails', model: 'ClientRequestDetail'} )
-      .populate({ path: 'courseId', model: 'Course', select: 'number name'})
-      .populate({ path: 'requestDetails', model: 'ClientRequestDetail', populate: {path: 'productId', model: 'Product', select: 'name'}})
-      .exec()
-      .then(object => {      
-        if(object){
-          res.status(200).json(object);
-        } else {
-          res.status(404).json({message: "No requests were found"});
-        }
-      })
-      .catch(err => {
-          return next(err);
-      })
-      
-  });
-
-  router.get('/api/clientRequests/:id', requireAuth, function(req, res, next){
-    logger.log('info','Get clientRequest' + req.params.id, 'verbose');
-    Model.findById(req.params.id)
-     .populate({path: 'courseId', model: 'Course', select: 'number name'})
-     .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country'})
-     .populate({path: 'requestDetails', model: 'ClientRequestDetail'})
-     .populate({ path: 'requestDetails', model: 'ClientRequestDetail', populate: {path: 'productId', model: 'Product', select: 'name'}})
-     .exec()
-     .then(object => {
-        if(object){
-          res.status(200).json(object);
-        } 
       })
       .catch(err => {
         return next(err);
       })
   });
 
-  router.post('/api/clientRequests', requireAuth, function(req, res, next){
-    logger.log('info','Create clientRequest','verbose');  
-
-    var clientRequest = new Model(req.body);
-    var tasks = new Array();   
-
-    clientRequest.requestDetails = new Array();
-    req.body.requestDetails.forEach(function(detail, index){
-      var obj = new ClientRequestDetail(detail);
-      obj.requestId = clientRequest._id;
-      clientRequest.requestDetails.push(obj._id);
-      tasks.push(ClientRequestDetail.create(obj)); 
-    });
-
-    Promise.all(tasks)
-      .then(function(results) {     
-        clientRequest.save(function (err, result) {         
-          if (err) {
-            return next(err);
-          } else {                                
-            res.status(200).json(result);
-          }
-        }) 
+  router.get('/api/clientRequestsP', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get clientRequests');
+    var query = buildQuery(req.query, Model.find());
+    query.sort(req.query.order)
+      .populate('requestDetails')
+      .populate({ path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone ext mobile email institutionId file country' })
+      .populate({ path: 'requestDetails', model: 'ClientRequestDetail', populate: { path: 'productId', model: 'Product', select: 'name' } })
+      .exec()
+      .then(object => {
+        if (object) {
+          res.status(200).json(object);
+        } else {
+          res.status(200).json({ message: "No requests were found" });
+        }
+      })
+      .catch(err => {
+        return next(err);
       })
   });
 
-  router.post('/api/clientRequests/sendMail', requireAuth, function(req, res, next){
-    logger.log('info',"Send email to " + req.body.email, 'verbose');
+  router.get('/api/clientRequests/current/count', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get helpTicket');
+    var query = buildQuery(req.query, ClientRequestDetail.find({ $or: [{ 'requestStatus': 1 }, { 'requestStatus': 3 }, { 'requestStatus': 4 }] }))
+    query.sort(req.query.order)
+      .exec(function (err, object) {
+        if (err) {
+          return next(err);
+        } else {
+          if (object) {
+            res.status(200).json(object);
+          } else {
+            res.status(404).json({ message: "No requests were found" });
+          }
+        }
+      });
+  });
 
-    if(req.body){
-       switch(req.body.reason){
+  router.get('/api/clientRequests/:id/:sessions', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get customers active clientRequests');
+    var activeSessions = req.params.sessions.split(":");
+    for (let i = 0; i < activeSessions.length; i++) {
+      activeSessions[i] = ObjectId(activeSessions[i]);
+    }
+    Model.find()
+      .where('personId').eq(req.params.id)
+      .where('sessionId').in(activeSessions)
+      .sort(req.query.order)
+      .populate({ path: 'requestDetails', model: 'ClientRequestDetail' })
+      .populate({ path: 'courseId', model: 'Course', select: 'number name' })
+      .populate({ path: 'requestDetails', model: 'ClientRequestDetail', populate: { path: 'productId', model: 'Product', select: 'name' } })
+      .exec()
+      .then(object => {
+        if (object) {
+          res.status(200).json(object);
+        } else {
+          res.status(404).json({ message: "No requests were found" });
+        }
+      })
+      .catch(err => {
+        return next(err);
+      })
+
+  });
+
+  router.get('/api/clientRequests/:id', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get clientRequest' + req.params.id, 'verbose');
+    Model.findById(req.params.id)
+      .populate({ path: 'courseId', model: 'Course', select: 'number name' })
+      .populate({ path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country' })
+      .populate({ path: 'requestDetails', model: 'ClientRequestDetail' })
+      .populate({ path: 'requestDetails', model: 'ClientRequestDetail', populate: { path: 'productId', model: 'Product', select: 'name' } })
+      .exec()
+      .then(object => {
+        if (object) {
+          res.status(200).json(object);
+        }
+      })
+      .catch(err => {
+        return next(err);
+      })
+  });
+
+  router.post('/api/clientRequests', requireAuth, function (req, res, next) {
+    logger.log('info', 'Create clientRequest', 'verbose');
+
+    var clientRequest = new Model(req.body);
+    var tasks = new Array();
+
+    clientRequest.requestDetails = new Array();
+    req.body.requestDetails.forEach(function (detail, index) {
+      var obj = new ClientRequestDetail(detail);
+      obj.requestId = clientRequest._id;
+      clientRequest.requestDetails.push(obj._id);
+      tasks.push(ClientRequestDetail.create(obj));
+    });
+
+    Promise.all(tasks)
+      .then(function (results) {
+        clientRequest.save(function (err, result) {
+          if (err) {
+            return next(err);
+          } else {
+            res.status(200).json(result);
+          }
+        })
+      })
+  });
+
+  router.post('/api/clientRequests/sendMail', requireAuth, function (req, res, next) {
+    logger.log('info', "Send email to " + req.body.email, 'verbose');
+
+    if (req.body) {
+      switch (req.body.reason) {
         case 1: //request created
-           var context = {
-                      products: req.body.products,
-                      MESSAGE: req.body.MESSAGE,
-                      BOTTOM: req.body.BOTTOM
-                    }   
+          var context = {
+            products: req.body.products,
+            MESSAGE: req.body.MESSAGE,
+            BOTTOM: req.body.BOTTOM
+          }
           var mailObj = {
             email: req.body.email,
             cc: req.body.cc,
-            context: context 
-          }                                     
+            context: context
+          }
 
           requestCreated(mailObj);
 
           break;
         case 2: //request Updated
           var context = {
-                      product: req.body.product,
-                      requestNo: req.body.requestNo,
-                      name: req.body.name,
-                      numStudents: req.body.numStudents
-                    }   
+            product: req.body.product,
+            requestNo: req.body.requestNo,
+            name: req.body.name,
+            numStudents: req.body.numStudents
+          }
           var mailObj = {
             email: req.body.email,
             cc: req.body.cc,
-            context: context 
-          }     
-          sendEmail(req.body)                             
+            context: context
+          }
+          sendEmail(req.body)
           break;
         case 3:
-           var context = {
-                      product: req.body.product,
-                      requestNo: req.body.clientRequestNo,
-                      customerMessage: req.body.customerMessage
-                    }   
+          var context = {
+            product: req.body.product,
+            requestNo: req.body.clientRequestNo,
+            customerMessage: req.body.customerMessage
+          }
           var mailObj = {
             email: req.body.email,
-            context: context 
-          }            
-                              
+            context: context
+          }
+
           customerAction(mailObj);
 
           var LogEntry = new EmailLog({
@@ -208,238 +209,239 @@ module.exports = function (app) {
             topic: 'c',
             subject: req.body.subject
           });
-    
+
           LogEntry.save();
-            
-          break; 
-       }
+
+          break;
+      }
     }
-    res.status(201).json({message: "Email sent"});
+    res.status(201).json({ message: "Email sent" });
   })
 
-  router.put('/api/clientRequests/assignBULK', requireAuth, function(req, res, next){
-    logger.log('info','Assign bulk');
-    if(req.body._id){
+  router.put('/api/clientRequests/assignBULK', requireAuth, function (req, res, next) {
+    logger.log('info', 'Assign bulk');
+    if (req.body._id) {
       var detailId;
-      var query = Model.findById(req.body._id, function(err, clientRequest){
-        if(err){
+      var query = Model.findById(req.body._id, function (err, clientRequest) {
+        if (err) {
           return next(error);
         }
-        if(clientRequest) {
+        if (clientRequest) {
           clientRequest.requestStatus = req.body.requestStatus;
           clientRequest.audit = req.body.audit;
         }
-        if(req.body.systemsToSave){
-          
+        if (req.body.systemsToSave) {
+
         }
 
-        if(req.body.requestDetailsToSave){      
-          var updates = req.body.requestDetailsToSave.map(detail => {     
-            if(detail._id){
-              detailId = detail._id;              
-              return { 
-                updateOne: { 
-                    "filter": { "_id": detail._id },              
-                    "update": detail 
-                } 
-              }   
+        if (req.body.requestDetailsToSave) {
+          var updates = req.body.requestDetailsToSave.map(detail => {
+            if (detail._id) {
+              detailId = detail._id;
+              return {
+                updateOne: {
+                  "filter": { "_id": detail._id },
+                  "update": detail
+                }
+              }
             }
-          });      
-        } 
+          });
+        }
 
 
       });
     }
   });
 
-  router.put('/api/clientRequests/assign', requireAuth, function(req, res, next){
-    logger.log('info','Assign clientRequest ' + req.body._id);      
-    if(req.body._id){
+  router.put('/api/clientRequests/assign', requireAuth, function (req, res, next) {
+    logger.log('info', 'Assign clientRequest ' + req.body._id);
+    if (req.body._id) {
       var detailId;
-      var query = Model.findById(req.body._id, function(err, clientRequest){     
-        if(err){
+      var query = Model.findById(req.body._id, function (err, clientRequest) {
+        if (err) {
           return next(error);
-        }     
-        if(clientRequest) {
+        }
+        if (clientRequest) {
           clientRequest.requestStatus = req.body.requestStatus;
           clientRequest.audit = req.body.audit;
         }
-        let tasks = new Array();   
-        if(req.body.requestDetailsToSave){
-          req.body.requestDetailsToSave.forEach((detail, index) => {            
-            detailId = detail._id;                        
-            tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
-          });
-        }   
-        
-        if(req.body.systemsToSave){
-          req.body.systemsToSave.forEach(detail => {                               
-            tasks.push(System.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
+        let tasks = new Array();
+        if (req.body.requestDetailsToSave) {
+          req.body.requestDetailsToSave.forEach((detail, index) => {
+            detailId = detail._id;
+            tasks.push(ClientRequestDetail.findOneAndUpdate({ _id: detail._id }, detail, { safe: true, new: true, multi: false, upsert: true }));
           });
         }
-    
+
+        if (req.body.systemsToSave) {
+          req.body.systemsToSave.forEach(detail => {
+            tasks.push(System.findOneAndUpdate({ _id: detail._id }, detail, { safe: true, new: true, multi: false, upsert: true }));
+          });
+        }
+
         Promise.all(tasks)
-            .then(request => {                               
-              Model.findOneAndUpdate({_id: clientRequest._id}, {$set: clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
-                    if(error){
-                      return next(error);
-                    } else { 
-                      ClientRequestDetail.findById(detailId)
-                      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country'}})
-                      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
-                      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
-                      .populate({ path: "productId", model: "Product", select: "name"})
-                      .exec()
-                      .then(object => {
-                        if(object){
-                          res.status(200).json(object);
-                        } else {
-                          res.status(404).json({message: "No request was found"});
-                        }
-                      })
-                      .catch(err => {
-                        return next(err);
-                      })
-                    }
-              })
-            })
-            .catch(error => { //Promise        
+          .then(request => {
+            Model.findOneAndUpdate({ _id: clientRequest._id }, { $set: clientRequest }, { safe: true, new: true, multi: false }, function (error, request) {
+              if (error) {
                 return next(error);
+              } else {
+                ClientRequestDetail.findById(detailId)
+                  .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country' } })
+                  .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
+                  .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'courseId', model: 'Course', select: 'number name' } })
+                  .populate({ path: "productId", model: "Product", select: "name" })
+                  .exec()
+                  .then(object => {
+                    if (object) {
+                      res.status(200).json(object);
+                    } else {
+                      res.status(404).json({ message: "No request was found" });
+                    }
+                  })
+                  .catch(err => {
+                    return next(err);
+                  })
+              }
             })
+          })
+          .catch(error => { //Promise        
+            return next(error);
+          })
       })
     }
   });
 
-  router.put('/api/clientRequests/deleteAssignment', requireAuth, function(req, res, next){
+  router.put('/api/clientRequests/deleteAssignment', requireAuth, function (req, res, next) {
     var detailId;
-    var clientRequest = new Model(req.body);   
-    if(req.body.requestDetailsToSave){      
-      var updates = req.body.requestDetailsToSave.map(detail => {     
-        if(detail._id){
-          detailId = detail._id;              
-          return { 
-            updateOne: { 
-                "filter": { "_id": detail._id },              
-                "update": detail 
-            } 
-          }   
+    var clientRequest = new Model(req.body);
+    if (req.body.requestDetailsToSave) {
+      var updates = req.body.requestDetailsToSave.map(detail => {
+        if (detail._id) {
+          detailId = detail._id;
+          return {
+            updateOne: {
+              "filter": { "_id": detail._id },
+              "update": detail
+            }
+          }
         }
-      });      
-    }  
-    ClientRequestDetail.bulkWrite(updates, function(err, result) {
-      if(err){
+      });
+    }
+    ClientRequestDetail.bulkWrite(updates, function (err, result) {
+      if (err) {
         return next(error);
-      }             
-      Model.findOneAndUpdate({_id: clientRequest._id}, {$set: clientRequest}, function(err, request) {        
+      }
+      Model.findOneAndUpdate({ _id: clientRequest._id }, { $set: clientRequest }, function (err, request) {
         if (err) {
           return next(err);
-        }                               
+        }
         ClientRequestDetail.findById(detailId)
-          .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country'}})
-          .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
-          .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
-          .populate({ path: "productId", model: "Product", select: "name"})
+          .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country' } })
+          .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
+          .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'courseId', model: 'Course', select: 'number name' } })
+          .populate({ path: "productId", model: "Product", select: "name" })
           .exec()
           .then(object => {
-            if(object){
+            if (object) {
               res.status(200).json(object);
             } else {
-              res.status(404).json({message: "No requests were found"});
+              res.status(404).json({ message: "No requests were found" });
             }
           })
           .catch(err => {
             return next(err);
           })
-      }); 
+      });
     });
   });
 
-  router.put('/api/clientRequests', requireAuth, function(req, res, next){
-    logger.log('info','Update clientRequest ' + req.body._id);     
-    
-    var clientRequest = new Model(req.body);   
+  router.put('/api/clientRequests', requireAuth, function (req, res, next) {
+    logger.log('info', 'Update clientRequest ' + req.body._id);
 
-    clientRequest.requestDetails = new Array();  
-    if(req.body.requestDetailsToSave){      
-      var updates =req.body.requestDetailsToSave.map(detail => {     
-         if(detail._id){
-           if(detail.delete){
-            return { 
+    var clientRequest = new Model(req.body);
+
+    clientRequest.requestDetails = new Array();
+    if (req.body.requestDetailsToSave) {
+      var updates = req.body.requestDetailsToSave.map(detail => {
+        if (detail._id) {
+          if (detail.delete) {
+            return {
               deleteOne: {
-                  filter: {_id: detail._id}
+                filter: { _id: detail._id }
               }
-            }          
-           } else {
-            clientRequest.requestDetails.push(detail._id);            
-            return { 
-              updateOne: { 
-                  "filter": { "_id": detail._id },              
-                  "update": detail 
-              } 
-            }   
-            
-           }
-         } else {
-           var obj = new ClientRequestDetail(detail);
-            obj.requestId = clientRequest._id;    
-            clientRequest.requestDetails.push(obj._id);        
-            return { "insertOne": { "document": obj } }
+            }
+          } else {
+            clientRequest.requestDetails.push(detail._id);
+            return {
+              updateOne: {
+                "filter": { "_id": detail._id },
+                "update": detail
+              }
+            }
 
-         }
-       });      
+          }
+        } else {
+          var obj = new ClientRequestDetail(detail);
+          obj.requestId = clientRequest._id;
+          clientRequest.requestDetails.push(obj._id);
+          return { "insertOne": { "document": obj } }
 
-      ClientRequestDetail.bulkWrite(updates, function(err, result) {
-        if(err){
+        }
+      });
+
+      ClientRequestDetail.bulkWrite(updates, function (err, result) {
+        if (err) {
           return next(error);
-        }     
-       
-        if(clientRequest.requestDetails.length === 0){
-          Model.findOneAndRemove({_id: clientRequest._id}, function(err, request) {
-            if(err) {
-              return next(err);
-            }         
-            res.status(200).json(request);
-          });
-        } else {               
-          Model.findOneAndUpdate({_id: clientRequest._id}, {$set: clientRequest}, function(err, request) {        
+        }
+
+        if (clientRequest.requestDetails.length === 0) {
+          Model.findOneAndRemove({ _id: clientRequest._id }, function (err, request) {
             if (err) {
               return next(err);
-            }                               
+            }
             res.status(200).json(request);
-          }); 
+          });
+        } else {
+          Model.findOneAndUpdate({ _id: clientRequest._id }, { $set: clientRequest }, function (err, request) {
+            if (err) {
+              return next(err);
+            }
+            res.status(200).json(request);
+          });
         }
       });
     }
   });
 
-  router.put('/api/clientRequests/:id', requireAuth, function(req, res, next){
-    logger.log('info','Update clientRequest ' + req.params._id);       
-    let clientRequest = new Model(req.body); 
-     Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
-        if(error){
-          return next(error);
-        } else { 
-         var updates = req.body.requestDetails.map(function (item) { 
-            return { 
-                "updateOne": { 
-                    "filter": { "_id": item._id } ,              
-                    "update": { audit: item.audit, requestStatus: item.requestStatus.toString()} } 
-                }         
+  router.put('/api/clientRequests/:id', requireAuth, function (req, res, next) {
+    logger.log('info', 'Update clientRequest ' + req.params._id);
+    let clientRequest = new Model(req.body);
+    Model.findOneAndUpdate({ _id: clientRequest._id }, { $set: clientRequest }, { safe: true, new: true, multi: false }, function (error, request) {
+      if (error) {
+        return next(error);
+      } else {
+        var updates = req.body.requestDetails.map(function (item) {
+          return {
+            "updateOne": {
+              "filter": { "_id": item._id },
+              "update": { audit: item.audit, requestStatus: item.requestStatus.toString() }
+            }
+          }
         });
-        ClientRequestDetail.bulkWrite(updates, function(err, result) {
-          if(err){
+        ClientRequestDetail.bulkWrite(updates, function (err, result) {
+          if (err) {
             return next(error);
           }
           res.status(200).json(request);
         });
-         
-        }
+
+      }
     });
   });
 
-  router.delete('/api/clientRequests/:id', requireAuth, function(req, res, next){
-    logger.log('info','Delete clientRequest [%s]', req.params.id);
-    Model.remove(req.params.id, function(err, result){
+  router.delete('/api/clientRequests/:id', requireAuth, function (req, res, next) {
+    logger.log('info', 'Delete clientRequest [%s]', req.params.id);
+    Model.remove(req.params.id, function (err, result) {
       if (err) {
         return next(err);
       } else {
@@ -447,16 +449,16 @@ module.exports = function (app) {
       }
     })
   });
-  router.get('/api/clientRequestsDetailsTest', requireAuth, function(req, res, next){ 
-    logger.log('info','Get clientRequests', 'verbose');
+  router.get('/api/clientRequestsDetailsTest', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get clientRequests', 'verbose');
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
-    .exec()
+      .exec()
       .then(object => {
-        if(object){
+        if (object) {
           res.status(200).json(object);
         } else {
-          res.status(404).json({message: "No requests were found"});
+          res.status(404).json({ message: "No requests were found" });
         }
       })
       .catch(err => {
@@ -464,25 +466,25 @@ module.exports = function (app) {
       })
   });
 
-  router.get('/api/clientRequestsDetails',  function(req, res, next){ 
-    logger.log('info','Get clientRequests', 'verbose');
+  router.get('/api/clientRequestsDetails', function (req, res, next) {
+    logger.log('info', 'Get clientRequests', 'verbose');
     console.log('is this it')
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
       .select('requestStatus requiredDate createdDate requestId productId assignments.systemId assignments.client')
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country'}})
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
-      .populate({ path: "productId", model: "Product", select: "name"})
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country' } })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'courseId', model: 'Course', select: 'number name' } })
+      .populate({ path: "productId", model: "Product", select: "name" })
       .exec()
       .then(object => {
-        if(object){
+        if (object) {
           object.forEach(item => {
-            if(item.requestId) item.requestId.audit = [];
+            if (item.requestId) item.requestId.audit = [];
           });
           res.status(200).json(object);
         } else {
-          res.status(404).json({message: "No requests were found"});
+          res.status(404).json({ message: "No requests were found" });
         }
       })
       .catch(err => {
@@ -507,23 +509,23 @@ module.exports = function (app) {
   //     })
   // });
 
-  router.get('/api/clientRequestsDetails/analytics', requireAuth, function(req, res, next){
-    logger.log('info','Get clientRequests', 'verbose');
+  router.get('/api/clientRequestsDetails/analytics', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get clientRequests', 'verbose');
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query
-    .select('')
-    .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country'}})
-    .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name country'}})
-    .populate({ path: 'productId', model: 'Product', select: 'name'})
+      .select('')
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country' } })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name country' } })
+      .populate({ path: 'productId', model: 'Product', select: 'name' })
     query.exec()
       .then(object => {
-        if(object){
+        if (object) {
           var result = [];
           object.forEach(item => {
-            if(item.requestId){
-              if(item.requestId && item.requestId.personId){
+            if (item.requestId) {
+              if (item.requestId && item.requestId.personId) {
                 result.push({
-                  requestId: {clientRequestsDetails: {fullName: item.requestId.personId.fullName}, institutionId: item.requestId.institutionId, graduateIds: item.requestId.graduateIds, undergradIds: item.requestId.undergradIds},
+                  requestId: { clientRequestsDetails: { fullName: item.requestId.personId.fullName }, institutionId: item.requestId.institutionId, graduateIds: item.requestId.graduateIds, undergradIds: item.requestId.undergradIds },
                   requestStatus: item.requestStatus,
                   productId: item.productId
                 });
@@ -532,7 +534,7 @@ module.exports = function (app) {
           });
           res.status(200).json(result);
         } else {
-          res.status(404).json({message: "No requests were found"});
+          res.status(404).json({ message: "No requests were found" });
         }
       })
       .catch(err => {
@@ -540,20 +542,20 @@ module.exports = function (app) {
       })
   });
 
-  router.get('/api/clientRequestsDetails/:id', requireAuth, function(req, res, next){
-    logger.log('info','Get clientRequests', 'verbose');
-    
+  router.get('/api/clientRequestsDetails/:id', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get clientRequests', 'verbose');
+
     ClientRequestDetail.findById(req.params.id)
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'}})
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
-      .populate({ path: "productId", model: "Product", select: "name"})
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country' } })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'courseId', model: 'Course', select: 'number name' } })
+      .populate({ path: "productId", model: "Product", select: "name" })
       .exec()
       .then(object => {
-        if(object){
+        if (object) {
           res.status(200).json(object);
         } else {
-          res.status(404).json({message: "No request was found"});
+          res.status(404).json({ message: "No request was found" });
         }
       })
       .catch(err => {
@@ -561,94 +563,94 @@ module.exports = function (app) {
       })
   });
 
-  router.get('/api/clientRequestsDetails/:sessionId/:institutionId', requireAuth, function(req, res, next){
-    logger.log('info','Get clientRequests', 'verbose');  
-   
-    ClientRequestDetail.find()    
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'}})
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
-      .populate({ path: "productId", model: "Product", select: "name"})
+  router.get('/api/clientRequestsDetails/:sessionId/:institutionId', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get clientRequests', 'verbose');
+
+    ClientRequestDetail.find()
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country' } })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'courseId', model: 'Course', select: 'number name' } })
+      .populate({ path: "productId", model: "Product", select: "name" })
       .exec()
-    .then(results => {   
-       if(results){
-          var resultArray = results.filter(item => {    
-            if(!item.requestId || item.requestId === null || !item.requestId.institutionId) {
-              return false; 
+      .then(results => {
+        if (results) {
+          var resultArray = results.filter(item => {
+            if (!item.requestId || item.requestId === null || !item.requestId.institutionId) {
+              return false;
             } else {
               return item.requestId.sessionId == req.params.sessionId && item.requestId.institutionId._id == req.params.institutionId;
-            } 
-          }) 
+            }
+          })
           res.status(200).json(resultArray);
         } else {
-          res.status(404).json({message: "No requests were found"});
-        } 
+          res.status(404).json({ message: "No requests were found" });
+        }
       })
       .catch(err => {
         return next(err);
       })
   });
 
-  router.put('/api/clientRequestsDetails', function(req, res, next){
-    logger.log('info','Update request detail', 'verbose');  
-    
-    Model.findOneAndUpdate({_id: req.body.requestId._id}, req.body.requestId, function(err, request){
-      if(err) return next(err);
-        ClientRequestDetail.findOneAndUpdate({_id: req.body._id}, req.body, function(err, requestDetail){
-          if(err) return next(err);
-          ClientRequestDetail.findById(requestDetail._id)
-            .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country'}})
-            .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
-            .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
-            .populate({ path: "productId", model: "Product", select: "name"})
-            .exec()
-            .then(object => {
-              if(object){               
-                res.status(200).json(object);
-              } else {
-                res.status(404).json({message: "No request was found"});
-              }
-            })
-            .catch(err => {
-              return next(err);
-            })
-        });
-    }); 
+  router.put('/api/clientRequestsDetails', function (req, res, next) {
+    logger.log('info', 'Update request detail', 'verbose');
+
+    Model.findOneAndUpdate({ _id: req.body.requestId._id }, req.body.requestId, function (err, request) {
+      if (err) return next(err);
+      ClientRequestDetail.findOneAndUpdate({ _id: req.body._id }, req.body, function (err, requestDetail) {
+        if (err) return next(err);
+        ClientRequestDetail.findById(requestDetail._id)
+          .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file country' } })
+          .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
+          .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'courseId', model: 'Course', select: 'number name' } })
+          .populate({ path: "productId", model: "Product", select: "name" })
+          .exec()
+          .then(object => {
+            if (object) {
+              res.status(200).json(object);
+            } else {
+              res.status(404).json({ message: "No request was found" });
+            }
+          })
+          .catch(err => {
+            return next(err);
+          })
+      });
+    });
   });
 
-  router.delete('/api/clientRequestsDetails/:id', requireAuth, function(req, res, next){
-    logger.log('info','Delete clientRequestsDetails ', req.params.id);
+  router.delete('/api/clientRequestsDetails/:id', requireAuth, function (req, res, next) {
+    logger.log('info', 'Delete clientRequestsDetails ', req.params.id);
 
-    ClientRequestDetail.findByIdAndRemove(req.params.id, function(err, result){
+    ClientRequestDetail.findByIdAndRemove(req.params.id, function (err, result) {
       if (err) {
         return next(err);
       } else {
-        res.status(204).json({message: "Request deleted"});
+        res.status(204).json({ message: "Request deleted" });
       }
     })
   });
 
-  router.delete('/api/clientRequestsDetails/:id/:requestid', requireAuth, function(req, res, next){
-    logger.log('info','Delete clientRequestsDetails ', req.params.id); 
-    if(req.params.requestid){    
-      Model.findById(req.params.requestid, function(err, request) {
-        if(err){
+  router.delete('/api/clientRequestsDetails/:id/:requestid', requireAuth, function (req, res, next) {
+    logger.log('info', 'Delete clientRequestsDetails ', req.params.id);
+    if (req.params.requestid) {
+      Model.findById(req.params.requestid, function (err, request) {
+        if (err) {
           return next(err);
-        } else {         
-          if(request){      
-            if(request.requestDetails && request.requestDetails.length > 0){      
-              request.requestDetails.splice(request.requestDetails.indexOf(req.params.id), 1);                     
-              if(request.requestDetails.length === 0) { 
-                Model.findOneAndRemove({_id: request._id}, function(err, request) {
-                  if(err) {
+        } else {
+          if (request) {
+            if (request.requestDetails && request.requestDetails.length > 0) {
+              request.requestDetails.splice(request.requestDetails.indexOf(req.params.id), 1);
+              if (request.requestDetails.length === 0) {
+                Model.findOneAndRemove({ _id: request._id }, function (err, request) {
+                  if (err) {
                     return next(err);
-                  }                                    
-                });            
+                  }
+                });
               } else {
-                request.save(function(err, request) {
-                  if(err) {
+                request.save(function (err, request) {
+                  if (err) {
                     return next(err);
-                  } 
+                  }
                 });
               }
             }
@@ -657,11 +659,11 @@ module.exports = function (app) {
       })
     }
 
-    ClientRequestDetail.findByIdAndRemove(req.params.id, function(err, result){
+    ClientRequestDetail.findByIdAndRemove(req.params.id, function (err, result) {
       if (err) {
         return next(err);
       } else {
-        res.status(204).json({message: "Request deleted"});
+        res.status(204).json({ message: "Request deleted" });
       }
     })
   });
@@ -669,43 +671,43 @@ module.exports = function (app) {
 
 
   //Courses Routes
-  router.get('/api/courses', requireAuth, function(req, res, next){
-    logger.log('info','Get courses', 'verbose');
+  router.get('/api/courses', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get courses', 'verbose');
     var query = buildQuery(req.query, Course.find());
-    query.exec(function(err, object){
+    query.exec(function (err, object) {
+      if (err) {
+        return next(err);
+      } else {
+        if (object) {
+          res.status(200).json(object);
+        } else {
+          res.status(404).json({ message: "No courses were found" });
+        }
+      }
+    });
+  });
+
+  router.get('/api/courses/person/:id', requireAuth, function (req, res, next) {
+    logger.log('info', 'Get courses', 'verbose');
+    Course.find({ personId: req.params.id })
+      .sort(req.query.order)
+      .exec(function (err, object) {
         if (err) {
           return next(err);
         } else {
-          if(object){
+          if (object) {
             res.status(200).json(object);
           } else {
-            res.status(404).json({message: "No courses were found"});
+            res.status(404).json({ message: "No courses was found" });
           }
         }
       });
   });
 
-  router.get('/api/courses/person/:id', requireAuth, function(req, res, next){
-    logger.log('info','Get courses', 'verbose');
-    Course.find({personId: req.params.id})
-      .sort(req.query.order)
-      .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-        if(object){
-          res.status(200).json(object);
-        } else {
-          res.status(404).json({message: "No courses was found"});
-        }
-        }
-      });
-  });
-
-  router.post('/api/courses', requireAuth, function(req, res, next){
-    logger.log('info','Create courses');
-    var clientRequest =  new Course(req.body);
-    clientRequest.save( function ( err, object ){
+  router.post('/api/courses', requireAuth, function (req, res, next) {
+    logger.log('info', 'Create courses');
+    var clientRequest = new Course(req.body);
+    clientRequest.save(function (err, object) {
       if (err) {
         return next(err);
       } else {
@@ -714,9 +716,9 @@ module.exports = function (app) {
     });
   });
 
-  router.put('/api/courses', requireAuth, function(req, res, next){
-    logger.log('info','Update courses ' + req.body._id, "verbose");
-    Course.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
+  router.put('/api/courses', requireAuth, function (req, res, next) {
+    logger.log('info', 'Update courses ' + req.body._id, "verbose");
+    Course.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false }, function (err, result) {
       if (err) {
         return next(err);
       } else {
@@ -725,9 +727,9 @@ module.exports = function (app) {
     })
   });
 
-  router.delete('/api/courses/:id', requireAuth, function(req, res, next){
+  router.delete('/api/courses/:id', requireAuth, function (req, res, next) {
     ogger.log('Delete courses ' + req.params.id, "verbose");
-    Course.remove(req.params.id, function(err, result){
+    Course.remove(req.params.id, function (err, result) {
       if (err) {
         return next(err);
       } else {
@@ -736,119 +738,181 @@ module.exports = function (app) {
     })
   });
 
-  router.get('/api/clientRequestLocks', function(req, res, next){
-      logger.log('info','Get clientRequest Locks','verbose');
-      ClientRequestLock.find()
-        .sort("-createdAt")
-        .exec()
-        .then(function(locks){
+  router.get('/api/clientRequestLocks', function (req, res, next) {
+    logger.log('info', 'Get clientRequest Locks', 'verbose');
+    ClientRequestLock.find()
+      .sort("-createdAt")
+      .exec()
+      .then(function (locks) {
+        res.status(200).json(locks);
+      })
+      .catch(function (err) {
+        return next(err);
+      })
+
+  });
+
+  router.get('/api/clientRequestLocks/:id', function (req, res, next) {
+    logger.log('info', 'Get clientRequest Locks' + req.params.id, 'verbose');
+    ClientRequestLock.find({ requestId: req.params.id })
+      .sort("-createdAt")
+      .exec()
+      .then(function (locks) {
+        if (locks.length === 0) {
+          res.status(200).json({ requestId: 0 });
+        } else {
           res.status(200).json(locks);
-        })
-        .catch(function(err){
-          return next(err);
-			  })
+        }
+      })
+      .catch(function (err) {
+        return next(err);
+      })
 
   });
 
-  router.get('/api/clientRequestLocks/:id',  function(req, res, next){
-      logger.log('info','Get clientRequest Locks' + req.params.id,'verbose');
-      ClientRequestLock.find({requestId: req.params.id})
-        .sort("-createdAt")
-        .exec()
-        .then(function(locks){         
-          if(locks.length === 0){
-            res.status(200).json({requestId: 0});
-          } else {
-            res.status(200).json(locks);
-          }
-        })
-        .catch(function(err){
-          return next(err);
-			})
+  router.post('/api/clientRequestLocks', function (req, res, next) {
+    logger.log('info', 'Create clientRequest Lock', 'verbose');
+    var clientRequestLock = new ClientRequestLock(req.body);
+    clientRequestLock.save()
+      .then(function (result) {
+        res.status(201).json(result);
+      })
+      .catch(function (err) {
+        return next(err);
+      });
+  });
+
+  router.delete('/api/clientRequestLocks/:id', function (req, res, next) {
+    logger.log('info', 'Delete Help Ticket Lock ' + req.params.id, 'verbose');
+    var query = ClientRequestLock.remove({ requestId: req.params.id })
+      .exec()
+      .then(function (result) {
+        res.status(200).json({ "message": "Lock removed" });
+      })
+      .catch(function (err) {
+        return next(err);
+      });
 
   });
 
-  router.post('/api/clientRequestLocks',  function(req, res, next){
-     logger.log('info','Create clientRequest Lock', 'verbose');
-      var clientRequestLock =  new ClientRequestLock(req.body);
-      clientRequestLock.save()
-				.then(function (result) {
-					res.status(201).json(result);
-				})
-				.catch(function (err) {
-					return next(err);
-				});
-  });
-
-  router.delete('/api/clientRequestLocks/:id',  function(req, res, next){
-      logger.log('info','Delete Help Ticket Lock ' + req.params.id, 'verbose');
-			var query = ClientRequestLock.remove({ requestId: req.params.id })
-				.exec()
-				.then(function (result) {
-					res.status(200).json({"message" : "Lock removed"});
-				})
-				.catch(function (err) {
-					return next(err);
-				});
-
-  });
-
-  router.get('/api/serverAssignments/:id', function(req, res, next){
+  router.get('/api/serverAssignments/:id', function (req, res, next) {
     var serverId = req.params.id;
     ClientRequestDetail.find()
-    .select('requestId productId assignments')
-    .populate({path:  'requestId', model: 'ClientRequest', select: 'personId institutionId' })
-    .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName institutionId'}})
-    .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
-    .populate({ path: "productId", model: "Product", select: "name"})
-         .then(results => {
-      results = results.filter(item => {
-        var keep = false;
-        item.assignments.forEach(ass =>{          
-          if(ass.systemId == serverId) keep = true;
+      .select('requestId productId assignments')
+      .populate({ path: 'requestId', model: 'ClientRequest', select: 'personId institutionId' })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'personId', model: 'Person', select: 'firstName lastName fullName institutionId' } })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
+      .populate({ path: "productId", model: "Product", select: "name" })
+      .then(results => {
+        results = results.filter(item => {
+          var keep = false;
+          item.assignments.forEach(ass => {
+            if (ass.systemId == serverId) keep = true;
+          });
+          return keep;
         });
-        return keep;
-      });
-      var assignments = new Array();
-      results.forEach(item => {
-        item.assignments.forEach(assign => {
-          assignments.push({
-          product: item.productId.name,
-          institution: item.requestId.institutionId.name,
-          firstName:  item.requestId.personId.firstName,
-          lastName:  item.requestId.personId.lastName,
-          client: assign.client,
-          studentIds: assign.studentUserIds,
-          studentPassword: assign.studentPassword,
-          facultyIds: assign.facultyUserIds,
-          facultyPassword: assign.facultyPassword,
-          assignDate: assign.assignedDate
-        })
-      })
+        var assignments = new Array();
+        results.forEach(item => {
+          item.assignments.forEach(assign => {
+            assignments.push({
+              product: item.productId.name,
+              institution: item.requestId.institutionId.name,
+              firstName: item.requestId.personId.firstName,
+              lastName: item.requestId.personId.lastName,
+              client: assign.client,
+              studentIds: assign.studentUserIds,
+              studentPassword: assign.studentPassword,
+              facultyIds: assign.facultyUserIds,
+              facultyPassword: assign.facultyPassword,
+              assignDate: assign.assignedDate
+            })
+          })
 
+        })
+        res.status(200).json(assignments);
       })
-      res.status(200).json(assignments);
-    })
+  })
+
+  router.put('/api/productUse', function (req, res, next) {
+
+    let sessions = req.body.sessions.split(';');
+    for (let i = 0; i < sessions.length; i++) {
+      sessions[i] = ObjectId(sessions[i]);
+    }
+
+    console.log(sessions[0])
+    // let sessions = req.params.session.split(':');
+    // let sessionsIDs = [];
+    // Session.find()
+    // .then(sessions => {
+    //   sessions.forEach(item => {
+
+    //   })
+    // })
+
+    ClientRequestDetail.find()
+      .where('sessionId').in(sessions)
+      .select('requestId productId assignments')
+      .populate({ path: 'requestId', model: 'ClientRequest', select: 'personId institutionId' })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
+      .populate({ path: "productId", model: "Product", select: "name" })
+      .then(results => {
+        let products = req.body.products.split(";");
+        let types = req.body.types.split(";");
+        let individualTypes = [types[0]];
+        types.forEach(item => {
+          if (individualTypes.indexOf(item) === -1) {
+            individualTypes.push(item);
+          }
+        })
+        console.log(individualTypes)
+        let institutions = [];
+        results.forEach((item, index) => {
+          var productIndex = products.indexOf(item.productId.name);
+          let institutionIndex = -1;
+          if (productIndex > -1) {
+            institutionIndex = -1
+            for (let i = 0; i < institutions.length; i++) {
+              if (institutions[i].name = item.requestId.institutionId.name) {
+                institutions[i][types[productIndex]] = 1;
+                break;
+              }
+            }
+            if (institutionIndex === -1) {
+              institutions.push({
+                name: item.requestId.institutionId.name
+              })
+              individualTypes.forEach(item => {
+                institutions[institutions.length - 1][item] = 0;
+                console.log('each item')
+                console.log(institutions[institutions.length - 1][item])
+              })
+              institutions[institutions.length - 1][types[productIndex]] = 1;
+            }
+          }
+        })
+        res.status(200).json(institutions);
+      })
   })
 
 };
 
-  function updateRequest(clientRequest, req, res, next){
-      Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
-        if(error){
-          return next(error);
-        } else { 
-          res.status(200).json(request);
-        }
-    })
-  }
+function updateRequest(clientRequest, req, res, next) {
+  Model.findOneAndUpdate({ _id: clientRequest._id }, { $set: clientRequest }, { safe: true, new: true, multi: false }, function (error, request) {
+    if (error) {
+      return next(error);
+    } else {
+      res.status(200).json(request);
+    }
+  })
+}
 
-  function deleteRequest(clientRequest, req, res, next){
-    Model.remove({_id: clientRequest._id}, function(error, request){
-        if(error){
-          return next(error);
-        } else { 
-            res.status(200).json(request);
-        }
-    })
-  }
+function deleteRequest(clientRequest, req, res, next) {
+  Model.remove({ _id: clientRequest._id }, function (error, request) {
+    if (error) {
+      return next(error);
+    } else {
+      res.status(200).json(request);
+    }
+  })
+}

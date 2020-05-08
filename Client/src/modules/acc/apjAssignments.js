@@ -180,8 +180,9 @@ export class APJAssignments {
 
     });
     // this.selectedRequestDetail.techComments = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
+    
+    this.insertAssignmentIntoSystem(client, this.selectedRequestDetail.assignments);
     this.assignClientStatus();
-    this.insertAssignmentIntoSystem(client, this.selectedRequestDetail.assignments)
 
   }
 
@@ -231,23 +232,6 @@ export class APJAssignments {
       if (this.selectedRow) this.selectedRow.children().removeClass('info');
     } else {
       this.selectedAssignedClient = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].client;
-
-      //Update the firstID and lastID fileds with the assignment firstID and lastID
-      // this.firstID = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].firstID;
-      // this.lastID = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].lastID;
-      // this.selectedSystem.clients[this.selectedClientIndex].lastIdAssigned = this.lastID;
-      // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex].lastIdAssigned = this.lastID;
-      // this.firstNumericFacID = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].firstFacID;
-      // this.lastNumericFacID = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].lastFacID;
-      // this.selectedSystem.clients[this.selectedClientIndex].lastFacIdAssigned = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].lastFacID;
-
-      // this.productSystems[this.selectedSystemIndex].clients[this.selectedClientIndex].lastFacIdAssigned = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].lastFacID;
-      // this.oldIdsAssigned = parseInt(this.lastID) - parseInt(this.lastID);
-      // this.oldLastID = this.lastID;
-      // this.lastFirstID = this.firstID;
-      // this.forceManual = this.selectedSystem.clients[this.selectedClientIndex].manual;
-      // this.manualMode = this.selectedSystem.clients[this.selectedClientIndex].manual;
-
       //Highlight the table row
       if (this.selectedAssignmentRow) this.selectedAssignmentRow.children().removeClass('info');
       this.selectedAssignmentRow = $(el.target).closest('tr');

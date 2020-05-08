@@ -171,12 +171,16 @@ export class ACCClientRequest {
   }
 
   async updateClient(request) {
-    var indexToSplice = -1;
     var saveSystem = false;
+    var clientToProcess;
+    var indexToSplice;
     request.assignments.forEach(item => {
+      indexToSplice = -1;
+      clientToProcess = -1;
       this.systems.selectedSystemFromId(item.systemId);
       for (let i = 0; i < this.systems.selectedSystem.clients.length; i++) {
         if (this.systems.selectedSystem.clients[i].client == item.client) {
+          clientToProcess = i;
           this.systems.selectedSystem.clients[i].assignments.forEach((assign, index) => {
             if (request._id === assign.assignment) {
               indexToSplice = index;
@@ -185,9 +189,9 @@ export class ACCClientRequest {
         }
         if (indexToSplice > -1) {
           saveSystem = true;
-          this.systems.selectedSystem.clients[i].assignments.splice(indexToSplice, 1);
-          if (this.systems.selectedSystem.clients[i].assignments.length === 0) {
-            this.systems.selectedSystem.clients[i].clientStatus = this.config.RETIRED_CLIENT_CODE;
+          this.systems.selectedSystem.clients[clientToProcess].assignments.splice(indexToSplice, 1);
+          if (this.systems.selectedSystem.clients[clientToProcess].assignments.length === 0) {
+            this.systems.selectedSystem.clients[clientToProcess].clientStatus = this.config.RETIRED_CLIENT_CODE;
           }
         }
       }

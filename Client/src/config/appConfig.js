@@ -106,12 +106,14 @@ export class AppConfig {
     REFRESHED_CLIENT_CODE = 3;
     SANDBOX_CLIENT_CODE = 5;
     RETIRED_CLIENT_CODE = 6;
-    CLIENT_STATUSES = [{ code: 1, description: "Unassigned", OKToDelete: true, lock: false },
-        { code: this.SHARED_CLIENT_CODE, description: "Shared", OKToDelete: false, lock: false },
-        { code: this.REFRESHED_CLIENT_CODE, description: "Refresh", OKToDelete: true, lock: true },
-        { code: this.ASSIGNED_CLIENT_CODE, description: "Assigned", OKToDelete: false, lock: true },
-        { code: this.SANDBOX_CLIENT_CODE, description: this.SANDBOX_NAME, OKToDelete: false, lock: false },
-        { code: this.RETIRED_CLIENT_CODE, description: "Retired", OKToDelete: false, lock: false }];          
+    CLIENT_STATUSES = [ 
+      { code: this.ASSIGNED_CLIENT_CODE, description: "Assigned", OKToDelete: false, lock: true },
+      { code: this.REFRESHED_CLIENT_CODE, description: "Refresh", OKToDelete: true, lock: true },
+      { code: this.RETIRED_CLIENT_CODE, description: "Retired", OKToDelete: false, lock: false },
+      { code: this.SHARED_CLIENT_CODE, description: "Shared", OKToDelete: false, lock: false },
+      { code: 1, description: "Unassigned", OKToDelete: true, lock: false },
+      { code: this.SANDBOX_CLIENT_CODE, description: this.SANDBOX_NAME, OKToDelete: false, lock: false },
+        ];          
 
         //Help Ticket parameters
     HELP_TICKET_OTHER_TYPE = "2";

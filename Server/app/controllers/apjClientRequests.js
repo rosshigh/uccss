@@ -67,7 +67,7 @@ module.exports = function (app, config) {
         }
 
         if (req.body.systemsToSave) {
-          req.body.systemsToSave.forEach(detail => {
+          req.body.systemsToSave.forEach(detail => {            
             tasks.push(System.findOneAndUpdate({ _id: detail._id }, detail, { safe: true, new: true, multi: false, upsert: true }));
           });
         }
