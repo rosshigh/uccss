@@ -1,5 +1,7 @@
 Client/node_modules/
 Server/node_modules/
+client20/node_modules/
+Server20/node_modules/
 twitterBot/node_modules/
 twitterBot/public
 UCCSS/

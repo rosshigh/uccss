@@ -92,17 +92,19 @@ export class ACCClientRequest {
     if (this.requestDetails.length >= this.selectedPackage.maxClients) {
       // this.utils.showNotification("This university has reached their maximum requested products.", "error");
       return this.dialog.showMessage(
-        "This university has reached their maximum requested products.",
+        "This university has reached their maximum requested products.  Are you sure you want to proceed?",
         "Extra Client",
-        ['OK']
+        ['Yes','No']
       ).whenClosed(response => {
-        // if(response.output === 'YES'){
-        //   this.invoiceRelevant = true;
-        //   this.addTheClient(product);
-        // } else {
-        //   this.invoiceRelevant = false;
-        //   return;
-        // }
+        if(response.output.toUpperCase() == 'YES'){
+          this.invoiceRelevant = true;
+          this.addTheClient(product);
+          return;
+        } else {
+          this.invoiceRelevant = false;
+          this.addTheClient(product);
+          return;
+        }
       });
     }
     this.invoiceRelevant = false;

@@ -840,24 +840,18 @@ module.exports = function (app) {
       sessions[i] = ObjectId(sessions[i]);
     }
 
-    console.log(sessions[0])
-    // let sessions = req.params.session.split(':');
-    // let sessionsIDs = [];
-    // Session.find()
-    // .then(sessions => {
-    //   sessions.forEach(item => {
-
-    //   })
-    // })
-
     ClientRequestDetail.find()
       .where('sessionId').in(sessions)
       .select('requestId productId assignments')
       .populate({ path: 'requestId', model: 'ClientRequest', select: 'personId institutionId' })
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name country' } })
       .populate({ path: "productId", model: "Product", select: "name" })
       .then(results => {
         let products = req.body.products.split(";");
+        products.forEach((item,index) =>{
+          products[index] = item.toUpperCase().replace(/\s/g, '');
+        })
+        
         let types = req.body.types.split(";");
         let individualTypes = [types[0]];
         types.forEach(item => {
@@ -865,32 +859,43 @@ module.exports = function (app) {
             individualTypes.push(item);
           }
         })
-        console.log(individualTypes)
         let institutions = [];
         results.forEach((item, index) => {
-          var productIndex = products.indexOf(item.productId.name);
+          if(item.productId.name.toUpperCase().indexOf('TS4') > -1) {
+            console.log('request product')
+            console.log(item.productId.name.trim().toUpperCase().replace(/\s/g, ''))
+            console.log('product')
+            console.log(products.indexOf(item.productId.name.trim().toUpperCase().replace(/\s/g, '')));
+            console.log('product name in array')
+            console.log(products[20].replace(/\s/g, ''));
+            console.log(item.productId.name.trim().toUpperCase())
+            console.log(item.productId.name.trim().toUpperCase() == products[20])
+          }
+          var productIndex = products.indexOf(item.productId.name.trim().toUpperCase().replace(/\s/g, ''));
           let institutionIndex = -1;
           if (productIndex > -1) {
             institutionIndex = -1
             for (let i = 0; i < institutions.length; i++) {
-              if (institutions[i].name = item.requestId.institutionId.name) {
-                institutions[i][types[productIndex]] = 1;
+              if (institutions[i].name == item.requestId.institutionId.name) {
+                institutionIndex = i;
                 break;
               }
             }
             if (institutionIndex === -1) {
               institutions.push({
-                name: item.requestId.institutionId.name
+                name: item.requestId.institutionId.name,
+                country: item.requestId.institutionId.country
               })
               individualTypes.forEach(item => {
                 institutions[institutions.length - 1][item] = 0;
-                console.log('each item')
-                console.log(institutions[institutions.length - 1][item])
               })
               institutions[institutions.length - 1][types[productIndex]] = 1;
+            } else {
+              institutions[institutionIndex][types[productIndex]] = 1;
             }
           }
         })
+        console.log(products)
         res.status(200).json(institutions);
       })
   })
