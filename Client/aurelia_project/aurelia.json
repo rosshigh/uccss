@@ -186,7 +186,7 @@
             "name": "aurelia-dialog",
             "path": "../node_modules/aurelia-dialog/dist/amd",
             "main": "aurelia-dialog",
-            "resources": ["resources/*.js"]
+            "resources": ["*.js"]
           },
           {
             "name": "nprogress",
