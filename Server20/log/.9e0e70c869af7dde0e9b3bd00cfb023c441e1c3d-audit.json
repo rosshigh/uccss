@@ -1,0 +1,29 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "log\\.9e0e70c869af7dde0e9b3bd00cfb023c441e1c3d-audit.json",
+    "files": [
+        {
+            "date": 1591030929850,
+            "name": "log\\application-2020-06-01-12.log",
+            "hash": "8063d0af2554ea6f2368542a66d30c50"
+        },
+        {
+            "date": 1591118226665,
+            "name": "log\\application-2020-06-02-12.log",
+            "hash": "8f44256c20922486105fc795d3b54e10"
+        },
+        {
+            "date": 1591122576813,
+            "name": "log\\application-2020-06-02-13.log",
+            "hash": "76cf26a8a1d40e17600098b96063f1ec"
+        },
+        {
+            "date": 1591124574378,
+            "name": "log\\application-2020-06-02-14.log",
+            "hash": "0bd747eaa90ae860786c40423d9332ac"
+        }
+    ]
+}

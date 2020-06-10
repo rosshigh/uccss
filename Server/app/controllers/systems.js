@@ -13,8 +13,8 @@ var requireAuth = passport.authenticate('jwt', { session: false });
 module.exports = function (app) {
   app.use('/', router);
 
-  router.get('/api/systems', requireAuth, asyncHandler(async (req, res) => {
-    logger.log('info', 'Get systems');
+  router.get('/api/systems', asyncHandler(async (req, res) => {
+    logger.log('info', 'Get systems lskadjflsd');
     var query = buildQuery(req.query, Model.find())
     await query
       .populate({ path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName' })

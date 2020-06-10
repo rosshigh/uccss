@@ -21,7 +21,8 @@ var ClientsSchema = new Schema({
     firstID: { type: Number },
     lastID: { type: Number },
     firstFacID: { type: Number },
-    lastFacID: { type: Number}
+    lastFacID: { type: Number},
+    statusCurrent: { type: Boolean, default: true }
   }]
 });
 

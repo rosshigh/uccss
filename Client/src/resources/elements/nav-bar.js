@@ -82,7 +82,7 @@ export class NavBar {
           if (!this.userObj.userRole) this.logout();
           sessionStorage.setItem('role', this.userObj.userRole)
           // this.events();
-          this.router.navigate("user");
+          this.router.navigate("user"); 
         }
       }
     } else {

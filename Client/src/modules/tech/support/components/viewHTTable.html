@@ -134,7 +134,7 @@
                       <a href="#" click.trigger="changeStatus(helpTicket, status.code, status.description)" repeat.for="status of config.HELP_TICKET_STATUSES | helpTicketStatuses:removeHTStatus">${status.description}</a>
                     </div>
                   </span>
-                </div>
+                </div> 
                 <div class="hidden-lg">${helpTicket.helpTicketStatus | lookupHTStatus:config.HELP_TICKET_STATUSES}</div>
 
               </td>

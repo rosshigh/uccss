@@ -147,7 +147,7 @@
                         <td>${products.selectedProduct.name}</td>
                         <td class="col-sm-6">
                           <table class="col-sm-12">
-                            <tr repeat.for="assignment of client.assignments">
+                            <tr repeat.for="assignment of client.assignments" class="${assignment.statusCurrent ? '': 'success'}">
                               <td>
                                 <div class="col-lg-12 list-group-item">
                                   <p class="list-group-item-text">
@@ -156,6 +156,9 @@
                                   <p class="list-group-item-text">
                                     <span>Student IDS:
                                       ${assignment.assignment.assignments[0].studentUserIds}</span></br>
+                                  </p>
+                                  <p>
+                                    <b>${assignment.statusCurrent === undefined || assignment.statusCurrent ? '' : 'Retired'}</b>
                                   </p>
                                 </div>
                               </td>
