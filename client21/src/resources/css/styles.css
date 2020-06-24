@@ -58,19 +58,19 @@
     overflow-y:scroll;
 }
 
-.footer {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    border-top: 1px solid black;
-    background-color: ghostwhite;
-    color: black;
-    text-align: center;
-  }
-
   .positionUnderToolbar {
     top:-110px;
   }
 
+  span i {
+    cursor: pointer;
+}
 
+
+thead, tbody { display: block; }
+
+tbody {
+    height: 1000px;       /* Just for the demo          */
+    overflow-y: auto;    /* Trigger vertical scroll    */
+    overflow-x: hidden;  /* Hide the horizontal scroll */
+}

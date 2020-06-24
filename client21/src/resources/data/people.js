@@ -169,6 +169,7 @@ export class People {
     }
   }
 
+  //Institutions
   async getInstitutionsArray(options) {
     var url = this.INSTITUTION_SERVICES;
     url += options ? options : "";
@@ -177,6 +178,35 @@ export class People {
       this.institutionsArray = response;
     } else {
       this.institutionsArray = undefined;
+    }
+  }
+
+  async getAPJPackages(options, refresh) {
+    if (!this.packageArray || refresh) {
+      var url = this.PACKAGES_SERVICES;
+      url += options ? options : "";
+      let response = await this.data.get(url)
+      if (!response.error) {
+        this.packageArray = response;
+      } else {
+        this.packageArray = undefined;
+      }
+
+    }
+  }
+
+  async getInstitution(id) {
+    try {
+      var url = this.INSTITUTION_SERVICES + '/' + id;
+      let response = await this.data.get(url)
+      if (!response.status) {
+        this.selectedInstitution = response;
+        this.originalInstitution = this.utils.copyObject(serverResponse);
+      } else {
+        this.data.processError(serverResponse);
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 }

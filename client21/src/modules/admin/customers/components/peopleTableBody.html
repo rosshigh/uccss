@@ -1,0 +1,14 @@
+<template>
+    <tr repeat.for="person of $displayData" click.delegate="edit(person)">
+        <td>${person.fullName}</td>
+        <td>${person.institutionId.name}</td>
+        <td><a href="mailto:${user.email}">${person.email}</a></td>
+        <td>
+            ${person.phone | phoneNumber:config.PHONE_MASKS:person.country:person.ext}<br>
+            ${person.mobile | phoneNumber:config.PHONE_MASKS:person.country}
+        </td>
+        <td>${person.roles}</td>
+        <td>${person.personStatus |
+            lookupValue:is4ua.personStatusArray:"code":"description"}</td>
+    </tr>
+</template>

@@ -47,9 +47,19 @@
                         <compose view="./password.html"></compose>
                     </div>
                 </div>
-                <ul if.bind="controller.errors.length > 0">
-                    <li repeat.for="error of controller.errors">${error}</li>
-                </ul>
+                <div class="row">
+                    <div class="col">
+                        <ul if.bind="controller.errors.length > 0">
+                            <li repeat.for="error of controller.errors">${error}</li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <ul if.bind="validationErrors.length > 0">
+                            <li repeat.for="error of validationErrors">${error}</li>
+                        </ul>
+                    </div>                    
+                </div>
+                
             </div>
         </div>
     </div>

@@ -56,6 +56,14 @@ module.exports = function (app, config) {
         })
     }));
 
+    router.post('/api/people', asyncHandler(async (req, res) => {
+        logger.log('info','Create Person');
+        var person =  new Person(req.body);  
+          person.save().then(result => {
+            res.status(200).json(result);
+        })
+    }));
+
     router.put('/people', asyncHandler(async (req, res) => {
         logger.log('info', 'Update Person ' + req.body._id);
         await Person.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false }).then(result => {

@@ -38,6 +38,7 @@
 
                             </th>
                         </tr>
+
                         <tr>
                             <th style="width:20rem;" aut-sort="key: lastName">Name</th>
                             <th style="width:30rem;" aut-sort="key: institutionId.name">Institution</th>
@@ -47,20 +48,25 @@
                             <th>Status</th>
                         </tr>
                     </thead>
+                    
                     <tbody>
-                        <tr repeat.for="person of $displayData" click.delegate="edit(person)">
-                            <td>${person.fullName}</td>
-                            <td>${person.institutionId.name}</td>
-                            <td><a href="mailto:${user.email}">${person.email}</a></td>
-                            <td>
+                        <tr repeat.for="person of $displayData" >
+                            <td click.delegate="edit(person)">${person.fullName}</td>
+                            <td click.delegate="edit(person)">${person.institutionId.name}</td>
+                            <td> <a href="mailto:${person.email}"><i class="fa fa-paper-plane" aria-hidden="true"></i></a> ${person.email}</td>
+                            <td click.delegate="edit(person)">
                                 ${person.phone | phoneNumber:config.PHONE_MASKS:person.country:person.ext}<br>
                                 ${person.mobile | phoneNumber:config.PHONE_MASKS:person.country}
                             </td>
-                            <td>${person.roles}</td>
+                            <td click.delegate="edit(person)">${person.roles}</td>
                             <td>${person.personStatus |
-                                lookupValue:is4ua.personStatusArray:"code":"description"}</td>
+                                lookupValue:is4ua.personStatusArray:"code":"description"}
+                                <span click.delegate="toggleStatus(person._id, person.personStatus)"
+                                innerhtml="${person.personStatus | activateButton}"></span>
+                            </td>
                         </tr>
                     </tbody>
+               
                 </table>
             </div>
         </div>
