@@ -1,9 +1,7 @@
 import { inject } from 'aurelia-framework';
-// import {EventAggregator} from 'aurelia-event-aggregator';
 import { DataServices } from './dataServices';
-import { Store } from 'aurelia-store';
+import {Store} from '../../store/store';
 
-// @inject(EventAggregator, DataServices, AppConfig)
 @inject(DataServices, Store)
 export class Auth {
 
@@ -11,22 +9,13 @@ export class Auth {
 	logoutUrl = 'users/logout';
 
 	constructor(data, store) {
-		// this.eventAggregator = eventAggregator;
 		this.data = data;
 		this.store = store;
 	}
 
-	bind() {
-		this.subscription = this.store.state.subscribe(
-			(state) => this.state = state
-		);
-	}
-
-	unbind() {
-		this.subscription.unsubscribe();
-	}
-
 	async login(email, password) {
+
+
 		let content = {
 			'email': email,
 			'password': password
@@ -35,24 +24,18 @@ export class Auth {
 		let response = await this.data.login(content, this.loginUrl);
 		if (!response.error) {
 			response.user.userRole = this.setRole(response.user.roles);
-			this.store.token = response.token;
-			this.store.user = JSON.stringify(response.user)
+			this.store.login(response.user, response.token);
 		}
-		// this.eventAggregator.publish('auth:login', response);
 		return response;
 	}
 
-	logout(email) {
-		this.data.saveObject({ email: email }, this.logoutUrl, 'post');
-		// sessionStorage.removeItem('token');
-		// sessionStorage.removeItem('user');
-		// sessionStorage.removeItem('role');
-		// sessionStorage.removeItem('alert');
+	logout() {
+		this.store.logout();
 	}
 
 	isAuthenticated() {
-		let token = this.store.token;
 		// let token = sessionStorage.getItem('token');
+		let token = this.store.getter('token');
 
 		// There's no token, so user is not authenticated.
 		if (!token) {
@@ -84,11 +67,13 @@ export class Auth {
  * Determine users role for authorizations
  ****************************************************************************/
 	setRole(roles) {
+		let config = this.store.getConfig();
+		let ROLES = config["ROLES"];
 		let userRole = 1;
 
 		for (let i = 0; i < roles.length; i++) {
 			// this.config.ROLES.forEach(item => {
-			this.store.config.ROLES.forEach(item => {
+			ROLES.forEach(item => {
 				if (roles[i] == item.role) {
 					userRole = item.authLevel > userRole ? item.authLevel : userRole;
 				}
@@ -98,3 +83,4 @@ export class Auth {
 	}
 
 }
+

@@ -1,0 +1,83 @@
+<template>
+	<style>
+		.navbar-inverse .navbar-brand {
+			color: $ {
+				configParameters.SUBMENU_COLOR
+			}
+
+			;
+		}
+
+		.navbar-inverse .navbar-nav>li>a {
+			color: $ {
+				configParameters.SUBMENU_COLOR
+			}
+
+			;
+		}
+
+		.navbar-inverse {
+			color: $ {
+				configParameters.SUBMENU_COLOR
+			}
+
+			;
+
+			background-color:$ {
+				configParameters.SUBMENU_BACKGROUND
+			}
+
+			;
+		}
+
+		.navbar-inverse .navbar-nav>.active>a,
+		.navbar-inverse .navbar-nav>.active>a:hover,
+		.navbar-inverse .navbar-nav>.active>a:focus {
+			color: $ {
+				configParameters.ACTIVE_SUBMENU_COLOR
+			}
+
+			;
+
+			background-color:$ {
+				configParameters.SUBMENU_BACKGROUND
+			}
+
+			;
+		}
+
+		.navbar-inverse .navbar-nav>li>a:hover,
+		.navbar-inverse .navbar-nav>li>a:focus {
+			background-color: $ {
+				configParameters.HOVER_SUBMENU_BACKGROUND
+			}
+
+			;
+
+			color: $ {
+				configParameters.ACTIVE_SUBMENU_COLOR
+			}
+
+			;
+		}
+	</style>
+ <div class="subMenu-container" style="z-index:1000;"> 
+	<nav class="navbar navbar-inverse subMenu">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2"
+			aria-expanded="false">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand">${title}</a>
+		</div>
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+			<ul class="nav navbar-nav">
+				<li class="${row.isActive ? 'active' : ''}" repeat.for="row of router.navigation"><a href.bind="row.href">${row.title}</a></li>
+			</ul>
+		</div>
+	</nav>
+</div>
+</template>

@@ -8,24 +8,36 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <form if.bind="!isAuthenticated && !passwordReset" class="form-inline">
         <div class="form-group">
-            <input value.bind="email" type="email" autofocus class="form-control" id="email"
-                placeholder="Email"></input>
+          <input value.bind="email" type="email" autofocus class="form-control" id="email" placeholder="Email"></input>
         </div>
         <div class="form-group">
-            <input value.bind="password" type="password" class="form-control smallLeftMargin" id="password"
-                placeholder="Password"></input>
+          <input value.bind="password" type="password" class="form-control smallLeftMargin" id="password"
+            placeholder="Password"></input>
         </div>
         <button class="btn btn-default smallLeftMargin" click.delegate='login()'>Login</button>
-        <button class="btn btn-link" click.delegate="requestPasswordReset()">Forgot password</button>
+        <button class="btn btn-link" click.delegate="requestPasswordReset()">Forgot password</button
         <label if.bind="loginError" style="color:white;">${loginError}</label>
-    </form>
+      </form>
+
       <ul class="navbar-nav mr-auto">
-       
+        <li class="nav-item dropdown">
+          <a if.bind="userObj.userRole >= config.UCC_ROLE && isAuthenticated" href="#" class="nav-link dropdown-toggle"
+            data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Administration <span
+              class="caret"></span></a>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="#/system">System Admin</a>
+            <a class="dropdown-item" href="#/customers">Customers</a>
+            <a class="dropdown-item" href="#/site">Site</a>
+            <a class="dropdown-item" href="#/documents">Documents</a>
+            <a class="dropdown-item" href="#/inventory">Inventory</a>
+          </div>
+        </li>
       </ul>
+
       <form class="form-inline">
-        <li if.bind="!isAuthenticated"><a href="#/register">Register</a></li>
-        <li class="hidden-sm hidden-md"><a href="#/about" style="color:white;">About the UCC</a></li>
-        <li if.bind="isAuthenticated" style="color:white;" click.trigger="logout()"><a href="#">Logout</a></li>
+        <a class="nav-link" if.bind="!isAuthenticated" href="#/register">Register</a></li>
+        <a class="nav-link" href="#/about" style="color:white;">About the UCC</a></li>
+        <a class="nav-link" if.bind="isAuthenticated" click.trigger="logout()" href="#">Logout</a></li>
       </form>
 
     </div>

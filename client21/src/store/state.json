@@ -1,0 +1,11 @@
+{
+    "auth" : {
+        "token": ""
+    },
+    "user" :  {
+        "id": "",
+        "firstName" : "",
+        "lastName" : "",
+        "fullName ": ""
+    }
+}

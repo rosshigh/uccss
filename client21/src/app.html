@@ -1,6 +1,10 @@
 <template>
-  <nav-bar></nav-bar>
-  <div class="page-host">
-    <router-view></router-view>
+  <require from="resources/css/material-dashboard.css"></require>
+  <require from="resources/css/styles.css"></require>
+  <div  class="wrapper ">
+    <side-bar></side-bar>
+    <div class="main-panel">
+      <router-view></router-view>
+    </div>
   </div>
 </template>

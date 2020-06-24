@@ -1,50 +1,49 @@
-import 'bootstrap';
-import 'bootstrap/dist/css/bootstrap.css';
-import "resources/css/styles.css";
-import {Config} from 'resources/data/config';
+import { EventAggregator } from 'aurelia-event-aggregator';
+import { Config } from 'resources/data/config';
 import { inject } from 'aurelia-dependency-injection';
-import { Store } from 'aurelia-store';
+import { Store } from './store/store';
 
-@inject(Config, Store)
+@inject(Config, EventAggregator, Store)
+
 export class App {
-  constructor(config, store) { this.config = config; this.store = store; }
-  
-  bind() {
-    this.subscription = this.store.state.subscribe(
-      (state) => this.state = state
-    );
+  constructor(config, eventAggregator, store) {
+    this.config = config;
+    this.eventAggregator = eventAggregator;
+    this.store = store;
+    this.validateUser();
+    this.subscribe();
   }
 
-  unbind() {
-    this.subscription.unsubscribe();
+  validateUser(){
+    this.userObj = this.store.getUser('user');
+    this.isAuthenticated = this.userObj;
+    console.log(this.isAuthenticated);
   }
 
-  async activate(){
-    await this.config.getConfigArray();
-    this.store.config = {};
-    this.config.configArray.forEach(item => {
-      this.store.config[item.parameter] = item.value;
-    })
-    this.configParameters();
-  }
+  subscribe() {
+    this.subscriber = this.eventAggregator.subscribe('auth:login', payload => {
+       this.isAuthenticated = payload == 'login';
+       console.log(this.isAuthenticated);
+    });
+ }
 
   configureRouter(config, router) {
     this.router = router;
     config.title = 'UCCSS';
     config.map([
       {
-        route: ['','home'],
-        moduleId: PLATFORM.moduleName('./modules/home/home'),
-        name: 'Home',
-        settings: { auth: false, roles: [] },
-        title: 'UCCSS'
+        route: ['', 'user'],
+        moduleId: PLATFORM.moduleName('./modules/user/user'),
+        name: 'User',
+        settings: { auth: false, roles: [] }
       },
+      {
+        route: 'customers',
+        moduleId: PLATFORM.moduleName('./modules/admin/Customers/customers'),
+        name: 'customers',
+        settings: { auth: false, roles: [] }
+      }
     ]);
   }
 
-  configParameters(){
-    this.store.config.INSTITUTIONS_ACTIVE = '01';
-    this.store.config.ACTIVE_PERSON = "01";
-    this.store.config.INACTIVE_PERSON = "02";
-  }
 }

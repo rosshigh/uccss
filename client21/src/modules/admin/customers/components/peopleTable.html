@@ -1,0 +1,69 @@
+<template>
+    <div class="card" style="top:-110px;">
+        <div class="card-body">
+            <div class='col-lg-10 offset-lg-1 bottomMargin'>
+
+                <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
+
+                <table class="table table-striped"
+                    aurelia-table="data.bind: people.peopleArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+                    <thead>
+                        <tr>
+                            <compose view='./peopleTableToolbar.html'></compose>
+                        </tr>
+                        <tr>
+                            <th colspan="2">
+                                <div class='col'>
+                                    <div class="form-group">
+                                        <input type="text" value.bind="filters[0].value"
+                                            placeholder="Filter name, institution, email and role" class="form-control"
+                                            id='filterField' />
+                                    </div>
+                                </div>
+                            </th>
+                            <th></th>
+                            <th></th>
+
+                            <th colspan="2">
+                                <div class='col'>
+                                    <div class="form-group">
+                                        <select value.bind="filters[1].value" class="form-control " id="personStatus">
+                                            <option value=""></option>
+                                            <option repeat.for='status of is4ua.personStatusArray'
+                                                model.bind='status.code'>
+                                                ${status.description}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="width:20rem;" aut-sort="key: lastName">Name</th>
+                            <th style="width:30rem;" aut-sort="key: institutionId.name">Institution</th>
+                            <th style="width:20rem;" aut-sort="key: email">E-mail</th>
+                            <th style="width:15rem;">Phone</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr repeat.for="person of $displayData" click.delegate="edit(person)">
+                            <td>${person.fullName}</td>
+                            <td>${person.institutionId.name}</td>
+                            <td><a href="mailto:${user.email}">${person.email}</a></td>
+                            <td>
+                                ${person.phone | phoneNumber:config.PHONE_MASKS:person.country:person.ext}<br>
+                                ${person.mobile | phoneNumber:config.PHONE_MASKS:person.country}
+                            </td>
+                            <td>${person.roles}</td>
+                            <td>${person.personStatus |
+                                lookupValue:is4ua.personStatusArray:"code":"description"}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+</template>

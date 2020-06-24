@@ -53,7 +53,7 @@ module.exports = function (app, config) {
 
   app.use(function (req, res, next) {
     onFinished(res, function (err) {
-      logger.log('info', req.connection.remoteAddress + " finished request", "verbose");
+      logger.log('info', req.connection.remoteAddress + " finished request");
     });
     next();
   });

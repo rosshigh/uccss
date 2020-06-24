@@ -11,7 +11,7 @@ module.exports = function (app) {
     if(queryObject.order) {
       var order = queryObject.order.split(':');  
       let sortOrder = 1;
-      let sortField = order[0];
+      let sortField = order[0];     
       if(order[1] && order[1] =='DSC')  sortOrder = -1;   
       let sortObject = {};
       sortObject[sortField] = sortOrder

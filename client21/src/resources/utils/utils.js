@@ -1,6 +1,4 @@
 import {inject} from 'aurelia-framework';
-// import * as toastr from "toastr";
-// import {Notification} from 'aurelia-notification';
 // import moment from 'moment';
 // import {AppConfig} from '../../config/appConfig';
 
@@ -46,12 +44,9 @@ export class Utils{
    * Display a notification
    * msg - the message to display
    ****************************************************************************/
-  // showNotification(msg, type){
-    
-  //   type = type ? type : "success";
-  //   toastr[type](msg);
-  //     // this.notification.note(msg);
-  // }
+  showNotification(msg, type){
+    $("#notification").html(msg).fadeIn(1500).fadeOut(5000);
+  }
 
    /*****************************************************************************
    * Determine users role for authorizations
@@ -75,21 +70,21 @@ export class Utils{
    * property - the object property to look for the value
    * itemArray - the array
    ****************************************************************************/
-  // countItems(value, property, itemArray){
-  //     var countArray = itemArray.filter(function (item){
-  //         return item[property] == value
-  //      });
-  //     return countArray.length;
-  // }
+  countItems(value, property, itemArray){
+      var countArray = itemArray.filter(function (item){
+          return item[property] == value
+       });
+      return countArray.length;
+  }
 
-  // arrayContainsValue(array, property, value){
-  //   for(var i = 0, x = array.length; i < x; i++){
-  //     if(array[i][property] == value){
-  //       return i;
-  //     }
-  //   }
-  //   return -1;
-  // }
+  arrayContainsValue(array, property, value){
+    for(var i = 0, x = array.length; i < x; i++){
+      if(array[i][property] == value){
+        return i;
+      }
+    }
+    return -1;
+  }
 
   /*************************************************************************
   * Compare to objects to determine if they are equal
@@ -97,82 +92,82 @@ export class Utils{
   * obj2 - second object
   * skip - an array of properties to skip
   // *************************************************************************/
-  // objectsEqual(obj1, obj2, skip){
-  //  var changes = new Array();
-  //  var skipArray = skip || new Array();
-  //  for (var property in obj1) {
-  //    if (obj1.hasOwnProperty(property)) {
-  //        if(!obj1[property] && !obj2[property] || skipArray.indexOf(property) !== -1){
-  //          continue;
-  //        }
-  //        else if(Array.isArray(obj1[property])){
-  //            if(!this.arraysEqual(obj1[property], obj2[property])) {
-  //              changes.push({
-  //                property: property,
-  //                oldValue: obj2[property].length,
-  //                newValue: obj1[property].length
-  //              });
-  //            }
-  //        } else if ((property.indexOf('Date') > -1 || property.indexOf('date') > -1) ||  (obj1[property] instanceof Date)){
-  //            var date1 = new Date(obj1[property]);
-  //            var date2 = new Date(obj2[property]);
-  //            if(!moment(date1).isSame(date2, 'year')
-  //                || !moment(date1).isSame(date2, 'month')
-  //                || !moment(date1).isSame(date2, 'day') ) {
-  //                changes.push({
-  //                  property: property,
-  //                  oldValue:  obj2[property],
-  //                  newValue: obj1[property]
-  //                });
-  //                }
-  //        } else if(typeof obj1[property] === 'object'){
-  //           var areEqual = true;
-  //           for(var x in obj1[property]){
-  //             if(obj1[property][x] != obj2[property][x]) areEqual = false;
-  //           }
-  //           if(!areEqual){
-  //             changes.push({
-  //               property: property,
-  //               oldValue: obj2[property],
-  //               newValue: obj1[property]
-  //             });              
-  //           }
-  //        } else {
-  //            if(obj1[property] != obj2[property]) {
-  //                if(!(obj1[property] === ""  && obj2[property] === undefined)){
-  //                    changes.push({
-  //                      property: property,
-  //                      oldValue: obj2[property],
-  //                      newValue: obj1[property]
-  //                    });
-  //                  }
-  //                }
-  //            }
-  //        }
-  //    }
-  //    return changes;
-  //  }
+  objectsEqual(obj1, obj2, skip){
+   var changes = new Array();
+   var skipArray = skip || new Array();
+   for (var property in obj1) {
+     if (obj1.hasOwnProperty(property)) {
+         if(!obj1[property] && !obj2[property] || skipArray.indexOf(property) !== -1){
+           continue;
+         }
+         else if(Array.isArray(obj1[property])){
+             if(!this.arraysEqual(obj1[property], obj2[property])) {
+               changes.push({
+                 property: property,
+                 oldValue: obj2[property].length,
+                 newValue: obj1[property].length
+               });
+             }
+         } else if ((property.indexOf('Date') > -1 || property.indexOf('date') > -1) ||  (obj1[property] instanceof Date)){
+             var date1 = new Date(obj1[property]);
+             var date2 = new Date(obj2[property]);
+             if(!moment(date1).isSame(date2, 'year')
+                 || !moment(date1).isSame(date2, 'month')
+                 || !moment(date1).isSame(date2, 'day') ) {
+                 changes.push({
+                   property: property,
+                   oldValue:  obj2[property],
+                   newValue: obj1[property]
+                 });
+                 }
+         } else if(typeof obj1[property] === 'object'){
+            var areEqual = true;
+            for(var x in obj1[property]){
+              if(obj1[property][x] != obj2[property][x]) areEqual = false;
+            }
+            if(!areEqual){
+              changes.push({
+                property: property,
+                oldValue: obj2[property],
+                newValue: obj1[property]
+              });              
+            }
+         } else {
+             if(obj1[property] != obj2[property]) {
+                 if(!(obj1[property] === ""  && obj2[property] === undefined)){
+                     changes.push({
+                       property: property,
+                       oldValue: obj2[property],
+                       newValue: obj1[property]
+                     });
+                   }
+                 }
+             }
+         }
+     }
+     return changes;
+   }
 
   /********************************************************************************
   * Compare to arrays
   ********************************************************************************/
-  // arraysEqual(array1, array2){
-  //   var arraysEqual = true;
-  //   if(array1.length != array2.length) {
-  //     return false;
-  //   } else {
-  //     var newArray = new Array();
-  //     for(var i = 0; i<array1.length; i++){
-  //       newArray[i] = JSON.stringify(array1[i]);
-  //     }
-  //     for(var i = 0; i<array1.length; i++){
-  //         if(newArray.indexOf(JSON.stringify(array2[i])) == -1){
-  //           return false;
-  //         }
-  //     }
-  //   }
-  //   return true;
-  // }
+  arraysEqual(array1, array2){
+    var arraysEqual = true;
+    if(array1.length != array2.length) {
+      return false;
+    } else {
+      var newArray = new Array();
+      for(var i = 0; i<array1.length; i++){
+        newArray[i] = JSON.stringify(array1[i]);
+      }
+      for(var i = 0; i<array1.length; i++){
+          if(newArray.indexOf(JSON.stringify(array2[i])) == -1){
+            return false;
+          }
+      }
+    }
+    return true;
+  }
 
   /************************************************************************************
   * Copy one object into another, used when you want a completly new object and not a reference
@@ -180,66 +175,66 @@ export class Utils{
   * objTO - object to copy to
   * properties - an array of specific properties to copy
   ***********************************************************************************/
-  //  copyObject(objFrom, objTo, properties){
-  //    objTo = objTo || new Object();;
-  //    if(!properties){
-  //      for (var property in objFrom) {
-  //        if (objFrom.hasOwnProperty(property)) {
-  //          if(Array.isArray(objFrom[property])){
-  //            objTo[property] = this.copyArray(objFrom[property]);
-  //          } else if (objFrom[property] instanceof Date){
-  //            objTo[property] = objFrom[property];
-  //        } else if (this.isObject(objFrom[property])){
-  //            objTo[property] = this.copyObject(objFrom[property]);
-  //          } else {
-  //            objTo[property] = objFrom[property];
-  //          }
-  //        }
-  //      }
-  //    } else {
-  //      for(var i = 0, x = properties.length; i<x; i++){
-  //        if (objFrom.hasOwnProperty(properties[i])) {
-  //           if(Array.isArray(objFrom[property])){
-  //            objTo[property] = this.copyArray(objFrom[property]);
-  //          } else if (objFrom[property] instanceof Date){
-  //            objTo[property] = objFrom[property];
-  //          } else if (this.isObject(objFrom[property])){
-  //            objTo[property] = this.copyObject(objFrom[property]);
-  //          } else {
-  //            objTo[property] = objFrom[property];
-  //          }
-  //        }
-  //      }
-  //    }
-  //    return objTo;
-  //  }
+   copyObject(objFrom, objTo, properties){
+     objTo = objTo || new Object();;
+     if(!properties){
+       for (var property in objFrom) {
+         if (objFrom.hasOwnProperty(property)) {
+           if(Array.isArray(objFrom[property])){
+             objTo[property] = this.copyArray(objFrom[property]);
+           } else if (objFrom[property] instanceof Date){
+             objTo[property] = objFrom[property];
+         } else if (this.isObject(objFrom[property])){
+             objTo[property] = this.copyObject(objFrom[property]);
+           } else {
+             objTo[property] = objFrom[property];
+           }
+         }
+       }
+     } else {
+       for(var i = 0, x = properties.length; i<x; i++){
+         if (objFrom.hasOwnProperty(properties[i])) {
+            if(Array.isArray(objFrom[property])){
+             objTo[property] = this.copyArray(objFrom[property]);
+           } else if (objFrom[property] instanceof Date){
+             objTo[property] = objFrom[property];
+           } else if (this.isObject(objFrom[property])){
+             objTo[property] = this.copyObject(objFrom[property]);
+           } else {
+             objTo[property] = objFrom[property];
+           }
+         }
+       }
+     }
+     return objTo;
+   }
 
    /*******************************************************************************
     * Return a copy of an array
     *******************************************************************************/
-  //  copyArray(array){
-  //    if(array){
-  //      var newArray = new Array();
-  //      array.forEach((item) => {
-  //        if(Array.isArray(item)){
-  //            newArray.push(this.copyArray(item));
-  //        } else if (this.isObject(item)){
-  //            newArray.push(this.copyObject(item));
-  //        } else {
-  //            newArray.push(item);
-  //        }
-  //      })
-  //      return newArray;
-  //    }
-  //    return null;
-  //  }
+   copyArray(array){
+     if(array){
+       var newArray = new Array();
+       array.forEach((item) => {
+         if(Array.isArray(item)){
+             newArray.push(this.copyArray(item));
+         } else if (this.isObject(item)){
+             newArray.push(this.copyObject(item));
+         } else {
+             newArray.push(item);
+         }
+       })
+       return newArray;
+     }
+     return null;
+   }
 
   /*********************************************************************************
    * Test of a variable is an object
   *********************************************************************************/
-  // isObject(obj) {
-  //    return obj === Object(obj);
-  // }
+  isObject(obj) {
+     return obj === Object(obj);
+  }
 
   // toCamelCase(str) {
   //   return str.toLowerCase()

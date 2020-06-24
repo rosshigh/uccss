@@ -1,6 +1,7 @@
 Client/node_modules/
 Server/node_modules/
 client20/node_modules/
+client21/node_modules/
 Server20/node_modules/
 twitterBot/node_modules/
 twitterBot/public
@@ -10,3 +11,4 @@ Server/log-auth/
 data/node_modules/
 data/data/
 Server/pm2Log/
+Server20/log/

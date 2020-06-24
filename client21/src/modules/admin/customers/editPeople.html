@@ -1,0 +1,15 @@
+<template>
+    <!-- <span id="loading">
+        <ul class="bokeh">
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </span> -->
+    <div show.bind="view === 'table'">
+        <compose view="./components/peopleTable.html"></compose>
+    </div>
+    <div show.bind="view === 'form'">
+        <compose view="./components/peopleForm.html"></compose>
+    </div>
+</template>

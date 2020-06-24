@@ -3,12 +3,14 @@
 import 'regenerator-runtime/runtime';
 import * as environment from '../config/environment.json';
 import { PLATFORM } from 'aurelia-pal';
-import { initialState } from 'appConfig';
 
 export function configure(aurelia) {
   aurelia.use
-    // .plugin(PLATFORM.moduleName('aurelia-store'))
     .standardConfiguration()
+    .globalResources(PLATFORM.moduleName("aurelia-mask/dist/masked-input"))
+    .plugin(PLATFORM.moduleName('au-table'))
+    .plugin(PLATFORM.moduleName("aurelia-validation"))
+  .plugin(PLATFORM.moduleName("aurelia-validatejs"))
     .feature(PLATFORM.moduleName('resources/index'));
 
   aurelia.use.developmentLogging(environment.debug ? 'debug' : 'warn');
@@ -17,9 +19,11 @@ export function configure(aurelia) {
     aurelia.use.plugin(PLATFORM.moduleName('aurelia-testing'));
   }
 
-  aurelia.use.plugin(PLATFORM.moduleName('aurelia-store'), {
-    initialState,
-    history: { undoable: true }
+  aurelia.start().then(() => {
+    let userObj = sessionStorage.getItem('user');
+    let root = userObj ? 'app' : 'home';
+    aurelia.setRoot(PLATFORM.moduleName(root))
   });
-  aurelia.start().then(() => aurelia.setRoot(PLATFORM.moduleName('app')));
+  
+  // aurelia.start().then(() => aurelia.setRoot(PLATFORM.moduleName('app')));
 }

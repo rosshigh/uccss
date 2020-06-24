@@ -21,7 +21,7 @@ var localLogin = new localStrategy(localOptions, function(email, password, next)
     .exec( function(err, user){
       if(err){
         return next(err);
-      } else {           ;
+      } else {  
         if(!user){
           logAuth.log('info','Wrong email logon-' + user.email);
           next(new NotFoundError("404",{ message: "Email not found."}));

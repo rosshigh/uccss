@@ -1,0 +1,114 @@
+<template>
+    <form>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="firstName">First Name *</label>
+                    <input value.bind="people.selectedPerson.firstName & validateOnChange" type="text" class="form-control" id="firstName"
+                        aria-describedby="firstNameHelp">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="middleName">Middle Name</label>
+                    <input value.bind="people.selectedPerson.middleName" type="text" class="form-control"
+                        id="middleName" aria-describedby="middleNameHelp">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="lastName">Last Name *</label>
+                    <input value.bind="people.selectedPerson.lastName & validateOnChange" type="text" class="form-control" id="lastName"
+                        aria-describedby="lastNameHelp">
+                </div>
+            </div>
+        </div>
+        <div class="row topMargin">
+            <div class="col">
+                <div class="form-group">
+                    <label for="nickName">Preferred Name</label>
+                    <input value.bind="people.selectedPerson.nickName" type="text" class="form-control" id="nickName">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="editStatus">Status *</label>
+                    <select value.bind="people.selectedPerson.personStatus & validateOnChange" id="editStatus" class="form-control topMargin"
+                        data-style="btn btn-link">
+                        <option value="">Select an option</option>
+                        <option repeat.for='status of is4ua.personStatusArray' value="${status.code}">
+                            ${status.description}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="editMobile">Mobile</label>
+                    <input if.bind="phoneMask" class="form-control" id="editMobile"
+                        masked="value.bind: people.selectedPerson.mobile  & validateOnChange; mask.bind: phoneMask; placeholder: *" />
+                    <input if.bind="!phoneMask" class="form-control" id="editMobile"
+                        value.bind="people.selectedPerson.mobile" />
+                </div>
+            </div>
+        </div>
+        <div class="row topMargin">
+            <div class="col">
+                <div class="form-group">
+                    <label for="editPhone">Phone *</label>
+                    <input if.bind="phoneMask" class="form-control" id="editPhone"
+                        masked="value.bind: people.selectedPerson.phone  & validateOnChange; mask.bind: phoneMask; placeholder: *" />
+                    <input if.bind="!phoneMask" class="form-control" id="editPhone"
+                        value.bind="people.selectedPerson.phone  & validateOnChange" />
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="editExtension">Extension</label>
+                    <input value.bind="people.selectedPerson.ext" type="text" class="form-control" id="editExtension"
+                        aria-describedby="extHelp">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="editEmail">Email *</label>
+                    <input value.bind="people.selectedPerson.email & validateOnChange" type="text" class="form-control" id="editEmail"
+                        aria-describedby="emailHelp">
+                </div>
+            </div>
+        </div>
+        <div class="row topMargin">
+            <div class="col">
+                <div class="form-group">
+                    <label for="editPhone">Institution *</label>
+                    <select value.two-way="people.selectedPerson.institutionId  & validateOnChange" id="editInstitution"
+                        class="form-control topMargin">
+                        <option value="">Select an option</option>
+                        <option repeat.for="institution of people.institutionsArray" value="${institution._id}">
+                            ${institution.name}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="editSpecialization">Specialization</label>
+                    <select value.two-way="people.selectedPerson.personSpecialization" id="editSpecialization"
+                        class="form-control topMargin">
+                        <option value="">Select an option</option>
+                        <option repeat.for="name of is4ua.specialArray" value="${name.code}">${name.description}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group" style="height:200px;">
+                    <label for="editDepartment">Department</label>
+                    <select value.two-way="people.selectedPerson.departmentCategory" id="editDepartment"
+                        class="form-control topMargin">
+                        <option value="">Select an option</option>
+                        <option repeat.for="name of is4ua.deptArray" value="${name.code}">${name.description}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </form>
+</template>

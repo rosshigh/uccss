@@ -1,0 +1,714 @@
+@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+
+.active {
+    text-decoration: underline;
+}
+
+.nav-link {
+    color: white;
+}
+
+.btn-link {
+    color: white;
+}
+
+/* .aut-sort:before{
+    font-family: FontAwesome;
+    padding-right: 0.5em;
+    width: 1.28571429em;
+    display: inline-block;
+    text-align: center;
+}
+
+.aut-sortable:before{
+    content: "\f0dc";
+}
+
+.aut-asc:before{
+    content: "\f160";
+}
+
+.aut-desc:before{
+    content: "\f161";
+}
+
+.toast {
+    opacity: 1 !important;
+}
+
+.assignedColor {
+  background-color: #dff0d8;
+}
+
+.toolbar {
+    position:fixed;
+    z-index:1000;
+    /* width:100%; */
+    top:91px;
+    /* left:0; */
+    background-color:ghostwhite;
+}
+
+.panelContrastColor {
+    background-color:ghostwhite;
+}
+
+.positionUnderToolbar{
+    margin-top:50px;
+}
+
+.provisional {
+    background-color: cyan;
+}
+
+.existing {
+    background-color: LightGoldenRodYellow;
+}
+
+.danger {
+    background-color:deeppink;
+}
+
+.customFont {
+    font-family: 'Montserrat', sans-serif;
+}
+.card-header{
+    font-size: 1.640625rem;
+}
+
+.card-title {
+    padding: 5px;
+}
+
+.card-title {
+    background-color: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.bigLabel{
+    font-size: 1.5rem;
+}
+
+.btn-default{
+    background-color:white;
+}
+    .hover_img a { position:relative; }
+    .hover_img a span { position:absolute; display:none; z-index:99; }
+    .hover_img a:hover span { display:block; }
+
+    .hover {
+        position:absolute;
+        height: 200px;
+        width: 600px;
+        z-index:99;
+        display:none; 
+        box-shadow: 10px 10px 5px #888888;
+        overflow: hidden;
+        background-color: white;
+        padding: 10px;
+    }
+
+.fixed
+{
+    position: fixed;
+    top: 20px;
+    right: 40px;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.redText {
+    color: purple;
+    font-weight: bolder !important;
+}
+
+.banner {
+    height: 50px;
+    width: 100%;
+    background-color: white;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
+
+.banner #notice {
+    margin-left: 30px;
+    font-size: 1.25em;
+    color: indianred;
+}
+
+.browse .textContainer {
+    height: 430px;
+    line-height: 400px;
+}
+
+.textContainer h4 {
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.vertical-align {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-borderless td,
+.table-borderless th {
+    border: 0 !important;
+} */
+
+.topMargin {
+    margin-top: 25px;
+}
+
+.smallTopMargin {
+  margin-top: 5px;
+}
+
+.bottomMargin {
+    margin-bottom: 25px;
+}
+
+.leftMargin {
+    margin-left: 25px;
+}
+
+.rightMargin {
+  margin-right: 25px;
+}
+
+.smallLeftMargin {
+    margin-left: 10px;
+}
+
+.backColorOne {
+  background-color: ghostwhite;
+}
+
+.backColorTwo{
+  background-color: LightSalmon;
+}
+
+.backColorThree {
+  background-color: cyan;
+}
+
+.backColorFour{
+  background-color: lightgrey;
+}
+
+
+.bigTopMargin {
+    margin-top: 50px;
+}
+
+.bigLeftMargin {
+    margin-left: 50px;
+}
+
+.smallMarginTop {
+    margin-top: 5px;
+}
+
+.smallMarginRight {
+    margin-right: 10px;
+}
+
+.parallax1 {
+    /* The image used */
+    background-image: url("/img/parallax1.jpg");
+
+    /* Set a specific height */
+    min-height: 300px;
+
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.parallax2 {
+    /* The image used */
+    background-image: url("/img/parallax2.jpg");
+
+    /* Set a specific height */
+    min-height: 200px;
+
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.caption span.border {
+    background-color: #111;
+    color: #fff;
+    padding: 18px;
+    font-size: 25px;
+    letter-spacing: 10px;
+}
+
+.caption {
+  position: absolute;
+  left: 0;
+  top: 25%;
+  width: 100%;
+  text-align: center;
+  color: #000;
+}
+
+.center-text {
+   text-align: center;
+}
+
+.home-page-header{
+    text-align: center;
+    font-size: 30px;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.subMenu{
+    position: relative;
+    top: -5px;
+    left: 0px;
+    width: 100%;
+}
+
+.subMenu-container {
+    position: fixed; /* Set the navbar to fixed position */
+    top: 5rem;
+    width: 100%;
+    z-index:99;
+}
+
+.hover {
+    position:absolute;
+    height: 200px;
+    width: 600px;
+    z-index:99;
+    display:none;
+    box-shadow: 10px 10px 5px #888888;
+    overflow: hidden;
+    background-color: white;
+    padding: 10px;
+}
+
+.hoverProfile {
+    position:absolute;
+    height: 250px;
+    width: 500px;
+    z-index:99;
+    display:none;
+    box-shadow: 10px 10px 5px #888888;
+    overflow: hidden;
+    background-color: white;
+    padding: 10px;
+     right:0;
+    bottom:0;
+}
+
+.overFlow {
+    overflow-y:scroll;
+}
+
+.carouselSize {
+    width:700px;
+    height:500px;
+}
+
+.carouselImage {
+    height:500px;
+}
+
+.weatherIcon {
+    height: 50px;
+    width: 50px;
+}
+
+.page-host {
+    margin-top: 10rem;
+}
+
+span i {
+    cursor: pointer;
+}
+
+.sortable {
+    cursor: pointer;   
+}
+
+.aurelia-flatpickr {
+    background-color: white !important;
+}
+
+/* Dropdown Button */
+.dropbtn {
+    border: none;
+    cursor: pointer;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+    background-color: #3e8e41;
+}
+
+.smart-timeline{position:relative}
+.smart-timeline-list{list-style:none;margin:0;padding:0}
+.smart-timeline-list:after{content:" ";background-color:#eee;position:absolute;display:block;width:2px;top:0;left:95px;bottom:0;z-index:1}
+.smart-timeline-list li{position:relative;margin:0;padding:15px 0}
+.smart-timeline-list>li:hover{background-color:#f4f4f4}
+.smart-timeline-hover li:hover{background-color:#f9f9f9}
+.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}
+.smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}
+.smart-timeline-time{float:left;width:70px;text-align:right}
+.smart-timeline-time>small{font-style:italic}
+.smart-timeline-content{margin-left:123px}
+
+
+/****** Style Star Rating Widget *****/
+
+.rating { 
+  border: none;
+  float: left;
+}
+
+.rating > span > input { display: none; } 
+.rating > span > label:before { 
+  margin: 5px;
+  font-size: 1.25em;
+  font-family: FontAwesome;
+  display: inline-block;
+  content: "\f005";
+}
+
+.rating > span > .half:before { 
+  content: "\f089";
+  position: absolute;
+}
+
+.rating > span > label { 
+    color: #ddd; 
+    float: right; 
+}
+
+/***** CSS Magic to Highlight Stars on Hover *****/
+
+.rating > span > input:checked ~ label, /* show gold star when clicked */
+.rating:not(:checked) > span > label:hover, /* hover current star */
+.rating:not(:checked) > span > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */
+
+.rating > span > input:checked + label:hover, /* hover current star when changing rating */
+.rating > span >  input:checked ~ label:hover,
+.rating > span > label:hover ~ input:checked ~ label, /* lighten current selection */
+.rating > span > input:checked ~ label:hover ~ label { color: #FFED85;  }
+
+.link-shadow {
+    -webkit-box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);
+    -moz-box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);
+    box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);
+}
+
+#curriculumInfo{
+     display:none;
+}
+
+ux-dialog-header {
+    background-color: #ffbd00 ;
+    color: white;
+}
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+.circular--square {
+  border-radius: 50%;
+}
+
+@media only screen and (max-width: 800px) {
+    
+    /* Force table to not be like tables anymore */
+	#no-more-tables table, 
+	#no-more-tables thead, 
+	#no-more-tables tbody, 
+	#no-more-tables th, 
+	#no-more-tables td, 
+	#no-more-tables tr { 
+		display: block; 
+	}
+ 
+	/* Hide table headers (but not display: none;, for accessibility) */
+	#no-more-tables thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+ 
+	#no-more-tables tr { border: 1px solid #ccc; }
+ 
+	#no-more-tables td { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee; 
+		position: relative;
+		padding-left: 50%; 
+		white-space: normal;
+		text-align:left;
+	}
+ 
+	#no-more-tables td:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+		text-align:left;
+		font-weight: bold;
+	}
+
+    .clickable{
+        cursor: pointer;   
+    }
+
+    .smallFont{
+        font-size: small;
+    }
+
+	/*
+	Label the data
+	*/
+    #no-more-tables td:before { content: attr(data-title); }
+    
+    }
+
+    #loading {
+        background: repeat scroll 0 0;
+        height: 100%;
+        left: 0;
+        margin: auto;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index:99;
+    }
+
+    .bokeh {
+        border: 0.01em solid rgba(150, 150, 150, 0.1);
+        border-radius: 50%;
+        font-size: 100px;
+        height: 1em;
+        list-style: outside none none;
+        margin: 0 auto;
+        position: relative;
+        top: 35%;
+        width: 1em;
+        z-index: 2147483647;
+    }
+    .bokeh li {
+        border-radius: 50%;
+        height: 0.2em;
+        position: absolute;
+        width: 0.2em;
+    }
+    .bokeh li:nth-child(1) {
+        animation: 1.13s linear 0s normal none infinite running rota, 3.67s ease-in-out 0s alternate none infinite running opa;
+        background: #00c176 none repeat scroll 0 0;
+        left: 50%;
+        margin: 0 0 0 -0.1em;
+        top: 0;
+        transform-origin: 50% 250% 0;
+    }
+    .bokeh li:nth-child(2) {
+        animation: 1.86s linear 0s normal none infinite running rota, 4.29s ease-in-out 0s alternate none infinite running opa;
+        background: #ff003c none repeat scroll 0 0;
+        margin: -0.1em 0 0;
+        right: 0;
+        top: 50%;
+        transform-origin: -150% 50% 0;
+    }
+    .bokeh li:nth-child(3) {
+        animation: 1.45s linear 0s normal none infinite running rota, 5.12s ease-in-out 0s alternate none infinite running opa;
+        background: #fabe28 none repeat scroll 0 0;
+        bottom: 0;
+        left: 50%;
+        margin: 0 0 0 -0.1em;
+        transform-origin: 50% -150% 0;
+    }
+    .bokeh li:nth-child(4) {
+        animation: 1.72s linear 0s normal none infinite running rota, 5.25s ease-in-out 0s alternate none infinite running opa;
+        background: #88c100 none repeat scroll 0 0;
+        margin: -0.1em 0 0;
+        top: 50%;
+        transform-origin: 250% 50% 0;
+    }
+    
+    .translucent{
+        opacity: 0.2;
+    }
+    
+    @keyframes opa {
+    12% {
+        opacity: 0.8;
+    }
+    19.5% {
+        opacity: 0.88;
+    }
+    37.2% {
+        opacity: 0.64;
+    }
+    40.5% {
+        opacity: 0.52;
+    }
+    52.7% {
+        opacity: 0.69;
+    }
+    60.2% {
+        opacity: 0.6;
+    }
+    66.6% {
+        opacity: 0.52;
+    }
+    70% {
+        opacity: 0.63;
+    }
+    79.9% {
+        opacity: 0.6;
+    }
+    84.2% {
+        opacity: 0.75;
+    }
+    91% {
+        opacity: 0.87;
+    }
+    }
+    
+    @keyframes rota {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Tabs panel */
+.tabbable-panel {
+  border:1px solid #eee;
+  padding: 10px;
+}
+
+/* Default mode */
+.tabbable-line > .nav-tabs {
+  border: none;
+  margin: 0px;
+}
+.tabbable-line > .nav-tabs > li {
+  margin-right: 2px;
+}
+.tabbable-line > .nav-tabs > li > a {
+  border: 0;
+  margin-right: 0;
+  color: #737373;
+}
+.tabbable-line > .nav-tabs > li > a > i {
+  color: #a6a6a6;
+}
+.tabbable-line > .nav-tabs > li.open, .tabbable-line > .nav-tabs > li:hover {
+  border-bottom: 4px solid #fbcdcf;
+}
+.tabbable-line > .nav-tabs > li.open > a, .tabbable-line > .nav-tabs > li:hover > a {
+  border: 0;
+  background: none !important;
+  color: #333333;
+}
+.tabbable-line > .nav-tabs > li.open > a > i, .tabbable-line > .nav-tabs > li:hover > a > i {
+  color: #a6a6a6;
+}
+.tabbable-line > .nav-tabs > li.open .dropdown-menu, .tabbable-line > .nav-tabs > li:hover .dropdown-menu {
+  margin-top: 0px;
+}
+.tabbable-line > .nav-tabs > li.active {
+  border-bottom: 4px solid #f3565d;
+  position: relative;
+}
+.tabbable-line > .nav-tabs > li.active > a {
+  border: 0;
+  color: #333333;
+}
+.tabbable-line > .nav-tabs > li.active > a > i {
+  color: #404040;
+}
+.tabbable-line > .tab-content {
+  margin-top: -3px;
+  background-color: #fff;
+  border: 0;
+  border-top: 1px solid #eee;
+  padding: 15px 0;
+}
+.portlet .tabbable-line > .tab-content {
+  padding-bottom: 0;
+}
+
+/* Below tabs mode */
+
+.tabbable-line.tabs-below > .nav-tabs > li {
+  border-top: 4px solid transparent;
+}
+.tabbable-line.tabs-below > .nav-tabs > li > a {
+  margin-top: 0;
+}
+.tabbable-line.tabs-below > .nav-tabs > li:hover {
+  border-bottom: 0;
+  border-top: 4px solid #fbcdcf;
+}
+.tabbable-line.tabs-below > .nav-tabs > li.active {
+  margin-bottom: -2px;
+  border-bottom: 0;
+  border-top: 4px solid #f3565d;
+}
+.tabbable-line.tabs-below > .tab-content {
+  margin-top: -10px;
+  border-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
