@@ -74,7 +74,6 @@
       {
         "name": "vendor-bundle.js",
         "prepend": [
-          "node_modules/whatwg-fetch/dist/fetch.umd.js",
           "node_modules/promise-polyfill/dist/polyfill.min.js",
           "node_modules/requirejs/require.js"
         ],
@@ -104,9 +103,6 @@
           "stub": false
         }
       ]
-    },
-    "copyFiles": {
-      "node_modules/@fortawesome/fontawesome-free/webfonts/*": "@fortawesome/fontawesome-free/webfonts"
     }
   },
   "packageManager": "npm"

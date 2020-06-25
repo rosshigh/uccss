@@ -1,11 +1,3 @@
 <template>
-  <require from="resources/css/styles.css"></require>
-  <require from="humane-js/themes/jackedup.css"></require>
-  <require from="toastr/build/toastr.min.css"></require>
-  <require from="bootstrap-select/css/bootstrap-select.css"></require>
-  <nav-bar></nav-bar>
-  <div class="page-host">
-    <loading-indicator progress.bind="data.progress" loading.bind="router.isNavigating || data.isRequesting"></loading-indicator>
-    <router-view></router-view>
-  </div>
+  <h1>${message}</h1>
 </template>
