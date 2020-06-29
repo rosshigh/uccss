@@ -1,0 +1,12 @@
+<template>
+  <span id="loading">
+    <ul class="bokeh">
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+  </span>
+  <div show.bind="dataTable.displayArray && dataTable.displayArray.length || initialLoaded">
+    <compose view="./components/selectionForm.html"></compose>
+  </div>
+</template>

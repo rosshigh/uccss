@@ -41,6 +41,22 @@ export class People {
     }
   }
 
+  
+  async getPeopleBulkEmailArray(options) {
+      var url = this.PEOPLE_SERVICE + '/bulkEmail';
+      url += options ? options : "";
+      try {
+        let serverResponse = await this.data.get(url);
+        if (!serverResponse.error) {
+          this.peopleBulkEmailArray = serverResponse;
+        } else {
+          this.data.processError(serverResponse);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+  }
+
   async getPerson(id) {
     let url = this.PEOPLE_SERVICE + '/' + id;
     try {
@@ -170,7 +186,7 @@ export class People {
   }
 
   //Institutions
-  async getInstitutionsArray(options) {
+  async getInstitutionArray(options) {
     var url = this.INSTITUTION_SERVICES;
     url += options ? options : "";
     let response = await this.data.get(url)
@@ -198,15 +214,91 @@ export class People {
   async getInstitution(id) {
     try {
       var url = this.INSTITUTION_SERVICES + '/' + id;
-      let response = await this.data.get(url)
-      if (!response.status) {
-        this.selectedInstitution = response;
+      let serverResponse = await this.data.get(url)
+      if (!serverResponse.status) {
+        this.selectedInstitution = serverResponse;
         this.originalInstitution = this.utils.copyObject(serverResponse);
       } else {
         this.data.processError(serverResponse);
       }
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async getInstitutionPeople(options) {
+    if(options === -1){
+      this.institutionPeopleArray = [];
+      return;
+    }
+    var url = this.PEOPLE_SERVICE;
+    url += options ? options : "";
+    try {
+      let serverResponse = await this.data.get(url);
+      if (!serverResponse.error) {
+        this.institutionPeopleArray = serverResponse;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  selectInstitution(index) {
+    if (index === undefined) {
+      this.selectedInstitution = this.emptyInstitution();
+    } else {
+      try {
+        this.selectedInstitution = this.utils.copyObject(this.institutionsArray[index]);
+        this.editInstitutionIndex = index;
+      } catch (error) {
+        console.log(error);
+        this.selectedInstitution = this.emptyInstitution();
+      }
+
+    }
+  }
+
+  selectInstitutionByID(id) {
+    this.institutionsArray.forEach((item, index) => {
+      if (item._id === id) {
+        this.selectedInstitution = this.utils.copyObject(item);
+        this.editInstitutionIndex = index;
+        return;
+      }
+    });
+    return null;
+  }
+
+  emptyInstitution() {
+    var newInstitution = new Object();
+    newInstitution.joinDate = new Date();
+    newInstitution.name = "";
+    return newInstitution;
+  }
+
+  async saveInstitution() {
+    if (!this.selectedInstitution._id) {
+      let response = await this.data.saveObject(this.selectedInstitution, this.INSTITUTION_SERVICES, "post")
+      if (!response.error) {
+        if (this.institutionsArray) {
+          this.institutionsArray.push(response);
+        }
+      }
+      return response;
+    } else {
+      let response = await this.data.saveObject(this.selectedInstitution, this.INSTITUTION_SERVICES, "put")
+      if (!response.status) {
+        if (this.institutionsArray) {
+          this.institutionsArray[this.editInstitutionIndex] = this.utils.copyObject(this.selectedInstitution, this.institutionsArray[this.editInstitutionIndex]);
+        }
+      }
+      return response;
+    }
+  }
+
+  isInstitutionDirty() {
+    if (this.selectedInstitution) {
+      return this.utils.objectsEqual(this.selectedInstitution, this.originalInstitution);
     }
   }
 }

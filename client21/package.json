@@ -19,6 +19,7 @@
     "aurelia-validatejs": "^0.7.0",
     "aurelia-validation": "^2.0.0-rc2",
     "bootstrap": "^4.5.0",
+    "flatpickr": "^4.6.3",
     "jquery": "^3.5.1",
     "popper.js": "^1.16.1",
     "rxjs": "^6.5.5",

@@ -1,34 +1,46 @@
 <template>
-     <div class="topMargin">
-        <div class="bottomMargin list-group-item leftMargin rightMargin">
-            <span click.delegate="copyInstAddress()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Copy Instituion Address"><i class="fa fa-files-o fa-lg fa-border" aria-hidden="true"></i></span>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Address</h4>
         </div>
-        <div class="topMargin">
-            <div class="col-sm-12 col-lg-12">
-                <label for="editAddress1" class="control-label hideOnPhone">Address 1</label>
-                <input value.bind="people.selectedPerson.address1" id="editAddress1" class="form-control " placeholder="Address 1" type="text" />
+        <div class="card-body">
+            <div class="bottomMargin leftMargin rightMargin">
+                <span click.delegate="copyInstAddress()" class="smallMarginRight" bootstrap-tooltip
+                    data-toggle="tooltip" data-placement="bottom" title=""
+                    data-original-title="Copy Instituion Address"><i class="fa fa-files-o fa-lg fa-border"
+                        aria-hidden="true"></i></span>
             </div>
-            <div class="col-sm-12 col-lg-12">
-                <label for="editAddress2" class="control-label hideOnPhone">Address 2</label>
-                <input value.bind="people.selectedPerson.address2" id="editAddress2" class="form-control " placeholder="Address2" type="text" />
-                    </div>
+            <div class="topMargin">
+                <div class="col-sm-12 col-lg-12">
+                    <label for="editAddress1" class="control-label hideOnPhone">Address 1</label>
+                    <input value.bind="people.selectedPerson.address1" id="editAddress1" class="form-control "
+                        type="text" />
+                </div>
+                <div class="col-sm-12 col-lg-12">
+                    <label for="editAddress2" class="control-label hideOnPhone">Address 2</label>
+                    <input value.bind="people.selectedPerson.address2" id="editAddress2" class="form-control "
+                        type="text" />
                 </div>
             </div>
             <div class="col-sm-12 col-lg-12">
                 <label for="editCity" class="control-label hideOnPhone">City</label>
-                <input value.bind="people.selectedPerson.city" id="editCity" class="form-control " placeholder="City" type="text" />
+                <input value.bind="people.selectedPerson.city" id="editCity" class="form-control " 
+                    type="text" />
             </div>
             <div class="col-sm-12 col-lg-12">
                 <label for="editRegion" class="control-label hideOnPhone">Region</label>
-                <input value.bind="people.selectedPerson.region" id="editRegion" class="form-control " placeholder="Region" type="text" />
+                <input value.bind="people.selectedPerson.region" id="editRegion" class="form-control "
+                     type="text" />
             </div>
             <div class="col-sm-12 col-lg-12">
                 <label for="editPostalCode" class="control-label hideOnPhone">Postal Code</label>
-                <input value.bind="people.selectedPerson.postalCode" id="editPostalCode" class="form-control " placeholder="Postal Code" type="text" />
+                <input value.bind="people.selectedPerson.postalCode" id="editPostalCode" class="form-control "
+                     type="text" />
             </div>
             <div class="col-sm-12 col-lg-12">
                 <label for="editCountry" class="control-label hideOnPhone">Country</label>
-                <input value.bind="people.selectedPerson.country" change.trigger="getPhoneMask()" id="editCountry" class="form-control" placeholder="Country" type="text" />
+                <input value.bind="people.selectedPerson.country" change.trigger="getPhoneMask()" id="editCountry"
+                    class="form-control" type="text" />
             </div>
         </div>
     </div>

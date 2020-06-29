@@ -17,7 +17,7 @@ export class AppConfig {
 
   ROLES = [{ role: 'USER', label: 'User', UCConly: false, authLevel: 2 },
   { role: 'FACU', label: 'Faculty', UCConly: false, authLevel: 3 },
-  { role: 'PROV', label: "Provisional", UCConly: false, authLevel: 1 },
+  // { role: 'PROV', label: "Provisional", UCConly: false, authLevel: 1 },
   { role: 'LEGL', label: 'Legal', UCConly: false, authLevel: 2 },
   { role: 'BUSI', label: 'Billing', UCConly: false, authLevel: 2 },
   { role: 'PRIM', label: 'Primary', UCConly: false, authLevel: 4 },
@@ -26,7 +26,7 @@ export class AppConfig {
   { role: 'UCCT', label: 'UCC Technical Staff', UCConly: true, authLevel: 8 },
   { role: 'UCCA', label: 'UCC Admin Staff', UCConly: true, authLevel: 6 },
   { role: 'UCSA', label: 'UCCSS Admin', UCConly: true, authLevel: 11 },
-  { role: 'BLOG', label: 'Blog Author', UCConly: false, authLevel: 2 },
+  // { role: 'BLOG', label: 'Blog Author', UCConly: false, authLevel: 2 },
   { role: "TMAN", label: "Director", UCConly: true, authLevel: 11 },
   { role: "EDIR", label: "Executive Director", UCConly: true, authLevel: 11 },
   { role: "TDIR", label: "Technical Director", UCConly: true, authLevel: 11 },
@@ -41,7 +41,10 @@ export class AppConfig {
   USER_ROLE = 4; d
   PROV_USER = 1;
 
-
+  USER_STATUS = [
+    {code: "01", description: "Active"},
+    {code: "02", description: "Inactive"}
+  ]
 
   PHONE_MASKS = [
     { country: 'US', mask: '999-999-9999' },

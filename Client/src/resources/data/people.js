@@ -120,7 +120,6 @@ export class People {
     } catch (error) {
       this.selectedPerson = undefined;
       console.log(error);
-    }
     return this.selectedPerson;
   }
 

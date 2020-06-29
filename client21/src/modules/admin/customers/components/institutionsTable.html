@@ -1,0 +1,74 @@
+<template>
+    <div class="card" style="top:-110px;">
+        <div class="card-body">
+            <div class='col-lg-10 offset-lg-1 bottomMargin'>
+
+                <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
+
+                <table class="table table-striped"
+                    aurelia-table="data.bind: people.institutionsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+                    <thead>
+                        <tr>
+                            <compose view='./institutionTableToolbar.html'></compose>
+                        </tr>
+                        <tr>
+                            <th colspan="3">
+                                <div class='col'>
+                                    <div class="form-group">
+                                        <input type="text" value.bind="filters[0].value"
+                                            placeholder="Filter name, country and region " class="form-control"
+                                            id='filterField' />
+                                    </div>
+                                </div>
+                            </th>
+                            <th colspan="1">
+                                <div class='col'>
+                                    <div class="form-group">
+                                        <select value.bind="filters[1].value" class="form-control "
+                                            id="institutionType">
+                                            <option value=""></option>
+                                            <option repeat.for="institution of is4ua.institutionTypes"
+                                                value="${institution.code}">${institution.description}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </th>
+                            <th colspan="1">
+                                <div class="form-group">
+                                    <select value.bind="filters[2].value" class="form-control " id="institutionStatus"
+                                        placeholder="Status">
+                                        <option value=""></option>
+                                        <option repeat.for='status of is4ua.institutonStatusArray'
+                                            model.bind='status.code'>
+                                            ${status.description}</option>
+                                    </select>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="width:25rem;" aut-sort="key: name">Name</th>
+                            <th style="width:10rem;" aut-sort="key: country">Country</th>
+                            <th style="width:5rem;" aut-sort="key: region">Region</th>
+                            <th style="width:20rem;">Institution Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr repeat.for="institution of $displayData" click.delegate="edit(institution)">
+                            <td style="width:25rem;">${institution.name}</td>
+                            <td style="width:10rem;">${institution.country}</td>
+                            <td style="width:5rem;">${institution.region}</td>
+                            <td style="width:20rem;">${institution.institutionType |
+                                lookupValue:is4ua.institutionTypes:"code":"description"}</td>
+                            <td>${institution.institutionStatus |
+                                lookupValue:is4ua.institutonStatusArray:"code":"description"}</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+</template>

@@ -29,7 +29,7 @@
                                     <div class="form-group">
                                         <select value.bind="filters[1].value" class="form-control " id="personStatus">
                                             <option value=""></option>
-                                            <option repeat.for='status of is4ua.personStatusArray'
+                                            <option repeat.for='status of config.USER_STATUS'
                                                 model.bind='status.code'>
                                                 ${status.description}</option>
                                         </select>
@@ -40,26 +40,28 @@
                         </tr>
 
                         <tr>
-                            <th style="width:20rem;" aut-sort="key: lastName">Name</th>
-                            <th style="width:30rem;" aut-sort="key: institutionId.name">Institution</th>
-                            <th style="width:20rem;" aut-sort="key: email">E-mail</th>
+                            <th style="width:10rem;" aut-sort="key: firstName">First Name</th>
+                            <th style="width:10rem;" aut-sort="key: lastName">Last Name</th>
+                            <th style="width:20rem;" aut-sort="key: institutionId.name">Institution</th>
+                            <th style="width:15rem;" aut-sort="key: email">E-mail</th>
                             <th style="width:15rem;">Phone</th>
-                            <th>Role</th>
-                            <th>Status</th>
+                            <th style="width:12rem;">Role</th>
+                            <th style="width:15rem;">Status</th>
                         </tr>
                     </thead>
                     
                     <tbody>
                         <tr repeat.for="person of $displayData" >
-                            <td click.delegate="edit(person)">${person.fullName}</td>
-                            <td click.delegate="edit(person)">${person.institutionId.name}</td>
-                            <td> <a href="mailto:${person.email}"><i class="fa fa-paper-plane" aria-hidden="true"></i></a> ${person.email}</td>
-                            <td click.delegate="edit(person)">
+                            <td click.delegate="edit(person)" style="width:10rem;" >${person.firstName}</td>
+                            <td click.delegate="edit(person)" style="width:10rem;" >${person.lastName}</td>
+                            <td click.delegate="edit(person)" style="width:20rem;" >${person.institutionId.name}</td>
+                            <td> <a href="mailto:${person.email}" style="width:20rem;" ><i class="fa fa-paper-plane" aria-hidden="true"></i></a> ${person.email}</td>
+                            <td click.delegate="edit(person)" style="width:15rem;">
                                 ${person.phone | phoneNumber:config.PHONE_MASKS:person.country:person.ext}<br>
                                 ${person.mobile | phoneNumber:config.PHONE_MASKS:person.country}
                             </td>
-                            <td click.delegate="edit(person)">${person.roles}</td>
-                            <td>${person.personStatus |
+                            <td click.delegate="edit(person)" style="width:12rem;">${person.roles}</td>
+                            <td style="width:15rem;">${person.personStatus |
                                 lookupValue:is4ua.personStatusArray:"code":"description"}
                                 <span click.delegate="toggleStatus(person._id, person.personStatus)"
                                 innerhtml="${person.personStatus | activateButton}"></span>

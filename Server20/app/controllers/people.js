@@ -49,6 +49,16 @@ module.exports = function (app, config) {
             }).catch(err => { return next(err); });
     });
 
+    router.get('/people/bulkEmail', asyncHandler(async (req, res) => {
+        logger.log('info', 'Get people builkEmail');
+        var query = buildQuery(req.query, Person.find());
+        query.select('lastName firstName institutionId fullName personStatus email phone roles')
+        query.populate('institutionId', { institutionStatus: 1, institutionType: 1, memberType: 1, name: 1, region: 1, city: 1, country: 1 })
+        query.exec().then(result => {
+            res.status(200).json(result);
+        })
+    }));
+
     router.get('/people/:id', asyncHandler(async (req, res) => {
         logger.log('info', 'Get person [%s]', req.params.id, 'verbose');
         await Person.findById(req.params.id).then(result => {
@@ -57,9 +67,9 @@ module.exports = function (app, config) {
     }));
 
     router.post('/api/people', asyncHandler(async (req, res) => {
-        logger.log('info','Create Person');
-        var person =  new Person(req.body);  
-          person.save().then(result => {
+        logger.log('info', 'Create Person');
+        var person = new Person(req.body);
+        person.save().then(result => {
             res.status(200).json(result);
         })
     }));

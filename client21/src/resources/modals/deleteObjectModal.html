@@ -1,5 +1,5 @@
 <template>
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteObject" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -13,7 +13,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-              <button click.trigger="deletePerson()" type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
+              <button click.trigger="delete()" type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
             </div>
           </div>
         </div>

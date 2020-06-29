@@ -1,16 +1,18 @@
 import { inject } from 'aurelia-framework';
 import { DataServices } from './dataServices';
 import {Store} from '../../store/store';
+import {AppConfig} from '../../appConfig';
 
-@inject(DataServices, Store)
+@inject(DataServices, Store, AppConfig)
 export class Auth {
 
 	loginUrl = 'users/login';
 	logoutUrl = 'users/logout';
 
-	constructor(data, store) {
+	constructor(data, store, config) {
 		this.data = data;
 		this.store = store;
+		this.config = config;
 	}
 
 	async login(email, password) {
@@ -67,13 +69,9 @@ export class Auth {
  * Determine users role for authorizations
  ****************************************************************************/
 	setRole(roles) {
-		let config = this.store.getConfig();
-		let ROLES = config["ROLES"];
 		let userRole = 1;
-
 		for (let i = 0; i < roles.length; i++) {
-			// this.config.ROLES.forEach(item => {
-			ROLES.forEach(item => {
+			this.config.ROLES.forEach(item => {
 				if (roles[i] == item.role) {
 					userRole = item.authLevel > userRole ? item.authLevel : userRole;
 				}

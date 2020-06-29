@@ -5,22 +5,20 @@ import { is4ua } from '../../../resources/data/is4ua';
 import { AppConfig } from '../../../appConfig';
 import { Store } from '../../../store/store';
 import { Utils } from '../../../resources/utils/utils';
-import Validation from '../../../resources/utils/validation';
 
-@inject(ValidationControllerFactory, People, is4ua, AppConfig, Store, Utils, Validation)
+@inject(ValidationControllerFactory, People, is4ua, AppConfig, Store, Utils)
 export class EditPeople {
 
     pageSize = 50;
     defaultPhoneMask = "999-999-9999";
 
-    constructor(ValidationControllerFactory, people, is4ua, config, store, utils, validation) {
+    constructor(ValidationControllerFactory, people, is4ua, config, store, utils) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
         this.people = people;
         this.is4ua = is4ua;
         this.config = config;
         this.store = store;
         this.utils = utils;
-        this.validation = validation;
 
         this.configParameters = this.store.getConfig();
 
@@ -38,7 +36,7 @@ export class EditPeople {
         let responses = await Promise.all([
             this.people.getPeopleArray('?order=lastName'), //PLATFORM.moduleName('./value-converters/phone-number')
             this.is4ua.loadIs4ua(),
-            this.people.getInstitutionsArray('?order=name')
+            this.people.getInstitutionArray('?order=name')
         ]);
     }
 
@@ -114,19 +112,7 @@ export class EditPeople {
         }
     }
 
-    delete() {
-        return this.dialog.showMessage(
-            "Are you sure you want to delete the person?",
-            "Delete Person",
-            ['Yes', 'No']
-        ).whenClosed(response => {
-            if (!response.wasCancelled) {
-                this.deletePerson();
-            }
-        });
-    }
-
-    async deletePerson() {
+    async delete() {
         var name = this.people.selectedPerson.fullName;
         let serverResponse = await this.people.deletePerson();
         if (!serverResponse.error) {
@@ -138,7 +124,8 @@ export class EditPeople {
 
     back() {
         if (this.people.isPersonDirty(this.people.selectedPerson).length) {
-            $("#personChanged").modal()
+            this.modalMessage = "Do you want to save the person's record?"
+            $("#objectChanged").modal()
         } else {
             this.goBack();
         }

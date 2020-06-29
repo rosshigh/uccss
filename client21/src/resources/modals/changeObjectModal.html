@@ -1,5 +1,5 @@
 <template>
-    <div class="modal fade" id="personChanged" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="objectChanged" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -9,7 +9,7 @@
               </button>
             </div>
             <div class="modal-body">
-              Do you want to save the person?
+              ${modalMessage}
             </div>
             <div class="modal-footer">
               <button click.trigger="goBack()" type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
