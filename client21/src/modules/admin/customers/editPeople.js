@@ -9,7 +9,7 @@ import { Utils } from '../../../resources/utils/utils';
 @inject(ValidationControllerFactory, People, is4ua, AppConfig, Store, Utils)
 export class EditPeople {
 
-    pageSize = 50;
+    pageSize = 200;
     defaultPhoneMask = "999-999-9999";
 
     constructor(ValidationControllerFactory, people, is4ua, config, store, utils) {
@@ -43,6 +43,7 @@ export class EditPeople {
     attached() {
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
+        $('.selectpicker').selectpicker();
     }
 
     async refresh() {
@@ -136,7 +137,7 @@ export class EditPeople {
     }
 
     cancel() {
-        this.people.selectedPersonById(this.selectedPersonId);
+        this.people.selectedPersonById(this.people.selectedPerson._id);
     }
 
     downloadInstExcel() {

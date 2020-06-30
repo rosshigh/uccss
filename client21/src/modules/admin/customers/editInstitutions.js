@@ -10,7 +10,7 @@ import Validation from '../../../resources/utils/validation';
 @inject(ValidationControllerFactory, People, is4ua, AppConfig, Store, Utils, Validation)
 export class EditInstitutions {
 
-    pageSize = 50;
+    pageSize = 200;
 
     constructor(ValidationControllerFactory, people, is4ua, config, store, utils, validation) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
@@ -45,20 +45,7 @@ export class EditInstitutions {
     attached() {
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
-        $('.datetimepicker').datetimepicker({
-            format: 'DD/MM/YYYY',
-            icons: {
-                time: "fa fa-clock-o",
-                date: "fa fa-calendar",
-                up: "fa fa-chevron-up",
-                down: "fa fa-chevron-down",
-                previous: 'fa fa-chevron-left',
-                next: 'fa fa-chevron-right',
-                today: 'fa fa-screenshot',
-                clear: 'fa fa-trash',
-                close: 'fa fa-remove'
-            }
-        });
+        $('.selectpicker').selectpicker();
     }
 
     async refresh() {

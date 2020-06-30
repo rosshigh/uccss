@@ -11,10 +11,10 @@ export class BulkEmails {
     composeEmailPanel = false;
     subject = "";
     MESSAGE = "";
-    spinnerHTML = "";
     email = new Object();
     roleIncludeFilterValue = new Array();
     roleExcludeFilterValue = new Array();
+    pageSize = 200;
 
     toolbar = [
         ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
@@ -47,6 +47,13 @@ export class BulkEmails {
     }
 
     async activate() {
+        let responses = await Promise.all([
+            this.people.getPeopleBulkEmailArray('?order=lastName&filter=personStatus|eq|01'),
+            this.people.getInstitutionArray('?order=name', true),
+            this.is4ua.loadIs4ua(),
+        ]);
+
+        this.filteredArray = this.utils.copyArray(this.people.peopleBulkEmailArray);
         this.initialLoaded = false;
     }
 
@@ -59,13 +66,7 @@ export class BulkEmails {
     async attached() {
         $('[data-toggle="tooltip"]').tooltip();
         $('#loading').show();
-        let responses = await Promise.all([
-            this.people.getPeopleBulkEmailArray('?order=lastName&filter=personStatus|eq|01'),
-            this.people.getInstitutionArray('?order=name', true),
-            this.is4ua.loadIs4ua(),
-        ]);
-
-        this.filteredArray = this.utils.copyArray(this.people.peopleBulkEmailArray);
+        $('.selectpicker').selectpicker();
     }
 
     rolesFilter(){

@@ -6,56 +6,6 @@
     "auditLog": "log\\.9e0e70c869af7dde0e9b3bd00cfb023c441e1c3d-audit.json",
     "files": [
         {
-            "date": 1592244794984,
-            "name": "log\\application-2020-06-15-13.log",
-            "hash": "8258f9b000e7203d74fa43400ee3920c"
-        },
-        {
-            "date": 1592247624274,
-            "name": "log\\application-2020-06-15-14.log",
-            "hash": "66f845a2e0e9e5c030fb721dd2cffd49"
-        },
-        {
-            "date": 1592251319585,
-            "name": "log\\application-2020-06-15-15.log",
-            "hash": "a99ac691a699df7639a630ba3e6def30"
-        },
-        {
-            "date": 1592254872075,
-            "name": "log\\application-2020-06-15-16.log",
-            "hash": "3f9140c873d1df7cceda886f086c8f7f"
-        },
-        {
-            "date": 1592258904979,
-            "name": "log\\application-2020-06-15-17.log",
-            "hash": "f7af19b0ea2e224469371b8b74cc0566"
-        },
-        {
-            "date": 1592310862454,
-            "name": "log\\application-2020-06-16-07.log",
-            "hash": "b1c25cac76051c2f201e3a4e24217fcc"
-        },
-        {
-            "date": 1592317216582,
-            "name": "log\\application-2020-06-16-09.log",
-            "hash": "1808ac79961002c02798000938901fd1"
-        },
-        {
-            "date": 1592319659072,
-            "name": "log\\application-2020-06-16-10.log",
-            "hash": "48d6b86038d224d7b98c1f18f774b9d5"
-        },
-        {
-            "date": 1592323426027,
-            "name": "log\\application-2020-06-16-11.log",
-            "hash": "635546e3288345e32a5334d7cc4036c7"
-        },
-        {
-            "date": 1592333060276,
-            "name": "log\\application-2020-06-16-13.log",
-            "hash": "0cc1fbdcff43fe065e2a235a8d512aca"
-        },
-        {
             "date": 1592334037021,
             "name": "log\\application-2020-06-16-14.log",
             "hash": "a283ee3362b3c6e53107dc268292f606"
@@ -274,6 +224,61 @@
             "date": 1593450844854,
             "name": "log\\application-2020-06-29-12.log",
             "hash": "3a51611ac7c14fab09ad4b35705d5252"
+        },
+        {
+            "date": 1593459503753,
+            "name": "log\\application-2020-06-29-14.log",
+            "hash": "ff310cd6a8c9ecd85c5c58094745d70b"
+        },
+        {
+            "date": 1593461031494,
+            "name": "log\\application-2020-06-29-15.log",
+            "hash": "e1da753c5db556bd38675268d751038d"
+        },
+        {
+            "date": 1593464479506,
+            "name": "log\\application-2020-06-29-16.log",
+            "hash": "33d37e1cdc1934d20f4517098ba9cdf1"
+        },
+        {
+            "date": 1593468242099,
+            "name": "log\\application-2020-06-29-17.log",
+            "hash": "034c2d153fa8d94f190651018f92bf69"
+        },
+        {
+            "date": 1593475951056,
+            "name": "log\\application-2020-06-29-19.log",
+            "hash": "9d4df00bb26cc3d2b14a4444245169d0"
+        },
+        {
+            "date": 1593521847592,
+            "name": "log\\application-2020-06-30-07.log",
+            "hash": "60c3922548f235aeda256e06b2723ab1"
+        },
+        {
+            "date": 1593522000798,
+            "name": "log\\application-2020-06-30-08.log",
+            "hash": "779291a00e0da1d957765d705852ac8f"
+        },
+        {
+            "date": 1593533659038,
+            "name": "log\\application-2020-06-30-11.log",
+            "hash": "e62e4ce9946c62e8227cd74e2f4e6865"
+        },
+        {
+            "date": 1593537023791,
+            "name": "log\\application-2020-06-30-12.log",
+            "hash": "3bc2016e7aea47416aab08df1a083626"
+        },
+        {
+            "date": 1593540051891,
+            "name": "log\\application-2020-06-30-13.log",
+            "hash": "8912bb1ace6a3a294af07480d3790019"
+        },
+        {
+            "date": 1593543604265,
+            "name": "log\\application-2020-06-30-14.log",
+            "hash": "d511596d30a335e4664ce9c815944241"
         }
     ]
 }

@@ -40,7 +40,7 @@
                         <div class="form-group">
                             <label for="editStatus">Status *</label>
                             <select value.bind="people.selectedPerson.personStatus & validateOnChange" id="editStatus"
-                                class="form-control topMargin" data-style="btn btn-link">
+                                class="form-control selectpicker" data-style="btn btn-link">
                                 <option value="">Select an option</option>
                                 <option repeat.for='status of is4ua.personStatusArray' value="${status.code}">
                                     ${status.description}</option>
@@ -87,7 +87,7 @@
                         <div class="form-group">
                             <label for="editPhone">Institution *</label>
                             <select value.two-way="people.selectedPerson.institutionId  & validateOnChange"
-                                id="editInstitution" class="form-control topMargin">
+                                id="editInstitution" class="form-control selectpicker" data-style="btn btn-link">
                                 <option value="">Select an option</option>
                                 <option repeat.for="institution of people.institutionsArray" value="${institution._id}">
                                     ${institution.name}</option>
@@ -98,7 +98,7 @@
                         <div class="form-group">
                             <label for="editSpecialization">Specialization</label>
                             <select value.two-way="people.selectedPerson.personSpecialization" id="editSpecialization"
-                                class="form-control topMargin">
+                                class="form-control selectpicker" data-style="btn btn-link">
                                 <option value="">Select an option</option>
                                 <option repeat.for="name of is4ua.specialArray" value="${name.code}">${name.description}
                                 </option>
@@ -106,10 +106,10 @@
                         </div>
                     </div>
                     <div class="col">
-                        <div class="form-group" style="height:200px;">
+                        <div class="form-group" ">
                             <label for="editDepartment">Department</label>
-                            <select value.two-way="people.selectedPerson.departmentCategory" id="editDepartment"
-                                class="form-control topMargin">
+                            <select value.bind="people.selectedPerson.departmentCategory" id="editDepartment"
+                                class="form-control selectpicker" data-style="btn btn-link">
                                 <option value="">Select an option</option>
                                 <option repeat.for="name of is4ua.deptArray" value="${name.code}">${name.description}
                                 </option>

@@ -54,5 +54,9 @@ export class AppConfig {
     { country: 'CO', mask: '9999999999999' }
   ];
 
+  SESSION_STATUSES = ["Closed","Active","Requests","Next"];
+
+  SYSTEM_TYPES = ["ERP", "HANA", "BO"];
+
 };
 

@@ -33,7 +33,7 @@
       <div class="row">
         <div class="col-lg-2 topMargin">
           <label class="control-label hideOnPhone">Institution Type</label>
-          <select value.bind="institutionTypeFilter" class="form-control">
+          <select value.bind="institutionTypeFilter" class="form-control selectpicker" data-style="btn btn-link">
             <option value=""></option>
             <option repeat.for="institution of is4ua.institutionTypes" value="${institution.code}"> ${institution.description}</option>
           </select>

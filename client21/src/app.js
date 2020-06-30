@@ -42,6 +42,12 @@ export class App {
         moduleId: PLATFORM.moduleName('./modules/admin/Customers/customers'),
         name: 'customers',
         settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'systems',
+        moduleId: PLATFORM.moduleName('./modules/admin/systems/systems'),
+        name: 'systems',
+        settings: { auth: false, roles: [] }
       }
     ]);
   }

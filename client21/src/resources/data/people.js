@@ -81,6 +81,7 @@ export class People {
         this.editIndex = index;
       } else {
         this.selectedPerson = this.utils.copyObject(this.peopleArray[index]);
+        this.originalPerson = this.utils.copyObject(this.selectedPerson);
         this.editIndex = index;
       }
     }
