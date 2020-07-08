@@ -4,11 +4,11 @@ export class AppConfig {
 
   // DOWNLOAD_URL = this.HOST + '/uploadedFiles', 
 
-  BASE_URL = "http=//localhost/api/";
-  IMG_DOWNLOAD_URL = "http=//localhost/img/";
+  // BASE_URL = "http=//localhost/api/";
+  // IMG_DOWNLOAD_URL = "http=//localhost/img/";
 
-  // BASE_URL = this.HOST + "/api/";
-  // IMG_DOWNLOAD_URL = this.HOST + '/img/';  
+  BASE_URL = this.HOST + "/api/";
+  IMG_DOWNLOAD_URL = this.HOST + '/img/';  
 
 
   INSTITUTIONS_ACTIVE = '01';
