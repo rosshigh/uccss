@@ -6,6 +6,7 @@ export class EditSystem{
     
     constructor(router){
         this.router = router;
+        this.pageTitle = 'System Administration';
     }
 
     attached(){

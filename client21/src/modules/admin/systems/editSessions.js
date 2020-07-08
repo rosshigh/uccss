@@ -1,19 +1,23 @@
 import { inject } from 'aurelia-framework';
 import { ValidationRules, ValidationControllerFactory, validationMessages } from 'aurelia-validation';
+import { DialogService } from 'aurelia-dialog';
+import { ConfirmDialog } from '../../../resources/dialogs/confirm-dialog';
+import { MessageDialog } from '../../../resources/dialogs/message-dialog';
 import { Sessions } from '../../../resources/data/sessions';
 import { AppConfig } from '../../../appConfig';
 import { Store } from '../../../store/store';
 import { Utils } from '../../../resources/utils/utils';
 
-@inject(ValidationControllerFactory, Sessions, AppConfig, Store, Utils)
+@inject(ValidationControllerFactory, Sessions, AppConfig, Store, Utils, DialogService)
 export class EditSessions {
 
-    constructor(ValidationControllerFactory, sessions, config, store, utils) {
+    constructor(ValidationControllerFactory, sessions, config, store, utils, dialogService) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
         this.sessions = sessions;
         this.config = config;
         this.store = store;
         this.utils = utils;
+        this.dialogService = dialogService;
 
         this.configParameters = this.store.getConfig();
 
@@ -33,7 +37,6 @@ export class EditSessions {
     async activate() {
         let responses = await Promise.all([
             this.sessions.getSessionsArray('?order=startDate:DSC'),
-            this.sessions.getSessionParameters()
         ]);
     }
 
@@ -77,7 +80,12 @@ export class EditSessions {
                 if (result.valid) {
                     this.saveSession();
                 } else {
-                    $("#fixErrors").modal();
+                    let message = 'You must fix the errors before you can save the system?';
+                    let title = "Fix Errors";
+                    let options = ['Ok'];
+                    this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+                        return;
+                    });
                 }
             });
     }
@@ -153,8 +161,16 @@ export class EditSessions {
 
     back() {
         if (this.sessions.isSessionDirty().length) {
-            this.modalMessage = "Do you want to save the session?"
-            $("#objectChanged").modal()
+            let message = 'Do you want to save the session?';
+            let title = "Save Session";
+            let options = {};
+            this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+                if (!response.wasCancelled) {
+                    this.saveSession();
+                } else {
+                    this.goBack();
+                }
+            });
         } else {
             this.goBack();
         }

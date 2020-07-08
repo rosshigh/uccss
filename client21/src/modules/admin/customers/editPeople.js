@@ -1,24 +1,28 @@
 import { inject } from 'aurelia-framework';
 import { ValidationRules, ValidationControllerFactory, validationMessages } from 'aurelia-validation';
+import { DialogService } from 'aurelia-dialog';
+import { ConfirmDialog } from '../../../resources/dialogs/confirm-dialog';
+import { MessageDialog } from '../../../resources/dialogs/message-dialog';
 import { People } from '../../../resources/data/people';
 import { is4ua } from '../../../resources/data/is4ua';
 import { AppConfig } from '../../../appConfig';
 import { Store } from '../../../store/store';
 import { Utils } from '../../../resources/utils/utils';
 
-@inject(ValidationControllerFactory, People, is4ua, AppConfig, Store, Utils)
+@inject(ValidationControllerFactory, People, is4ua, AppConfig, Store, Utils, DialogService)
 export class EditPeople {
 
     pageSize = 200;
     defaultPhoneMask = "999-999-9999";
 
-    constructor(ValidationControllerFactory, people, is4ua, config, store, utils) {
+    constructor(ValidationControllerFactory, people, is4ua, config, store, utils, dialogService) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
         this.people = people;
         this.is4ua = is4ua;
         this.config = config;
         this.store = store;
         this.utils = utils;
+        this.dialogService = dialogService;
 
         this.configParameters = this.store.getConfig();
 
@@ -92,7 +96,12 @@ export class EditPeople {
                 if (result.valid) {
                     this.savePerson();
                 } else {
-                    $("#fixErrors").modal();
+                     let message = 'You must fix the errors before you can save the system?';
+                     let title = "Fix Errors";
+                     let options = ['Ok'];
+                     this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+                         return;
+                     });
                 }
             });
     }
@@ -109,11 +118,31 @@ export class EditPeople {
             }
             this._cleanUp();
         } else {
-            $("#fixErrors").modal();
+             let message = 'You must fix the errors before you can save the system?';
+             let title = "Fix Errors";
+             let options = ['Ok'];
+             this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+                 return;
+             });
         }
     }
 
     async delete() {
+        let message = 'Are you sure you want to delete this person?';
+        let title = "Confirm Delete";
+        let options = {};
+        this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+            if (!response.wasCancelled) {
+                this.deletePersion();
+            } else {
+                this.goBack();
+            }
+        });
+
+      
+    }
+
+    async deletePersion(){
         var name = this.people.selectedPerson.fullName;
         let serverResponse = await this.people.deletePerson();
         if (!serverResponse.error) {
@@ -125,8 +154,16 @@ export class EditPeople {
 
     back() {
         if (this.people.isPersonDirty(this.people.selectedPerson).length) {
-            this.modalMessage = "Do you want to save the person's record?"
-            $("#objectChanged").modal()
+            let message = 'Do you want to save the system?';
+            let title = "Save System";
+            let options = {};
+            this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+                if (!response.wasCancelled) {
+                    this.save();
+                } else {
+                    this.goBack();
+                }
+            });
         } else {
             this.goBack();
         }

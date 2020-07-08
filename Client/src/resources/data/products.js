@@ -1,11 +1,11 @@
-import {inject} from 'aurelia-framework';
-import {DataServices} from './dataServices';
-import {Utils} from '../utils/utils';
+import { inject } from 'aurelia-framework';
+import { DataServices } from './dataServices';
+import { Utils } from '../utils/utils';
 
 @inject(DataServices, Utils)
 export class Products {
-   
-   	PRODUCTS_SERVICE = 'products';
+
+    PRODUCTS_SERVICE = 'products';
 
     constructor(data, utils) {
         this.data = data;
@@ -27,6 +27,7 @@ export class Products {
         }
     }
 
+   
     async getProduct(index){
         if(index){
             let id = this.productsArray[index]._id;
@@ -57,13 +58,13 @@ export class Products {
         }
     }
 
-    selectedProductFromId(id){
+    selectedProductFromId(id) {
         this.selectedProduct = this.emptyProduct();
         this.productsArray.forEach((item) => {
-          if(item._id === id){
-            this.selectedProduct = this.utils.copyObject(item);
-            return;
-          }
+            if (item._id === id) {
+                this.selectedProduct = this.utils.copyObject(item);
+                return;
+            }
         });
         return null;
     }
@@ -90,16 +91,16 @@ export class Products {
         return newProduct;
     }
 
-    getProductInfo(id){
-        if(!id) return null;
-        for(var i = 0; i < this.productsArray.length; i++){
-            if(this.productsArray[i]._id === id){
-                if(this.productsArray[i].productDescription) {
+    getProductInfo(id) {
+        if (!id) return null;
+        for (var i = 0; i < this.productsArray.length; i++) {
+            if (this.productsArray[i]._id === id) {
+                if (this.productsArray[i].productDescription) {
                     return {
-                                info: this.productsArray[i].productDescription,
-                                productId: id,
-                                header: this.productsArray[i].name
-                            }
+                        info: this.productsArray[i].productDescription,
+                        productId: id,
+                        header: this.productsArray[i].name
+                    }
                 } else {
                     return null;
                 }
@@ -109,18 +110,18 @@ export class Products {
     }
 
     async saveProduct() {
-        if(!this.selectedProduct){
+        if (!this.selectedProduct) {
             return;
         }
 
-        if(!this.selectedProduct._id){
+        if (!this.selectedProduct._id) {
             let serverResponse = await this.data.saveObject(this.selectedProduct, this.PRODUCTS_SERVICE, "post");
             if (!serverResponse.error) {
                 this.productsArray.push(serverResponse);
                 this.editIndex = this.productsArray.length - 1;
             } else {
                 this.data.processError(serverResponse, "There was an error creating the product.");
-                }
+            }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedProduct, this.PRODUCTS_SERVICE, "put");
@@ -128,24 +129,24 @@ export class Products {
                 this.productsArray[this.editIndex] = this.utils.copyObject(this.selectedProduct, this.productsArray[this.editIndex]);
             } else {
                 this.data.processError(serverResponse, "There was an error updating the product.");
-                }
+            }
             return serverResponse;
         }
 
     }
 
-    async deleteProduct(){
-         let serverResponse = await this.data.deleteObject(this.PRODUCTS_SERVICE + '/' + this.selectedProduct._id);
-            if (!serverResponse.error) {
-                this.productsArray.splice(this.editIndex, 1);
-                this.editIndex = - 1;
-            }
-            return serverResponse;
+    async deleteProduct() {
+        let serverResponse = await this.data.deleteObject(this.PRODUCTS_SERVICE + '/' + this.selectedProduct._id);
+        if (!serverResponse.error) {
+            this.productsArray.splice(this.editIndex, 1);
+            this.editIndex = - 1;
+        }
+        return serverResponse;
     }
 
-    isDirty(){
-        if(this.selectedProduct){
-            if(this.selectedProduct._id){
+    isDirty() {
+        if (this.selectedProduct) {
+            if (this.selectedProduct._id) {
                 var obj = this.productsArray[this.editIndex];
             } else {
                 var obj = this.emptyProduct();

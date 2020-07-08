@@ -1,25 +1,27 @@
 import { inject } from 'aurelia-framework';
 import { ValidationRules, ValidationControllerFactory, validationMessages } from 'aurelia-validation';
+import { DialogService } from 'aurelia-dialog';
+import { ConfirmDialog } from '../../../resources/dialogs/confirm-dialog';
+import { MessageDialog } from '../../../resources/dialogs/message-dialog';
 import { People } from '../../../resources/data/people';
 import { is4ua } from '../../../resources/data/is4ua';
 import { AppConfig } from '../../../appConfig';
 import { Store } from '../../../store/store';
 import { Utils } from '../../../resources/utils/utils';
-import Validation from '../../../resources/utils/validation';
 
-@inject(ValidationControllerFactory, People, is4ua, AppConfig, Store, Utils, Validation)
+@inject(ValidationControllerFactory, People, is4ua, AppConfig, Store, Utils, DialogService)
 export class EditInstitutions {
 
     pageSize = 200;
 
-    constructor(ValidationControllerFactory, people, is4ua, config, store, utils, validation) {
+    constructor(ValidationControllerFactory, people, is4ua, config, store, utils, dialogService) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
         this.people = people;
         this.is4ua = is4ua;
         this.config = config;
         this.store = store;
         this.utils = utils;
-        this.validation = validation;
+        this.dialogService = dialogService;
 
         this.configParameters = this.store.getConfig();
 
@@ -87,7 +89,12 @@ export class EditInstitutions {
                 if (result.valid) {
                     this.saveInstitution();
                 } else {
-                    $("#fixErrors").modal();
+                    let message = 'You must fix the errors before you can save the system?';
+                    let title = "Fix Errors";
+                    let options = ['Ok'];
+                    this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+                        return;
+                    });
                 }
             });
     }
@@ -104,6 +111,19 @@ export class EditInstitutions {
     }
 
     async delete() {
+        let message = 'Are you sure you want to delete the institution?';
+        let title = "Confirm Delete";
+        let options = {};
+        this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+            if (!response.wasCancelled) {
+                this.deleteInstitution();
+            } else {
+                this.goBack();
+            }
+        });
+    }
+
+    async deleteInstitution(){
         var name = this.people.selectedPerson.fullName;
         let serverResponse = await this.people.deletePerson();
         if (!serverResponse.error) {
@@ -115,8 +135,16 @@ export class EditInstitutions {
 
     back() {
         if (this.people.isInstitutionDirty(this.people.selectedInstitution).length) {
-            this.modalMessage = "Do you want to save the institution?";
-            $("#objectChanged").modal()
+            let message = 'Do you want to save the institution?';
+            let title = "Save Instituion";
+            let options = {};
+            this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+                if (!response.wasCancelled) {
+                    this.save();
+                } else {
+                    this.goBack();
+                }
+            });
         } else {
             this.goBack();
         }

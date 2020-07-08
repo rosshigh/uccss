@@ -10,7 +10,8 @@ export function configure(aurelia) {
     .globalResources(PLATFORM.moduleName("aurelia-mask/dist/masked-input"))
     .plugin(PLATFORM.moduleName('au-table'))
     .plugin(PLATFORM.moduleName("aurelia-validation"))
-  .plugin(PLATFORM.moduleName("aurelia-validatejs"))
+    .plugin(PLATFORM.moduleName("aurelia-validatejs"))
+    .plugin(PLATFORM.moduleName('aurelia-dialog'))
     .feature(PLATFORM.moduleName('resources/index'));
 
   aurelia.use.developmentLogging(environment.debug ? 'debug' : 'warn');
@@ -24,6 +25,6 @@ export function configure(aurelia) {
     let root = userObj ? 'app' : 'home';
     aurelia.setRoot(PLATFORM.moduleName(root))
   });
-  
+
   // aurelia.start().then(() => aurelia.setRoot(PLATFORM.moduleName('app')));
 }

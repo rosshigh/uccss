@@ -4,11 +4,11 @@ export class AppConfig {
 
   // DOWNLOAD_URL = this.HOST + '/uploadedFiles', 
 
-  // BASE_URL = "http=//localhost/api/";
-  // IMG_DOWNLOAD_URL = "http=//localhost/img/";
+  BASE_URL = "http=//localhost/api/";
+  IMG_DOWNLOAD_URL = "http=//localhost/img/";
 
-  BASE_URL = this.HOST + "/api/";
-  IMG_DOWNLOAD_URL = this.HOST + '/img/';  
+  // BASE_URL = this.HOST + "/api/";
+  // IMG_DOWNLOAD_URL = this.HOST + '/img/';  
 
 
   INSTITUTIONS_ACTIVE = '01';
@@ -42,8 +42,8 @@ export class AppConfig {
   PROV_USER = 1;
 
   USER_STATUS = [
-    {code: "01", description: "Active"},
-    {code: "02", description: "Inactive"}
+    { code: "01", description: "Active" },
+    { code: "02", description: "Inactive" }
   ]
 
   PHONE_MASKS = [
@@ -54,9 +54,27 @@ export class AppConfig {
     { country: 'CO', mask: '9999999999999' }
   ];
 
-  SESSION_STATUSES = ["Closed","Active","Requests","Next"];
+  SESSION_STATUSES = ["Closed", "Active", "Requests", "Next"];
 
   SYSTEM_TYPES = ["ERP", "HANA", "BO"];
+
+  SANDBOX_ID = 'a1a1a1a1a1a1a1a1a1a1a1a1';      //Name used for sandbox requests
+  SANDBOX_NAME = "Trial Client"
+  ASSIGNED_CLIENT_CODE = 4;
+  UNASSIGNED_CLIENT_CODE = 1;
+  SHARED_CLIENT_CODE = 2;
+  REFRESHED_CLIENT_CODE = 3;
+  SANDBOX_CLIENT_CODE = 5;
+  RETIRED_CLIENT_CODE = 6;
+  CLIENT_STATUSES = [
+    { code: this.ASSIGNED_CLIENT_CODE, description: "Assigned", OKToDelete: false, lock: true },
+    { code: this.REFRESHED_CLIENT_CODE, description: "Refresh", OKToDelete: true, lock: true },
+    { code: this.RETIRED_CLIENT_CODE, description: "Retired", OKToDelete: false, lock: false },
+    { code: this.SHARED_CLIENT_CODE, description: "Shared", OKToDelete: false, lock: false },
+    { code: this.UNASSIGNED_CLIENT_CODE, description: "Unassigned", OKToDelete: true, lock: false },
+    { code: this.SANDBOX_CLIENT_CODE, description: this.SANDBOX_NAME, OKToDelete: false, lock: false },
+  ];
+
 
 };
 

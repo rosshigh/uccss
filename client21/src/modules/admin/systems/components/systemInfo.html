@@ -6,12 +6,23 @@
         <div class="card-body">
             <div class="row">
                 <div class="col">
-                    <div class="form-group">
-                        <div class="col-sm-10">
-                            <div class="checkbox">
-                                <label>
-                                    <input checked.bind="systems.selectedSystem.apj" type="checkbox"> APJ
-                                </label>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <label>
+                                        <input checked.bind="systems.selectedSystem.active" type="checkbox"> Active
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <label>
+                                        <input checked.bind="systems.selectedSystem.apj" type="checkbox"> APJ
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -55,13 +66,12 @@
                 </div>
                 <div class="col">
                     <label for="editIts" class="form-control-label">URL</label>
-                    <input value.bind="systems.selectedSystem.its" id="editIts" class="form-control" 
-                        type="text" />
+                    <input value.bind="systems.selectedSystem.its" id="editIts" class="form-control" type="text" />
                 </div>
                 <div class="col">
                     <label>Sessions</label>
                     <select class="form-control selectpicker" id="sessions" multiple data-style="btn btn-link"
-                        value.bind="selectedSessions">
+                        value.bind="systems.selectedSystem.sessions">
                         <option model.bind="session.session" repeat.for="session of sessions.SESSION_PARAMS">
                             ${session.session}</option>
                     </select>

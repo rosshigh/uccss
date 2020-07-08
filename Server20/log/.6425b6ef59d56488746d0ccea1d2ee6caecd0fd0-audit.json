@@ -6,41 +6,6 @@
     "auditLog": "log\\.6425b6ef59d56488746d0ccea1d2ee6caecd0fd0-audit.json",
     "files": [
         {
-            "date": 1592407432092,
-            "name": "log\\error-2020-06-17-10.log",
-            "hash": "6e4684c950c3a4572c8abde93652ae4b"
-        },
-        {
-            "date": 1592836826834,
-            "name": "log\\error-2020-06-22-09.log",
-            "hash": "a0ed2cab9af9f4dffed525303b8d0f11"
-        },
-        {
-            "date": 1592851351461,
-            "name": "log\\error-2020-06-22-13.log",
-            "hash": "1700a64495379c34e823d2697c75a374"
-        },
-        {
-            "date": 1592852496120,
-            "name": "log\\error-2020-06-22-14.log",
-            "hash": "ac5380cd04cdee5416260ea947dd9803"
-        },
-        {
-            "date": 1592856311405,
-            "name": "log\\error-2020-06-22-15.log",
-            "hash": "c79748ed54876c07cadddff5ed17051d"
-        },
-        {
-            "date": 1592860029537,
-            "name": "log\\error-2020-06-22-16.log",
-            "hash": "8af2ebadb4809950c4837315e65b35fe"
-        },
-        {
-            "date": 1592927829732,
-            "name": "log\\error-2020-06-23-10.log",
-            "hash": "7dd8be23686f39048839f01d6f3ef9fe"
-        },
-        {
             "date": 1593006976892,
             "name": "log\\error-2020-06-24-08.log",
             "hash": "38dffe4bae7481b6e6f978c8e1e05a97"
@@ -114,6 +79,41 @@
             "date": 1593543604262,
             "name": "log\\error-2020-06-30-14.log",
             "hash": "e762100380a433495894bd16f8a34971"
+        },
+        {
+            "date": 1594048446718,
+            "name": "log\\error-2020-07-06-10.log",
+            "hash": "b85f93ac11bef7133e15ebc0deae8e6c"
+        },
+        {
+            "date": 1594051914772,
+            "name": "log\\error-2020-07-06-11.log",
+            "hash": "4fbb06d724384ec39ed950f9e6f21ace"
+        },
+        {
+            "date": 1594058270062,
+            "name": "log\\error-2020-07-06-12.log",
+            "hash": "ee0facdaa5ef0477a82cb6df61f53435"
+        },
+        {
+            "date": 1594060093128,
+            "name": "log\\error-2020-07-06-13.log",
+            "hash": "dcbd5805d571618d65cb49a5d1a4842b"
+        },
+        {
+            "date": 1594129953861,
+            "name": "log\\error-2020-07-07-08.log",
+            "hash": "8f9fcbfe86e40a9e9d669ecc9d3eb5d7"
+        },
+        {
+            "date": 1594130612835,
+            "name": "log\\error-2020-07-07-09.log",
+            "hash": "1059454dba2d5063eff17d188883ab50"
+        },
+        {
+            "date": 1594141573319,
+            "name": "log\\error-2020-07-07-12.log",
+            "hash": "e3d6c5146e05a4f68328cd909114ffb1"
         }
     ]
 }

@@ -10,6 +10,7 @@ export function configure(config) {
     PLATFORM.moduleName('./value-converters/activate-button'),
     PLATFORM.moduleName('./value-converters/date-format'),
     PLATFORM.moduleName('./value-converters/session-status-button'),
-    PLATFORM.moduleName('./value-converters/translate-status')
+    PLATFORM.moduleName('./value-converters/translate-status'),
+    PLATFORM.moduleName('./value-converters/system-list')
   ]);
 }

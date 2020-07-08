@@ -1,0 +1,43 @@
+<template>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Product Information</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <label>
+                                        <input checked.bind="products.selectedObject.active" type="checkbox"> Active
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <label>
+                                        <input checked.bind="products.selectedObject.apj" type="checkbox"> APJ
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label for="sid">Name *</label>
+                        <input value.bind="products.selectedObject.name & validateOnChange" type="text"
+                            class="form-control" id="name" aria-describedby="nameHelp">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <compose view="./productAssignments.html"></compose>
+    </div>
+</template>

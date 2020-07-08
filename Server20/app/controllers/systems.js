@@ -16,7 +16,8 @@ module.exports = function (app) {
     logger.log('info', 'Get systems');
     var query = buildQuery(req.query, System.find())
     await query
-      .populate({ path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName' })
+    .select('sid description server instance active')
+      // .populate({ path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName' })
       .exec().then(result => {
         res.status(200).json(result);
       })
@@ -60,6 +61,12 @@ module.exports = function (app) {
     } else {
       return next(error);
     }
+  }));
+
+  router.delete('/systems/:id', asyncHandler(async (req, res) => {
+    await System.remove({ _id: req.params.id }).then(result => {
+      res.status(200).json(result);
+    })
   }));
 
 }

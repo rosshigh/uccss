@@ -1,3 +1,8 @@
 <template>
-    
+    <div show.bind="view === 'table'">
+        <compose view="./components/productsTable.html"></compose>
+    </div>
+    <div show.bind="view === 'form'">
+        <compose view="./components/productsForm.html"></compose>
+    </div>
 </template>

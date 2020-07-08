@@ -6,27 +6,27 @@
                 <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
 
                 <table class="table table-striped"
-                    aurelia-table="data.bind: systems.systemsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+                    aurelia-table="data.bind: products.productsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
                     <thead>
                         <tr>
                             <compose view='./systemsTableToolbar.html'></compose>
                         </tr>
                         <tr>
-                            <th colspan="2">
+                            <th>
                                 <div class='col'>
                                     <div class="form-group">
                                         <input type="text" value.bind="filters[0].value"
-                                            placeholder="Filter SID, Description, and Server" class="form-control"
+                                            placeholder="Filter Name and Systems" class="form-control"
                                             id='filterField' />
                                     </div>
                                 </div>
                             </th>
-                            <th></th>
+                           
                             <th></th>
 
                             <th colspan="2">
                                 <div class='col'>
-                                        <select value.bind="filters[1].value" class="form-control selectpicker" id="personStatus" data-style="btn btn-link">
+                                        <select value.bind="filters[1].value" class="form-control" id="personStatus" data-style="btn btn-link">
                                             <option value=true>Active</option>
                                             <option value=false>Inactive</option>
                                         </select>
@@ -36,21 +36,17 @@
                         </tr>
 
                         <tr>
-                            <th style="width:10rem;" aut-sort="key: sid">SID</th>
-                            <th style="width:20rem;" aut-sort="key: description">Description</th>
-                            <th style="width:20rem;" aut-sort="key: server">Server</th>
-                            <th style="width:20rem;" aut-sort="key: instance">Instance</th>
-                            <th style="width:15rem;">Status</th>
+                            <th style="width:30rem;" aut-sort="key: name">Name</th>
+                            <th style="width:20rem;" aut-sort="key: systemList">Systems</th>
+                            <th style="width:20rem;" >Status</th>
                         </tr>
                     </thead>
                     
                     <tbody>
-                        <tr repeat.for="system of $displayData" >
-                            <td click.delegate="edit(system)" style="width:10rem;" >${system.sid}</td>
-                            <td click.delegate="edit(system)" style="width:20rem;" >${system.description}</td>
-                            <td click.delegate="edit(system)" style="width:20rem;" >${system.server}</td>
-                            <td style="width:20rem;" > ${system.instance}</td>
-                            <td click.delegate="edit(system)" style="width:15rem;">${system.active | translateStatus}
+                        <tr repeat.for="product of $displayData" >
+                            <td click.delegate="edit(product)" style="width:30rem;" >${product.name}</td>
+                            <td click.delegate="edit(product)" style="width:20rem;" >${product.systemList}</td>
+                            <td click.delegate="edit(product)" style="width:15rem;">${product.active | translateStatus}
                         </tr>
                     </tbody>
                
