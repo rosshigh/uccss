@@ -14,6 +14,15 @@ export class EditProducts {
 
     pageSize = 200;
 
+    toolbar = [
+        ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
+        ['color', ['color']],
+        ['font', ['strikethrough', 'superscript', 'subscript']],
+        ['layout', ['ul', 'ol', 'paragraph']],
+        ['insert', ['link', 'table', 'hello']],
+        ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
+      ];
+
     constructor(ValidationControllerFactory, products, systems, config, store, utils, dialog) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
         this.products = products;
@@ -44,8 +53,8 @@ export class EditProducts {
 
     calculateSystemList() {
         let list;
-        if (this.products.productsArray) {
-            this.products.productsArray.forEach(item => {
+        if (this.products.objectsArray) {
+            this.products.objectsArray.forEach(item => {
                 list = "";
                 item.systems.forEach(system => {
                     list += system.sid + " "
@@ -241,6 +250,8 @@ export class EditProducts {
             if (!this._systemAlreadySelected(system.sid)) {
                 this.products.selectedObject.systems.push({ sid: system.sid, systemId: system._id });
             }
+        }else {
+            this.utils.showNotification("You can edit the system unless you click enable.", 'error');
         }
     }
 
@@ -259,6 +270,8 @@ export class EditProducts {
                     break;
                 }
             }
+        } else {
+            this.utils.showNotification("You can edit the system unless you click enable.", 'error');
         }
     }
 

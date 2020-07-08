@@ -3,7 +3,7 @@
         <div class="card-body">
             <div class='col-lg-10 offset-lg-1 bottomMargin'>
                 <table class="table table-striped"
-                    aurelia-table="data.bind: systems.selectedSystem.clients; display-data.bind: $displayData; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+                    aurelia-table="data.bind: systems.selectedObject.clients; display-data.bind: $displayData; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
                     <!-- filters.bind: filters; -->
                     <thead>
                         <tr>
@@ -22,7 +22,7 @@
                         <tr repeat.for="client of $displayData" >
                             <td click.delegate="editClient(client, $index)" style="width:10rem;" >${client.client}</td>
                             <td click.delegate="editClient(client, $index)" style="width:20rem;" >${client.productId |
-                                lookupValue:products.productsArray:"_id":"name"}</td>
+                                lookupValue:products.objectsArray:"_id":"name"}</td>
                             <td click.delegate="editClient(client, $index)" style="width:20rem;" >${client.assignments.length}</td>
                             <td click.delegate="editClient(client, $index)" style="width:20rem;" > ${client.clientStatus |
                                 lookupValue:config.CLIENT_STATUSES:"code":"description"}</td>                           

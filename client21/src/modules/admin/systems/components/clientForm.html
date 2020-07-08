@@ -22,7 +22,7 @@
                     <label for="productID">Product</label>
                     <select class="form-control" value.bind="selectedClient.productId" data-style="btn btn-link">
                         <option value="">Choose a product</option>
-                        <option repeat.for="product of products.productsArray" model.bind="product._id">${product.name}
+                        <option repeat.for="product of products.objectsArray" model.bind="product._id">${product.name}
                         </option>
                     </select>
                 </div>

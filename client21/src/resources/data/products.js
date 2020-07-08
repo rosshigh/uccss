@@ -18,7 +18,7 @@ export class Products {
         try {
             let serverResponse = await this.data.get(url);
             if (!serverResponse.error) {
-                this.productsArray = serverResponse;
+                this.objectsArray = serverResponse;
             }
         } catch (error) {
             console.log(error);
@@ -41,7 +41,7 @@ export class Products {
     }
 
 
-    selectProduct(index) {
+    selectObject(index) {
         if (index === undefined) {
             this.selectedObject = this.emptyProduct();
             this.newSystem = true;
@@ -62,8 +62,8 @@ export class Products {
     selectedObjectFromId(id) {
         this.selectedObject = this.emptyProduct();
         for (let i = 0; i < this.productsArray.length; i++) {
-            if (this.productsArray[i]._id === id) {
-                this.selectedObject = this.utils.copyObject(this.productsArray[i]);
+            if (this.objectsArray[i]._id === id) {
+                this.selectedObject = this.utils.copyObject(this.objectsArray[i]);
                 return i;
             }
         }

@@ -40,8 +40,8 @@ export class EditSystems {
 
     async activate() {
         let responses = await Promise.all([
-            this.systems.getSystemsArray('?order=sid'),
-            this.products.getProductsArray('?filter=active|eq|true&order=name'),
+            this.systems.getObjectsArray('?order=sid'),
+            this.products.getObjectsArray('?filter=active|eq|true&order=name'),
             this.sessions.getSessionParameters()
         ]);
     }
@@ -54,17 +54,17 @@ export class EditSystems {
 
     async refresh() {
         this.clearFilters();
-        await this.systems.getSystemsArray('?order=sid')
+        await this.systems.getObjectsArray('?order=sid')
     }
 
     new() {
-        this.systems.selectSystem();
+        this.systems.selectObject();
         this.createValidationRules();
         this.view = 'form';
     }
 
     async edit(system) {
-        await this.systems.getSystem(system._id);
+        await this.systems.getObject(system._id);
         this.createValidationRules();
         this.saveFilterValues();
         this.view = 'form';
@@ -91,7 +91,7 @@ export class EditSystems {
         ValidationRules
             .ensure('sid').displayName('a SID').required()
             .ensure('description').displayName('a Description').required()
-            .on(this.systems.selectedSystem);
+            .on(this.systems.selectedObject);
     }
 
     async save() {
@@ -111,22 +111,14 @@ export class EditSystems {
     }
 
     async saveSystem() {
-        let serverResponse = await this.systems.saveSystem();
+        let serverResponse = await this.systems.saveObject();
         if (!serverResponse.error) {
             this.utils.showNotification("The system was updated");
             this.productsToSave.forEach(item => {
-                this.products.selectProduct(item)
-                this.products.saveProduct();
+                this.products.selectObject(item)
+                this.products.saveObject();
             })
             this.productsToSave = [];
-                // if( this.productsToUpdate &&  this.productsToUpdate.length > 0){
-                //     this.productsToUpdate.forEach(item => {
-                //         this.products.selectedProductFromId(item._id);
-                //         this.products.selectedProduct.systems = item.systems;
-                //         this.products.saveProduct()
-                //     });
-                //     this.productsToUpdate = new Array();
-                // }
         } else {
             this.utils.showNotification("There was a problem saving the system", 'error');
         }
@@ -147,8 +139,8 @@ export class EditSystems {
     }
 
     async deleteSystem() {
-        var name = this.systems.selectedSystem.sid;
-        let serverResponse = await this.systems.deleteSystem();
+        var name = this.systems.selectedObject.sid;
+        let serverResponse = await this.systems.deleteObject();
         if (!serverResponse.error) {
             this.utils.showNotification(name + " was deleted");
         }
@@ -156,7 +148,7 @@ export class EditSystems {
     }
 
     back() {
-        if (this.systems.isSystemDirty().length) {
+        if (this.systems.isObjectDirty().length) {
             let message = 'Do you want to save the system?';
             let title = "Save System";
             let options = {};
@@ -180,7 +172,7 @@ export class EditSystems {
     }
 
     cancel() {
-        this.systems.selectedSystemById(this.systems.selectedSystem._id);
+        this.systems.selectedObjectById(this.systems.selectedObject._id);
     }
 
     editClientsButton() {
@@ -236,27 +228,27 @@ export class EditSystems {
         if (result.error) {
             this.utils.showNotification(result.error, 'error');
         } else {
-            let indexOfProduct = this.products.selectedProductFromId(this.selectedProduct);
+            let indexOfProduct = this.products.selectedObjectFromId(this.selectedProduct);
             this.saveProduct = true;
-            if (this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
-                this.products.selectedProduct.systems.forEach(item => {
-                    if (item.sid === this.systems.selectedSystem.sid) this.saveProduct = false;
+            if (this.products.selectedObject.systems && this.products.selectedObject.systems.length > 0) {
+                this.products.selectedObject.systems.forEach(item => {
+                    if (item.sid === this.systems.selectedObject.sid) this.saveProduct = false;
                 })
             }
             if (this.saveProduct) {
-                this.products.selectedProduct.systems.push({ systemId: this.systems.selectedSystem._id, sid: this.systems.selectedSystem.sid });
+                this.products.selectedObject.systems.push({ systemId: this.systems.selectedObject._id, sid: this.systems.selectedObject.sid });
                 if(this.productsToSave.indexOf(indexOfProduct) === -1) this.productsToSave.push(indexOfProduct);
             }
         }
     }
 
     generateAllClients(start, end, interval) {
-        this.systems.selectedSystem.clients = this.systems.selectedSystem.clients || new Array();
-        let lastClientIndex = this.systems.selectedSystem.clients.length - 1;
+        this.systems.selectedObject.clients = this.systems.selectedObject.clients || new Array();
+        let lastClientIndex = this.systems.selectedObject.clients.length - 1;
         if (start > 0 && end > 0 && end >= start) {
             for (let i = start; i <= end; i += interval) {
                 if (lastClientIndex === -1 || this._findClient(i, 0, lastClientIndex) < 0) {
-                    this.systems.selectedSystem.clients.push(this.systems.emptyClient(i, this.editClientStatus, this.selectedProduct, this.idsAvailable));
+                    this.systems.selectedObject.clients.push(this.systems.emptyClient(i, this.editClientStatus, this.selectedProduct, this.idsAvailable));
                 }
             }
             return true;
@@ -268,7 +260,7 @@ export class EditSystems {
     _findClient(client, start, end) {
         if (end >= 0) {
             for (let i = start; i <= end; i++) {
-                if (this.systems.selectedSystem.clients[i].client == client) return i;
+                if (this.systems.selectedObject.clients[i].client == client) return i;
             }
         }
         return -1;
@@ -287,7 +279,7 @@ export class EditSystems {
     }
 
     executeRefreshAllClients() {
-        this.systems.selectedSystem.clients.forEach((item, index) => {
+        this.systems.selectedObject.clients.forEach((item, index) => {
             this.selectedIndex = index;
             this.executeRefreshClient();
         })
@@ -299,14 +291,14 @@ export class EditSystems {
         let options = {};
         this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
             if (!response.wasCancelled) {
-                let productToUpdate = this.systems.selectedSystem.clients[0].productId;
+                let productToUpdate = this.systems.selectedObject.clients[0].productId;
                 this.executeDeleteAllClients();
-                let indexOfProduct = this.products.selectedProductFromId(productToUpdate);
+                let indexOfProduct = this.products.selectedObjectFromId(productToUpdate);
                 this.saveProduct = false;
-                if (this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
-                    this.products.selectedProduct.systems.forEach((item, index) => {
-                        if (item.sid === this.systems.selectedSystem.sid) {
-                            this.products.selectedProduct.systems.splice(index, 1);
+                if (this.products.selectedObject.systems && this.products.selectedObject.systems.length > 0) {
+                    this.products.selectedObject.systems.forEach((item, index) => {
+                        if (item.sid === this.systems.selectedObject.sid) {
+                            this.products.selectedObject.systems.splice(index, 1);
                             this.saveProduct = true;
                         }
                     })
@@ -320,7 +312,7 @@ export class EditSystems {
     }
 
     executeDeleteAllClients() {
-        this.systems.selectedSystem.clients = [];
+        this.systems.selectedObject.clients = [];
     }
 
     updateAllProducts() {
@@ -342,24 +334,24 @@ export class EditSystems {
 
     executeUpdateAllProducts() {
         this.selectProduct();
-        if (this.products.selectedProduct._id) {
-            let newProductId = this.products.selectedProduct._id;
-            this.systems.selectedSystem.clients.forEach((item, index) => {
+        if (this.products.selectedObject._id) {
+            let newProductId = this.products.selectedObject._id;
+            this.systems.selectedObject.clients.forEach((item, index) => {
                 item.productId = newProductId;
             })
         }
     }
 
     selectProduct() {
-        this.products.selectedProductFromId(this.selectedProduct);
+        this.products.selectedObjectFromId(this.selectedProduct);
         // if (this.products.selectedProduct) this.idsAvailable = this.products.selectedProduct.idsAvailable ? this.products.selectedProduct.idsAvailable : 0;
     }
 
     toggleSandBox() {
-        if (this.systems.selectedSystem.clients[this.selectedIndex].assignments.length > 0) {
+        if (this.systems.selectedObject.clients[this.selectedIndex].assignments.length > 0) {
             this.utils.showNotification("The client has assignments. You must refresh it before changing it's status", 'warning');
         } else {
-            this.systems.selectedSystem.clients[this.selectedIndex].clientStatus = this.systems.selectedSystem.clients[this.selectedIndex].clientStatus == this.config.SANDBOX_CLIENT_CODE ? this.config.UNASSIGNED_CLIENT_CODE : this.config.SANDBOX_CLIENT_CODE;
+            this.systems.selectedObject.clients[this.selectedIndex].clientStatus = this.systems.selectedObject.clients[this.selectedIndex].clientStatus == this.config.SANDBOX_CLIENT_CODE ? this.config.UNASSIGNED_CLIENT_CODE : this.config.SANDBOX_CLIENT_CODE;
         }
 
     }
@@ -377,9 +369,9 @@ export class EditSystems {
     }
 
     executeRefreshClient() {
-        this.systems.selectedSystem.clients[this.selectedIndex].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
-        this.systems.selectedSystem.clients[this.selectedIndex].assignments = new Array();
-        this.systems.selectedSystem.clients[this.selectedIndex].idsAvailable = this.systems.selectedSystem.idsAvailable;
+        this.systems.selectedObject.clients[this.selectedIndex].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
+        this.systems.selectedObject.clients[this.selectedIndex].assignments = new Array();
+        this.systems.selectedObject.clients[this.selectedIndex].idsAvailable = this.systems.selectedObject.idsAvailable;
     }
 
     deleteClient() {
@@ -388,7 +380,7 @@ export class EditSystems {
         let options = {};
         this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
             if (!response.wasCancelled) {
-                this.systems.selectedSystem.clients.splice(this.selectedIndex, 1);
+                this.systems.selectedObject.clients.splice(this.selectedIndex, 1);
                 this.backToClientTable();
             } else {
             }

@@ -30,13 +30,13 @@ export class Systems {
         }
     }
 
-    async getSystem(id) {
+    async getObject(id) {
         let url = this.SYSTEMS_SERVICE + '/' + id;
         try {
             let serverResponse = await this.data.get(url);
             if (!serverResponse.error) {
-                this.selectedSystem = serverResponse;
-                this.originalSystem = this.utils.copyObject(this.selectedSystem);
+                this.selectedObject = serverResponse;
+                this.originalObject = this.utils.copyObject(this.selectedObject);
             } else {
                 this.data.processError(serverResponse);
             }
@@ -45,28 +45,28 @@ export class Systems {
         }
     }
     
-    selectSystem(index){
+    selectObject(index){
         if(!index && index != 0) {
-            this.selectedSystem = this.emptySystem();
+            this.selectedObject = this.emptySystem();
         } else {
             try{
-                this.selectedSystem = this.utils.copyObject(this.systemsArray[index]);
+                this.selectedObject = this.utils.copyObject(this.systemsArray[index]);
                 this.newSystem = false;
                 this.editIndex = index;
             } catch (error){
                 console.log(error);
-                this.selectedSystem = this.emptySystem();
+                this.selectedObject = this.emptySystem();
                 this.newSystem = true;
             }
 
         }
     }
 
-    selectedSystemById(id) {
-        this.selectedSystem = null;
+    selectedObjectById(id) {
+        this.selectedObject = null;
         for (var i = 0, x = this.systemsArray.length; i < x; i++) {
             if (this.systemsArray[i]._id === id) {
-                this.selectedSystem = this.utils.copyObject(this.systemsArray[i]);
+                this.selectedObject = this.utils.copyObject(this.systemsArray[i]);
                 break;
             }
         };
@@ -87,13 +87,13 @@ export class Systems {
         return newSystemObj;
     }
 
-    async saveSystem() {
-        if (!this.selectedSystem) {
+    async saveObject() {
+        if (!this.selectedObject) {
             return;
         }
 
-        if (!this.selectedSystem._id) {
-            let serverResponse = await this.data.saveObject(this.selectedSystem, this.SYSTEMS_SERVICE, "post");
+        if (!this.selectedObject._id) {
+            let serverResponse = await this.data.saveObject(this.selectedObject, this.SYSTEMS_SERVICE, "post");
             if (!serverResponse.error) {
                 this.systemsArray.push(serverResponse);
             } else {
@@ -101,7 +101,7 @@ export class Systems {
             }
             return serverResponse;
         } else {
-            var serverResponse = await this.data.saveObject(this.selectedSystem, this.SYSTEMS_SERVICE, "put");
+            var serverResponse = await this.data.saveObject(this.selectedObject, this.SYSTEMS_SERVICE, "put");
             if (!serverResponse.error) {
                 return serverResponse;
             } else {
@@ -111,12 +111,12 @@ export class Systems {
         }
     }
 
-    isSystemDirty() {
-        return this.utils.objectsEqual(this.selectedSystem, this.originalSystem);
+    isObjectDirty() {
+        return this.utils.objectsEqual(this.selectedObject, this.originalObject);
     }
 
-    async deleteSystem() {
-        let serverResponse = await this.data.deleteObject(this.SYSTEMS_SERVICE + '/' + this.selectedSystem._id);
+    async deleteObject() {
+        let serverResponse = await this.data.deleteObject(this.SYSTEMS_SERVICE + '/' + this.selectedObject._id);
         return serverResponse;
     }
 
@@ -124,7 +124,7 @@ export class Systems {
         let obj = new Object();
         obj.client = clientNo;
         obj.clientStatus = status;
-        obj.systemId = this.selectedSystem._id;
+        obj.systemId = this.selectedObject._id;
         obj.idsAvailable = product.idsAvailable;
         obj.assignments = new Array(); 
         obj.createdDate = new Date();
