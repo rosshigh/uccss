@@ -48286,7 +48286,7 @@ define('modules/user/requests/viewProducts',['exports', 'aurelia-framework', '..
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return Promise.all([this.products.getProductsArray('?filter=active|eq|true&order=name'), this.config.getConfig()]);
+                return Promise.all([this.products.getProductsArray('?filter=active|eq|true&order=name', true), this.config.getConfig()]);
 
               case 2:
                 responses = _context.sent;

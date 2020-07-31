@@ -17,7 +17,7 @@ export class ViewProducts {
 
   async activate() {
     let responses =  await Promise.all([
-      this.products.getProductsArray('?filter=active|eq|true&order=name'),
+      this.products.getProductsArray('?filter=active|eq|true&order=name', true),
       this.config.getConfig() 
     ]);
 	//  this.dataTable.updateArray(this.products.productsArray);
