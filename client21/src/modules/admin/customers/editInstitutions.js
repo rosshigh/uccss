@@ -59,6 +59,7 @@ export class EditInstitutions {
 
     new() {
         this.people.selectInstitution();
+        this.refreshSelects();
         this.people.getInstitutionPeople(-1);
         this.createValidationRules();
         this.view = 'form';
@@ -67,9 +68,15 @@ export class EditInstitutions {
     async edit(institution) {
         this.selectedInstitutionId = institution._id;
         await this.people.getInstitution(institution._id);
+        this.refreshSelects();
         this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.people.selectedInstitution._id);
         this.createValidationRules();
         this.view = 'form';
+    }
+
+    refreshSelects(){
+        this.utils.refreshSelect("#editInstitutonStatusArray", this.is4ua.institutonStatusArray, "code", this.people.selectedInstitution.institutionStatus);
+        this.utils.refreshSelect("#editInstitutionType", this.is4ua.institutionTypes, "code", this.people.selectedInstitution.institutionType );
     }
 
     createValidationRules() {
@@ -183,5 +190,14 @@ export class EditInstitutions {
     _cleanUp() {
         this.clearFilters();
         this.goBack();
+    }
+
+    copyEmail(person) {
+        const el = document.createElement('textarea');
+        el.value = person.email;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
     }
 }

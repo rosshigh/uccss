@@ -1,0 +1,69 @@
+<template>
+    <div class="row">
+        <div class="col">
+            <h2>${documentsService.selectedCat.description}</h2>
+            <h4>${documentsService.selectedCat.subCategories[selectedSubCategoryIndex].description}</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-primary" click.trigger="createDocument()">Create Document</button>
+        </div>
+        <div class="col">
+            <label show.bind="showDocumentForm" class="btn btn-primary">
+                Browse for files&hellip; <input type="file" style="display: none;" change.delegate="changeFiles()"
+                    files.bind="files">
+            </label>
+        </div>
+        <div class="col">
+            <button if.bind="filesToUpload.length || documentsService.selectedDocument.files.length || showSaveButton"
+                class="btn btn-primary" click.trigger="saveDocument()">Save
+                Document</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div if.bind="filesToUpload.length" class="card">
+                <div class="card-body">
+                    <ul>
+                        <li repeat.for="file of filesToUpload" class="list-group-item">${file.name}<span
+                                click.delegate="removeFile($index)" class="pull-right"><i class="fa fa-trash"
+                                    aria-hidden="true"></i></span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div show.bind="showDocumentForm" class="col">
+            <div class="card">
+                <div class="card-body">
+                    <span><i click.trigger="closeDocumentForm()" class="fa fa-window-close-o"
+                            aria-hidden="true"></i></span>
+                    <div class="form-group">
+                        <label for="sid">Name *</label>
+                        <input value.bind="documentsService.selectedDocument.name  & validateOnChange" type="text"
+                            class="form-control" id="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="sid">Description</label>
+                        <textarea value.bind="documentsService.selectedDocument.description" class="form-control"
+                            id="description" rows="5"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <ul if.bind="controller.errors.length > 0">
+                <li repeat.for="error of controller.errors">${error}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <compose view="./documentTable.html"></compose>
+        </div>
+    </div>
+</template>

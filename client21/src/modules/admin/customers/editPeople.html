@@ -1,13 +1,10 @@
 <template>
-    <!-- <span id="loading">
-        <ul class="bokeh">
-            <li></li>
-            <li></li>
-            <li></li>
-        </ul>
-    </span> -->
     <div show.bind="view === 'table'">
-        <compose view="./components/peopleTable.html"></compose>
+        <div class="card">
+            <div class="card-body">
+                <compose view="./components/peopleTable.html"></compose>
+            </div>
+        </div>
     </div>
     <div show.bind="view === 'form'">
         <compose view="./components/peopleForm.html"></compose>

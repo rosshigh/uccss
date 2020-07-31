@@ -58,8 +58,8 @@
                     </div>
                 </div>
                 <div class="col">
-                    <label for="edittype" class="control-label">System Type</label>
-                    <select value.bind="systems.selectedObject.type" id="edittype" class="form-control ">
+                    <label for="edittype">System Type</label>
+                    <select value.bind="systems.selectedObject.type" id="edittype" class="form-control selectpicker" data-style="btn btn-link"> 
                         <option model.bind="type" repeat.for="type of config.SYSTEM_TYPES">${type}
                         </option>
                     </select>
@@ -75,7 +75,6 @@
                         <option model.bind="session.session" repeat.for="session of sessions.SESSION_PARAMS">
                             ${session.session}</option>
                     </select>
-                    Sessions: ${systems.selectedObject.sessions}
                 </div>
             </div>
         </div>

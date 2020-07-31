@@ -22,6 +22,14 @@ module.exports = function (app) {
     })
   }));
 
+  router.get('/products/small', asyncHandler(async (req, res) => {
+    var query = buildQuery(req.query, Product.find())
+    .select('name systems active')
+    query.exec().then(result => {
+      res.status(200).json(result);
+    })
+  }));
+
   router.get('/products/:id', asyncHandler(async (req, res) => {
     logger.log('info','Get product ' + req.params.id);
     

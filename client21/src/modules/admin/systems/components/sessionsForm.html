@@ -1,71 +1,68 @@
 <template>
-    <div class="card positionUnderToolbar">
-        <div class="card-body">
-            <div class="list-group-item toolbar">
-                <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
-                    data-placement="bottom" title="" data-original-title="Back"><i
-                        class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
-                <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
-                    data-placement="bottom" title="" data-original-title="Save"><i
-                        class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
-                <span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
-                    data-placement="bottom" title="" data-original-title="Cancel Changes"><i
-                        class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
-            </div>
-            <div class="panel panel-info positionUnderToolbar">
-                <div class="row">
-                    <div class="container">
-                        <div class="topMargin">
-                            <div class="col-lg-5 topMargin">
-                                <label for="editSession" class="form-control-label">Session</label>
-                                <select value.bind="sessions.selectedSession.session" class="form-control"
-                                    id="editSession">
-                                    <option></option>
-                                    <option repeat.for="session of sessions.SESSION_PARAMS">${session.session}</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-5 col-lg-offset-1 topMargin">
-                                <label for="editYear" class="form-control-label ">Year</label>
-                                <input value.bind="sessions.selectedSession.year" id="editYear" class=" form-control"
-                                    placeholder="Year" type="text" />
-                            </div>
-                            <div class="col-lg-5 topMargin">
-                                <label class="form-control-label ">Start Date</label>
-                                <flat-picker controlid="startDate" config.bind="config"
-                                    value.bind="sessions.selectedSession.startDate"></flat-picker>
-                            </div>
-                            <div class="col-lg-5 col-lg-offset-1 topMargin">
-                                <label class="form-control-label ">End Date</label>
-                                <flat-picker controlid="endDate" config.bind="config"
-                                    value.bind="sessions.selectedSession.endDate"></flat-picker>
-                            </div>
-                            <div class="col-lg-5 topMargin">
-                                <label class="form-control-label ">Requests Open</label>
-                                <flat-picker controlid="requestsOpenDate" config.bind="config"
-                                    value.bind="sessions.selectedSession.requestsOpenDate"></flat-picker>
-                            </div>
-                            <div class="col-lg-5 col-lg-offset-1 topMargin">
-                                <label for="editStatus" class="form-control-label">Status</label>
-                                <select value.bind="sessions.selectedSession.sessionStatus" id="editStatus"
-                                    class="form-control" id="editStatus">
-                                    <option repeat.for="session of config.SESSION_STATUSES" value.bind="session">
-                                        ${session}</option>
-                                </select>
-                            </div>
-                        </div>
+    <div class="list-group-item toolbar">
+        <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+            data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border"
+                aria-hidden="true"></i></span>
+        <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+            data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border"
+                aria-hidden="true"></i></span>
+        <span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+            data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border"
+                aria-hidden="true"></i></span>
+    </div>
+    <div class="panel panel-info positionUnderToolbar">
+        <div class="row">
+            <div class="container">
+                <div class="topMargin">
+                    <div class="col-lg-5 topMargin">
+                        <label for="editSession" class="form-control-label">Session</label>
+                        <select value.bind="sessions.selectedSession.session" class="form-control selectpicker"
+                            id="editSession" data-style="btn btn-link">
+                            <option></option>
+                            <option repeat.for="session of sessions.SESSION_PARAMS" model.bind="session.session">
+                                ${session.session}</option>
+                        </select>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <div if.bind="controller.errors.length > 0" class="alert alert-danger topMargin" role="alert">
-                        <ul  class="list-group">
-                            <li repeat.for="error of controller.errors" class="list-group-item" >
-                                ${error}</li>
-                        </ul>
+                    <div class="col-lg-5 col-lg-offset-1 topMargin">
+                        <label for="editYear" class="form-control-label ">Year</label>
+                        <input value.bind="sessions.selectedSession.year" id="editYear" class=" form-control"
+                            placeholder="Year" type="text" />
+                    </div>
+                    <div class="col-lg-5 topMargin">
+                        <label class="form-control-label ">Start Date</label>
+                        <flat-picker controlid="startDate" config.bind="config"
+                            value.bind="sessions.selectedSession.startDate"></flat-picker>
+                    </div>
+                    <div class="col-lg-5 col-lg-offset-1 topMargin">
+                        <label class="form-control-label ">End Date</label>
+                        <flat-picker controlid="endDate" config.bind="config"
+                            value.bind="sessions.selectedSession.endDate"></flat-picker>
+                    </div>
+                    <div class="col-lg-5 topMargin">
+                        <label class="form-control-label ">Requests Open</label>
+                        <flat-picker controlid="requestsOpenDate" config.bind="config"
+                            value.bind="sessions.selectedSession.requestsOpenDate"></flat-picker>
+                    </div>
+                    <div class="col-lg-5 col-lg-offset-1 topMargin">
+                        <label for="editStatus" class="form-control-label">Status</label>
+                        <select value.bind="sessions.selectedSession.sessionStatus" id="editStatus"
+                            class="form-control selectpicker" id="editStatus" data-style="btn btn-link">
+                            <option repeat.for="session of config.SESSION_STATUSES" value.bind="session">
+                                ${session}</option>
+                        </select>
                     </div>
                 </div>
             </div>
         </div>
-    </div> 
+    </div>
+    <div class="row">
+        <div class="col">
+            <div if.bind="controller.errors.length > 0" class="alert alert-danger topMargin" role="alert">
+                <ul class="list-group">
+                    <li repeat.for="error of controller.errors" class="list-group-item">
+                        ${error}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </template>

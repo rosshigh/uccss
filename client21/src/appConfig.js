@@ -1,14 +1,15 @@
 export class AppConfig {
 
-  // HOST = location.origin, 
+  HOST = location.origin;
 
   // DOWNLOAD_URL = this.HOST + '/uploadedFiles', 
+  DOCUMENT_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/documents'; 
 
-  // BASE_URL = "http=//localhost/api/";
-  // IMG_DOWNLOAD_URL = "http=//localhost/img/";
+  BASE_URL = "http=//localhost/api/";
+  IMG_DOWNLOAD_URL = "http=//localhost/img/";
 
-  BASE_URL = this.HOST + "/api/";
-  IMG_DOWNLOAD_URL = this.HOST + '/img/';  
+  // BASE_URL = this.HOST + "/api/";
+  // IMG_DOWNLOAD_URL = this.HOST + '/img/';  
 
 
   INSTITUTIONS_ACTIVE = '01';

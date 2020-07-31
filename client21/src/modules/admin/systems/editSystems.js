@@ -49,7 +49,7 @@ export class EditSystems {
     attached() {
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
-        // $('.selectpicker').selectpicker();
+        $('.selectpicker').selectpicker();
     }
 
     async refresh() {
@@ -59,15 +59,22 @@ export class EditSystems {
 
     new() {
         this.systems.selectObject();
+        this.refreshSelects();
         this.createValidationRules();
         this.view = 'form';
     }
 
     async edit(system) {
         await this.systems.getObject(system._id);
+        this.refreshSelects();
         this.createValidationRules();
         this.saveFilterValues();
         this.view = 'form';
+    }
+
+    refreshSelects(){
+        this.utils.refreshSelect("#edittype", this.config.SYSTEM_TYPES, "type", this.systems.selectedObject.type);
+        this.utils.refreshSelect("#sessions", this.sessions.SESSION_PARAMS, "session", this.systems.selectedObject.sessions);
     }
 
     saveFilterValues() {

@@ -174,7 +174,7 @@ export class DataServices {
 		return this.http.createRequest(url)
 			.asPost()
 			.withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token'))
-			.withContent(formData)
+            .withContent(formData)
 			.skipContentProcessing()
             .withProgressCallback(progress => {
                 console.log(progress.loaded)
@@ -217,70 +217,5 @@ export class DataServices {
         }
         if(msg && msg.length > 0) this.utils.showNotification(msg);
     }
-
-    // //File URLs
-    FILE_URL = "http://localhost:5000/api/upload";
-    FILE_DOWNLOAD_URL = "http://localhost:5000/";
-
-    // //Institution Services
-    // INSTITUTION_SERVICES = "institutions";
-
-    // //People Services
-    // PEOPLE_SERVICE = "people";
-    // PERSON_REGISTER = "people/register"
-    // CHECK_EMAIL = 'people/checkEmail';
-    // CHECK_NAME = 'people/checkName';
-    // SEND_MAIL = 'people/sendMail';
-    // PASSWORD_RESET = 'passwordReset';
-    // NOTES_SERVICE = "notes";
-
-    // CURRICULUM_SERVICE = 'curriculum';
-    // CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';
-
-    // //IS4UA Services
-    IS4UA = 'is4ua';
-
-    // //Systems Services
-    // SYSTEMS_SERVICE = "systems";
-
-    // //Clients Services
-    CLIENTS_SERVICE = 'clients';
-    DELETE_ALL_CLIENTS = 'clients/system/SYSTEMID';
-
-
-    // //Products Services
-    // PRODUCTS_SERVICE = 'products';
-
-
-
-    // //Help Tickets
-    // HELP_TICKET_SERVICES = 'helpTickets';
-    // HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID/STATUS";
-    // HELP_TICKET_LOCK_SERVICES = "helpTicketLocks";
-    // HELP_TICKET_TYPES = "helpTicketsTypes";
-
-    // //Downloads
-    // DOWNLOADS_SERVICE = "apps";
-    // APPLICATION_CATEGORY_SERVICE = "appsCategory";
-    // DOCUMENTS_SERVICE = "documents";
-    // DOCUMENTS_CATEGORY_SERVICE = "documentCategory";
-    // DOWNLOADS_UPLOADS = "downloads/upload";
-
-    // //Clientrequests Services
-    COURSES_SERVICE = 'courses';
-    PERSON_COURSES_SERVICE = 'courses/person/PERSONID';
-    // CLIENT_REQUESTS_SERVICES = 'clientRequests';
-    // CLIENT_REQUEST_DETAILS='clientRequestsDetails';
-    // CLIENT_REQUEST_LOCK_SERVICES = 'clientRequestLocks';
-    // CUSTOMER_ACTION = 'clientRequests/customerAction';
-
-    CONFIG_SERVICE = 'config';
-    SESSIONS_CONFIG_SERVICE = 'semesterConfig';
-
-    //File upload
-    DOCUMENTS_FILE_UPLOAD = 'documents/file';
-
-    // API_KEY='0f85bb931f8faad7e35b6f685aa4e931';
-    // OPEN_WEATHER_MAP_SERVICE = 'http://api.openweathermap.org/data/2.5/weather';
 
 }

@@ -4,32 +4,6 @@ import {inject} from 'aurelia-framework';
 
 // @inject(Notification, AppConfig)
 export class Utils{
-
-  // constructor(notification, config){
-  //     this.config = config;
-  //     this.notification = notification;
-  //     this.notification.waitForMove = true
-  //     toastr.options.extendedTimeOut = "1000";
-  //     toastr.options.timeOut = "1500";
-
-      // toastr.options = {
-      //   "closeButton": false,
-      //   "debug": false,
-      //   "newestOnTop": false,
-      //   "progressBar": false,
-      //   "positionClass": "toast-top-right",
-      //   "preventDuplicates": false,
-      //   "onclick": null,
-      //   "showDuration": "100",
-      //   "hideDuration": "1000",
-      //   "timeOut": "1000",
-      //   "extendedTimeOut": "1000",
-      //   "showEasing": "swing",
-      //   "hideEasing": "linear",
-      //   "showMethod": "fadeIn",
-      //   "hideMethod": "fadeOut"
-      // }
-  // }
   
   // guid() {
   //   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -38,7 +12,27 @@ export class Utils{
   //   });
   // }
 
-
+  refreshSelect(selectElement, collection, matchProperty, valueToMatch){
+    let selectedOption = null;
+    if(Array.isArray(valueToMatch)) {
+      selectedOption = valueToMatch;
+    } else {
+      collection.forEach(item => {
+        if(this.isObject(item) ){
+          if( valueToMatch === item[matchProperty]){
+            selectedOption = item[matchProperty];
+          }
+        } else {
+          if( valueToMatch === item){
+            selectedOption = item;
+          }
+        }
+      })
+    }
+  
+    $(selectElement).val(selectedOption); 
+    $(selectElement).selectpicker('refresh');
+  }
 
   /*****************************************************************************
    * Display a notification

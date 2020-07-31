@@ -4,6 +4,7 @@ export function configure(config) {
     PLATFORM.moduleName('./elements/side-bar'),
     PLATFORM.moduleName('./elements/top-bar'),
     PLATFORM.moduleName('./elements/flat-picker'),
+    PLATFORM.moduleName('./elements/documents'),
 
     PLATFORM.moduleName('./editor/editor'),
 
@@ -13,6 +14,8 @@ export function configure(config) {
     PLATFORM.moduleName('./value-converters/date-format'),
     PLATFORM.moduleName('./value-converters/session-status-button'),
     PLATFORM.moduleName('./value-converters/translate-status'),
-    PLATFORM.moduleName('./value-converters/system-list')
+    PLATFORM.moduleName('./value-converters/system-list'),
+    PLATFORM.moduleName('./value-converters/concatenate-string'),
+    PLATFORM.moduleName('./value-converters/remove-spaces')  
   ]);
 }

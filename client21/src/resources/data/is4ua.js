@@ -4,13 +4,15 @@ import {DataServices} from './dataServices';
 @inject(DataServices)
 export class is4ua {
 
+    IS4UA = 'is4ua';
+
     constructor(data) {
         this.data = data;
     }
 
     async loadIs4ua(){
         // if(!this.personStatusArray){
-        let responses = await this.data.get(this.data.IS4UA);
+        let responses = await this.data.get(this.IS4UA);
 
         this.personStatusArray = responses[0].personStatus;
         this.deptArray = responses[0].deptCat;

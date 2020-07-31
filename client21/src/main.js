@@ -3,6 +3,7 @@
 import 'regenerator-runtime/runtime';
 import * as environment from '../config/environment.json';
 import { PLATFORM } from 'aurelia-pal';
+import "froala-editor/js/froala_editor.pkgd.min";
 
 export function configure(aurelia) {
   aurelia.use
@@ -15,6 +16,7 @@ export function configure(aurelia) {
     .feature(PLATFORM.moduleName('resources/index'));
 
   aurelia.use.developmentLogging(environment.debug ? 'debug' : 'warn');
+  aurelia.use.plugin(PLATFORM.moduleName('aurelia-froala-editor'));
 
   if (environment.testing) {
     aurelia.use.plugin(PLATFORM.moduleName('aurelia-testing'));

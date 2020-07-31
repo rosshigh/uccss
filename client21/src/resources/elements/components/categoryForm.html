@@ -1,0 +1,26 @@
+<template>
+    <div class="panel panel-default" style="background-color:ghostwhite;">
+        <div class="panel-body" style="padding:5px;">
+            <div class="bottomMargin">
+                <div class="bottomMargin list-group-item" style="1px solid black">
+                    <span click.delegate="backCategory()" class="smallMarginRight" bootstrap-tooltip
+                        data-toggle="tooltip" data-placement="bottom" title=""
+                        data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border"
+                            aria-hidden="true"></i></span>
+                    <span click.delegate="saveCategory()" class="smallMarginRight" bootstrap-tooltip
+                        data-toggle="tooltip" data-placement="bottom" title=""
+                        data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border"
+                            aria-hidden="true"></i></span>
+                    <span click.delegate="cancelEditCategory()" class="smallMarginRight"
+                        bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+                        data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border"
+                            aria-hidden="true"></i></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <input id="name" value.bind="documentsService.selectedCat.description" type="text"
+                    placeholder="Category Name" class="form-control" />
+            </div>
+        </div>
+    </div>
+</template>

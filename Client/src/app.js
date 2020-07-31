@@ -1,6 +1,6 @@
 import {inject} from 'aurelia-framework';
 import AppRouterConfig from './config/routerConfig';
-import $ from 'bootstrap'
+// import $ from 'bootstrap'
 
 @inject(AppRouterConfig)
 export class App {
@@ -12,5 +12,7 @@ export class App {
 
   activate(){
      this.appRouterConfig.configure();
+     $.fn.selectpicker.Constructor.BootstrapVersion = '3';
+
   }
 }

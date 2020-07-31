@@ -87,7 +87,7 @@
                         <div class="form-group">
                             <label for="editPhone">Institution *</label>
                             <select value.two-way="people.selectedPerson.institutionId  & validateOnChange"
-                                id="editInstitution" class="form-control selectpicker" data-style="btn btn-link">
+                               class="form-control selectpicker" data-style="btn btn-link" id="institutionSelect">
                                 <option value="">Select an option</option>
                                 <option repeat.for="institution of people.institutionsArray" value="${institution._id}">
                                     ${institution.name}</option>
@@ -97,8 +97,8 @@
                     <div class="col">
                         <div class="form-group">
                             <label for="editSpecialization">Specialization</label>
-                            <select value.two-way="people.selectedPerson.personSpecialization" id="editSpecialization"
-                                class="form-control selectpicker" data-style="btn btn-link">
+                            <select value.two-way="people.selectedPerson.personSpecialization"
+                                class="form-control selectpicker" data-style="btn btn-link" id="specializationSelect">
                                 <option value="">Select an option</option>
                                 <option repeat.for="name of is4ua.specialArray" value="${name.code}">${name.description}
                                 </option>
@@ -108,8 +108,8 @@
                     <div class="col">
                         <div class="form-group" ">
                             <label for="editDepartment">Department</label>
-                            <select value.bind="people.selectedPerson.departmentCategory" id="editDepartment"
-                                class="form-control selectpicker" data-style="btn btn-link">
+                            <select value.bind="people.selectedPerson.departmentCategory"
+                                class="form-control selectpicker" data-style="btn btn-link" id="departmentSelect">
                                 <option value="">Select an option</option>
                                 <option repeat.for="name of is4ua.deptArray" value="${name.code}">${name.description}
                                 </option>

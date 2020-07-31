@@ -1,5 +1,5 @@
 <template>
-	<div class=" list-group-item toolbar" style="top:-110px;">
+	<div class=" list-group-item toolbar">
 		<span click.delegate="_clearFilters()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
 			data-placement="bottom" title="" data-original-title="Clear Filters"><i class="fa fa-filter"
 				aria-hidden="true"></i></span>
@@ -7,12 +7,12 @@
 			data-placement="bottom" title="" data-original-title="Send"><i class="fa fa-paper-plane fa-lg fa-border"
 				aria-hidden="true"></i></span>
 	</div>
-	<div if.bind="composeEmailPanel" class="card" style="top:-110px;">
+	<div if.bind="composeEmailPanel" class="card">
 		<div class="card-body">
 			<compose view="./composeEmail.html"></compose>
 		</div>
 	</div>
-	<div class="card" style="top:-110px;">
+	<div class="card">
 		<div class="card-header">
 			<h4 class="card-title">Filters</h4>
 		</div>
@@ -20,7 +20,7 @@
 			<compose view="./selectionPanel.html"></compose>
 		</div>
 	</div>
-	<div class="card"  style="top:-110px;">
+	<div class="card" >
 		<div class="card-header">
 			<h4 class="card-title">Email Pool</h4>
 		</div>

@@ -13,6 +13,7 @@ import { Utils } from '../../../resources/utils/utils';
 export class EditProducts {
 
     pageSize = 200;
+    testVar = 'alksjdf;alskdfj;l';
 
     toolbar = [
         ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
@@ -39,12 +40,14 @@ export class EditProducts {
 
         this.configParameters = this.store.getConfig();
 
+        this.foo = "mmmm";
+
         this.view = 'table';
     }
 
     async activate() {
         let responses = await Promise.all([
-            this.products.getObjectsArray('?order=name'),
+            this.products.getSmallObjectsArray('?order=name'),
             this.systems.getObjectsArray('?order=sid')
         ]);
         this.calculateSystemList();
@@ -71,7 +74,7 @@ export class EditProducts {
 
     async refresh() {
         this.clearFilters();
-        await this.products.getProductsArray('?&order=name');
+        await this.products.getSmallObjectsArray('?&order=name');
         this.calculateSystemList();
     }
 
@@ -85,7 +88,12 @@ export class EditProducts {
         await this.products.getObject(product._id);
         this.createValidationRules();
         this.saveFilterValues();
+        this.productDescription = this.products.selectedObject.productDescription ? this.products.selectedObject.productDescription : "";
         this.view = 'form';
+    }
+
+    testing(){
+        this.foo = "werwe";
     }
 
     saveFilterValues() {

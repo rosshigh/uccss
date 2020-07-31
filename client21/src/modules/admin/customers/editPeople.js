@@ -48,6 +48,7 @@ export class EditPeople {
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
         $('.selectpicker').selectpicker();
+        
     }
 
     async refresh() {
@@ -59,6 +60,7 @@ export class EditPeople {
 
     new() {
         this.people.selectPerson();
+        this.refreshSelects();
         this.createValidationRules();
         this.getPhoneMask();
         this.view = 'form';
@@ -67,10 +69,18 @@ export class EditPeople {
     async edit(person) {
         this.selectedPersonId = person._id;
         await this.people.getPerson(person._id);
+        this.refreshSelects();
         this.createValidationRules();
         this.getPhoneMask();
         this.filterRoles();
         this.view = 'form';
+    }
+
+    refreshSelects(){
+        this.utils.refreshSelect("#editStatus", this.is4ua.personStatusArray, "code", this.people.selectedPerson.personStatus);
+        this.utils.refreshSelect("#institutionSelect", this.people.institutionsArray, "_id", this.people.selectedPerson.institutionId);
+        this.utils.refreshSelect("#specializationSelect", this.is4ua.specialArray, "code", this.people.selectedPerson.personSpecialization);
+        this.utils.refreshSelect("#departmentSelect", this.is4ua.deptArray, "code", this.people.selectedPerson.departmentCategory);
     }
 
     createValidationRules() {
@@ -96,12 +106,12 @@ export class EditPeople {
                 if (result.valid) {
                     this.savePerson();
                 } else {
-                     let message = 'You must fix the errors before you can save the system?';
-                     let title = "Fix Errors";
-                     let options = ['Ok'];
-                     this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                         return;
-                     });
+                    let message = 'You must fix the errors before you can save the system?';
+                    let title = "Fix Errors";
+                    let options = ['Ok'];
+                    this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+                        return;
+                    });
                 }
             });
     }
@@ -118,12 +128,12 @@ export class EditPeople {
             }
             this._cleanUp();
         } else {
-             let message = 'You must fix the errors before you can save the system?';
-             let title = "Fix Errors";
-             let options = ['Ok'];
-             this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                 return;
-             });
+            let message = 'You must fix the errors before you can save the system?';
+            let title = "Fix Errors";
+            let options = ['Ok'];
+            this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+                return;
+            });
         }
     }
 
@@ -139,10 +149,10 @@ export class EditPeople {
             }
         });
 
-      
+
     }
 
-    async deletePersion(){
+    async deletePersion() {
         var name = this.people.selectedPerson.fullName;
         let serverResponse = await this.people.deletePerson();
         if (!serverResponse.error) {
@@ -200,7 +210,7 @@ export class EditPeople {
 
         link.click();
     }
-  
+
     clearFilters() {
         this.filters[0].value = "";
         this.filters[1].value = this.config.ACTIVE_PERSON;
@@ -254,17 +264,17 @@ export class EditPeople {
     }
 
     //Specifically editPerson
-    async toggleStatus(id, personStatus){
-        if(id && personStatus){
+    async toggleStatus(id, personStatus) {
+        if (id && personStatus) {
             this.people.selectedPersonById(id);
             this.people.selectedPerson.personStatus = personStatus === this.config.ACTIVE_PERSON ? this.config.INACTIVE_PERSON : this.config.ACTIVE_PERSON;
             let serverResponse = await this.people.savePerson();
             if (!serverResponse.error) {
                 this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
             } else {
-                this.utils.showNotification("There was a problem saving the person",'error');
+                this.utils.showNotification("There was a problem saving the person", 'error');
             }
-        } 
+        }
     }
 
     async copyInstAddress() {
@@ -331,5 +341,14 @@ export class EditPeople {
                 this.newPassword = "";
             }
         }
+    }
+
+    copyEmail(person) {
+        const el = document.createElement('textarea');
+        el.value = person.email;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
     }
 }

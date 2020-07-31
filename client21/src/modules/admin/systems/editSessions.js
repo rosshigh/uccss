@@ -37,12 +37,14 @@ export class EditSessions {
     async activate() {
         let responses = await Promise.all([
             this.sessions.getSessionsArray('?order=startDate:DSC'),
+            this.sessions.getSessionParameters()
         ]);
     }
 
     attached() {
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
+        $('.selectpicker').selectpicker();
     }
 
     async refresh() {
@@ -52,14 +54,21 @@ export class EditSessions {
 
     new() {
         this.sessions.selectSession();
+        this.refreshSelects();
         this.createValidationRules();
         this.view = 'form';
     }
 
     async edit(session) {
         await this.sessions.getSession(session._id);
+        this.refreshSelects();
         this.createValidationRules();
         this.view = 'form';
+    }
+
+    refreshSelects(){
+        this.utils.refreshSelect("#editSession", this.sessions.SESSION_PARAMS, "session", this.sessions.selectedSession.session);
+        this.utils.refreshSelect("#institutionSelect", this.config.SESSION_STATUSES, "status", this.sessions.selectedSession.sessionStatus);
     }
 
     createValidationRules() {

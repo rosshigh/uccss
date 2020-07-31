@@ -17,13 +17,11 @@ export class App {
   validateUser(){
     this.userObj = this.store.getUser('user');
     this.isAuthenticated = this.userObj;
-    console.log(this.isAuthenticated);
   }
 
   subscribe() {
     this.subscriber = this.eventAggregator.subscribe('auth:login', payload => {
        this.isAuthenticated = payload == 'login';
-       console.log(this.isAuthenticated);
     });
  }
 
@@ -47,6 +45,18 @@ export class App {
         route: 'systems',
         moduleId: PLATFORM.moduleName('./modules/admin/systems/systems'),
         name: 'systems',
+        settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'documents',
+        moduleId: PLATFORM.moduleName('./modules/admin/documents/documents'),
+        name: 'documents',
+        settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'site',
+        moduleId: PLATFORM.moduleName('./modules/admin/site/site'),
+        name: 'site',
         settings: { auth: false, roles: [] }
       }
     ]);

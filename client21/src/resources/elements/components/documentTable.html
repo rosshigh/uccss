@@ -1,0 +1,34 @@
+<template>
+    <div class="table-responsive">
+        <table class="table table-striped" style="width:100%;"
+            aurelia-table="data.bind: documentsService.selectedCat.subCategories[selectedSubCategoryIndex].documents; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Date Uploaded</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr repeat.for="document of $displayData">
+                    <td><a target="_blank"
+                            href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documentsService.selectedCat.DocCode}/${selectedSubCategoryIndex}/${document.files[0].fileName}">${document.name}</a>
+                    </td>
+                    <td>${document.description | concatenateString:10}</td>
+                    <td>${document.createdDate | dateFormat:configParameters.DATE_FORMAT_TABLE}</td>
+                    <td click.trigger="toggleFileActive($index)" innerhtml.bind='document.active'></td>
+                    <td>
+                        <span click.delegate="editDocument($index)" bootstrap-tooltip data-toggle="toggle"
+                            data-placement="bottom" title="" data-original-title="Edit" class="rightMargin"><i
+                                class="fa fa-pencil" aria-hidden="true"></i></span>
+                        <span click.trigger="deleteDocument($index)" bootstrap-tooltip data-toggle="toggle"
+                            data-placement="bottom" title="" data-original-title="Delete"><i
+                                class="fa fa-trash"></i></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</template>

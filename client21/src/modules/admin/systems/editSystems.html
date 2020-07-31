@@ -1,8 +1,16 @@
 <template>
     <div show.bind="view === 'table'">
-        <compose view="./components/systemsTable.html"></compose>
+        <div class="card">
+            <div class="card-body">
+                <compose view="./components/systemsTable.html"></compose>
+            </div>
+        </div>
     </div>
     <div show.bind="view === 'form'">
-        <compose view="./components/systemsForm.html"></compose>
+        <div class="card">
+            <div class="card-body">
+                <compose view="./components/systemsForm.html"></compose>
+            </div>
+        </div>
     </div>
 </template>

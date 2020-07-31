@@ -162,6 +162,7 @@ module.exports = ({ production } = {}, {extractCss, analyze, tests, hmr, port, h
     ...when(!tests, new DuplicatePackageCheckerPlugin()),
     new AureliaPlugin(),
     new ModuleDependenciesPlugin({
+      "aurelia-froala-editor": [ './froala-editor' ],
       'aurelia-testing': ['./compile-spy', './view-spy']
     }),
     new HtmlWebpackPlugin({

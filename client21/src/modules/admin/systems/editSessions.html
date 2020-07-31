@@ -1,11 +1,23 @@
 <template>
     <div show.bind="view === 'table'">
-        <compose view="./components/sessionsTable.html"></compose>
+        <div class="card">
+            <div class="card-body">
+                <compose view="./components/sessionsTable.html"></compose>
+            </div>
+        </div>
     </div>
     <div show.bind="view === 'form'">
-        <compose view="./components/sessionsForm.html"></compose>
+        <div class="card">
+            <div class="card-body">
+                <compose view="./components/sessionsForm.html"></compose>
+            </div>
+        </div>
     </div>
-    <!-- <div show.bind="view == 'config'">
-        <compose view="./components/sessionConfigTable.html"></compose>
-    </div> -->
+    <div show.bind="view == 'config'">
+        <div class="card">
+            <div class="card-body">
+                <compose view="./components/sessionConfigTable.html"></compose>
+            </div>
+        </div>
+    </div>
 </template>

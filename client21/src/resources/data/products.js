@@ -25,6 +25,19 @@ export class Products {
         }
     }
 
+    async getSmallObjectsArray(options) {
+        var url = this.PRODUCTS_SERVICE +"/small";
+        url += options ? options : "";
+        try {
+            let serverResponse = await this.data.get(url);
+            if (!serverResponse.error) {
+                this.objectsArray = serverResponse;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     async getObject(id) {
         let url = this.PRODUCTS_SERVICE + '/' + id;
         try {

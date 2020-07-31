@@ -20,7 +20,8 @@
                         <div class="col-sm-10">
                             <label class="left">Status *</label>
                             <select value.bind="people.selectedInstitution.institutionStatus & validateOnChange"
-                                id="editInstitutonStatusArray" class="form-control">
+                                id="editInstitutonStatusArray" class="form-control selectpicker"
+                                data-style="btn btn-link">
                                 <option value="">Select an option</option>
                                 <option repeat.for="status of is4ua.institutonStatusArray" value="${status.code}">
                                     ${status.description}</option>
@@ -35,6 +36,8 @@
                             value.bind="people.selectedInstitution.dateModified"></flat-picker>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col">
                     <div class="form-group">
                         <div class="col-sm-10">
@@ -53,15 +56,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-3">
-                <div class="form-group">
-                    <div class="col-sm-10">
+                <div class="col">
+                    <div class="form-group">
                         <label>Institution Type *</label>
                         <select value.bind="people.selectedInstitution.institutionType & validateOnChange"
-                            id="editInstitutionType" class="form-control topMargin">
+                            id="editInstitutionType" class="form-control selectpicker"
+                            data-style="btn btn-link">
                             <option value="">Select an option</option>
                             <option repeat.for="status of is4ua.institutionTypes" value="${status.code}">
                                 ${status.description}</option>

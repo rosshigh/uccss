@@ -1,0 +1,12 @@
+<template>
+    <div show.bind="view === 'table'">
+        <div class="card">
+            <div class="card-body">
+                <compose view="./components/infoTable.html"></compose>
+            </div>
+        </div>
+    </div>
+    <div show.bind="view === 'form'">
+        <compose view="./components/infoForm.html"></compose>
+    </div>
+</template>
