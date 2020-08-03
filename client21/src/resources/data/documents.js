@@ -95,6 +95,14 @@ export class DocumentsServices {
     emptySubCat() {
         var newObj = new Object();
         newObj.description = "";
+        newObj.subSubCatgories = [];
+
+        return newObj;
+    }
+
+    emptySubSubCat() {
+        var newObj = new Object();
+        newObj.description = "";
         newObj.documents = [];
 
         return newObj;

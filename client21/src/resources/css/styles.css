@@ -62,6 +62,14 @@ span i {
     cursor: pointer;
 }
 
+.pointMe {
+  cursor: pointer;
+}
+
+.dontPointMe{
+  cursor: default
+}
+
 .content {
     margin-top:75px;
 }

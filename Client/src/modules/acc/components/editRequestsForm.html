@@ -1,119 +1,55 @@
 <template>
-		<div  class="panel panel-default rightMargin leftMargin" style="margin-top:50px;">
-        <div class="panel-body">
-            <div class="row">
-  <div class="hoverProfile" >
-      <span  click.delegate="hideProfile()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Close"><i class="fa fa-window-close-o" aria-hidden="true"></i></span>
-      <span  click.delegate="customerActionDialog()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Send Email"><i class="fa fa-envelope-o" aria-hidden="true"></i></span>
-      <hr/>
-      <div class="col-md-4">
-				 <div class="topMargin">
-            <img if.bind="personImage" class="circular--square leftMargin" src ="${config.PERSON_IMAGE_DOWNLOAD_URL}/${selectedRequestDetail.requestId.personId.file.fileName}" height="100">
-        </div>
-        <div if.bind="!personImage" style="height:100px;width:100px;" innerhtml.bind="selectedRequestDetail.requestId.personId.email | gravatarUrl:100:6"></div>
-      </div>
-      <div class="col-md-8">
-        <h5>Nickname: ${selectedRequestDetail.requestId.personId.nickName}</h5>
-        <h5>Phone: ${selectedRequestDetail.requestId.personId.phone | formatPhone}</h5>
-        <h5>Mobile: ${selectedRequestDetail.requestId.personId.mobile | formatPhone}</h5>
-        <h5>Email: ${selectedRequestDetail.requestId.personId.email}</h5>
-      </div>
-  </div>
-<div class="fluid-container">
-	<div class="list-group-item toolbar">
-		<span click.delegate="backEdit()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
-		<span click.delegate="saveEdit()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
-		<span click.delegate="customerActionDialog()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Customer Action"><i class="fa fa-paper-plane fa-lg fa-border" aria-hidden="true"></i></span>
-		<span click.delegate="openAudit()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Audit"><i class="fa fa-history fa-lg fa-border" aria-hidden="true"></i></span>
-		<span click.delegate="delete()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>
-	</div>
+	<div class="panel panel-default rightMargin leftMargin" style="margin-top:50px;">
+		<div class="panel-body">
+			<div class="row">
+				<div class="fluid-container">
+					<div class="list-group-item toolbar">
+						<span click.delegate="backEdit()" class="smallMarginRight" bootstrap-tooltip
+							data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i
+								class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
+						<span click.delegate="saveEdit()" class="smallMarginRight" bootstrap-tooltip
+							data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i
+								class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+					</div>
 
-	<div show.bind="showAudit">
-    <table class="table table-striped table-hover">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Property</th>
-          <th>Old Value</th>
-          <th>New Value</th>
-          <th>Person</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr  repeat.for="item of selectedRequestDetail.requestId.audit">
-          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
-          <td>${item.property}</td>
-          <td>${item.oldValue}</td>
-          <td>${item.newValue}</td>
-          <td>${item.personId.fullName}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+					<div class="col-lg-10 col-lg-offset-1">
+						<h4>Request No. ${selectedRequestDetail.requestNo}</h4>
+						<h5 class="dropbtn" click.delegate="showProfile(selectedRequestDetail, $event)">Faculty:
+							${selectedRequestDetail.requestId.personId.fullName} <i class="fa fa-info"
+								aria-hidden="true"></i></h5>
+						<h5>Institution: ${selectedRequestDetail.requestId.institutionId.name}</h5>
 
-	<div show.bind="!showAudit" class="col-lg-10 col-lg-offset-1">
-		<h4>Request No. ${selectedRequestDetail.requestNo}</h4>
-		<h5 class="dropbtn" click.delegate="showProfile(selectedRequestDetail, $event)">Faculty: ${selectedRequestDetail.requestId.personId.fullName} <i class="fa fa-info" aria-hidden="true"></i></h5>
-		<h5>Institution: ${selectedRequestDetail.requestId.institutionId.name}</h5>
-	
-	<div class="col-lg-5" >
-		<div class="topMargin">
-			<label class="form-control-label ">Status</label>
-			<select class="form-control" value.bind="selectedRequestDetail.requestStatus">
-				<option repeat.for="status of config.REQUEST_STATUS" value="${status.code}">${status.description}</option>
-			</select>
-		</div>
-		<div class="topMargin">
-			<label for="undergraduates" class="control-label">Undergraduates</label>
-			<input  id="undergraduates"  type="number" placeholder="Number of Undergraduates" class="form-control" value.bind="selectedRequestDetail.requestId.undergradIds"/>
-		</div>
-		<div class="topMargin">
-			<label for="graduates" class="control-label">Graduates</label>
-			<input id="graduates" type="number" placeholder="Number of Graduates" class="form-control" value.bind="selectedRequestDetail.requestId.graduateIds"/>
-		</div>
-		 <div class="row col-lg-offset-3">
-			<span class="col-lg-8 " id="numberOfStudentsError"></span>
-		</div>
-		<div class="topMargin">
-			<label class="form-control-label ">Product</label>
-			<select class="form-control" value.bind="selectedRequestDetail.productId._id">
-				<option repeat.for="product of products.productsArray" value="${product._id}">${product.name}</option>
-			</select>
-		</div>
-  </div>
+						<div class="col-lg-5">
+							<div class="topMargin">
+								<label class="form-control-label ">Status</label>
+								<select class="form-control" value.bind="selectedRequestDetail.requestStatus">
+									<option repeat.for="status of config.REQUEST_STATUS" value="${status.code}">
+										${status.description}</option>
+								</select>
+							</div>
 
-	<div class="col-lg-5" >
-		<div  show.bind="config.SANDBOX_USED" class="topMargin">
-			<label class="form-control-label ">Request Type</label>
-			<select class="form-control" value.bind="selectedRequestDetail.requestId.courseId._id">
-				<option model.bind="config.SANDBOX_ID">${config.SANDBOX_NAME}</option>
-				<option repeat.for="course of people.coursesArray" model.bind="course._id">${course.number} ${course.name}</option>
-			</select>
-		</div>
-		<div class="topMargin">
-			<label class="form-control-label ">Start Date</label>
-			<flat-picker controlid="startDate" config.bind="dateConfig"  
-					value.bind="selectedRequestDetail.requestId.startDate" startdate.bind="minStartDate" enddate.bind="maxStartDate"></flat-picker>
-			<span id='startDateError'></span>
-		</div>
-		<div class="topMargin">
-			<label class="form-control-label ">End Date</label>
-				<flat-picker controlid="endDate" config.bind="dateConfig" value.bind="selectedRequestDetail.requestId.endDate" startdate.bind="minEndDate" enddate.bind="maxEndDate"></flat-picker>
-				<span id='endDateError'></span>
-		</div>
-			<div class="topMargin">
-			<label class="form-control-label ">Required Date</label>
-				<flat-picker controlid="requiredDate" config.bind="dateConfig" value.bind="selectedRequestDetail.requiredDate" startdate.bind="minEndDate" enddate.bind="maxEndDate"></flat-picker>
-				<span id='requiredDateError'></span>
-		</div>
-	</div>
+							<div class="topMargin">
+								<label class="form-control-label ">Product</label>
+								<select class="form-control" value.bind="selectedRequestDetail.productId._id">
+									<option repeat.for="product of products.productsArray" value="${product._id}">
+										${product.name}</option>
+								</select>
+							</div>
+						</div>
 
-
-	 <div class="col-lg-12 topMargin" innerhtml.bind="selectedRequestDetail.requestId.comments"></div>
-	 
-</div>
-
-</div>
-</div>
-</div>
+						<div class="col-lg-5">
+							<div class="topMargin">
+								<label class="form-control-label ">Required Date</label>
+								<flat-picker controlid="requiredDate" config.bind="dateConfig"
+									value.bind="selectedRequestDetail.requiredDate" startdate.bind="minEndDate"
+									enddate.bind="maxEndDate"></flat-picker>
+								<span id='requiredDateError'></span>
+							</div>
+						</div>
+						<div class="col-lg-12 topMargin" innerhtml.bind="selectedRequestDetail.requestId.comments">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 </template>

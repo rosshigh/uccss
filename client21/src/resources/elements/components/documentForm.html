@@ -16,7 +16,7 @@
             </label>
         </div>
         <div class="col">
-            <button if.bind="filesToUpload.length || documentsService.selectedDocument.files.length || showSaveButton"
+            <button if.bind="filesToUpload.length ||  showSaveButton"
                 class="btn btn-primary" click.trigger="saveDocument()">Save
                 Document</button>
         </div>
@@ -49,6 +49,9 @@
                         <label for="sid">Description</label>
                         <textarea value.bind="documentsService.selectedDocument.description" class="form-control"
                             id="description" rows="5"></textarea>
+                    </div>
+                    <div>
+                        <h4 if.bind="documentsService.selectedDocument.files && documentsService.selectedDocument.files.length">File Name: ${documentsService.selectedDocument.files[0].fileName}</h4>
                     </div>
                 </div>
             </div>

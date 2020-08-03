@@ -180,7 +180,7 @@ export class APJAssignments {
 
     });
     // this.selectedRequestDetail.techComments = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
-    
+
     this.insertAssignmentIntoSystem(client, this.selectedRequestDetail.assignments);
     this.assignClientStatus();
 
@@ -488,7 +488,7 @@ export class APJAssignments {
     return item.productId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
   }
 
-  getStatus(status) { 
+  getStatus(status) {
     let statusDescription = "";
     this.config.REQUEST_STATUS.forEach(item => {
       if (item.code == status) statusDescription = item.description;
@@ -513,5 +513,33 @@ export class APJAssignments {
     document.body.appendChild(link); // Required for FF
 
     link.click();
+  }
+
+  async editRequest(index, request) {
+    this.editIndex = index;
+    this.selectedRequestDetail = this.utils.copyObject(request);
+    await this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
+    // await this.people.getCoursesArray(true, '?filter=personId|eq|' + this.selectedRequestDetail.requestId.personId._id);
+    this.editStartDate = this.selectedRequestDetail.requestId.startDate;
+    this.originalRequestDetail = this.utils.copyObject(this.selectedRequestDetail);
+
+    this.requestSelected = 'edit';
+  }
+
+  backEdit() {
+    this.requestSelected = 'table';
+  }
+
+  async saveEdit() {
+    this.requests.setTheSelectedRequestDetail(this.selectedRequestDetail);
+    let serverResponse = await this.requests.saveRequestDetail();
+    if (!serverResponse.error) {
+      this.utils.showNotification("The request was updated");
+      this.dataTable.updateArrayMaintainFilters(this.requests.requestsDetailsArray);
+      this.reSort();
+      await this.filterInAssigned();
+      this._cleanUp();
+    }
+
   }
 }

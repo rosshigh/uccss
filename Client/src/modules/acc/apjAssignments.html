@@ -6,6 +6,9 @@
         <compose view="./components/requestForm.html"></compose>
     </div>
     <div show.bind="requestSelected == 'view'">
-            <compose view="./components/viewAssignmentForm.html"></compose>
-        </div>
+        <compose view="./components/viewAssignmentForm.html"></compose>
+    </div>
+    <div show.bind="requestSelected == 'edit'">
+        <compose view="./components/editRequestsForm.html"></compose>
+    </div>
 </template>

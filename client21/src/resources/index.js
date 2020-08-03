@@ -16,6 +16,7 @@ export function configure(config) {
     PLATFORM.moduleName('./value-converters/translate-status'),
     PLATFORM.moduleName('./value-converters/system-list'),
     PLATFORM.moduleName('./value-converters/concatenate-string'),
-    PLATFORM.moduleName('./value-converters/remove-spaces')  
+    PLATFORM.moduleName('./value-converters/remove-spaces'),
+    PLATFORM.moduleName('./value-converters/document-icons')  
   ]);
 }

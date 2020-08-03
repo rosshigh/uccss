@@ -10,7 +10,6 @@ import { AppConfig } from '../../appConfig';
 @inject(ValidationControllerFactory, Element, DocumentsServices, Utils, Store, DialogService, AppConfig)
 export class DocumentsManagementCustomElement {
 
-    // @bindable({defaultBindingMode: bindingMode.twoWay}) value;
     pageSize = 200;
 
     constructor(ValidationControllerFactory, element, documentsService, utils, store, dialogService, config) {
@@ -61,38 +60,53 @@ export class DocumentsManagementCustomElement {
     }
 
     newCategory() {
-        this.view = 'categoryForm';
         this.documentsService.selectCategory();
+        $('#CategoryForm').show()
+        $('#categoryInput').focus();
     }
 
-    editCategory(obj) {
+    editCategory(obj, el) {
         this.documentsService.setCategory(obj);
-        $('.' + obj.DocCode).hide();
-        $('#' + obj.DocCode + 'inp').show()
-        this.editDescription = obj.description;
-        this.editCurriculum = obj.curriculum;
-        this.editDownloads = obj.downloads;
-
-        $('#' + obj.DocCode + 'inp').focus();
+        $('#CategoryForm').show()
+        $('#categoryInput').focus();
+        el.stopPropagation();
     }
 
-    newSubCategory(obj) {
+    newSubCategory(obj, el) {
         this.documentsService.setCategory(obj);
         this.documentsService.selectedCat.subCategories.push(this.documentsService.emptySubCat());
         this.selectedSubCategoryIndex = this.documentsService.selectedCat.subCategories.length - 1;
-        this.view = 'subCategoryForm';
+        $("#SubCategoryForm").show();
+        $("#subCategoryInput").focus();
+        el.stopPropagation();
     }
 
-    editSubCategory(subCat, index, el) {
+    editSubCategory(index, category, el) {
+        this.documentsService.setCategory(category);
         this.selectedSubCategoryIndex = index;
-        // this.view = "subCategoryForm";
-        let descriptionNoSpaces = subCat.description.split(" ").join("");
+        let descriptionNoSpaces = this.documentsService.selectedCat.subCategories[index].description.split(" ").join("");
+        $("#SubCategoryForm").show();
+        $("#subCategoryInput").focus();
+        el.stopPropagation();
+    }
 
-        $('.' + descriptionNoSpaces).hide();
-        $('#' + descriptionNoSpaces + 'inp').show()
-        this.editDescription = subCat.description;
-    
-        $('#' + descriptionNoSpaces + 'inp').focus();
+    newSubSubCategory(index, obj, el){
+        this.documentsService.setCategory(obj);
+        this.selectedSubCategoryIndex = index;
+        if(!this.documentsService.selectedCat.subCategories[index].subSubCategories) this.documentsService.selectedCat.subCategories[index].subSubCategories = [];
+        this.documentsService.selectedCat.subCategories[index].subSubCategories.push(this.documentsService.emptySubSubCat());
+        this.selectedSubSubCategoryIndex = this.documentsService.selectedCat.subCategories[index].subSubCategories.length - 1;
+        $("#SubSubCategoryForm").show();
+        $("#subSubCategoryInput").focus();
+        el.stopPropagation();
+    }
+
+    editSubSubCategory(index, obj, subCatIndex, el){
+        this.documentsService.setCategory(obj);
+        this.selectedSubCategoryIndex = subCatIndex;
+        this.selectedSubSubCategoryIndex = index;
+        $("#SubSubCategoryForm").show();
+        $("#subSubCategoryInput").focus();
         el.stopPropagation();
     }
 
@@ -117,7 +131,6 @@ export class DocumentsManagementCustomElement {
                 this.documentsService.uploadFile(this.filesToUpload, this.selectedSubCategoryIndex);
             }
         }
-        this.hideForm(this.documentsService.selectedCat);
         this.cleanUp();
     }
 
@@ -139,24 +152,12 @@ export class DocumentsManagementCustomElement {
         })
     }
 
-    async saveSubCategory() {
-        let saveIt = true;
-        this.documentsService.selectedCat.subCategories.forEach(item => {
-            if (item.description === this.newSubCat.description) {
-                saveIt = false;
-                this.utils.showNotification("A subcategory with that name already exists")
-            }
-        })
-
-        if (saveIt) {
-            await this.saveCategory();
-        }
-    }
-
-    showSubCategoryDocuments(category, index) {
+    showSubCategoryDocuments(category, SubCategoryIndex, SubSubCategoryIndex, el) {
         this.documentsService.setCategory(category);
-        this.selectedSubCategoryIndex = index;
+        this.selectedSubCategoryIndex = SubCategoryIndex;
+        this.selectedSubSubCategoryIndex = SubSubCategoryIndex;
         this.showDocuments = true;
+        el.stopPropagation();
     }
 
     cleanUp() {
@@ -165,22 +166,19 @@ export class DocumentsManagementCustomElement {
         this.showDocumentForm = false;
         this.showSaveButton = false;
         this.filesToUpload = new Array();
+        $('#CategoryForm').hide();
+        $("#SubCategoryForm").hide();
+        $("#SubSubCategoryForm").hide();
     }
 
     backCategory() {
         this.view = 'categoryList';
     }
 
-    cancelEditCategory(obj) {
-        this.hideForm(obj);
-        obj.curriculum = this.editCurriculum
-        obj.downloads = this.editDownloads;
-        obj.description = this.editDescription;
-    }
-
-    hideForm(obj){
-        $('#' + obj.DocCode + 'inp').hide();
-        $('.' + obj.DocCode).show();
+    cancelEditCategory() {
+        $('#CategoryForm').hide();
+        $("#SubCategoryForm").hide();
+        $("#SubSubCategoryForm").hide();
     }
 
     createDocument() {
@@ -215,10 +213,10 @@ export class DocumentsManagementCustomElement {
                             personId: this.userObj._id
                         });
                     }
-                    this.documentsService.selectedCat.subCategories[this.selectedSubCategoryIndex].documents.push(this.documentsService.selectedDocument);
+                    this.documentsService.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories[this.selectedSubSubCategoryIndex].documents.push(this.documentsService.selectedDocument);
                     this.saveCategory();
                 } else {
-                    let message = 'You must fix the errors before you can save the system?';
+                    let message = 'You must fix the errors before you can save the document?';
                     let title = "Fix Errors";
                     let options = ['Ok'];
                     this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
@@ -229,13 +227,14 @@ export class DocumentsManagementCustomElement {
     }
 
     deleteDocument(index) {
-        this.documentsService.selectedCat.subCategories[this.selectedSubCategoryIndex].documents.splice(index, 1);
+        this.documentsService.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories[this.selectedSubSubCategoryIndex].documents.splice(index, 1);
         this.showSaveButton = true;
     }
 
     editDocument(index) {
-        this.documentsService.setDocument(this.documentsService.selectedCat.subCategories[this.selectedSubCategoryIndex].documents[index]);
+        this.documentsService.setDocument(this.documentsService.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories[this.selectedSubSubCategoryIndex].documents[index]);
         this.showDocumentForm = true;
+        this.showSaveButton = true;
         this.createValidationRules();
     }
 

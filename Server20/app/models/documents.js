@@ -34,7 +34,7 @@ var DocumentSubCategorySchema = new Schema({
   SubCatCode: { type: Number },
   description: { type: String, required: true },
   active: { type: Boolean, default: true },
-  documents: ['DocSubSubCategory']
+  subSubCategories: ['DocSubSubCategory']
 });
 
 DocumentSubCategorySchema.plugin(AutoIncrement, { inc_field: 'SubCatCode' });

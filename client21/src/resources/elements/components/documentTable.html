@@ -1,7 +1,7 @@
 <template>
     <div class="table-responsive">
         <table class="table table-striped" style="width:100%;"
-            aurelia-table="data.bind: documentsService.selectedCat.subCategories[selectedSubCategoryIndex].documents; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+            aurelia-table="data.bind: documentsService.selectedCat.subCategories[selectedSubCategoryIndex].subSubCategories[selectedSubSubCategoryIndex].documents; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
             <thead>
                 <tr>
                     <th>Name</th>
