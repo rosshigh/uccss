@@ -1,0 +1,45 @@
+<template>
+    <div class="row">
+        <div class="col-8">
+            <div class='topMargin bottomMargin'>
+                <label for="prioritySelect" class='class="bigLabel topMargin'>Priority</label>
+                <select class="form-control selectpicker" id="prioritySelect"
+                    value.bind="helpTickets.selectedHelpTicket.priority" data-style="btn btn-link">
+                    <option repeat.for="priority of config.HELP_TICKET_PRIORITIES" value.bind="$index">
+                        ${priority.priority}</option>
+                </select>
+                <span>${config.HELP_TICKET_PRIORITIES[helpTickets.selectedHelpTicket.priority].message}</span>
+            </div>
+<div>
+            <!-- Category Select -->
+            <div class="form-group" show.bind="helpTickets.selectedHelpTicket.priority">
+                <!-- <Label class="bigLabel topMargin">To help us define your issue, select the category.</Label> -->
+                <select value.bind="catIndex"
+                    change.delegate="categoryChanged(types.length)" id="helpTicketCategory" class="form-control selectpicker"
+                    data-style="btn btn-link">
+                    <option repeat.for="types of helpTickets.helpTicketTypesArray | sortArray:'category':'ASC'" 
+                        model.bind="types.category">${types.description}</option>
+                </select>
+            </div>
+
+            <select value.bind="thisIndex">
+                <option model.bind="data.code" repeat.for="data of myData">${data.code}</option>
+            </select>
+            <select >
+                <option model.bind="data.code" repeat.for="data of myData[thisIndex].subArray">${data.code}</option>
+            </select>
+
+            <!-- Type Select -->
+            <!-- <div show.bind="showTypes" class="form-group"> -->
+                <!-- <Label class="bigLabel topMargin">To help us further define your issue, select the type.</Label> -->
+                <select value.bind="helpTickets.selectedHelpTicket.helpTicketType" change.delegate="typeChanged()"
+                    id="helpTicketType" class="form-control selectpicker" data-style="btn btn-link">
+                    <option value="-1">To help us further define your issue, select the type</option>
+                    <option repeat.for="subcatTypes of helpTickets.helpTicketTypesArray[catIndex].subtypes"
+                        model.bind="subcatTypes.type">${subcatTypes.description}</option>
+                </select>
+            <!-- </div> -->
+        </div>
+    </div>
+    </div>
+</template>

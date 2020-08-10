@@ -1,0 +1,12 @@
+<template>
+    <ul>
+        <li class="pointMe" click.delegate="toggleListItem($event)" repeat.for="subCat of selectedCat.subCategories">
+            <span class="caret">${subCat.description}</span>
+            <ul class="nested">
+                <li click.delegate="showSubCategoryDocuments($parent.$index, $index, $event)" repeat.for="subSubCat of subCat.subSubCategories | sortArray:'sortOrder':'ASC'">
+                    <span>${subSubCat.description}</span>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</template>

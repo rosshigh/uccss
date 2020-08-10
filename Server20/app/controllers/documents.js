@@ -38,6 +38,13 @@ module.exports = function (app, config) {
     })
   }));
 
+  router.delete('/documentCategory/:id', asyncHandler(async (req, res) => {
+    logger.log('info', 'Delete documentsCategory [%s]', req.params.id);
+    Category.remove({ _id: req.params.id }).then(result => {
+      res.status(200).json(result);
+    });
+  }));
+
   var storage = multer.diskStorage({
     destination: function (req, file, cb) {
       console.log('tehre')
@@ -61,22 +68,22 @@ module.exports = function (app, config) {
 
   var upload = multer({ storage: storage });
 
-  //upload.any(),
-
-  router.post('/documentCategory/file/:container/:subcontainer', function (req, res, next) {
+  router.post('/documentCategory/file/:container/:level1/:level2', function (req, res, next) {
     var fs = require('fs');
     const formidable = require('formidable');
     const form = formidable({ multiples: true });
+    // form.maxFileSize = 300 * 1024 * 1024; changes the max file size to 300
     form.parse(req, function (err, fields, files) {
+      console.log(files)
       let oldpath = files.file0.path;
-      let newpath = config.uploads + "/documents/" + req.params.container + "/" + req.params.subcontainer;
-      mkdirp(newpath).then(made => {
+      let newpath = config.uploads + "/" + req.params.container + "/" + req.params.level1 + "/" + req.params.level2;
+      mkdirp(newpath).then(made => { 
         console.log(made)
         newpath = newpath + "/" + files.file0.name
         fs.rename(oldpath, newpath, function (err) {
           if (err) throw err;
           res.status(201).json({ message: 'file uploaded' });
-        });
+        }); 
       })
       .catch(error => {
         return next(error);

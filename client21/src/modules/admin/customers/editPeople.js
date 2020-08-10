@@ -48,7 +48,6 @@ export class EditPeople {
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
         $('.selectpicker').selectpicker();
-        
     }
 
     async refresh() {
@@ -148,8 +147,6 @@ export class EditPeople {
                 this.goBack();
             }
         });
-
-
     }
 
     async deletePersion() {

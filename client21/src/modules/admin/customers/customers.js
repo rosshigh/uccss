@@ -9,10 +9,6 @@ export class Customers {
         this.pageTitle = 'Customers';
     }
 
-    // attached(){
-    //     this.userObj = JSON.parse(this.store.user);
-    //  }
-
     configureRouter(config, router) {
         config.map([
         {

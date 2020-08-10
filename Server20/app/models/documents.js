@@ -23,6 +23,7 @@ var DocumentSubSubCategorySchema = new Schema({
   SubSubCatCode: { type: Number },
   description: { type: String, required: true },
   active: { type: Boolean, default: true },
+  sortOrder: { type: Number, default: 0 },
   documents: ['Document']
 });
 
@@ -34,6 +35,7 @@ var DocumentSubCategorySchema = new Schema({
   SubCatCode: { type: Number },
   description: { type: String, required: true },
   active: { type: Boolean, default: true },
+  sortOrder: { type: Number, default: 0 },
   subSubCategories: ['DocSubSubCategory']
 });
 
@@ -49,8 +51,8 @@ var DocumentCategorySchema = new Schema({
   createdDate: { type: Date, default: Date.now },
   subCategories: ['DocSubCategory'],
   type: { type: String },
-  curriculum: { type: Boolean, default: false },
-  downloads: { type: Boolean, default: false }
+  sortOrder: { type: Number, default: 0 },
+  category: { type: String }
 });
 
 DocumentCategorySchema.plugin(AutoIncrement, { inc_field: 'DocCode' });

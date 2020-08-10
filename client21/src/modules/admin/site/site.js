@@ -12,7 +12,7 @@ export class Site {
     configureRouter(config, router) {
         config.map([
         {
-            route: ['', 'siteInfo'],
+            route: ['', 'editInfo'],
             moduleId: PLATFORM.moduleName('./editInfo'),
             settings: { auth: true, roles: [] },
             nav: true,
@@ -26,14 +26,6 @@ export class Site {
             nav: true,
             name: 'editConfig',
             title: 'Configuration'
-        },
-        {
-            route: 'editDownloads',
-            moduleId: PLATFORM.moduleName('./editDownloads'),
-            settings: { auth: true, roles: [] },
-            nav: true,
-            name: 'editDownloads',
-            title: 'Downloads'
         }
         ]);
 

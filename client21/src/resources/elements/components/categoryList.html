@@ -10,35 +10,32 @@
                     <span class="input-group-btn">
                         <i click.trigger="cancelEditCategory()" class="fa fa-ban fa-lg fa-border"
                             aria-hidden="true"></i>
-
-                        <!-- <button click.trigger="cancelEditCategory(subCat)" type="button"
-                            class="btn btn-fab btn-round btn-primary">
-                            <i class="material-icons">cancel</i>
-                        </button> -->
                     </span>
                     <span class="input-group-btn">
                         <i click.trigger="saveCategory()" class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i>
-                        <!-- <button click.trigger="saveCategory()" type="button"
-                            class="btn btn-fab btn-round btn-primary">
-                            <i class="material-icons">save_alt</i>
-                        </button> -->
+                    </span>
+                    <span class="input-group-btn">
+                        <i if.bind="documentsService.selectedCat._id" click.trigger="deleteCategory()"
+                            class="fa fa-trash fa-lg fa-border" aria-hidden="true"></i>
                     </span>
                 </div>
                 <div class="row">
                     <div class="col">
-                        <div class="checkbox">
-                            <label>
-                                <input checked.bind="documentsService.selectedCat.curriculum" type="checkbox">
-                                Curriculum
-                            </label>
+                        <div class="form-group">
+                            <label for="editCategory">Type</label>
+                            <select value.bind="documentsService.selectedCat.category" id="editCategory"
+                                class="form-control selectpicker" data-style="btn btn-link">
+                                <option repeat.for='cat of config.DOCUMENT_CATGORIES' value="${cat.code}">
+                                    ${cat.description}</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="col">
-                        <div class="checkbox">
-                            <label>
-                                <input checked.bind="documentsService.selectedCat.downloads" type="checkbox"> Downloads
-                            </label>
-                        </div>
+                </div>
+                <div class="form-group row">
+                    <label for="catSortOrder" class="col-sm-3 col-form-label">Sort Order</label>
+                    <div class="col-sm-5">
+                        <input class="form-control" type="number" id="catSortOrder" placeholder="Sort Order"
+                            value.bind="documentsService.selectedCat.sortOrder" />
                     </div>
                 </div>
             </div>
@@ -51,18 +48,21 @@
                     <span class="input-group-btn">
                         <i click.trigger="cancelEditCategory()" class="fa fa-ban fa-lg fa-border"
                             aria-hidden="true"></i>
-                        <!-- <button click.trigger="cancelEditCategory()" type="button"
-                            class="btn btn-fab btn-round btn-primary">
-                            <i class="material-icons">cancel</i>
-                        </button> -->
                     </span>
                     <span class="input-group-btn">
                         <i click.trigger="saveCategory()" class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i>
-                        <!-- <button click.trigger="saveCategory()" type="button"
-                            class="btn btn-fab btn-round btn-primary">
-                            <i class="material-icons">save_alt</i>
-                        </button> -->
                     </span>
+                    <span class="input-group-btn">
+                        <i if.bind="!newSubCategoryFlag" click.trigger="deleteSubCategory()"
+                            class="fa fa-trash fa-lg fa-border" aria-hidden="true"></i>
+                    </span>
+                </div>
+                <div class="form-group row">
+                    <label for="catSortOrder" class="col-sm-3 col-form-label">Sort Order</label>
+                    <div class="col-sm-5">
+                        <input class="form-control" type="number" placeholder="Sort Order"
+                            value.bind="documentsService.selectedCat.subCategories[selectedSubCategoryIndex].sortOrder" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -74,18 +74,21 @@
                     <span class="input-group-btn">
                         <i click.trigger="cancelEditCategory()" class="fa fa-ban fa-lg fa-border"
                             aria-hidden="true"></i>
-                        <!-- <button click.trigger="cancelEditCategory(subCat)" type="button"
-                            class="btn btn-fab btn-round btn-primary">
-                            <i class="material-icons">cancel</i>
-                        </button> -->
                     </span>
                     <span class="input-group-btn">
                         <i click.trigger="saveCategory()" class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i>
-                        <!-- <button click.trigger="saveCategory()" type="button"
-                            class="btn btn-fab btn-round btn-primary">
-                            <i class="material-icons">save_alt</i>
-                        </button> -->
                     </span>
+                    <span if.bind="!newSubSubCategoryFlag" class="input-group-btn">
+                        <i click.trigger="deleteSubSubCategory()" class="fa fa-trash fa-lg fa-border"
+                            aria-hidden="true"></i>
+                    </span>
+                </div>
+                <div class="form-group row">
+                    <label for="catSortOrder" class="col-sm-3 col-form-label">Sort Order</label>
+                    <div class="col-sm-5">
+                        <input class="form-control" type="number" placeholder="Sort Order"
+                            value.bind="documentsService.selectedCat.subCategories[selectedSubCategoryIndex].subSubCategories[selectedSubSubCategoryIndex].sortOrder" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -94,28 +97,29 @@
         <div class="row">
             <div class="col-10">
                 <ul id="myUL">
-                    <li class="pointMe" repeat.for="type of filteredDocumentArray">
+                    <li class="pointMe" repeat.for="type of filteredDocumentArray | sortArray:'sortOrder':'ASC'">
                         <span click.trigger="toggleListItem($event, type.DocCode)"><i class="${type | documentIcons}"
                                 aria-hidden="true"></i> ${type.description}</span>
                         <span click.delegate="newSubCategory(type, $event)" class="smallMarginRight" bootstrap-tooltip
                             data-toggle="tooltip" data-placement="bottom" title=""
                             data-original-title="New Subcategory"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                        <span click.delegate="editCategory(type, $event)" bootstrap-tooltip
-                            data-toggle="toggle" data-placement="bottom" title="" data-original-title="Edit"><i
-                                class="fa fa-pencil" aria-hidden="true"></i></span>
+                        <span click.delegate="editCategory(type, $index, $event)" bootstrap-tooltip data-toggle="toggle"
+                            data-placement="bottom" title="" data-original-title="Edit"><i class="fa fa-pencil"
+                                aria-hidden="true"></i></span>
                         <ul class="nested">
                             <li click.delegate="toggleListItem($event)"
-                                repeat.for="subCat of type.subCategories">
+                                repeat.for="subCat of type.subCategories | sortArray:'sortOrder':'ASC'">
                                 <span class="caret">${subCat.description}</span>
-                                <span click.delegate="newSubSubCategory($index, type, $event)"
-                                    class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
-                                    data-placement="bottom" title="" data-original-title="New Subcategory"><i
-                                        class="fa fa-plus" aria-hidden="true"></i></span>
+                                <span click.delegate="newSubSubCategory($index, type, $event)" class="smallMarginRight"
+                                    bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+                                    data-original-title="New Subcategory"><i class="fa fa-plus"
+                                        aria-hidden="true"></i></span>
                                 <span click.delegate="editSubCategory($index, type, $event)" bootstrap-tooltip
                                     data-toggle="toggle" data-placement="bottom" title="" data-original-title="Edit"><i
                                         class="fa fa-pencil" aria-hidden="true"></i></span>
                                 <ul class="nested">
-                                    <li click.delegate="showSubCategoryDocuments(type, $parent.$index, $index, $event)" repeat.for="subSubCat of subCat.subSubCategories">
+                                    <li click.delegate="showSubCategoryDocuments(type, $parent.$index, $index, $event)"
+                                        repeat.for="subSubCat of subCat.subSubCategories | sortArray:'sortOrder':'ASC'">
                                         <span>${subSubCat.description}</span>
                                         <span click.delegate="editSubSubCategory($index, type, $parent.$index, $event)"
                                             bootstrap-tooltip data-toggle="toggle" data-placement="bottom" title=""

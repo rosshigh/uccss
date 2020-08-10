@@ -58,6 +58,18 @@ export class App {
         moduleId: PLATFORM.moduleName('./modules/admin/site/site'),
         name: 'site',
         settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'downloads/:id',
+        moduleId: PLATFORM.moduleName('./modules/user/resources/downloads'),
+        name: 'downloads',
+        settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'helpTickets',
+        moduleId: PLATFORM.moduleName('./modules/user/helpTickets/helpTickets'),
+        name: 'helpTickets',
+        settings: { auth: false, roles: [] }
       }
     ]);
   }

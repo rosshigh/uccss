@@ -16,9 +16,16 @@
             </label>
         </div>
         <div class="col">
-            <button if.bind="filesToUpload.length ||  showSaveButton"
-                class="btn btn-primary" click.trigger="saveDocument()">Save
+            <button show.bind="filesToUpload.length ||  showSaveButton" class="btn btn-primary"
+                click.trigger="saveDocument()">Save
                 Document</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col topMargin">
+            <ul if.bind="controller.errors.length > 0">
+                <li repeat.for="error of controller.errors">${error}</li>
+            </ul>
         </div>
     </div>
     <div class="row">
@@ -51,7 +58,9 @@
                             id="description" rows="5"></textarea>
                     </div>
                     <div>
-                        <h4 if.bind="documentsService.selectedDocument.files && documentsService.selectedDocument.files.length">File Name: ${documentsService.selectedDocument.files[0].fileName}</h4>
+                        <h4
+                            if.bind="documentsService.selectedDocument.files && documentsService.selectedDocument.files.length">
+                            File Name: ${documentsService.selectedDocument.files[0].fileName}</h4>
                     </div>
                 </div>
             </div>

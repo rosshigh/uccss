@@ -1,20 +1,20 @@
-import { inject, bindable, bindingMode } from 'aurelia-framework';
+import { inject} from 'aurelia-framework';
 import { ValidationRules, ValidationControllerFactory, validationMessages } from 'aurelia-validation';
 import { DocumentsServices } from '../data/documents';
 import { DialogService } from 'aurelia-dialog';
+import { ConfirmDialog } from '../dialogs/confirm-dialog';
 import { MessageDialog } from '../dialogs/message-dialog';
 import { Utils } from '../utils/utils';
 import { Store } from '../../store/store';
 import { AppConfig } from '../../appConfig';
 
-@inject(ValidationControllerFactory, Element, DocumentsServices, Utils, Store, DialogService, AppConfig)
+@inject(ValidationControllerFactory, DocumentsServices, Utils, Store, DialogService, AppConfig)
 export class DocumentsManagementCustomElement {
 
     pageSize = 200;
 
-    constructor(ValidationControllerFactory, element, documentsService, utils, store, dialogService, config) {
+    constructor(ValidationControllerFactory, documentsService, utils, store, dialogService, config) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
-        this.element = element;
         this.documentsService = documentsService;
         this.utils = utils;
         this.store = store;
@@ -31,6 +31,7 @@ export class DocumentsManagementCustomElement {
     async attached() {
         $('[data-toggle="tooltip"]').tooltip();
         $(".hover").css("display", "none");
+        $('.selectpicker').selectpicker();
         this.refresh();
     }
 
@@ -41,11 +42,16 @@ export class DocumentsManagementCustomElement {
         el.stopPropagation();
     }
 
+    refreshSelects(){
+        this.utils.refreshSelect("#editCategory", this.config.DOCUMENT_CATGORIES, "code", this.documentsService.selectedCat.category);
+    }
+
     async refresh() {
         let responses = await Promise.all([
             this.documentsService.getDocumentsCategoriesArray(),
         ]);
         this.filterList();
+        this.showDocumentForm = false;
     }
 
     filterList() {
@@ -61,21 +67,44 @@ export class DocumentsManagementCustomElement {
 
     newCategory() {
         this.documentsService.selectCategory();
+        this. refreshSelects();
         $('#CategoryForm').show()
         $('#categoryInput').focus();
     }
 
-    editCategory(obj, el) {
+    editCategory(obj, index, el) {
         this.documentsService.setCategory(obj);
+        this.selectedCategory = index;
+        this. refreshSelects();
         $('#CategoryForm').show()
         $('#categoryInput').focus();
         el.stopPropagation();
+    }
+
+    async deleteCategory(){
+        let message = 'Are you sure you want to delete this category?';
+        let title = "Confirm Delete";
+        let options = {};
+        this.dialogService.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+            if (!response.wasCancelled) {
+                this.deleteTheCategory();
+            } 
+        });
+    }
+
+    async deleteTheCategory(){
+        let serverResponse = this.documentsService.deleteCategory();
+        if (!serverResponse.error) {
+            this.utils.showNotification("Category Deleted");
+        }
+        this.cleanUp();
     }
 
     newSubCategory(obj, el) {
         this.documentsService.setCategory(obj);
         this.documentsService.selectedCat.subCategories.push(this.documentsService.emptySubCat());
         this.selectedSubCategoryIndex = this.documentsService.selectedCat.subCategories.length - 1;
+        this.newSubCategoryFlag = true;
         $("#SubCategoryForm").show();
         $("#subCategoryInput").focus();
         el.stopPropagation();
@@ -85,17 +114,35 @@ export class DocumentsManagementCustomElement {
         this.documentsService.setCategory(category);
         this.selectedSubCategoryIndex = index;
         let descriptionNoSpaces = this.documentsService.selectedCat.subCategories[index].description.split(" ").join("");
+        this.newSubCategoryFlag = false;
         $("#SubCategoryForm").show();
         $("#subCategoryInput").focus();
         el.stopPropagation();
+    }
+
+    async deleteSubCategory(){
+        let message = 'Are you sure you want to delete this subcategory?';
+        let title = "Confirm Delete";
+        let options = {};
+        this.dialogService.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+            if (!response.wasCancelled) {
+                this.deleteTheSubCategory();
+            } 
+        });
+    }
+
+    async deleteTheSubCategory(){
+        this.documentsService.selectedCat.subCategories.splice(this.selectedSubCategoryIndex, 1);
+        this.saveCategory();
     }
 
     newSubSubCategory(index, obj, el){
         this.documentsService.setCategory(obj);
         this.selectedSubCategoryIndex = index;
         if(!this.documentsService.selectedCat.subCategories[index].subSubCategories) this.documentsService.selectedCat.subCategories[index].subSubCategories = [];
-        this.documentsService.selectedCat.subCategories[index].subSubCategories.push(this.documentsService.emptySubSubCat());
+        this.documentsService.selectedCat.subCategories[index].subSubCategories.push(this.documentsService.emptySubSubCat(index));
         this.selectedSubSubCategoryIndex = this.documentsService.selectedCat.subCategories[index].subSubCategories.length - 1;
+        this.newSubSubCategoryFlag = true;
         $("#SubSubCategoryForm").show();
         $("#subSubCategoryInput").focus();
         el.stopPropagation();
@@ -105,9 +152,26 @@ export class DocumentsManagementCustomElement {
         this.documentsService.setCategory(obj);
         this.selectedSubCategoryIndex = subCatIndex;
         this.selectedSubSubCategoryIndex = index;
+        this.newSubSubCategoryFlag = false;
         $("#SubSubCategoryForm").show();
         $("#subSubCategoryInput").focus();
         el.stopPropagation();
+    }
+
+    deleteSubSubCategory(){
+        let message = 'Are you sure you want to delete this subcategory?';
+        let title = "Confirm Delete";
+        let options = {};
+        this.dialogService.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+            if (!response.wasCancelled) {
+                this.deleteTheSubSubCategory();
+            } 
+        });
+    }
+
+    deleteTheSubSubCategory(){
+        this.documentsService.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories.splice(this.selectedSubSubCategoryIndex, 1);
+        this.saveCategory();
     }
 
     async validateCategoryToSave() {
@@ -128,7 +192,7 @@ export class DocumentsManagementCustomElement {
         if (!serverResponse.error) {
             this.utils.showNotification("Category Saved");
             if (this.filesToUpload && this.filesToUpload.length) {
-                this.documentsService.uploadFile(this.filesToUpload, this.selectedSubCategoryIndex);
+                this.documentsService.uploadFile(this.filesToUpload, 'documents', this.documentsService.selectedCat.DocCode, this.selectedSubCategoryIndex);
             }
         }
         this.cleanUp();
@@ -219,16 +283,28 @@ export class DocumentsManagementCustomElement {
                     let message = 'You must fix the errors before you can save the document?';
                     let title = "Fix Errors";
                     let options = ['Ok'];
-                    this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+                    this.dialogService.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
                         return;
                     });
                 }
             });
     }
 
-    deleteDocument(index) {
-        this.documentsService.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories[this.selectedSubSubCategoryIndex].documents.splice(index, 1);
-        this.showSaveButton = true;
+    async deleteDocument(index) {
+        this.documentToSplice = index;
+        let message = 'Are you sure you want to delete this document?';
+        let title = "Confirm Delete";
+        let options = {};
+        this.dialogService.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+            if (!response.wasCancelled) {
+                this.deleteTheDocument();
+            } 
+        });
+    }
+
+    async deleteTheDocument(){
+        this.documentsService.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories[this.selectedSubSubCategoryIndex].documents.splice(this.documentToSplice, 1);
+        await this.saveCategory();
     }
 
     editDocument(index) {

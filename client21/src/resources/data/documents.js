@@ -88,6 +88,8 @@ export class DocumentsServices {
         var newObj = new Object();
         newObj.description = "";
         newObj.subCategories = [];
+        newObj.category = 'DOC';
+        newObj.sortOrder = this.objectCategoriesArray.length;
 
         return newObj;
     }
@@ -96,14 +98,16 @@ export class DocumentsServices {
         var newObj = new Object();
         newObj.description = "";
         newObj.subSubCatgories = [];
+        newObj.sortOrder = this.selectedCat.subCategories.length;
 
         return newObj;
     }
 
-    emptySubSubCat() {
+    emptySubSubCat(index) {
         var newObj = new Object();
         newObj.description = "";
         newObj.documents = [];
+        newObj.sortOrder = this.selectedCat.subCategories[index].subSubCategories.length;
 
         return newObj;
     }
@@ -121,6 +125,11 @@ export class DocumentsServices {
             return serverResponse;
         }
 
+    }
+
+    async deleteCategory(){
+        let serverResponse = await this.data.deleteObject(this.DOCUMENTS_CATEGORY_SERVICE + "/" + this.selectedCat._id);
+        return serverResponse;
     }
 
     setDocument(obj) {
@@ -142,8 +151,8 @@ export class DocumentsServices {
         return newObj;
     }
 
-    uploadFile(files, index) {
-        let path = this.selectedCat.DocCode + "/" + index;
+    uploadFile(files, container, level1, level2) {
+        let path = container + "/" + level1 + "/" + level2;
         this.data.uploadFiles(files, this.DOCUMENTS_CATEGORY_SERVICE + "/file/" + path);
     }
 }

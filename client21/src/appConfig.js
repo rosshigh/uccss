@@ -2,7 +2,7 @@ export class AppConfig {
 
   HOST = location.origin;
 
-  // DOWNLOAD_URL = this.HOST + '/uploadedFiles', 
+  DOWNLOAD_URL = this.HOST + '/uploadedFiles';
   DOCUMENT_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/documents'; 
 
   BASE_URL = "http=//localhost/api/";
@@ -76,6 +76,35 @@ export class AppConfig {
     { code: this.SANDBOX_CLIENT_CODE, description: this.SANDBOX_NAME, OKToDelete: false, lock: false },
   ];
 
+
+  DOCUMENT_CATGORIES = [
+    { code: 'DOC', description: "Document"},
+    { code: 'CUR', description: "Curriculum"},
+    { code: 'SOF', description: "Software"},
+    { code: 'HPT', description: "Help Tickets"},
+    { code: 'USE', description: "Useful Info"}
+  ]
+
+  SITE_INFO_TYPES = [
+    {
+        'type': 'INFO',
+        'description': 'Session Information'
+    },
+    {
+        'type': 'NEWS',
+        'description': 'UCC and UA News'
+    },
+    {
+        'type': 'SYST',
+        'description': 'System Status'
+    },
+    {
+        'type': "DLNK",
+        'description': 'Useful Information - Home Page'
+    }
+];
+
+HELP_TICKET_PRIORITIES = [{priority: "Low", message: "Not time sensitive", status: ""},{priority: "Medium", message: "Time sensitive but doesn't require immediate attention", status: "warning"},{priority: "Critical", message:"Critical, time sensitive issue",status: "danger"}];
 
 };
 

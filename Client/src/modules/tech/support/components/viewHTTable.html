@@ -118,7 +118,7 @@
           <tbody>
             <tr repeat.for="helpTicket of dataTable.displayArray" class="${helpTicket.priority | getArrayValue:config.HELP_TICKET_PRIORITIES:'status'}">
               <td style="width:100px;" data-title="Number">${helpTicket.helpTicketNo}</td>
-              <td  mouseover.delegate="showDescription($index, $event)" mouseout.delegate="hideComment()" click.trigger="selectHelpTicket($event, $index, helpTicket)"
+              <td  mouseover.delegate="showComment(helpTicket, $event)" mouseout.delegate="hideComment()" click.trigger="selectHelpTicket($event, $index, helpTicket)"
                 data-title="Type">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}
               </td>
               <td data-title="Owner">

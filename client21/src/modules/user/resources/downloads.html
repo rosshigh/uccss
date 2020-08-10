@@ -1,0 +1,19 @@
+<template>
+    <compose view="../../../resources/elements/top-bar.html"></compose>
+    <div class="content">
+        <div class="container-fluid">
+            <div class="card" style="height:1000px;">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-3">
+                            <compose view="./components/downloadList.html"></compose>
+                        </div>
+                        <div show.bind="showDocuments" class="col-8">
+                            <compose view="./components/documentForm.html"></compose>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

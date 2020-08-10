@@ -1,16 +1,6 @@
 var Mongoose = require('mongoose'),
   Schema = Mongoose.Schema;
 
-var MessageSchema = new Schema({
-  key: { type: String, required: true },
-  category: { type: String },
-  description: { type: String },
-  content: { type: String },
-  variables: { type: String }
-});
-
-module.exports = Mongoose.model('Message', MessageSchema);
-
 var SiteSchema = new Schema({
   title: { type: String, required: true },
   content: { type: String },

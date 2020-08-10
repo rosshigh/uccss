@@ -606,7 +606,7 @@ export class ViewHelpTickets {
   async saveCourse() {
     if (this.validation.validate(5)) {
       if (this.userObj._id) {
-        if (this.people.selectedCourse._id) this.editCourseIndex = this.baseArray.length;
+        // if (this.people.selectedCourse._id) this.editCourseIndex = this.baseArray.length;
         this.people.selectedCourse.personId = this.userObj._id;
         let serverResponse = await this.people.saveCourse();
         if (!serverResponse.status) {
