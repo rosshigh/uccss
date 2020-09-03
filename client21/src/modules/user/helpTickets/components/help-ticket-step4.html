@@ -1,0 +1,16 @@
+<template>
+    <div class="row topMargin leftMargin rightMargin" id="descriptionGroup">
+        <span id="descriptionErrorMessage"></span>
+        <div class="form-group">
+            <div>Enter a <strong>description</strong> of the issue. Be as specific as possible and include steps that led up to the issue.</div>
+            <p>&nbsp;</p>
+            <editor id="comments" value.bind="helpTickets.selectedHelpTicketContent.content.comments" height="250"></editor>
+        </div>
+
+        <div class="form-group topMargin">
+            <div>Enter the <strong>steps required to recreate the problem</strong>.  Try to make it complete enough that we can create the exact same circumstances.</div>
+            <p>&nbsp;</p>
+            <editor id="steps" value.bind="helpTickets.selectedHelpTicketContent.content.steps" height="250"></editor>
+        </div>
+    </div>
+</template>

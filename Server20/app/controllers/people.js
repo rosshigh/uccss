@@ -36,7 +36,7 @@ module.exports = function (app, config) {
         logger.log('info', 'Get all people');
         var query = buildQuery(req.query, Person.find())
         query
-            .select('lastName firstName fullName institutionId personStatus email phone roles country region')
+            .select('lastName firstName fullName nickName institutionId personStatus email phone mobile roles country region')
             .populate({ path: 'institutionId', model: 'Institution', select: 'name' })
             .sort(req.query.order)
             .exec()

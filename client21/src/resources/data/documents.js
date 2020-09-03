@@ -97,7 +97,7 @@ export class DocumentsServices {
     emptySubCat() {
         var newObj = new Object();
         newObj.description = "";
-        newObj.subSubCatgories = [];
+        newObj.subSubCategories = [];
         newObj.sortOrder = this.selectedCat.subCategories.length;
 
         return newObj;
@@ -147,6 +147,10 @@ export class DocumentsServices {
         newObj.files = new Array();
         newObj.active = true;
         newObj.createdDate = new Date();
+        newObj.sortOrder = 0;
+        newObj.displayDate = new Date();
+        newObj.size = 0;
+        newObj.guid = this.utils.guid();
 
         return newObj;
     }

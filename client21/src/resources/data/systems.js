@@ -50,9 +50,7 @@ export class Systems {
             this.selectedObject = this.emptySystem();
         } else {
             try{
-                this.selectedObject = this.utils.copyObject(this.systemsArray[index]);
-                this.newSystem = false;
-                this.editIndex = index;
+                this.selectedObject = this.utils.copyObject(this.objectsArray[index]);
             } catch (error){
                 console.log(error);
                 this.selectedObject = this.emptySystem();
@@ -64,9 +62,9 @@ export class Systems {
 
     selectedObjectById(id) {
         this.selectedObject = null;
-        for (var i = 0, x = this.systemsArray.length; i < x; i++) {
-            if (this.systemsArray[i]._id === id) {
-                this.selectedObject = this.utils.copyObject(this.systemsArray[i]);
+        for (var i = 0, x = this.objectsArray.length; i < x; i++) {
+            if (this.objectsArray[i]._id === id) {
+                this.selectedObject = this.utils.copyObject(this.objectsArray[i]);
                 break;
             }
         };
@@ -94,19 +92,9 @@ export class Systems {
 
         if (!this.selectedObject._id) {
             let serverResponse = await this.data.saveObject(this.selectedObject, this.SYSTEMS_SERVICE, "post");
-            if (!serverResponse.error) {
-                this.systemsArray.push(serverResponse);
-            } else {
-                this.data.processError(serverResponse, "Error updating the system.<br>")
-            }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedObject, this.SYSTEMS_SERVICE, "put");
-            if (!serverResponse.error) {
-                return serverResponse;
-            } else {
-                this.data.processError(serverResponse, "Error updating the system.<br>")
-            }
             return serverResponse;
         }
     }

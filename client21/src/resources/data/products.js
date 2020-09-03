@@ -60,21 +60,18 @@ export class Products {
             this.newSystem = true;
         } else {
             try {
-                this.selectedObject = this.utils.copyObject(this.productsArray[index]);
-                this.newSystem = false;
-                this.editIndex = index;
+                this.selectedObject = this.utils.copyObject(this.objectsArray[index]);
             } catch (error) {
                 console.log(error);
                 this.selectedObject = this.emptyProduct();
                 this.newSystem = true;
             }
-
         }
     }
 
     selectedObjectFromId(id) {
         this.selectedObject = this.emptyProduct();
-        for (let i = 0; i < this.productsArray.length; i++) {
+        for (let i = 0; i < this.objectsArray.length; i++) {
             if (this.objectsArray[i]._id === id) {
                 this.selectedObject = this.utils.copyObject(this.objectsArray[i]);
                 return i;

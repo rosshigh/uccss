@@ -1,0 +1,34 @@
+<template>
+    <div class="row">
+        <div id="container">
+            <compose if.bind="helpTickets.selectedHelpTicket.helpTicketType == 'APPLICATION_ERROR'"
+                view="./help-ticket-input-APPLICATION_ERROR.html"></compose>
+        </div>
+    </div>
+   
+    <div class="leftMargin rightMargin topMargin panel panel-default" style="padding:5px;">
+        <div class='panel-body'>
+            <div class="row">
+                <div>
+                    <label>Upload screenshots or other files that will help us solve you problem.</lable></br>
+                        <label>If you want to upload multiple files, hold the control key while selecting files</label>
+                </div>
+
+
+                <div class="col-lg-2">
+                    <label class="btn btn-primary">
+                        Browse for files&hellip; <input type="file" style="display: none;"
+                            change.delegate="changeFiles()" files.bind="files" multiple>
+                    </label>
+                </div>
+                <div class="col-lg-6 col-lg-offset-2">
+                    <ul>
+                        <li repeat.for="file of filesToUpload" class="list-group-item" style="background-color:cyan;">
+                            ${file.name}<span click.delegate="removeFile($index)" class="pull-right"><i
+                                    class="fa fa-trash" aria-hidden="true"></i></span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

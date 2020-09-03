@@ -4,8 +4,10 @@
             aurelia-table="data.bind:selectedCat.subCategories[selectedSubCategoryIndex].subSubCategories[selectedSubSubCategoryIndex].documents; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
             <thead>
                 <tr>
-                    <th style="width:15rem;">Name</th>
-                    <th>Description</th>
+                    <th style="width:15rem;" aut-sort="key: name">Name</th>
+                    <th >Size</th>
+                    <th aut-sort="key: displayDate">Date</th>
+                    <th style="width:30rem;">Description</th>
                 </tr>
             </thead>
 
@@ -14,6 +16,8 @@
                     <td><a target="_blank"
                             href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${selectedCat.DocCode}/${selectedSubCategoryIndex}/${document.files[0].fileName}">${document.name}</a>
                     </td>
+                    <td>${document.files[0].size}</td>
+                    <td>${document.displayDate | dateFormat}</td>
                     <td>${document.description}</td>
                 </tr>
             </tbody>

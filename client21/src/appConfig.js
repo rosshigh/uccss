@@ -5,11 +5,11 @@ export class AppConfig {
   DOWNLOAD_URL = this.HOST + '/uploadedFiles';
   DOCUMENT_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/documents'; 
 
-  BASE_URL = "http=//localhost/api/";
-  IMG_DOWNLOAD_URL = "http=//localhost/img/";
+  // BASE_URL = "http=//localhost/api/";
+  // IMG_DOWNLOAD_URL = "http=//localhost/img/";
 
-  // BASE_URL = this.HOST + "/api/";
-  // IMG_DOWNLOAD_URL = this.HOST + '/img/';  
+  BASE_URL = this.HOST + "/api/";
+  IMG_DOWNLOAD_URL = this.HOST + '/img/';  
 
 
   INSTITUTIONS_ACTIVE = '01';
@@ -105,6 +105,60 @@ export class AppConfig {
 ];
 
 HELP_TICKET_PRIORITIES = [{priority: "Low", message: "Not time sensitive", status: ""},{priority: "Medium", message: "Time sensitive but doesn't require immediate attention", status: "warning"},{priority: "Critical", message:"Critical, time sensitive issue",status: "danger"}];
+
+HELP_TICKET_TYPES = [
+  {
+    "description":"Other",
+    "message": "This includes issues that don't fall into other categories.",
+    "requstsRequired": false,
+    "subTypes": [
+      {"type":"OTHER_OTHER","description":"Other general"},
+      {"type":"OTHER_UCCSS","description":"UCCSS account issues"},
+      {"type":"OTHER_GENERAL","description":"General curriculum/client questions"},
+      {"type":"OTHER_UA","description":"UA Learning Hub & UA INformation"},
+    ]
+  },
+  {
+    "description":"Desktop Application Help",
+    "message": "This includes issues with applications other than those osted by the UCC.",
+    "requstsRequired": false,
+    "subTypes": [
+      {"type":"APPLICATION_ERROR","description":"Application or installation problems"},
+      {"type":"LICENSE_KEYS","description":"License keys for analytics software"},
+      {"type":"APPLICATION_OTHER","description":"Other issues with software"}
+    ]
+  },
+  {
+    "description":"Issues with curriculum exercises",
+    "message": "This includes any problems with requested products, clients assigned by the UCC.",
+    "requstsRequired": true,
+    "subTypes": [
+      {"type":"CURRICULUM_EXERCISES","description":"Issues with curriculum exercises"},
+      {"type":"RESET_PASSWORDS","description":"Reset passwords"},
+      {"type":"OTHER_LOGON","description":"Other logon or connection problems"},
+      {"type":"REFRESH_HEC","description":"Refresh ERPSim client"},
+      {"type":"PRODUCT_OTHER","description":"Other product issues"}
+    ]
+  }
+]
+
+ASSIGNED_REQUEST_CODE = 2;
+UNASSIGNED_REQUEST_CODE = 1;
+UPDATED_REQUEST_CODE = 3;
+CUSTOMER_ACTION_REQUEST_CODE = 4;
+CANCELLED_REQUEST_CODE = 5;
+PROVISIONAL_REQUEST_CODE = 6;
+REPLIED_REQUEST_CODE = 7;
+RETIRED_REQUEST_CODE = 8;
+
+REQUEST_STATUS = [{ code: this.UNASSIGNED_REQUEST_CODE, description: 'Unassigned', status: "" }, 
+                  { code: this.ASSIGNED_REQUEST_CODE, description: 'Assigned', status: "assign"  }, 
+                  { code: this.UPDATED_REQUEST_CODE, description: 'Updated', status: "success"  }, 
+                  { code: this.CUSTOMER_ACTION_REQUEST_CODE, description: 'Customer Action', status: "warning"  },
+                  { code: this.CANCELLED_REQUEST_CODE, description: 'Cancelled', status: ""  },
+                  { code: this.PROVISIONAL_REQUEST_CODE, description: 'Provisional', status: ""  },
+                  { code: this.REPLIED_REQUEST_CODE, description: 'Replied', status: "danger" },
+                  { code: this.RETIRED_REQUEST_CODE, description: 'Retired', status: "danger" }];
 
 };
 

@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div class="col-8">
+        <div class="col-5">
             <div class='topMargin bottomMargin'>
                 <label for="prioritySelect" class='class="bigLabel topMargin'>Priority</label>
                 <select class="form-control selectpicker" id="prioritySelect"
@@ -10,36 +10,34 @@
                 </select>
                 <span>${config.HELP_TICKET_PRIORITIES[helpTickets.selectedHelpTicket.priority].message}</span>
             </div>
-<div>
-            <!-- Category Select -->
-            <div class="form-group" show.bind="helpTickets.selectedHelpTicket.priority">
-                <!-- <Label class="bigLabel topMargin">To help us define your issue, select the category.</Label> -->
-                <select value.bind="catIndex"
-                    change.delegate="categoryChanged(types.length)" id="helpTicketCategory" class="form-control selectpicker"
-                    data-style="btn btn-link">
-                    <option repeat.for="types of helpTickets.helpTicketTypesArray | sortArray:'category':'ASC'" 
-                        model.bind="types.category">${types.description}</option>
+
+            <div class="form-group">
+                <Label class="bigLabel topMargin">Help Ticket Category</Label>
+                <select value.bind="catIndex" id="helpTicketCategory" class="form-control selectpicker"
+                    data-style="btn btn-link" change.trigger="categoryChanged()">
+                    <option value="-1">To help define your issue, select the category</option>
+                    <option repeat.for="types of config.HELP_TICKET_TYPES" model.bind="$index">
+                    ${types.description}</option>
                 </select>
+
             </div>
 
-            <select value.bind="thisIndex">
-                <option model.bind="data.code" repeat.for="data of myData">${data.code}</option>
-            </select>
-            <select >
-                <option model.bind="data.code" repeat.for="data of myData[thisIndex].subArray">${data.code}</option>
-            </select>
-
-            <!-- Type Select -->
-            <!-- <div show.bind="showTypes" class="form-group"> -->
-                <!-- <Label class="bigLabel topMargin">To help us further define your issue, select the type.</Label> -->
-                <select value.bind="helpTickets.selectedHelpTicket.helpTicketType" change.delegate="typeChanged()"
-                    id="helpTicketType" class="form-control selectpicker" data-style="btn btn-link">
-                    <option value="-1">To help us further define your issue, select the type</option>
-                    <option repeat.for="subcatTypes of helpTickets.helpTicketTypesArray[catIndex].subtypes"
+            <div show.bind="catIndex != -1" class="form-group">
+                <Label class="bigLabel topMargin">Help Ticket Type</Label>
+                <select value.bind="helpTickets.selectedHelpTicket.helpTicketType" change.trigger="typeChanged()" class="form-control selectpicker"
+                    data-style="btn btn-link" id="helpTicketType">
+                    <option value="null">To help us further define your issue, select the type</option>
+                    <option repeat.for="subcatTypes of config.HELP_TICKET_TYPES[catIndex].subTypes"
                         model.bind="subcatTypes.type">${subcatTypes.description}</option>
                 </select>
-            <!-- </div> -->
+            </div>
         </div>
     </div>
+    <div class="row" style="padding:10px;">
+        <div if.bind="stepOneErrors.length > 0" class="col alert alert-warning" role="alert">
+            <ul>
+                <li repeat.for="error of stepOneErrors">${error}</li>
+            </ul>
+        </div>
     </div>
 </template>

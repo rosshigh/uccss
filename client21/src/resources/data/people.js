@@ -147,21 +147,9 @@ export class People {
         var url = this.PEOPLE_SERVICE;
       }
       let response = await this.data.saveObject(this.selectedPerson, url, "post")
-      if (!response.error) {
-        if (this.peopleArray) {
-          this.peopleArray.push(response);;
-        }
-      } else {
-        this.data.processError(response, "There was an error creating the account.");
-      }
       return response;
     } else {
       let response = await this.data.saveObject(this.selectedPerson, this.PEOPLE_SERVICE, "put")
-      if (!response.error) {
-        if (this.peopleArray) {
-          this.peopleArray[this.editIndex] = this.utils.copyObject(this.selectedPerson, this.peopleArray[this.editIndex]);
-        }
-      }
       return response;
     }
   }
@@ -280,19 +268,9 @@ export class People {
   async saveInstitution() {
     if (!this.selectedInstitution._id) {
       let response = await this.data.saveObject(this.selectedInstitution, this.INSTITUTION_SERVICES, "post")
-      if (!response.error) {
-        if (this.institutionsArray) {
-          this.institutionsArray.push(response);
-        }
-      }
       return response;
     } else {
       let response = await this.data.saveObject(this.selectedInstitution, this.INSTITUTION_SERVICES, "put")
-      if (!response.status) {
-        if (this.institutionsArray) {
-          this.institutionsArray[this.editInstitutionIndex] = this.utils.copyObject(this.selectedInstitution, this.institutionsArray[this.editInstitutionIndex]);
-        }
-      }
       return response;
     }
   }

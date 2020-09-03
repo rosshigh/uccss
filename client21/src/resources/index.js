@@ -19,6 +19,7 @@ export function configure(config) {
     PLATFORM.moduleName('./value-converters/remove-spaces'),
     PLATFORM.moduleName('./value-converters/document-icons'),  
     PLATFORM.moduleName('./value-converters/sort-array'),
-    PLATFORM.moduleName('./value-converters/help-ticket-category')
+    PLATFORM.moduleName('./value-converters/help-ticket-category'),
+    PLATFORM.moduleName('./value-converters/session')
   ]);
 }

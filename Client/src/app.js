@@ -1,6 +1,7 @@
 import {inject} from 'aurelia-framework';
 import AppRouterConfig from './config/routerConfig';
-// import $ from 'bootstrap'
+import $ from 'bootstrap'
+import 'bootstrap';
 
 @inject(AppRouterConfig)
 export class App {

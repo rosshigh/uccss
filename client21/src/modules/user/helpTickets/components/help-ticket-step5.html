@@ -1,0 +1,38 @@
+<template>
+    <div class="leftMargin rightMargin">
+        <div show.bind="outputForm">
+            <h3 class="topMargin">Details:</h3>
+            <div class="card-title" style="padding:20px;" id="outputContainer"></div>
+        </div>
+        <div show.bind="SelectedClientRequest">
+            <h3 class="topMargin">Product Request</h3>
+            <div class="card-title">
+                <h4>Session: ${SelectedClientRequest.sessionId | session:sessions.sessionsArray}</h4>
+                <h4>Product: ${SelectedClientRequest.productName}</h4>
+                <h4>System: ${SelectedClientRequest.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</h4>
+                <h4>Client: ${SelectedClientRequest.client}</h4>
+                <h4>Course: ${SelectedClientRequest.courseName}</h4>
+            </div>
+        </div>
+        <h3 class="topMargin">Attachments:</h3>
+        <div show.bind="filesToUpload.length" class="topMargin card-title">
+            <ul>
+                <li repeat.for="file of filesToUpload" class="list-group-item">${file.name}<span click.delegate="removeFile($index)"
+                        class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
+            </ul>
+        </div>
+        <div show.bind="!filesToUpload.length" class="topMargin card-title">Are you sure you don't want to add an
+            attachement?</div>
+        <h3 class="topMargin">Description:</h3>
+        <div show.bind="helpTickets.selectedHelpTicketContent.content.comments" class="topMargin card-title"
+            innerhtml.bind="helpTickets.selectedHelpTicketContent.content.comments"></div>
+        <div show.bind="!helpTickets.selectedHelpTicketContent.content.comments" class="topMargin card-title">Are you
+            sure you don't wish to provide a description?</div>
+        <h3 class="topMargin">Steps to Reproduce:</h3>
+        <div show.bind="helpTickets.selectedHelpTicketContent.content.steps" class="topMargin card-title"
+            innerhtml.bind="helpTickets.selectedHelpTicketContent.content.steps"></div>
+        <div show.bind="!helpTickets.selectedHelpTicketContent.content.steps" class="topMargin card-title">Are you sure
+            you don't wish to provide the steps to reproduce the problem?</div>
+    </div>
+
+</template>

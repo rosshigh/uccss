@@ -48,6 +48,14 @@
                     <span><i click.trigger="closeDocumentForm()" class="fa fa-window-close-o"
                             aria-hidden="true"></i></span>
                     <div class="form-group">
+                        <div class="checkbox">
+                            <label class="pull-left">
+                                <input id="activeProduct" checked.bind="documentsService.selectedDocument.helpTicketRelevant"
+                                    type="checkbox"> Help Ticket Relevant
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="sid">Name *</label>
                         <input value.bind="documentsService.selectedDocument.name  & validateOnChange" type="text"
                             class="form-control" id="name">
@@ -56,6 +64,16 @@
                         <label for="sid">Description</label>
                         <textarea value.bind="documentsService.selectedDocument.description" class="form-control"
                             id="description" rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="sid">Sort Order</label>
+                        <input value.bind="documentsService.selectedDocument.sortOrder" type="number"
+                            class="form-control" id="sortOrder">
+                    </div>
+                    <div class="form-group">
+                        <label>Date to Display to User</label>
+                        <flat-picker controlid="modifiedDate" config.bind="dateConfig"
+                            value.bind="documentsService.selectedDocument.displayDate"></flat-picker>
                     </div>
                     <div>
                         <h4

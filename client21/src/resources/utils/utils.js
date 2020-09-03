@@ -5,12 +5,12 @@ import {inject} from 'aurelia-framework';
 // @inject(Notification, AppConfig)
 export class Utils{
   
-  // guid() {
-  //   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-  //     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-  //     return v.toString(16); 
-  //   });
-  // }
+  guid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16); 
+    });
+  }
 
   refreshSelect(selectElement, collection, matchProperty, valueToMatch){
     let selectedOption = null;
@@ -41,6 +41,21 @@ export class Utils{
   showNotification(msg, type){
     $("#notification").html(msg).fadeIn(1500).fadeOut(5000);
   }
+
+  dateSort(a, b, sortOrder) {
+    let date1 = new Date(a.registered);
+    let date2 = new Date(b.registered);
+
+    if (date1 === date2) {
+        return 0;
+    }
+
+    if (date1 > date2) {
+        return 1 * sortOrder;
+    }
+
+    return -1 * sortOrder;
+}
 
    /*****************************************************************************
    * Determine users role for authorizations

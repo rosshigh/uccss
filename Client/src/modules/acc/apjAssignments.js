@@ -345,10 +345,11 @@ export class APJAssignments {
 
   updateClientAssignments() {
     if (this.selectedClientIndex) {
-      this.selectedSystem.clients[this.selectedClientIndex].studentIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentUserIds;
-      this.selectedSystem.clients[this.selectedClientIndex].studentPassword = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentPassword;
-      this.selectedSystem.clients[this.selectedClientIndex].facultyIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].facultyIDRange;
-      this.selectedSystem.clients[this.selectedClientIndex].facultyPassword = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].facultyPassword;
+      // this.selectedSystem.clients[this.selectedClientIndex].assignments[this.clientSelectedIndex].studentIDRange
+      this.selectedSystem.clients[this.selectedClientIndex].assignments[this.clientSelectedIndex].studentIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentUserIds;
+      this.selectedSystem.clients[this.selectedClientIndex].assignments[this.clientSelectedIndex].studentPassword = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].studentPassword;
+      this.selectedSystem.clients[this.selectedClientIndex].assignments[this.clientSelectedIndex].facultyIDRange = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].facultyIDRange;
+      this.selectedSystem.clients[this.selectedClientIndex].assignments[this.clientSelectedIndex].facultyPassword = this.selectedRequestDetail.assignments[this.assignmentDetailIndex].facultyPassword;
     }
   }
 

@@ -19,6 +19,7 @@ module.exports = function (app, config) {
     logger.log('info', 'Get documents');
     var query = buildQuery(req.query, Category.find())
     await query.exec().then(result => {
+console.log(result)      
       res.status(200).json(result);
     })
   }));
@@ -47,10 +48,8 @@ module.exports = function (app, config) {
 
   var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      console.log('tehre')
       let paths = req.params.container.split('$@').join('/');
       var path = config.uploads + "/documents/" + paths;
-      console.log(paths);
       mkdirp(path, function (err) {
         if (err) {
           res.status(500).json(err);
@@ -61,7 +60,6 @@ module.exports = function (app, config) {
     },
     filename: function (req, file, cb) {
       let fileName = file.originalname.split('.');
-      console.log(fileName)
       cb(null, fileName[0] + " (" + req.params.version + ")." + fileName[fileName.length - 1]);
     }
   });
@@ -72,13 +70,11 @@ module.exports = function (app, config) {
     var fs = require('fs');
     const formidable = require('formidable');
     const form = formidable({ multiples: true });
-    // form.maxFileSize = 300 * 1024 * 1024; changes the max file size to 300
+    form.maxFileSize = 800 * 1024 * 1024; //changes the max file size to 800
     form.parse(req, function (err, fields, files) {
-      console.log(files)
-      let oldpath = files.file0.path;
+      let oldpath = files.file0.path;   
       let newpath = config.uploads + "/" + req.params.container + "/" + req.params.level1 + "/" + req.params.level2;
       mkdirp(newpath).then(made => { 
-        console.log(made)
         newpath = newpath + "/" + files.file0.name
         fs.rename(oldpath, newpath, function (err) {
           if (err) throw err;

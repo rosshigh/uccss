@@ -13,13 +13,13 @@ export class Sessions {
         this.utils = utils;
     }
 
-    async getSessionsArray(options) {
+    async getObjectsArray(options) {
         var url = this.SESSIONS_SERVICE;
         url += options ? options : "";
         try {
             let serverResponse = await this.data.get(url);
             if (!serverResponse.error) {
-                this.sessionsArray = serverResponse;
+                this.objectsArray = serverResponse;
             } else {
                 this.data.processError(serverResponse);
             }
@@ -33,8 +33,8 @@ export class Sessions {
         try {
             let serverResponse = await this.data.get(url);
             if (!serverResponse.error) {
-                this.selectedSession = serverResponse;
-                this.originalSession = this.utils.copyObject(serverResponse);
+                this.selectedObject = serverResponse;
+                this.originalObject = this.utils.copyObject(serverResponse);
             } else {
                 this.data.processError(serverResponse);
             }
@@ -59,15 +59,15 @@ export class Sessions {
 
     selectSession(index) {
         if (!index && index != 0) {
-            this.selectedSession = this.emptySession();
+            this.selectedObject = this.emptySession();
         } else {
             try {
-                this.selectedSession = this.utils.copyObject(this.sessionsArray[index]);
+                this.selectedObject = this.utils.copyObject(this.objectsArray[index]);
                 this.editIndex = index;
             } catch (error) {
                 console.log(error);
-                this.selectedSession = this.emptySession();
-                this.originalSession = this.utils.copyObject(his.selectedSession);
+                this.selectedObject = this.emptySession();
+                this.originalObject = this.utils.copyObject(his.selectedObject);
                 this.newSession = true;
             }
 
@@ -76,10 +76,10 @@ export class Sessions {
     }
 
     selectSessionById(id) {
-        this.selectedSession = null;
-        for (var i = 0; i < this.sessionsArray.length; i++) {
-            if (this.sessionsArray[i]._id === id) {
-                this.selectedSession = this.utils.copyObject(this.sessionsArray[i]);
+        this.selectedObject = null;
+        for (var i = 0; i < this.objectsArray.length; i++) {
+            if (this.objectsArray[i]._id === id) {
+                this.selectedObject = this.utils.copyObject(this.objectsArray[i]);
                 this.editIndex = i;
                 break;
             }
@@ -87,7 +87,7 @@ export class Sessions {
     }
 
     setSession(session) {
-        this.selectedSession = session;
+        this.selectedObject = session;
     }
 
     emptySession() {
@@ -108,18 +108,18 @@ export class Sessions {
     }
 
     async saveSession() {
-        if (!this.selectedSession) {
+        if (!this.selectedObject) {
             return;
         }
 
-        if (!this.selectedSession._id) {
-            let serverResponse = await this.data.saveObject(this.selectedSession, this.SESSIONS_SERVICE, "post");
+        if (!this.selectedObject._id) {
+            let serverResponse = await this.data.saveObject(this.selectedObject, this.SESSIONS_SERVICE, "post");
             if (!serverResponse.error) {
-                this.sessionsArray.unshift(serverResponse);
+                this.objectsArray.unshift(serverResponse);
             }
             return serverResponse;
         } else {
-            var serverResponse = await this.data.saveObject(this.selectedSession, this.SESSIONS_SERVICE, "put");
+            var serverResponse = await this.data.saveObject(this.selectedObject, this.SESSIONS_SERVICE, "put");
             return serverResponse;
         }
 
@@ -139,6 +139,6 @@ export class Sessions {
     }
 
     isSessionDirty() {
-        return this.utils.objectsEqual(this.selectedSession, this.originalSession);
+        return this.utils.objectsEqual(this.selectedObject, this.originalObject);
     }
 }

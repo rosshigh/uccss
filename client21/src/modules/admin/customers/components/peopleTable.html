@@ -48,6 +48,7 @@
             <tr repeat.for="person of $displayData">
                 <td click.delegate="edit(person)">${person.firstName}</td>
                 <td click.delegate="edit(person)">${person.lastName}</td>
+                <td click.delegate="edit(person)">${person.nickName}</td>
                 <td click.delegate="edit(person)">${person.institutionId.name}</td>
                 <td><span><i click.trigger="copyEmail(person)" class="fa fa-paper-plane" aria-hidden="true"></i></span>
                     ${person.email}</td>
@@ -59,7 +60,7 @@
                 <td>${person.personStatus |
                     lookupValue:is4ua.personStatusArray:"code":"description"}
                     <span click.delegate="toggleStatus(person._id, person.personStatus)"
-                        innerhtml="${person.personStatus | activateButton}"></span>
+                        innerhtml="${person.personStatus | activateButton:'02'}"></span>
                 </td>
             </tr>
         </tbody>

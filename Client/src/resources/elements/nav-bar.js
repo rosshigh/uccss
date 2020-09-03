@@ -9,7 +9,7 @@ import { CommonDialogs } from '../dialogs/common-dialogs';
 import { APJClientRequests } from '../../resources/data/apjClientRequests';
 import moment from 'moment';
 import * as toastr from "toastr";
-import $ from "jquery";
+// import $ from "jquery";
 
 @inject(Router, EventAggregator, BindingEngine, Auth, Utils, People, AppConfig, CommonDialogs, APJClientRequests)
 export class NavBar {

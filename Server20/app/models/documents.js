@@ -46,8 +46,10 @@ module.exports = Mongoose.model('DocSubCategory', DocumentSubCategorySchema);
 var DocumentCategorySchema = new Schema({
   DocCode: { type: Number },
   name: { type: String },
+  size: { type: Number },
   description: { type: String },
   active: { type: Boolean, default: true },
+  displayDate: { type: Date, default: Date.now },
   createdDate: { type: Date, default: Date.now },
   subCategories: ['DocSubCategory'],
   type: { type: String },

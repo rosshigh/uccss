@@ -36,7 +36,7 @@ export class EditSessions {
 
     async activate() {
         let responses = await Promise.all([
-            this.sessions.getSessionsArray('?order=startDate:DSC'),
+            this.sessions.getObjectsArray('?order=startDate:DSC'),
             this.sessions.getSessionParameters()
         ]);
     }
@@ -49,7 +49,7 @@ export class EditSessions {
 
     async refresh() {
         this.clearFilters();
-        await this.sessions.getSessionsArray('?order=startDate:DSC');
+        await this.sessions.getObjectsArray('?order=startDate:DSC');
     }
 
     new() {
@@ -67,8 +67,8 @@ export class EditSessions {
     }
 
     refreshSelects(){
-        this.utils.refreshSelect("#editSession", this.sessions.SESSION_PARAMS, "session", this.sessions.selectedSession.session);
-        this.utils.refreshSelect("#institutionSelect", this.config.SESSION_STATUSES, "status", this.sessions.selectedSession.sessionStatus);
+        this.utils.refreshSelect("#editSession", this.sessions.SESSION_PARAMS, "session", this.sessions.selectedObject.session);
+        this.utils.refreshSelect("#institutionSelect", this.config.SESSION_STATUSES, "status", this.sessions.selectedObject.sessionStatus);
     }
 
     createValidationRules() {
@@ -80,7 +80,7 @@ export class EditSessions {
             .ensure('startDate').displayName('a Start Date').required()
             .ensure('endDate').displayName('an End Date').required().minLength(10)
             .ensure('requestsOpenDate').displayName('a Requst Open Date').required()
-            .on(this.sessions.selectedSession);
+            .on(this.sessions.selectedObject);
     }
 
     async save() {
@@ -164,7 +164,7 @@ export class EditSessions {
                 this.editStatus = "Closed"
                 break;
         }
-        this.sessions.selectedSession.sessionStatus = this.editStatus;
+        this.sessions.selectedObject.sessionStatus = this.editStatus;
         this.save();
     }
 
@@ -190,7 +190,7 @@ export class EditSessions {
     }
 
     cancel() {
-        this.sessions.selectSessionById(this.sessions.selectedSession._id);
+        this.sessions.selectSessionById(this.sessions.selectedObject._id);
     }
 
     clearFilters() {
