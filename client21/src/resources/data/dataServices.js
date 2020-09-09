@@ -1,20 +1,20 @@
 import {inject} from 'aurelia-framework';
 import {HttpClient} from 'aurelia-http-client';
 import {Utils} from '../utils/utils';
-// import {AppConfig} from '../../config/appConfig';
+import {AppConfig} from '../../appConfig';
 import {EventAggregator} from 'aurelia-event-aggregator';
 
-@inject(HttpClient, Utils,  EventAggregator)
+@inject(HttpClient, Utils,  AppConfig, EventAggregator)
 export class DataServices {
     isRequesting = false;
-    config= {
-        BASE_URL : 'http://localhost/api'
-    }
+    // config= {
+    //     BASE_URL : 'http://localhost/api'
+    // }
 
-    constructor(http, utils,  eventAggregator) {
+    constructor(http, utils, config, eventAggregator) {
         this.http = http;
         this.utils = utils;
-        // this.config = config;
+        this.config = config;
         this.eventAggregator = eventAggregator;
 
 		this.http.configure(x => {
