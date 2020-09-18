@@ -1,7 +1,7 @@
 <template>
-    <div class="panel panel-default" style="background-color:ghostwhite;">
+    <div class="panel panel-default" >
         <div class="panel-body" style="padding:5px;">
-            <div class="bottomMargin">
+            <!-- <div class="bottomMargin">
                 <div class="bottomMargin list-group-item" style="1px solid black">
                     <span click.delegate="backCategory()" class="smallMarginRight" bootstrap-tooltip
                         data-toggle="tooltip" data-placement="bottom" title=""
@@ -17,14 +17,15 @@
                             aria-hidden="true"></i></span>
 
                 </div>
-            </div>
-            <h3>${documentsService.selectedCat.description}</h3>
-            <span if.bind="documentsService.selectedCat.subCategories.length">
+            </div> -->
+            <h3>Category: ${documentsService.selectedCat.description}</h3>
+            <div if.bind="documentsService.selectedCat.subCategories.length" style="padding:2px;background-color:ghostwhite;">
+                <h4>Existing Subcategories:</h4>
                 <ul class="list-group">
                     <li class="list-group-item" repeat.for="subCat of documentsService.selectedCat.subCategories">
                         ${subCat.description}</li>
                 </ul>
-            </span>
+            </div>
             <span if.bind="!documentsService.selectedCat.subCategories.length">
                 <h5>This document category has no subcategories</h5>
             </span>

@@ -1,11 +1,15 @@
 <template>
+    <compose view="./components/categoryModal.html"></compose>
+    <compose view="./components/subCategoryModal.html"></compose>
+    <compose view="./components/subSubCategoryModal.html"></compose>
     <div class="card positionUnderToolbar">
         <div class="card-body">
             <div class="row">
                 <div class="col-3">
                     <div class="bottomMargin list-group-item panelContrastColor">
-                        <span click.delegate="newCategory()" class="smallMarginRight" bootstrap-tooltip
-                            data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New Category"><i
+                        <!-- " data-toggle="tooltip"-->
+                        <span  data-toggle="tooltip" click.delegate="newCategory()" class="smallMarginRight" bootstrap-tooltip
+                             data-placement="bottom" title="" data-original-title="New Category"><i
                                 class="fa fa-plus fa-lg fa-border" aria-hidden="true"></i></span>
                         <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip
                             data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i

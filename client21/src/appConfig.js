@@ -5,8 +5,8 @@ export class AppConfig {
   DOWNLOAD_URL = this.HOST + '/uploadedFiles';
   DOCUMENT_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/documents'; 
 
-  // BASE_URL = "http=//localhost/api/";
-  // IMG_DOWNLOAD_URL = "http=//localhost/img/";
+  // BASE_URL = "http://localhost/api/";
+  // IMG_DOWNLOAD_URL = "http://localhost/img/";
 
   BASE_URL = this.HOST + "/api/";
   IMG_DOWNLOAD_URL = this.HOST + '/img/';  
@@ -104,7 +104,22 @@ export class AppConfig {
     }
 ];
 
-HELP_TICKET_PRIORITIES = [{priority: "Low", message: "Not time sensitive", status: ""},{priority: "Medium", message: "Time sensitive but doesn't require immediate attention", status: "warning"},{priority: "Critical", message:"Critical, time sensitive issue",status: "danger"}];
+HELP_TICKET_PRIORITIES = [
+  {
+    priority: "Low", 
+    message:"<p>I'm walking into class in 10 minutes, and eventhough I didn't test this beforehand, I don't want to embarrass myself in my students.</p><ul><li>I know I should have thought of it earlier</li><li>I won't ever do it again</li><li>I don't expect you to move heaven and earth when I was so remiss</li></ul><p>Okay, I'm sorry.</p>",
+    status: "card-header-success"
+  },
+  {
+    priority: "Medium", 
+    message:"<p>I'm walking into class in 10 minutes, and eventhough I didn't test this beforehand, I don't want to embarrass myself in my students.</p><ul><li>I know I should have thought of it earlier</li><li>I won't ever do it again</li><li>I don't expect you to move heaven and earth when I was so remiss</li></ul><p>Okay, I'm sorry.</p>",
+    status: "card-header-warning"
+  },
+  {
+    priority: "Critical", 
+    message:"<p>I'm walking into class in 10 minutes, and eventhough I didn't test this beforehand, I don't want to embarrass myself in my students.</p><ul><li>I know I should have thought of it earlier</li><li>I won't ever do it again</li><li>I don't expect you to move heaven and earth when I was so remiss</li></ul><p>Okay, I'm sorry.</p>",
+    status: "card-header-danger"
+  }];
 
 HELP_TICKET_TYPES = [
   {

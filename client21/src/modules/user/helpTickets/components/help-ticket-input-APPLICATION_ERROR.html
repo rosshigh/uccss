@@ -1,57 +1,191 @@
 <template>
-    <div class='col-md-12' id='appHelp'>
-        <div class='col-lg-12'>
-            <div class='topMargin form-group'>
-                <label class='control-label'>Application</label>
-                <select value.bind='helpTickets.selectedHelpTicketContent.content.applicationId' id='applicationId'
-                    class='form-control'>
-                    <option value=''>Select an application</option>
-                    <option repeat.for='app of appsArray' value.bind='app'>${app}</option>
-                </select>
-            </div>
-        </div>
-        <div class='col-lg-12'>
-            <div class='topMargin form-group'>
-                <label class='control-label'>Describe the Operating System</label>
-                <div class='panel panel-default'>
-                    <div class='panel-body'>
-                        <div class='row'>
-                            <div class='col-lg-6'>
-                                <span id='osWindows'>
-                                    <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.osWindows'
-                                        class='fa fa-check-square-o'></i>
-                                    <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.osWindows'
-                                        class='fa fa-square-o'></i>
-                                </span> Windows
+    <div class='row'>
+        <div class='col-5'>
+            <div class="card" style="background-color:ghostwhite;">
+                <div class="card-header">
+                    <h4 class="card-title">These are your current product requests. If the issue you are having is
+                        related to a
+                        specific product, please select it.</h4>
+                    <p class="category">Category subtitle</p>
+                </div>
+                <div class="card-body">
+                    <div class='row'>
+                        <div class='col'>
+                            <div class='topMargin form-group'>
+                                <label class='control-label'>Application</label>
+                                <select value.bind='helpTickets.selectedHelpTicketContent.content.applicationId'
+                                    id='applicationId' class='form-control'>
+                                    <option value=''>Select an application</option>
+                                    <option repeat.for='app of appsArray' value.bind='app'>${app}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class='col'>
+                            <div class='topMargin form-group'>
+                                <label class='control-label'>Describe the Operating System</label>
 
-                                <input show.bind='helpTickets.selectedHelpTicketContent.content.osWindows' value.bind='helpTickets.selectedHelpTicketContent.content.windowsVersion'
-                                    id='windowsVersion' class='form-control extend topMargin' placeholder='Windows 8, 8.1, 10, etc.'
-                                    type='text' />
+                                <div class='row'>
+                                    <div class='col'>
+                                        <span id='osWindows'>
+                                            <div class="form-group">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input
+                                                            checked.bind="helpTickets.selectedHelpTicketContent.content.osWindows"
+                                                            type="checkbox"> Windows
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </span>
+                                        <input show.bind='helpTickets.selectedHelpTicketContent.content.osWindows'
+                                            value.bind='helpTickets.selectedHelpTicketContent.content.windowsVersion'
+                                            id='windowsVersion' class='form-control extend topMargin'
+                                            placeholder='Windows 8, 8.1, 10, etc.' type='text' />
 
-                                <div class='row topMargin' show.bind='helpTickets.selectedHelpTicketContent.content.osWindows'>
-                                    <span class='leftMargin ' id='osWindows32bit'>
-                                        <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.osWindows32bit'
-                                            class='fa fa-check-square-o'></i>
-                                        <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.osWindows32bit'
-                                            class='fa fa-square-o'></i>
-                                    </span> 32-bit
-                                    <span class='leftMargin ' id='osWindows64bit'>
-                                        <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.osWindows64bit'
-                                            class='fa fa-check-square-o'></i>
-                                        <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.osWindows64bit'
-                                            class='fa fa-square-o'></i>
-                                    </span> 64-bit
-
+                                        <div class='row topMargin'
+                                            show.bind='helpTickets.selectedHelpTicketContent.content.osWindows'>
+                                            <span class='leftMargin ' id='osWindows32bit'>
+                                                <div class="form-group">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            <input
+                                                                checked.bind="helpTickets.selectedHelpTicketContent.content.osWindows32bit"
+                                                                type="checkbox"> 32-bit
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </span>
+                                            <span class='leftMargin ' id='osWindows64bit'>
+                                                <div class="form-group">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            <input
+                                                                checked.bind="helpTickets.selectedHelpTicketContent.content.osWindows64bit"
+                                                                type="checkbox"> 64-bit
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class='col'>
+                                        <span class='leftMargin' id='osMac'>
+                                            <div class="form-group">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input
+                                                            checked.bind="helpTickets.selectedHelpTicketContent.content.osMac"
+                                                            type="checkbox"> Mac OS
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class='col-lg-6'>
-                                <span class='leftMargin topMargin' id='osMac'>
-                                    <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.osMac'
-                                        class='fa fa-check-square-o'></i>
-                                    <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.osMac'
-                                        class='fa fa-square-o'></i>
-                                </span> Mac OS
-
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class='col-lg-12'>
+                <div class='topMargin col-lg-6 form-group '><label class='control-label'>Other Software Involved</label>
+                    <div class='panel panel-default'>
+                        <div class='panel-body'>
+                            <div class='col-lg-12'>
+                                <div class='col-lg-8'>
+                                    <span class='topMargin' id='officeInvolved'>
+                                        <div class="form-group">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input
+                                                        checked.bind="helpTickets.selectedHelpTicketContent.content.officeInvolved"
+                                                        type="checkbox"> Is Microsoft Office involved?
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <!-- <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.officeInvolved'
+                                    class='fa fa-check-square-o'></i>
+                                <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.officeInvolved'
+                                    class='fa fa-square-o'></i> -->
+                                    </span>
+                                    <input show.bind='helpTickets.selectedHelpTicketContent.content.officeInvolved'
+                                        value.bind='helpTickets.selectedHelpTicketContent.content.officeVersion'
+                                        id='officeVersion' class='form-control extend topMargin'
+                                        placeholder='2007, 2010, 2013, etc.' type='text' />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class='topMargin col-lg-6 form-group'><label class='control-label'>Describe the Network
+                        Connection</label>
+                    <div class='panel panel-default'>
+                        <div class='panel-body'>
+                            <div class='row'>
+                                <span class='leftMargin topMargin' id='wiredNetwork'>
+                                    <div class="form-group">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input
+                                                    checked.bind="helpTickets.selectedHelpTicketContent.content.wiredNetwork"
+                                                    type="checkbox"> Wired
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <!-- <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.wiredNetwork'
+                                class='fa fa-check-square-o'></i>
+                            <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.wiredNetwork'
+                                class='fa fa-square-o'></i> -->
+                                </span>
+                                <span class='leftMargin topMargin' id='wirelessNetwork'>
+                                    <div class="form-group">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input
+                                                    checked.bind="helpTickets.selectedHelpTicketContent.content.wirelessNetwork"
+                                                    type="checkbox"> Wireless
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <!-- <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.wirelessNetwork'
+                                class='fa fa-check-square-o'></i>
+                            <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.wirelessNetwork'
+                                class='fa fa-square-o'></i> -->
+                                </span>
+                            </div>
+                            <div class='row topMargin'>
+                                <span class='leftMargin topMargin' id='campusNetwork'>
+                                    <div class="form-group">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input
+                                                    checked.bind="helpTickets.selectedHelpTicketContent.content.campusNetwork"
+                                                    type="checkbox"> Campus
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <!-- <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.campusNetwork'
+                                class='fa fa-check-square-o'></i>
+                            <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.campusNetwork'
+                                class='fa fa-square-o'></i> -->
+                                </span>
+                                <span class='leftMargin topMargin' id='personalNetwork'>
+                                    <div class="form-group">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input
+                                                    checked.bind="helpTickets.selectedHelpTicketContent.content.personalNetwork"
+                                                    type="checkbox"> Personal/Private Network
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <!-- <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.personalNetwork'
+                                class='fa fa-check-square-o'></i>
+                            <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.personalNetwork'
+                                class='fa fa-square-o'></i> -->
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -59,62 +193,6 @@
             </div>
         </div>
     </div>
-    <div class='col-lg-12'>
-        <div class='topMargin col-lg-6 form-group '><label class='control-label'>Other Software Involved</label>
-            <div class='panel panel-default'>
-                <div class='panel-body'>
-                    <div class='col-lg-12'>
-                        <div class='col-lg-8'>
-                            <span class='topMargin' id='officeInvolved'>
-                                <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.officeInvolved'
-                                    class='fa fa-check-square-o'></i>
-                                <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.officeInvolved'
-                                    class='fa fa-square-o'></i>
-                            </span> Is Microsoft Office involved?
-                            <input show.bind='helpTickets.selectedHelpTicketContent.content.officeInvolved' value.bind='helpTickets.selectedHelpTicketContent.content.officeVersion'
-                                id='officeVersion' class='form-control extend topMargin' placeholder='2007, 2010, 2013, etc.'
-                                type='text' />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class='topMargin col-lg-6 form-group'><label class='control-label'>Describe the Network
-                Connection</label>
-            <div class='panel panel-default'>
-                <div class='panel-body'>
-                    <div class='row'>
-                        <span class='leftMargin topMargin' id='wiredNetwork'>
-                            <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.wiredNetwork'
-                                class='fa fa-check-square-o'></i>
-                            <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.wiredNetwork'
-                                class='fa fa-square-o'></i>
-                        </span> Wired
-                        <span class='leftMargin topMargin' id='wirelessNetwork'>
-                            <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.wirelessNetwork'
-                                class='fa fa-check-square-o'></i>
-                            <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.wirelessNetwork'
-                                class='fa fa-square-o'></i>
-                        </span> Wired
-                    </div>
-                    <div class='row topMargin'>
-                        <span class='leftMargin topMargin' id='campusNetwork'>
-                            <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.campusNetwork'
-                                class='fa fa-check-square-o'></i>
-                            <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.campusNetwork'
-                                class='fa fa-square-o'></i>
-                        </span> Campus
-                        <span class='leftMargin topMargin' id='personalNetwork'>
-                            <i click.trigger='toggleField($event)' show.bind='helpTickets.selectedHelpTicketContent.content.personalNetwork'
-                                class='fa fa-check-square-o'></i>
-                            <i click.trigger='toggleField($event)' show.bind='!helpTickets.selectedHelpTicketContent.content.personalNetwork'
-                                class='fa fa-square-o'></i>
-                        </span> Personal/Private Network
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-
-    </div> 
+    </div>
 </template>

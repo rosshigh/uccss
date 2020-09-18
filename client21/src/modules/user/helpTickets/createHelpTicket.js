@@ -1,24 +1,24 @@
 import { inject, BindingEngine } from 'aurelia-framework';
-import {BindingSignaler} from 'aurelia-templating-resources';
+import { BindingSignaler } from 'aurelia-templating-resources';
 import { HelpTickets } from '../../../resources/data/helpTickets';
-import {ClientRequests} from '../../../resources/data/clientRequests';
-import {Sessions} from '../../../resources/data/sessions';
-import {Systems} from '../../../resources/data/systems';
+import { ClientRequests } from '../../../resources/data/clientRequests';
+import { Sessions } from '../../../resources/data/sessions';
+import { Systems } from '../../../resources/data/systems';
 import { DocumentsServices } from '../../../resources/data/documents';
 import { Store } from '../../../store/store';
 import { AppConfig } from '../../../appConfig';
 import { Utils } from '../../../resources/utils/utils';
 import * as smartWizard from '../../../resources/js/jquery.smartWizard.min';
 
-@inject( HelpTickets, ClientRequests, Sessions, Systems, DocumentsServices, Store, AppConfig, Utils)
+@inject(HelpTickets, ClientRequests, Sessions, Systems, DocumentsServices, Store, AppConfig, Utils)
 export class UserCreateHelpTicket {
-    
+
     testArray = [
-        {item: 'a', index: 0, subItems: [1, 2]},
-        {item: 'b', index: 1, subItems: [3, 4]}
+        { item: 'a', index: 0, subItems: [1, 2] },
+        { item: 'b', index: 1, subItems: [3, 4] }
     ];
 
-    constructor( helpTickets, requests, sessions, systems, documents, store, config, utils){
+    constructor(helpTickets, requests, sessions, systems, documents, store, config, utils) {
         this.helpTickets = helpTickets;
         this.requests = requests;
         this.sessions = sessions;
@@ -31,7 +31,7 @@ export class UserCreateHelpTicket {
         this.userObj = this.store.getUser('user');
     }
 
-    async activate(){
+    async activate() {
         let responses = await Promise.all([
             this.helpTickets.getHelpTicketTypes('?order=category'),
             this.sessions.getObjectsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate'),
@@ -44,7 +44,7 @@ export class UserCreateHelpTicket {
             item1.subCategories.forEach(item2 => {
                 item2.subSubCategories.forEach(item3 => {
                     item3.documents.forEach(item4 => {
-                        if(item4.helpTicketRelevant){
+                        if (item4.helpTicketRelevant) {
                             this.appsArray.push(item4.name);
                         }
                     })
@@ -53,7 +53,7 @@ export class UserCreateHelpTicket {
         })
         // let responses = await Promise.all([
         //     this.helpTickets.getHelpTicketTypes('?order=category'),
-          
+
         //     this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id + '&order=number'),
         //     this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true&order=name'),
         //     this.systems.getSystemsArray(),
@@ -63,7 +63,7 @@ export class UserCreateHelpTicket {
         this.helpTickets.selectObject();
     }
 
-    attached(){
+    attached() {
         $('.selectpicker').selectpicker();
         $('.selectpicker').click(e => e.stopPropagation());
         var wizard = $('.wizard').wizard();
@@ -72,14 +72,14 @@ export class UserCreateHelpTicket {
         wizard.on('actionclicked.fu.wizard', (e, data) => {
             that.step = data.step;
             if (data.direction !== "previous") {
-                switch(data.step){
+                switch (data.step) {
                     case 1:
                         that.validateStepOne();
-                        if(that.stepOneErrors.length){
+                        if (that.stepOneErrors.length) {
                             e.preventDefault();
                         } else {
                             that.showForm = true;
-                            if(that.helpTickets.helpTicketTypesArray[that.catIndex].requestsRequired){
+                            if (that.helpTickets.helpTicketTypesArray[that.catIndex].requestsRequired) {
                                 that.getActiveRequests();
                             } else {
                                 $('.wizard').wizard('selectedItem', { step: 2 });
@@ -95,7 +95,7 @@ export class UserCreateHelpTicket {
                     case 5:
                         break;
                 }
-             
+
 
 
                 // if (!that.validation.validate(data.step)) {
@@ -121,25 +121,28 @@ export class UserCreateHelpTicket {
 
     }
 
-    validateStepOne(){
+    validateStepOne() {
         this.stepOneErrors = [];
-        if(this.catIndex == -1){
+        if (this.catIndex == -1) {
             this.stepOneErrors.push('Choose a help ticket category')
         }
-        if(!this.helpTickets.selectedHelpTicket.helpTicketType){
+        if (!this.helpTickets.selectedHelpTicket.helpTicketType) {
             this.stepOneErrors.push('Choose a help ticket type')
         }
     }
 
     async categoryChanged() {
-        setTimeout(()=>{$("#helpTicketType").selectpicker('refresh');},500);
+        setTimeout(() => { $("#helpTicketType").selectpicker('refresh'); }, 500);
+        if (this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired) {
+            await this.getActiveRequests();
+        }
     }
 
     getCategoryIndex() {
         var index = 0;
         this.helpTickets.helpTicketTypesArray.forEach((item, categoryIndex) => {
             if (this.helpTickets.selectedHelpTicket.helpTicketCategory == item.category) {
-                index = categoryIndex;                
+                index = categoryIndex;
             }
         });
         return index;
@@ -150,7 +153,7 @@ export class UserCreateHelpTicket {
         // this.selectedHelpTicketType = this.getTypeIndex();
         // this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired;
         // this.descriptionRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].descriptionRequired;
-        // this.showForm = true;
+        this.showForm = true;
     }
 
     getTypeIndex() {
@@ -163,12 +166,12 @@ export class UserCreateHelpTicket {
         return typeIndex;
     }
 
-    async getActiveRequests(){
+    async getActiveRequests() {
         var sessions = "";
         this.sessions.objectsArray.forEach(item => {
             sessions += item._id + ":";
         });
-        sessions = sessions.substring(0, sessions.length-1);
+        sessions = sessions.substring(0, sessions.length - 1);
         await this.requests.getActiveObjectsArray(this.userObj._id, sessions);
         this.originalClientRequestsArray = new Array();
         this.clientRequestsArray = new Array();
@@ -177,7 +180,7 @@ export class UserCreateHelpTicket {
             //Cycle through details of request
             item.requestDetails.forEach(item2 => {
                 //If there are assignments
-                if(item2.assignments && item2.assignments.length > 0){
+                if (item2.assignments && item2.assignments.length > 0) {
                     //Cycle through the assignments
                     item2.assignments.forEach((assign) => {
                         this.originalClientRequestsArray.push({
@@ -215,7 +218,7 @@ export class UserCreateHelpTicket {
                         _id: item2._id
                     })
                 }
-            }) 
+            })
         });
         this.originalClientRequestsArray.forEach(item => {
             this.clientRequestsArray.push(item);

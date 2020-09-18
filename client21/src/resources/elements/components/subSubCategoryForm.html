@@ -1,0 +1,24 @@
+<template>
+    <div class="input-group">
+        <input class="form-control" type="text" id="subSubCategoryInput" placeholder="Subsubcategory Name"
+            value.bind="documentsService.selectedCat.subCategories[selectedSubCategoryIndex].subSubCategories[selectedSubSubCategoryIndex].description" />
+        <!-- <span class="input-group-btn">
+            <i click.trigger="cancelEditCategory()" class="fa fa-ban fa-lg fa-border"
+                aria-hidden="true"></i>
+        </span>
+        <span class="input-group-btn">
+            <i click.trigger="saveCategory()" class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i>
+        </span> -->
+        <!-- <span if.bind="!newSubSubCategoryFlag" class="input-group-btn">
+            <i click.trigger="deleteSubSubCategory()" class="fa fa-trash fa-lg fa-border"
+                aria-hidden="true"></i>
+        </span> -->
+    </div>
+    <div class="form-group row">
+        <label for="catSortOrder" class="col-sm-3 col-form-label">Sort Order</label>
+        <div class="col-sm-5">
+            <input class="form-control" type="number" placeholder="Sort Order"
+                value.bind="documentsService.selectedCat.subCategories[selectedSubCategoryIndex].subSubCategories[selectedSubSubCategoryIndex].sortOrder" />
+        </div>
+    </div>
+</template>

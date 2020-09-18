@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div class="col">
+        <div class="col-4">
             <div class='topMargin bottomMargin'>
                 <label for="prioritySelect" class='class="bigLabel topMargin'>Priority</label>
                 <select class="form-control selectpicker" id="prioritySelect"
@@ -9,6 +9,9 @@
                         ${priority.priority}</option>
                 </select>
             </div>
+           
+        </div>
+        <div class="col-4">
             <div class="form-group">
                 <Label class="bigLabel topMargin">Help Ticket Category</Label>
                 <select value.bind="catIndex" id="helpTicketCategory" class="form-control selectpicker"
@@ -18,6 +21,8 @@
                         ${types.description}</option>
                 </select>
             </div>
+        </div>
+        <div class="col-4">
             <div show.bind="catIndex != -1" class="form-group">
                 <Label class="bigLabel topMargin">Help Ticket Type</Label>
                 <select value.bind="helpTickets.selectedHelpTicket.helpTicketType" change.trigger="typeChanged()"
@@ -28,15 +33,11 @@
                 </select>
             </div>
         </div>
-        <div class="col">
+    </div>
+    <div class="row">
+        <div class="col-4">
             <div class="card">
-                <div
-                    class="card-header ${config.HELP_TICKET_PRIORITIES[helpTickets.selectedHelpTicket.priority].status}">
-                    <h4 class="card-title">
-                        ${config.HELP_TICKET_PRIORITIES[helpTickets.selectedHelpTicket.priority].priority}</h4>
-                    <p class="category">Category subtitle</p>
-                </div>
-                <div class="card-body"
+                <div class="card-body" style="background-color: ghostwhite;"
                     innerhtml.bind="config.HELP_TICKET_PRIORITIES[helpTickets.selectedHelpTicket.priority].message">
                     The place is close to Barceloneta Beach and bus stop just 2 min by walk and near to
                     "Naviglio" where
@@ -44,12 +45,13 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row" style="padding:10px;">
-        <div if.bind="stepOneErrors.length > 0" class="col alert alert-warning" role="alert">
-            <ul>
-                <li repeat.for="error of stepOneErrors">${error}</li>
-            </ul>
+        <div class="col-8">
+            <compose view="./help-ticket-step2.html"></compose>
         </div>
     </div>
+  <div class="row">
+      <div class="col">
+        <compose show.bind="showForm" view="./help-ticket-step3.html"></compose>
+      </div>
+  </div>
 </template>

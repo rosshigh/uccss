@@ -68,7 +68,9 @@ export class DocumentsManagementCustomElement {
     newCategory() {
         this.documentsService.selectCategory();
         this.refreshSelects();
-        $('#CategoryForm').show()
+        this.modalTitle = "New Category";
+        // $('#CategoryForm').show()
+        $('#categoryModal').modal('show');
         $('#categoryInput').focus();
     }
 
@@ -76,7 +78,9 @@ export class DocumentsManagementCustomElement {
         this.documentsService.setCategory(obj);
         this.selectedCategory = index;
         this.refreshSelects();
-        $('#CategoryForm').show()
+        this.modalTitle = "Edit Category";
+        // $('#CategoryForm').show()
+        $('#categoryModal').modal('show');
         $('#categoryInput').focus();
         el.stopPropagation();
     }
@@ -99,13 +103,15 @@ export class DocumentsManagementCustomElement {
         }
         this.cleanUp();
     }
-
+    
     newSubCategory(obj, el) {
         this.documentsService.setCategory(obj);
         this.documentsService.selectedCat.subCategories.push(this.documentsService.emptySubCat());
         this.selectedSubCategoryIndex = this.documentsService.selectedCat.subCategories.length - 1;
         this.newSubCategoryFlag = true;
-        $("#SubCategoryForm").show();
+        this.modalTitle = "New Subcategory";
+        // $("#SubCategoryForm").show();
+        $('#subCategoryModal').modal('show');
         $("#subCategoryInput").focus();
         el.stopPropagation();
     }
@@ -115,7 +121,9 @@ export class DocumentsManagementCustomElement {
         this.selectedSubCategoryIndex = index;
         let descriptionNoSpaces = this.documentsService.selectedCat.subCategories[index].description.split(" ").join("");
         this.newSubCategoryFlag = false;
-        $("#SubCategoryForm").show();
+        this.modalTitle = "Edit Subcategory";
+        // $("#SubCategoryForm").show();
+        $('#subCategoryModal').modal('show');
         $("#subCategoryInput").focus();
         el.stopPropagation();
     }
@@ -143,7 +151,8 @@ export class DocumentsManagementCustomElement {
         this.documentsService.selectedCat.subCategories[index].subSubCategories.push(this.documentsService.emptySubSubCat(index));
         this.selectedSubSubCategoryIndex = this.documentsService.selectedCat.subCategories[index].subSubCategories.length - 1;
         this.newSubSubCategoryFlag = true;
-        $("#SubSubCategoryForm").show();
+        // $("#SubSubCategoryForm").show();
+        $('#subSubCategoryModal').modal('show');
         $("#subSubCategoryInput").focus();
         el.stopPropagation();
     }
@@ -153,7 +162,8 @@ export class DocumentsManagementCustomElement {
         this.selectedSubCategoryIndex = subCatIndex;
         this.selectedSubSubCategoryIndex = index;
         this.newSubSubCategoryFlag = false;
-        $("#SubSubCategoryForm").show();
+        // $("#SubSubCategoryForm").show();
+        $('#subSubCategoryModal').modal('show');
         $("#subSubCategoryInput").focus();
         el.stopPropagation();
     }
@@ -196,6 +206,9 @@ export class DocumentsManagementCustomElement {
             }
         }
         this.cleanUp();
+        $('#categoryModal').modal('hide');
+        $('#subCategoryModal').modal('hide');
+        $('#subSubCategoryModal').modal('hide');
     }
 
     checkCurriculum() {

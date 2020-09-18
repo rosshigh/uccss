@@ -265,7 +265,7 @@ export class EditProducts {
             "valFunction":function(context){
                 var found = false;
                 for(var i = 0; i < context.products.productsArray.length; i++){
-                    if( context.products.productsArray[i].name.toUpperCase() === context.products.selectedProduct.name.toUpperCase()){
+                    if( context.products.productsArray[i].name && context.products.productsArray[i].name.toUpperCase() === context.products.selectedProduct.name.toUpperCase()){
                         if(context.products.selectedProduct._id && context.products.selectedProduct._id != context.products.productsArray[i]._id){
                             found = true;
                         } else if (!context.products.selectedProduct._id){
