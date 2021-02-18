@@ -1,7 +1,7 @@
 import {inject} from 'aurelia-framework';
 import $ from 'jquery';
 import * as toastr from "toastr";
-import {Notification} from 'aurelia-notification';
+import {Notification} from 'aurelia-notification'; 
 import moment from 'moment';
 import {AppConfig} from '../../config/appConfig';
 
@@ -14,6 +14,8 @@ export class Utils{
       this.notification.waitForMove = true
       toastr.options.extendedTimeOut = "1000";
       toastr.options.timeOut = "1500";
+
+      this.notification.note('it worked')
 
       // toastr.options = {
       //   "closeButton": false,

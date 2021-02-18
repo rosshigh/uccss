@@ -1,0 +1,25 @@
+<template>
+    <div class="row">
+        <div class="col-4">
+            <label id=" customerList">Select the customers you want to include</label>
+            <input class="form-control" value.bind="peopleFilter" input.trigger="filterPeopleList()"
+                placeholder="Filter people" />
+            <div class="overFlow" style="height:400px;">
+                <ul class="list-group">
+                    <button click.trigger="selectPerson($event, person)" type="button"
+                        repeat.for="person of filteredPersonArray" id="${person._id}"
+                        class="list-group-item">${person.fullName}</button>
+                </ul>
+            </div>
+        </div>
+        <div class="col-4">
+            <label>Customers you want to include in your search</label>
+            <div style="height:400px;width:350px;margin-top:30px;">
+                <ul class="list-group">
+                    <button click.trigger="removePerson($event)" type="button" repeat.for="person of selectedPeople"
+                        id="${person._id}" class="list-group-item">${person.fullName}</button>
+                </ul>
+            </div>
+        </div>
+    </div>
+</template>

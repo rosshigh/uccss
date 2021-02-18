@@ -574,9 +574,6 @@ export class ViewHelpTickets {
     } else {
       this.ownIt();
     }
-
-
-
   }
 
   async ownIt() {

@@ -1,0 +1,11 @@
+<template>
+    <div show.bind="!existingRequest">
+        <p>For example, if you need multiple instances of the same product.</p>
+        <editor toolbar.bind="toolbar" value.bind="requestComments" height="250"></editor>
+    </div>
+    <div show.bind="existingRequest">
+        <h4 class="bigTopMargin">Because one or more clients have been assigned for this request, if you wish to add or edit your comments, please file a help ticket. Make sure you reference the course you selected.
+        </h4>
+        <div show.bind="requestComments" class="bigTopMargin" innerhtml.bind="requestComments"></div>
+    </div>
+</template>

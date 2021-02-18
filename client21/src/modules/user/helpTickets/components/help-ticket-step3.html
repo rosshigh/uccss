@@ -1,34 +1,35 @@
 <template>
-    <div class="row">
-        <div class="col">
-            <compose if.bind="helpTickets.selectedHelpTicket.helpTicketType == 'APPLICATION_ERROR'"
-                view="./help-ticket-input-APPLICATION_ERROR.html"></compose>
-        </div>
-    </div>
-   
-    <div class="leftMargin rightMargin topMargin panel panel-default" style="padding:5px;">
-        <div class='panel-body'>
+    <div class="row" style="padding:10px;">
+        <div class="col-7">
             <div class="row">
-                <div>
-                    <label>Upload screenshots or other files that will help us solve you problem.</lable></br>
-                        <label>If you want to upload multiple files, hold the control key while selecting files</label>
+                <div class="col-8">
+                    <h5>Are you having an issue with desktop software? </h5>
                 </div>
-
-
-                <div class="col-lg-2">
-                    <label class="btn btn-primary">
-                        Browse for files&hellip; <input type="file" style="display: none;"
-                            change.delegate="changeFiles()" files.bind="files" multiple>
-                    </label>
-                </div>
-                <div class="col-lg-6 col-lg-offset-2">
-                    <ul>
-                        <li repeat.for="file of filesToUpload" class="list-group-item" style="background-color:cyan;">
-                            ${file.name}<span click.delegate="removeFile($index)" class="pull-right"><i
-                                    class="fa fa-trash" aria-hidden="true"></i></span></li>
-                    </ul>
+                <div class="col">
+                    <div class="form-check form-check-radio form-check-inline leftMargin">
+                        <label class="form-check-label" repeat.for="option of yesNo">
+                            <input change.delegate="toggleSoftwareQuestion()" checked.bind="softwareQuestion"
+                                value.bind="option" class="form-check-input" type="radio" name="softwareOptions"
+                                id="inlineRadio4" value="option3"> ${option}
+                            <span class="circle">
+                                <span class="check"></span>
+                            </span>
+                        </label>
+                    </div>
                 </div>
             </div>
+        </div>
+        <div class="col">
+            <div if.bind="stepThreeErrors.length > 0" class="alert alert-danger col" role="alert">
+                <ul>
+                    <li repeat.for="error of stepThreeErrors">Error: ${error}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <compose if.bind="softwareQuestion === 'Yes'" view="./softwareHelp.html"></compose>
         </div>
     </div>
 </template>

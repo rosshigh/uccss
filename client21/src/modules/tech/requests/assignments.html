@@ -1,0 +1,51 @@
+<template>
+    <compose view="./components/confirmCloneModal.html"></compose>
+    <compose view="./components/confirmShareClientModal.html"></compose>
+    <compose view="./components/viewHoverProfile.html"></compose>
+    <compose view="./components/confirmDeleteAssignedModal.html"></compose>
+    <compose view="./components/confirmDeleteModal.html"></compose>
+    <compose view="./components/statusMenu.html"></compose>
+    <div class="card">
+        <div class="card-body">
+            <div show.bind="view === 'table'">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="form-group topMargin leftMargin">
+                            <select value.bind="selectedSession"
+                                change.delegate="getRequests()" id="session" class="form-control selectpicker"
+                                data-style="btn btn-link">
+                                <option repeat.for="session of sessions.objectsArray" value.bind="session._id">Session
+                                    ${session.session} - ${session.year}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-4"></div>
+                    <div class="col-4">
+                        <label>
+                            <input checked.bind="filterAssigned" change.trigger="getRequests()" type="checkbox">
+                            Filter out Assigned Requests
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div if.bind="requests.detailsArray.length === 0">
+                <h3>There are no requests for this session.</h3>
+            </div>
+
+            <div show.bind="view === 'table'">
+                <compose show.bind="requests.detailsArray.length > 0" view="./components/requestsTable.html"></compose>
+            </div>
+
+        </div>
+        <div show.bind="view === 'form'">
+            <compose view="./components/requestsForm.html"></compose>
+        </div>
+        <div show.bind="view === 'assign'">
+            <compose view="./components/assignmentForm.html"></compose>
+        </div>
+        <div show.bind="view == 'edit'">
+            <compose view="./components/editRequestsForm.html"></compose>
+        </div>
+    </div>
+    </div>
+</template>>

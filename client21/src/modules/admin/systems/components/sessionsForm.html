@@ -10,51 +10,50 @@
             data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border"
                 aria-hidden="true"></i></span>
     </div>
-    <div class="panel panel-info positionUnderToolbar">
-        <div class="row">
-            <div class="container">
-                <div class="topMargin">
-                    <div class="col-lg-5 topMargin">
-                        <label for="editSession" class="form-control-label">Session</label>
-                        <select value.bind="sessions.selectedObject.session" class="form-control selectpicker"
-                            id="editSession" data-style="btn btn-link">
-                            <option></option>
-                            <option repeat.for="session of sessions.SESSION_PARAMS" model.bind="session.session">
-                                ${session.session}</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-5 col-lg-offset-1 topMargin">
-                        <label for="editYear" class="form-control-label ">Year</label>
-                        <input value.bind="sessions.selectedObject.year" id="editYear" class=" form-control"
-                            placeholder="Year" type="text" />
-                    </div>
-                    <div class="col-lg-5 topMargin">
-                        <label class="form-control-label ">Start Date</label>
-                        <flat-picker controlid="startDate" config.bind="config"
-                            value.bind="sessions.selectedObject.startDate"></flat-picker>
-                    </div>
-                    <div class="col-lg-5 col-lg-offset-1 topMargin">
-                        <label class="form-control-label ">End Date</label>
-                        <flat-picker controlid="endDate" config.bind="config"
-                            value.bind="sessions.selectedObject.endDate"></flat-picker>
-                    </div>
-                    <div class="col-lg-5 topMargin">
-                        <label class="form-control-label ">Requests Open</label>
-                        <flat-picker controlid="requestsOpenDate" config.bind="config"
-                            value.bind="sessions.selectedObject.requestsOpenDate"></flat-picker>
-                    </div>
-                    <div class="col-lg-5 col-lg-offset-1 topMargin">
-                        <label for="editStatus" class="form-control-label">Status</label>
-                        <select value.bind="sessions.selectedObject.sessionStatus" id="editStatus"
-                            class="form-control selectpicker" id="editStatus" data-style="btn btn-link">
-                            <option repeat.for="session of config.SESSION_STATUSES" value.bind="session">
-                                ${session}</option>
-                        </select>
-                    </div>
-                </div>
+    <div class="row positionUnderToolbar topMargin  justify-content-md-center">
+        <div class="col-4">
+            <div class="topMargin">
+                <label for="editSession" class="form-control-label">Session</label>
+                <select value.bind="sessions.selectedObject.session" class="form-control selectpicker" id="editSession"
+                    data-style="btn btn-link">
+                    <option></option>
+                    <option repeat.for="session of sessions.SESSION_PARAMS" model.bind="session.session">
+                        ${session.session}</option>
+                </select>
+            </div>
+            <div class="topMargin">
+                <label for="editYear" class="form-control-label ">Year</label>
+                <input value.bind="sessions.selectedObject.year" id="editYear" class=" form-control" placeholder="Year"
+                    type="text" />
+            </div>
+            <div class="topMargin">
+                <label class="form-control-label ">Start Date</label>
+                <flat-picker controlid="startDate" config.bind="config" value.bind="sessions.selectedObject.startDate">
+                </flat-picker>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="topMargin">
+                <label class="form-control-label ">End Date</label>
+                <flat-picker controlid="endDate" config.bind="config" value.bind="sessions.selectedObject.endDate">
+                </flat-picker>
+            </div>
+            <div class="topMargin">
+                <label class="form-control-label ">Requests Open</label>
+                <flat-picker controlid="requestsOpenDate" config.bind="config"
+                    value.bind="sessions.selectedObject.requestsOpenDate"></flat-picker>
+            </div>
+            <div class="topMargin">
+                <label for="editStatus" class="form-control-label">Status</label>
+                <select value.bind="sessions.selectedObject.sessionStatus" id="editStatus"
+                    class="form-control selectpicker" id="editStatus" data-style="btn btn-link">
+                    <option repeat.for="session of config.SESSION_STATUSES" value.bind="session">
+                        ${session}</option>
+                </select>
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col">
             <div if.bind="controller.errors.length > 0" class="alert alert-danger topMargin" role="alert">

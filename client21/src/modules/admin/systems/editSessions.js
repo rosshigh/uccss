@@ -68,7 +68,7 @@ export class EditSessions {
 
     refreshSelects(){
         this.utils.refreshSelect("#editSession", this.sessions.SESSION_PARAMS, "session", this.sessions.selectedObject.session);
-        this.utils.refreshSelect("#institutionSelect", this.config.SESSION_STATUSES, "status", this.sessions.selectedObject.sessionStatus);
+        this.utils.refreshSelect("#editStatus", this.config.SESSION_STATUSES, "status", this.sessions.selectedObject.sessionStatus);
     }
 
     createValidationRules() {
@@ -102,6 +102,7 @@ export class EditSessions {
     async saveSession() {
         let serverResponse = await this.sessions.saveSession();
         if (!serverResponse.error) {
+            this.utils.updateArrayItem(serverResponse, this.sessions.objectsArray);
             this.utils.showNotification("The session was updated");
             this.refresh();
         } else {
@@ -110,9 +111,11 @@ export class EditSessions {
         this._cleanUp();
     }
 
-    saveSortOrder(session){
+    saveSortOrder(session, event){
+        event.stopPropagation();
         this.sessions.setSession(session);
         let serverResponse = this.sessions.saveSession();
+        this.utils.updateArrayItem(serverResponse, this.sessions.objectsArray);
     }
 
     async refreshConfig(){
@@ -148,7 +151,8 @@ export class EditSessions {
         }
     }
 
-    updateStatus(index, session) {
+    updateStatus(index, session, event) {
+        event.stopPropagation();
         if(session.sessionStatus === "Closed") return;
         
         this.sessions.selectSessionById(session._id);

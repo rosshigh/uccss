@@ -1,0 +1,31 @@
+<template>
+    <div class="card">
+        <div class="card-body">
+            <div class="row" style="padding:10px;">
+                <div class="col-7">
+                </div>
+                <div class="col">
+                    <div if.bind="stepOneErrors.length > 0" class="alert alert-info col" role="alert">
+                        <ul>
+                            <li repeat.for="error of stepOneErrors">Error: ${error}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div>
+                        <div id="demo" class="collapse show">
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="card-title">Current Product Requests:</h4>
+                                    <compose view="./Requests.html"></compose>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

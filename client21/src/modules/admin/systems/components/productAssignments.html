@@ -1,7 +1,7 @@
 <template>
     <div class="card">
         <div class="card-header">
-            <h4 class="card-title">Assignment Information</h4>
+            <!-- <h4 class="card-title">Assignment Information</h4> -->
         </div>
         <div class="card-body">
             <div class="row">
@@ -26,6 +26,17 @@
                         <h6>To change the systems assigned to a product, create clients on the Systems page</h6>
                     </div>
                 </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="editFacultyId" class="control-label">First ID</label>
+                        <input value.bind="products.selectedObject.firstAllowableId" id="editFirstId"
+                            class="form-control " placeholder="First Allowable ID" type="text" />
+                    </div>
+                </div>
+                <div class="col"></div>
+                <div class="col"></div>
             </div>
         </div>
 </template>

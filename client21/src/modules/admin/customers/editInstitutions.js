@@ -51,7 +51,6 @@ export class EditInstitutions {
     }
 
     async refresh() {
-        this.clearFilters();
         $('#loading').show();
         await this.people.getInstitutionArray('?order=lastName');
         $('#loading').hide();
@@ -74,9 +73,9 @@ export class EditInstitutions {
         this.view = 'form';
     }
 
-    refreshSelects(){
+    refreshSelects() {
         this.utils.refreshSelect("#editInstitutonStatusArray", this.is4ua.institutonStatusArray, "code", this.people.selectedInstitution.institutionStatus);
-        this.utils.refreshSelect("#editInstitutionType", this.is4ua.institutionTypes, "code", this.people.selectedInstitution.institutionType );
+        this.utils.refreshSelect("#editInstitutionType", this.is4ua.institutionTypes, "code", this.people.selectedInstitution.institutionType);
     }
 
     createValidationRules() {
@@ -109,6 +108,7 @@ export class EditInstitutions {
     async saveInstitution() {
         let serverResponse = await this.people.saveInstitution();
         if (!serverResponse.error) {
+            this.utils.updateArrayItem(serverResponse, this.people.institutionsArray);
             this.utils.showNotification(serverResponse.name + " was updated");
             this.refresh();
         } else {
@@ -130,7 +130,7 @@ export class EditInstitutions {
         });
     }
 
-    async deleteInstitution(){
+    async deleteInstitution() {
         var name = this.people.selectedPerson.fullName;
         let serverResponse = await this.people.deletePerson();
         if (!serverResponse.error) {
@@ -201,3 +201,4 @@ export class EditInstitutions {
         document.body.removeChild(el);
     }
 }
+

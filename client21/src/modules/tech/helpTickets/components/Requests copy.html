@@ -1,0 +1,79 @@
+<template>
+    <h5>These are your current product requests.  If the issue you are having is related to a specific product, please select it.</h5>
+    <div class="topMargin">
+      <span id="selectProductRequestError"></span>
+      <h5 show.bind="clientRequestsArray.length === 0">You have no product requests that apply to this type of help ticket.</h5>
+      <table id="clientTable" show.bind="clientRequestsArray.length > 0" class="table table-bordered table-responsive" style="background:white;">
+        <thead>
+        <tr class="header">
+          <th>Course</th>
+          <th>Session</th>
+          <th>Product</th>
+          <th>System</th>
+          <th>Client</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr class="sortable" id="${product.id}" productId="${product.productId}" 
+              repeat.for="product of clientRequestsArray"
+              click.trigger="requestChosen($event, $index)">
+            <td>${product.courseName}</td>
+            <td>${product.sessionId | session:sessions.sessionsArray}</td>
+            <td>${product.productName}</td> 
+            <td>${product.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
+            <td>${product.client}</td>
+            <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
+            <td>
+              <span class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="View Assignment">
+                <i class="fa fa-eye fa-lg fa-border" click.delegate="viewAssignment($index, product)" aria-hidden="true"></i>
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <span id="client"></span>
+    </div>
+  </div>
+</div>
+      <!-- <div>
+        <h5 show.bind="clientRequestsArray.length === 0">You have no product requests that apply to this type of help ticket.</h5>
+        <table id="clientTable" show.bind="clientRequestsArray.length > 0" class="table table-bordered table-responsive" style="background:white;">
+          <thead>
+          <tr class="header">
+            <th>Course</th>
+            <th>Session</th>
+            <th>Product</th>
+            <th>System</th>
+            <th>Client</th>
+            <th>Status</th>
+            <th show.bind="viewHelpTickets">User IDS</th>
+            <th show.bind="viewHelpTickets">Faculty IDs</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr id="${product.id}" productId="${product.productId}" 
+                repeat.for="product of clientRequestsArray">
+              <td>${product.courseId | courseName:people.coursesArray}</td>
+              <td>${product.sessionId | sessionName:sessions.sessionsArray}</td>
+              <td>${product.productId._id | lookupValue:products.productsArray:"_id":"name"}</td>
+              <td>${product.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
+              <td>${product.client}</td>
+              <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
+              <td show.bind="viewHelpTickets">${product.studentIds}<br>${product.studentPassword}</td>
+              <td show.bind="viewHelpTickets">${product.facultyIds}<br>${product.facultyPassword}</td>
+              <td>
+                <span class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="View Assignment">
+                  <i class="fa fa-eye fa-lg fa-border" click.delegate="viewAssignment($index, product)" aria-hidden="true"></i>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <span id="client"></span>
+      </div>
+    </div>
+  </div> -->
+</template>

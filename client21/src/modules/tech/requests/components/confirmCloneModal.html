@@ -1,0 +1,21 @@
+<template>
+    <div class="modal fade" id="confirmClone" tabindex="-1" role="dialog" aria-labelledby="confirmCloneLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="confirmCloneLabel">Confirm Close</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <h4>Are you sure you want to clone this request?</h4>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+              <button type="button" click.delegate="cloneRequest()" class="btn btn-primary">Yes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+</template>

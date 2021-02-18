@@ -3,7 +3,15 @@
 import 'regenerator-runtime/runtime';
 import * as environment from '../config/environment.json';
 import { PLATFORM } from 'aurelia-pal';
-import "froala-editor/js/froala_editor.pkgd.min";
+import * as Bluebird from 'bluebird';
+// import '@slickgrid-universal/common/dist/styles/css/slickgrid-theme-bootstrap.css';
+
+Bluebird.config({
+  warnings: {
+    wForgottenReturn: false
+  },
+  longStackTraces: false
+});
 
 export function configure(aurelia) {
   aurelia.use
@@ -13,14 +21,26 @@ export function configure(aurelia) {
     .plugin(PLATFORM.moduleName("aurelia-validation"))
     .plugin(PLATFORM.moduleName("aurelia-validatejs"))
     .plugin(PLATFORM.moduleName('aurelia-dialog'))
-    .feature(PLATFORM.moduleName('resources/index'));
+    .feature(PLATFORM.moduleName('resources/index'))
+    .plugin(PLATFORM.moduleName('aurelia-notification'), config => {
+      config.configure({
+        translate: false,  // 'true' needs aurelia-i18n to be configured
+        notifications: {
+          'success': 'humane-libnotify-success',
+          'error': 'humane-libnotify-error',
+          'info': 'humane-libnotify-info'
+        }
+      });
+    });
 
   aurelia.use.developmentLogging(environment.debug ? 'debug' : 'warn');
-  aurelia.use.plugin(PLATFORM.moduleName('aurelia-froala-editor'));
+  // aurelia.use.plugin(PLATFORM.moduleName('aurelia-froala-editor'));
 
   if (environment.testing) {
     aurelia.use.plugin(PLATFORM.moduleName('aurelia-testing'));
   }
+
+  // aurelia.use.plugin(PLATFORM.moduleName('aurelia-slickgrid'));
 
   aurelia.start().then(() => {
     let userObj = sessionStorage.getItem('user');

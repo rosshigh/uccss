@@ -148,3 +148,13 @@ var NotificationSchema = new Schema({
 });
 
 module.exports = Mongoose.model('Notification', NotificationSchema);
+
+var CourseSchema = new Schema({
+  name: { type: String, required: true },
+  personId: { type: Schema.Types.ObjectId, required: true },
+  number: { type: String, required: true },
+  description: { type: String },
+  active: { type: Boolean, default: true }
+});
+
+module.exports = Mongoose.model('Course', CourseSchema);

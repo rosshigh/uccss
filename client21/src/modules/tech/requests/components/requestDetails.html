@@ -1,0 +1,38 @@
+<template>
+	<div class="row">
+		<div class="col">
+			<h4 class="topMargin"><strong>Request Details</strong></h4>
+			<div class="card topMargin">
+				<div class="card-body leftJustify">
+					<div class="form-horizontal topMargin">
+						<h4>Product: <span class="bold">${requests.selectedDetail.productId.name}</span></h4>
+						<p>Status: <span class="bold">${requests.selectedDetail.requestStatus |
+								lookupValue:config.REQUEST_STATUS:"code":"description"}</span></p>
+						<p>Course: <span class="bold">${requests.selectedDetail.requestId.courseId.number} ${requests.selectedDetail.requestId.courseId.name}
+							</span></p>
+						<div show.bind="requests.selectedDetail.courseId.name != config.SANDBOX_NAME">
+							<p>Undergrads: <span class="bold">${requests.selectedDetail.requestId.undergradIds}</span></p>
+							<p>Graduate: <span class="bold">${requests.selectedDetail.requestId.graduateIds}</span>
+						</div>
+						<p>Start Date: <span class="bold">${requests.selectedDetail.requestId.startDate |
+								dateFormat:config.DATE_FORMAT_TABLE}</span></p>
+						<p>End Date: <span class="bold">${requests.selectedDetail.requestId.endDate |
+								dateFormat:config.DATE_FORMAT_TABLE}</span></p>
+						<p>Required Date: <span class="bold">${requests.selectedDetail.requiredDate |
+								dateFormat:config.DATE_FORMAT_TABLE}</span></p>
+						<div
+							show.bind="requests.selectedDetail.requestId.customerMessage && requests.selectedDetail.requestId.customerMessage.length > 0">
+							<label class="topMargin">Requests comments</label>
+							<div class="well" innerhtml.bind="requests.selectedDetail.requestId.customerMessage"></div>
+						</div>
+						<!-- <div
+							show.bind="requests.selectedDetail.techComments && requests.selectedDetail.techComments.length > 0">
+							<label class="topMargin">Comments from the UCC staff</label>
+							<div innerhtml.bind="requests.selectedDetail.techComments"></div>
+						</div> -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>

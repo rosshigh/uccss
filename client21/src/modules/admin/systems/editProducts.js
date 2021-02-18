@@ -5,11 +5,12 @@ import { ConfirmDialog } from '../../../resources/dialogs/confirm-dialog';
 import { MessageDialog } from '../../../resources/dialogs/message-dialog';
 import { Products } from '../../../resources/data/products';
 import { Systems } from '../../../resources/data/systems';
+import { DocumentsServices } from '../../../resources/data/documents';
 import { AppConfig } from '../../../appConfig';
 import { Store } from '../../../store/store';
 import { Utils } from '../../../resources/utils/utils';
 
-@inject(ValidationControllerFactory, Products, Systems, AppConfig, Store, Utils, DialogService)
+@inject(ValidationControllerFactory, Products, Systems, DocumentsServices, AppConfig, Store, Utils, DialogService)
 export class EditProducts {
 
     pageSize = 200;
@@ -24,10 +25,11 @@ export class EditProducts {
         ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
       ];
 
-    constructor(ValidationControllerFactory, products, systems, config, store, utils, dialog) {
+    constructor(ValidationControllerFactory, products, systems, documents, config, store, utils, dialog) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
         this.products = products;
         this.systems = systems;
+        this.documents = documents;
         this.config = config;
         this.store = store;
         this.utils = utils;
@@ -92,10 +94,6 @@ export class EditProducts {
         this.view = 'form';
     }
 
-    testing(){
-        this.foo = "werwe";
-    }
-
     saveFilterValues() {
         this.filterValues = [];
         this.filters.forEach(item => {
@@ -138,18 +136,13 @@ export class EditProducts {
     async saveObject() {
         let serverResponse = await this.products.saveObject();
         if (!serverResponse.error) {
+            this.utils.updateArrayItem(serverResponse, this.products.objectsArray);
             this.utils.showNotification("The product was updated");
-            this.uploadFile();
+            // this.uploadFile();
         } else {
             this.utils.showNotification("There was a problem saving the system", 'error');
         }
         this._cleanUp();
-    }
-
-    uploadFile() {
-        if (this.filesToUpload && this.filesToUpload.length > 0) {
-            this.products.uploadFile(this.filesToUpload);
-        }
     }
 
     async delete() {
@@ -200,7 +193,6 @@ export class EditProducts {
     cancel() {
         this.products.selectedObjectById(this.products.selectedObject._id);
     }
-
 
     downloadInstExcel() {
         let csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,Phone,Institution,Country,Region,Status,Roles\r\n";
@@ -283,14 +275,83 @@ export class EditProducts {
         }
     }
 
-    changeFiles() {
-        this.filesToUpload = new Array();
-        this.filesToUpload.push(this.files[0]);
-        // this.siteinfo.selectedItem.url = this.config.DOWNLOAD_URL + '/site/' + this.filesToUpload[0].name;
-        // this.siteinfo.selectedItem.file.fileName = this.filesToUpload[0].name;
+    async attachDocument() {
+        let responses = await Promise.all([
+            this.documents.getDocumentsCategoriesArray("?filter=[or]category|DOC:CUR:SOF:HPT:USE"),
+        ]);
+        this.filterDocumentList();
+        this.modalTitle = "Choose Documents to Add";
+        $('#documentsModal').modal('show');
     }
 
-    removeFile(index) {
-        this.filesToUpload.splice(index, 1);
+    filterDocumentList() {
+        if (this.DocumentFilter) {
+            let thisFilter = this.filter
+            this.filteredDocumentArray = this.documents.objectCategoriesArray.filter((item) => {
+                return item.description.toUpperCase().indexOf(thisFilter.toUpperCase()) > -1;
+            });
+        } else {
+            this.filteredDocumentArray = this.documents.objectCategoriesArray;
+        }
     }
+
+    toggleListItem(el, id) {
+        let thisElement = el.target;
+        thisElement.parentElement.querySelector(".nested").classList.toggle("active");
+        thisElement.classList.toggle("caret-down");
+        el.stopPropagation();
+    }
+
+    closeDocumentForm() {
+        this.showDocumentForm = false;
+    }
+
+    showSubCategoryDocuments(category, SubCategoryIndex, SubSubCategoryIndex, el) {
+        this.documents.setCategory(category);
+        this.selectedDocSubCategoryIndex = SubCategoryIndex;
+        this.selectedDocSubSubCategoryIndex = SubSubCategoryIndex;
+        this.catDescription = this.documents.selectedCat.description;
+        this.subCatDescription = this.documents.selectedCat.subCategories[this.selectedDocSubCategoryIndex].description;
+        this.showDocuments = true;
+        setTimeout(() => { 
+            $('[data-toggle="tooltip"]').tooltip();
+            $(".form-check-input").prop('checked', false);
+            this.products.selectedObject.documents.forEach(item => {
+                let id = item.fileName.split(" ").join("");
+                $("#" + id).prop('checked',true);
+            })
+        }, 1000);
+        el.stopPropagation();
+    }
+
+    toggleAddToList(document, el, index) {
+        if ($(el.target)[0].checked) {
+            this.products.selectedObject.documents.push({
+                fileName: this.documents.selectedCat.subCategories[this.selectedDocSubCategoryIndex].subSubCategories[this.selectedDocSubSubCategoryIndex].documents[index].file.fileName,
+                path: this.documents.selectedCat.subCategories[this.selectedDocSubCategoryIndex].subSubCategories[this.selectedDocSubSubCategoryIndex].documents[index].file.path
+            })
+        } else {
+            var indexToRemove = -1;
+            this.products.selectedObject.documents.forEach((item, index) => {
+                if (item.fileName === document.file.fileName) {
+                    indexToRemove = index; 
+                }
+            });
+            if (indexToRemove >= 0) {
+                this.products.selectedObject.documents.splice(indexToRemove, 1);
+            }
+        }
+    }
+
+    // documents: [{
+    //     categoryCode: { type: Number }, 
+    //     categoryName: { type: String },
+    //     fileName: { type: String },
+    //     default: { type: Boolean, default: true } 
+    //   }],
+
+    removeDocument(index){
+        this.products.selectedObject.documents.splice(index, 1);
+    }
+
 }

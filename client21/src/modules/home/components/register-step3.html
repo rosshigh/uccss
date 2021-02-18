@@ -1,0 +1,81 @@
+<template>
+    <div class="row">
+        <div class="col-6">
+            <form>
+                <div class="form-group row">
+                    <label for="register_phone" class="col-sm-3 col-form-label">Phone *</label>
+                    <div class="col-sm-9">
+                        <input show.bind="useMask" class="form-control" id="register_phone"
+                            masked="value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *" />
+                        <input show.bind="!useMask" class="form-control" id="register_phoneNoMask"
+                            value.bind="people.selectedPerson.phone" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="register_mobile" class="col-sm-3 col-form-label">Mobile</label>
+                    <div class="col-sm-9">
+                        <input show.bind="useMask" id="register_mobile" class="form-control"
+                            masked="value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *" />
+                        <input show.bind="!useMask" class="form-control" id="register_mobileNoMask"
+                            value.bind="people.selectedPerson.mobile" />
+                    </div>
+
+
+                </div>
+                <div class="form-group row">
+                    <label for="register_email" class="col-sm-3 col-form-label">Email *</label>
+                    <div class="col-sm-9">
+                        <input blur.trigger="checkEmail()" value.bind="people.selectedPerson.email" id="register_email"
+                            class="form-control" placeholder="Email" type="text" />
+                        <small show.bind="duplicateAccount" id="emailHelp" class="form-text text-muted">An
+                            account with
+                            that email already exists.</small>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-5">
+            <div show.bind="stepThreeErrors.length">
+                <ul class="pull-right">
+                    <li repeat.for="error of stepThreeErrors">${error}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <form>
+                <div class="form-group label-floating has-success row">
+                    <label for="register_password" class="col-sm-3 col-form-label">Password *</label>
+                    <div class="col-sm-9">
+                        <input id="register_password" type="password" placeholder="Password" class="form-control"
+                            value.bind="people.selectedPerson.password" keydown.trigger="passwordComplexity()" />
+                        <span show.bind="complexPassword" class="form-control-feedback">
+                            <i class="material-icons">done</i>
+                        </span>
+
+                    </div>
+                </div>
+                <div class="form-group label-floating has-success row">
+                    <label for="register_password_repeat" class="col-sm-3 col-form-label">Repeat Password
+                        *</label>
+                    <div class="col-sm-9">
+                        <input id="register_password_repeat" type="password" placeholder="Repeat Password"
+                            class="form-control" value.bind="password_repeat"
+                            keypress.trigger="DoThePasswordsMatch()" />
+                        <span show.bind="passwordsMatch" class="form-control-feedback">
+                            <i class="material-icons">done</i>
+                        </span>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-5">
+            <small id="passwordHelp" class="form-text text-muted">Password should be at least
+                ${thresholdLength}
+                characters long and should contain ${threshold < 4 ? "at least " + threshold
+                    + " of the following groups:" : "a combination of" } lowercase letters, uppercase letters, digits or
+                    special characters</small>
+        </div>
+    </div>
+</template>

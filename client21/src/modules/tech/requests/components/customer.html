@@ -1,0 +1,27 @@
+<template>
+    <div class="row">
+        <div class="col">
+            <h4 class="topMargin"><strong>Customer Details</strong></h4>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <h5>Name: <span class="bold">${requests.selectedDetail.requestId.personId.fullName}</span></h5>
+                            <h5>Preferred: <span class="bold">${requests.selectedDetail.requestId.personId.nickName}</span></h5>
+                            <h5>Phone: <span class="bold">${requests.selectedDetail.requestId.personId.personId.phone |
+                                phoneNumber:config.PHONE_MASKS:person.country:person.ext}</span></h5>
+                            <h5>Mobile: <span class="bold">${requests.selectedDetail.requestId.personId.mobile |
+                                phoneNumber:config.PHONE_MASKS:person.country:person.ext}</span></h5>
+                            <h5 class="pointMe" click.trigger="copyEmail(requests.selectedDetail)">Email:
+                                <span class="bold">${requests.selectedDetail.requestId.personId.email}</span></h5>
+                        </div>
+                        <div class="col">
+                            <img class="imgG smallPhoto pull-right"
+                            src="${config.PHOTO_DOWNLOAD_URL}/${requests.selectedDetail.requestId.personId.file.fileName}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

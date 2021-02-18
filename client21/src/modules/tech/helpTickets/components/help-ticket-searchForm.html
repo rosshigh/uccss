@@ -1,0 +1,63 @@
+<template>
+    <div class="row">
+        <div class="list-group-item toolbar">
+            <span click.delegate="search()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                data-placement="bottom" title="" data-original-title="Search"><i class="fa fa-search fa-lg fa-border"
+                    aria-hidden="true"></i></span>
+            <span click.delegate="clearCriteria()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                data-placement="bottom" title="" data-original-title="Clear Criteria"><i
+                    class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-2 topMargin">
+            <div class="form-group">
+                <label>Help Ticket Number</label>
+                <input input.delegate="helpTicketNoEntered()" class="form-control" value.bind="helpTicketNo"
+                    type="text" />
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-5 topMargin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>KeyWords</label>
+                        <input class="form-control" value.bind="keyWords" type="text" />
+                    </div>
+                    <div class="form-group">
+                        <label>Content</label>
+                        <input class="form-control" value.bind="content" type="text" />
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Date Created</h4>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Date From</label>
+                        <flat-picker controlid="endDate" config.bind="configDate" value.bind="dateFrom"></flat-picker>
+                    </div>
+                    <div class="form-group">
+                        <div class="topMargin">
+                            <label>Date To</label>
+                            <flat-picker controlid="endDateTo" config.bind="configDate" value.bind="dateTo">
+                            </flat-picker>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-7 topMargin">
+            <compose view="./accordians.html"></compose>
+        </div>
+    </div>
+
+ 
+   
+</template>

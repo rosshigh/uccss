@@ -1,0 +1,28 @@
+<template>
+    <h5 class="topMargin">Assigned Clients</h5>
+    <div class="row pointMe" click.delegate="selectAssignedClient($index)" repeat.for="client of requests.selectedDetail.assignments" style="font-size:10px;border-bottom:1px solid;border-top:1px solid;">
+        <div class="col" id="${client.systemId}-${client.client}" >
+            <span class="bold">System: ${client.systemId  | lookupValue:systems.objectsArray:"_id":"sid"}</span><span class="pull-right bold">Client: ${client.client}</span>
+            <div class="row">
+                <div class="col-7">
+                    Student IDs: <span class="bold">${client.studentUserIds}</span><br/>
+                    Faculty IDs: <span class="bold">${client.facultyUserIds}</span>
+                </div>
+                <div class="col-5">
+                    Student password: <span class="bold">${client.studentPassword}</span><br/>
+                    Faculty password: <span class="bold">${client.facultyPassword}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    Assigned on ${client.assignedDate | dateFormat:'MM/DD/YYYY'} by ${client.staffId | lookupValue:people.uccPeople:'_id':'fullName'}
+                </div>
+                <div class="col">
+                    <span click.trigger="deleteClientFromAssignedList($index, $event)" class="smallMarginRight pull-right" bootstrap-tooltip
+                    data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash-o"
+                        aria-hidden="true"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

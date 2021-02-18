@@ -4,7 +4,6 @@ export function configure(config) {
     PLATFORM.moduleName('./elements/side-bar'),
     PLATFORM.moduleName('./elements/top-bar'),
     PLATFORM.moduleName('./elements/flat-picker'),
-    PLATFORM.moduleName('./elements/documents'),
 
     PLATFORM.moduleName('./editor/editor'),
 
@@ -20,6 +19,18 @@ export function configure(config) {
     PLATFORM.moduleName('./value-converters/document-icons'),  
     PLATFORM.moduleName('./value-converters/sort-array'),
     PLATFORM.moduleName('./value-converters/help-ticket-category'),
-    PLATFORM.moduleName('./value-converters/session')
+    PLATFORM.moduleName('./value-converters/session'),
+    PLATFORM.moduleName('./value-converters/file-name-checked'),
+    PLATFORM.moduleName('./value-converters/convert-course-names'),
+    PLATFORM.moduleName('./value-converters/gravatar-url'),
+    PLATFORM.moduleName('./value-converters/sort-date-time'),
+    PLATFORM.moduleName('./value-converters/file-type'),
+    PLATFORM.moduleName('./value-converters/get-array-value'),
+    PLATFORM.moduleName('./value-converters/idsRequested'),
+    PLATFORM.moduleName('./value-converters/filter-clients'),
+    PLATFORM.moduleName('./value-converters/parse-assignments'),
+    PLATFORM.moduleName('./value-converters/info-filter'),
+    PLATFORM.moduleName('./value-converters/session-type'),
+    PLATFORM.moduleName('./value-converters/filter-statuses')
   ]);
 }

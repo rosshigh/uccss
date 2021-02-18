@@ -7,7 +7,7 @@ import { AppConfig } from '../../appConfig';
 export class DocumentsServices {
 
     DOCUMENTS_SERVICE = "documents";
-    DOCUMENTS_CATEGORY_SERVICE = "documentCategory";
+    DOCUMENTS_CATEGORY_SERVICE = "documentCategories";
 
     constructor(data, utils, config) {
         this.data = data;
@@ -53,8 +53,8 @@ export class DocumentsServices {
             this.selectedCat = this.emptyCat();
         } else {
             try {
-                this.selectedCat = this.utils.copyObject(this.docCatsArray[index]);
-                this.editCatIndex = index;
+                this.selectedCat = this.utils.copyObject(this.objectCategoriesArray[index]);
+                // this.editCatIndex = index;
             } catch (error) {
                 this.selectedCat = this.emptyCat();
             }
@@ -112,6 +112,17 @@ export class DocumentsServices {
         return newObj;
     }
 
+    async deleteSubSubCategory(subIndex, subSubIndex){
+        if (!this.selectedCat) {
+            return;
+        }
+
+        this.selectedCat.subCategories[subIndex].subSubCategories.splice(subSubIndex, 1);  
+console.log( this.selectedCat.subCategories[subIndex].subSubCategories)             
+        let serverResponse = await this.data.saveObject(this.selectedCat, this.DOCUMENTS_CATEGORY_SERVICE, "put");
+        return serverResponse;
+    }
+
     async saveCategory() {
         if (!this.selectedCat) {
             return;
@@ -144,7 +155,6 @@ export class DocumentsServices {
         var newObj = new Object();
         newObj.name = "";
         newObj.description = "";
-        newObj.files = new Array();
         newObj.active = true;
         newObj.createdDate = new Date();
         newObj.sortOrder = 0;
@@ -155,8 +165,8 @@ export class DocumentsServices {
         return newObj;
     }
 
-    uploadFile(files, container, level1, level2) {
-        let path = container + "/" + level1 + "/" + level2;
-        this.data.uploadFiles(files, this.DOCUMENTS_CATEGORY_SERVICE + "/file/" + path);
+    uploadFile(files, filePrefix) {
+        this.data.uploadFiles(files, this.DOCUMENTS_CATEGORY_SERVICE + "/file/" + filePrefix);
     }
+
 }

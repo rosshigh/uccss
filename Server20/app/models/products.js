@@ -13,10 +13,8 @@ var ProductSchema = new Schema({
   clientRelevant: { type: Boolean },
   idsAvailable: { type: Number },
   documents: [{
-    categoryCode: { type: Number }, 
-    categoryName: { type: String },
-    fileName: { type: String },
-    default: { type: Boolean, default: true } 
+    fileName: { type: String }, 
+    path: { type: String }
   }],
   files: [ {
     originalFilename: { type: String },

@@ -7,6 +7,7 @@ const project = require('./aurelia_project/aurelia.json');
 const { AureliaPlugin, ModuleDependenciesPlugin } = require('aurelia-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const { ProvidePlugin } = require('webpack');
 
 // config helpers:
 const ensureArray = (config) => config && (Array.isArray(config) ? config : [config]) || [];
@@ -38,7 +39,8 @@ module.exports = ({ production } = {}, {extractCss, analyze, tests, hmr, port, h
       // https://github.com/aurelia/binding/issues/702
       // Enforce single aurelia-binding, to avoid v1/v2 duplication due to
       // out-of-date dependencies on 3rd party aurelia plugins
-      'aurelia-binding': path.resolve(__dirname, 'node_modules/aurelia-binding')
+      'aurelia-binding': path.resolve(__dirname, 'node_modules/aurelia-binding'),
+      // 'jquery': path.join(__dirname, 'node_modules/jquery/dist/jquery'),
     }
   },
   entry: {
@@ -46,7 +48,8 @@ module.exports = ({ production } = {}, {extractCss, analyze, tests, hmr, port, h
       // Uncomment next line if you need to support IE11
       // 'promise-polyfill/src/polyfill',
       'aurelia-bootstrapper'
-    ]
+    ],
+    // vendor: ['jquery']
   },
   mode: production ? 'production' : 'development',
   output: {
@@ -127,6 +130,7 @@ module.exports = ({ production } = {}, {extractCss, analyze, tests, hmr, port, h
     rules: [
       // CSS required in JS/TS files should use the style-loader that auto-injects it into the website
       // only when the issuer is a .js/.ts file, so the loaders are not applied inside html templates
+      // { test: require.resolve('jquery'), loader: 'expose-loader?$!expose-loader?jQuery' },
       {
         test: /\.css$/i,
         issuer: [{ not: [{ test: /\.html$/i }] }],
@@ -162,7 +166,6 @@ module.exports = ({ production } = {}, {extractCss, analyze, tests, hmr, port, h
     ...when(!tests, new DuplicatePackageCheckerPlugin()),
     new AureliaPlugin(),
     new ModuleDependenciesPlugin({
-      "aurelia-froala-editor": [ './froala-editor' ],
       'aurelia-testing': ['./compile-spy', './view-spy']
     }),
     new HtmlWebpackPlugin({

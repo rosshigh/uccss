@@ -1,0 +1,17 @@
+<template>
+    <div class="card offWhite" repeat.for = "content of helpTickets.selectedObject.content  | sortDateTime:'contentNo':'DESC':isUCC:true">
+        <div class="card-header">
+            <h4 class="card-title bold">${content.personId |
+                lookupValue:people.peopleArray:'_id':'fullName'}</h4>
+            <p class="category">${content.dateCreated | dateFormat:'YYYY-MM-DD':true}</p>
+        </div>
+        <div class="card-body">
+            <div innerhtml.bind="content.response"></div>
+            <h3 class="bold">Attachments:</h3>
+            <div class="hover_img" repeat.for="file of content.files" >
+                <a href=${config.HELPTICKET_FILE_DOWNLOAD_URL}/${file}" target="_blank"
+                    innerhtml.bind="file | fileType:file"></a>
+            </div>
+        </div>
+    </div>
+</template>

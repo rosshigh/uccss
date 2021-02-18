@@ -1,0 +1,38 @@
+<template>
+    <div class="card">
+        <div class="card-body">
+            <div class="row" style="padding:10px;">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="editPhone">Institution</label>
+                        <select value.two-way="selectedInsitutionId" change.trigger="institutionSelected()"
+                            class="form-control selectpicker" data-style="btn btn-link" id="institutionSelect">
+                            <option value="">Select an option</option>
+                            <option repeat.for="institution of people.institutionsArray" value="${institution._id}">
+                                ${institution.name}</option>
+                        </select>
+                    </div>
+
+                    <div show.bind="people.peopleArray.length" class="form-group">
+                        <label for="editPhone">Faculty</label>
+                        <select value.two-way="selectedPersonId" change.trigger="personSelected()"
+                            class="form-control selectpicker" data-style="btn btn-link" id="personSelect">
+                            <option value="">Select an option</option>
+                            <option repeat.for="person of people.peopleArray" value="${person._id}">
+                                ${person.fullName}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3"></div>
+                    <div class="col">
+                        <div if.bind="stepZerorErrors.length > 0" class="alert alert-danger col" role="alert">
+                            <ul>
+                                <li repeat.for="error of stepZerorErrors">Error: ${error}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

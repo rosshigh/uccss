@@ -2,7 +2,7 @@
 
 export class DateFormatValueConverter {
 
-  toView(value, format ='MMM Do YYYY', fromNow) {
+  toView(value, format ="dddd, MMMM Do YYYY, h:mm:ss a", fromNow) {
     if(value === undefined || value === null){
       return;
     }

@@ -1,55 +1,86 @@
 <template>
-    <div class="row">
-        <div class="col">
-            <div class='topMargin bottomMargin'>
-                <label for="prioritySelect" class='class="bigLabel topMargin'>Priority</label>
-                <select class="form-control selectpicker" id="prioritySelect"
-                    value.bind="helpTickets.selectedHelpTicket.priority" data-style="btn btn-link">
-                    <option repeat.for="priority of config.HELP_TICKET_PRIORITIES" value.bind="$index">
-                        ${priority.priority}</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <Label class="bigLabel topMargin">Help Ticket Category</Label>
-                <select value.bind="catIndex" id="helpTicketCategory" class="form-control selectpicker"
-                    data-style="btn btn-link" change.trigger="categoryChanged()">
-                    <option value="-1">To help define your issue, select the category</option>
-                    <option repeat.for="types of config.HELP_TICKET_TYPES" model.bind="$index">
-                        ${types.description}</option>
-                </select>
-            </div>
-            <div show.bind="catIndex != -1" class="form-group">
-                <Label class="bigLabel topMargin">Help Ticket Type</Label>
-                <select value.bind="helpTickets.selectedHelpTicket.helpTicketType" change.trigger="typeChanged()"
-                    class="form-control selectpicker" data-style="btn btn-link" id="helpTicketType">
-                    <option value="null">To help us further define your issue, select the type</option>
-                    <option repeat.for="subcatTypes of config.HELP_TICKET_TYPES[catIndex].subTypes"
-                        model.bind="subcatTypes.type">${subcatTypes.description}</option>
-                </select>
-            </div>
+    <div class="row" style="padding:10px;">
+        <div class="col-7">
+            <!-- <div class="row">
+                <div class="col-8">
+                    <h5>Does this issue relate to a product that you have requested? </h5>
+                </div>
+                <div class="col">
+                    <div class="form-check form-check-radio form-check-inline leftMargin">
+                        <label class="form-check-label" repeat.for="option of yesNo">
+                            <input change.delegate="toggleRequresClient()" checked.bind="requiresClient"
+                                value.bind="option" class="form-check-input" type="radio"
+                                name="productRequestRequredOptions" id="inlineRadio1" value="option1"> ${option}
+                            <span class="circle">
+                                <span class="check"></span>
+                            </span>
+                        </label>
+                    </div>
+
+                </div>
+            </div> -->
+            <!-- <div show.bind="requiresClient === 'Yes'">
+                <div class="row">
+                    <div class="col-8">
+                        <h5>Does this issue relate to all the products requested for a course or only one product? </h5>
+                    </div>
+                    <div class="col">
+                        <div class="form-check form-check-radio form-check-inline leftMargin">
+                            <label class="form-check-label" repeat.for="option of courseProduct">
+                                <input change.delegate="toggleForACourse()" checked.bind="forACourse"
+                                    value.bind="option" class="form-check-input" type="radio"
+                                    name="courseOrClientOptions" id="inlineRadio2" value="option1"> ${option}
+                                <span class="circle">
+                                    <span class="check"></span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
         </div>
         <div class="col">
-            <div class="card">
-                <div
-                    class="card-header ${config.HELP_TICKET_PRIORITIES[helpTickets.selectedHelpTicket.priority].status}">
-                    <h4 class="card-title">
-                        ${config.HELP_TICKET_PRIORITIES[helpTickets.selectedHelpTicket.priority].priority}</h4>
-                    <p class="category">Category subtitle</p>
+            <div if.bind="stepOneErrors.length > 0" class="alert alert-info col" role="alert">
+                <ul>
+                    <li repeat.for="error of stepOneErrors">Error: ${error}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <!-- <div show.bind="forACourse === 'Course' && requiresClient === 'Yes'">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <h4 class="topMargin">Courses:</h4>
+                                    <select value.bind="courseSelected" id="selectedCourse"
+                                        change.delegate="aCourseIsSelected($index)" class="form-control selectpicker"
+                                        data-style="btn btn-link">
+                                        <option value=null></option>
+                                        <option repeat.for="course of activeCourses" model.bind="$index">
+                                            ${course.courseNumber} - ${course.courseName}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body"
-                    innerhtml.bind="config.HELP_TICKET_PRIORITIES[helpTickets.selectedHelpTicket.priority].message">
-                    The place is close to Barceloneta Beach and bus stop just 2 min by walk and near to
-                    "Naviglio" where
-                    you can enjoy the main night life in Barcelona...
+            </div> -->
+            <div >
+                <!-- show.bind="forACourse === 'Product' && requiresClient === 'Yes'" -->
+                <div id="demo" class="collapse show">
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="card-title">Current Product Requests:</h4>
+                            <compose view="./Requests.html"></compose>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row" style="padding:10px;">
-        <div if.bind="stepOneErrors.length > 0" class="col alert alert-warning" role="alert">
-            <ul>
-                <li repeat.for="error of stepOneErrors">${error}</li>
-            </ul>
-        </div>
     </div>
 </template>

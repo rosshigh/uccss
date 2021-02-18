@@ -1,53 +1,56 @@
 <template>
     <label>Available Categories</label>
     <div class="well well2 overFlow" style="height:600px;">
-        <input class="form-control" value.bind="filter" input.trigger="filterList()"
-            placeholder="Filter Categories" />
-        <ul id="categoryList" class="list-group">
-            <li type="button" repeat.for="type of filteredDocumentArray"
-                class="${ $first ? 'menuButtons' : ''} list-group-item" data-toggle="collapse"
-                data-target="#${type.code}">
-                <div class="row">
-                    <div class="col-9">
-                        ${type.description}
-                    </div>
-                    <div class="col-3">
-                        <span click.delegate="newSubCategory(type)" class="smallMarginRight"
-                            bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
-                            data-original-title="New Subcategory"><i class="fa fa-plus"
+        <input class="form-control" value.bind="filter" input.trigger="filterList()" placeholder="Filter Categories" />
+        <div class="row">
+            <div class="col-10">
+                <ul id="myUL">
+                    <li class="pointMe" repeat.for="type of filteredDocumentArray | sortArray:'sortOrder':'ASC'">
+                        <span click.trigger="toggleListItem($event, type.DocCode)"><i class="${type | documentIcons}"
+                                aria-hidden="true"></i> ${type.description}</span><br/>
+                        <span click.delegate="newSubCategory(type, $event)" class="" bootstrap-tooltip
+                            data-toggle="tooltip" data-placement="bottom" title=""
+                            data-original-title="New Subcategory"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                        <span click.delegate="editCategory(type, $index, $event)" bootstrap-tooltip data-toggle="toggle"
+                            data-placement="bottom" title="" data-original-title="Edit" class=""><i class="fa fa-pencil"
                                 aria-hidden="true"></i></span>
-                        <span click.delegate="editCategory(type)" bootstrap-tooltip
-                            data-toggle="toggle" data-placement="bottom" title=""
-                            data-original-title="Edit"><i class="fa fa-pencil"
-                                aria-hidden="true"></i></span>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="collapse" id="${type.code}"
-                            style="background-color:ghostwhite;">
-                            <ul class="list-group">
-                                <li click.trigger="showSubCategoryDocuments(type, $index)"
-                                    repeat.for="subcat of type.subCategories"
-                                    class="list-group-item">
-                                    <div class="row">
-                                        <div class="col-10">
-                                            ${subcat.description}
-                                        </div>
-                                        <div class="col-2">
-                                            <span click.delegate="editSubCategory($index)"
-                                                bootstrap-tooltip data-toggle="toggle"
-                                                data-placement="bottom" title=""
-                                                data-original-title="Edit"><i class="fa fa-pencil"
-                                                    aria-hidden="true"></i></span>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </li>
-        </ul>
+                        <span class="input-group-btn">
+                            <i click.trigger="deleteCategory(type)" class="fa fa-trash" aria-hidden="true"></i>
+                        </span>
+                        <ul class="nested">
+                            <li click.delegate="toggleListItem($event)"
+                                repeat.for="subCat of type.subCategories | sortArray:'sortOrder':'ASC'">
+                                <span class="caret">${subCat.description}</span><br/>
+                                <span click.delegate="newSubSubCategory($index, type, $event)" class=""
+                                    bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+                                    data-original-title="New Subcategory"><i class="fa fa-plus"
+                                        aria-hidden="true"></i></span>
+                                <span click.delegate="editSubCategory($index, type, $event)" class="" bootstrap-tooltip
+                                    data-toggle="toggle" data-placement="bottom" title="" data-original-title="Edit"><i
+                                        class="fa fa-pencil" aria-hidden="true"></i></span>
+                                <span class="input-group-btn">
+                                    <i click.trigger="this($index, $parent.$index, $event)" class="fa fa-trash" aria-hidden="true"></i>
+                                </span>
+                                <ul class="nested">
+                                    <li click.delegate="showSubCategoryDocuments(type, $parent.$index, $index, $event)"
+                                        repeat.for="subSubCat of subCat.subSubCategories | sortArray:'sortOrder':'ASC'">
+                                        <span>${subSubCat.description}</span><br/>
+                                        <span click.delegate="editSubSubCategory($index, type, $parent.$index, $event)"
+                                            bootstrap-tooltip data-toggle="toggle" data-placement="bottom" title=""
+                                            data-original-title="Edit"><i class="fa fa-pencil"
+                                                aria-hidden="true"></i></span>
+                                        <span class="input-group-btn ">
+                                            <i click.trigger="deleteSubSubCategory(subSubCat, $parent.$index, $parent.$parent.$index, $event)" class="fa fa-trash"
+                                                aria-hidden="true"></i>
+                                        </span>
+                                    </li>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </template>

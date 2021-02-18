@@ -11,16 +11,6 @@ var clientRequestLockSchema = new Schema({
 
 module.exports = Mongoose.model('ClientRequestLock', clientRequestLockSchema);
 
-var CourseSchema = new Schema({
-  name: { type: String, required: true },
-  personId: { type: Schema.Types.ObjectId, required: true },
-  number: { type: String, required: true },
-  description: { type: String },
-  active: { type: Boolean, default: true }
-});
-
-module.exports = Mongoose.model('Course', CourseSchema);
-
 var AssignmentSchema = new Schema({
   systemId: { type: Schema.Types.ObjectId },
   client: { type: Number },
@@ -34,7 +24,8 @@ var AssignmentSchema = new Schema({
   firstID: { type: Number },
   lastID: { type: Number },
   firstFacID: { type: Number },
-  lastFacID: { type: Number }
+  lastFacID: { type: Number },
+  uccComment: { type: String }
 }, { versionKey: false });
 
 AssignmentSchema.pre('update', function() {

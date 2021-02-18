@@ -1,17 +1,14 @@
 <template>
  
-    <div class="sidebar" data-color="rose" data-background-color="black" data-image="../assets/img/sidebar-1.jpg">
+    <div class="sidebar" id="sidebar" data-color="rose" data-background-color="black" data-image="../assets/img/sidebar-1.jpg">
       <!--
           Tip 1: You can change the color of the sidebar using: data-color="purple | azure | green | orange | danger"
   
           Tip 2: you can also add an image using data-image tag
       -->
-      <div class="logo"><a href="http://www.creative-tim.com" class="simple-text logo-mini">
-          CT
-        </a>
-        <a href="http://www.creative-tim.com" class="simple-text logo-normal">
-          UCCSS
-        </a>
+      <div class="logo">
+          <img class="leftMargin" src="${config.IMG_DOWNLOAD_URL}UCC_LOGO_HOME.png">
+          <!-- <span class="align-middle" style="color:white;margin-left:30px;font-weight:bold;">UCCSS</span> -->
       </div>
       <div class="sidebar-wrapper">
         <div class="user">
@@ -28,13 +25,13 @@
             <div class="collapse" id="collapseExample">
               <ul class="nav">
                 <li class="nav-item">
-                  <a class="nav-link" href="#">
+                  <a class="nav-link" href="#profile">
                     <span class="sidebar-normal"> My Profile </span>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" click.trigger="logout()">
-                    <span class="sidebar-normal"> Logoff </span>
+                    <span class="sidebar-normal pointMe"> Logoff </span>
                   </a>
                 </li>
               </ul>
@@ -44,13 +41,13 @@
         <ul class="nav">
           <li class="nav-item ">
             <a class="nav-link" href="#/user">
-              <i class="material-icons">dashboard</i>
+              <i class="material-icons">home</i>
               <p> Home </p>
             </a>
           </li>
           <li class="nav-item ">
             <a class="nav-link" data-toggle="collapse" href="#pagesExamples">
-              <i class="material-icons">image</i>
+              <i class="material-icons">dashboard</i>
               <p> Administration
                 <b class="caret"></b>
               </p>
@@ -69,20 +66,48 @@
                 <li class="nav-item">
                   <a class="nav-link" href="#/inventory"><span class="sidebar-normal">Inventory</span></a>
                 </li>
+                <li class="nav-item ">
+                  <a class="nav-link" href="#/documents"><span class="sidebar-normal">File Management</span></a>
+                </li>
               </ul>
             </div>
           </li>
           <li class="nav-item ">
-            <a class="nav-link" href="#/documents">
-              <i class="material-icons">image</i>
-              <p> File Management
+            <a class="nav-link" data-toggle="collapse" href="#pagesTech">
+              <i class="material-icons">build</i>
+              <p> Tech Staff
+                <b class="caret"></b>
+              </p>
+            </a>
+            <div class="collapse" id="pagesTech">
+              <ul class="nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="#/techProductRequests"><span class="sidebar-normal">Product Requests</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#/helpTicketsTech"><span class="sidebar-normal">Help Tickets</span></a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="#/helpTickets">
+              <i class="material-icons">help</i>
+              <p> HelpTickets
               </p>
             </a>
           </li>
           <li class="nav-item ">
-            <a class="nav-link" href="#/helpTickets">
-              <i class="material-icons">image</i>
-              <p> HelpTickets
+            <a class="nav-link" href="#/productRequests">
+              <i class="material-icons">help</i>
+              <p> Product Requests
+              </p>
+            </a>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="#/facCoord">
+              <i class="material-icons">help</i>
+              <p> Faculty Coordinator
               </p>
             </a>
           </li>
@@ -91,7 +116,7 @@
               <i class="material-icons">image</i>
               <p> Faculty Resources
                 <b class="caret"></b>
-              </p>
+              </p> 
             </a>
             <div class="collapse" id="facultyResources">
               <ul class="nav">
@@ -102,23 +127,11 @@
                   <a class="nav-link" href="#/downloads/SOF"><span class="sidebar-normal">Software</span></a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#/downloads/USE"><span class="sidebar-normal">Useful information</span></a>
+                  <a class="nav-link" href="#/faq"><span class="sidebar-normal">FAQ</span></a>
                 </li>
               </ul>
             </div>
           </li>
       </div>
-    </div>
-
-  </div>
-
-  <!-- <div class="main-panel">
-    <compose view="./top-bar.html"></compose>
-    <div class="container-fluid" style="padding-top:200px;">
-      <div class="content">
-        <router-view></router-view>
-      </div>
-    </div>
-  </div> -->
- 
+    </div> 
 </template>

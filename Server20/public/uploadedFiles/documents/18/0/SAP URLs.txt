@@ -1,3 +1,0 @@
-https://answers.sap.com/questions/12525407/how-to-assign-cost-elements-to-cost-components.html
-
-ctrl-y to activate select mode for lists in SAP GUI

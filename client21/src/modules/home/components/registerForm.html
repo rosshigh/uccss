@@ -1,0 +1,131 @@
+<template>
+  <div class="row">
+    <div class="col-3">
+      <input value.bind="people.selectedPerson.firstName" id="register_firstName" class="form-control"
+        placeholder="First Name" type="text" />
+    </div>
+    <div class="col-3">
+      <input value.bind="people.selectedPerson.middleName" id="register_middletName" class="form-control"
+        placeholder="Middle Name" type="text" />
+    </div>
+    <div class="col-3">
+      <input value.bind="people.selectedPerson.lastName" id="register_lastName" class="form-control"
+        placeholder="Last Name" type="text" />
+    </div>
+    <div class="col-3">
+      <input value.bind="people.selectedPerson.nickName" id="editNickName" class="form-control "
+        placeholder="Preferred name" type="text" />
+    </div>
+  </div>
+  <div class="row topMargin">
+    <div class="col-5">
+      <div class="col topMargin" style="border:1px solid gray;padding-bottom:5px;">
+        <label id=" productList">Institution *</label>
+        <input class="form-control" value.bind="filter" input.trigger="filterList()"
+          placeholder="Filter institutions" />
+        <div class="overFlow" style="height:200px;">
+          <ul class="list-group">
+            <a click.trigger="institutionSelected(institution._id)" type="button"
+              repeat.for="institution of filteredInstitutionsArray" id="${institution._id}"
+              class="list-group-item dropbtn">${institution.name}</a>
+          </ul>
+        </div>
+        <!-- <label for="register_institution" class="control-label">Institution *</label>
+            <select value.bind="people.selectedPerson.institutionId" id="register_institution"
+              class="form-control" placeholder="Institution" change.trigger="institutionSelected()">
+              <option value="">Select an option</option>
+              <option repeat.for="institution of people.institutionsArray" value="${institution._id}">
+                ${institution.name}</option>
+            </select> -->
+      </div>
+      <div class="topMargin">
+        <h3>Address</h3>
+        <div class="row">
+          <div class="col">
+            <!-- <label for="register_address1" class="control-label ">Address 1</label> -->
+            <input value.bind="people.selectedPerson.address1" id="register_address1" class="form-control"
+              placeholder="Address 1" type="text" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <!-- <label for="register_address2" class="control-label ">Address 2</label> -->
+            <input value.bind="people.selectedPerson.address2" id="register_address2" class="form-control"
+              placeholder="Address2" type="text" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4">
+            <!-- <label for="register_city" class="control-label ">City</label> -->
+            <input value.bind="people.selectedPerson.city" id="register_city" class="form-control" placeholder="City"
+              type="text" />
+          </div>
+          <div class="col-3">
+            <!-- <label for="register_region" class="control-label ">Region</label> -->
+            <input value.bind="people.selectedPerson.region" id="register_region" class="form-control"
+              placeholder="Region" type="text" />
+          </div>
+          <div class="col-3">
+            <!-- <label for="register_postal_code" class="control-label ">Postal Code</label> -->
+            <input value.bind="people.selectedPerson.postalCode" id="register_postal_code" class="form-control"
+              placeholder="Postal Code" type="text" />
+          </div>
+          <div class="col-2">
+            <!-- <label for="register_country" class="control-label ">Country</label> -->
+            <input value.bind="people.selectedPerson.country" id="register_country" class="form-control"
+              placeholder="Country" type="text" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-1"></div>
+    <div class="col-5">
+      <div class="col">
+        <label for="register_phone" class="control-label ">Phone *</label>
+        <input show.bind="useMask" class="form-control" id="register_phone"
+          masked="value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *" />
+        <input show.bind="!useMask" class="form-control" id="register_phoneNoMask"
+          value.bind="people.selectedPerson.phone" />
+      </div>
+      <div class="col">
+        <label for="register_mobile" class="control-label ">Mobile</label>
+        <input show.bind="useMask" id="register_mobile" class="form-control"
+          masked="value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *" />
+        <input show.bind="!useMask" class="form-control" id="register_mobileNoMask"
+          value.bind="people.selectedPerson.mobile" />
+      </div>
+      <div class="topMargin" style="border:1px solid gray;padding:8px;">
+        <div class="col topMargin">
+          <!-- <label for="register_email" class="control-label">Email *</label> -->
+          <input blur.trigger="checkEmail()" value.bind="people.selectedPerson.email" id="register_email"
+            class="form-control" placeholder="Email" type="text" />
+          <small show.bind="duplicateAccount" id="emailHelp" class="form-text text-muted">An account with that email
+            already exists.</small>
+        </div>
+        <div class="col topMargin">
+          <!-- <label for="register_password" class="control-label">Password *</label> -->
+          <div class="form-group label-floating has-success">
+            <input id="register_password" type="password" placeholder="Password" class="form-control"
+              value.bind="people.selectedPerson.password" keydown.trigger="passwordComplexity()" />
+            <span show.bind="complexPassword" class="form-control-feedback">
+              <i class="material-icons">done</i>
+            </span>
+            <small id="passwordHelp" class="form-text text-muted">Password should be at least ${thresholdLength}
+              characters long and should contain ${threshold < 4 ? "at least " + threshold + " of the following groups:"
+                : "a combination of" } lowercase letters, uppercase letters, digits or special characters</small>
+          </div>
+        </div>
+        <div class="col topMargin">
+          <div class="form-group label-floating has-success">
+            <!-- <label for="register_password_repeat" class="control-label">Repeat Password *</label> -->
+            <input id="register_password_repeat" type="password" placeholder="Repeat Password" class="form-control"
+              value.bind="password_repeat" keypress.trigger="DoThePasswordsMatch()" />
+            <span show.bind="passwordsMatch" class="form-control-feedback">
+              <i class="material-icons">done</i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

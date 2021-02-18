@@ -1,0 +1,43 @@
+<template>
+    <div class="container-fluid">
+        <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
+        <table class="table-sm table-striped" style="width:100%;"
+            aurelia-table="data.bind: requests.objectsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+            <thead>
+                <tr>
+                    <compose view='./requestsTableToolbar.html'></compose>
+                </tr>
+                <tr>
+                    <th style="width:35%;">Course</th>
+                    <th style="width:65%;">Product Requests (Click to see the details)</th>
+                </tr>
+            </thead>
+            <tbody style="height:500px;">
+                <tr repeat.for="request of $displayData">
+                    <td click.trigger="customerActionResponse(request, $event)" data-title="Course">
+                        <h5>${request.courseId.number} ${request.courseId.name}</h5>
+                        <h6>Undergraduates: ${request.undergradIds} Graduates: ${request.graduateIds}</h6>
+                        <h7>Request No: ${request.clientRequestNo}</h7>
+                        <h6 show.bind="request.requestStatus == config.CUSTOMER_ACTION_REQUEST_CODE"><b>CUSTOMER ACTION
+                                REQUIRED (click here to respond)</b></h6>
+                    </td>
+                    <td>
+                        <div class="${detail.requestStatus == config.ASSIGNED_REQUEST_CODE ? 'assigned' : ''} card pointMe"
+                            click.trigger="edit(detail, request)" repeat.for="detail of request.requestDetails">
+                            <div class="card-body">
+                                <h5>${detail.productId.name}</h5>
+                                Status: ${detail.requestStatus |
+                                lookupValue:config.REQUEST_STATUS:"code":"description"}
+                                <span class="leftMargin">Required: ${detail.requiredDate |
+                                    dateFormat:config.DATE_FORMAT_TABLE}</span>
+                                <span class="pull-right"
+                                    show.bind="detail.requestStatus == config.CUSTOMER_ACTION_REQUEST_CODE && request.requestStatus != config.CUSTOMER_ACTION_REQUEST_CODE">
+                                    <b>CUSTOMER ACTION REQUIRED (click here to respond)</b></span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</template>

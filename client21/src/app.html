@@ -1,12 +1,16 @@
 <template>
-  <!-- <require from="froala-editor/css/froala_editor.pkgd.min.css"></require>
-  <require from="froala-editor/css/froala_style.min.css"></require> -->
   <require from="resources/css/material-dashboard.css"></require>
   <require from="resources/css/styles.css"></require>
-  <div  class="wrapper ">
+  <require from="humane-js/themes/jackedup.css"></require>
+  <div class="wrapper ">
     <side-bar></side-bar>
     <div class="main-panel">
       <router-view></router-view>
+      <footer class='footer'>
+        <div class="container-fluid">
+          <h5 id="notification" class="pull-left"></h5>
+        </div>
+      </footer>
     </div>
   </div>
 </template>

@@ -3,8 +3,8 @@
     <!-- <require from="flatpickr/flatpickr.css"></require> -->
 
     <div class="row">
-    <div class="fuelux col-9 blackText" style="height:1000px;">
-        <div class="wizard" data-initialize="wizard" id="myWizard">
+    <div class="fuelux col blackText" >
+        <div class="wizard" data-initialize="wizard" id="myWizard" style="height:1000px;">
             <div class="steps-container">
                 <ul class="steps">
                     <li data-step="1" data-target="#step1" class="active">
@@ -22,6 +22,9 @@
                     <li data-step="5" data-target="#step5">
                         <span class="badge">5</span>Step 5<span class="chevron"></span>
                     </li>
+                    <li data-step="6" data-target="#step6">
+                        <span class="badge">6</span>Review<span class="chevron"></span>
+                    </li>
                 </ul>
             </div>
             <div class="actions">
@@ -34,19 +37,19 @@
             <div class="step-content">
 
                 <div class="step-pane active" id="step1" data-step="1">
-                    <h3><strong>Step 1 </strong> - Help Ticket Type</h3>
+                    <h3><strong>Step 1 </strong> - Select all the affected product requests</h3>
                     <compose view="./help-ticket-step1.html"></compose>
                 </div>
 
                 <div class="step-pane" id="step2" data-step="2">
-                    <h3><strong>Step 2 </strong> - Which product request does this apply to</h3>
+                    <h3><strong>Step 2 </strong> - Tell us if this applies to a specific curriculum</h3>
 
                     <compose view="./help-ticket-step2.html"></compose>
 
                 </div>
 
                 <div class="step-pane" id="step3" data-step="3">
-                    <h3><strong>Step 3 </strong> - Give us some details and add attachments</h3>
+                    <h3><strong>Step 3 </strong> - Tell us the problem involves software</h3>
                     <compose view="./help-ticket-step3.html"></compose>
                 </div>
 
@@ -56,8 +59,13 @@
                 </div>
 
                 <div class="step-pane" id="step5" data-step="5">
-                    <h3><strong>Step 5 </strong> - Review and Confirm</h3>
+                    <h3><strong>Step 5 </strong> - Attachments</h3>
                     <compose view="./help-ticket-step5.html"></compose>
+                </div>
+
+                <div class="step-pane" id="step6" data-step="6">
+                    <h3><strong>Step 6 </strong> - Review and Confirm</h3>
+                    <compose view="./help-ticket-step6.html"></compose>
                 </div>
 
             </div>

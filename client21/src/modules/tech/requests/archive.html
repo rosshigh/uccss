@@ -1,0 +1,32 @@
+<template>
+    <div class="card">
+        <div class="card-body">
+            <div show.bind="view === 'table'">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="form-group topMargin leftMargin">
+                            <select value.bind="selectedSession"
+                                change.delegate="getRequests()" id="session" class="form-control selectpicker"
+                                data-style="btn btn-link">
+                                <option repeat.for="session of sessions.objectsArray" value.bind="session._id">Session
+                                    ${session.session} - ${session.year}</option>
+                            </select>
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+            <div if.bind="requests.detailsArray.length === 0">
+                <h3>There are no requests for this session.</h3>
+            </div>
+
+            <div show.bind="view === 'table'">
+                <compose show.bind="requests.detailsArray.length > 0" view="./components/archiveRequestsTable.html"></compose>
+            </div>
+
+        </div>
+        <div show.bind="view === 'form'">
+            <compose view="./components/requestsForm.html"></compose>
+        </div>
+    </div>
+</template>

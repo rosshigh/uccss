@@ -19,6 +19,7 @@ export class Editor {
 		['insert', ['picture', 'link', 'table', 'hello']],
 		['misc', ['undo', 'redo', 'fullscreen']]
 	];
+	@bindable placeholder;
 
 	editor = null;
 
@@ -40,6 +41,7 @@ export class Editor {
 		this.editor = $(`#${this.editorid}`);
 		this.editor.data('view-model', this);
 		this.editor.summernote({
+			placeholder: this.placeholder,
 			height: this.height,
 			toolbar: this.toolbar,
       callbacks: {

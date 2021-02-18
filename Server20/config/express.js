@@ -37,6 +37,8 @@ module.exports = function (app, config) {
     logger.log('info', "Mongoose connected to the database");
   });
 
+  mongoose.set('useFindAndModify', false);
+  
   logger.log('info', "Attaching plugins");
   app.use(bodyParser.json({ limit: '1000mb' }));
   // app.use(bodyParser.urlencoded({ limit: '1000mb', extended: true }));

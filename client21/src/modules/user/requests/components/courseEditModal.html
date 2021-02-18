@@ -1,0 +1,54 @@
+<template>
+    <div class="modal fade" id="courseEditModal" tabindex="-1" role="dialog" aria-labelledby="courseEditModal"
+        aria-hidden="true">
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-6">
+                <div class="modal-dialog" style="max-width: 50%;" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="requestCloseModal">Course Form</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="padding:10px;">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="panel panel-default col-md-10 col-md-offset-1"
+                                            style="background-color:ghostwhite;">
+                                            <div class="panel-body">
+                                                <div class="form-group">
+                                                    <input id="number" value.bind="people.selectedCourse.number"
+                                                        type="text" placeholder="Course Number" class="form-control" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <input id="name" value.bind="people.selectedCourse.name" type="text"
+                                                        placeholder="Course Name" class="form-control" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div if.bind="courseErrors.length > 0" class="alert alert-danger col" role="alert">
+                                        <ul>
+                                            <li repeat.for="error of courseErrors">Error: ${error}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" click.trigger="cancelEditCourse()"
+                                class="btn btn-secondary">Cancel</button>
+                            <button type="button" click.trigger="saveCourse()" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col"></div>
+        </div>
+    </div>
+</template>

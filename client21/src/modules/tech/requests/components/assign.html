@@ -1,0 +1,73 @@
+<template>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <ul class="nav nav-pills" id="nav-tab">
+                        <li class="nav-item">
+                            <a href="#proposed" class="nav-link active clientTabs proposed" id="proposed-tab"
+                                data-toggle="tab" role="tab">Proposed</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#assigned" class="nav-link clientTabs assigned" id="assigned-tab" data-toggle="tab"
+                                role="tab">Assigned</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent2">
+                        <div class="tab-pane fade show active clientTabs proposedTab" id="proposed" role="tabpanel"
+                            aria-labelledby="nav-propsed-tab">
+                            <div class="topMargin bold">
+                                <span show.bind="selectedClientIndex >= 0">
+                                    System: ${provisionalClientList[selectedClientIndex].proposedClient.systemId |
+                                    lookupValue:systems.objectsArray:"_id":"sid"}
+                                    Client: ${provisionalClientList[selectedClientIndex].proposedClient.client}
+                                </span>
+                                <span class='pull-right'>Requested user IDs: ${requests.selectedDetail.requestId |
+                                    idsRequested}</span>
+                            </div>
+                            <compose show.bind="!verticalDisplay" view="./verticalInputFields.html"></compose>
+                            <compose show.bind="verticalDisplay" view="./horizontalInputFields.html"></compose>
+                            <span if.bind="requests.selectedDetail.requestId.customerMessage.length">
+                                <h5 class="topMargin">Customer Comments</h5>
+                                <div innerhtml.bind="requests.selectedDetail.requestId.customerMessage"></div>
+                            </span>
+                            <editor value.bind="uccMessage" toolbar.bind="toolbar" height="250"></editor>
+                        </div>
+                        <div class="tab-pane fade clientTabs assignedTab" id="assigned" role="tabpanel"
+                            aria-labelledby="nav-assigned-tab">
+                            <div class="form-group">
+                                <input change.delegate="assignmentChanged()" id="assignedStudentIDs" type="text"
+                                    placeholder="Student IDs" class="form-control"
+                                    value.bind="requests.selectedDetail.assignments[selectedAssignmentIndex].studentUserIds" />
+                            </div>
+                            <div class="form-group">
+                                <input id="assignedStudentPassword" type="text" placeholder="Student Password"
+                                    class="form-control"
+                                    value.bind="requests.selectedDetail.assignments[selectedAssignmentIndex].studentPassword" />
+                            </div>
+                            <div class="form-group">
+                                <input id="assignedFacultyIDs" type="text" placeholder="Faculty IDs"
+                                    class="form-control"
+                                    value.bind="requests.selectedDetail.assignments[selectedAssignmentIndex].facultyUserIds" />
+                            </div>
+                            <div class="form-group">
+                                <input id="assignedFacultyPassword" type="text" placeholder="Faculty Password"
+                                    class="form-control"
+                                    value.bind="requests.selectedDetail.assignments[selectedAssignmentIndex].facultyPassword" />
+                            </div>
+                            <compose view="./assignedClientsTable.html"></compose>
+                            <span if.bind="requests.selectedDetail.requestId.customerMessage.length">
+                                <h5 class="topMargin">Customer Comments</h5>
+                                <div innerhtml.bind="requests.selectedDetail.requestId.customerMessage"></div>
+                            </span>
+                            <editor value.bind="products.selectedObject.productInfo" toolbar.bind="toolbar" height="250"></editor>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <compose view="./clientList2.html"></compose>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

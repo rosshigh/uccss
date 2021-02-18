@@ -9,6 +9,7 @@ export class FlatPickerCustomElement {
     @bindable startdate;
     @bindable enddate
     @bindable controlid;
+    @bindable placeholder
     @bindable disabled;
     @bindable({defaultBindingMode: bindingMode.twoWay}) value;
 

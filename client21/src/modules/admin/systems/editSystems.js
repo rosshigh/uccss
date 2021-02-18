@@ -120,6 +120,7 @@ export class EditSystems {
     async saveSystem() {
         let serverResponse = await this.systems.saveObject();
         if (!serverResponse.error) {
+            this.utils.updateArrayItem(serverResponse, this.systems.objectsArray);
             this.utils.showNotification("The system was updated");
             this.productsToSave.forEach(item => {
                 this.products.selectObject(item)

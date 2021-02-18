@@ -1,0 +1,28 @@
+<template>
+    <label>Available Categories</label>
+    <div class="well well2 overFlow" style="height:600px;">
+        <input class="form-control" value.bind="filter" input.trigger="filterList()" placeholder="Filter Categories" />
+        <div class="row">
+            <div class="col-10">
+                <ul id="myUL">
+                    <li class="pointMe" repeat.for="type of filteredDocumentArray | sortArray:'sortOrder':'ASC'">
+                        <span click.trigger="toggleListItem($event, type.DocCode)"><i class="${type | documentIcons}"
+                                aria-hidden="true"></i> ${type.description}</span>
+                        <ul class="nested">
+                            <li click.delegate="toggleListItem($event)"
+                                repeat.for="subCat of type.subCategories | sortArray:'sortOrder':'ASC'">
+                                <span class="caret">${subCat.description}</span>
+                                <ul class="nested">
+                                    <li click.delegate="showSubCategoryDocuments(type, $parent.$index, $index, $event)"
+                                        repeat.for="subSubCat of subCat.subSubCategories | sortArray:'sortOrder':'ASC'">
+                                        <span>${subSubCat.description}</span>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</template>>

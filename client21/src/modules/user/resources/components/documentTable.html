@@ -14,10 +14,10 @@
             <tbody>
                 <tr repeat.for="document of $displayData">
                     <td><a target="_blank"
-                            href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${selectedCat.DocCode}/${selectedSubCategoryIndex}/${document.files[0].fileName}">${document.name}</a>
+                            href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.file.path}/${document.file.fileName}">${document.name}</a>
                     </td>
-                    <td>${document.files[0].size}</td>
-                    <td>${document.displayDate | dateFormat}</td>
+                    <td>${document.file.size}</td>
+                    <td>${document.displayDate | dateFormat:"MMMM YYYY"}</td>
                     <td>${document.description}</td>
                 </tr>
             </tbody>

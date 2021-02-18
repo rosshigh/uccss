@@ -1,0 +1,25 @@
+<template>
+    <div class="row">
+        <div class="col-4">
+            <label id=" institutionList">Select the institutions you want to include</label>
+            <input class="form-control" value.bind="institutionsFilter" input.trigger="filterInstitutionsList()"
+                placeholder="Filter instiutions" />
+            <div class="overFlow" style="height:400px;">
+                <ul class="list-group">
+                    <button click.trigger="selectInstitution($event, institution)" type="button"
+                        repeat.for="institution of filteredInstitutionArray" id="${institution._id}"
+                        class="list-group-item">${institution.name}</button>
+                </ul>
+            </div>
+        </div>
+        <div class="col-4">
+            <label>Institutions you want to include in your search</label>
+            <div style="height:400px;width:350px;margin-top:30px;">
+                <ul class="list-group">
+                    <button click.trigger="removeInstitution($event)" type="button" repeat.for="institution of selectedInstitutions"
+                        id="${institution._id}" class="list-group-item">${institution.name}</button>
+                </ul>
+            </div>
+        </div>
+    </div>
+</template>

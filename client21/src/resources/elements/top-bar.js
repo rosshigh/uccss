@@ -16,4 +16,8 @@ export class TopBar {
         this.isAuthenticated = this.auth.isAuthenticated();
         this.router.navigate("home");
     }
+
+    toggleSideBar(){
+        $('#sidebar').slideToggle();
+    }
 }

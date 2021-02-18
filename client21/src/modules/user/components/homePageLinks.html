@@ -1,0 +1,13 @@
+<template>
+  <h2 class="underline bottomMargin">Useful Links</h2>
+  <img style="height: 150px; width: 100%; display: block;" src="${config.IMG_DOWNLOAD_URL}ua2.jpg" alt="Card image">
+  <div repeat.for="item of site.objectArray | infoFilter:'DLNK'">
+    <blockquote class="topMargin">
+      <a href.bind="item.url" target="_blank">
+        <h6>${item.title}</h6>
+      </a>
+      <p innerhtml.bind="item.content"></p>
+    </blockquote>
+    <hr/>
+  </div>
+</template>

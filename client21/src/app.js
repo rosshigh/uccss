@@ -14,16 +14,20 @@ export class App {
     this.subscribe();
   }
 
-  validateUser(){
+  validateUser() {
     this.userObj = this.store.getUser('user');
     this.isAuthenticated = this.userObj;
   }
 
   subscribe() {
     this.subscriber = this.eventAggregator.subscribe('auth:login', payload => {
-       this.isAuthenticated = payload == 'login';
+      this.isAuthenticated = payload == 'login';
     });
- }
+  }
+
+  toggleTheSideBar() {
+    $('#sidebar').slideToggle();
+  }
 
   configureRouter(config, router) {
     this.router = router;
@@ -69,6 +73,42 @@ export class App {
         route: 'helpTickets',
         moduleId: PLATFORM.moduleName('./modules/user/helpTickets/helpTickets'),
         name: 'helpTickets',
+        settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'faq',
+        moduleId: PLATFORM.moduleName('./modules/user/faq'),
+        name: 'faq',
+        settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'helpTicketsTech',
+        moduleId: PLATFORM.moduleName('./modules/tech/helpTickets/helpTickets'),
+        name: 'helpTicketsTech',
+        settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'productRequests',
+        moduleId: PLATFORM.moduleName('./modules/user/requests/productRequests'),
+        name: 'productRequests',
+        settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'techProductRequests',
+        moduleId: PLATFORM.moduleName('./modules/tech/requests/productRequests'),
+        name: 'productRequests',
+        settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'profile',
+        moduleId: PLATFORM.moduleName('./modules/user/profile'),
+        name: 'profile',
+        settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'facCoord',
+        moduleId: PLATFORM.moduleName('./modules/user/facCoord'),
+        name: 'facCoord',
         settings: { auth: false, roles: [] }
       }
     ]);

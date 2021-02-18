@@ -1,0 +1,39 @@
+<template>
+    <div class="card">
+        <div class="card-body">
+            <div class="row" style="padding:10px;">
+                <div class="col-7">
+                    <div class="row">
+                        <div class="col-8">
+                            <h5>Are you having an issue with desktop software? </h5>
+                        </div>
+                        <div class="col">
+                            <div class="form-check form-check-radio form-check-inline leftMargin">
+                                <label class="form-check-label" repeat.for="option of yesNo">
+                                    <input change.delegate="toggleSoftwareQuestion()" checked.bind="softwareQuestion"
+                                        value.bind="option" class="form-check-input" type="radio" name="softwareOptions"
+                                        id="inlineRadio4" value="option3"> ${option}
+                                    <span class="circle">
+                                        <span class="check"></span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div if.bind="stepThreeErrors.length > 0" class="alert alert-danger col" role="alert">
+                        <ul>
+                            <li repeat.for="error of stepThreeErrors">Error: ${error}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <compose if.bind="softwareQuestion === 'Yes'" view="./softwareHelp.html"></compose>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

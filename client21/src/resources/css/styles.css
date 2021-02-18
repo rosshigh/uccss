@@ -1,5 +1,176 @@
+
+ 
+.assigned {
+  background-color: aqua;
+}
+
+.smallPhoto {
+  width:100px;
+  height:100px;
+}
+
+.bigPhoto{
+  width:200px;
+  height:200px;
+}
+
+.imgG {
+  position:relative
+}
+
+.imgG:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: inherit;
+  height: inherit;
+  background: #ebebeb url('http://localhost/img/default.jpg') no-repeat center;
+  color: transparent;
+}
+
+ .subMenu{
+  position: relative;
+  top: -5px;
+  left: 0px;
+  width: 100%;
+}
+
+.subMenu-container {
+  position: fixed; 
+  top: 5rem;
+  left: 18rem;
+  width: 100%;
+  z-index:99;
+}
+/* 
+.banner {
+  height: 50px;
+  width: 100%;
+  background-color: white;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+}  */
+
+/* .subMenu-container {
+  position: fixed;
+  top: 20px;
+} */
+
+.menu:hover {background-color: #f1f1f1}
+
+.copy {cursor: copy;}
+
+.header-fixed {
+  width: 100% 
+}
+
+.deletedAssignment{
+  background-color: lightcoral;
+}
+
+.header-fixed > thead,
+.header-fixed > tbody,
+.header-fixed > thead > tr,
+.header-fixed > tbody > tr,
+.header-fixed > thead > tr > th,
+.header-fixed > tbody > tr > td {
+  display: block;
+}
+
+.header-fixed > tbody > tr:after,
+.header-fixed > thead > tr:after {
+  content: ' ';
+  display: block;
+  visibility: hidden;
+  clear: both;
+}
+
+.header-fixed > tbody {
+  overflow-y: auto;
+  height: 150px;
+}
+
+.header-fixed > tbody > tr > td,
+.header-fixed > thead > tr > th {
+  width: 20%;
+  float: left;
+}
+
+.hover_img a { position:relative; }
+.hover_img a span { position:absolute; display:none; z-index:99; }
+.hover_img a:hover span { display:block; }
+
+.hover {
+  position:absolute;
+  height: 400px;
+  width: 600px;
+  z-index:99;
+  display:none; 
+  box-shadow: 10px 10px 5px #888888;
+  overflow: hidden;
+  background-color: white;
+  padding: 10px;
+}
+
+.hoverProfile {
+  position:absolute;
+  height: 250px;
+  width: 500px;
+  z-index:99;
+  display:none;
+  box-shadow: 10px 10px 5px #888888;
+  overflow: hidden;
+  background-color: white;
+  padding: 10px;
+   right:0;
+  bottom:0;
+}
+
+.hoverMenu {
+  position:absolute;
+  height: 250px;
+  width: 200px;
+  z-index:99;
+  display:none;
+  box-shadow: 10px 10px 5px #888888;
+  overflow: hidden;
+  background-color: white;
+  padding: 10px;
+   right:0;
+  bottom:0;
+}
+
+.notification {
+  position:absolute;
+  height: 3em;
+  /* width: 200px; */
+  left: 70iv;
+  top: 50;
+  z-index:99;
+  display:none;
+  box-shadow: 10px 10px 5px #888888;
+  overflow: hidden;
+  /* background-color: green; */
+  color: black;
+  padding: 10px;
+   right:0;
+  bottom:0;
+}
+
+.tableFixHead          { overflow-y: auto; height: 400px; }
+.tableFixHead thead th { position: sticky; top: 0; background-color:#FFFFFF}
+
+.selectedStatus {
+  background-color: blue;
+}
+
 .navbar-nav .active {
     text-decoration: underline;
+}
+
+.underline {
+  text-decoration: underline;
 }
 
 .page-item .active {
@@ -106,6 +277,10 @@ ul, #myUL {
     display: inline-block;
     margin-right: 6px;
   }
+
+  .blackText {
+    color: black;
+  }
   
   /* Rotate the caret/arrow icon when clicked on (using JavaScript) */
   .caret-down::before {
@@ -116,10 +291,18 @@ ul, #myUL {
   .nested {
     display: none;
   }
+
+  .offWhite {
+    background-color:#e8fdff;
+  }
   
   /* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
   .active {
     display: block;
+  }
+
+  .bold {
+    font-weight : bold;
   }
 
   .aut-sort:before{
@@ -141,3 +324,55 @@ ul, #myUL {
 .aut-desc:before{
     content: "\f161";
 }
+
+.hidden {
+  visibility: hidden;
+}
+
+.visible {
+  visibility: visible;
+}
+
+/* Timeline vertical line */
+ul.timeline:before {
+  content: ' ';
+  background: #fff;
+  display: inline-block;
+  position: absolute;
+  left: 16px;
+  width: 4px;
+  height: 100%;
+  z-index: 400;
+  border-radius: 1rem;
+}
+
+li.timeline-item {
+  margin: 20px 0;
+}
+
+/* Timeline item arrow */
+.timeline-arrow {
+  border-top: 0.5rem solid transparent;
+  border-right: 0.5rem solid #fff;
+  border-bottom: 0.5rem solid transparent;
+  display: block;
+  position: absolute;
+  left: 2rem;
+}
+
+/* Timeline item circle marker */
+li.timeline-item::before {
+  content: ' ';
+  background: #ddd;
+  display: inline-block;
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  left: 11px;
+  width: 14px;
+  height: 14px;
+  z-index: 400;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+

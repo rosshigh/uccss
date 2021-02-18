@@ -658,7 +658,8 @@ module.exports = function (app, config) {
               };            
               content.files.push(file); 
             }           
-            helpticket.content.push(content)      
+            helpticket.content.push(content)   
+               
             helpticket.save(function (err, helpticket) {
               if (err) {
                 return next(err);

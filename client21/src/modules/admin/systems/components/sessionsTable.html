@@ -1,11 +1,10 @@
 <template>
     <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
-    <table class="table table-striped"
+    <table class="table-sm table-striped header-fixed"
         aurelia-table="data.bind: sessions.objectsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
-
         <thead>
             <tr>
-                <td colspan='7'>
+                <th colspan='7'>
                     <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
                         data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh"
                             aria-hidden="true"></i></span>
@@ -15,7 +14,7 @@
                     <span click.delegate="editSessionConfig()" bootstrap-tooltip data-toggle="tooltip"
                         data-placement="bottom" title="" data-original-title="Config"><i class="fa fa-pencil"
                             aria-hidden="true"></i></span>
-                </td>
+                </th>
             </tr>
             <tr>
                 <th colspan='6'>
@@ -38,19 +37,19 @@
             </tr>
         </thead>
 
-        <tbody>
-            <tr repeat.for="session of $displayData">
-                <td click.delegate="edit(session)" style="width:10rem;">${session.session} - ${session.year}
+        <tbody style="height:500px;">
+            <tr click.delegate="edit(session)" class="pointMe" repeat.for="session of $displayData">
+                <td style="width:10rem;">${session.session} - ${session.year}
                 </td>
-                <td click.delegate="edit(session)" style="width:15rem;">${session.startDate |
+                <td style="width:15rem;">${session.startDate |
                     dateFormat:config.DATE_FORMAT_TABLE}</td>
-                <td click.delegate="edit(session)" style="width:15rem;">${session.endDate |
+                <td style="width:15rem;">${session.endDate |
                     dateFormat:config.DATE_FORMAT_TABLE}</td>
-                <td click.delegate="edit(session)" style="width:15rem;"> ${session.requestsOpenDate |
+                <tdstyle="width:15rem;"> ${session.requestsOpenDate |
                     dateFormat:config.DATE_FORMAT_TABLE}</td>
-                <td style="width:15rem;"><Input change.trigger="saveSortOrder(session)" type="number"
+                <td style="width:15rem;"><Input change.trigger="saveSortOrder(session, $event)" type="number"
                         value.bind="session.sortOrder" /></td>
-                <td click.delegate="edit(session)" style="width:12rem;">${session.sessionStatus}</td>
+                <td style="width:12rem;">${session.sessionStatus}</td>
                 <td style="width:15rem;" style="width: 100px" click.trigger="updateStatus($index, session, $event)"
                     innerhtml.bind="session.sessionStatus | sessionStatusButton"></td>
             </tr>

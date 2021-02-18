@@ -1,0 +1,45 @@
+<template>
+    <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
+    <table class="table-sm table-striped header-fixed"
+        aurelia-table="data.bind: helpTickets.objectArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+        <thead>
+            <tr>
+                <th>
+                    <compose view='./helpTicketTableToolbar.html'></compose>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="3">
+                    <div class="form-group">
+                        <input type="text" value.bind="filters[0].value" placeholder="Help Ticket Number"
+                            class="form-control" id='filterField' />
+                    </div>
+                </th>
+                <th></th>
+                <th></th>
+            </tr>
+            <tr>
+                <th style="width:100px" aut-sort="key: helpTicketNo">No.</th>
+                <th style="width:150px">Status</th>
+                <th style="width:200px;">Owner</th>
+                <th style="width:150px;">Created Date</th>
+                <th style="width:150px;">Modifed Date</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody style="height:500px;">
+            <tr class="pointMe" click.trigger="selectHelpTicket(helpTicket)" repeat.for="helpTicket of $displayData">
+                <td style="width:100px">${helpTicket.helpTicketNo}</td>
+                <td  style="width:150px">${helpTicket.helpTicketStatus |
+                    lookupValue:config.HELP_TICKET_STATUSES:'code':'description'}</td>
+                <td style="width:200px">${helpTicket.owner[0].personId.fullName}</td>
+                <td style="width:150px">${helpTicket.createdDate |
+                    dateFormat:config.DATE_FORMAT_TABLE:false}</td>
+                <td style="width:150px" >${helpTicket.modifiedDate |
+                    dateFormat:config.DATE_FORMAT_TABLE:false}</td>
+                <td><button click.trigger="closeHelpTicket(helpTicket, $event)" class="btn btn-primary btn-sm">Request
+                        Close</button></td>
+            </tr>
+        </tbody>
+    </table>
+</template>

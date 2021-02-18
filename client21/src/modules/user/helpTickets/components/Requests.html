@@ -2,10 +2,11 @@
       <div class="topMargin">
         <span id="selectProductRequestError"></span>
         <h5 show.bind="clientRequestsArray.length === 0">You have no product requests that apply to this type of help ticket.</h5>
-        <table id="clientTable" show.bind="clientRequestsArray.length > 0" class="table table-bordered table-responsive" style="background:white;">
+        <table id="clientTable" show.bind="clientRequestsArray.length > 0" class="table table-bordered table-responsive  table-hover" style="background:white;">
           <thead>
           <tr class="header">
-            <th>Course</th>
+            <th>Course Number</th>
+            <th>Course Name</th>
             <th>Session</th>
             <th>Product</th>
             <th>System</th>
@@ -14,9 +15,10 @@
           </tr>
           </thead>
           <tbody>
-            <tr class="sortable" id="${product.id}" productId="${product.productId}" 
+            <tr class="sortable pointMe" id="${product.id}" productId="${product.productId}" 
                 repeat.for="product of clientRequestsArray"
                 click.trigger="requestChosen($event, $index)">
+              <td>${product.courseNumber}</td>
               <td>${product.courseName}</td>
               <td>${product.sessionId | session:sessions.objectsArray}</td>
               <td>${product.productName}</td> 

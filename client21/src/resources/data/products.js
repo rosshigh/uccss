@@ -53,7 +53,6 @@ export class Products {
         }
     }
 
-
     selectObject(index) {
         if (index === undefined) {
             this.selectedObject = this.emptyProduct();
@@ -123,5 +122,23 @@ export class Products {
 
     isObjectDirty() {
         return this.utils.objectsEqual(this.selectedObject, this.originalObject);
+    }
+
+    getProductInfo(id) {
+        if (!id) return null;
+        for (var i = 0; i < this.objectsArray.length; i++) {
+            if (this.objectsArray[i]._id === id) {
+                if (this.objectsArray[i].productDescription) {
+                    return {
+                        info: this.objectsArray[i].productDescription,
+                        productId: id,
+                        header: this.objectsArray[i].name
+                    }
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 }

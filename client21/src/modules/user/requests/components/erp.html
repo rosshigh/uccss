@@ -1,0 +1,27 @@
+<template>
+  <div class="row" style="word-wrap: break-word;">
+    <div class="col-5">
+      <h6 class="leftMargin">System: <span class="bold">${assign.system.sid}</span></h6>
+      <h6 class="leftMargin">Client: <span class="bold"> ${assign.assignment.client} </span></h6>
+      <h6 class="leftMargin">Server: <span class="bold"> ${assign.system.server} </span></h6>
+      <h6 class="leftMargin">System Number: <span class="bold"> ${assign.system.instance} </span></h6>
+    </div>
+    <div class="col-7">
+      <h6>Student IDs: <span class="bold"> ${assign.assignment.studentUserIds ? assign.assignment.studentUserIds :
+          'N/A'}</span></h6>
+      <h6>Student Password: <span class="bold"> ${assign.assignment.studentPassword ? assign.assignment.studentPassword
+          : 'N/A'}</span></h6>
+      <h6 class="topMargin">Faculty IDs <span class="bold">: ${assign.assignment.facultyUserIds ?
+          assign.assignment.facultyUserIds : 'N/A'}</span></h6>
+      <h6>Faculty Password: <span class="bold"> ${assign.assignment.facultyPassword ? assign.assignment.facultyPassword
+          : 'N/A'}</span></h6>
+    </div>
+    <div class="row">
+      <div class="col">
+        <h6 show.bind="assign.system.its && assign.system.its.length > 0" class="leftMargin bigTopMargin">Web URL:</h6>
+        <h6 show.bind="assign.system.its && assign.system.its.length > 0"><span class="bold"> <a
+              href="${assign.system.its}" target="_blank">${assign.system.its}</a> </span></h6>
+      </div>
+    </div>
+  </div>
+</template>

@@ -1,0 +1,62 @@
+<template>
+    <div class="row">
+        <div class="col">
+            <h2>${faqservices.selectedCat.description}</h2>
+            <h4>${faqservices.selectedCat.subCategories[selectedSubCategoryIndex].description}</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div show.bind="!showDocumentForm">
+                <div class="card">
+                    <div class="card-body">
+                        <ul>
+                            <li class="list-group-item pointMe" click.trigger="selectQuestion($index, question)"
+                                repeat.for="question of filteredQuestionArray[selectedCategoryIndex].subCategories[selectedSubCategoryIndex].questions">
+                                ${question.question}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div show.bind="showDocumentForm">
+                <div class="card">
+                    <div class="card-body">
+                        <span><i click.trigger="closeDocumentForm()" class="fa fa-window-close-o"
+                                aria-hidden="true"></i></span>
+                        <div class="row">
+                            <div class="col">
+
+                                <div class="form-group">
+                                    <h3>${faqservices.selectedQuestion.question}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <div innerhtml.bind="faqservices.selectedQuestion.answer"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Documents</label>
+                                    <ul>
+                                        <li repeat.for="link of faqservices.selectedQuestion.links"><a target="_blank"
+                                                href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documentsService.selectedCat.DocCode}/${selectedSubCategoryIndex}/${document.files[0].fileName}">${link.fileName}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -13,7 +13,7 @@ var config = {
     db: 'mongodb://127.0.0.1/uccss-dev',
     corsDomain: 'http://localhost:5000',
     secret: "Ci23fWtahDYE3dfirAHrJhzrUEoslIxqwcDN9VNhRJCWf8Tyc1F1mqYrjGYF",
-    uploads: './public/uploadedFiles',
+    uploads: rootPath + '/public/uploadedFiles',
     UCC_HOME: "Milwaukee",
     UCC_ID: "58e6c8f23b75444aa021be7e",
     smtp: 'smtps://rhightower@gmail.com:Kinja1@3@smtp.gmail.com',

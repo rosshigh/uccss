@@ -1,0 +1,33 @@
+<template>
+    <div class="card">
+        <div class="card-body">
+            <h1>View Product Requests</h1>
+            <div show.bind="!requestSelected">
+            <div class="row">
+                <div class="col-4">
+                    <div class="form-group topMargin leftMargin">
+                        <select show.bind="!requestSelected" value.bind="selectedSession"
+                            change.delegate="getRequests()" id="session" class="form-control selectpicker"
+                            data-style="btn btn-link">
+                            <option repeat.for="session of sessions.objectsArray" value.bind="session._id">Session
+                                ${session.session} - ${session.year}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+                <div if.bind="requests.objectsArray.length === 0">
+                    <h3>You have made no requests for this semester.</h3>
+                </div>
+              
+                    <div show.bind="noRequests" class="bottomMargin leftMargin">
+                        <h4>You have no existing requests for this session</h4>
+                    </div>
+                    <compose show.bind="requests.objectsArray.length > 0" view="./components/requestsTable.html">
+                    </compose>
+                </div>
+                <div show.bind="requestSelected">
+                    <compose view="./components/requestsForm.html"></compose>
+                </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,14 @@
+<template>
+    <div class="hoverMenu" id="statusMenu" style="border-style: solid;border-width:1px;">
+        <span click.delegate="hideStatusMenu()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+            data-placement="bottom" title="" data-original-title="Close"><i class="fa fa-window-close-o"
+                aria-hidden="true"></i></span>
+        <hr />
+        <ul>
+            <li class="pointMe menu" click.trigger="changeStatus(status.code)"
+                repeat.for="status of config.REQUEST_STATUS | filterStatuses:filterStatuses">${status.description}</li>
+        </ul>
+    </div>
+
+   
+</template>

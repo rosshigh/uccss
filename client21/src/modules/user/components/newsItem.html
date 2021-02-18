@@ -1,0 +1,15 @@
+<template>
+  <h2 class="underline">UCC and UA News</h2>
+  <img style="height: 150px; width: 100%; display: block;" src="${config.IMG_DOWNLOAD_URL}uaucc.png" alt="Card image">
+  <div repeat.for="item of site.objectArray | infoFilter:'NEWS'">
+    <blockquote class="topMargin">
+      <a if.bind="item.url" href.bind="item.url" target="_blank">
+        <h6>${item.title}</h6>
+      </a>
+      <h6 if.bind="!item.url">${item.title}</h6>
+      <p innerhtml.bind="item.content"></p>
+    </blockquote>
+    <hr/>
+  </div>
+  
+</template>

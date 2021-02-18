@@ -1,0 +1,41 @@
+<template>
+    <div class="modal fade" id="currentSessionsModal" tabindex="-1" role="dialog" aria-labelledby="currentSessionsModal"
+        aria-hidden="true">
+        <div class="row">
+            <div class="col">
+                <div class="modal-dialog" style="max-width: 30%;" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="requestCloseModal" Current Sessions</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+                        <div class="modal-body" style="padding:10px;">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="list-group">
+                                            <div class="list-group-item" repeat.for="session of sessions.objectsArray">
+                                                <h4>Session ${session.session} - ${session.year}</h4>
+                                                Requests open: ${session.requestsOpenDate |
+                                                dateFormat:config.DATE_FORMAT_TABLE}<br />
+                                                Clients available: ${session.startDate |
+                                                dateFormat:config.DATE_FORMAT_TABLE}<br />
+                                                Session ends: ${session.endDate |
+                                                dateFormat:config.DATE_FORMAT_TABLE}<br />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col"></div>
+            </div>
+        </div>
+</template>

@@ -27,8 +27,7 @@ export class EditPeople {
         this.configParameters = this.store.getConfig();
 
         this.filters = [
-            { value: '', keys: ['fullName', 'institutionId.name', 'email', 'roles'] },
-            { value: this.config.ACTIVE_PERSON, keys: ['personStatus'] }
+            { value: '', keys: ['fullName', 'email', 'roles'] }
         ];
 
         this.validationErrors = [];
@@ -38,23 +37,54 @@ export class EditPeople {
 
     async activate() {
         let responses = await Promise.all([
-            this.people.getPeopleArray('?order=lastName'), //PLATFORM.moduleName('./value-converters/phone-number')
+            this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01'),
             this.is4ua.loadIs4ua(),
             this.people.getInstitutionArray('?order=name')
         ]);
     }
 
     attached() {
+        var $th = $('.tableFixHead').find('thead th')
+        $('.tableFixHead').on('scroll', function () {
+            $th.css('transform', 'translateY(' + this.scrollTop + 'px)');
+        });
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
         $('.selectpicker').selectpicker();
     }
 
     async refresh() {
-        this.clearFilters();
         $('#loading').show();
-        await this.people.getPeopleArray('?order=lastName'), //&filter=personStatus|eq|01
+        await this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|' + this.loadStatus),
             $('#loading').hide();
+    }
+
+    institutionName(row) {
+        if (row.institutionId !== null) {
+            return row.institutionId.name;
+        } else {
+            return null;
+        }
+    }
+
+    sortInstitutionName(a, b, sortOrder) {
+
+        if (a.institutionId == null || b.institutionId == null) {
+            return -1 * sortOrder;
+        }
+
+        let name1 = a.institutionId.name;
+        let name2 = b.institutionId.name;
+
+        if (name1 === name2) {
+            return 0;
+        }
+
+        if (name1 > name2) {
+            return 1 * sortOrder;
+        }
+
+        return -1 * sortOrder;
     }
 
     new() {
@@ -67,7 +97,7 @@ export class EditPeople {
 
     async edit(person) {
         this.selectedPersonId = person._id;
-        await this.people.getPerson(person._id);
+        await this.people.getPerson(this.selectedPersonId);
         this.refreshSelects();
         this.createValidationRules();
         this.getPhoneMask();
@@ -75,7 +105,7 @@ export class EditPeople {
         this.view = 'form';
     }
 
-    refreshSelects(){
+    refreshSelects() {
         this.utils.refreshSelect("#editStatus", this.is4ua.personStatusArray, "code", this.people.selectedPerson.personStatus);
         this.utils.refreshSelect("#institutionSelect", this.people.institutionsArray, "_id", this.people.selectedPerson.institutionId);
         this.utils.refreshSelect("#specializationSelect", this.is4ua.specialArray, "code", this.people.selectedPerson.personSpecialization);
@@ -119,7 +149,8 @@ export class EditPeople {
         this.localValidation()
         if (this.validationErrors.length === 0) {
             let serverResponse = await this.people.savePerson();
-            if (!serverResponse.error) {
+            if (!serverResponse.error){
+                this.utils.updateArrayItem(serverResponse, this.people.peopleArray);
                 this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
                 this.refresh();
             } else {
@@ -210,7 +241,6 @@ export class EditPeople {
 
     clearFilters() {
         this.filters[0].value = "";
-        this.filters[1].value = this.config.ACTIVE_PERSON;
         $('#filterField').focus();
     }
 
@@ -261,12 +291,14 @@ export class EditPeople {
     }
 
     //Specifically editPerson
-    async toggleStatus(id, personStatus) {
+    async toggleStatus(id, personStatus, event) {
+        event.stopPropagation();
         if (id && personStatus) {
             this.people.selectedPersonById(id);
             this.people.selectedPerson.personStatus = personStatus === this.config.ACTIVE_PERSON ? this.config.INACTIVE_PERSON : this.config.ACTIVE_PERSON;
             let serverResponse = await this.people.savePerson();
             if (!serverResponse.error) {
+                this.utils.updateArrayItem(serverResponse, this.people.peopleArray);
                 this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
             } else {
                 this.utils.showNotification("There was a problem saving the person", 'error');
@@ -301,7 +333,7 @@ export class EditPeople {
     }
 
     filterRoles() {
-        this.filteredArray = this.configParameters.ROLES.filter(item => {
+        this.filteredArray = this.config.ROLES.filter(item => {
             return this.people.selectedPerson.roles.indexOf(item.role) === -1;
         });
         if (this.filteredArray.length === 0) this.filteredArray.push({ role: "NOROLE", label: "No Roles Remaining" });
@@ -340,12 +372,14 @@ export class EditPeople {
         }
     }
 
-    copyEmail(person) {
+    copyEmail(person, event) {
+        event.stopPropagation();
         const el = document.createElement('textarea');
         el.value = person.email;
         document.body.appendChild(el);
         el.select();
         document.execCommand('copy');
         document.body.removeChild(el);
+        this.utils.showNotification('Email copied')
     }
 }

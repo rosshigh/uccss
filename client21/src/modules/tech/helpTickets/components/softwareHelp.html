@@ -1,0 +1,100 @@
+<template>
+    <div class='row justify-content-md-center'>
+        <div class="col">
+            <!-- <button data-toggle="collapse" click.trigger="togglecurrtoggleSoftwareFormiculumForm()"
+                data-target="#softwareForm" class="btn btn-primary">${softwareFormCaption}</button> -->
+            <div id="softwareForm" class="collapse show">
+                <div class="card" style="background-color:ghostwhite;">
+                    <div class="card-header">
+                        <h5>The more information you can provide, the easier it for us to troubleshoot the issue.</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="blackText">What software are you installing/configuring *</label>
+                                    <input value.bind="content.softwareName" class="form-control" type="text" placeholder="${softwareNamePlaceholder}"/>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <label class="blackText">What version number of the sofware?</label>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        checked.bind="versionNotApplicable">
+                                                    Not applicable
+                                                    <span class="form-check-sign">
+                                                        <span class="check"></span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input value.bind="content.version" class="form-control" type="text" disabled.bind="versionNotApplicable" placeholder="${softwareVersionPlaceholder}"/>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <label  class="blackText">What operating system are you using?</label>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        checked.bind="osNotApplicable">
+                                                    Not applicable
+                                                    <span class="form-check-sign">
+                                                        <span class="check"></span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input value.bind="content.os" class="form-control" type="text" disabled.bind="osNotApplicable" placeholder="${softwareOSPlaceholder}"/>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <label class="blackText">What is the version of the operating system?</label>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        checked.bind="osVersionNotApplicable">
+                                                    Not applicable
+                                                    <span class="form-check-sign">
+                                                        <span class="check"></span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input value.bind="content.osVersion" class="form-control" type="text" disabled.bind="osVersionNotApplicable" placeholder="${softwareOSVersionPlaceholder}"/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="blackText">Is this a computer lab environment? </h5>
+                                    <div class="form-check form-check-radio form-check-inline leftMargin">
+                                        <label class="form-check-label" repeat.for="option of yesNo">
+                                            <input checked.bind="content.lab" value.bind="option"
+                                                class="form-check-input" type="radio" name="labOptions"
+                                                id="inlineRadio3" value="option1"> ${option}
+                                            <span class="circle">
+                                                <span class="check"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

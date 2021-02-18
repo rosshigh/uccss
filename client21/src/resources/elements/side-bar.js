@@ -51,6 +51,7 @@ export class SideBar {
     }
 
     logout() {
+        this.router.navigate("");
         this.auth.logout();
         this.isAuthenticated = this.auth.isAuthenticated();
         this.aurelia.setRoot(PLATFORM.moduleName('home'));
@@ -99,75 +100,5 @@ export class SideBar {
         }
 
     }
-
-    // configureRouter(config, router) {
-    //     config.map([
-    //         {
-    //             route: ['', 'user'],
-    //             moduleId: PLATFORM.moduleName('../../modules/user/user'),
-    //             settings: { auth: true, roles: [] },
-    //             nav: true,
-    //             name: 'user',
-    //             title: "User"
-    //         },
-    //         {
-    //             route: 'Customers',
-    //             moduleId: PLATFORM.moduleName('../../modules/admin/Customers/customers'),
-    //             settings: { auth: true, roles: [] },
-    //             nav: true,
-    //             name: 'customers',
-    //             title: 'Customers'
-    //         },
-    //         {
-    //             route: 'editPeople',
-    //             moduleId: PLATFORM.moduleName('../../modules/admin/Customers/editPeople'),
-    //             settings: { auth: true, roles: [] },
-    //             nav: true,
-    //             name: 'editPeople',
-    //             title: "People"
-    //         },
-    //         {
-    //             route: 'editInstitutions',
-    //             moduleId: PLATFORM.moduleName('../../modules/admin/Customers/editInstitutions'),
-    //             settings: { auth: true, roles: [] },
-    //             nav: true,
-    //             name: 'editInstitutions',
-    //             title: 'Institutions'
-    //         },
-    //         {
-    //             route: 'bulkEmails',
-    //             moduleId: PLATFORM.moduleName('../../modules/admin/Customers/bulkEmails'),
-    //             settings: { auth: true, roles: [] },
-    //             nav: true,
-    //             name: 'bulkEmails',
-    //             title: 'Bulk Emails'
-    //         },
-    //         {
-    //             route: 'documents',
-    //             moduleId: PLATFORM.moduleName('../../modules/admin/documents/documents'),
-    //             settings: { auth: true, roles: [] },
-    //             nav: true,
-    //             name: 'documents',
-    //             title: 'Documents'
-    //         }
-    //         // {
-    //         //     route: 'home',
-    //         //     moduleId: PLATFORM.moduleName('../../modules/home/home'),
-    //         //     name: 'Home',
-    //         //     settings: { auth: false, roles: [] },
-    //         //     title: 'UCCSS'
-    //         //   },
-    //         // {
-    //         //     route: 'bulkEmails',
-    //         //     moduleId: PLATFORM.moduleName('./bulkEmails'),
-    //         //     settings: { auth: true, roles: [] },
-    //         //     nav: true,
-    //         //     name: 'bulkEmails',
-    //         //     title: 'Bulk Emails'
-    //         // }
-    //     ]);
-
-    //     this.router = router;
-    // }
 
 }

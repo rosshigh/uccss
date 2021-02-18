@@ -4,25 +4,13 @@ var express = require('express'),
     router = express.Router(),
     mongoose = require('mongoose'),
     Person = mongoose.model('Person'),
+    Course = mongoose.model('Course'),
     asyncHandler = require('express-async-handler'),
-    // PersonArchive = mongoose.model('PersonArchive'),
-    // Note = mongoose.model('Note'),
-    // TechNote = mongoose.model('TechNote'),
-    // TechNoteCategory = mongoose.model('TechNoteCategory'),
     http = require('http'),
     PasswordReset = mongoose.model('PasswordReset'),
-    // path = require('path'),
     logger = require('../../config/logger'),
-    // logAuth = require('../../config/log-authenticate'),
     passportService = require('../../config/passport'),
     passport = require('passport');
-// Notifications =  mongoose.model('Notification'),
-// Event = mongoose.model('Event'),
-// EmailLog = mongoose.model('EmailLog'),
-// multer = require('multer'),
-// mkdirp = require('mkdirp'),
-// DuplicateRecordError = require(path.join(__dirname, "../../config", "errors", "DuplicateRecordError.js"));
-
 
 // var AsyncPolling = require('async-polling');
 
@@ -32,7 +20,7 @@ var requireAuth = passport.authenticate('jwt', { session: false }),
 module.exports = function (app, config) {
     app.use('/api', router);
 
-    router.route('/people').get((req, res, next) => {
+    router.get('/people', asyncHandler(async (req, res) => {
         logger.log('info', 'Get all people');
         var query = buildQuery(req.query, Person.find())
         query
@@ -46,8 +34,25 @@ module.exports = function (app, config) {
                 } else {
                     res.status(404).json({ message: "No users" });
                 }
-            }).catch(err => { return next(err); });
-    });
+            });
+    }));
+
+    router.get('/people/small', asyncHandler(async (req, res) => {
+        logger.log('info', 'Get all people small');
+        var query = buildQuery(req.query, Person.find())
+        query
+            .select('lastName firstName fullName')
+            .populate({ path: 'institutionId', model: 'Institution', select: 'name' })
+            .sort(req.query.order)
+            .exec()
+            .then(result => {
+                if (result && result.length) {
+                    res.status(200).json(result);
+                } else {
+                    res.status(404).json({ message: "No users" });
+                }
+            })
+    }));
 
     router.get('/people/bulkEmail', asyncHandler(async (req, res) => {
         logger.log('info', 'Get people builkEmail');
@@ -66,7 +71,42 @@ module.exports = function (app, config) {
         })
     }));
 
-    router.post('/api/people', asyncHandler(async (req, res) => {
+    router.get('/uccStaff/:uccRoles', asyncHandler(async (req, res) => {
+        logger.log('info', 'Getting UCC Staff');
+        let roles = req.params.uccRoles.split(':');
+        Person.find({ roles: { $in: roles } })
+            .select('lastName firstName fullName')
+            .exec().then(people => {
+                res.status(200).json(people);
+            })
+    }));
+
+    router.get('/people/checkEmail/:email', asyncHandler(async (req, res) => {
+        logger.log('info', 'Get person for email =' + req.params.email);
+        var value = req.params.email.toLowerCase();
+
+        var query = Person.findOne({ email: { $regex: new RegExp('^' + value, 'i') } });
+        query.exec().then(object => {
+            if (object) {
+                res.status(409).json({ status: 'exists' });
+            } else {
+                res.status(200).json({ status: 'available' });
+            }
+        });
+    }));
+
+    router.get('/people/checkName', asyncHandler(async (req, res) => {
+        var query = buildQuery(req.query, Model.find())
+        query.exec().then(object => {
+            if (object.length) {
+                res.status(409).json({ status: 'exists' });
+            } else {
+                res.status(200).json({ status: 'available' });
+            }
+        });
+    }));
+
+    router.post('/people', asyncHandler(async (req, res) => {
         logger.log('info', 'Create Person');
         var person = new Person(req.body);
         person.save().then(result => {
@@ -76,7 +116,7 @@ module.exports = function (app, config) {
 
     router.put('/people', asyncHandler(async (req, res) => {
         logger.log('info', 'Update Person ' + req.body._id);
-        await Person.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false }).then(result => {
+        await Person.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false, new: true }).then(result => {
             res.status(200).json(result);
         })
     }));
@@ -110,4 +150,60 @@ module.exports = function (app, config) {
         res.status(201).json({ message: "logout successful" });
     })
 
+    router.get('/courses', asyncHandler(async (req, res) => {
+        logger.log('info', 'Get courses');
+        var query = buildQuery(req.query, Course.find());
+        query.select('name number')
+        query.exec().then(result => {
+            res.status(200).json(result);
+        })
+    }));
+
+    router.post('/courses', asyncHandler(async (req, res) => {
+        logger.log('info', 'Create Course');
+        var course = new Course(req.body);
+        course.save().then(result => {
+            res.status(200).json(result);
+        })
+    }));
+
+    router.put('/courses', asyncHandler(async (req, res) => {
+        logger.log('info', 'Update course');
+        Course.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false }).then(result => {
+            res.status(200).json(result);
+        })
+    }));
+
+    router.post('/people/files/:id', function (req, res, next) {
+        Person.findById(req.params.id, function (err, person) {
+            if (!person) {
+                res.status(404).json({ message: 'person not found' });
+            }
+
+            const formidable = require('formidable');
+            const form = formidable();
+            form.maxFileSize = 800 * 1024 * 1024;
+            form.parse(req);
+            form.on('fileBegin', function (name, file) {
+                let fileParts = file.name.split('.');
+                let filename = req.params.id + '.' + fileParts[fileParts.length - 1];
+                file.path = config.uploads + '/photos/' + filename;
+                person.file = {
+                    fileName: filename
+                }
+            });
+
+            form.on('file', function (name, file) {
+
+            });
+
+            form.on('end', function () {
+                console.log(person)
+                person.save().then(result => {
+                    console.log(result)
+                    res.status(201).json({ message: 'file uploaded' });
+                })
+            })
+        });
+    })
 };

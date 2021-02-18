@@ -1,0 +1,27 @@
+<template>
+    <div class="card">
+        <div class="card-body">
+            <div>
+                <label>Upload screenshots or other files that will help us solve you problem.</lable></br>
+                    <label>If you want to upload multiple files, hold the control key while selecting files</label>
+            </div>
+
+            <div class="row" style="padding:10px;">
+                <div class="col-3">
+                    <label class="btn btn-primary">
+                        Browse for files&hellip; <input type="file" style="display: none;"
+                            change.delegate="changeFiles()" files.bind="files" multiple>
+                    </label>
+                </div>
+                <div class="col">
+                    <ul>
+                        <li repeat.for="file of filesToUpload" class="list-group-item" style="background-color:cyan;">
+                            ${file.name}<span click.delegate="removeFile($index)" class="pull-right"><i
+                                    class="fa fa-trash" aria-hidden="true"></i></span></li>
+                    </ul>
+                </div>
+                <div class="col"></div>
+            </div>
+        </div>
+    </div>
+</template>

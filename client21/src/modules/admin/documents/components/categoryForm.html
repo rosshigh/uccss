@@ -1,0 +1,24 @@
+<template>
+    <div class="panel panel-default" style="background-color:ghostwhite;">
+        <div class="panel-body" style="padding:5px;">
+            <div class="form-group row">
+                <label for="catSortOrder">Category Name</label>
+                <input id="categoryInput" value.bind="documents.selectedCat.description" type="text"
+                    placeholder="Category Name" class="form-control"/>
+            </div> 
+            <div class="form-group row">
+                <label for="catSortOrder">Sort Order</label>
+                <input class="form-control" type="number" id="catSortOrder" placeholder="Sort Order"
+                    value.bind="documents.selectedCat.sortOrder" />
+            </div>
+            <div class="form-group">
+                <label for="editCategory">Type</label>
+                <select value.bind="documents.selectedCat.category" id="editCategory"
+                    class="form-control selectpicker" data-style="btn btn-link">
+                    <option repeat.for='cat of config.DOCUMENT_CATGORIES' value="${cat.code}">
+                        ${cat.description}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</template>

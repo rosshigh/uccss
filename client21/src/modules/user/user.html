@@ -1,16 +1,24 @@
 <template>
-    <top-bar></top-bar>
-    <div class="content" style="margin-top:200px;">
-       <div class="container-fluid">
-          <h1>Nothing to see here folks, move along.</h1>
-          <h4>Working pages</h4>
-          <ul>
-              <li>Customers-People</li>
-              <li>Customers-Institutions</li>
-              <li>Customers-Bulkemail (no email)</li>
-              <li>System Admin-Sessions</li>
-              <li>System Admin-Systems (partial)</li>
-          </ul>
-       </div>
+    <compose view="../../resources/elements/top-bar.html"></compose>
+    <div class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-3 offset-1 leftMartin">
+                            <compose view="./components/uccInformation.html"></compose>
+                        </div>
+
+                        <div class="col-3 bigLeftMargin">
+                            <compose view="./components/newsItem.html"></compose>
+                        </div>
+
+                        <div class="col-3 bigLeftMargin">
+                            <compose view="./components/homePageLinks.html"></compose>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>

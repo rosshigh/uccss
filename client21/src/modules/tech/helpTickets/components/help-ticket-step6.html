@@ -1,0 +1,113 @@
+<template>
+    <div class="row">
+        <div class="col-4">
+            <div class="form-group">
+                <label for="editPhone">Help Ticket Status</label>
+                <select value.two-way="selectedStatus"
+                    class="form-control selectpicker" data-style="btn btn-link" id="statusSelect">
+                    <option repeat.for="status of config.HELP_TICKET_STATUSES" value="${status.code}">
+                        ${status.description}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-5">
+            <h3 class="bold">Product Assignment or Course</h3>
+            <h5 if.bind="requiresClient === 'No'">Does not involve a product assigned by the UCC</h5>
+            <div if.bind="requiresClient === 'Yes'">
+                <h5 if.bind="forACourse === 'Course'"> ${courseSelected | convertCourseNames:clientRequestsArray}</h5>
+                <div if.bind="forACourse === 'Product'" class="leftMargin">
+                    <h5>${clientRequestsArray[productAssignmentSelectedIndex].productName}</h5>
+                    <h5>${clientRequestsArray[productAssignmentSelectedIndex].courseName}</h5>
+                    <h5>${clientRequestsArray[productAssignmentSelectedIndex].systemId |
+                        lookupValue:systems.objectsArray:"_id":"sid"}</h5>
+                    <h5>${clientRequestsArray[productAssignmentSelectedIndex].client}</h5>
+                </div>
+            </div>
+            <h3 class="bold">Curriculum</h3>
+            <h5 if.bind="curriculumQuestion === 'No'">Does not involve a SAP UA curriculum.</h5>
+            <div if.bind="curriculumQuestion === 'Yes'">
+                <!-- <div class="row">
+            <div class="col"> -->
+                <h4>Title: ${content.curriculumTitle}</h4>
+                <h4>Author: ${content.curriculumAuthor}</h4>
+                <h4>Author: ${content.curriculumModule}</h4>
+                <h4>Page No: ${content.curriculumPageNumber}</h4>
+                <!-- </div>
+            <div class="col"> -->
+                <h4>Step: ${content.curriculumStep}</h4>
+                <h4>IDs affected: ${content.curriculumIDs}</h4>
+                <h4>Other students past this point: ${content.otherStudentsPastThisPoint}</h4>
+                <!-- </div>
+            </div>
+        </div> -->
+            </div>
+            <h3 class="bold">Software</h3>
+            <h5 if.bind="softwareQuestion === 'No'">Does not involve software.</h5>
+            <div if.bind="softwareQuestion === 'Yes'">
+                <!-- <div class="row">
+            <div class="col"> -->
+                <h4>Software: ${content.softwareName}</h4>
+                <h4>Version: ${content.version}</h4>
+                <h4>Operating system: ${content.os}</h4>
+                <!-- </div>
+            <div class="col"> -->
+                <h4>Operating system version: ${content.osVersion}</h4>
+                <h4>Lab: ${content.lab}</h4>
+                <!-- </div>
+        </div> -->
+            </div>
+            <h3 class="bold">Attachments:</h3>
+            <div show.bind="filesToUpload.length" class="topMargin card-title">
+                <ul>
+                    <li repeat.for="file of filesToUpload" class="list-group-item">${file.name}<span click.delegate="removeFile($index)"
+                            class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
+                </ul>
+            </div>
+            <div show.bind="!filesToUpload.length" class="topMargin card-title">Are you sure you don't want to add an
+                attachement?</div>
+        </div>
+        <div class="col">
+            <h3 class="bold">Description of the problem</h3>
+            <h5 if.bind="!content.problemDescription">No description</h5>
+            <div if.bind="content.problemDescription" innerhtml.bind="content.problemDescription"></div>
+        </div>
+    </div>
+    <!-- <div class="leftMargin rightMargin">
+        <div show.bind="outputForm">
+            <h3 class="topMargin">Details:</h3>
+            <div class="card-title" style="padding:20px;" id="outputContainer"></div>
+        </div>
+        <div show.bind="SelectedClientRequest">
+            <h3 class="topMargin">Product Request</h3>
+            <div class="card-title">
+                <h4>Session: ${SelectedClientRequest.sessionId | session:sessions.sessionsArray}</h4>
+                <h4>Product: ${SelectedClientRequest.productName}</h4>
+                <h4>System: ${SelectedClientRequest.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</h4>
+                <h4>Client: ${SelectedClientRequest.client}</h4>
+                <h4>Course: ${SelectedClientRequest.courseName}</h4>
+            </div>
+        </div>
+        <h3 class="topMargin">Attachments:</h3>
+        <div show.bind="filesToUpload.length" class="topMargin card-title">
+            <ul>
+                <li repeat.for="file of filesToUpload" class="list-group-item">${file.name}<span click.delegate="removeFile($index)"
+                        class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
+            </ul>
+        </div>
+        <div show.bind="!filesToUpload.length" class="topMargin card-title">Are you sure you don't want to add an
+            attachement?</div>
+        <h3 class="topMargin">Description:</h3>
+        <div show.bind="helpTickets.selectedHelpTicketContent.content.comments" class="topMargin card-title"
+            innerhtml.bind="helpTickets.selectedHelpTicketContent.content.comments"></div>
+        <div show.bind="!helpTickets.selectedHelpTicketContent.content.comments" class="topMargin card-title">Are you
+            sure you don't wish to provide a description?</div>
+        <h3 class="topMargin">Steps to Reproduce:</h3>
+        <div show.bind="helpTickets.selectedHelpTicketContent.content.steps" class="topMargin card-title"
+            innerhtml.bind="helpTickets.selectedHelpTicketContent.content.steps"></div>
+        <div show.bind="!helpTickets.selectedHelpTicketContent.content.steps" class="topMargin card-title">Are you sure
+            you don't wish to provide the steps to reproduce the problem?</div>
+    </div> -->
+
+</template>

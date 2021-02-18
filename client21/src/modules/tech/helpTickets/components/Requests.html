@@ -1,0 +1,35 @@
+<template>
+      <div class="topMargin">
+        <span id="selectProductRequestError"></span>
+        <h5 show.bind="clientRequestsArray.length === 0">You have no product requests that apply to this type of help ticket.</h5>
+        <table id="clientTable" show.bind="clientRequestsArray.length > 0" class="table table-bordered table-responsive  table-hover" style="background:white;">
+          <thead>
+          <tr class="header">
+            <th>Course Number</th>
+            <th>Course Name</th>
+            <th>Session</th>
+            <th>Product</th>
+            <th>System</th>
+            <th>Client</th>
+            <th>Status</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr class="sortable pointMe" id="${product.id}" productId="${product.productId}" 
+                repeat.for="product of clientRequestsArray"
+                click.trigger="viewAssignment(product._id)">
+              <td>${product.courseNumber}</td>
+              <td>${product.courseName}</td>
+              <td>${product.sessionId | session:sessions.objectsArray}</td>
+              <td>${product.productName}</td> 
+              <td>${product.systemId | lookupValue:systems.objectsArray:"_id":"sid"}</td>
+              <td>${product.client}</td>
+              <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
+            </tr>
+          </tbody>
+        </table>
+        <span id="client"></span>
+      </div>
+    </div>
+  </div>
+</template>

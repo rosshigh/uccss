@@ -1,0 +1,44 @@
+<template>
+	<div class="row">
+		<div class="col">
+			<h4 class="topMargin"><strong>Request Details</strong></h4>
+			<div class="card topMargin">
+				<div class="card-body leftJustify">
+					<div class="form-group bottomMargin" show.bind="customerActionRequired">
+						<h5 for="message">The UCC staff has asked you to provide additional information</h5>
+						<div class="well col-lg-12" id="message" innerhtml.bind="customerMessage" class="form-control">
+						</div>
+						<h5>Enter your response in the comments box below and click save</h5>
+						<editor value.bind="customerResponse" height="250"></editor>
+					</div>
+					<div class="form-horizontal topMargin">
+						<h4>Product: <span class="bold">${requests.selectedDetail.productId.name}</span></h4>
+						<p>Status: <span class="bold">${requests.selectedDetail.requestStatus |
+							lookupValue:config.REQUEST_STATUS:"code":"description"}</span></p>
+						<p>Course: <span class="bold">${requests.selectedObject.courseId.number} ${requests.selectedObject.courseId.name}
+						</span></p>
+						<div show.bind="requests.selectedObject.courseId.name != config.SANDBOX_NAME">
+							<p>Undergrads: <span class="bold">${requests.selectedObject.undergradIds}</span>
+							Graduate: <span class="bold">${requests.selectedObject.graduateIds}</span></p>
+						</div>
+						<p>Start Date:  <span class="bold">${requests.selectedObject.startDate |
+								dateFormat:config.DATE_FORMAT_TABLE}</span>
+						End Date:  <span class="bold">${requests.selectedObject.endDate | dateFormat:config.DATE_FORMAT_TABLE}</span>
+						</p>
+						<p>Required Date: <span class="bold">${requests.selectedDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</span></p>
+						<div
+							show.bind="requests.selectedObject.customerMessage && requests.selectedObject.customerMessage.length > 0">
+							<label class="topMargin">Requests comments</label>
+							<div class="well" innerhtml.bind="requests.selectedObject.customerMessage"></div>
+						</div>
+						<div
+							show.bind="requests.selectedObject.comments && requests.selectedObject.comments.length > 0">
+							<label class="topMargin">Comments from the UCC staff</label>
+							<div innerhtml.bind="requests.selectedObject.comments"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>

@@ -1,0 +1,67 @@
+<template>
+    <div class="row">
+        <div class="col-6">
+            <label id=" productList">Institution *</label>
+            <input class="form-control" value.bind="filter" input.trigger="filterList()"
+                placeholder="Filter institutions" />
+            <div class="overFlow" style="height:200px;">
+                <ul class="list-group" style="border:1px solid gray;padding-bottom:5px;">
+                    <a click.trigger="institutionSelected(institution._id)" type="button"
+                        repeat.for="institution of filteredInstitutionsArray" id="${institution._id}"
+                        class="list-group-item dropbtn">${institution.name}</a>
+                </ul>
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="row">
+                <div show.bind="stepTwoErrors.length">
+                    <ul class="pull-right">
+                        <li repeat.for="error of stepTwoErrors">${error}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <h3>Address</h3>
+                    <div class="row">
+                        <div class="col">
+                            <!-- <label for="register_address1" class="control-label ">Address 1</label> -->
+                            <input value.bind="people.selectedPerson.address1" id="register_address1"
+                                class="form-control" placeholder="Address 1" type="text" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <!-- <label for="register_address2" class="control-label ">Address 2</label> -->
+                            <input value.bind="people.selectedPerson.address2" id="register_address2"
+                                class="form-control" placeholder="Address2" type="text" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <!-- <label for="register_city" class="control-label ">City</label> -->
+                            <input value.bind="people.selectedPerson.city" id="register_city" class="form-control"
+                                placeholder="City" type="text" />
+                        </div>
+                        <div class="col-3">
+                            <!-- <label for="register_region" class="control-label ">Region</label> -->
+                            <input value.bind="people.selectedPerson.region" id="register_region" class="form-control"
+                                placeholder="Region" type="text" />
+                        </div>
+                        <div class="col-3">
+                            <!-- <label for="register_postal_code" class="control-label ">Postal Code</label> -->
+                            <input value.bind="people.selectedPerson.postalCode" id="register_postal_code"
+                                class="form-control" placeholder="Postal Code" type="text" />
+                        </div>
+                        <div class="col-2">
+                            <!-- <label for="register_country" class="control-label ">Country</label> -->
+                            <input value.bind="people.selectedPerson.country" id="register_country" class="form-control"
+                                placeholder="Country" type="text" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</template>

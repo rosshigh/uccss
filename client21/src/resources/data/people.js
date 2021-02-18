@@ -7,7 +7,7 @@ export class People {
 
   UCC_STAFF_SERVICE = 'uccStaff';
   PEOPLE_SERVICE = "people";
-  PERSON_REGISTER = "people/register"
+  // PERSON_REGISTER = "people/register"
   CHECK_EMAIL = 'people/checkEmail';
   CHECK_NAME = 'people/checkName';
   SEND_MAIL = 'people/sendMail';
@@ -41,20 +41,19 @@ export class People {
     }
   }
 
-  
   async getPeopleBulkEmailArray(options) {
-      var url = this.PEOPLE_SERVICE + '/bulkEmail';
-      url += options ? options : "";
-      try {
-        let serverResponse = await this.data.get(url);
-        if (!serverResponse.error) {
-          this.peopleBulkEmailArray = serverResponse;
-        } else {
-          this.data.processError(serverResponse);
-        }
-      } catch (error) {
-        console.log(error);
+    var url = this.PEOPLE_SERVICE + '/bulkEmail';
+    url += options ? options : "";
+    try {
+      let serverResponse = await this.data.get(url);
+      if (!serverResponse.error) {
+        this.peopleBulkEmailArray = serverResponse;
+      } else {
+        this.data.processError(serverResponse);
       }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async getPerson(id) {
@@ -64,6 +63,20 @@ export class People {
       if (!serverResponse.error) {
         this.selectedPerson = serverResponse;
         this.originalPerson = this.utils.copyObject(serverResponse);
+      } else {
+        this.data.processError(serverResponse);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getUCCStaff(uccRoles) {
+    var url = this.UCC_STAFF_SERVICE + '/' + uccRoles;
+    try {
+      let serverResponse = await this.data.get(url);
+      if (!serverResponse.error) {
+        this.uccPeople = serverResponse;
       } else {
         this.data.processError(serverResponse);
       }
@@ -139,17 +152,13 @@ export class People {
     return obj;
   }
 
-  async savePerson(register) {
+  async savePerson() {
+    let url = this.PEOPLE_SERVICE;
     if (!this.selectedPerson._id) {
-      if (register) {
-        var url = this.PERSON_REGISTER;
-      } else {
-        var url = this.PEOPLE_SERVICE;
-      }
       let response = await this.data.saveObject(this.selectedPerson, url, "post")
       return response;
     } else {
-      let response = await this.data.saveObject(this.selectedPerson, this.PEOPLE_SERVICE, "put")
+      let response = await this.data.saveObject(this.selectedPerson, url, "put")
       return response;
     }
   }
@@ -172,6 +181,37 @@ export class People {
     if (this.selectedPerson._id) {
       return this.data.saveObject(obj, this.PEOPLE_SERVICE + '/password/' + this.selectedPerson._id, "put");
     }
+  }
+
+  async checkEmail() {
+    if (this.selectedPerson.email) {
+      let serverResponse = await this.data.get(this.CHECK_EMAIL + '/' + this.selectedPerson.email);
+      if (serverResponse.code === 409) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  async checkName() {
+    if (this.selectedPerson.firstName && this.selectedPerson.lastName && this.selectedPerson.institutionId) {
+      let serverResponse = await this.data.get(thisCHECK_NAME + '?filter=[and]firstName|eq|' + this.selectedPerson.firstName + ':lastName|eq|' + this.selectedPerson.lastName + ':institutionId|eq|' + this.selectedPerson.institutionId);
+      if (serverResponse.code === 409) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  async uploadPhoto(files) {
+    if (!this.selectedPerson._id) {
+      return;
+    }
+    let url = this.PEOPLE_SERVICE + "/files/" + this.selectedPerson._id;
+    let response = await this.data.uploadFiles(files, url);
+    return response;
   }
 
   //Institutions
@@ -216,7 +256,7 @@ export class People {
   }
 
   async getInstitutionPeople(options) {
-    if(options === -1){
+    if (options === -1) {
       this.institutionPeopleArray = [];
       return;
     }
@@ -258,6 +298,10 @@ export class People {
     return null;
   }
 
+  setInstitution(obj){
+    this.selectedInstitution = this.utils.copyObject(obj);
+  }
+
   emptyInstitution() {
     var newInstitution = new Object();
     newInstitution.joinDate = new Date();
@@ -278,6 +322,94 @@ export class People {
   isInstitutionDirty() {
     if (this.selectedInstitution) {
       return this.utils.objectsEqual(this.selectedInstitution, this.originalInstitution);
+    }
+  }
+
+  async getCoursesArray(options) {
+    var url = this.COURSES_SERVICE;
+    url += options ? options : "";
+    try {
+      let serverResponse = await this.data.get(url);
+      if (!serverResponse.error) {
+        this.coursesArray = serverResponse;
+      }
+    } catch (error) {
+      console.log(error);
+    };
+  }
+
+  async getTrialClient() {
+    let url = this.COURSES_SERVICE + '?filter=name|eq|Trial Client';
+    let serverResponse = await this.data.get(url);
+    if (!serverResponse.error) {
+      this.trialClient = serverResponse[0];
+    } else {
+      this.trialClient = null;
+    }
+  }
+
+  selectCourse(index) {
+    if (index === undefined) {
+      this.selectedCourse = this.emptyCourse();
+    } else {
+      try {
+        this.selectedCourse = this.utils.copyObject(this.coursesArray[index]);
+        this.editCourseIndex = index;
+      } catch (error) {
+        console.log(error);
+        this.selectedCourse = this.emptyCourse();
+      }
+
+    }
+  }
+
+  selectCourseByID(id) {
+
+    this.selectedCourse = this.emptyCourse();
+    this.coursesArray.forEach(item => {
+      if (item._id === id) {
+        this.selectedCourse = this.utils.copyObject(item);
+      }
+    })
+  }
+
+  setCourse(object) {
+    this.selectedCourse = this.utils.copyObject(object);
+  }
+
+  emptyCourse() {
+    var newObj = new Object();;
+    newObj.name = "";
+    newObj.description = "";
+    newObj.number = "";
+    newObj.active = true;
+    return newObj;
+  }
+
+  async saveCourse() {
+    if (!this.selectedCourse) {
+      return;
+    }
+
+    if (!this.selectedCourse._id) {
+      let serverResponse = await this.data.saveObject(this.selectedCourse, this.COURSES_SERVICE, "post");
+      if (!serverResponse.error) {
+        this.selectedCourse = this.utils.copyObject(serverResponse);
+        if (this.coursesArray) this.coursesArray.push(this.selectedCourse);
+        this.editIneditCourseIndex = this.coursesArray.length - 1;
+      } else {
+        this.data.processError(response, "There was an error creating the product.");
+      }
+      return serverResponse;
+    } else {
+      var serverResponse = await this.data.saveObject(this.selectedCourse, this.COURSES_SERVICE, "put");
+      if (!serverResponse.error) {
+        this.selectedCourse = this.utils.copyObject(serverResponse);
+        this.coursesArray[this.editCourseIndex] = this.utils.copyObject(this.selectedCourse, this.coursesArray[this.editCourseIndex]);
+      } else {
+        this.data.processError(response, "There was an error updating the course.");
+      }
+      return serverResponse;
     }
   }
 }

@@ -1,0 +1,27 @@
+<template>
+    <div show.bind="showRequestPanel">
+        <div show.bind="requestTableOrForm === 'table'">
+        <div class="row">
+            <!-- Session Select -->
+            <div class="col-lg-4">
+                <div class="form-group topMargin leftMargin">
+                    <select value.bind="selectedSession" change.delegate="getActiveRequests()" id="session" class="form-control selectpicker" data-style="btn btn-link">
+                        <option repeat.for="session of sessions.objectsArray" value.bind="session._id">Session
+                            ${session.session} - ${session.year}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 topMargin">
+                <compose view="./Requests.html"></compose>
+            </div>
+        </div>
+            
+        </div>
+    </div>
+    <div show.bind="requestTableOrForm === 'form'">
+        <h1>Show Request Details</h1>
+    </div>
+    </div>
+</template>

@@ -1,0 +1,51 @@
+<template>
+    <div class="modal fade" id="requestCloseModal" tabindex="-1" role="dialog" aria-labelledby="requestCloseModal"
+        aria-hidden="true">
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-6">
+                <div class="modal-dialog" style="max-width: 50%;" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="requestCloseModal">Request Close</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="padding:10px;">
+                            <div class="container">
+                                <div class="form-group">
+                                    <label class="blackText">Please provide the reason for closing the help
+                                        ticket</label>
+                                    <select class="form-control selectpicker" data-style="btn btn-link" change.delegate="reasonSelected()"
+                                        value.bind="selectedReason" id="reason" change.trigger="reasonSelected()">
+                                        <option value="">Please select a reason</option>
+                                        <option repeat.for="option of config.HELP_TICKET_CLOSE_REASONS"
+                                            model.bind="$index">
+                                            ${option.reason}</option>
+                                    </select>
+                                </div>
+                                <div show.bind="selectedReason == config.HELP_TICKET_CLOSE_REASON_OTHER"
+                                    class="topMargin">
+                                    <label class="blackText">Please provide the reason</label>
+                                    <textarea class="form-control" id="otherReason" value.bind="otherReason" rows="5"
+                                        placeholder="Please describe the reason..."></textarea>
+                                </div>
+                                <div class="topMargin">
+                                    <label class="blackText">One of our goals is to learn from each other and share the
+                                        knowledge</label>
+                                    <textarea class="form-control" id="method" value.bind="method" placeholder="Please let us know how you resolved the issue..." rows="5"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">cancel</button>
+                                <button type="button" click.trigger="closeTicket()"
+                                    class="btn btn-primary">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col"></div>
+            </div>
+        </div>
+</template>

@@ -1,0 +1,91 @@
+<template>
+    <!-- <div class="row">
+        <div class="col"> -->
+            <div class="form-group">
+                <!-- <label for="editPhone">Course</label> -->
+                <div class="row">
+                    <div class="col">
+                        <span click.delegate="refreshCourses()" class="smallMarginRight" bootstrap-tooltip
+                            data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i
+                                class="fa fa-refresh" aria-hidden="true"></i></span>
+                        <span click.delegate="newCourse()" class="smallMarginRight" bootstrap-tooltip
+                            data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New Course"><i
+                                class="fa fa-plus" aria-hidden="true"></i></span>
+                        <span show.bind="CourseSelected && CourseSelected !== '' && requestType !== 'sandboxCourse'" style="margin-left:5px;" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                            data-placement="bottom" title="" data-original-title="Save"
+                            click.delegate="editACourse()"><i class="fa fa-pencil" aria-hidden="true"></i></span>
+                    </div>
+                </div>
+                <div>You don't need to create a new course each session</div>
+                <!-- <select value.two-way="selectedCourse" change.trigger="selectCourse()" class="form-control selectpicker"
+                    data-style="btn btn-link" id="courseSelect">
+                    <option value="">Choose a course</option>
+                    <option value="58a746e8dddd74e80be43a70">Trial Client</option>
+                    <option repeat.for="course of people.coursesArray" value="${course._id}">
+                        Session ${course.number} - ${course.name}</option>
+                </select> -->
+                   <table id="coursesTable" class="table table-striped table-hover header-fixed">
+            <thead>
+                <!-- <tr>
+                    <td colspan='6'>
+                        <span click.delegate="refreshCourses()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                        <span click.delegate="newCourse()" class="smallMarginRight"  bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New Course"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                        <span style="margin-left:5px;"  class="smallMarginRight"  bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save" click.delegate="editACourse()"><i class="fa fa-pencil" aria-hidden="true"></i></span>
+                        <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
+                    </td>
+                </tr> -->
+                <tr>
+                    <th style="width:15%;"><span class="bold">Number</span> </th>
+                    <th style="width:80%;"><span class="bold">Name</span></th>
+                </tr>
+            </thead>
+            <tbody style="height:220px;">
+                <tr if.bind="people.trialClient" class="pointMe" click.delegate="selectCourse(people.trialClient, $event)">
+                    <td style="width:15%;">Trial Client</td>
+                    <td style="width:80%;">Trial Clients are used to test curriculum. Not for using with students in class.</td>
+                </tr>
+                <tr class="pointMe" id="selectCourse" click.delegate="selectCourse(course, $event)"  repeat.for="course of people.coursesArray">
+                    <td style="width:15%;" data-title="nummber">${course.number} </td>
+                    <td style="width:80%;" data-title="name">${course.name}</td>
+                </tr>
+            </tbody>
+        </table>
+               
+            </div>
+            <!--
+            <div class="row" show.bind="editCourse">
+                <div class="col">
+                    <div class="panel panel-default col-md-10 col-md-offset-1" style="background-color:ghostwhite;">
+                        <div class="bottomMargin list-group-item leftMargin rightMargin topMargin">
+                            <span click.trigger="saveCourse()" class="smallMarginRight" bootstrap-tooltip
+                                data-toggle="tooltip" data-placement="bottom" title=""
+                                data-original-title="Save Course"><i class="fa fa-floppy-o fa-lg fa-border"
+                                    aria-hidden="true"></i></span>
+                            <span click.trigger="cancelEditCourse()" class="smallMarginRight" bootstrap-tooltip
+                                data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel"><i
+                                    class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <input id="number" value.bind="people.selectedCourse.number" type="text"
+                                    placeholder="Course Number" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <input id="name" value.bind="people.selectedCourse.name" type="text"
+                                    placeholder="Course Name" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div if.bind="courseErrors.length > 0" class="alert alert-danger col" role="alert">
+                        <ul>
+                            <li repeat.for="error of courseErrors">Error: ${error}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </div>
+</template>

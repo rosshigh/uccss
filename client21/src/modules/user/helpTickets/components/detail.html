@@ -1,0 +1,77 @@
+<template>
+    <div class="card offWhite">
+        <div class="card-header">
+            <h4 class="card-title bold">${helpTickets.selectedObject.personId.fullName} - ${helpTickets.selectedObject.institutionId.name}</h4>
+            <p class="category">${helpTickets.selectedObject.personId.phone | phoneNumber:config.PHONE_MASKS:person.country:person.ext} - ${helpTickets.selectedObject.personId.email}</p>
+            <p class="category">${helpTickets.selectedObject.createdDate | dateFormat:'YYYY-MM-DD':true}</p>
+            <span show.bind="helpTickets.selectedObject.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS"
+                click.trigger="toggleOriginalTicket()" class="float-right" bootstrap-tooltip data-toggle="tooltip"
+                data-placement="bottom" title="" data-original-title="Respond"><i class="fa ${chevronIcon} fa-lg fa-border" aria-hidden="true"></i></span>
+        </div>
+        <div class="card-body" id="originalTicket">
+            <div class="row">
+                <div class="col">
+                    <h3 class="bold">Product Assignment</h3>
+                    <h6 if.bind="helpTickets.selectedObject.content[0].requests.length === 0">Does not involve a product
+                        assigned by the UCC</h6>
+                    <div if.bind="helpTickets.selectedObject.content[0].requests.length > 0">
+                        <div class="topMargin" repeat.for="product of helpTickets.selectedObject.content[0].requests">
+                            <span class="helpTicketText">Product: ${product.productId |
+                                lookupValue:products.objectsArray:"_id":"name"}</span><br />
+                            <span class="helpTicketText">Course: ${product.courseId |
+                                lookupValue:people.coursesArray:"_id":"name"}</span><br />
+                            <span class="helpTicketText">System: ${product.systemId |
+                                lookupValue:systems.objectsArray:"_id":"sid"}</span><br />
+                            <span class="helpTicketText">Client: ${product.client}</span><br />
+                        </div>
+                    </div>
+                    <h3 class="bold">Curriculum</h3>
+                    <h6 class="helpTicketText" if.bind="helpTickets.selectedObject.content[0].curriculumTitle === ''">No
+                        SAP UA curriculum selected.</h6>
+                    <div if.bind="helpTickets.selectedObject.content[0].curriculumTitle != ''">
+                        <span class="helpTicketText">Title:
+                            ${helpTickets.selectedObject.content[0].curriculumTitle}</span><br />
+                        <span class="helpTicketText">Author:
+                            ${helpTickets.selectedObject.content[0].curriculumAuthor}</span><br />
+                        <span class="helpTicketText">Author:
+                            ${helpTickets.selectedObject.content[0].curriculumModule}</span><br />
+                        <span class="helpTicketText">Page No:
+                            ${helpTickets.selectedObject.content[0].curriculumPageNumber}</span><br />
+                        <span class="helpTicketText">Step:
+                            ${helpTickets.selectedObject.content[0].curriculumStep}</span><br />
+                        <span class="helpTicketText">IDs affected:
+                            ${helpTickets.selectedObject.content[0].curriculumIDs}</span><br />
+                        <span class="helpTicketText">Other students past this point:
+                            ${helpTickets.selectedObject.content[0].otherStudentsPastThisPoint}</span><br />
+                    </div>
+                    <h3 class="bold">Software</h3>
+                    <h6 class="helpTicketText" if.bind="helpTickets.selectedObject.content[0].softwareName == ''">No
+                        software selected.</h6>
+                    <div if.bind="helpTickets.selectedObject.content[0].softwareName != ''">
+                        <span class="helpTicketText">Software:
+                            ${helpTickets.selectedObject.content[0].softwareName}</span><br />
+                        <span class="helpTicketText">Version:
+                            ${helpTickets.selectedObject.content[0].version}</span><br />
+                        <span class="helpTicketText">Operating system:
+                            ${helpTickets.selectedObject.content[0].os}</span><br />
+                        <span class="helpTicketText">Operating system version:
+                            ${helpTickets.selectedObject.content[0].osVersion}</span><br />
+                        <span class="helpTicketText">Lab: ${helpTickets.selectedObject.content[0].lab}</span><br />
+                    </div>
+                    <h3 class="bold">Attachments:</h3>
+                    <div class="hover_img" repeat.for="file of helpTickets.selectedObject.content[0].files" >
+                        <a href=${config.HELPTICKET_FILE_DOWNLOAD_URL}/${file}" target="_blank"
+                            innerhtml.bind="file | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file"></a>
+                    </div>
+                </div>
+                <div class="col">
+                    <h3 class="bold">Description of the problem</h3>
+                    <span class="helpTicketText" if.bind="!helpTickets.selectedObject.content[0].problemDescription">No
+                        description</span>
+                    <div if.bind="helpTickets.selectedObject.content[0].problemDescription"
+                        innerhtml.bind="helpTickets.selectedObject.content[0].problemDescription"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

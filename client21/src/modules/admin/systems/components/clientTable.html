@@ -4,7 +4,6 @@
             <div class='col-lg-10 offset-lg-1 bottomMargin'>
                 <table class="table table-striped"
                     aurelia-table="data.bind: systems.selectedObject.clients; display-data.bind: $displayData; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
-                    <!-- filters.bind: filters; -->
                     <thead>
                         <tr>
                             <compose view='./clientTableToolbar.html'></compose>
@@ -17,9 +16,8 @@
                             <th style="width:20rem;" aut-sort="key: instance">Status</th>
                         </tr>
                     </thead>
-                    
                     <tbody>
-                        <tr repeat.for="client of $displayData" >
+                        <tr class="pointMe" repeat.for="client of $displayData" >
                             <td click.delegate="editClient(client, $index)" style="width:10rem;" >${client.client}</td>
                             <td click.delegate="editClient(client, $index)" style="width:20rem;" >${client.productId |
                                 lookupValue:products.objectsArray:"_id":"name"}</td>

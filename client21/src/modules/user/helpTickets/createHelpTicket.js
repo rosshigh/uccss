@@ -1,5 +1,4 @@
-import { inject, BindingEngine } from 'aurelia-framework';
-import { BindingSignaler } from 'aurelia-templating-resources';
+import { inject } from 'aurelia-framework';
 import { HelpTickets } from '../../../resources/data/helpTickets';
 import { ClientRequests } from '../../../resources/data/clientRequests';
 import { Sessions } from '../../../resources/data/sessions';
@@ -8,9 +7,11 @@ import { DocumentsServices } from '../../../resources/data/documents';
 import { Store } from '../../../store/store';
 import { AppConfig } from '../../../appConfig';
 import { Utils } from '../../../resources/utils/utils';
+import { DialogService } from 'aurelia-dialog';
+import { ConfirmDialog } from '../../../resources/dialogs/confirm-dialog';
 import * as smartWizard from '../../../resources/js/jquery.smartWizard.min';
 
-@inject(HelpTickets, ClientRequests, Sessions, Systems, DocumentsServices, Store, AppConfig, Utils)
+@inject(HelpTickets, ClientRequests, Sessions, Systems, DocumentsServices, Store, AppConfig, Utils, DialogService)
 export class UserCreateHelpTicket {
 
     testArray = [
@@ -18,49 +19,87 @@ export class UserCreateHelpTicket {
         { item: 'b', index: 1, subItems: [3, 4] }
     ];
 
-    constructor(helpTickets, requests, sessions, systems, documents, store, config, utils) {
+    yesNo = ['Yes', 'No'];
+    courseProduct = ['Course', 'Product'];
+    filesToUpload = new Array();
+
+    curriculumTitlePlaceholder = "e.g. Introduction to SAP S/4HANA using Global Bike 3.3";
+    curriculumAuthorPlaceholder = "e.g. Magal and Word";
+    curriculumModulePlaceHolder = "e.g. Material Planning Master Data";
+    curriculumPageNumberPlaceHolder = "e.g. page 12";
+    curriculumStepNumberPlaceHolder = "e.g. Section I.2, Step 1.2.7";
+    curriculumUserIDsPlaceholder = "e.g. gbx-4 thru gbx-20, gbx-24";
+    softwareNamePlaceholder = "e.g. SAP GUI 7.6";
+    softwareVersionPlaceholder = "e.g. 7.6";
+    softwareOSPlaceholder = "e.g. Windows";
+    softwareOSVersionPlaceholder = "e.g. version 10";
+
+    placeholder = '<p class="MsoNormal"><span style="color:gray;mso-themecolor:background1;mso-themeshade:128">For example: My student (GBI-20) is getting an SAP system error when trying to create a sales order. We are using system YOSHI and client 100.<br><br>Steps to reproduce: <br><ol><li>Go to transaction VA01</li><li>Enter Order Type “OR” and press Continue</li><li>Enter material “BIKE101” and press Save.</li><br>Error message appears.<o:p></o:p></span></p>';
+
+    constructor(helpTickets, requests, sessions, systems, documents, store, config, utils, dialogService) {
         this.helpTickets = helpTickets;
         this.requests = requests;
         this.sessions = sessions;
         this.systems = systems;
-        this.documents = documents;
+        // this.documents = documents;
         this.store = store;
         this.config = config;
         this.utils = utils;
+        this.dialogService = dialogService;
 
         this.userObj = this.store.getUser('user');
     }
 
+    resetHelpTicket() {
+        this.curriculumQuestion = null;
+        this.softwareQuestion = null;
+        this.selectedNextOnce = false;
+        this.productAssignmentSelectedIndex = -1;
+        this.filesToUpload = [];
+        $("tr").removeClass('table-info');
+        this.createContentObject();
+    }
+
+    createContentObject() {
+        this.authorNotApplicable = false;
+        this.moduleNotApplicable = false;
+        this.pageNumberNotApplicable = false;
+        this.stepNumberNotApplicable = false;
+        this.idsNotApplicable = false;
+        this.otherStudentsNotApplicable = false;
+        this.versionNotApplicable = false;
+        this.osNotApplicable = false;
+        this.osVersionNotApplicable = false;
+        this.affectedProductRequests = [];
+        this.content = {
+            contentNo: 0,
+            curriculumTitle: "",
+            curriculumAuthor: "",
+            curriculumModule: "",
+            curriculumPageNumber: "",
+            curriculumStep: "",
+            curriculumIDs: "",
+            otherStudentsPastThisPoint: null,
+            softwareName: "",
+            version: "",
+            os: "",
+            osVersion: "",
+            lab: null,
+            problemDescription: "",
+            files: []
+        }
+    }
+
     async activate() {
         let responses = await Promise.all([
-            this.helpTickets.getHelpTicketTypes('?order=category'),
             this.sessions.getObjectsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate'),
             this.systems.getObjectsArray(),
-            this.documents.getDocumentsCategoriesArray('?filter=category|eq|SOF')
+            // this.documents.getDocumentsCategoriesArray('?filter=category|eq|SOF')
         ]);
 
-        this.appsArray = [];
-        this.documents.objectCategoriesArray.forEach(item1 => {
-            item1.subCategories.forEach(item2 => {
-                item2.subSubCategories.forEach(item3 => {
-                    item3.documents.forEach(item4 => {
-                        if (item4.helpTicketRelevant) {
-                            this.appsArray.push(item4.name);
-                        }
-                    })
-                })
-            })
-        })
-        // let responses = await Promise.all([
-        //     this.helpTickets.getHelpTicketTypes('?order=category'),
+        await this.getActiveRequests();
 
-        //     this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id + '&order=number'),
-        //     this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true&order=name'),
-        //     this.systems.getSystemsArray(),
-        //     this.config.getConfig(),
-        //     this.site.getMessageArray('?filter=category|eq|HELP_TICKETS', true)
-        //  ]);
-        this.helpTickets.selectObject();
+        this.resetHelpTicket();
     }
 
     attached() {
@@ -77,45 +116,28 @@ export class UserCreateHelpTicket {
                         that.validateStepOne();
                         if (that.stepOneErrors.length) {
                             e.preventDefault();
-                        } else {
-                            that.showForm = true;
-                            if (that.helpTickets.helpTicketTypesArray[that.catIndex].requestsRequired) {
-                                that.getActiveRequests();
-                            } else {
-                                $('.wizard').wizard('selectedItem', { step: 2 });
-                            }
                         }
                         break;
                     case 2:
+                        that.validateStepTwo();
+                        if (that.stepTwoErrors.length) {
+                            e.preventDefault();
+                        }
                         break;
                     case 3:
+                        that.validateStepThree();
+                        if (that.stepThreeErrors.length) {
+                            e.preventDefault();
+                        }
                         break;
                     case 4:
                         break;
                     case 5:
                         break;
+                    case 6:
+                        this.Save();
+                        break;
                 }
-
-
-
-                // if (!that.validation.validate(data.step)) {
-                //     e.preventDefault();
-                // } else if (data.step === 2) {
-                //     that.createInputForm(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].inputForm);
-                //     this.setupValidation(this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].validation);
-                //     // $("#comments").focus();
-                // } else if (data.step === 3) {
-                //     setTimeout(() => { 
-                //         $(".note-editable:first").focus().scroll(); 
-                //     }, 500);
-                // } else if (data.step === 4) {
-                //     this.outputForm = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].outputForm;
-                //     this.createOutputForm(this.outputForm)
-                // } else if (data.step === 5) {
-                //     that.save();
-                // }
-            } else {
-                // that.validation.makeAllValid(data.step);
             }
         })
 
@@ -123,47 +145,49 @@ export class UserCreateHelpTicket {
 
     validateStepOne() {
         this.stepOneErrors = [];
-        if (this.catIndex == -1) {
-            this.stepOneErrors.push('Choose a help ticket category')
-        }
-        if (!this.helpTickets.selectedHelpTicket.helpTicketType) {
-            this.stepOneErrors.push('Choose a help ticket type')
+        if(this.affectedProductRequests.length === 0 && !this.selectedNextOnce){
+            this.stepOneErrors.push("Click Next again if you are sure you don't want to select a product request?");
+            this.selectedNextOnce = true;
         }
     }
 
-    async categoryChanged() {
-        setTimeout(() => { $("#helpTicketType").selectpicker('refresh'); }, 500);
-        if (this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired) {
-            await this.getActiveRequests();
-        }
-    }
-
-    getCategoryIndex() {
-        var index = 0;
-        this.helpTickets.helpTicketTypesArray.forEach((item, categoryIndex) => {
-            if (this.helpTickets.selectedHelpTicket.helpTicketCategory == item.category) {
-                index = categoryIndex;
+    validateStepTwo() {
+        this.stepTwoErrors = [];
+        if (this.curriculumQuestion === null) {
+            this.stepTwoErrors.push("You must choose yes or no.");
+        } else if (this.curriculumQuestion === 'Yes') {
+            if (this.content.curriculumTitle === "") {
+                this.stepTwoErrors.push("You must enter the title of the curriculum.");
             }
-        });
-        return index;
-    }
-
-    typeChanged() {
-        this.formToShow = './help-ticket-input-' + this.helpTickets.selectedHelpTicket.helpTicketType + '.html';
-        // this.selectedHelpTicketType = this.getTypeIndex();
-        // this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].requestsRequired;
-        // this.descriptionRequired = this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes[this.selectedHelpTicketType].descriptionRequired;
-        this.showForm = true;
-    }
-
-    getTypeIndex() {
-        var typeIndex = 0;
-        this.helpTickets.helpTicketTypesArray[this.catIndex].subtypes.forEach((item, typIndex) => {
-            if (this.helpTickets.selectedHelpTicket.helpTicketType == item.type) {
-                typeIndex = typIndex;
+            if ((this.content.curriculumAuthor === "" && !this.authorNotApplicable) ||
+                (this.content.curriculumModule === "" && !this.moduleNotApplicable) ||
+                (this.content.curriculumPageNumber === "" && !this.pageNumberNotApplicable) ||
+                (this.content.curriculumStep === "" && !this.stepNumberNotApplicable) ||
+                (this.content.curriculumIDs === "" && !this.idsNotApplicable) ||
+                (this.content.otherStudentsPastThisPoint === null && !this.content.otherStudentsNotApplicable)) {
+                this.stepTwoErrors.push("You must answer each question or select NA.");
             }
-        });
-        return typeIndex;
+        }
+
+    }
+
+    validateStepThree() {
+        this.stepThreeErrors = [];
+        if (this.softwareQuestion === null) {
+            this.stepThreeErrors.push("You must choose yes or no.");
+        } else if (this.softwareQuestion === 'Yes') {
+            if (this.content.softwareName === "") {
+                this.stepThreeErrors.push("You must enter the name of the software.");
+            }
+            if ((this.content.version === "" && !this.versionNotApplicable) ||
+                (this.content.os === "" && !this.osNotApplicable) ||
+                (this.content.osVersion === "" && !this.osVersionNotApplicable)) {
+                this.stepThreeErrors.push("You must answer each question or select NA.");
+            }
+            if (this.content.lab === null) {
+                this.stepThreeErrors.push("You must tell us if this is a computer lab environment.");
+            }
+        }
     }
 
     async getActiveRequests() {
@@ -199,6 +223,7 @@ export class UserCreateHelpTicket {
                             systemId: assign.systemId,
                             courseName: item.courseId ? item.courseId.name : 'Trial Client',
                             courseId: item.courseId ? item.courseId._id : null,
+                            courseNumber: item.courseId ? item.courseId.number : 'Trial Client',
                             client: assign.client,
                             clientId: assign.clientId,
                             _id: item2._id
@@ -238,5 +263,113 @@ export class UserCreateHelpTicket {
 
     removeFile(index) {
         this.filesToUpload.splice(index, 1);
+    }
+
+    toggleRequestTable() {
+        this.requestTableButtonCaption = this.requestTableButtonCaption === "Hide Request Table" ? "Show Request Table" : "Hide Request Table";
+    }
+
+    togglecurriculumForm() {
+        this.curriculumFormButtonCaption = this.curriculumFormButtonCaption === "Hide Curriculum Form" ? "Show Curriculum Form" : "Hide Curriculum Form";
+    }
+
+    toggleSoftwareForm() {
+        this.softwareFormCaption = this.softwareFormCaption === "Hide Software Form" ? "Show Software Form" : "Hide Software Form";
+    }
+
+    toggleForACourse() {
+        this.stepOneErrors = [];
+        this.productAssignmentSelectedIndex = -1;
+        $("tr").removeClass('table-info');
+    }
+
+    toggleCurriculumQuestion() {
+        this.stepTwoErrors = [];
+    }
+
+    toggleSoftwareQuestion() {
+        console.log(this.softwareQuestion)
+    }
+
+    requestChosen(el, index) {
+        this.stepOneErrors = [];
+        if (this.affectedProductRequests.indexOf(index) > -1) {
+            this.affectedProductRequests.splice(index, 1);
+            $(el.target).closest('tr').removeClass('table-info');
+        } else {
+            this.affectedProductRequests.push(index);
+            $(el.target).closest('tr').addClass('table-info');
+        }
+        // this.requiresClient = this.affectedProductRequests.length > 0 ? 'Yes' : 'No';
+    }
+
+    aCourseIsSelected() {
+        this.stepOneErrors = [];
+    }
+
+    showComment(element) {
+        $("#" + element).css("display", "block");
+    }
+
+    hideComment(element) {
+        $("#" + element).css("display", "none");
+    }
+
+    changeFiles() {
+        this.filesToUpload = new Array();
+        for (let i = 0; i < this.files.length; i++) {
+            this.filesToUpload.push(this.files[i]);
+        }
+    }
+
+    removeFile(index) {
+        this.filesToUpload.splice(index, 1);
+    }
+
+    buildHelpTicket() {
+        this.content.personId = this.userObj._id;
+        this.content.date = new Date();
+        this.helpTickets.selectObject();
+        this.helpTickets.selectedObject.personId = this.userObj._id;
+        this.helpTickets.selectedObject.institutionId = this.userObj.institutionId;
+        this.helpTickets.selectedObject.assignedProduct = this.forACourse;
+        this.helpTickets.selectedObject.curriculum = this.curriculumQuestion === 'Yes';
+        this.helpTickets.selectedObject.software = this.softwareQuestion === 'Yes';
+        if (this.affectedProductRequests.length > 0) {
+            this.content.requests = [];
+            this.affectedProductRequests.forEach(item => {
+                this.content.requests.push({
+                    productId: this.clientRequestsArray[item].productId._id,
+                    courseId: this.clientRequestsArray[item].courseId,
+                    sessionId: this.clientRequestsArray[item].sessionId,
+                    systemId: this.clientRequestsArray[item].systemId,
+                    client: this.clientRequestsArray[item].client,
+                    requestId: this.clientRequestsArray[item]._id
+                })
+            })
+        }
+
+        this.helpTickets.selectedObject.content = [this.content];
+    }
+
+    async Save() {
+        this.buildHelpTicket();
+        let serverResponse = await this.helpTickets.saveHelpTicket();
+        if (!serverResponse.error) {
+            this.utils.showNotification("The help ticket was updated");
+            if (this.filesToUpload && this.filesToUpload.length > 0) {
+                this.helpTickets.uploadFile(this.filesToUpload, 0, serverResponse._id);
+            }
+        } else {
+            this.utils.showNotification("There was a problem saving the help ticket", 'error');
+        }
+        this._cleanUp();
+    }
+
+    _cleanUp() {
+        $('.wizard').wizard('selectedItem', {
+            step: 1
+        })
+        this.resetHelpTicket()
     }
 }

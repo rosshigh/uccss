@@ -1,0 +1,30 @@
+<template>
+    <div class="row">
+        <div class="col-5">
+            <label id=" productList">Select the products you want to include</label>
+            <input class="form-control" value.bind="filter" input.trigger="filterList()"
+                placeholder="Filter products" />
+            <div class="overFlow" style="height:400px;">
+                <ul class="list-group">
+                    <a click.trigger="selectProduct($event)" type="button"
+                        repeat.for="product of filteredProductsArray" id="${product._id}"
+                        class="list-group-item dropbtn">${product.name}</a>
+                </ul>
+            </div>
+        </div>
+        <div class="col-4">
+            <label id="requestProductsLabel">Products you want to include in your search</label>
+            <div class="well well2" style="height:400px;width:350px;margin-top:30px;">
+                <ul class="list-group">
+                    <li repeat.for="product of selectedProducts">
+                    <h6 click.trigger="removeProduct($index, product)" type="button"
+                        id="${product.product._id}"
+                        class="list-group-item pointMe">${product.name}
+                    </h6>
+                       
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</template>

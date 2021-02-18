@@ -30,6 +30,20 @@ export class Systems {
         }
     }
 
+    async getObjectsArrayWithClients(options) {
+        var url = this.SYSTEMS_SERVICE +'/clients';
+        url += options ? options : "";
+        try {
+            let serverResponse = await this.data.get(url);
+            if (!serverResponse.error) {
+                this.objectsArray = serverResponse;
+            }
+        } catch (error) {
+            console.log(error);
+            this.objectsArray = undefined;
+        }
+    }
+
     async getObject(id) {
         let url = this.SYSTEMS_SERVICE + '/' + id;
         try {
@@ -68,6 +82,10 @@ export class Systems {
                 break;
             }
         };
+    }
+
+    setObject(object){
+        this.selectedObject = this.utils.copyObject(object);
     }
 
     emptySystem() {
@@ -123,6 +141,13 @@ export class Systems {
         obj.productId = product;
         obj.firstAllowableID = product.firstAllowableId ? parseInt(product.firstAllowableId) : 1;
         return obj;
+    }
+
+    async getConfiguredProductSystems(sids){
+        if(sids){
+            let serverResponse = await this.data.get(this.SYSTEMS_SERVICE + "/product/" + sids);
+            return serverResponse;
+        }
     }
 
 }

@@ -1,0 +1,90 @@
+<template>
+    <div class="row">
+        <div class="fuelux col blackText">
+            <div class="wizard" data-initialize="wizard" id="myWizard" style="height:800px;">
+                <div class="steps-container">
+                    <ul class="steps">
+                        <li data-step="1" data-target="#step1" class="active">
+                            <span class="badge">1</span>Step 1<span class="chevron"></span>
+                        </li>
+                        <li data-step="2" data-target="#step2">
+                            <span class="badge">2</span>Step 2<span class="chevron"></span>
+                        </li>
+                        <li data-step="3" data-target="#step3">
+                            <span class="badge">3</span>Step 3<span class="chevron"></span>
+                        </li>
+                        <li data-step="4" data-target="#step4">
+                            <span class="badge">4</span>Step 4<span class="chevron"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn btn-default btn-prev btn-md">
+                        <span><i class="fa fa-chevron-left" aria-hidden="true"></i></span>Prev</button>
+                    <button type="button" class="btn btn-primary btn-next btn-md" data-last="Complete">Next
+                        <span><i class="fa fa-chevron-right" aria-hidden="true"></i></span>
+                    </button>
+                </div>
+                <div class="step-content">
+
+                    <div class="step-pane" id="step1" data-step="1" class="active">
+                        <div class="row">
+                            <div class="col-8">
+                                <h3><strong>Step 1 </strong> - Provide some information about the course</h3>
+                            </div>
+                            <div class="col-4">
+                                <div if.bind="stepOneErrors.length > 0" class="alert alert-danger col" role="alert">
+                                    <ul>
+                                        <li repeat.for="error of stepOneErrors">Error: ${error}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <compose view="./product-request-step1.html"></compose>
+                    </div>
+
+                    <div class="step-pane" id="step2" data-step="2">
+                        <div class="row">
+                            <div class="col-8">
+                                <h3><strong>Step 2 </strong> - Choose the products you need</h3>
+                            </div>
+                            <div class="col-4">
+                                <div if.bind="stepTwoErrors.length > 0" class="alert alert-danger col" role="alert">
+                                    <ul>
+                                        <li repeat.for="error of stepTwoErrors">Error: ${error}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <compose view="./product-request-step2.html"></compose>
+                    </div>
+
+                    <div class="step-pane" id="step3" data-step="3">
+                        <h3><strong>Step 3 </strong> - Tell us anything that might help us with your request</h3>
+                        <compose view="./product-request-step3.html"></compose>
+                    </div>
+
+                    <div class="step-pane" id="step4" data-step="4">
+                        <div class="row">
+                            <div class="col-8">
+                                <h3><strong>Step 4 </strong> - Review and tell us when you will need the product
+                                    assigned
+                                </h3>
+                            </div>
+                            <div class="col-4">
+                                <div if.bind="stepFourErrors.length > 0" class="alert alert-danger col" role="alert">
+                                    <ul>
+                                        <li repeat.for="error of stepFourErrors">Error: ${error}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                            <compose view="./product-request-step4.html"></compose>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+</template>

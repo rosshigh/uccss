@@ -1,0 +1,26 @@
+<template>
+    <div class="row">
+        <div class="col">
+            <ul>
+                <li click.delegate="toggleListItem($event)"
+                    repeat.for="sys of productSystems">
+                    <span class="caret">${sys.sid}</span>
+                    <ul class="nested">
+                        <li click.delegate="toggleListItem($event)"
+                            repeat.for="client of sys.clients">
+                            <span><i class="fa fa-hand-paper-o" aria-hidden="true"></i>${client.client}</span>
+                            <ul class="nested">
+                                <li style="border-bottom: 1px solid;" click.delegate="showSubCategoryDocuments(type, $parent.$index, $index, $event)"
+                                    repeat.for="assignment of client.assignments">
+                                    <span if.bind="assignment.personId">${assignment.personId.fullName}</span>
+                                    <span class="pull-right">${assignment.institutionId.name}</span></br></p>
+                                    <span>${assignment.studentIDRange}</span>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</template>

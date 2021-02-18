@@ -1,5 +1,15 @@
 <template>
-    <div class="row topMargin leftMargin rightMargin" id="descriptionGroup">
+    <div class="row">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="topMargin">Please describe your question in detail:</h4>
+                <editor value.bind="content.problemDescription" placeholder.bind="placeholder" toolbar.bind="toolbar"
+                    height="250">
+                </editor>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="row topMargin leftMargin rightMargin" id="descriptionGroup">
         <span id="descriptionErrorMessage"></span>
         <div class="form-group">
             <div>Enter a <strong>description</strong> of the issue. Be as specific as possible and include steps that led up to the issue.</div>
@@ -12,5 +22,5 @@
             <p>&nbsp;</p>
             <editor id="steps" value.bind="helpTickets.selectedHelpTicketContent.content.steps" height="250"></editor>
         </div>
-    </div>
+    </div> -->
 </template>

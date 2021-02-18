@@ -23,6 +23,27 @@ module.exports = function (app) {
       })
   }));
 
+  router.get('/systems/clients', asyncHandler(async (req, res) => {
+    logger.log('info', 'Get systems');
+    var query = buildQuery(req.query, System.find())
+    await query
+    .select('sid description server instance active clients')
+      .exec().then(result => {
+        res.status(200).json(result);
+      })
+  }));
+
+  router.get('/systems/product/:systems', asyncHandler(async (req, res) => {
+    logger.log('info', 'Getting product systems');
+    var productSystems = req.params.systems.split(':');
+    await System.find({ sid: { $in: productSystems } })
+      .populate({ path: 'clients.assignments.assignment', model: 'ClientRequestDetail' })
+      .populate({ path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName' })
+      .exec().then(result => {
+        res.status(200).json(result);
+      })
+  }));
+
   router.get('/systems/:id', asyncHandler(async (req, res) => {
     logger.log('info', 'Get system ' + req.params.id);
     await System.findById(req.params.id)
