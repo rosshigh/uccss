@@ -1,0 +1,57 @@
+<template>
+    <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
+
+    <table class="table-sm table-striped header-fixed"
+        aurelia-table="data.bind: systems.objectsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+        <thead>
+            <tr>
+                <th>
+                    <compose view='./systemsTableToolbar.html'></compose>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="2">
+                    <div class="form-group">
+                        <input type="text" value.bind="filters[0].value"
+                            placeholder="Filter SID, Description, and Server" class="form-control" id='filterField' />
+                    </div>
+                </th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>
+                    <div class='col'>
+                        <select value.bind="filters[1].value" class="form-control selectpicker" id="personStatus"
+                            data-style="btn btn-link">
+                            <option value=true>Active</option>
+                            <option value=false>Inactive</option>
+                        </select>
+                    </div>
+
+                </th>
+            </tr>
+            <tr>
+                <th style="width:15%;" aut-sort="key: sid">SID</th>
+                <th style="width:25%;" aut-sort="key: description">Description</th>
+                <th style="width:25%;" aut-sort="key: server">Server</th>
+                <th style="width:25%;" aut-sort="key: instance">Instance</th>
+                <th style="width:10%;">Status</th>
+            </tr>
+        </thead>
+
+        <tbody style="height:500px;">
+            <tr class="pointMe" click.delegate="edit(system)" repeat.for="system of $displayData">
+                <td style="width:15%;">${system.sid}</td>
+                <td style="width:25%;">${system.description}</td>
+                <td style="width:25%;">${system.server}</td>
+                <td style="width:25%;"> ${system.instance}</td>
+                <td style="width:10%;">${system.active | translateStatus}
+            </tr>
+        </tbody>
+
+    </table>
+    </div>
+    </div>
+    </div>
+    </div>
+</template>

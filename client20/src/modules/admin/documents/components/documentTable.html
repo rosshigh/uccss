@@ -1,0 +1,43 @@
+<template>
+    <table show.bind="documents.selectedCat.subCategories[selectedSubCategoryIndex].subSubCategories[selectedSubSubCategoryIndex].documents.length > 0" class="table table-striped" style="width:100%;"
+        aurelia-table="data.bind: documents.selectedCat.subCategories[selectedSubCategoryIndex].subSubCategories[selectedSubSubCategoryIndex].documents; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+        <thead>
+            <tr>
+                <th aut-sort="key: name">Name</th>
+                <th aut-sort="key: files[0].fileName">File</th>
+                <th aut-sort="key: sortOrder">Sort Order</th>
+                <th>Size</th>
+                <th>Description</th>
+                <th aut-sort="custom.bind: utils.dateSort">Date Uploaded</th>
+                <th aut-sort="custom.bind: utils.dateSort">Display Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr repeat.for="document of $displayData">
+                <td><a target="_blank"
+                        href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedCat.DocCode}-${selectedSubCategoryIndex}-${selectedSubSubCategoryIndex}-${document.files[0].fileName}">${document.name}</a>
+                </td>
+                <td>${document.files[0].fileName}</td>
+                <td style="width:10rem;"><input change.trigger="saveDocument(document)" class="form-control" type="number" value.bind="document.sortOrder"></td>
+                <td>${document.files[0].size}</td>
+                <td>${document.description | concatenateString:10}</td>
+                <td>${document.createdDate | dateFormat:configParameters.DATE_FORMAT_TABLE}</td>
+                <td>${document.displayDate | dateFormat:configParameters.DATE_FORMAT_TABLE}</td>
+                <td> <span click.trigger="toggleFileActive(document)"
+                        innerhtml="${document.active | activateButton:true}" bootstrap-tooltip data-toggle="tooltip"
+                        data-placement="bottom" title="" data-original-title="${document.active}"></span>
+
+                </td>
+                <td>
+                    <span click.delegate="editDocument(document)" bootstrap-tooltip data-toggle="toggle"
+                        data-placement="bottom" title="" data-original-title="Edit" class="rightMargin"><i
+                            class="fa fa-pencil" aria-hidden="true"></i></span>
+                    <span click.trigger="deleteDocument(document)" bootstrap-tooltip data-toggle="toggle"
+                        data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash"></i></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</template>

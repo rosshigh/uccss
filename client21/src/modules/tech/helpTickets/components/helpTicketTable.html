@@ -1,117 +1,125 @@
 <template>
     <div class="hover" innerhtml.bind="commentShown"></div>
-    <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
-    <table class="table-sm table-striped"
-        aurelia-table="data.bind: helpTickets.objectArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
-        <thead>
-            <tr>
-                <th colspan="2">
-                    <div class="checkbox">
-                        <label>
-                            <input checked.bind="sendEmail" type="checkbox"> Send email
-                        </label>
-                    </div>
-                </th>
-                <th colspan="3">
-                    <div class="checkbox">
-                        <label>
-                            <input change.trigger="toggleShowClosedHelpTickets()" checked.bind="showClosed"
-                                type="checkbox"> Show closed help tickets
-                        </label>
-                    </div>
-                </th>
-            </tr>
-            <tr>
-                <td colspan='7'>
-                    <span click.delegate="toggleShowClosedHelpTickets()" class="smallMarginRight" bootstrap-tooltip
-                        data-toggle="tooltip" data-placement="bottom" title=""
-                        data-original-title="Refresh"><i class="fa fa-refresh"
-                            aria-hidden="true"></i></span>
-                    <span click.delegate="clearFilters()" class="smallMarginRight" bootstrap-tooltip
-                        data-toggle="tooltip" data-placement="bottom" title=""
-                        data-original-title="Clear Filters"><i class="fa fa-filter"
-                            aria-hidden="true"></i></span>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <div class="form-group">
-                        <input type="text" value.bind="filters[0].value" placeholder="Number" class="form-control"
-                            id='filterField0' />
-                    </div>
-                </th>
-                <th>
-                    <div class="form-group">
-                        <select value.bind="filters[1].value" class="form-control" id="personStatus">
-                            <option value=""></option>
-                            <option repeat.for='status of config.HELP_TICKET_STATUSES' model.bind='status.code'>
-                                ${status.description}</option>
-                        </select>
-                    </div>
-                </th>
-                <th>
-                    <div class="form-group">
-                        <input type="text" value.bind="filters[2].value" placeholder="Owner" class="form-control"
-                            id='filterField2' />
-                    </div>
-                </th>
-                <th>
-                    <div class="form-group">
-                        <input type="text" value.bind="filters[3].value" placeholder="Faculty" class="form-control"
-                            id='filterField3' />
-                    </div>
-                </th>
-                <th>
-                    <div class="form-group">
-                        <input type="text" value.bind="filters[5].value" placeholder="Preferred" class="form-control"
-                            id='filterField5' />
-                    </div>
-                </th>
-                <th>
-                    <div class="form-group">
-                        <input type="text" value.bind="filters[4].value" placeholder="Instiution" class="form-control"
-                            id='filterField4' />
-                    </div>
-                </th>
-            </tr>
+    <div show.bind="!searchForm">
+        <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
+        <table class="table-sm table-striped"
+            aurelia-table="data.bind: helpTickets.objectArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+            <thead>
+                <tr>
+                    <th colspan="2">
+                        <div class="checkbox">
+                            <label>
+                                <input checked.bind="sendEmail" type="checkbox"> Send email
+                            </label>
+                        </div>
+                    </th>
+                    <th colspan="3">
+                        <div class="checkbox">
+                            <label>
+                                <input change.trigger="toggleShowClosedHelpTickets()" checked.bind="showClosed"
+                                    type="checkbox"> Show closed help tickets
+                            </label>
+                        </div>
+                    </th>
+                </tr>
+                <tr>
+                    <td colspan='7'>
+                        <span click.delegate="toggleShowClosedHelpTickets()" class="smallMarginRight" bootstrap-tooltip
+                            data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i
+                                class="fa fa-refresh" aria-hidden="true"></i></span>
+                        <span click.delegate="clearFilters()" class="smallMarginRight" bootstrap-tooltip
+                            data-toggle="tooltip" data-placement="bottom" title=""
+                            data-original-title="Clear Filters"><i class="fa fa-filter" aria-hidden="true"></i></span>
+                        <span click.delegate="openSearchForm()" class="smallMarginRight" bootstrap-tooltip
+                            data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Search"><i
+                                class="fa fa-search" aria-hidden="true"></i></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <div class="form-group">
+                            <input type="text" value.bind="filters[0].value" placeholder="Number" class="form-control"
+                                id='filterField0' />
+                        </div>
+                    </th>
+                    <th>
+                        <div class="form-group">
+                            <select value.bind="filters[1].value" class="form-control" id="personStatus">
+                                <option value=""></option>
+                                <option repeat.for='status of config.HELP_TICKET_STATUSES' model.bind='status.code'>
+                                    ${status.description}</option>
+                            </select>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="form-group">
+                            <input type="text" value.bind="filters[2].value" placeholder="Owner" class="form-control"
+                                id='filterField2' />
+                        </div>
+                    </th>
+                    <th>
+                        <div class="form-group">
+                            <input type="text" value.bind="filters[3].value" placeholder="Faculty" class="form-control"
+                                id='filterField3' />
+                        </div>
+                    </th>
+                    <th>
+                        <div class="form-group">
+                            <input type="text" value.bind="filters[5].value" placeholder="Preferred"
+                                class="form-control" id='filterField5' />
+                        </div>
+                    </th>
+                    <th>
+                        <div class="form-group">
+                            <input type="text" value.bind="filters[4].value" placeholder="Instiution"
+                                class="form-control" id='filterField4' />
+                        </div>
+                    </th>
+                </tr>
 
-            <tr>
-                <th style="width:5%" aut-sort="key: helpTicketNo">No.</th>
-                <th style="width:10%">Status</th>
-                <th style="width:10%">Owner</th>
-                <th style="width:15%">Faculty</th>
-                <th style="width:15%">Preferred Name</th>
-                <th style="width:20%">Institution</th>
-                <th style="width:10%">Created Date</th>
-                <th style="width:10%">Modifed Date</th>
-                <th style="width:10%">Email</th>
+                <tr>
+                    <th style="width:5%" aut-sort="key: helpTicketNo">No.</th>
+                    <th style="width:10%">Status</th>
+                    <th style="width:10%">Owner</th>
+                    <th style="width:15%">Faculty</th>
+                    <th style="width:15%">Preferred Name</th>
+                    <th style="width:20%">Institution</th>
+                    <th style="width:10%">Created Date</th>
+                    <th style="width:10%">Modifed Date</th>
+                    <th style="width:10%">Email</th>
 
-            </tr>
-        </thead>
+                </tr>
+            </thead>
 
-        <tbody style="height:500px;">
-            <tr repeat.for="helpTicket of $displayData">
-                <td click.trigger="selectHelpTicket(helpTicket)" mouseover.delegate="showComment(helpTicket, $event)"
-                    mouseout.delegate="hideComment()">
-                    ${helpTicket.helpTicketNo}</td>
-                <td click.trigger="selectHelpTicket(helpTicket)">
-                    <i click.trigger="statusModal(helpTicket, $event)" class="fa fa-stack-overflow pointMe"
-                        aria-hidden="true"></i> ${helpTicket.helpTicketStatus |
-                    lookupValue:config.HELP_TICKET_STATUSES:'code':'description'}</td>
-                <td click.trigger="selectHelpTicket(helpTicket)"><i click.trigger="ownHelpTicket($event, helpTicket)"
-                        class="fa fa-child pointMe" aria-hidden="true"></i> ${helpTicket.owner[0].personId.fullName}
-                </td>
-                </td>
-                <td click.trigger="selectHelpTicket(helpTicket)"><i click.trigger="showProfile($event, helpTicket)"
-                        class="fa fa-info pointMe" aria-hidden="true"></i> ${helpTicket.personId.fullName}</td>
-                <td click.trigger="selectHelpTicket(helpTicket)">${helpTicket.personId.nickName}</td>
-                <td click.trigger="selectHelpTicket(helpTicket)">${helpTicket.institutionId.name}</td>
-                <td click.trigger="selectHelpTicket(helpTicket)">${helpTicket.createdDate |
-                    dateFormat:config.DATE_FORMAT_TABLE:false}</td>
-                <td click.trigger="selectHelpTicket(helpTicket)">${helpTicket.modifiedDate |
-                    dateFormat:config.DATE_FORMAT_TABLE:false}</td>
-                <td click.trigger="copyEmail(helpTicket)">${helpTicket.personId.email}</td>
-            </tr>
-        </tbody>
-    </table>
+            <tbody style="height:500px;">
+                <tr class="pointMe" repeat.for="helpTicket of $displayData">
+                    <td click.trigger="selectHelpTicket(helpTicket)"
+                        mouseover.delegate="showComment(helpTicket, $event)" mouseout.delegate="hideComment()">
+                        ${helpTicket.helpTicketNo}</td>
+                    <td click.trigger="selectHelpTicket(helpTicket)">
+                        <i click.trigger="statusModal(helpTicket, $event)" class="fa fa-stack-overflow pointMe"
+                            aria-hidden="true"></i> ${helpTicket.helpTicketStatus |
+                        lookupValue:config.HELP_TICKET_STATUSES:'code':'description'}
+                    </td>
+                    <td click.trigger="selectHelpTicket(helpTicket)"><i
+                            click.trigger="ownHelpTicket($event, helpTicket)" class="fa fa-child pointMe"
+                            aria-hidden="true"></i> ${helpTicket.owner[0].personId.fullName}
+                    </td>
+                    </td>
+                    <td click.trigger="selectHelpTicket(helpTicket)"><i click.trigger="showProfile($event, helpTicket)"
+                            class="fa fa-info pointMe" aria-hidden="true"></i> ${helpTicket.personId.fullName}</td>
+                    <td click.trigger="selectHelpTicket(helpTicket)">${helpTicket.personId.nickName}</td>
+                    <td click.trigger="selectHelpTicket(helpTicket)">${helpTicket.institutionId.name}</td>
+                    <td click.trigger="selectHelpTicket(helpTicket)">${helpTicket.createdDate |
+                        dateFormat:config.DATE_FORMAT_TABLE:false}</td>
+                    <td click.trigger="selectHelpTicket(helpTicket)">${helpTicket.modifiedDate |
+                        dateFormat:config.DATE_FORMAT_TABLE:false}</td>
+                    <td click.trigger="copyEmail(helpTicket)">${helpTicket.personId.email}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div show.bind="searchForm">
+        <compose view="./currentHTSearchForm.html"></compose>
+    </div>
 </template>

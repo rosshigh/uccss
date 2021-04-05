@@ -1,0 +1,35 @@
+<template>
+    <compose view="./components/categoryModal.html"></compose>
+    <compose view="./components/subCategoryModal.html"></compose>
+    <compose view="./components/subSubCategoryModal.html"></compose>
+    <compose view="../../../resources/elements/top-bar.html"></compose>
+    <div class="content">
+        <div class="container-fluid">
+            <div class="card positionUnderToolbar">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="bottomMargin list-group-item panelContrastColor">
+                                <!-- " data-toggle="tooltip"-->
+                                <span data-toggle="tooltip" click.delegate="newCategory()" class="smallMarginRight"
+                                    bootstrap-tooltip data-placement="bottom" title=""
+                                    data-original-title="New Category"><i class="fa fa-plus fa-lg fa-border"
+                                        aria-hidden="true"></i></span>
+                                <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip
+                                    data-toggle="tooltip" data-placement="bottom" title=""
+                                    data-original-title="Refresh"><i class="fa fa-refresh fa-lg fa-border"
+                                        aria-hidden="true"></i></span>
+                            </div>
+                            <div show.bind="view == 'categoryList'">
+                                <compose view="./components/categoryList.html"></compose>
+                            </div>
+                        </div>
+                        <div show.bind="showDocuments" class="col-9">
+                            <compose view="./components/documentForm.html"></compose>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

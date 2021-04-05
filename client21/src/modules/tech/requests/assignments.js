@@ -83,6 +83,7 @@ export class Assignments {
     }
 
     async getRequests() {
+        $("#loading").show();
         if (this.selectedSession) {
             this.sessions.selectSessionById(this.selectedSession);
             if (this.filterAssigned) {
@@ -93,6 +94,7 @@ export class Assignments {
                 this.requestSelected = false;
             }
         }
+        $("#loading").hide();
     }
 
     async selectARequest(request) {

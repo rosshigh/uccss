@@ -1,0 +1,81 @@
+<template>
+    <div class="row">
+        <div class="col">
+            <span show.bind="!selectedPackage">
+                <h5>Currently there is no package assigned to the institution.</h5>
+            </span>
+
+            <span show.bind="selectedPackage">
+                <h5>Package: <span class="bold">${selectedPackage.name}</span> Max Clients: <span
+                        class="bold">${selectedPackage.maxClients}</span></h5>
+                <span click.delegate="newRequest()" class="smallMarginRight" bootstrap-tooltip
+                    data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Add Product"><i
+                        class="fa fa-plus" aria-hidden="true"></i></span>
+                <span click.delegate="saveRequests()" class="smallMarginRight"
+                    bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+                    data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+                <!-- <span show.bind="!requestTable" click.delegate="backAdProduct()" class="smallMarginRight"
+                        bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+                        data-original-title="Back"><i class="fa fa-arrow-left" aria-hidden="true"></i></span> -->
+             
+                    <div show.bind="!requestDetails.length && !newRequestDetails.length">
+                        <h3>This institution has no active requests</h3>
+                    </div>
+
+                    <div>
+                        <div class="row">
+                            <div class="col-6">
+                                <h3>New Requests</h3>
+                                <compose show.bind="newRequestDetails.length" view="./newRequests.html"></compose>
+                            </div>
+                            <div class="col-6">
+                                <h3>Existing Requests</h3>
+                                <compose show.bind="requestDetails.length" view="./requests.html"></compose>
+                            </div>
+                        </div>
+                    </div>
+        
+                <!-- <div show.bind="!requestTable">
+
+                        <div class="row">
+                            <div class="col-4">
+                                This
+                            </div>
+                            <!-- <div class="col-8">
+                                <div class="row">
+                                    <div class="col-6 topMargin">
+                                        <label id="productList">Available Products</label>
+                                        <div class="overFlow" style="height:400px;">
+                                            <input class="form-control" value.bind="filter" input.trigger="filterList()"
+                                                placeholder="Filter products" />
+                                            <ul class="list-group">
+                                                <li click.trigger="selectProduct(product)"
+                                                    repeat.for="product of filteredProductsArray" id="${product._id}"
+                                                    class="list-group-item pointMe">
+                                                    <h4>${product.name}</h4>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 topMargin">
+                                        <label id="requestProductsLabel">Requested Products</label>
+                                        <div class=" overflow" style="height:400px;">
+                                            <ul class="list-group">
+                                                <li click.trigger="removeProduct($index)"
+                                                    repeat.for="product of requestDetails" id="${product.productId}"
+                                                    class="${product.assignments.length ? 'assignedColor list-group-item pointMe' : 'list-group-item pontMe}">
+                                                    <h4>${product.productId |
+                                                        lookupValue:products.productsArray:"_id":"name"}
+                                                    </h4>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>
+                    </div> -->
+        </div>
+        </span>
+    </div>
+</template>

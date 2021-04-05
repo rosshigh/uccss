@@ -1,0 +1,24 @@
+<template>
+    <!-- <button click.trigger="testing()">Test</button> -->
+    <!-- <froala-editor value.bind="products.selectedObject.productInfo"></froala-editor> -->
+
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Product Notes</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <label for="sid">This text appears in a user's assignment details</label> 
+                    <editor value.bind="products.selectedObject.productInfo" toolbar.bind="toolbar" height="250"></editor>
+                 </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label class="topMargin" for="sid">This text appears when the user hovers an item on the product list</label>
+                    <editor value.bind="products.selectedObject.productDescription" toolbar.bind="toolbar" height="250"></editor>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

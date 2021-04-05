@@ -1,0 +1,43 @@
+<template>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Client ${selectedClient.client}</h4>
+        </div>
+        <div class="card-body">
+            <compose view='./clientFormToolbar.html'></compose>
+            <div class="bottomMargin topMargin list-group-item leftMargin rightMargin">
+               
+                <!-- <span click.delegate="saveClient()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+                 data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span> -->
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="firstID">First Allowable ID</label>
+                    <input value.bind="selectedClient.firstAllowableID" id="lastID" class="form-control topMargin"
+                        placeholder="First Allowable ID" type="number" />
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="productID">Product</label>
+                    <select class="form-control" value.bind="selectedClient.productId" data-style="btn btn-link">
+                        <option value="">Choose a product</option>
+                        <option repeat.for="product of products.objectsArray" model.bind="product._id">${product.name}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="productID">Status</label>
+                    <select value.bind="selectedClient.clientStatus" class="form-control" id="status"
+                        data-style="btn btn-link">
+                        <option value="">Select an option</option>
+                        <option repeat.for="name of config.CLIENT_STATUSES" model.bind="name.code">
+                            ${name.description}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

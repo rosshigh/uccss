@@ -11,10 +11,9 @@
                 <span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
                     data-placement="bottom" title="" data-original-title="Cancel Changes"><i
                         class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
-                <span show.bind="!newPerson" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                <span click.delegate="deleteInstitution()" show.bind="!newPerson" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
                     data-placement="bottom" title="" data-original-title="Delete"><i
-                        class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true" data-toggle="modal"
-                        data-target="#deleteObject"></i></span>
+                        class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>
             </div>
             <div class='col-lg-10 bottomMargin topMargin'>
                 <ul class="nav nav-pills bottomMargin">

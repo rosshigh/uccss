@@ -124,6 +124,11 @@ export class Products {
         return this.utils.objectsEqual(this.selectedObject, this.originalObject);
     }
 
+    async deleteObject() {
+        let serverResponse = await this.data.deleteObject(this.PRODUCTS_SERVICE + '/' + this.selectedObject._id);
+        return serverResponse;
+    }
+
     getProductInfo(id) {
         if (!id) return null;
         for (var i = 0; i < this.objectsArray.length; i++) {

@@ -1,3 +1,7 @@
 <template>
-  <h1>${message}</h1>
+  <menu></menu>
+  <loading-indicator loading.bind="router.isNavigating || data.isRequesting"></loading-indicator>
+  <div class="content">
+    <router-view></router-view>
+  </div> 
 </template>

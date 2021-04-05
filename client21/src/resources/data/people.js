@@ -226,8 +226,7 @@ export class People {
     }
   }
 
-  async getAPJPackages(options, refresh) {
-    if (!this.packageArray || refresh) {
+  async getAPJPackages(options) {
       var url = this.PACKAGES_SERVICES;
       url += options ? options : "";
       let response = await this.data.get(url)
@@ -236,8 +235,6 @@ export class People {
       } else {
         this.packageArray = undefined;
       }
-
-    }
   }
 
   async getInstitution(id) {
@@ -306,6 +303,7 @@ export class People {
     var newInstitution = new Object();
     newInstitution.joinDate = new Date();
     newInstitution.name = "";
+    newInstitution.packages = [];
     return newInstitution;
   }
 
@@ -323,6 +321,14 @@ export class People {
     if (this.selectedInstitution) {
       return this.utils.objectsEqual(this.selectedInstitution, this.originalInstitution);
     }
+  }
+
+  async deleteInstitution() {
+    if (this.selectedInstitution._id) {
+      let serverResponse = await this.data.deleteObject(this.INSTITUTION_SERVICES + '/' + this.selectedInstitution._id);
+      return serverResponse;
+    }
+    return null;
   }
 
   async getCoursesArray(options) {
@@ -393,22 +399,9 @@ export class People {
 
     if (!this.selectedCourse._id) {
       let serverResponse = await this.data.saveObject(this.selectedCourse, this.COURSES_SERVICE, "post");
-      if (!serverResponse.error) {
-        this.selectedCourse = this.utils.copyObject(serverResponse);
-        if (this.coursesArray) this.coursesArray.push(this.selectedCourse);
-        this.editIneditCourseIndex = this.coursesArray.length - 1;
-      } else {
-        this.data.processError(response, "There was an error creating the product.");
-      }
       return serverResponse;
     } else {
       var serverResponse = await this.data.saveObject(this.selectedCourse, this.COURSES_SERVICE, "put");
-      if (!serverResponse.error) {
-        this.selectedCourse = this.utils.copyObject(serverResponse);
-        this.coursesArray[this.editCourseIndex] = this.utils.copyObject(this.selectedCourse, this.coursesArray[this.editCourseIndex]);
-      } else {
-        this.data.processError(response, "There was an error updating the course.");
-      }
       return serverResponse;
     }
   }

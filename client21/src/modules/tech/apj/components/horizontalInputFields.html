@@ -1,0 +1,82 @@
+<template>
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <input id="studentIDs" type="text" placeholder="Template" class="form-control"
+                                    value.bind="defaultStudentIdPrefix" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <input id="firstId" type="number" change.trigger="calcIDRangeFromTemplate()"
+                                    placeholder="First ID" class="form-control" value.bind="firstId" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <input id="lastId" type="number" change.trigger="calcIDRangeFromTemplate()"
+                                    placeholder="Number of IDs" class="form-control" value.bind="lastId" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <input id="studentIDs" type="text" placeholder="Student IDs" class="form-control"
+                                    value.bind="provisionalClientList[selectedClientIndex].proposedClient.studentUserIds" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input id="studentPassword" type="text" placeholder="Student Password" class="form-control"
+                            value.bind="provisionalClientList[selectedClientIndex].proposedClient.studentPassword" />
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <input id="facultyIDs" type="text" placeholder="Template" class="form-control"
+                                    value.bind="defaultFacultyIdPrefix" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <input id="firstFacId" type="number" change.trigger="calcIDRangeFromTemplate()"
+                                    placeholder="First Faculty ID" class="form-control" value.bind="firstFacId" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <input id="lastFacId" type="number" change.trigger="calcIDRangeFromTemplate()"
+                                    placeholder="Last Faculty ID" class="form-control" value.bind="lastFacId" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <input id="facultyIDs" type="text" placeholder="Faculty IDs" class="form-control"
+                                    value.bind="provisionalClientList[selectedClientIndex].proposedClient.facultyUserIds" />
+                            </div>
+                            <div class="form-group">
+                                <input id="facultyPassword" type="text" placeholder="Faculty Password"
+                                    class="form-control"
+                                    value.bind="provisionalClientList[selectedClientIndex].proposedClient.facultyPassword" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class='row'>
+        <div class="col-8">
+            <compose view="./proposedClientsTable.html"></compose>
+        </div>
+    </div>
+</template>

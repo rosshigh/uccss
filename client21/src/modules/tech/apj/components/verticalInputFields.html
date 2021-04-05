@@ -1,0 +1,64 @@
+<template>
+    <div class="row">
+        <div class="col-8">
+            <div class="form-group">
+                <input id="studentVerticalIDs" type="text" placeholder="Template" class="form-control"
+                    value.bind="defaultStudentIdPrefix" />
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="form-group">
+                <input id="firstVerticalIdTemplate" type="number" change.trigger="calcIDRangeFromTemplate()" placeholder="First ID"
+                    class="form-control" value.bind="firstId" />
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="form-group">
+                <input id="lastVerticalId" type="number" change.trigger="calcIDRangeFromTemplate()" placeholder="Last ID"
+                    class="form-control" value.bind="lastId" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <input id="studentVerticalIDs" type="text" placeholder="Student IDs" class="form-control"
+                    value.bind="provisionalClientList[selectedClientIndex].proposedClient.studentUserIds" />
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <input id="studentVerticalPassword" type="text" placeholder="Student Password" class="form-control"
+            value.bind="provisionalClientList[selectedClientIndex].proposedClient.studentPassword" />
+    </div>
+    <div class="row">
+        <div class="col-8">
+            <div class="form-group">
+                <input id="facIDs" type="text" placeholder="Template" class="form-control"
+                    value.bind="defaultFacultyIdPrefix" />
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="form-group">
+                <input id="firstFacId" type="number" change.trigger="calcFacIDRangeFromTemplate()"
+                    placeholder="First ID" class="form-control" value.bind="firstFacId" />
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="form-group">
+                <input id="lastFacId" type="number" change.trigger="calcFacIDRangeFromTemplate()" placeholder="Last ID"
+                    class="form-control" value.bind="lastFacId" />
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <input id="facultyVerticalIDs" type="text" placeholder="Faculty IDs" class="form-control"
+            value.bind="provisionalClientList[selectedClientIndex].proposedClient.facultyUserIds" />
+    </div>
+    <div class="form-group">
+        <input id="facultyVerticalPassword" type="text" placeholder="Faculty Password" class="form-control"
+            value.bind="provisionalClientList[selectedClientIndex].proposedClient.facultyPassword" />
+    </div>
+    <compose view="./proposedClientsTable.html"></compose>
+</template>

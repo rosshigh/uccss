@@ -1,0 +1,24 @@
+<template>
+    <div class="panel panel-default" >
+        <div class="panel-body" style="padding:5px;">
+            <h3>Category: ${documentsService.selectedCat.description}</h3>
+            <div if.bind="faqservices.selectCat.subCategories.length" style="padding:2px;background-color:ghostwhite;">
+                <h4>Existing Subcategories:</h4>
+                <ul class="list-group">
+                    <li class="list-group-item" repeat.for="subCat of faqservices.selectCat.subCategories">
+                        ${subCat.description}</li>
+                </ul>
+            </div>
+            <span if.bind="!faqservices.selectCat.subCategories.length">
+                <h5>This document category has no subcategories</h5>
+            </span>
+
+            <div class="form-group topMargin">
+                <input id="subCategoryInput"
+                    value.bind="faqservices.selectedCat.subCategories[selectedSubCategoryIndex].description"
+                    type="text" placeholder="Subcategory Name" class="form-control" />
+            </div>
+        </div>
+
+    </div>
+</template>

@@ -1,0 +1,101 @@
+<template>
+    <div class="row">
+        <div class="col">
+            <h2>${catDescription}</h2>
+            <h4>${subCatDescription}</h4>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Name</th>
+                        <th>Filename</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr repeat.for="document of documentsService.selectedCat.subCategories[selectedDocSubCategoryIndex].subSubCategories[selectedDocSubSubCategoryIndex].documents">
+                        <!-- documentsService.selectedCat.subCategories[selectedDocSubCategoryIndex].subSubCategories[selectedDocSubSubCategoryIndex].documents -->
+                        <td>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="checkbox" value="" change.trigger="toggleAddToList(document)">
+                                    <span class="form-check-sign">
+                                        <span class="check"></span>
+                                    </span>
+                                </label>
+                            </div>
+                        </td>
+                        <td>${document.name}</td>
+                        <td> <a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documentsService.selectedCat.DocCode}/${selectedSubCategoryIndex}/${document.files[0].fileName}">${document.files[0].fileName}</a></td>
+                    </tr>
+            </tbody>
+            </table>
+
+            <!-- <ul>
+                <li class="list-group-item pointMe"
+                    repeat.for="document of documentsService.selectedCat.subCategories[selectedSubCategoryIndex].subSubCategories[selectedSubSubCategoryIndex].documents">
+                    <div class="row">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" value="" change.trigger="toggleAddToList(document)">
+                                <span class="form-check-sign">
+                                    <span class="check"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="col-3">
+                            ${document.name}
+                        </div>
+                        <div class="col-3">
+                            <a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documentsService.selectedCat.DocCode}/${selectedSubCategoryIndex}/${document.files[0].fileName}">${document.files[0].fileName}</a>
+                        </div>
+                    </div>
+                </li>
+            </ul> -->
+        </div>
+    </div>
+    <!-- <table class="table table-striped" style="width:100%;"
+    aurelia-table="data.bind: documentsService.selectedCat.subCategories[selectedSubCategoryIndex].subSubCategories[selectedSubSubCategoryIndex].documents; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+    <thead>
+        <tr>
+            <th aut-sort="key: name">Name</th>
+            <th aut-sort="key: files[0].fileName">File</th>
+            <th aut-sort="key: sortOrder">Sort Order</th>
+            <th>Size</th>
+            <th>Description</th>
+            <th aut-sort="custom.bind: utils.dateSort">Date Uploaded</th>
+            <th aut-sort="custom.bind: utils.dateSort">Display Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr repeat.for="document of $displayData">
+            <td><a target="_blank"
+                    href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documentsService.selectedCat.DocCode}/${selectedSubCategoryIndex}/${document.files[0].fileName}">${document.name}</a>
+            </td>
+            <td>${document.files[0].fileName}</td>
+            <td style="width:10rem;"><input change.trigger="saveDocument(document)" class="form-control" type="number" value.bind="document.sortOrder"></td>
+            <td>${document.files[0].size}</td>
+            <td>${document.description | concatenateString:10}</td>
+            <td>${document.createdDate | dateFormat:configParameters.DATE_FORMAT_TABLE}</td>
+            <td>${document.displayDate | dateFormat:configParameters.DATE_FORMAT_TABLE}</td>
+            <td> <span click.trigger="toggleFileActive(document)"
+                    innerhtml="${document.active | activateButton:true}" bootstrap-tooltip data-toggle="tooltip"
+                    data-placement="bottom" title="" data-original-title="${document.active}"></span>
+
+            </td>
+            <td>
+                <span click.delegate="editDocument(document)" bootstrap-tooltip data-toggle="toggle"
+                    data-placement="bottom" title="" data-original-title="Edit" class="rightMargin"><i
+                        class="fa fa-pencil" aria-hidden="true"></i></span>
+                <span click.trigger="deleteDocument(document)" bootstrap-tooltip data-toggle="toggle"
+                    data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash"></i></span>
+            </td>
+        </tr>
+    </tbody>
+</table> -->
+</template>

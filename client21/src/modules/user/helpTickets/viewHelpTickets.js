@@ -146,7 +146,6 @@ export class UserViewHelpTickets {
         } else {
             $("#method").focus();
         }
-        
     }
 
     clearFilters() {
@@ -155,6 +154,8 @@ export class UserViewHelpTickets {
 
     async selectHelpTicket(helpTicket) {
         await this.helpTickets.getHelpTicket(helpTicket._id);
+        this.helpTickets.selectedObject.views.push(new Date());
+        this.helpTickets.saveHelpTicket();
         this.showTable = false;
     }
 

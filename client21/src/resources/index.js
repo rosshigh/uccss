@@ -31,6 +31,7 @@ export function configure(config) {
     PLATFORM.moduleName('./value-converters/parse-assignments'),
     PLATFORM.moduleName('./value-converters/info-filter'),
     PLATFORM.moduleName('./value-converters/session-type'),
-    PLATFORM.moduleName('./value-converters/filter-statuses')
+    PLATFORM.moduleName('./value-converters/filter-statuses'),
+    PLATFORM.moduleName('./value-converters/help-ticket-type')
   ]);
 }

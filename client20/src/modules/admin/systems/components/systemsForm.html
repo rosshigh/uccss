@@ -1,0 +1,64 @@
+<template>
+            <div class="list-group-item toolbar">
+                <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                    data-placement="bottom" title="" data-original-title="Back"><i
+                        class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
+                <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                    data-placement="bottom" title="" data-original-title="Save"><i
+                        class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+                <span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                    data-placement="bottom" title="" data-original-title="Cancel Changes"><i
+                        class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+                <span click.delegate="delete()" show.bind="systems.selectedObject._id" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                    data-placement="bottom" title="" data-original-title="Delete"><i
+                        class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>
+            </div>
+            <div class="row">
+                <div class="col ">
+                <compose view="./systemInfo.html"></compose>
+            </div>
+           
+            <div class="col">
+                <div show.bind="showClientTable">
+                    <compose view="./clientTable.html"></compose>
+                </div>
+                <div show.bind="!showClientTable">
+                    <compose view="./clientForm.html"></compose>
+                </div>
+            </div>
+                
+
+            <!-- <div class='col-lg-10 bottomMargin topMargin'>
+                <ul class="nav nav-pills bottomMargin">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" role="tab" href="#systemInfo">System Info</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" role="tab" href="#clients">Clients</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="systemInfo" role="tabpanel" aria-labelledby="home-tab">
+                        <compose view="./systemInfo.html"></compose>
+                    </div>
+                    <div class="tab-pane fade" id="clients" role="tabpanel" aria-labelledby="home-tab">
+                        <div show.bind="showClientTable">
+                            <compose view="./clientTable.html"></compose>
+                        </div>
+                        <div show.bind="!showClientTable">
+                            <compose view="./clientForm.html"></compose>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div if.bind="controller.errors.length > 0" class="alert alert-danger topMargin" role="alert">
+                            <ul class="list-group">
+                                <li repeat.for="error of controller.errors" class="list-group-item">
+                                    ${error}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+</template>

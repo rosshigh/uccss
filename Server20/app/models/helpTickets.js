@@ -36,6 +36,7 @@ var HelpTicketSchema = new Schema({
   curriculum : { type: Boolean },
   software : { type: Boolean },
   notes: { type: String },
+  views: [{type: Date }],
   owner: [{
     personId: { type: Schema.Types.ObjectId, ref: 'Person' },
     dateAssigned: { type: Date, default: Date.now }

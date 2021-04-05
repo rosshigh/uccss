@@ -1,16 +1,12 @@
 import { inject } from 'aurelia-framework';
 import { ValidationRules, ValidationControllerFactory, validationMessages } from 'aurelia-validation';
-import { DialogService } from 'aurelia-dialog';
-import { ConfirmDialog } from '../../../resources/dialogs/confirm-dialog';
-import { MessageDialog } from '../../../resources/dialogs/message-dialog';
 import { Products } from '../../../resources/data/products';
 import { Systems } from '../../../resources/data/systems';
 import { DocumentsServices } from '../../../resources/data/documents';
 import { AppConfig } from '../../../appConfig';
-import { Store } from '../../../store/store';
 import { Utils } from '../../../resources/utils/utils';
 
-@inject(ValidationControllerFactory, Products, Systems, DocumentsServices, AppConfig, Store, Utils, DialogService)
+@inject(ValidationControllerFactory, Products, Systems, DocumentsServices, AppConfig, Utils)
 export class EditProducts {
 
     pageSize = 200;
@@ -25,33 +21,29 @@ export class EditProducts {
         ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
       ];
 
-    constructor(ValidationControllerFactory, products, systems, documents, config, store, utils, dialog) {
+    constructor(ValidationControllerFactory, products, systems, documents, config, utils) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
         this.products = products;
         this.systems = systems;
         this.documents = documents;
         this.config = config;
-        this.store = store;
         this.utils = utils;
-        this.dialog = dialog;
 
         this.filters = [
             { value: '', keys: ['name', 'systemList'] },
             { value: true, keys: ['active'] }
         ];
 
-        this.configParameters = this.store.getConfig();
-
-        this.foo = "mmmm";
-
         this.view = 'table';
     }
 
     async activate() {
+        $("#loading").show();
         let responses = await Promise.all([
             this.products.getSmallObjectsArray('?order=name'),
             this.systems.getObjectsArray('?order=sid')
         ]);
+        $("#loading").hide();
         this.calculateSystemList();
         this.filterList();
     }
@@ -70,14 +62,17 @@ export class EditProducts {
     }
 
     attached() {
+        $("#loading").hide();
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
     }
 
     async refresh() {
+        $("#loading").show();
         this.clearFilters();
         await this.products.getSmallObjectsArray('?&order=name');
         this.calculateSystemList();
+        $("#loading").hide();
     }
 
     new() {
@@ -123,44 +118,30 @@ export class EditProducts {
                 if (result.valid) {
                     this.saveObject();
                 } else {
-                    let message = 'You must fix the errors before you can save the system?';
-                    let title = "Fix Errors";
-                    let options = ['Ok'];
-                    this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                        return;
-                    });
+                    $("#fixErrorsModal").modal('show');
                 }
             });
     }
 
-    async saveObject() {
+    async save() {
         let serverResponse = await this.products.saveObject();
         if (!serverResponse.error) {
             this.utils.updateArrayItem(serverResponse, this.products.objectsArray);
             this.utils.showNotification("The product was updated");
-            // this.uploadFile();
         } else {
-            this.utils.showNotification("There was a problem saving the system", 'error');
+            this.utils.showNotification("There was a problem saving the product", 'error');
         }
         this._cleanUp();
     }
 
-    async delete() {
-        let message = 'Are you sure you want to delete the system?';
-        let title = "Confirm Delete";
-        let options = {};
-        this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-            if (!response.wasCancelled) {
-                this.deleteSystem();
-            } else {
-                this.goBack();
-            }
-        });
+    async deleteProduct() {
+        this.modalMessage = 'Are you sure you want to delete the product?';
+        $("#confirmDeleteModal").modal('show');
     }
 
-    async deleteSystem() {
+    async delete() {
         var name = this.products.selectedObject.sid;
-        let serverResponse = await this.products.deleteSystem();
+        let serverResponse = await this.products.deleteObject();
         if (!serverResponse.error) {
             this.utils.showNotification(name + " was deleted");
         }
@@ -169,16 +150,8 @@ export class EditProducts {
 
     back() {
         if (this.products.isObjectDirty().length) {
-            let message = 'Do you want to save the product?';
-            let title = "Save Product";
-            let options = {};
-            this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                if (!response.wasCancelled) {
-                    this.saveObject();
-                } else {
-                    this.goBack();
-                }
-            });
+            this.modalMessage = 'Do you want to save the product?';
+            $("#confirmSaveModal").modal('show');
         } else {
             this.goBack();
         }

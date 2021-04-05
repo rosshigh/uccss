@@ -1,25 +1,17 @@
 import { inject } from 'aurelia-framework';
 import { ValidationRules, ValidationControllerFactory, validationMessages } from 'aurelia-validation';
-import { DialogService } from 'aurelia-dialog';
-import { ConfirmDialog } from '../../../resources/dialogs/confirm-dialog';
-import { MessageDialog } from '../../../resources/dialogs/message-dialog';
 import { Sessions } from '../../../resources/data/sessions';
 import { AppConfig } from '../../../appConfig';
-import { Store } from '../../../store/store';
 import { Utils } from '../../../resources/utils/utils';
 
-@inject(ValidationControllerFactory, Sessions, AppConfig, Store, Utils, DialogService)
+@inject(ValidationControllerFactory, Sessions, AppConfig, Utils)
 export class EditSessions {
 
-    constructor(ValidationControllerFactory, sessions, config, store, utils, dialogService) {
+    constructor(ValidationControllerFactory, sessions, config, utils) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
         this.sessions = sessions;
         this.config = config;
-        this.store = store;
         this.utils = utils;
-        this.dialogService = dialogService;
-
-        this.configParameters = this.store.getConfig();
 
         this.filters = [
             { value: true, custom: this.closedFilter }
@@ -30,7 +22,7 @@ export class EditSessions {
         this.view = 'table';
     }
 
-    closedFilter(filterValue, row){
+    closedFilter(filterValue, row) {
         return !filterValue || row.sessionStatus !== 'Closed';
     }
 
@@ -66,7 +58,7 @@ export class EditSessions {
         this.view = 'form';
     }
 
-    refreshSelects(){
+    refreshSelects() {
         this.utils.refreshSelect("#editSession", this.sessions.SESSION_PARAMS, "session", this.sessions.selectedObject.session);
         this.utils.refreshSelect("#editStatus", this.config.SESSION_STATUSES, "status", this.sessions.selectedObject.sessionStatus);
     }
@@ -89,12 +81,7 @@ export class EditSessions {
                 if (result.valid) {
                     this.saveSession();
                 } else {
-                    let message = 'You must fix the errors before you can save the system?';
-                    let title = "Fix Errors";
-                    let options = ['Ok'];
-                    this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                        return;
-                    });
+                    $("#fixErrorsModal").modal('show');
                 }
             });
     }
@@ -111,14 +98,14 @@ export class EditSessions {
         this._cleanUp();
     }
 
-    saveSortOrder(session, event){
+    saveSortOrder(session, event) {
         event.stopPropagation();
         this.sessions.setSession(session);
         let serverResponse = this.sessions.saveSession();
         this.utils.updateArrayItem(serverResponse, this.sessions.objectsArray);
     }
 
-    async refreshConfig(){
+    async refreshConfig() {
         await this.sessions.getSessionParameters()
         this.editSessionConfig();
     }
@@ -153,8 +140,8 @@ export class EditSessions {
 
     updateStatus(index, session, event) {
         event.stopPropagation();
-        if(session.sessionStatus === "Closed") return;
-        
+        if (session.sessionStatus === "Closed") return;
+
         this.sessions.selectSessionById(session._id);
 
         switch (session.sessionStatus) {
@@ -174,16 +161,8 @@ export class EditSessions {
 
     back() {
         if (this.sessions.isSessionDirty().length) {
-            let message = 'Do you want to save the session?';
-            let title = "Save Session";
-            let options = {};
-            this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                if (!response.wasCancelled) {
-                    this.saveSession();
-                } else {
-                    this.goBack();
-                }
-            });
+            this.modalMessage = 'Do you want to save the session?';
+            $("#confirmSaveModal").modal('show');
         } else {
             this.goBack();
         }

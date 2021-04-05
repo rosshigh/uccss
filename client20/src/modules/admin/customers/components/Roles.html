@@ -1,0 +1,32 @@
+<template>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title">Assign Roles</h4>
+      </div>
+      <div class="card-body">
+        <form>
+          <div class="row">
+            <div class="col">
+              <label>Roles</label>
+              <div class="card overFlow" style="height:400px;">
+                <ul class="list-group list-group-flush">
+                  <button href="#" click.trigger="selectRole($event, role)" repeat.for="role of filteredArray"
+                    type="button" class="list-group-item">${role.label}</a>
+                </ul>
+              </div>
+            </div>
+            <div class="col">
+              <label>Assigned Roles</label>
+              <div class="card overFlow" style="height:400px;">
+                <ul class="list-group">
+                  <button click.trigger="removeRole($index, role)" repeat.for="role of people.selectedPerson.roles"
+                    type="button" class="list-group-item">${role | lookupValue:config.ROLES:'role':'label'}</button>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+</template>

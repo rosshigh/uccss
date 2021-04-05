@@ -1,0 +1,35 @@
+<template>
+    <div class="card">
+        <div class="card-body">
+            <div class='col-lg-10 offset-lg-1 bottomMargin'>
+                <table class="table table-striped"
+                    aurelia-table="data.bind: systems.selectedObject.clients; display-data.bind: $displayData; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+                    <thead>
+                        <tr>
+                            <compose view='./clientTableToolbar.html'></compose>
+                            <compose if.bind="showClientParametersForm" view="./refreshClientForm.html"></compose>
+                        </tr>
+                        <tr>
+                            <th style="width:10rem;" aut-sort="key: client">Client</th>
+                            <th style="width:15rem;" aut-sort="key: description">Product</th>
+                            <th style="width:25rem;">Assignments</th>
+                            <th style="width:20rem;" aut-sort="key: instance">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pointMe" repeat.for="client of $displayData" >
+                            <td click.delegate="editClient(client, $index)" style="width:10rem;" >${client.client}</td>
+                            <td click.delegate="editClient(client, $index)" style="width:20rem;" >${client.productId |
+                                lookupValue:products.objectsArray:"_id":"name"}</td>
+                            <td click.delegate="editClient(client, $index)" style="width:20rem;" >${client.assignments.length}</td>
+                            <td click.delegate="editClient(client, $index)" style="width:20rem;" > ${client.clientStatus |
+                                lookupValue:config.CLIENT_STATUSES:"code":"description"}</td>                           
+                        </tr>
+                    </tbody>
+               
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+</template>

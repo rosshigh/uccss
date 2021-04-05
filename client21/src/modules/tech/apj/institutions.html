@@ -1,0 +1,30 @@
+<template>
+    <span id="loading">
+        <ul class="bokeh">
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </span>
+    <compose view="../../../resources/modals/fixErrorsModal.html"></compose>
+    <compose view="../../../resources/modals/confirmDeleteModal.html"></compose>
+    <compose view="../../../resources/modals/confirmSaveModal.html"></compose>
+    <compose view="./components/addPackageModal.html"></compose>
+    <compose view="./components/editPackageModal.html"></compose>
+    <compose view="./components/newRequestModal.html"></compose> 
+    <compose view="./components/requestModal.html"></compose>
+    <compose view="./components/confirmRetireModal.html"></compose>
+    <compose view="./components/confirmExtraRequestModal.html"></compose> 
+    <div class="fluid-container">
+        <div show.bind="view === 'table'" class="card">
+            <div class="card-body">
+                <compose view="./components/apjInstitutionsTable.html"></compose>
+            </div>
+        </div>
+        <div show.bind="view === 'form'" class="card">
+            <div class="card-body">
+                <compose view="./components/institutionsForm.html"></compose>
+            </div>
+        </div>
+    </div>
+</template>

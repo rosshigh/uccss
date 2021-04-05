@@ -1,0 +1,78 @@
+<template>
+    <form class="form-horizontal"></form>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Institution Information</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <div class="col-sm-10">
+                            <label>Name *</label>
+                            <input value.bind="people.selectedInstitution.name & validateOnChange" id="editName"
+                                class="form-control" type="text" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <div class="col-sm-10">
+                            <label class="left">Status *</label>
+                            <select value.bind="people.selectedInstitution.institutionStatus & validateOnChange"
+                                id="editInstitutonStatusArray" class="form-control selectpicker"
+                                data-style="btn btn-link">
+                                <option value="">Select an option</option>
+                                <option repeat.for="status of is4ua.institutonStatusArray" value="${status.code}">
+                                    ${status.description}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Modifed Date</label>
+                        <flat-picker controlid="modifiedDate" config.bind="dateConfig"
+                            value.bind="people.selectedInstitution.dateModified"></flat-picker>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <div class="col-sm-10">
+                            <label>Date Joined</label>
+                            <flat-picker controlid="joinDate" config.bind="dateConfig"
+                                value.bind="people.selectedInstitution.joinDate"></flat-picker>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <div class="col-sm-10">
+                            <label>Date Dropped</label>
+                            <flat-picker controlid="dropDate" config.bind="dateConfig"
+                                value.bind="people.selectedInstitution.dropDate"></flat-picker>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Institution Type *</label>
+                        <select value.bind="people.selectedInstitution.institutionType & validateOnChange"
+                            id="editInstitutionType" class="form-control selectpicker"
+                            data-style="btn btn-link">
+                            <option value="">Select an option</option>
+                            <option repeat.for="status of is4ua.institutionTypes" value="${status.code}">
+                                ${status.description}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="topMargin">
+        <compose view="./institutionAddress.html"></compose>
+    </div>
+    </form>
+</template>

@@ -1,0 +1,44 @@
+<template>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-1">
+                    <label>First</label>
+                    <input value.bind="editFirstClient" id="editFirstClient" placeholder="Start"
+                        class="form-control input-sm" type="number" />
+                </div>
+                <div class="col-1">
+                    <label>Last</label>
+                    <input value.bind="editLastClient" id="editLastClient" placeholder="End"
+                        class="form-control input-sm" type="number" />
+                </div>
+                <div class="col ">
+                    <label>IDs Available</label>
+                    <input value.bind="idsAvailable" id="editClientIdsAvailable" placeholder="IDS Available"
+                        class="form-control input-sm" type="number" />
+                </div>
+                <div class="col">
+                    <label>Status</label>
+                    <select value.bind="editClientStatus" class="form-control" data-title="Single Select"
+                        data-style="btn-default btn-block" data-menu-style="dropdown-blue">
+                        <option repeat.for="status of config.CLIENT_STATUSES" value="${status.code}">
+                            ${status.description}
+                        </option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label>Client Interval</label>
+                    <input value.bind="clientInterval" id="clientInterval" placeholder="Interval"
+                        class="form-control input-sm" type="number" />
+                </div>
+                <div class="col">
+                    <label>Product</label>
+                    <select class="form-control col-lg-8" value.bind="selectedProduct">
+                        <option value="">Products</option>
+                        <option repeat.for="product of products.productsArray" model.bind="product._id">${product.name}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+</template>

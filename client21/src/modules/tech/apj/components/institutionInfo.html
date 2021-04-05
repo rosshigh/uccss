@@ -1,0 +1,133 @@
+<template>
+    <form class="form-horizontal"></form>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Institution Information</h4>
+            <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+                data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border"
+                    aria-hidden="true"></i></span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label>Name *</label>
+                                <input value.bind="people.selectedInstitution.name & validateOnChange" id="editName"
+                                    class="form-control" type="text" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="left">Status *</label>
+                                <select value.bind="people.selectedInstitution.institutionStatus & validateOnChange"
+                                    id="editInstitutonStatusArray" class="form-control selectpicker"
+                                    data-style="btn btn-link">
+                                    <option value="">Select an option</option>
+                                    <option repeat.for="status of is4ua.institutonStatusArray" value="${status.code}">
+                                        ${status.description}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <div class="col-sm-10">
+                                    <label>Date Joined</label>
+                                    <flat-picker controlid="joinDate" config.bind="dateConfig"
+                                        value.bind="people.selectedInstitution.joinDate"></flat-picker>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <div class="col-sm-10">
+                                    <label>Date Dropped</label>
+                                    <flat-picker controlid="dropDate" config.bind="dateConfig"
+                                        value.bind="people.selectedInstitution.dropDate"></flat-picker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label>Institution Type *</label>
+                                <select value.bind="people.selectedInstitution.institutionType & validateOnChange"
+                                    id="editInstitutionType" class="form-control selectpicker"
+                                    data-style="btn btn-link">
+                                    <option value="">Select an option</option>
+                                    <option repeat.for="status of is4ua.institutionTypes" value="${status.code}">
+                                        ${status.description}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <compose view="./institutionAddress.html"></compose>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="topMargin">
+                        <div class="card">
+                            <div class="card-body">
+                                <label class="left">Package History</label>
+                                <span click.delegate="addPackage()" class="smallMarginRight" bootstrap-tooltip
+                                    data-toggle="tooltip" data-placement="bottom" title=""
+                                    data-original-title="Add Package"><i class="fa fa-plus"
+                                        aria-hidden="true"></i></span>
+                                <table class="table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Package</th>
+                                            <th>Date Started</th>
+                                            <th>Date Ended</th>
+                                            <th>Active</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="pointMe" click.delegate="editPackage($index)"
+                                            repeat.for="package of people.selectedInstitution.packages | sortArray:'dateStarted'">
+                                            <td>${package.packageId | lookupValue:people.packageArray:"_id":"name"}
+                                            </td>
+                                            <td>${package.dateStarted | dateFormat:config.DATE_FORMAT_TABLE}</td>
+                                            <td>${package.dateEnded | dateFormat:config.DATE_FORMAT_TABLE}</td>
+                                            <td>${package.active}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="topMargin">
+        <span click.delegate="addPackage()" class="smallMarginRight" bootstrap-tooltip
+        data-toggle="tooltip" data-placement="bottom" title=""
+        data-original-title="Add Package"><i class="fa fa-plus"
+            aria-hidden="true"></i></span>
+        <table class="table-sm table-striped" >
+            <thead>
+                <tr>
+                    <th>Package</th>
+                    <th>Date Started</th>
+                    <th>Date Ended</th>
+                    <th>Active</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr repeat.for="package of people.selectedInstitution.packages">
+                    <td>${package.packageId | lookupValue:people.packageArray:"_id":"name"}</td>
+                    <td>${package.dateStarted | dateFormat:config.DATE_FORMAT_TABLE}</td>
+                    <td>${package.endDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+                    <td>${package.active}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div> -->
+    </form>
+</template>

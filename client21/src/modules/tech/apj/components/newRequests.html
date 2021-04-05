@@ -1,0 +1,25 @@
+<template>
+    <div class="topMargin">
+        <span id="selectProductRequestError"></span>
+        <table id="clientTable" class="table table-responsive" style="background:white;">
+            <thead>
+                <tr class="header">
+                    <th style="width:50%;">Product</th>
+                    <th style="width:25%;">Students</th>
+                    <th style="width:25%;">Required Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr click.trigger="editNewRequest($index)" repeat.for="requestDetail of newRequestDetails"
+                    class="pointMe ${requestDetail.productId !== '' && requestDetail.numberOfStudents > 0 && requestDetail.requiredDate ? '' : 'alert alert-default'}"
+                    >
+                    <td style="width:50%;">
+                        ${requestDetail.productId | lookupValue:products.objectsArray:"_id":"name"}
+                    </td>
+                    <td>${requestDetail.numberOfStudents}</td>
+                    <td>${requestDetail.requiredDate |  dateFormat:config.DATE_FORMAT_TABLE}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</template>

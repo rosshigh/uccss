@@ -1,0 +1,20 @@
+<template>
+    <span click.delegate="editClientsButton()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+    data-placement="bottom" title="" data-original-title="Edit Client List"><i class="fa fa-pencil fa-lg fa-border"
+        aria-hidden="true"></i></span>
+    <span if.bind="showClientParametersForm" click.delegate="generateClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+        data-placement="bottom" title="" data-original-title="Add Clients"><i class="fa fa-plus fa-lg fa-border"
+            aria-hidden="true"></i></span>
+    <span click.delegate="refreshAllClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+        data-placement="bottom" title="" data-original-title="Refresh Clients"><i
+            class="fa fa-refresh fa-lg fa-border text-danger" aria-hidden="true"></i></span>
+    <span click.delegate="deleteAllClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+        data-placement="bottom" title="" data-original-title="Delete Clients"><i
+            class="fa fa-trash-o fa-lg fa-border text-danger" aria-hidden="true"></i></span>
+    <span if.bind="showClientParametersForm" click.trigger="updateAllProducts()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+        data-placement="bottom" title="" data-original-title="Update Products"><i
+            class="fa fa-product-hunt fa-lg fa-border" aria-hidden="true"></i></span>
+    <span click.delegate="assignmentDetails()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+        data-placement="bottom" title="" data-original-title="Details"><i class="fa fa-eye fa-lg fa-border"
+            aria-hidden="true"></i></span>
+</template>

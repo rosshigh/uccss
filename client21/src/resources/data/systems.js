@@ -150,4 +150,11 @@ export class Systems {
         }
     }
 
+    async getAPJConfiguredProductSystems(sids){
+        if(sids){
+            let serverResponse = await this.data.get('apj/' + this.SYSTEMS_SERVICE + "/product/" + sids);
+            return serverResponse;
+        }
+    }
+
 }

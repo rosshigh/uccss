@@ -94,6 +94,12 @@ export class App {
         settings: { auth: false, roles: [] }
       },
       {
+        route: 'apj',
+        moduleId: PLATFORM.moduleName('./modules/tech/apj/apj'),
+        name: 'apj',
+        settings: { auth: false, roles: [] }
+      },
+      {
         route: 'techProductRequests',
         moduleId: PLATFORM.moduleName('./modules/tech/requests/productRequests'),
         name: 'productRequests',
@@ -109,6 +115,12 @@ export class App {
         route: 'facCoord',
         moduleId: PLATFORM.moduleName('./modules/user/facCoord'),
         name: 'facCoord',
+        settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'about',
+        moduleId: PLATFORM.moduleName('./modules/home/about'),
+        name: 'about',
         settings: { auth: false, roles: [] }
       }
     ]);

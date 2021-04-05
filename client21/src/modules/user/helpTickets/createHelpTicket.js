@@ -208,15 +208,7 @@ export class UserCreateHelpTicket {
                     //Cycle through the assignments
                     item2.assignments.forEach((assign) => {
                         this.originalClientRequestsArray.push({
-                            // productId: item2.productId,
-                            // sessionId: item.sessionId,
-                            // requestStatus: item2.requestStatus,
-                            // systemId: assign.systemId,
-                            // courseId: item.courseId,
-                            // client: assign.client,
-                            // clientId: assign.clientId,
-                            // _id: item2._id
-                            productId: item2.productId,
+                            productId: item2.productId._id,
                             productName: item2.productId.name,
                             sessionId: item.sessionId,
                             requestStatus: item2.requestStatus,
@@ -231,11 +223,10 @@ export class UserCreateHelpTicket {
                     })
                 } else {
                     this.originalClientRequestsArray.push({
-                        // productId: item2.productId,
-                        // sessionId: item.sessionId,
-                        // requestStatus: item2.requestStatus,
-                        // courseId: item.courseId,
-                        // _id: item2._id
+                        productId: item2.productId._id,
+                        sessionId: item.sessionId,
+                        requestStatus: item2.requestStatus,
+                        courseId: item.courseId ? item.courseId._id : null,
                         productName: item2.productId.name,
                         sessionId: item.sessionId,
                         requestStatus: item2.requestStatus,
@@ -339,7 +330,7 @@ export class UserCreateHelpTicket {
             this.content.requests = [];
             this.affectedProductRequests.forEach(item => {
                 this.content.requests.push({
-                    productId: this.clientRequestsArray[item].productId._id,
+                    productId: this.clientRequestsArray[item].productId,
                     courseId: this.clientRequestsArray[item].courseId,
                     sessionId: this.clientRequestsArray[item].sessionId,
                     systemId: this.clientRequestsArray[item].systemId,

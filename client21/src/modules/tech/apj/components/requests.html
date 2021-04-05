@@ -1,0 +1,45 @@
+<template>
+  <div class="topMargin">
+    <label>
+      <input checked.bind="filterRetired" change.trigger="filterNotActiveRequests()" type="checkbox">
+      Filter out Retired Requests
+  </label>
+    <span id="selectProductRequestError"></span>
+    <table id="clientTable" class="table table-responsive" style="background:white;">
+      <thead>
+        <tr class="header">
+          <th style="width:40%;">Product</th>
+          <th style="width:10%;">System</th>
+          <th style="width:10%;">Client</th>
+          <th style="width:10%;">Students</th>
+          <th style="width:20%;">Required Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="pointMe" click.trigger="editRequest($index)" 
+        class="${requestDetail.requestStatus === config.RETIRED_REQUEST_CODE ? 'success sortable' : 'sortable'}"
+          repeat.for="requestDetail of requestDetails">
+          <td style="width:40%;">${requestDetail.productId | lookupValue:products.objectsArray:"_id":"name"}</td>
+          <td style="width:10%;">${requestDetail.assignments[0].systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
+          <td style="width:10%;">${requestDetail.assignments[0].client}</td>
+          <td style="width:10%;">${requestDetail.numberOfStudents}</td>
+          <td style="width:20%;">${requestDetail.requiredDate |  dateFormat:config.DATE_FORMAT_TABLE}</td>
+          <td style="width:10%">
+            <span show.bind="requestDetail.requestStatus == config.RETIRED_REQUEST_CODE" click.trigger="unRetireRequest($event, $index)" ><i class="fa fa-sun-o text-danger" aria-hidden="true"></i></span>
+            <span show.bind="requestDetail.requestStatus != config.RETIRED_REQUEST_CODE" click.trigger="retireRequest($event, $index)" ><i class="fa fa-bed text-danger" aria-hidden="true"></i></span>
+          </td>
+          <!-- <td><input type="number" class="form-control" value.bind="requestDetail.numberOfStudents"></td>
+          <td>
+            <flat-picker controlid="requiredDate-${$index}" config.bind="configDate"
+              value.bind="requestDetail.requiredDate">
+            </flat-picker>
+          </td> -->
+        </tr>
+      </tbody>
+    </table>
+    <span id="client"></span>
+  </div>
+  </div>
+  </div>
+</template>

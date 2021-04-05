@@ -1,0 +1,56 @@
+<template>
+    <div class="list-group-item toolbar">
+        <span click.delegate="backConfig()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+            data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border"
+                aria-hidden="true"></i></span>
+        <span click.delegate="saveConfig()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+            data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border"
+                aria-hidden="true"></i></span>
+        <span click.delegate="cancelConfig()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+            data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border"
+                aria-hidden="true"></i></span>
+    </div>
+    <div class="row">
+        <div id="no-more-tables">
+            <table id="newsTable" class="table table-striped table-hover cf">
+                <thead class="cf">
+                    <tr>
+                        <td colspan='5'>
+                            <span click.delegate="refreshConfig()" class="smallMarginRight" bootstrap-tooltip
+                                data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i
+                                    class="fa fa-refresh" aria-hidden="true"></i></span>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="width:12rem;">Session</th>
+                        <!-- <th style="width:12rem;">Start Day</th>
+                                            <th style="width:12rem;">Start Month</th>
+                                            <th style="width:12rem;">End Day</th>
+                                            <th style="width:12rem;">End Month</th>
+                                            <th style="width:12rem;">Open Day</th>
+                                            <th style="width:12rem;">Open Month</th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr repeat.for="item of editSessionConfigArray">
+                        <td><input value.bind="item.session" class="form-control" type="text" />
+                        </td>
+                        <!-- <td><input value.bind="item.startDay" class="form-control" type="text" />
+                                            </td>
+                                            <td><input value.bind="item.startMonth" class="form-control" type="text" />
+                                            </td>
+                                            <td><input value.bind="item.endDay" class="form-control" type="text" /></td>
+                                            <td><input value.bind="item.endMonth" class="form-control" type="text" />
+                                            </td>
+                                            <td><input value.bind="item.openDay" class="form-control" type="text" />
+                                            </td>
+                                            <td><input value.bind="item.openMonth" class="form-control" type="text" />
+                                            </td> -->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</template>

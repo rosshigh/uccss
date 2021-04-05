@@ -1,36 +1,28 @@
 import { inject } from 'aurelia-framework';
 import { ValidationRules, ValidationControllerFactory, validationMessages } from 'aurelia-validation';
-import { DialogService } from 'aurelia-dialog';
-import { ConfirmDialog } from '../../../resources/dialogs/confirm-dialog';
-import { MessageDialog } from '../../../resources/dialogs/message-dialog';
 import { Systems } from '../../../resources/data/systems';
 import { Sessions } from '../../../resources/data/sessions';
 import { Products } from '../../../resources/data/products';
 import { AppConfig } from '../../../appConfig';
-import { Store } from '../../../store/store';
 import { Utils } from '../../../resources/utils/utils';
 
-@inject(ValidationControllerFactory, Systems, Sessions, Products, AppConfig, Store, Utils, DialogService)
+@inject(ValidationControllerFactory, Systems, Sessions, Products, AppConfig, Utils)
 export class EditSystems {
 
     pageSize = 200;
 
-    constructor(ValidationControllerFactory, systems, sessions, products, config, store, utils, dialog) {
+    constructor(ValidationControllerFactory, systems, sessions, products, config, utils) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
         this.systems = systems;
         this.sessions = sessions;
         this.products = products;
         this.config = config;
-        this.store = store;
         this.utils = utils;
-        this.dialog = dialog;
 
         this.filters = [
             { value: '', keys: ['sid', 'description'] },
             { value: true, keys: ['active'] }
         ];
-
-        this.configParameters = this.store.getConfig();
 
         this.productsToSave = [];
 
@@ -39,22 +31,27 @@ export class EditSystems {
     }
 
     async activate() {
+        $("#loading").show();
         let responses = await Promise.all([
             this.systems.getObjectsArray('?order=sid'),
             this.products.getObjectsArray('?filter=active|eq|true&order=name'),
             this.sessions.getSessionParameters()
         ]);
+        $("#loading").hide();
     }
 
     attached() {
+        $("#loading").hide();
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
         $('.selectpicker').selectpicker();
     }
 
     async refresh() {
+        $("#loading").show();
         this.clearFilters();
         await this.systems.getObjectsArray('?order=sid')
+        $("#loading").hide();
     }
 
     new() {
@@ -107,12 +104,7 @@ export class EditSystems {
                 if (result.valid) {
                     this.saveSystem();
                 } else {
-                    let message = 'You must fix the errors before you can save the system?';
-                    let title = "Fix Errors";
-                    let options = ['Ok'];
-                    this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                        return;
-                    });
+                    $("#fixErrorsModal").modal('show');
                 }
             });
     }
@@ -133,20 +125,12 @@ export class EditSystems {
         this._cleanUp();
     }
 
-    async delete() {
-        let message = 'Are you sure you want to delete the system?';
-        let title = "Confirm Delete";
-        let options = {};
-        this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-            if (!response.wasCancelled) {
-                this.deleteSystem();
-            } else {
-                this.goBack();
-            }
-        });
+    async deleteSystem() {
+        this.modalMessage = 'Are you sure you want to delete the system?';
+        $("#confirmDeleteModal").modal('show');
     }
 
-    async deleteSystem() {
+    async delete() {
         var name = this.systems.selectedObject.sid;
         let serverResponse = await this.systems.deleteObject();
         if (!serverResponse.error) {
@@ -157,16 +141,8 @@ export class EditSystems {
 
     back() {
         if (this.systems.isObjectDirty().length) {
-            let message = 'Do you want to save the system?';
-            let title = "Save System";
-            let options = {};
-            this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                if (!response.wasCancelled) {
-                    this.saveSystem();
-                } else {
-                    this.goBack();
-                }
-            });
+            this.modalMessage = 'Do you want to save the system?';
+            $("#confirmSaveModal").modal('show');
         } else {
             this.goBack();
         }
@@ -203,34 +179,16 @@ export class EditSystems {
         var end = parseInt(this.editLastClient);
         this.clientInterval = parseInt(this.clientInterval) > 0 ? parseInt(this.clientInterval) : 1;
         if (this.selectedProduct === "" || this.idsAvailable === "0" || !this.editFirstClient || !this.editLastClient) {
-            let message = 'Enter all the required parameters.';
-            let title = "Enter Parameters";
-            let options = ['Ok'];
-            this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                if (!response.wasCancelled) {
-                    return;
-                }
-            });
+            this.modalMessage = 'Enter all the required parameters.';
+           $("#messageModal").modal('show');
         };
         if (end < start) {
-            let message = 'The first client number must be less than the last client number.';
-            let title = "Invalid Client Number";
-            let options = ['Ok'];
-            this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                if (!response.wasCancelled) {
-                    return;
-                }
-            });
+            this.modalMessage = 'The first client number must be less than the last client number.';
+            $("#messageModal").modal('show');
         }
         if (this.editFirstClient.length != 3 || this.editLastClient.length != 3) {
-            let message = 'The client number must be 3 digits.';
-            let title = "Invalid Client Number";
-            let options = ['Ok'];
-            this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                if (!response.wasCancelled) {
-                    return;
-                }
-            });
+            this.modalMessage = 'The client number must be 3 digits.';
+            $("#messageModal").modal('show');
         }
         let result = this.generateAllClients(start, end, parseInt(this.clientInterval));
         if (result.error) {
@@ -275,15 +233,7 @@ export class EditSystems {
     }
 
     refreshAllClients() {
-        let message = 'Are you sure you want to return all the clients to their initial state?';
-        let title = "Confirm Refresh";
-        let options = {};
-        this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-            if (!response.wasCancelled) {
-                this.executeRefreshAllClients();
-            } else {
-            }
-        });
+        $("#refreshClientsModal").modal('show');
     }
 
     executeRefreshAllClients() {
@@ -294,29 +244,48 @@ export class EditSystems {
     }
 
     deleteAllClients() {
-        let message = 'Are you sure you want to delete all the clients?';
-        let title = "Confirm Deelete";
-        let options = {};
-        this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-            if (!response.wasCancelled) {
-                let productToUpdate = this.systems.selectedObject.clients[0].productId;
-                this.executeDeleteAllClients();
-                let indexOfProduct = this.products.selectedObjectFromId(productToUpdate);
-                this.saveProduct = false;
-                if (this.products.selectedObject.systems && this.products.selectedObject.systems.length > 0) {
-                    this.products.selectedObject.systems.forEach((item, index) => {
-                        if (item.sid === this.systems.selectedObject.sid) {
-                            this.products.selectedObject.systems.splice(index, 1);
-                            this.saveProduct = true;
-                        }
-                    })
+        $("#confirmDeleteAllClientsModal").modal('show');
+        // let message = 'Are you sure you want to delete all the clients?';
+        // let title = "Confirm Deelete";
+        // let options = {};
+        // this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
+        //     if (!response.wasCancelled) {
+        //         let productToUpdate = this.systems.selectedObject.clients[0].productId;
+        //         this.executeDeleteAllClients();
+        //         let indexOfProduct = this.products.selectedObjectFromId(productToUpdate);
+        //         this.saveProduct = false;
+        //         if (this.products.selectedObject.systems && this.products.selectedObject.systems.length > 0) {
+        //             this.products.selectedObject.systems.forEach((item, index) => {
+        //                 if (item.sid === this.systems.selectedObject.sid) {
+        //                     this.products.selectedObject.systems.splice(index, 1);
+        //                     this.saveProduct = true;
+        //                 }
+        //             })
+        //         }
+        //         if (this.saveProduct) {
+        //             if(this.productsToSave.indexOf(indexOfProduct) === -1) this.productsToSave.push(indexOfProduct);
+        //         }
+        //     } else {
+        //     }
+        // });
+    }
+
+    executeUpdateProducts(){
+        let productToUpdate = this.systems.selectedObject.clients[0].productId;
+        this.executeDeleteAllClients();
+        let indexOfProduct = this.products.selectedObjectFromId(productToUpdate);
+        this.saveProduct = false;
+        if (this.products.selectedObject.systems && this.products.selectedObject.systems.length > 0) {
+            this.products.selectedObject.systems.forEach((item, index) => {
+                if (item.sid === this.systems.selectedObject.sid) {
+                    this.products.selectedObject.systems.splice(index, 1);
+                    this.saveProduct = true;
                 }
-                if (this.saveProduct) {
-                    if(this.productsToSave.indexOf(indexOfProduct) === -1) this.productsToSave.push(indexOfProduct);
-                }
-            } else {
-            }
-        });
+            })
+        }
+        if (this.saveProduct) {
+            if(this.productsToSave.indexOf(indexOfProduct) === -1) this.productsToSave.push(indexOfProduct);
+        }
     }
 
     executeDeleteAllClients() {
@@ -325,16 +294,8 @@ export class EditSystems {
 
     updateAllProducts() {
         if (!this.selectedProduct) {
-            let message = 'You must choose a product?';
-            let title = "Choose a Product";
-            let options = ['Ok'];
-            this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                if (!response.wasCancelled) {
-
-                } else {
-
-                }
-            });
+            this.modalMessage = "You must choose a product?";
+            $("#messageModal").modal('show');
         } else {
             this.executeUpdateAllProducts();
         }
@@ -352,7 +313,6 @@ export class EditSystems {
 
     selectProduct() {
         this.products.selectedObjectFromId(this.selectedProduct);
-        // if (this.products.selectedProduct) this.idsAvailable = this.products.selectedProduct.idsAvailable ? this.products.selectedProduct.idsAvailable : 0;
     }
 
     toggleSandBox() {
@@ -365,15 +325,7 @@ export class EditSystems {
     }
 
     refreshClient(index) {
-        let message = 'Are you sure you want to return the client to its initial state?';
-        let title = "Confirm Refresh";
-        let options = {};
-        this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-            if (!response.wasCancelled) {
-                this.executeRefreshClient();
-            } else {
-            }
-        });
+        $("#confirmRefreshClientModal").modal('show');
     }
 
     executeRefreshClient() {
@@ -383,16 +335,11 @@ export class EditSystems {
     }
 
     deleteClient() {
-        let message = 'Are you sure you want to delete the client?';
-        let title = "Confirm Delete";
-        let options = {};
-        this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-            if (!response.wasCancelled) {
-                this.systems.selectedObject.clients.splice(this.selectedIndex, 1);
-                this.backToClientTable();
-            } else {
-            }
-        });
+        $("#confirmDeleteClient").modal('show');
+    }
+
+    executeDeleteClient(){
+        this.systems.selectedObject.clients.splice(this.selectedIndex, 1);
     }
 
     downloadInstExcel() {

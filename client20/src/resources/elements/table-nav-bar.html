@@ -1,0 +1,55 @@
+<template>
+    <div class="row">
+        <div class="col-2">
+            <div>
+                <label style="padding-left:15px;" class="pull-left">Records: ${totalItems}</label>
+            </div>
+        </div>
+        <div class="col-7 d-flex justify-content-center">
+            <aut-pagination current-page.bind="currentPage" page-size.bind="pageSize"
+                total-items.bind="totalItems" pagination-size.bind="5" boundary-links.bind="true">
+                <template replace-part="pagination">
+                    <nav>
+                        <ul class="pagination pagination-primary" hide.bind="hideSinglePage && totalPages === 1">
+                            <li class="page-item">
+                                <a aria-label="Previous" click.delegate="previousPage()"
+                                    class-name.bind="currentPage === 1 ? 'disabled page-link' : 'page-link'">
+                                    <span aria-hidden="true">«</span>
+                                </a>
+                            </li>
+
+                            <li class-name.bind="currentPage === page.value ? 'active page-item' : 'page-item'" repeat.for="page of displayPages">
+                                <a class="page-link" click.delegate="selectPage(page.value)">
+                                    ${page.title}
+                                </a>
+                            </li>
+
+                            <li class="page-item">
+                                <a aria-label="Next" click.delegate="nextPage()"
+                                    class-name.bind="currentpage === totalPages ? 'disabled page-link' : 'page-link'">
+                                    <span aria-hidden="true">»</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </template>
+            </aut-pagination>
+        </div>
+
+        <div class="col-2">
+            <div class="form-inline pull-right">
+                <div class="form-group">
+                    <label for="pageSize">Page Size: </label>
+                    <select value.bind="pageSize" id="pageSize" class="form-control smallLeftMargin">
+                        <option model.bind="5">5</option>
+                        <option model.bind="10">10</option>
+                        <option model.bind="20">20</option>
+                        <option model.bind="50">50</option>
+                        <option model.bind="200">200</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>

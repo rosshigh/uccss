@@ -1,10 +1,6 @@
 import { inject } from 'aurelia-framework';
 import { Notification } from 'aurelia-notification';
-// import humane from 'humane-js';
 import * as toastr from 'toastr';
-
-// import moment from 'moment';
-// import {AppConfig} from '../../config/appConfig';
 
 @inject(Notification)
 export class Utils {
@@ -50,10 +46,8 @@ export class Utils {
    * msg - the message to display
    ****************************************************************************/
   showNotification(msg, type) {
-    // setTimeout(() => {
-    //   $("#notification").html(msg).fadeIn(1500).fadeOut(5000);
-    // }, 500);
 
+    $(".notification").css("background-color", "ghostwhite");
     switch (type) {
       case 'error':
         $(".notification").css("color", "red");
@@ -68,21 +62,7 @@ export class Utils {
         $(".notification").html(msg).fadeIn(1500).fadeOut(1500);
     }
 
-    // $(".notification").css("width", "green");
-    // $(".notification").html(msg).fadeIn(1500).fadeOut(1500);
-
-    // let width = window.innerWidth * .70;
-    // $(".notification").css("top", 50);
-    // $(".notification").css("left", width);
-    // $(".notification").css("display", "block");
   }
-
-  //  showNotification(msg, type){
-  //  type = type ? type : "success";
-  //  toastr[type](msg);s
-  // humane.log(msg);
-  // this.notification.success(msg);
-  //  }
 
   getIndex(obj, array){
     let index = -1;

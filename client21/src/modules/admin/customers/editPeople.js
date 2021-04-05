@@ -1,30 +1,22 @@
 import { inject } from 'aurelia-framework';
 import { ValidationRules, ValidationControllerFactory, validationMessages } from 'aurelia-validation';
-import { DialogService } from 'aurelia-dialog';
-import { ConfirmDialog } from '../../../resources/dialogs/confirm-dialog';
-import { MessageDialog } from '../../../resources/dialogs/message-dialog';
 import { People } from '../../../resources/data/people';
 import { is4ua } from '../../../resources/data/is4ua';
 import { AppConfig } from '../../../appConfig';
-import { Store } from '../../../store/store';
 import { Utils } from '../../../resources/utils/utils';
 
-@inject(ValidationControllerFactory, People, is4ua, AppConfig, Store, Utils, DialogService)
+@inject(ValidationControllerFactory, People, is4ua, AppConfig, Utils)
 export class EditPeople {
 
     pageSize = 200;
     defaultPhoneMask = "999-999-9999";
 
-    constructor(ValidationControllerFactory, people, is4ua, config, store, utils, dialogService) {
+    constructor(ValidationControllerFactory, people, is4ua, config, utils) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
         this.people = people;
         this.is4ua = is4ua;
         this.config = config;
-        this.store = store;
         this.utils = utils;
-        this.dialogService = dialogService;
-
-        this.configParameters = this.store.getConfig();
 
         this.filters = [
             { value: '', keys: ['fullName', 'email', 'roles'] }
@@ -36,14 +28,17 @@ export class EditPeople {
     }
 
     async activate() {
+        $("#loading").show();
         let responses = await Promise.all([
             this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01'),
             this.is4ua.loadIs4ua(),
             this.people.getInstitutionArray('?order=name')
         ]);
+        $("#loading").hide();
     }
 
     attached() {
+        $("#loading").hide();
         var $th = $('.tableFixHead').find('thead th')
         $('.tableFixHead').on('scroll', function () {
             $th.css('transform', 'translateY(' + this.scrollTop + 'px)');
@@ -55,8 +50,8 @@ export class EditPeople {
 
     async refresh() {
         $('#loading').show();
-        await this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|' + this.loadStatus),
-            $('#loading').hide();
+        await this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|' + this.loadStatus);
+        $('#loading').hide();
     }
 
     institutionName(row) {
@@ -135,12 +130,7 @@ export class EditPeople {
                 if (result.valid) {
                     this.savePerson();
                 } else {
-                    let message = 'You must fix the errors before you can save the system?';
-                    let title = "Fix Errors";
-                    let options = ['Ok'];
-                    this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                        return;
-                    });
+                    $("#fixCustomerErrorsModal").modal('show');
                 }
             });
     }
@@ -149,7 +139,7 @@ export class EditPeople {
         this.localValidation()
         if (this.validationErrors.length === 0) {
             let serverResponse = await this.people.savePerson();
-            if (!serverResponse.error){
+            if (!serverResponse.error) {
                 this.utils.updateArrayItem(serverResponse, this.people.peopleArray);
                 this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
                 this.refresh();
@@ -158,29 +148,16 @@ export class EditPeople {
             }
             this._cleanUp();
         } else {
-            let message = 'You must fix the errors before you can save the system?';
-            let title = "Fix Errors";
-            let options = ['Ok'];
-            this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                return;
-            });
+            $("#fixCustomerErrorsModal").modal('show');
         }
     }
 
-    async delete() {
-        let message = 'Are you sure you want to delete this person?';
-        let title = "Confirm Delete";
-        let options = {};
-        this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-            if (!response.wasCancelled) {
-                this.deletePersion();
-            } else {
-                this.goBack();
-            }
-        });
+    async deletePerson() {
+        this.modalMessage = 'Are you sure you want to delete this person?';
+        $("#confirmDeleteModal").modal('show');
     }
 
-    async deletePersion() {
+    async delete() {
         var name = this.people.selectedPerson.fullName;
         let serverResponse = await this.people.deletePerson();
         if (!serverResponse.error) {
@@ -192,16 +169,8 @@ export class EditPeople {
 
     back() {
         if (this.people.isPersonDirty(this.people.selectedPerson).length) {
-            let message = 'Do you want to save the system?';
-            let title = "Save System";
-            let options = {};
-            this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                if (!response.wasCancelled) {
-                    this.save();
-                } else {
-                    this.goBack();
-                }
-            });
+            this.modalMessage = 'Do you want to save the person?';
+            $("#confirmSaveModal").modal('show');
         } else {
             this.goBack();
         }
@@ -247,7 +216,6 @@ export class EditPeople {
     _cleanUp() {
         this.institutionId = "";
         this.clearFilters();
-        // this.validation.makeAllValid(1);
         this.goBack();
     }
 
@@ -357,8 +325,6 @@ export class EditPeople {
     }
 
     async savePassword() {
-        // this.newPassword = $("#newPassword").val();
-        // if (this.validation.validate(3, this)) {
         this.checkPasswordBlank();
         if (this.validationErrors.length === 0) {
             var obj = {

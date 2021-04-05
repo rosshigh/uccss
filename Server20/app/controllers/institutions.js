@@ -16,8 +16,7 @@ module.exports = function (app) {
   router.get('/institutions', asyncHandler(async (req, res) => {
     let query = buildQuery(req.query, Institutions.find())
     query
-      .populate({ path: "packageId", model: "InstitutionPackage" })
-
+      .populate({ path: "packageId", model: "Packages" })
     await query.exec().then(result => {
       res.status(200).json(result);
     })
@@ -63,4 +62,11 @@ module.exports = function (app) {
       res.status(200).json(result);
     })
   }));
+
+  router.delete('/institutions/:id', asyncHandler(async (req, res) => {
+    logger.log('info', 'Delete institution [%s]', req.params.id);
+    await Institutions.remove({ _id: req.params.id }).then(result => {
+        res.status(200).json({ msg: "Institutions Deleted" });
+    })
+}));
 }

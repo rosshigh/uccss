@@ -1,0 +1,25 @@
+<template>
+		<h3 class="underline">UCC Information</h3>
+		<!-- <img style="height: 150px; width: 100%; display: block;" src="${config.IMG_DOWNLOAD_URL}Lubar-2019.gif" alt="Card image"> -->
+		<div class="${item.priority}" repeat.for="item of site.objectArray | infoFilter:'SYST'">
+			<h3>${item.title}</h3>
+			<span innerhtml="${item.content}"></span>
+			<hr/>
+		</div>
+		<div repeat.for="item of site.objectArray | infoFilter:'INFO'">
+			<h3>${item.title}</h3>
+			<span innerhtml="${item.content}"></span>
+			<hr/>
+		</div>
+		<div class="bigTopMargin">
+			<h2 class="underline">Current Sessions</h2>
+			<div class="list-group">
+				<a class="list-group-item" repeat.for="session of sessions.objectsArray">
+					<h4 class="list-group-item-heading">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>
+					<span>Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</span><br/>
+					<span>Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</span><br/>
+					<span>Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</span><br/>
+				</a>
+			</div>
+		</div>
+</template>

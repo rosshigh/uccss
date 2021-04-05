@@ -1,0 +1,71 @@
+<template>
+   
+    <!-- <div class="card"> -->
+        <div class="table-responsive">
+            <div class="row">
+                <compose view='../../../../resources/elements/table-nav-bar.html'></compose>
+                <!-- <table-nav-bar totalitems.bind='totalItems' currentpage ='currentPage'></table-nav-bar> -->
+                <div class="col-4">
+                    <div class="form-group">
+                        <input type="text" value.bind="filters[0].value"
+                            placeholder="Filter name, institution, email and role" class="form-control"
+                            id='filterField' />
+                    </div>
+                </div>
+                <div class='col-3'>
+                    <div class="form-group">
+                        <select change.delegate="refresh()" value.bind="loadStatus" class="form-control"
+                            id="personStatus">
+                            <option repeat.for='status of config.USER_STATUS' model.bind='status.code'>
+                                ${status.description}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+           
+            <table class="table table-striped table-hover header-fixed blackText tableFont"
+                aurelia-table="data.bind: people.peopleArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+                <thead>
+                    <tr>
+                        <th colspan="8">
+                            <compose view='./peopleTableToolbar.html'></compose>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th style="width:10%;" aut-sort="key: firstName">First Name</th>
+                        <th style="width:10%;" aut-sort="key: lastName; default: asc">Last Name</th>
+                        <th style="width:10%;" aut-sort="key: nickName">Preferred Name</th>
+                        <th style="width:15%;" aut-sort="key.bind: institutionName">Institution</th>
+                        <th style="width:20%;" aut-sort="key: email">E-mail</th>
+                        <th style="width:10%;">Phone</th>
+                        <th style="width:10%;">Role</th>
+                        <th style="width:10%;">Status</th>
+                    </tr>
+                </thead>
+
+                <tbody style="height:400px;">
+                    <tr class="pointMe" repeat.for="person of $displayData" click.delegate="edit(person)">
+                        <td style="width:10%;">${person.firstName}</td>
+                        <td style="width:10%;">${person.lastName}</td>
+                        <td style="width:10%;">${person.nickName} &nbsp;</td>
+                        <td style="width:15%;">${person.institutionId.name | concatenateString:35}</td>
+                        <td style="width:20%;"><span><i click.trigger="copyEmail(person, $event)"
+                                    class="fa fa-paper-plane copy" aria-hidden="true"></i></span>
+                            ${person.email}</td>
+                        <td style="width:10%;">
+                            <span show.bind="person.phone"></span> ${person.phone |
+                            phoneNumber:config.PHONE_MASKS:person.country:person.ext}<br>
+                            <!-- <span show.bind="person.mobile">M:</span> ${person.mobile | phoneNumber:config.PHONE_MASKS:person.country} -->
+                        </td>
+                        <td style="width:10%;">${person.roles}</td>
+                        <td style="width:10%;">${person.personStatus |
+                            lookupValue:is4ua.personStatusArray:"code":"description"}
+                            <span click.delegate="toggleStatus(person._id, person.personStatus, $event)"
+                                innerhtml="${person.personStatus | activateButton:'02'}"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</template>

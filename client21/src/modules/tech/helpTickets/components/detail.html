@@ -13,12 +13,13 @@
                     <p class="category">${helpTickets.selectedObject.createdDate | dateFormat}</p>
                     <p>Status: ${helpTickets.selectedObject.helpTicketStatus |
                         lookupValue:config.HELP_TICKET_STATUSES:'code':'description'}</p>
+                        <span class="">Last viewed: ${helpTickets.selectedObject.views[helpTickets.selectedObject.views.length-1] | dateFormat }</span>
                 </div>
                 <div class="col-2">
                     <img class="imgG smallPhoto"
                         src="${config.PHOTO_DOWNLOAD_URL}/${helpTickets.selectedObject.personId.file.fileName}">
                 </div>
-                <div class="col">
+                <div class="col">                   
                     <span show.bind="helpTickets.selectedObject.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS"
                         click.trigger="toggleOriginalTicket()" class="float-right" bootstrap-tooltip
                         data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Respond"><i
@@ -35,7 +36,7 @@
                         assigned by the UCC</h6>
                     <div if.bind="helpTickets.selectedObject.content[0].requests.length > 0">
                         <div class="topMargin" repeat.for="product of helpTickets.selectedObject.content[0].requests">
-                            <span class="helpTicketText">Product: ${product.productId |
+                            <span class="helpTicketText pointMe">Product: ${product.productId |
                                 lookupValue:products.objectsArray:"_id":"name"}</span><i
                                 click.trigger="viewAssignment(product.requestId)" class="fa fa-eye smallLeftMargin"
                                 aria-hidden="true"></i> <br />

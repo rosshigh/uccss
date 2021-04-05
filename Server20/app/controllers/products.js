@@ -54,4 +54,10 @@ module.exports = function (app) {
       res.status(200).json(result);
     })
   }));
+
+  router.delete('/products/:id', asyncHandler(async (req, res) => {
+    await Product.remove({ _id: req.params.id }).then(result => {
+      res.status(200).json(result);
+    })
+  }));
 }

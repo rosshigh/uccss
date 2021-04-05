@@ -1,0 +1,43 @@
+<template>
+    <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
+
+    <table class="table-sm table-striped header-fixed"
+        aurelia-table="data.bind: products.objectsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+        <thead>
+            <tr>
+                <th>
+                    <compose view='./systemsTableToolbar.html'></compose>
+                </th>
+            </tr>
+            <tr>
+                <th>
+                    <div class="form-group">
+                        <input type="text" value.bind="filters[0].value" placeholder="Filter Name and Systems"
+                            class="form-control" id='filterField' />
+                    </div>
+                </th>
+                <th></th>
+                <th></th>
+                <th>
+                    <select value.bind="filters[1].value" class="form-control" id="personStatus"
+                        data-style="btn btn-link">
+                        <option value=true>Active</option>
+                        <option value=false>Inactive</option>
+                    </select>
+                </th>
+            </tr>
+            <tr>
+                <th style="width:40%;" aut-sort="key: name">Name</th>
+                <th style="width:25%;" aut-sort="key: systemList">Systems</th>
+                <th style="width:25%;">Status</th>
+            </tr>
+        </thead>
+        <tbody style="height:500px;">
+            <tr class="pointMe" click.delegate="edit(product)" repeat.for="product of $displayData">
+                <td style="width:40%;">${product.name}</td>
+                <td style="width:25%;">${product.systemList}</td>
+                <td style="width:25%;">${product.active | translateStatus}
+            </tr>
+        </tbody>
+    </table>
+</template>

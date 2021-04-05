@@ -38,6 +38,7 @@ export class UserViewHelpTickets {
         this.view = 'categoryList';
         this.showDocuments = false;
         this.showNotesPanel = false;
+        this.privateChecked = false;
 
         this.filters = [
             { value: '', keys: ['helpTicketNo'] },
@@ -90,6 +91,7 @@ export class UserViewHelpTickets {
     }
 
     async activate() {
+        $("#loading").show();
         let responses = await Promise.all([
             this.helpTickets.getObjectArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC"),
             this.products.getSmallObjectsArray(),
@@ -98,9 +100,11 @@ export class UserViewHelpTickets {
             this.people.getPeopleArray('/small'),
             this.sessions.getObjectsArray('?order=startDate:DSC')
         ]);
+        $("#loading").hide();
     }
 
     attached() {
+        $("#loading").hide();
         $('[data-toggle="tooltip"]').tooltip();
         $('.selectpicker').selectpicker();
     }
@@ -144,6 +148,8 @@ export class UserViewHelpTickets {
 
     back() {
         this.showTable = true;
+        this.enterResponse = false;
+        this.enableButton = false;
     }
 
     respond() {
@@ -464,6 +470,7 @@ export class UserViewHelpTickets {
 
     async viewAssignment(id) {
         console.log(id);
+        await this.requests.getRequestDetail(id);
         this.showRequestPanel = true;
         // // this.selectedRequestDetail = this.utils.copyObject(request);
         // let response = await this.clientRequests.getRequestDetail(request._id);
@@ -476,5 +483,149 @@ export class UserViewHelpTickets {
         // }
 
     }
+
+    async openSearchForm(){
+        let responses = await Promise.all([
+            this.products.getObjectsArray('?order=name'),
+            this.people.getPeopleArray('?order=lastName'),
+            this.people.getInstitutionArray('?order=name'),
+            this.sessions.getObjectsArray('?order=startDate:DSC'),
+            this.products.getSmallObjectsArray('?order=name')
+          ]);
+      
+          this.filterList();
+          this.filterPeopleList();
+          this.filterInstitutionsList();
+        this.searchForm = true;
+    }
+
+    backToTable(){
+        this.searchForm = false;
+    }
+
+    selectProduct(el) {
+        if (!this.selectedProducts) this.selectedProducts = [];
+        $("#requestProductsLabel").html("Requested Products");
+        this.products.selectedObjectFromId(el.target.id);
+        this.selectedProducts.push(this.products.selectedObject);
+      }
+    
+      removeProduct(el) {
+        this.selectedProducts.splice(this.selectedProducts.indexOf(el.target.id), 1);
+      }
+    
+      filterList() {
+        if (this.filter) {
+          var thisFilter = this.filter
+          this.filteredProductsArray = this.products.objectsArray.filter((item) => {
+            return item.name.toUpperCase().indexOf(thisFilter.toUpperCase()) != -1;
+          });
+        } else {
+          this.filteredProductsArray = this.products.objectsArray;
+        }
+      }
+    
+      filterPeopleList() {
+        if (this.peopleFilter) {
+          var thisFilter = this.peopleFilter
+          this.filteredPersonArray = this.people.peopleArray.filter((item) => {
+            return item.fullName.toUpperCase().indexOf(thisFilter.toUpperCase()) != -1;
+          });
+        } else {
+          this.filteredPersonArray = this.people.peopleArray;
+        }
+      }
+    
+      selectPerson(el, person) {
+        if (!this.selectedPeople) this.selectedPeople = [];
+        $("#requestProductsLabel").html("Requested Person");
+        this.people.setSelectedPerson(person)
+        this.selectedPeople.push(this.people.selectedPerson);
+      }
+    
+      removePerson(el) {
+        this.selectedPeople.splice(this.selectedPeople.indexOf(el.target.id), 1);
+      }
+    
+      filterInstitutionsList() {
+        if (this.institutionsFilter) {
+          var thisFilter = this.institutionsFilter;
+          this.filteredInstitutionArray = this.people.institutionsArray.filter((item) => {
+            return item.name.toUpperCase().indexOf(thisFilter.toUpperCase()) != -1;
+          });
+        } else {
+          this.filteredInstitutionArray = this.people.institutionsArray;
+        }
+      }
+    
+      selectInstitution(el, obj) {
+        if (!this.selectedInstitutions) this.selectedInstitutions = [];
+        this.people.setInstitution(obj);
+        this.selectedInstitutions.push(this.people.selectedInstitution);
+      }
+    
+      removeInstitution(el) {
+        this.selectedInstitutions.splice(this.selectedInstitutions.indexOf(el.target.id), 1);
+      }
+    
+    //   buildSearchCriteria() {
+    //     console.log('lkasjdflj')
+    //     this.searchObj = new Object();
+    
+    //     if (this.helpTicketNo) {
+    //       this.searchObj.helpTicketNo = this.helpTicketNo;
+    //     }
+    
+    //     if (this.dateFrom || this.dateTo) {
+    //       this.searchObj.dateRange = {
+    //         dateFrom: this.dateFrom,
+    //         dateTo: this.dateTo
+    //       };
+    //     }
+    
+    //     // if (this.selectedStatus) {
+    //     //   if(this.selectedStatus == this.config.MY_HELPTICKET_STATUS){
+    //     //     this.searchObj.owner = this.userObj._id;
+    //     //   } else {
+    //     //     this.searchObj.status = this.selectedStatus;
+    //     //   }
+    //     // }
+    
+    //     if (this.keyWords) {
+    //       this.searchObj.keyWords = this.keyWords;
+    //     }
+    
+    //     if (this.content) {
+    //       this.searchObj.content = this.contentSearchTerm;
+    //     }
+    
+    //     // if (this.selectedType != -1) {
+    //     //   this.searchObj.helpTicketType = this.selectedType;
+    //     // }
+    
+    //     if (this.selectedProducts && this.selectedProducts.length) {
+    //       this.searchObj.productIds = this.selectedProducts;
+    //     }
+    
+    //     if (this.selectedPeople && this.selectedPeople.length) {
+    //       this.searchObj.peopleIds = this.selectedPeople;
+    //     }
+    
+    //     if (this.selectedInstitutions && this.selectedInstitutions.length) {
+    //       this.searchObj.institutionIds = this.selectedInstitutions;
+    //     }
+    
+    //   }
+    
+    //   async search() {
+    //     $("#loading").show();
+    //     this.buildSearchCriteria();
+    //     this.resultArray = await this.helpTickets.archiveSearch(this.searchObj);
+    //     this.helpTicketSelected = true;
+    //     this.searchResults = true;
+    //     this.showTable = true;
+    //     $("#loading").hide();
+    //     setTimeout(this.toolTips(), 3000);
+    //   }
 
 }

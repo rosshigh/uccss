@@ -1,0 +1,52 @@
+<template>
+    <compose view='./assignmentsFormToolbar.html'></compose>
+    <div class='bottomMargin topMargin'></div>
+    <ul class="nav nav-pills bottomMargin">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" role="tab" href="#assign">Assign</a>
+        </li>
+        <!-- <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#comments">UCC Comments</a>
+        </li> -->
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#request">Details</a>
+        </li>
+        <!-- <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#customerinfo">Customer</a>
+        </li> -->
+    </ul>
+    <div class="tab-content" id="myTabContent" style="padding:10px;">
+        <div class="tab-pane fade show active" id="assign" role="tabpanel" aria-labelledby="home-tab">
+            <compose view="./assign.html"></compose>
+        </div>
+        <!-- <div class="tab-pane fade" id="comments" role="tabpanel" aria-labelledby="home-tab">
+            <editor value.bind="products.selectedObject.productInfo" toolbar.bind="toolbar" height="250"></editor>
+        </div> -->
+        <div class="tab-pane fade" id="request" role="tabpanel" aria-labelledby="home-tab">
+            <div class="row">
+                <div class="col">
+                    <compose view="./requestDetails.html"></compose>
+                </div>
+                <div class="col">
+                    <compose view="./customer.html"></compose>
+                </div>
+            </div>
+            
+        </div>
+        <!-- <div class="tab-pane fade" id="customerinfo" role="tabpanel" aria-labelledby="home-tab">
+            <compose view="./customer.html"></compose>
+        </div> -->
+    </div>
+    <div class="row">
+        <div class="col">
+            <ul if.bind="controller.errors.length > 0">
+                <li repeat.for="error of controller.errors">${error}</li>
+            </ul>
+        </div>
+        <div class="col">
+            <ul if.bind="validationErrors.length > 0">
+                <li repeat.for="error of validationErrors">${error}</li>
+            </ul>
+        </div>
+    </div>
+</template>

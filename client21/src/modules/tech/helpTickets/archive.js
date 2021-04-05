@@ -1,4 +1,4 @@
-import { inject } from 'aurelia-framework';
+import { inject, TemplatingEngine } from 'aurelia-framework';
 import { HelpTickets } from '../../../resources/data/helpTickets';
 import { Sessions } from '../../../resources/data/sessions';
 import { Products } from '../../../resources/data/products';
@@ -10,10 +10,12 @@ import { Store } from '../../../store/store';
 
 import moment from 'moment';
 
-@inject(AppConfig, People, Utils, HelpTickets, Sessions, Products, Systems, Store)
+@inject(AppConfig, People, Utils, HelpTickets, Sessions, Products, Systems, Store, TemplatingEngine)
 export class Archive {
 
-  constructor(config, people, utils, helpTickets, sessions, products, systems, store) {
+  pageSize = 200;
+
+  constructor(config, people, utils, helpTickets, sessions, products, systems, store, templatingEngine) {
     this.config = config;
     this.people = people;
     this.utils = utils;
@@ -22,6 +24,7 @@ export class Archive {
     this.products = products;
     this.systems = systems;
     this.store = store;
+    this.templatingEngine = templatingEngine;
 
     this.userObj = this.store.getUser('user');
   };
@@ -30,12 +33,24 @@ export class Archive {
     let responses = await Promise.all([
       this.products.getObjectsArray('?order=name'),
       this.people.getPeopleArray('?order=lastName'),
-      this.people.getInstitutionArray('?order=name')
+      this.people.getInstitutionArray('?order=name'),
+      this.sessions.getObjectsArray('?order=startDate:DSC'),
+      this.products.getSmallObjectsArray('?order=name')
     ]);
 
     this.filterList();
     this.filterPeopleList();
     this.filterInstitutionsList();
+  }
+
+  attached() {
+    $("#loading").hide();
+    this.toolTips();
+  }
+
+  toolTips() {
+    $('[data-toggle="tooltip"]').tooltip();
+    document.body.scrollTop = document.documentElement.scrollTop = 0;
   }
 
   selectProduct(el) {
@@ -72,7 +87,7 @@ export class Archive {
   }
 
   selectPerson(el, person) {
-    if(!this.selectedPeople) this.selectedPeople = [];
+    if (!this.selectedPeople) this.selectedPeople = [];
     $("#requestProductsLabel").html("Requested Person");
     this.people.setSelectedPerson(person)
     this.selectedPeople.push(this.people.selectedPerson);
@@ -94,13 +109,90 @@ export class Archive {
   }
 
   selectInstitution(el, obj) {
-    if(!this.selectedInstitutions) this.selectedInstitutions = [];
+    if (!this.selectedInstitutions) this.selectedInstitutions = [];
     this.people.setInstitution(obj);
     this.selectedInstitutions.push(this.people.selectedInstitution);
   }
 
   removeInstitution(el) {
     this.selectedInstitutions.splice(this.selectedInstitutions.indexOf(el.target.id), 1);
+  }
+
+  buildSearchCriteria() {
+    this.searchObj = new Object();
+
+    if (this.helpTicketNo) {
+      this.searchObj.helpTicketNo = this.helpTicketNo;
+    }
+
+    if (this.dateFrom || this.dateTo) {
+      this.searchObj.dateRange = {
+        dateFrom: this.dateFrom,
+        dateTo: this.dateTo
+      };
+    }
+
+    // if (this.selectedStatus) {
+    //   if(this.selectedStatus == this.config.MY_HELPTICKET_STATUS){
+    //     this.searchObj.owner = this.userObj._id;
+    //   } else {
+    //     this.searchObj.status = this.selectedStatus;
+    //   }
+    // }
+
+    if (this.keyWords) {
+      this.searchObj.keyWords = this.keyWords;
+    }
+
+    if (this.content) {
+      this.searchObj.content = this.content;
+    }
+
+    // if (this.selectedType != -1) {
+    //   this.searchObj.helpTicketType = this.selectedType;
+    // }
+
+    if (this.selectedProducts && this.selectedProducts.length) {
+      this.searchObj.productIds = this.selectedProducts;
+    }
+
+    if (this.selectedPeople && this.selectedPeople.length) {
+      this.searchObj.peopleIds = this.selectedPeople;
+    }
+
+    if (this.selectedInstitutions && this.selectedInstitutions.length) {
+      this.searchObj.institutionIds = this.selectedInstitutions;
+    }
+
+  }
+
+  async search() {
+    $("#loading").show();
+    this.buildSearchCriteria();
+    this.resultArray = await this.helpTickets.archiveSearch(this.searchObj);
+    this.helpTicketSelected = true;
+    this.searchResults = true;
+    this.showTable = true;
+    $("#loading").hide();
+    setTimeout(this.toolTips(), 3000);
+  }
+
+  backToSearch(){
+    this.searchResults = false;
+  }
+
+  async selectHelpTicket(helpTicket, el) {
+    await this.helpTickets.getArchiveHelpTicket(helpTicket._id);
+    if (this.helpTickets.selectedObject.content[0].content.systemId) {
+      await this.systems.getObject(this.helpTickets.content.content.systemId);
+    }
+    this.showTable = false;
+    this.showRequestDetails = true;
+    this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedObject.helpTicketNo;
+  }
+
+  back(){
+    this.showTable = true;
   }
 
 }

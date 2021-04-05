@@ -1,0 +1,45 @@
+<template>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Assigned Systems</h4>
+        </div>
+        <div class="card-body">
+            <h5 class="bottomMargin">To assign systems to products, you should use the Systems client generation
+                process.</h5>
+            <div class="row">
+                <div class="col">
+                    <div class="checkbox">
+                        <label>
+                            <input checked.bind="enable" type="checkbox"> Enable editing
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <form>
+                <div class="row">
+                    <div class="col">
+                        <label>Systems</label>
+                        <div class="card overFlow" style="height:400px;">
+                            <input class="form-control" value.bind="filter" input.trigger="filterList()"
+                                placeholder="Filter systems" />
+                            <ul class="list-group list-group-flush">
+                                <button href="#" click.trigger="selectSystem($event, system)" type="button"
+                                    repeat.for="system of filteredsystemsarray" id="${system._id}"
+                                    class="list-group-item">${system.sid}</button>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <label>Assigned Systems</label>
+                        <div class="card overFlow" style="height:400px;">
+                            <ul class="list-group">
+                                <button click.trigger="removeSystem($event, system)" type="button"
+                                    repeat.for="system of products.selectedObject.systems" id="${system._id}"
+                                    class="list-group-item">${system.sid}</button>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+</template>

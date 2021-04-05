@@ -1,4 +1,14 @@
 <template>
+    <span id="loading">
+        <ul class="bokeh">
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </span>
+    <compose view="../../../resources/modals/fixErrorsModal.html"></compose>
+    <compose view="../../../resources/modals/confirmDeleteModal.html"></compose>
+    <compose view="../../../resources/modals/confirmSaveModal.html"></compose>
     <div class="fluid-container">
         <div show.bind="view === 'table'">
             <div class="card">

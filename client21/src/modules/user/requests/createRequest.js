@@ -234,6 +234,12 @@ export class CreateRequest {
     }
 
     cleanUp() {
+        this.sessions.setSession();
+        this.startDate = "";
+        this.endDate = "";
+        this.CourseSelected = "";
+        this.numberOfUndergradIds = "";
+        this.numberOfGraduateIds = "";
         this.selectedSession = "";
         this.aSessionHasBeenSelected = false;
         this.requestTypeChosen = false;
@@ -247,7 +253,7 @@ export class CreateRequest {
 
     async refreshCourses() {
         await this.people.getCoursesArray('?filter=personId|eq|' + this.userObj._id + '&order=number');
-        this.utils.refreshSelect("#courseSelect", this.people.coursesArray, "_id", this.selectedCourse);
+        // this.utils.refreshSelect("#courseSelect", this.people.coursesArray, "_id", this.selectedCourse);
     }
 
     editACourse() {
@@ -272,6 +278,7 @@ export class CreateRequest {
                 let serverResponse = await this.people.saveCourse();
                 if (!serverResponse.status) {
                     this.utils.showNotification("The course was updated");
+                    this.refreshCourses();
                 }
                 $('#courseEditModal').modal('hide');
             }

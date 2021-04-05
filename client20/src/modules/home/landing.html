@@ -1,0 +1,139 @@
+<template>
+
+  <div class="auth-fluid"> 
+    <!--Auth fluid left content -->
+    <div class="auth-fluid-form-box">
+        <div class="align-items-center d-flex h-100">
+            <div class="card-body">
+
+                <!-- Logo -->
+                <div class="auth-brand text-center text-lg-left">
+                    <a href="index.html" class="logo-dark">
+                        <span><img src="http://localhost/img/UCC_LOGO_HOME.png" alt="" height="18"></span>
+                    </a>
+                    <a href="index.html" class="logo-light">
+                        <span><img src="http://localhost/assets/images/logo.png" alt="" height="18"></span>
+                    </a>
+                </div>
+
+                <!-- title-->
+                <h4 class="mt-0">Sign In</h4>
+                <p class="text-muted mb-4">Enter your email address and password to access account.</p>
+
+                <!-- form -->
+                <form action="#">
+                    <div class="form-group">
+                        <label for="emailaddress">Email address</label>
+                        <input value.bind="email" class="form-control" type="email" id="emailaddress" required="" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <a href="pages-recoverpw-2.html" class="text-muted float-right"><small>Forgot your password?</small></a>
+                        <label for="password">Password</label>
+                        <input value.bind="password" class="form-control" type="password" required="" id="password" placeholder="Enter your password">
+                    </div>
+                    <div class="form-group mb-3">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="checkbox-signin">
+                            <label class="custom-control-label" for="checkbox-signin">Remember me</label>
+                        </div>
+                    </div>
+                    <div class="form-group mb-0 text-center">
+                        <button click.trigger="login()" class="btn btn-primary btn-block" type="submit"><i class="mdi mdi-login"></i> Log In </button>
+                    </div>
+                    <!-- social-->
+                    <div class="text-center mt-4">
+                        <p class="text-muted font-16">Sign in with</p>
+                        <ul class="social-list list-inline mt-3">
+                            <li class="list-inline-item">
+                                <a href="javascript: void(0);" class="social-list-item border-primary text-primary"><i class="mdi mdi-facebook"></i></a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="javascript: void(0);" class="social-list-item border-danger text-danger"><i class="mdi mdi-google"></i></a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="javascript: void(0);" class="social-list-item border-info text-info"><i class="mdi mdi-twitter"></i></a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="javascript: void(0);" class="social-list-item border-secondary text-secondary"><i class="mdi mdi-github-circle"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+                <!-- end form-->
+
+                <!-- Footer-->
+                <footer class="footer footer-alt">
+                    <p class="text-muted">Don't have an account? <a href="pages-register-2.html" class="text-muted ml-1"><b>Sign Up</b></a></p>
+                </footer>
+
+            </div> <!-- end .card-body -->
+        </div> <!-- end .align-items-center.d-flex.h-100-->
+    </div>
+    <!-- end auth-fluid-form-box-->
+
+    <!-- Auth fluid right content -->
+    <div class="auth-fluid-right text-center">
+        <div class="auth-user-testimonial">
+            <h2 class="mb-3">I love the color!</h2>
+            <p class="lead"><i class="mdi mdi-format-quote-open"></i> It's a elegent templete. I love it very much! . <i class="mdi mdi-format-quote-close"></i>
+            </p>
+            <p>
+                - Hyper Admin User
+            </p>
+        </div> <!-- end auth-user-testimonial-->
+    </div>
+    <!-- end Auth fluid right content -->
+</div>
+    <!-- <section>
+        <div class="page-header section-height-100">
+          <div class="container">
+            <div class="row">
+              <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
+                <div class="card card-plain">
+                  <div class="card-header pb-0 text-left">
+                    <h4 class="font-weight-bolder">Sign In</h4>
+                    <p class="mb-0">Enter your email and password to sign in</p>
+                  </div>
+                  <div class="card-body">
+                    <form role="form">
+                      <div class="mb-3">
+                        <input type="email" value.bind="email" class="form-control form-control-lg" placeholder="Email" aria-label="Email" aria-describedby="email-addon">
+                      </div>
+                      <div class="mb-3">
+                        <input type="password" value.bind="password" class="form-control form-control-lg" placeholder="Password" aria-label="Password" aria-describedby="password-addon">
+                      </div> -->
+                      <!-- <div class="form-check form-switch"> -->
+                        <!-- <input class="form-check-input" type="checkbox" id="rememberMe"> -->
+                        <!-- <label class="form-check-label" for="rememberMe">Remember me</label> -->
+                      <!-- </div> -->
+                      <!-- <div class="text-center">
+                        <button click.delegate="login()" type="button" class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                    <p class="mb-4 text-sm mx-auto">
+                      Don't have an account?
+                      <a href="javascript:;" class="text-primary text-gradient font-weight-bold">Sign up</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <img height="700" src="http://localhost/img/Lubar-2019.gif">
+              </div> -->
+              <!-- <div class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 end-0 text-center justify-content-center flex-column">
+                <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center">
+                  <img src="http://localhost/soft/img/shapes/pattern-lines.svg" alt="pattern-lines" class="position-absolute opacity-4 start-0">
+                  <div class="position-relative">
+                    <img class="max-width-500 w-100 position-relative z-index-2" src="http://localhost/img/Lubar-2019.gif">
+                  </div> -->
+                  <!-- <h4 class="mt-5 text-white font-weight-bolder">"Attention is the new currency"</h4>
+                  <p class="text-white">The more effortless the writing looks, the more effort the writer actually put into the process.</p> -->
+                <!-- </div> -->
+              <!-- </div>
+            </div>
+          </div>
+        </div>
+      </section> -->
+</template>

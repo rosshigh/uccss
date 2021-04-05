@@ -1,0 +1,18 @@
+<template>
+    <compose view='./assignmentsFormToolbar.html'></compose>
+    <div class='bottomMargin topMargin'></div>
+            <compose view="./assign.html"></compose>
+    </div>
+    <div class="row">
+        <div class="col">
+            <ul if.bind="controller.errors.length > 0">
+                <li repeat.for="error of controller.errors">${error}</li>
+            </ul>
+        </div>
+        <div class="col">
+            <ul if.bind="validationErrors.length > 0">
+                <li repeat.for="error of validationErrors">${error}</li>
+            </ul>
+        </div>
+    </div>
+</template>

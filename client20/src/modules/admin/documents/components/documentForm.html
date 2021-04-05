@@ -1,0 +1,106 @@
+<template>
+    <div class="row">
+        <div class="col">
+            <h2>${documents.selectedCat.description}</h2>
+            <h4>${documents.selectedCat.subCategories[selectedSubCategoryIndex].description}</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-primary" click.trigger="createDocument()">Create Document</button>
+        </div>
+        <div class="col">
+            <label show.bind="showDocumentForm" class="btn btn-primary">
+                Browse for files&hellip; <input type="file" style="display: none;" change.delegate="changeFiles()"
+                    files.bind="files">
+            </label>
+        </div>
+        <div class="col">
+            <button show.bind="filesToUpload.length ||  showSaveButton" class="btn btn-primary"
+                click.trigger="saveDocument()">Save
+                Document</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col topMargin">
+            <ul if.bind="controller.errors.length > 0">
+                <li repeat.for="error of controller.errors">${error}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div if.bind="filesToUpload.length" class="card">
+                <div class="card-body">
+                    <ul>
+                        <li repeat.for="file of filesToUpload" class="list-group-item">${file.name}<span
+                                click.delegate="removeFile($index)" class="pull-right"><i class="fa fa-trash"
+                                    aria-hidden="true"></i></span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div show.bind="showDocumentForm" class="col">
+            <div class="card">
+                <div class="card-body">
+                    <span><i click.trigger="closeDocumentForm()" class="fa fa-window-close-o"
+                            aria-hidden="true"></i></span>
+                    <div class="row">
+                        <div class="col"></div>
+                        <div class="col-8">
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <label >
+                                        <input id="activeProduct"
+                                            checked.bind="documents.selectedDocument.helpTicketRelevant"
+                                            type="checkbox"> Help Ticket Relevant
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Document Name *</label>
+                                <input id="documentName" value.bind="documents.selectedDocument.name  & validateOnChange" type="text"
+                                    class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="sid">Description</label>
+                                <textarea value.bind="documents.selectedDocument.description" class="form-control"
+                                    id="description" rows="5"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="sid">Sort Order</label>
+                                <input value.bind="documents.selectedDocument.sortOrder" type="number"
+                                    class="form-control" id="sortOrder">
+                            </div>
+                            <div class="form-group">
+                                <label>Date to Display to User</label>
+                                <flat-picker controlid="modifiedDate" config.bind="dateConfig"
+                                    value.bind="documents.selectedDocument.displayDate"></flat-picker>
+                            </div>
+                            <div>
+                                <h4
+                                    if.bind="documents.selectedDocument.files && documents.selectedDocument.files.length">
+                                    File Name: ${documents.selectedDocument.files[0].fileName}</h4>
+                            </div>
+                        </div>
+                        <div class="col"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <ul if.bind="controller.errors.length > 0">
+                <li repeat.for="error of controller.errors">${error}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <compose view="./documentTable.html"></compose>
+        </div>
+    </div>
+</template>

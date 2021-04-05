@@ -1,0 +1,36 @@
+<template>
+    <label>Available Categories</label>
+    <div class="well well2 overFlow" style="height:600px;">
+        <!-- <input class="form-control" value.bind="filter" input.trigger="filterQuestionList()" placeholder="Filter Categories" /> -->
+        <div class="row">
+            <div class="col-12">
+                <div class="input-group-append">
+                    <input type="text" class="form-control" value.bind="filter" input.trigger="filterQuestionList()"
+                        placeholder="Filter Questions" />
+                    <div class="input-group-text pointMe" click.delegate="clearFilter()">
+                        <i class="material-icons">clear</i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-10">
+                <ul id="myUL">
+                    <li class="pointMe" repeat.for="type of filteredQuestionArray | sortArray:'sortOrder':'ASC'">
+                        <span click.trigger="toggleListItem($event, type.DocCode)" class="caret">
+                            ${type.description}</span>
+                        <ul class="nested">
+                            <li click.delegate="showQuestions(type, $parent.$index, $index, $event)"
+                                repeat.for="subCat of type.subCategories | sortArray:'sortOrder':'ASC'">
+                                <span>${subCat.description | concatenateString:25}</span>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</template>

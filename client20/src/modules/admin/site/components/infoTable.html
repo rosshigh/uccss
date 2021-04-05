@@ -1,0 +1,60 @@
+<template>
+    <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
+    <table class="table-sm table-striped header-fixed" style="width:100%"
+        aurelia-table="data.bind: siteInfo.objectArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+        <thead>
+            <tr>
+                <th>
+                    <div class="checkbox">
+                        <label>
+                            <input checked.bind="filters[2].value" type="checkbox"> Hide expired entries
+                        </label>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th>
+                    <compose view='./siteTableToolbar.html'></compose>
+                </th>
+            </tr>
+            <tr>
+                <th style="width:25%;">
+                    <div class="form-group">
+                        <input type="text" value.bind="filters[0].value" placeholder="Filter title" class="form-control"
+                            id='filterField' />
+                    </div>
+                    </div>
+                </th>
+                <th style="width:15%;"></th>
+                <th style="width:15%;"></th>
+                <th style="width:15%;">
+                    <div class="form-group">
+                        <select value.bind="filters[1].value" class="form-control selectpicker"
+                            data-style="btn btn-link" id="typeFilter">
+                            <option value=""></option>
+                            <option value="${type.type}" repeat.for="type of config.SITE_INFO_TYPES">
+                                ${type.description}</optionp>
+                        </select>
+                    </div>
+                </th>
+                <th style="width:15%;"></th>
+            </tr>
+            <tr>
+                <th style="width:25%;" aut-sort="key: title">Title</th>
+                <th style="width:15%;" aut-sort="key: createdDate">Created</th>
+                <th style="width:15%;" aut-sort="key: expiredDate">Expires</th>
+                <th style="width:15%;" aut-sort="key: email">Type</th>
+                <th style="width:15%;">URL</th>
+            </tr>
+        </thead>
+        <tbody style="height:500px;">
+            <tr class="pointMe" click.delegate="edit(item)" repeat.for="item of $displayData">
+                <td style="width:25%;">${item.title}</td>
+                <td style="width:15%;">${item.createdDate | dateFormat:'MMMM DD, YYYY'}</td>
+                <td style="width:15%;">${item.expiredDate | dateFormat:'MMMM DD, YYYY'}</td>
+                <td style="width:15%;">${item.itemType}</td>
+                <td style="width:15%;">${item.url}</td>
+            </tr>
+        </tbody>
+    </table>
+</template>

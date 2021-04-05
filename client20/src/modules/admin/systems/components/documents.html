@@ -1,0 +1,9 @@
+<template>
+    <button click.trigger="attachDocument()" class="btn btn-primary">Add a Document</button>
+
+    <ul class="topMargin">
+        <li repeat.for="document of products.selectedObject.documents"> 
+            <span class="input-group-btn"><i click.trigger="removeDocument($index)" class="fa fa-trash" aria-hidden="true"></i></span>
+            <a href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.path}/${document.fileName}" target="_blank">${document.fileName}</a></li>
+    </ul>
+</template>

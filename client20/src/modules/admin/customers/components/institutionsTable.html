@@ -1,0 +1,63 @@
+<template>
+    <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
+
+    <table class="table-sm table-striped header-fixed"
+        aurelia-table="data.bind: people.institutionsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+        <thead>
+            <tr>
+                <th>
+                    <compose view='./institutionTableToolbar.html'></compose>
+                </th>
+            </tr>
+            <tr>
+                <th style="width:25%;">
+                    <div class="form-group">
+                        <input type="text" value.bind="filters[0].value" placeholder="Filter name, country and region "
+                            class="form-control" id='filterField' />
+                    </div>
+                </th>
+              <th  style="width:15%;" ></th>
+              <th  style="width:15%;"></th>
+                <th style="width:25%;">
+                    <div class="form-group">
+                        <select value.bind="filters[1].value" class="form-control selectpicker"
+                            data-style="btn btn-link" id="institutionType">
+                            <option value=""></option>
+                            <option repeat.for="institution of is4ua.institutionTypes" value="${institution.code}">
+                                ${institution.description}</option>
+                        </select>
+                    </div>
+                </th>
+                <th>
+                    <div class="form-group">
+                        <select value.bind="filters[2].value" class="form-control selectpicker"
+                            data-style="btn btn-link" id="institutionStatus" placeholder="Status">
+                            <option value=""></option>
+                            <option repeat.for='status of is4ua.institutonStatusArray' model.bind='status.code'>
+                                ${status.description}</option>
+                        </select>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th style="width:25%;" aut-sort="key: name">Name</th>
+                <th style="width:15%;" aut-sort="key: country">Country</th>
+                <th style="width:15%;" aut-sort="key: region">Region</th>
+                <th style="width:25%;">Institution Type</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody style="height:500px;">
+            <tr repeat.for="institution of $displayData" click.delegate="edit(institution)">
+                <td style=width:25%;">${institution.name}</td>
+                <td style="width:15%;">${institution.country}</td>
+                <td style="width:100px;">${institution.region}</td>
+                <td style="width:25%;">${institution.institutionType |
+                    lookupValue:is4ua.institutionTypes:"code":"description"}</td>
+                <td>${institution.institutionStatus |
+                    lookupValue:is4ua.institutonStatusArray:"code":"description"}</td>
+            </tr>
+        </tbody>
+    </table>
+</template>

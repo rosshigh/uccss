@@ -1,0 +1,28 @@
+<template>
+
+    <!-- <div if.bind="!event.personId.file.fileName" class="smart-timeline-icon bottomMarginLg" innerhtml.bind="event.personId.email | gravatarUrl:100:1"></div> -->
+	<div class="smart-timeline-time">
+		<small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>
+		<p><span if.bind="event.emailSent"  ><i class="fa fa-envelope" aria-hidden="true"></i></span></p>
+    	<span if.bind="event.confidential"  ><i class="fa fa-user-secret" aria-hidden="true"></i></i></span> 
+	</div>
+	<div class="smart-timeline-content borderTop leftJustify">
+		<div class="form-group">
+			<p>${event.personId.fullName}</p>
+			<div class="row">
+				<div class="topMargin bottomMargin"  innerhtml.bind="event.content.comments ? event.content.comments : ' ' "></div>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="hover_img" repeat.for="file of event.files">
+				<a href="${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedObject.helpTicketNo}/${file.fileName}" target="_blank"
+					innerhtml.bind="file.fileName | fileType:helpTickets.selectedObject.helpTicketNo:'helpTickets':file.originalFilename"></a>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="hover_img" repeat.for="document of event.documents">
+				<a href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}" target="_blank">${document.fileName}</a>
+			</div>
+		</div>
+	</div>
+</template>

@@ -1,0 +1,14 @@
+<template>
+    <div class="content container-fluid">
+        <div show.bind="view === 'table'">
+            <div class="card">
+                <div class="card-body">
+                    <compose view="./components/peopleTable.html"></compose>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div show.bind="view === 'form'">
+        <compose view="./components/peopleForm.html"></compose>
+    </div>
+</template>
