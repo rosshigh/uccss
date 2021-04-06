@@ -17,6 +17,9 @@ export class User {
         this.sessions = sessions;
         this.config = config;
         // this.store = store;
+
+        this.screenHeight = $(window).height();
+        // console.log(this.screenHeight);
     }
 
     async activate() {

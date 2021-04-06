@@ -10,7 +10,7 @@
     <compose view="../../../resources/modals/confirmDeleteModal.html"></compose>
     <compose view="../../../resources/modals/confirmSaveModal.html"></compose>
     <div show.bind="view === 'table'">
-        <div class="card">
+        <div style="height:${screenHeight}px;" class="card">
             <div class="card-body">
                 <compose view="./components/peopleTable.html"></compose>
             </div>

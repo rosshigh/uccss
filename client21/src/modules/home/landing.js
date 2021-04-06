@@ -26,6 +26,8 @@ export class Landing {
         this.thresholdLength = 6;
         this.threshold = 3;
         this.useMask = true;
+
+        this.screenHeight = $(window).height();
     }
 
     async activate() {

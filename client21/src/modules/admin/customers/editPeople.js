@@ -22,6 +22,8 @@ export class EditPeople {
             { value: '', keys: ['fullName', 'email', 'roles'] }
         ];
 
+        this.screenHeight = $(window).height();
+        
         this.validationErrors = [];
 
         this.view = 'table';
