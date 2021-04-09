@@ -55,10 +55,9 @@ module.exports = function (app) {
 
   router.post('/systems', asyncHandler(async (req, res) => {
     logger.log('info', 'Create system');
-
     if (req.body) {
-      req.body.clients = new Array();
-      var system = new System(req.body);
+      req.body.clients = req.body.clients ? req.body.clients : new Array();
+      var system = new System(req.body);     
       await system.save().then(result => {
         res.status(200).json(result);
       })

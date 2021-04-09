@@ -34,7 +34,6 @@ export class EditInstitutions {
             this.is4ua.loadIs4ua()
         ]);
         $("#loading").hide();
-        this.timeZones = this.store.getter('')
     }
 
     attached() {
@@ -55,6 +54,7 @@ export class EditInstitutions {
         this.refreshSelects();
         this.people.getInstitutionPeople(-1);
         this.createValidationRules();
+        this.refreshSelects();
         this.view = 'form';
     }
 
@@ -73,7 +73,6 @@ export class EditInstitutions {
     }
 
     createValidationRules() {
-
         validationMessages['required'] = 'You must enter \${$displayName}.'
         ValidationRules
             .ensure('name').displayName('a name').required()

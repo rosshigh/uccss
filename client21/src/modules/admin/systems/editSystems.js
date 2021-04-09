@@ -161,6 +161,11 @@ export class EditSystems {
 
     editClientsButton() {
         this.showClientParametersForm = !this.showClientParametersForm;
+        this.editClientStatus = this.config.UNASSIGNED_CLIENT_CODE;
+        setTimeout(() => {
+            $('#clientStatusSelect').selectpicker();
+            this.utils.refreshSelect("#clientStatusSelect", this.config.CLIENT_STATUSES, "code", this.editClientStatus);
+        },250); 
         $("#editFirstClient").focus();
     }
 

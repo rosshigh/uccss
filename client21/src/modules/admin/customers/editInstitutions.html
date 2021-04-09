@@ -11,14 +11,14 @@
     <compose view="../../../resources/modals/confirmSaveModal.html"></compose>
     <div class="fluid-container">
         <div show.bind="view === 'table'">
-            <div class="card">
+            <div class="card cardContainer">
                 <div class="card-body">
                     <compose view="./components/institutionsTable.html"></compose>
                 </div>
             </div>
         </div>
         <div show.bind="view === 'form'">
-            <div class="card">
+            <div class="card cardContainer">
                 <div class="card-body">
                     <compose view="./components/institutionsForm.html"></compose>
                 </div>

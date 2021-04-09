@@ -68,7 +68,7 @@ export class Products {
         }
     }
 
-    selectedObjectFromId(id) {
+    selectedObjectById(id) {
         this.selectedObject = this.emptyProduct();
         for (let i = 0; i < this.objectsArray.length; i++) {
             if (this.objectsArray[i]._id === id) {
@@ -98,6 +98,7 @@ export class Products {
         newProduct.firstAllowableId = 1;
         newProduct.active = true;
         newProduct.systems = new Array();
+        newProduct.documents = new Array();
         return newProduct;
     }
 

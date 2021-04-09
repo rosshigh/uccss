@@ -319,6 +319,7 @@ export class CreateRequest {
                     assigned: item.requestStatus == this.config.ASSIGNED_REQUEST_CODE
                 })
             });
+            this.requestType = 'regularCourse';
         } else {
             if (this.people.trialClient && course._id === this.people.trialClient._id) {
                 this.people.setCourse(this.people.trialClient);

@@ -89,6 +89,8 @@ export class EditPeople {
         this.refreshSelects();
         this.createValidationRules();
         this.getPhoneMask();
+        this.filterRoles();
+        this.utils.refreshSelect("#editStatus", this.is4ua.personStatusArray, "code", this.people.selectedPerson.personStatus);
         this.view = 'form';
     }
 

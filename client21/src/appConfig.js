@@ -1,5 +1,9 @@
 export class AppConfig {
 
+    constructor(){
+        this.screenHeight = $(window).height();
+    }
+
     HOST = location.origin;
 
     DOWNLOAD_URL = this.HOST + '/uploadedFiles';

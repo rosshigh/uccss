@@ -39,7 +39,8 @@
           </select>
         </div>
       
-        <div class="col-lg-2" style="margin-top: 55px;">
+        <div class="col-lg-2 topMargin">
+          <label class="control-label hideOnPhone">Member Type</label>
           <select class="form-control selectpicker" multiple data-style="btn btn-link" value.bind="memberTypesFilter" >
           <option repeat.for="institution of is4ua.memberTypes" model.bind="institution.code">${institution.description}</option>
         </select>

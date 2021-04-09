@@ -94,10 +94,11 @@ export class Systems {
         newSystemObj.active = true;
         newSystemObj.description = "";
         newSystemObj.server = "";
-        newSystemObj.instance = "";
+        newSystemObj.instance = "00";
         newSystemObj.its = "";
         newSystemObj.terms = "";
         newSystemObj.idsAvailable = 0;
+        newSystemObj.type = "ERP";
         newSystemObj.productId = new Array();
         newSystemObj.clients = [];
         return newSystemObj;

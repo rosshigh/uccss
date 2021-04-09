@@ -48,11 +48,11 @@
             </tr>
         </thead>
 
-        <tbody style="height:500px;">
+        <tbody style="height:75vh;">
             <tr class="pointMe" repeat.for="institution of $displayData" click.delegate="edit(institution)">
                 <td style=width:25%;">${institution.name}</td>
                 <td style="width:15%;">${institution.country}</td>
-                <td style="width:100px;">${institution.region}</td>
+                <td style="width:15%;">${institution.region}</td>
                 <td style="width:25%;">${institution.institutionType |
                     lookupValue:is4ua.institutionTypes:"code":"description"}</td>
                 <td>${institution.institutionStatus |

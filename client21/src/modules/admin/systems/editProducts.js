@@ -76,7 +76,7 @@ export class EditProducts {
     }
 
     new() {
-        this.products.selectProduct();
+        this.products.selectObject();
         this.createValidationRules();
         this.view = 'form';
     }
@@ -123,7 +123,7 @@ export class EditProducts {
             });
     }
 
-    async save() {
+    async saveObject() {
         let serverResponse = await this.products.saveObject();
         if (!serverResponse.error) {
             this.utils.updateArrayItem(serverResponse, this.products.objectsArray);
@@ -164,7 +164,8 @@ export class EditProducts {
     }
 
     cancel() {
-        this.products.selectedObjectById(this.products.selectedObject._id);
+        this.products.getObject(this.products.selectedObject._id);
+        // this.products.selectedObjectById(this.products.selectedObject._id);
     }
 
     downloadInstExcel() {
@@ -280,21 +281,23 @@ export class EditProducts {
     }
 
     showSubCategoryDocuments(category, SubCategoryIndex, SubSubCategoryIndex, el) {
+        el.stopPropagation();
         this.documents.setCategory(category);
         this.selectedDocSubCategoryIndex = SubCategoryIndex;
         this.selectedDocSubSubCategoryIndex = SubSubCategoryIndex;
         this.catDescription = this.documents.selectedCat.description;
         this.subCatDescription = this.documents.selectedCat.subCategories[this.selectedDocSubCategoryIndex].description;
         this.showDocuments = true;
-        setTimeout(() => { 
-            $('[data-toggle="tooltip"]').tooltip();
-            $(".form-check-input").prop('checked', false);
-            this.products.selectedObject.documents.forEach(item => {
-                let id = item.fileName.split(" ").join("");
-                $("#" + id).prop('checked',true);
-            })
-        }, 1000);
-        el.stopPropagation();
+        if( this.products.selectedObject.documents){
+            setTimeout(() => { 
+                $('[data-toggle="tooltip"]').tooltip();
+                $(".form-check-input").prop('checked', false);
+                this.products.selectedObject.documents.forEach(item => {
+                    let id = item.fileName.split(" ").join("");
+                    $("#" + id).prop('checked',true);
+                })
+            }, 1000);
+        }
     }
 
     toggleAddToList(document, el, index) {

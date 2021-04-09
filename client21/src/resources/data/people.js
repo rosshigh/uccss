@@ -137,6 +137,7 @@ export class People {
     obj.mobile = ""
     obj.email = "";
     obj.gender = "";
+    obj.personStatus = "01";
     obj.roles = new Array();
     obj.roles.push("USER");
     obj.password = "";
@@ -302,6 +303,8 @@ export class People {
   emptyInstitution() {
     var newInstitution = new Object();
     newInstitution.joinDate = new Date();
+    newInstitution.institutionStatus = "01";
+    newInstitution.institutionType = "01";
     newInstitution.name = "";
     newInstitution.packages = [];
     return newInstitution;
