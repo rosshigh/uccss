@@ -1,5 +1,9 @@
 
  
+ .selected {
+   background-color:grey;
+ }
+ 
  .cardContainer {
     height: 100vh;
   }

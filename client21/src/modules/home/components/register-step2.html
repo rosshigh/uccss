@@ -6,7 +6,7 @@
                 placeholder="Filter institutions" />
             <div class="overFlow" style="height:200px;">
                 <ul class="list-group" style="border:1px solid gray;padding-bottom:5px;">
-                    <a click.trigger="institutionSelected(institution._id)" type="button"
+                    <a click.trigger="institutionSelected(institution._id, $event)" type="button"
                         repeat.for="institution of filteredInstitutionsArray" id="${institution._id}"
                         class="list-group-item dropbtn">${institution.name}</a>
                 </ul>

@@ -6,46 +6,6 @@
     "auditLog": "log\\.6425b6ef59d56488746d0ccea1d2ee6caecd0fd0-audit.json",
     "files": [
         {
-            "date": 1617122527105,
-            "name": "log\\error-2021-03-30-11.log",
-            "hash": "9b09c5edf49f31f525472aa2acd2fc0a"
-        },
-        {
-            "date": 1617124003221,
-            "name": "log\\error-2021-03-30-12.log",
-            "hash": "194f65a4f53a78888a30e819548812ce"
-        },
-        {
-            "date": 1617127744199,
-            "name": "log\\error-2021-03-30-13.log",
-            "hash": "aca79ca8e7c30f2e884ccecccd347ea2"
-        },
-        {
-            "date": 1617131197251,
-            "name": "log\\error-2021-03-30-14.log",
-            "hash": "5ec62e79962710333188816f51877345"
-        },
-        {
-            "date": 1617284890939,
-            "name": "log\\error-2021-04-01-08.log",
-            "hash": "6f24df9c99a2196253e3136905f94cb4"
-        },
-        {
-            "date": 1617286131785,
-            "name": "log\\error-2021-04-01-09.log",
-            "hash": "3c59e9f49f0b88c0dfe6d622250ce156"
-        },
-        {
-            "date": 1617371644042,
-            "name": "log\\error-2021-04-02-08.log",
-            "hash": "d952493e29f216ba1890b0dbc0d99c5c"
-        },
-        {
-            "date": 1617380803584,
-            "name": "log\\error-2021-04-02-11.log",
-            "hash": "59e51aa898ced36f1d758d5e5c51fc24"
-        },
-        {
             "date": 1617629240684,
             "name": "log\\error-2021-04-05-08.log",
             "hash": "8cd3742bfeab75e1fa53286b73b597bf"
@@ -79,6 +39,16 @@
             "date": 1617982048386,
             "name": "log\\error-2021-04-09-10.log",
             "hash": "b8b3e3be772a45cc12e6edecca089168"
+        },
+        {
+            "date": 1618512037125,
+            "name": "log\\error-2021-04-15-13.log",
+            "hash": "da3b3f0db46783509963996d794e67e4"
+        },
+        {
+            "date": 1618600653775,
+            "name": "log\\error-2021-04-16-14.log",
+            "hash": "d2ca6635177a26d56116a16dd7dc8ec6"
         }
     ]
 }

@@ -12,7 +12,7 @@
     </div>
     <div class="row">
         <div class="col-2">
-           
+
             <div class="row">
                 <div class="col">
                     <img class="imgG smallPhoto" if.bind="!files.length"
@@ -49,124 +49,132 @@
                         placeholder="Preferred Name" type="text" />
                 </div>
             </div>
-       
-        <div class="row topMargin">
-            <div class="col-5">
-                <h3>Contact Info</h3>
-                <div class="form-group row">
-                    <label for="register_phone" class="col-sm-3 col-form-label">Phone *</label>
-                    <div class="col-sm-9">
-                        <input if.bind="useMask" class="form-control" id="register_phone"
-                            masked="value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *" />
-                        <input if.bind="!useMask" class="form-control" id="register_phoneNoMask"
-                            value.bind="people.selectedPerson.phone" />
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="editext" class="col-sm-3 col-form-label">Extension</label>
-                    <div class="col-sm-9">
-                        <input value.bind="people.selectedPerson.ext" id="editext" class="form-control input-md"
-                            placeholder="Extension" type="text" />
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="register_mobile" class="col-sm-3 col-form-label">Mobile</label>
-                    <div class="col-sm-9">
-                        <input if.bind="useMask" id="register_mobile" class="form-control"
-                            masked="value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *" />
-                        <input if.bind="!useMask" class="form-control" id="register_mobileNoMask"
-                            value.bind="people.selectedPerson.mobile" />
-                    </div>
-                </div>
 
-                <div class="form-group row">
-                    <label for="editEmail" class="col-sm-3 col-form-label topMargin">Email</label>
-                    <div class="col-sm-9">
-                        <input disabled value.bind="people.selectedPerson.email" id="editEmail"
-                            class="form-control input-md topMargin" placeholder="Email" type="text" />
-                        <small id="emailHelp" class="form-text text-muted">If you need to change your email, file a help
-                            ticket.</small>
+            <div class="row topMargin">
+                <div class="col-5">
+                    <h3>Contact Info</h3>
+                    <div class="form-group row">
+                        <label for="register_phone" class="col-sm-3 col-form-label">Phone *</label>
+                        <div class="col-sm-9">
+                            <input if.bind="useMask" class="form-control" id="register_phone"
+                                masked="value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *" />
+                            <input if.bind="!useMask" class="form-control" id="register_phoneNoMask"
+                                value.bind="people.selectedPerson.phone" />
+                        </div>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label for="editInstitution" class="col-sm-3 col-form-label">Institution</label>
-                    <div class="col-sm-9">
-                        <input disabled value.bind="people.selectedPerson.institutionId.name" id="editInstitution"
-                            class="form-control input-md" placeholder="Institution" type="text" />
-                        <small id="institutionHelp" class="form-text text-muted">If you need to change your institution,
-                            file a help ticket.</small>
+                    <div class="form-group row">
+                        <label for="editext" class="col-sm-3 col-form-label">Extension</label>
+                        <div class="col-sm-9">
+                            <input value.bind="people.selectedPerson.ext" id="editext" class="form-control input-md"
+                                placeholder="Extension" type="text" />
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-5 offset-1">
-                <h3>Address</h3>
-                <div class="row">
-                    <div class="col">
-                        <!-- <label for="register_address1" class="control-label ">Address 1</label> -->
-                        <input value.bind="people.selectedPerson.address1" id="register_address1" class="form-control"
-                            placeholder="Address 1" type="text" />
+                    <div class="form-group row">
+                        <label for="register_mobile" class="col-sm-3 col-form-label">Mobile</label>
+                        <div class="col-sm-9">
+                            <input if.bind="useMask" id="register_mobile" class="form-control"
+                                masked="value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *" />
+                            <input if.bind="!useMask" class="form-control" id="register_mobileNoMask"
+                                value.bind="people.selectedPerson.mobile" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <!-- <label for="register_address2" class="control-label ">Address 2</label> -->
-                        <input value.bind="people.selectedPerson.address2" id="register_address2" class="form-control"
-                            placeholder="Address2" type="text" />
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        <!-- <label for="register_city" class="control-label ">City</label> -->
-                        <input value.bind="people.selectedPerson.city" id="register_city" class="form-control"
-                            placeholder="City" type="text" />
-                    </div>
-                    <div class="col-3">
-                        <!-- <label for="register_region" class="control-label ">Region</label> -->
-                        <input value.bind="people.selectedPerson.region" id="register_region" class="form-control"
-                            placeholder="Region" type="text" />
-                    </div>
-                    <div class="col-3">
-                        <!-- <label for="register_postal_code" class="control-label ">Postal Code</label> -->
-                        <input value.bind="people.selectedPerson.postalCode" id="register_postal_code"
-                            class="form-control" placeholder="Postal Code" type="text" />
-                    </div>
-                    <div class="col-2">
-                        <!-- <label for="register_country" class="control-label ">Country</label> -->
-                        <input value.bind="people.selectedPerson.country" id="register_country" class="form-control"
-                            placeholder="Country" type="text" />
-                    </div>
-                </div>
-                <div class="row">
 
+                    <div class="form-group row">
+                        <label for="editEmail" class="col-sm-3 col-form-label topMargin">Email</label>
+                        <div class="col-sm-9">
+                            <input disabled value.bind="people.selectedPerson.email" id="editEmail"
+                                class="form-control input-md topMargin" placeholder="Email" type="text" />
+                            <small id="emailHelp" class="form-text text-muted">If you need to change your email, file a
+                                help
+                                ticket.</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="editInstitution" class="col-sm-3 col-form-label">Institution</label>
+                        <div class="col-sm-9">
+                            <input disabled value.bind="people.selectedPerson.institutionId.name" id="editInstitution"
+                                class="form-control input-md" placeholder="Institution" type="text" />
+                            <small id="institutionHelp" class="form-text text-muted">If you need to change your
+                                institution,
+                                file a help ticket.</small>
+                            <p if.bind="people.peopleArray.length" class="smallMarginTop bold">Your faculty coordinators
+                                <span if.bind="people.peopleArray.length > 1">are:
+                                    <div class="bold" repeat.for="person of people.peopleArray">${person.fullName}</div>
+                                </span>
+                                <span class="bold" if.bind="people.peopleArray.length == 1">is ${people.peopleArray[0].fullName</span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <!-- <div class="row">
+                <div class="col-5 offset-1">
+                    <h3>Address</h3>
+                    <div class="row">
+                        <div class="col">
+                            <!-- <label for="register_address1" class="control-label ">Address 1</label> -->
+                            <input value.bind="people.selectedPerson.address1" id="register_address1"
+                                class="form-control" placeholder="Address 1" type="text" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <!-- <label for="register_address2" class="control-label ">Address 2</label> -->
+                            <input value.bind="people.selectedPerson.address2" id="register_address2"
+                                class="form-control" placeholder="Address2" type="text" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <!-- <label for="register_city" class="control-label ">City</label> -->
+                            <input value.bind="people.selectedPerson.city" id="register_city" class="form-control"
+                                placeholder="City" type="text" />
+                        </div>
+                        <div class="col-3">
+                            <!-- <label for="register_region" class="control-label ">Region</label> -->
+                            <input value.bind="people.selectedPerson.region" id="register_region" class="form-control"
+                                placeholder="Region" type="text" />
+                        </div>
+                        <div class="col-3">
+                            <!-- <label for="register_postal_code" class="control-label ">Postal Code</label> -->
+                            <input value.bind="people.selectedPerson.postalCode" id="register_postal_code"
+                                class="form-control" placeholder="Postal Code" type="text" />
+                        </div>
+                        <div class="col-2">
+                            <!-- <label for="register_country" class="control-label ">Country</label> -->
+                            <input value.bind="people.selectedPerson.country" id="register_country" class="form-control"
+                                placeholder="Country" type="text" />
+                        </div>
+                    </div>
+                    <div class="row">
+
+                    </div>
+                    <!-- <div class="row">
                     <div class="col">
                         <h4 class="bigTopMargin">Help us get to know you by uploading an image</h4>
                     </div>
                 </div> -->
-                <div class="row">
-                    <div class="col">
-                        <!-- <label class="btn btn-primary">
+                    <div class="row">
+                        <div class="col">
+                            <!-- <label class="btn btn-primary">
                         Select an Image&hellip; <input type="file" style="display: none;"
                             change.delegate="changeFiles()" files.bind="files" multiple>
                     </label> -->
-                    </div>
-                    <div class="col bigTopMargin">
-                        <div show.bind="errors.length">
-                            <ul class="pull-right">
-                                <li repeat.for="error of errors">${error}</li>
-                            </ul>
+                        </div>
+                        <div class="col bigTopMargin">
+                            <div show.bind="errors.length">
+                                <ul class="pull-right">
+                                    <li repeat.for="error of errors">${error}</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <!-- <div class="row">
+                    <!-- <div class="row">
                 <div class="col-2">
                     <img class="imgG smallPhoto" if.bind="!files.length"
                         src="${config.PHOTO_DOWNLOAD_URL}/${people.selectedPerson.file.fileName}">
                     <img class="img-rounded" height="100" show.bind="files.length" id="myImg" src="#">
                 </div>
             </div> -->
+                </div>
             </div>
         </div>
-    </div>
 </template>

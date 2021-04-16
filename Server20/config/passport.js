@@ -23,7 +23,7 @@ var localLogin = new localStrategy(localOptions, function(email, password, next)
         return next(err);
       } else {  
         if(!user){
-          logAuth.log('info','Wrong email logon-' + user.email);
+          logAuth.log('info','Wrong email logon-' + email);
           next(new NotFoundError("404",{ message: "Email not found."}));
         } else {       
           user.comparePassword(password, function (err, isMatch) {

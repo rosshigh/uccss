@@ -3,6 +3,16 @@
         <div class="col-7" style="margin-left:25px;">
             <form>
                 <div class="form-group row">
+                    <label for="register_email" class="col-sm-3 col-form-label">Email *</label>
+                    <div class="col-sm-9">
+                        <input blur.trigger="checkEmail()" value.bind="people.selectedPerson.email" id="register_email"
+                            class="form-control" placeholder="Email" type="text" />
+                        <small show.bind="duplicateAccount" id="emailHelp" class="form-text text-muted">An
+                            account with
+                            that email already exists.</small>
+                    </div>
+                </div>
+                <div class="form-group row">
                     <label for="register_firstName" class="col-sm-3 col-form-label">First Name *</label>
                     <div class="col-sm-9">
                         <input value.bind="people.selectedPerson.firstName" id="register_firstName" class="form-control"
@@ -33,6 +43,7 @@
                             placeholder="Preferred name" type="text" />
                     </div>
                 </div>
+               
         </div>
         <div class="col">
             <div show.bind="stepOneErrors.length">

@@ -32,7 +32,7 @@ export class Landing {
 
     async activate() {
         this.store.retrieveConfig();
-        await this.people.getInstitutionArray('?filter=institutionStatus|eq|01&order=name&fields=_id name');
+        await this.people.getInstitutionArray('?filter=[and]institutionStatus|eq|01:apj|eq|false&order=name&fields=_id name');
         await this.is4ua.loadIs4ua();
         this.people.selectPerson();
         this.filterList();
@@ -79,14 +79,20 @@ export class Landing {
 
     validateStepOne() {
         this.stepOneErrors = [];
+        if(this.duplicateAccount){
+            this.stepOneErrors.push("An account with that email already exists");
+        }
         if (this.people.selectedPerson.firstName.length === 0) {
             this.stepOneErrors.push("You must enter a first name");
         }
         if (this.people.selectedPerson.lastName.length === 0) {
             this.stepOneErrors.push("You must enter a last name");
         }
+        if (this.people.selectedPerson.email.length === 0) {
+            this.stepThreeErrors.push('You must enter an email address');
+        }
     }
-
+    
     validateStepTwo() {
         this.stepTwoErrors = [];
         if (!this.people.selectedPerson.institutionId || this.people.selectedPerson.institutionId === "") {
@@ -100,9 +106,6 @@ export class Landing {
         if (this.people.selectedPerson.phone.length === 0) {
             this.stepThreeErrors.push('You must enter a phone number');
         }
-        if (this.people.selectedPerson.email.length === 0) {
-            this.stepThreeErrors.push('You must enter an email address');
-        }
         if (this.people.selectedPerson.password.length === 0) {
             this.stepThreeErrors.push('You must enter a password');
         }
@@ -114,7 +117,7 @@ export class Landing {
         }
     }
 
-    async institutionSelected(id) {
+    async institutionSelected(id, el) {
         this.people.selectedPerson.institutionId = id;
         await this.people.getInstitution(this.people.selectedPerson.institutionId);
         this.people.selectedPerson.address1 = this.people.selectedInstitution.address1;
@@ -128,6 +131,7 @@ export class Landing {
         } else {
             this.useMask = true;
         }
+        $(el.target).addClass('selected');
     }
 
     filterList() {
@@ -246,8 +250,10 @@ export class Landing {
     }
 
     openRegisterModal() {
+        this.people.selectPerson();
+        $(".list-group-item").removeClass('selected');
         $('#registerModal').modal('show');
-        setTimeout(() => { $('#register_firstName').focus(); }, 500);
+        setTimeout(() => { $('#register_email').focus(); }, 500);
     }
 
     saveRegistration() {

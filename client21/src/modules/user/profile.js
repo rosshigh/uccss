@@ -6,7 +6,7 @@ import { AppConfig } from '../../appConfig';
 
 @inject(People, Store, Utils, AppConfig)
 export class Profile {
-
+ 
     constructor(people, store, utils, config) {
         this.people = people;
         this.store = store;
@@ -27,6 +27,19 @@ export class Profile {
         this.thresholdLength = 6;
         this.threshold = 3;
     }
+
+    async activate(){
+        this.facultyCoordinators = "";
+        await this.people.getPeopleArray('?filter=[and]institutionId|eq|' + this.userObj.institutionId._id + ':roles|eq|PRIM');
+        if(this.people.peopleArray){
+            this.people.peopleArray.forEach(item => {
+                this.facultyCoordinators = this.facultyCoordinators + item.fullName + " ";
+            });
+        }
+    }
+
+     //filter=[and]field1|eq|value1:field2|eq|value2
+  //filter=[in]field|list|value1:value2:value3
 
     attached() {
         $('[data-toggle="tooltip"]').tooltip();
@@ -92,13 +105,22 @@ export class Profile {
             let response = await this.people.savePerson();
             if(!response.error){
                 this.utils.showNotification('Your profile was saved');
-                sessionStorage.setItem('user', JSON.stringify(this.people.selectedPerson));
+               
                 if (this.filesToUpload && this.filesToUpload.length > 0) {
                     this.people.uploadPhoto(this.filesToUpload);
                 }
             }
+            await this.updateUserObject();
         }
 
+    }
+
+    async updateUserObject(){
+        let response = await this.people.getPerson(this.people.selectedPerson._id);
+        if(!response.error){
+            this.people.setSelectedPerson(response);
+            sessionStorage.setItem('user', JSON.stringify(this.people.selectedPerson));
+        }
     }
 
     changeFiles() {
