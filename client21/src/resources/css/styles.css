@@ -155,10 +155,10 @@
   content: "";
   position: absolute;
   top: 0;
-  left: 0;
+  left: 0; 
   width: inherit;
   height: inherit;
-  background: #ebebeb url('http://localhost/img/default.jpg') no-repeat center;
+  background: #ebebeb url('../img/default.jpg') no-repeat center;
   color: transparent;
 }
 
@@ -510,7 +510,7 @@ li.timeline-item::before {
 
 .parallax1 {
   /* The image used */
-  background-image: url("http://localhost/img/parallax1.jpg");
+  background-image: url("http://129.89.93.82/img/parallax1.jpg");
 
   /* Set a specific height */
   min-height: 300px;
@@ -524,7 +524,7 @@ li.timeline-item::before {
 
 .parallax2 {
   /* The image used */
-  background-image: url("http://localhost/img/parallax2.jpg");
+  background-image: url("../img/parallax2.jpg");
 
   /* Set a specific height */
   min-height: 200px;

@@ -244,11 +244,6 @@ export class EditPeople {
         this.addValidationError('A person with that name at that institution already exists.', found);
     }
 
-    checkPasswordBlank() {
-        this.newPassword = $("#newPassword").val();
-        this.addValidationError('You must enter a password.', this.newPassword.length === 0);
-    }
-
     addValidationError(msg, add) {
         if (add) {
             if (this.validationErrors.indexOf(msg) === -1) {
@@ -329,7 +324,10 @@ export class EditPeople {
     }
 
     async savePassword() {
-        this.checkPasswordBlank();
+        if(!this.newPassword.length){
+            this.addValidationError('You must enter a password.', this.newPassword.length === 0);
+        }
+
         if (this.validationErrors.length === 0) {
             var obj = {
                 password: this.newPassword

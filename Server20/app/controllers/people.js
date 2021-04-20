@@ -116,8 +116,17 @@ module.exports = function (app, config) {
 
     router.put('/people', asyncHandler(async (req, res) => {
         logger.log('info', 'Update Person ' + req.body._id);
-        await Person.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false, new: true }).then(result => {
-            res.status(200).json(result);
+        await Person.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false }).then(result => {
+            Person.findById(result._id)
+            .populate({ path: 'institutionId', model: 'Institution', select: 'name' })
+            .exec()
+            .then(object => {
+                if (object) {                   
+                    res.status(200).json(object);
+                } else {
+                    res.status(404).json({ message: "No users" });
+                }
+            });
         })
     }));
 

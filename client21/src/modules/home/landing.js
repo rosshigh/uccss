@@ -36,13 +36,11 @@ export class Landing {
 
     async activate() {
         let responses = await Promise.all([
-            this.people.getInstitutionArray('?filter=[and]institutionStatus|eq|01:apj|eq|false&order=name&fields=_id name'),
+            this.people.getInstitutionArray('?filter=institutionStatus|eq|01&order=name&fields=_id name'),
             this.is4ua.loadIs4ua(),
             this.config.getObjectArray(),
             this.sessions.getObjectsArray('?filter=[or]sessionStatus|Active:Requests:Next&order=startDate')
         ]);
-
-        // filter=[or]field1|value1:value2
 
         this.config.objectifyConfig();
         this.people.selectPerson();
@@ -53,35 +51,6 @@ export class Landing {
 
     openAboutTheUCC(){
         this.router.navigate('about');
-    }
-
-    letsEnhance() {
-        $("#leftContainer").html(this.config.configObject.HOME_PAGE_LEFT)
-        let el1 = document.getElementById('leftContainer');
-
-        if (el1) {
-            if (!el1.querySelectorAll('.au-target').length) {
-                this.templatingEngine.enhance({ element: el1, bindingContext: this });
-            }
-        }
-
-        $("#middleContainer").html(this.config.configObject.HOME_PAGE_MIDDLE)
-        let el2 = document.getElementById('middleContainer');
-
-        if (el2) {
-            if (!el2.querySelectorAll('.au-target').length) {
-                this.templatingEngine.enhance({ element: el2, bindingContext: this });
-            }
-        }
-
-        $("#rightContainer").html(this.config.configObject.HOME_PAGE_RIGHT)
-        let el3 = document.getElementById('rightContainer');
-
-        if (el3) {
-            if (!el3.querySelectorAll('.au-target').length) {
-                this.templatingEngine.enhance({ element: el3, bindingContext: this });
-            }
-        }
     }
 
     refreshSelects() {
@@ -120,12 +89,6 @@ export class Landing {
                 }
             }
         });
-
-        setTimeout(() => {
-            setTimeout(() => {
-                // this.letsEnhance();
-            }, 100);
-        }, 100);
     }
 
     validateStepOne() {
@@ -189,10 +152,12 @@ export class Landing {
         if (this.filter) {
             var thisFilter = this.filter
             this.filteredInstitutionsArray = this.people.institutionsArray.filter((item) => {
-                return item.name.toUpperCase().indexOf(thisFilter.toUpperCase()) != -1;
+                return item.name.toUpperCase().indexOf(thisFilter.toUpperCase()) != -1 && !item.apj;
             });
         } else {
-            this.filteredInstitutionsArray = this.people.institutionsArray;
+            this.filteredInstitutionsArray = this.people.institutionsArray.filter((item) => {
+                return !item.apj;
+            });
         }
     }
 
@@ -290,10 +255,6 @@ export class Landing {
         // $(".list-group-item").removeClass('selected');
         $('#registerModal').modal('show');
         setTimeout(() => { $('#register_email').focus(); }, 500);
-    }
-
-    saveRegistration() {
-
     }
 
 }

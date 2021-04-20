@@ -58,17 +58,14 @@ export class People {
 
   async getPerson(id) {
     let url = this.PEOPLE_SERVICE + '/' + id;
-    try {
-      let serverResponse = await this.data.get(url);
-      if (!serverResponse.error) {
-        this.selectedPerson = serverResponse;
-        this.originalPerson = this.utils.copyObject(serverResponse);
-      } else {
-        this.data.processError(serverResponse);
-      }
-    } catch (error) {
-      console.log(error);
+    let serverResponse = await this.data.get(url);
+    if (!serverResponse.error) {
+      this.selectedPerson = serverResponse; 
+      this.originalPerson = this.utils.copyObject(serverResponse);
+    } else {
+      this.data.processError(serverResponse);
     }
+    return serverResponse;
   }
 
   async getUCCStaff(uccRoles) {
@@ -228,14 +225,14 @@ export class People {
   }
 
   async getAPJPackages(options) {
-      var url = this.PACKAGES_SERVICES;
-      url += options ? options : "";
-      let response = await this.data.get(url)
-      if (!response.error) {
-        this.packageArray = response;
-      } else {
-        this.packageArray = undefined;
-      }
+    var url = this.PACKAGES_SERVICES;
+    url += options ? options : "";
+    let response = await this.data.get(url)
+    if (!response.error) {
+      this.packageArray = response;
+    } else {
+      this.packageArray = undefined;
+    }
   }
 
   async getInstitution(id) {
@@ -296,7 +293,7 @@ export class People {
     return null;
   }
 
-  setInstitution(obj){
+  setInstitution(obj) {
     this.selectedInstitution = this.utils.copyObject(obj);
   }
 

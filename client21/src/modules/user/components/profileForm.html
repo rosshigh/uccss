@@ -24,9 +24,9 @@
                 Select an Image&hellip; <input type="file" style="display: none;" change.delegate="changeFiles()"
                     files.bind="files" multiple>
             </label>
-            <h4 show.bind="files.length" class="bigTopMargin">Help us get to know you by uploading an image</h4>
+            <h4 class="bigTopMargin">Help us get to know you by uploading an image</h4>
         </div>
-        <div class="col-10">
+        <div class="col-10"> 
             <div class="row">
                 <div class="col">
                     <label for="editFirstName" class="control-label topMargin">First Name *</label>
@@ -99,9 +99,9 @@
                                 file a help ticket.</small>
                             <p if.bind="people.peopleArray.length" class="smallMarginTop bold">Your faculty coordinators
                                 <span if.bind="people.peopleArray.length > 1">are:
-                                    <div class="bold" repeat.for="person of people.peopleArray">${person.fullName}</div>
+                                    <div class="bold" repeat.for="person of people.peopleArray">${person.fullName} ${person.email}</div>
                                 </span>
-                                <span class="bold" if.bind="people.peopleArray.length == 1">is ${people.peopleArray[0].fullName</span>
+                                <span class="bold" if.bind="people.peopleArray.length == 1">is ${people.peopleArray[0].fullName ${people.peopleArray[0].email}</span>
                             </p>
                         </div>
                     </div>
