@@ -26,9 +26,11 @@ module.exports = function (app) {
         var field = queryArray[0];
         var queryValues = queryArray[1].split(":");
         var query = new Array();
-        queryValues.forEach(function(item){
+        queryValues.forEach(item => {
+         
           var obj = new Object();
           obj[field] = item;
+console.log(obj) 
           query.push(obj)
         });
         reqQuery.or(query);

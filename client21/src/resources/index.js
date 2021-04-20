@@ -8,6 +8,7 @@ export function configure(config) {
     PLATFORM.moduleName('./editor/editor'),
 
     PLATFORM.moduleName('./value-converters/lookup-value'),
+    PLATFORM.moduleName('./value-converters/onoff-switch'),
     PLATFORM.moduleName('./value-converters/phone-number'),
     PLATFORM.moduleName('./value-converters/activate-button'),
     PLATFORM.moduleName('./value-converters/date-format'),

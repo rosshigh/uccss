@@ -1,0 +1,31 @@
+<template>
+	<div class="home-page-header underline">${config.configObject.HOME_PAGE_UCC_TITLE}</div>
+
+	<div class="row">
+		<div id="leftContainer" class="col-3">
+			<h3 class="underline">Current Sessions</h3>
+			<div class="list-group">
+				<a class="list-group-item" repeat.for="session of sessions.objectsArray">
+					<h4 class="bold">${session.sessionStatus}: Session ${session.session} -
+						${session.year}</h4>
+					Requests open: ${session.requestsOpenDate |
+					dateFormat:appConfig.DATE_FORMAT_TABLE}<br />
+					Clients available: ${session.startDate |
+					dateFormat:appConfig.DATE_FORMAT_TABLE}<br />
+					Session ends: ${session.endDate |
+					dateFormat:appConfig.DATE_FORMAT_TABLE}<br />
+				</a>
+			</div>
+
+		</div>
+		<div id="middleContainer" class="col-4 offset-1">
+			<!-- <h3 class="underline">Sessions Schedule</h3> -->
+			<span innerhtml.bind="config.configObject.HOME_PAGE_MIDDLE"></span>
+		</div>
+
+	<div id="rightContainer" class="col-3">
+		<h3 class="underline">What is the SAP UCC?</h3>
+		<span innerhtml.bind="config.configObject.HOME_PAGE_RIGHT"></span>
+	</div>
+	</div>
+</template>

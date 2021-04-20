@@ -24,6 +24,12 @@ export class Home {
                 moduleId: PLATFORM.moduleName('./modules/home/register'),
                 name: 'register',
                 settings: { auth: false, roles: [] }
+            },
+            {
+                route: 'about',
+                moduleId: PLATFORM.moduleName('./modules/home/about'),
+                name: 'about',
+                settings: { auth: false, roles: [] }
             }
         ]);
     }

@@ -13,18 +13,41 @@ export class Config {
         this.data = data;
     }
 
-    async getConfigArray(options) {
+    async getObjectArray(options) {
         var url = this.CONFIG_SERVICE;
         url += options ? options : "";
         try {
             let serverResponse = await this.data.get(url);
             if (!serverResponse.error) {
-                this.configArray = serverResponse;
+                this.objectArray = serverResponse;
             } else {
                 this.data.processError(serverResponse);
             }
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    objectifyConfig() {
+        this.configObject = {};
+        if (this.objectArray) {
+            this.objectArray.forEach(item => {
+                this.configObject[item.parameter] = item.value;
+            })
+        }
+    }
+
+    async save(obj) {
+        if (!obj) {
+            return;
+        }
+        let url = this.CONFIG_SERVICE;
+        if (!obj._id) {
+            let response = await this.data.saveObject(obj, url, "post");
+            return response;
+        } else {
+            let response = await this.data.saveObject(obj, url, "put");
+            return response;
         }
     }
 

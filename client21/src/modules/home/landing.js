@@ -1,4 +1,4 @@
-import { Aurelia, inject } from 'aurelia-framework';
+import { Aurelia, inject, TemplatingEngine } from 'aurelia-framework';
 import { Router } from "aurelia-router";
 import { Auth } from '../../resources/data/auth';
 import { AppConfig } from '../../appConfig';
@@ -7,12 +7,13 @@ import { Store } from '../../store/store';
 import { Config } from '../../resources/data/config';
 import { People } from '../../resources/data/people';
 import { is4ua } from '../../resources/data/is4ua';
+import { Sessions } from '../../resources/data/sessions';
 
-@inject(Auth, AppConfig, Router, Utils, Aurelia, Store,People, is4ua, Config)
+@inject(Auth, AppConfig, Router, Utils, Aurelia, Store, People, is4ua, Config, Sessions, TemplatingEngine)
 export class Landing {
 
 
-    constructor(auth, appConfig, router, utils, aurelia, store, people, is4ua, config) {
+    constructor(auth, appConfig, router, utils, aurelia, store, people, is4ua, config, sessions, templatingEngine) {
         this.auth = auth;
         this.router = router;
         this.aurelia = aurelia;
@@ -22,21 +23,65 @@ export class Landing {
         this.people = people;
         this.is4ua = is4ua;
         this.appConfig = appConfig;
+        this.sessions = sessions;
+        this.templatingEngine = templatingEngine;
 
         this.thresholdLength = 6;
         this.threshold = 3;
         this.useMask = true;
+        this.loginError = "";
 
         this.screenHeight = $(window).height();
     }
 
     async activate() {
-        this.store.retrieveConfig();
-        await this.people.getInstitutionArray('?filter=[and]institutionStatus|eq|01:apj|eq|false&order=name&fields=_id name');
-        await this.is4ua.loadIs4ua();
+        let responses = await Promise.all([
+            this.people.getInstitutionArray('?filter=[and]institutionStatus|eq|01:apj|eq|false&order=name&fields=_id name'),
+            this.is4ua.loadIs4ua(),
+            this.config.getObjectArray(),
+            this.sessions.getObjectsArray('?filter=[or]sessionStatus|Active:Requests:Next&order=startDate')
+        ]);
+
+        // filter=[or]field1|value1:value2
+
+        this.config.objectifyConfig();
         this.people.selectPerson();
+
         this.filterList();
         this.refreshSelects();
+    }
+
+    openAboutTheUCC(){
+        this.router.navigate('about');
+    }
+
+    letsEnhance() {
+        $("#leftContainer").html(this.config.configObject.HOME_PAGE_LEFT)
+        let el1 = document.getElementById('leftContainer');
+
+        if (el1) {
+            if (!el1.querySelectorAll('.au-target').length) {
+                this.templatingEngine.enhance({ element: el1, bindingContext: this });
+            }
+        }
+
+        $("#middleContainer").html(this.config.configObject.HOME_PAGE_MIDDLE)
+        let el2 = document.getElementById('middleContainer');
+
+        if (el2) {
+            if (!el2.querySelectorAll('.au-target').length) {
+                this.templatingEngine.enhance({ element: el2, bindingContext: this });
+            }
+        }
+
+        $("#rightContainer").html(this.config.configObject.HOME_PAGE_RIGHT)
+        let el3 = document.getElementById('rightContainer');
+
+        if (el3) {
+            if (!el3.querySelectorAll('.au-target').length) {
+                this.templatingEngine.enhance({ element: el3, bindingContext: this });
+            }
+        }
     }
 
     refreshSelects() {
@@ -74,12 +119,18 @@ export class Landing {
 
                 }
             }
-        })
+        });
+
+        setTimeout(() => {
+            setTimeout(() => {
+                // this.letsEnhance();
+            }, 100);
+        }, 100);
     }
 
     validateStepOne() {
         this.stepOneErrors = [];
-        if(this.duplicateAccount){
+        if (this.duplicateAccount) {
             this.stepOneErrors.push("An account with that email already exists");
         }
         if (this.people.selectedPerson.firstName.length === 0) {
@@ -92,7 +143,7 @@ export class Landing {
             this.stepThreeErrors.push('You must enter an email address');
         }
     }
-    
+
     validateStepTwo() {
         this.stepTwoErrors = [];
         if (!this.people.selectedPerson.institutionId || this.people.selectedPerson.institutionId === "") {
@@ -176,15 +227,7 @@ export class Landing {
         let response = await this.people.savePerson()
         if (!response.error) {
             $("#registerModal").modal('hide');
-            setTimeout(()=> { $("#confirmModal").modal('show')},500);
-            // this.sendFacDevEmail();
-            // return this.dialog.showMessage(
-            //   "Your account has been created.  Your faculty coordinator must activate the account before you can log on to the UCCSS.",
-            //   "Account Created",
-            //   ['OK']
-            // ).whenClosed(response => {
-            //   this.router.navigate("home");
-            // });
+            setTimeout(() => { $("#confirmModal").modal('show') }, 500);
         } else {
             this.utils.showNotification("An error occurred creating the account", 'error');
         }
@@ -202,7 +245,7 @@ export class Landing {
     }
 
     async loginSuccess() {
-        this.userObj = this.store.getUser('user');
+        this.userObj = JSON.parse(sessionStorage.getItem('user'));
         if (this.userObj) {
             if (this.userObj.institutionId.institutionStatus !== this.appConfig.INSTITUTIONS_ACTIVE) {
                 this.utils.showNotification("You must belong to an active institution to access the web site");
@@ -210,16 +253,9 @@ export class Landing {
             } else {
                 if (this.userObj.personStatus !== this.appConfig.ACTIVE_PERSON) {
                     $("#activeModal").modal('show');
-                    // return this.dialog.showMessage(
-                    //     "You must have an active account to access the web site.  Contact your faculty coordinator to activate your account.",
-                    //     "Account Not Active",
-                    //     ['OK']
-                    // ).whenClosed(response => {
-                    //     this.logout();
-                    // });
                 } else {
                     if (!this.userObj.userRole) this.logout();
-                    this.store.setUserRole(this.userObj.userRole);
+                    sessionStorage.setItem('role', this.userObj.userRole);
                     this.aurelia.setRoot(PLATFORM.moduleName('app'));
                 }
             }
@@ -245,13 +281,13 @@ export class Landing {
 
     }
 
-    logoff(){
+    logoff() {
         console.log('logging off');
     }
 
     openRegisterModal() {
         this.people.selectPerson();
-        $(".list-group-item").removeClass('selected');
+        // $(".list-group-item").removeClass('selected');
         $('#registerModal').modal('show');
         setTimeout(() => { $('#register_email').focus(); }, 500);
     }
