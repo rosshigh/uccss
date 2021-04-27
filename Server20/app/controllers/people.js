@@ -88,9 +88,9 @@ module.exports = function (app, config) {
         var query = Person.findOne({ email: { $regex: new RegExp('^' + value, 'i') } });
         query.exec().then(object => {
             if (object) {
-                res.status(409).json({ status: 'exists' });
+                res.status(200).json(object);
             } else {
-                res.status(200).json({ status: 'available' });
+                res.status(404).json({ status: 'available' });
             }
         });
     }));

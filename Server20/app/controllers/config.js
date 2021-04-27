@@ -59,7 +59,7 @@ module.exports = function (app) {
     logger.log('info', 'Save all parameters');
     var tasks = new Array();
     req.body.parameters.forEach(item => {
-      tasks.push(Model.findOneAndUpdate({ _id: item._id }, item, { safe: true, new: true }));
+      tasks.push(Config.findOneAndUpdate({ _id: item._id }, item, { safe: true, new: true }));
     });
     Promise.all(tasks)
       .then(function (results) {

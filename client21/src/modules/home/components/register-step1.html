@@ -7,9 +7,7 @@
                     <div class="col-sm-9">
                         <input blur.trigger="checkEmail()" value.bind="people.selectedPerson.email" id="register_email"
                             class="form-control" placeholder="Email" type="text" />
-                        <small show.bind="duplicateAccount" id="emailHelp" class="form-text text-muted">An
-                            account with
-                            that email already exists.</small>
+                        <small show.bind="duplicateAccount" id="emailHelp" class="form-text text-muted">${duplicateEmailMessage}</small>
                     </div>
                 </div>
                 <div class="form-group row">

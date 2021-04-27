@@ -18,13 +18,23 @@ export class EditInstitutions {
         this.utils = utils;
 
         this.filters = [
-            { value: '', keys: ['name', 'country', 'region'] },
+            { value: '', keys: ['name'] },
             { value: '', keys: ['institutionType'] },
-            { value: '', keys: ['institutionStatus'] }
-
+            { value: '', keys: ['institutionStatus'] },
+            { value: false, custom: this.filterAPJ },
+            { value: '', keys: ['country'] },
+            { value: '', keys: ['region'] }
         ];
 
         this.view = 'table';
+    }
+
+    filterAPJ(filterValue, row) {
+        if (filterValue) {
+            return row.apj;
+        } else {
+            return row.apj === undefined || !row.apj;
+        }
     }
 
     async activate() {
@@ -88,7 +98,7 @@ export class EditInstitutions {
                 if (result.valid) {
                     this.saveInstitution();
                 } else {
-                  $("#fixErrorsModal").modal('show');
+                    $("#fixErrorsModal").modal('show');
                 }
             });
     }
@@ -106,7 +116,7 @@ export class EditInstitutions {
     }
 
     async deleteInstitution() {
-        this.modalMessage="Are you sure you want to delete that instititution?"
+        this.modalMessage = "Are you sure you want to delete that instititution?"
         $("#confirmDeleteModal").modal('show');
     }
 
@@ -137,20 +147,106 @@ export class EditInstitutions {
         this.people.selectInstitutionByID(this.selectedInstitutionId);
     }
 
-    downloadInstExcel() {
-        let csvContent = "data:text/csv;charset=utf-8;,Name,City,State,Country,Type,Status\r\n";
-        this.dataTable.baseArray.forEach(item => {
-            csvContent += item.name + "," + item.city + "," + item.region + "," + item.country + "," + item.institutionType + "," + item.institutionStatus;
-            csvContent += "\r\n";
-        })
-        var encodedUri = encodeURI(csvContent);
-        var link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "institutions.csv");
-        document.body.appendChild(link); // Required for FF
+    filterPeopleArray() {
+        this.downLoadArray = [];
+        let keep;
+        let nameFilter = this.filters[0].value.toUpperCase();
+        let typeFilter = this.filters[1].value;
+        let statusFilter = this.filters[2].value;
+        let apjFilter = this.filters[3].value;
+        let countryFilter = this.filters[4].value.toUpperCase();
+        let regionFilter = this.filters[5].value.toUpperCase();
 
-        link.click();
+        this.people.institutionsArray.forEach(item => {
+            keep = false;
+            if (nameFilter.length) {
+                keep = (item.name !== null && item.name.toUpperCase().indexOf(nameFilter) > -1);
+            } else {
+                keep = true;
+            }
+            if (keep) this.downLoadArray.push(item);
+        });
+        if (typeFilter.length) {
+            this.downLoadArray = this.downLoadArray.filter(item => {
+                return item.institutionType !== null && item.institutionType === instFilter;
+
+            })
+        }
+        if (statusFilter.length) {
+            this.downLoadArray = this.downLoadArray.filter(item => {
+                return item.institutionStatus !== null && item.institutionStatus === statusFilter;
+
+            })
+        }
+        this.downLoadArray = this.downLoadArray.filter(item => {
+            if (apjFilter) {
+                return item.apj;
+            } else {
+                return item.apj === undefined || !item.apj;
+            }
+        })
+        if (countryFilter.length) {
+            this.downLoadArray = this.downLoadArray.filter(item => {
+                return item.country !== null && item.country.toUpperCase().indexOf(countryFilter) > -1;
+
+            })
+        }
+        if (regionFilter.length) {
+            this.downLoadArray = this.downLoadArray.filter(item => {
+                return item.region !== null && item.region.toUpperCase().indexOf(regionFilter) > -1;
+
+            })
+        }
+
     }
+
+    fnExcelReport() {
+        this.filterPeopleArray();
+        var tab_text = "<table><tr><th>Name</th><th>City</th><th>State</th><th>Country</th><th>Type</th><th>Status</th></tr><tr>";
+
+        this.downLoadArray.forEach(item => {
+            tab_text = tab_text + "<td>" + item.name + "</td>"
+                + "<td>" + item.city + "</td>"
+                + "<td>" + item.region + "</td>"
+                + "<td>" + item.country + "</td>"
+                + "<td>" + item.institutionType + "</td>"
+                + "<td>" + item.institutionStatus + "</td></tr>";
+        });
+
+        tab_text = tab_text + "</table>";
+
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE ");
+
+        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+            txtArea1.document.open("txt/html", "replace");
+            txtArea1.document.write(tab_text);
+            txtArea1.document.close();
+            txtArea1.focus();
+            sa = txtArea1.document.execCommand("SaveAs", true, "insttutions.xls");
+        } else {
+            var link = document.createElement('a');
+            link.download = "institutions.xls";
+            link.href = 'data:application/vnd.ms-excel,' + encodeURIComponent(tab_text);
+            link.click();
+        }
+    }
+
+
+    // downloadInstExcel() {
+    //     let csvContent = "data:text/csv;charset=utf-8;,Name,City,State,Country,Type,Status\r\n";
+    //     this.dataTable.baseArray.forEach(item => {
+    //         csvContent += item.name + "," + item.city + "," + item.region + "," + item.country + "," + item.institutionType + "," + item.institutionStatus;
+    //         csvContent += "\r\n";
+    //     })
+    //     var encodedUri = encodeURI(csvContent);
+    //     var link = document.createElement("a");
+    //     link.setAttribute("href", encodedUri);
+    //     link.setAttribute("download", "institutions.csv");
+    //     document.body.appendChild(link); // Required for FF
+
+    //     link.click();
+    // }
 
     clearFilters() {
         this.filters[0].value = "";

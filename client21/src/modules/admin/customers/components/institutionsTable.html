@@ -5,6 +5,16 @@
         aurelia-table="data.bind: people.institutionsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
         <thead>
             <tr>
+                <th colspan="3">
+                    <div class="checkbox">
+                        <label>
+                            <input checked.bind="filters[3].value"
+                                type="checkbox"> APJ
+                        </label>
+                    </div>
+                </th>
+            </tr>
+            <tr>
                 <th>
                     <compose view='./institutionTableToolbar.html'></compose>
                 </th>
@@ -12,12 +22,22 @@
             <tr>
                 <th style="width:25%;">
                     <div class="form-group">
-                        <input type="text" value.bind="filters[0].value" placeholder="Filter name, country and region "
-                            class="form-control" id='filterField' />
+                        <input type="text" value.bind="filters[0].value" placeholder="Filter name"
+                            class="form-control" id='filterField1' />
                     </div>
                 </th>
-              <th  style="width:15%;" ></th>
-              <th  style="width:15%;"></th>
+              <th  style="width:15%;" >
+                <div class="form-group">
+                    <input type="text" value.bind="filters[4].value" placeholder="Filter country"
+                        class="form-control" id='filterField1' />
+                </div>
+            </th>
+              <th  style="width:15%;">
+                <div class="form-group">
+                    <input type="text" value.bind="filters[5].value" placeholder="Filter region"
+                        class="form-control" id='filterField3' />
+                </div>
+            </th>
                 <th style="width:25%;">
                     <div class="form-group">
                         <select value.bind="filters[1].value" class="form-control selectpicker"

@@ -15,11 +15,11 @@
 				<div class="row bigTopMargin">
 					<div class="col-lg-10 col-lg-offset-1">
 						<div class="form-group">
-							<editor value.bind="siteConfig.configArray[selectedIndex].value" toolbar.bind="toolbar" height="250"></editor>
+							<editor value.bind="appConfig.objectArray[selectedIndex].value" toolbar.bind="toolbar" height="250"></editor>
 						</div>
 					</div>
 				</div>
-				<div innerhtml.bind="siteConfig.configArray[selectedIndex].value" class="col-lg-10 col-lg-offset-1 bigTopMargin">
+				<div innerhtml.bind="appConfig.objectArray[selectedIndex].value" class="col-lg-10 col-lg-offset-1 bigTopMargin">
 				</div>
 			</div>
 		</div>

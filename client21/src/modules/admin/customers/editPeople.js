@@ -19,14 +19,29 @@ export class EditPeople {
         this.utils = utils;
 
         this.filters = [
-            { value: '', keys: ['fullName', 'email', 'roles'] }
+            { value: '', custom: this.filterName },
+            { value: '', custom: this.filterInstiutionName },
+            { value: '', keys: ['email'] },
+            { value: '', keys: ['roles'] },
+            { value: '', keys: ['phone'] }
         ];
 
         this.screenHeight = $(window).height();
-        
+
         this.validationErrors = [];
 
         this.view = 'table';
+    }
+
+    filterName(filterValue, row) {
+        if (filterValue === null || filterValue === undefined || filterValue === "") return true;
+        let filterVal = filterValue.toUpperCase();
+        return (row.fullName !== null && row.fullName.toUpperCase().indexOf(filterVal) > -1) || (row.nickName && row.nickName !== null && row.nickName.toUpperCase().indexOf(filterVal) > -1);
+    }
+
+    filterInstiutionName(filterValue, row) {
+        if (filterValue === null || filterValue === undefined || filterValue === "") return true;
+        return row.institutionId !== null && row.institutionId.name.toUpperCase().indexOf(filterValue.toUpperCase()) > -1;
     }
 
     async activate() {
@@ -52,7 +67,11 @@ export class EditPeople {
 
     async refresh() {
         $('#loading').show();
-        await this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|' + this.loadStatus);
+        if (this.loadStatus === "03") {
+            await this.people.getPeopleArray('?order=lastName');
+        } else {
+            await this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|' + this.loadStatus);
+        }
         $('#loading').hide();
     }
 
@@ -188,33 +207,85 @@ export class EditPeople {
         this.people.selectedPersonById(this.people.selectedPerson._id);
     }
 
-    downloadInstExcel() {
-        let csvContent = "data:text/csv;charset=utf-8;,First Name,Last Name,Email,Phone,Institution,Country,Region,Status,Roles\r\n";
-        this.dataTable.baseArray.forEach(item => {
-            let isActive = item.personStatus == '01' ? 'Active' : 'Inactive';
-            csvContent += item.firstName + ","
-                + item.lastName.replace(',', ' ') + ","
-                + item.email + ","
-                + item.phone + ","
-                + item.institutionId.name.replace(",", " ") + ","
-                + item.country + ","
-                + item.region + ","
-                + isActive + ","
-                + item.roles.join(":");
-            csvContent += "\r\n";
-        })
-        var encodedUri = encodeURI(csvContent);
-        var link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "people.csv");
-        document.body.appendChild(link); // Required for FF
+    filterPeopleArray() {
+        this.downLoadArray = [];
+        let keep;
+        let nameFilter = this.filters[0].value.toUpperCase();
+        let instFilter = this.filters[1].value.toUpperCase();
+        let emailFilter = this.filters[2].value.toUpperCase();
+        let rolesFilter = this.filters[3].value.toUpperCase();
+        this.people.peopleArray.forEach(item => {
+            keep = false;
+            if (nameFilter.length) {
+                keep = (item.fullName !== null && item.fullName.toUpperCase().indexOf(nameFilter) > -1) || (item.nickName !== undefined && item.nickName !== null && item.nickName.toUpperCase().indexOf(nameFilter) > -1);
+            } else {
+                keep = true;
+            }
+            if (keep) this.downLoadArray.push(item);
+        });
+        if (instFilter.length) {
+            this.downLoadArray = this.downLoadArray.filter(item => {
+                return item.institutionId !== null && item.institutionId.name.toUpperCase().indexOf(instFilter) > -1;
 
-        link.click();
+            })
+        }
+        if (emailFilter.length) {
+            this.downLoadArray = this.downLoadArray.filter(item => {
+                return item.email !== null && item.email.toUpperCase().indexOf(emailFilter) > -1;
+
+            })
+        }
+        if (rolesFilter.length) {
+            this.downLoadArray = this.downLoadArray.filter(item => {
+                return item.roles !== null && item.roles.indexOf(rolesFilter) > -1;
+
+            })
+        }
+
+    }
+
+    fnExcelReport() {
+        this.filterPeopleArray();
+        var tab_text = "<table><tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Phone</th><th>Institution</th><th>Country</th><th>Region</th><th>Status</th><th>Roles</th></tr><tr>";
+
+        this.downLoadArray.forEach(item => {
+            if (item.institutionId === null) item.institutionId = { name: "" };
+            let isActive = item.personStatus == '01' ? 'Active' : 'Inactive';
+            tab_text = tab_text + "<td>" + item.firstName + "</td>"
+                + "<td>" + item.lastName + "</td>"
+                + "<td>" + item.email + "</td>"
+                + "<td>" + item.phone + "</td>"
+                + "<td>" + item.institutionId.name + "</td>"
+                + "<td>" + item.country + "</td>"
+                + "<td>" + item.region + "</td>"
+                + "<td>" + isActive + "</td>"
+                + "<td>" + item.roles.join(":") + "</td></tr>";
+        });
+
+        tab_text = tab_text + "</table>";
+
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE ");
+
+        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+            txtArea1.document.open("txt/html", "replace");
+            txtArea1.document.write(tab_text);
+            txtArea1.document.close();
+            txtArea1.focus();
+            sa = txtArea1.document.execCommand("SaveAs", true, "people.xls");
+        } else {
+            var link = document.createElement('a');
+            link.download = "people.xls";
+            link.href = 'data:application/vnd.ms-excel,' + encodeURIComponent(tab_text);
+            link.click();
+        }
     }
 
     clearFilters() {
-        this.filters[0].value = "";
-        $('#filterField').focus();
+        this.filters.forEach(item => {
+            item.value = "";
+            $('#filterField').focus();
+        })
     }
 
     _cleanUp() {
@@ -324,7 +395,7 @@ export class EditPeople {
     }
 
     async savePassword() {
-        if(!this.newPassword.length){
+        if (!this.newPassword.length) {
             this.addValidationError('You must enter a password.', this.newPassword.length === 0);
         }
 

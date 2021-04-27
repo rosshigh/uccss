@@ -1,5 +1,4 @@
 import { inject } from 'aurelia-framework';
-import { ValidationRules, ValidationControllerFactory, validationMessages } from 'aurelia-validation';
 import { DialogService } from 'aurelia-dialog';
 import { ConfirmDialog } from '../../../resources/dialogs/confirm-dialog';
 import { MessageDialog } from '../../../resources/dialogs/message-dialog';
@@ -8,17 +7,15 @@ import { DocumentsServices } from '../../../resources/data/documents';
 import { AppConfig } from '../../../appConfig';
 import { Store } from '../../../store/store';
 import { Utils } from '../../../resources/utils/utils';
-// import moment from 'moment';
 
-@inject(ValidationControllerFactory, SiteInfo, DocumentsServices, AppConfig, Store, Utils, DialogService)
+@inject(SiteInfo, DocumentsServices, AppConfig, Store, Utils, DialogService)
 export class EditInfo {
 
     pageSize = 200;
     todayMoment = moment(new Date());
     priorities = ['INFO', 'WARN', 'DANG'];
 
-    constructor(ValidationControllerFactory, siteInfo, documentsServices, config, store, utils, dialogService) {
-        this.controller = ValidationControllerFactory.createForCurrentScope();
+    constructor(siteInfo, documentsServices, config, store, utils, dialogService) {
         this.siteInfo = siteInfo;
         this.documentsService = documentsServices;
         this.config = config;
@@ -59,7 +56,6 @@ export class EditInfo {
     new() {
         this.siteInfo.selectObject();
         this.refreshSelects();
-        this.createValidationRules();
         this.view = 'form';
     }
 
@@ -67,7 +63,6 @@ export class EditInfo {
         this.selectedInfoId = info._id;
         await this.siteInfo.getObject(this.selectedInfoId);
         this.refreshSelects();
-        this.createValidationRules();
         this.view = 'form';
     }
 
@@ -77,33 +72,26 @@ export class EditInfo {
         this.utils.refreshSelect("#typeFilter", this.config.SITE_INFO_TYPES, "value", this.filters[1].value);
     }
 
-    createValidationRules() {
-
-        validationMessages['required'] = 'You must enter \${$displayName}.'
-        ValidationRules
-            .ensure('title').displayName('a Title').required()
-            .ensure('content').displayName('a Content').required()
-            .on(this.siteInfo.selectedObject);
-    }
-
-    async save() {
-        this.controller.validate()
-            .then(result => {
-                if (result.valid) {
-                    this.saveObject();
-                } else {
-                    let message = 'You must fix the errors before you can save the system?';
-                    let title = "Fix Errors";
-                    let options = ['Ok'];
-                    this.dialog.open({ viewModel: MessageDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-                        return;
-                    });
-                }
-            });
+    validateObject(){
+        this.titleError = "";
+        this.contentError = "";
+        let valid = true;
+        if(!this.siteInfo.selectedObject.title || !this.siteInfo.selectedObject.title.length){
+            this.titleError = 'Tile is required'
+            valid = false;
+        }
+        if(!this.siteInfo.selectedObject.content || !this.siteInfo.selectedObject.content.length){
+            this.titleError = 'Content is required'
+            valid = false;
+        }
+        return valid;
     }
 
     async saveObject() {
-        
+        if(!this.validateObject()){
+            $("#fixCustomerErrorsModal").modal('show');
+            return;
+        }
         let serverResponse = await this.siteInfo.saveObject();
         if (!serverResponse.error) {
             this.utils.showNotification("The Item was saved");

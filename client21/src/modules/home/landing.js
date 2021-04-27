@@ -36,7 +36,7 @@ export class Landing {
 
     async activate() {
         let responses = await Promise.all([
-            this.people.getInstitutionArray('?filter=institutionStatus|eq|01&order=name&fields=_id name'),
+            this.people.getInstitutionArray('?filter=institutionStatus|eq|01&order=name&fields=_id name apj'),
             this.is4ua.loadIs4ua(),
             this.config.getObjectArray(),
             this.sessions.getObjectsArray('?filter=[or]sessionStatus|Active:Requests:Next&order=startDate')
@@ -132,6 +132,7 @@ export class Landing {
     }
 
     async institutionSelected(id, el) {
+        $(".list-group-item").removeClass('selected');
         this.people.selectedPerson.institutionId = id;
         await this.people.getInstitution(this.people.selectedPerson.institutionId);
         this.people.selectedPerson.address1 = this.people.selectedInstitution.address1;
@@ -159,10 +160,17 @@ export class Landing {
                 return !item.apj;
             });
         }
+        console.log(this.filteredInstitutionsArray)
     }
 
     async checkEmail() {
         if (await this.people.checkEmail()) {
+            if(this.people.selectedPerson.personStatus === this.appConfig.USER_STATUS[0].code){
+               this.duplicateEmailMessage = "An account with that email already exists. Use the Forgot Password link above to set your password" 
+            } else {
+                await this.people.getPeopleArray('?filter=[and]institutionId|eq|' + this.people.selectedPerson.institutionId + ':roles|eq|PRIM');
+                this.duplicateEmailMessage = "An account with that email already exists but is inactive. Contact " + this.people.peopleArray[0].fullName +  " who is school’s Faculty Coordinator and has the authorization to activate the account."
+            }
             this.duplicateAccount = true;
         } else {
             this.duplicateAccount = false;
@@ -205,7 +213,7 @@ export class Landing {
             this.loginSuccess();
             this.isAuthenticated = this.auth.isAuthenticated();
         } else {
-            this.loginError = "Invalid credentials.";
+            this.loginError = "Invalid Credentials.";
         }
     }
 
@@ -250,9 +258,8 @@ export class Landing {
         console.log('logging off');
     }
 
-    openRegisterModal() {
-        this.people.selectPerson();
-        // $(".list-group-item").removeClass('selected');
+    openRegisterModal() {      
+        this.people.selectPerson(); 
         $('#registerModal').modal('show');
         setTimeout(() => { $('#register_email').focus(); }, 500);
     }

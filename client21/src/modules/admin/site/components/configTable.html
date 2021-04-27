@@ -19,15 +19,23 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th style="width:200px;">Parameter</th>
+                                    <th>
+                                        <div class="form-group">
+                                            <input type="text" value.bind="filters[0].value" placeholder="Filter parameter" class="form-control"
+                                                id='filterField' />
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th style="width:210px;">Parameter</th>
                                     <th style="width:300px;">Description</th>
                                     <th style="width:100px;">Value</th>
                                     <th style="width:200px;">Date Modified</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody style="height:500px;">
                                 <tr>
-                                  <th></th>
+                                  <th></th> 
                                 </tr>
                                 <tr  repeat.for="item of $displayData">
                                     <td data-title="Parameter">${item.parameter}</td>

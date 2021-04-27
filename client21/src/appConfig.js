@@ -55,7 +55,8 @@ export class AppConfig {
 
     USER_STATUS = [
         { code: "01", description: "Active" },
-        { code: "02", description: "Inactive" }
+        { code: "02", description: "Inactive" },
+        { code: "03", description: 'All' }
     ]
 
     PHONE_MASKS = [

@@ -51,9 +51,9 @@ export class Config {
         }
     }
 
-    async saveAll(saveConfigArray) {
-        if (saveConfigArray) {
-            var saveObj = { parameters: saveConfigArray };
+    async saveAll() {
+        if (this.objectArray) {
+            var saveObj = { parameters: this.objectArray };
             let response = await this.data.saveObject(saveObj, this.CONFIG_SERVICE + '/saveAll', "put")
             if (!response.error) {
                 return response;

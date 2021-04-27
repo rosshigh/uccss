@@ -1,4 +1,6 @@
-
+.errorText {
+  color: red;
+}
  
  .selected {
    background-color:grey;

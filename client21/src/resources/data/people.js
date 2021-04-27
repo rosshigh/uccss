@@ -88,6 +88,7 @@ export class People {
     } else {
       if (array && array === 'i') {
         this.selectedPerson = this.utils.copyObject(this.instutionPeopleArray[index]);
+        this.originalPerson = this.utils.copyObject(this.selectedPerson);
         this.editIndex = index;
       } else {
         this.selectedPerson = this.utils.copyObject(this.peopleArray[index]);
@@ -103,6 +104,7 @@ export class People {
         if (item._id === id) {
           this.editIndex = index;
           this.selectedPerson = this.utils.copyObject(item);
+          this.originalPerson = this.utils.copyObject(item);
         }
       });
       return;
@@ -111,6 +113,7 @@ export class People {
         if (item._id === id) {
           this.editIndex = index;
           this.selectedPerson = this.utils.copyObject(item);
+          this.originalPerson = this.utils.copyObject(item);
         }
       });
       return;
@@ -120,6 +123,7 @@ export class People {
   setSelectedPerson(userObj) {
     if (userObj) {
       this.selectedPerson = this.utils.copyObject(userObj);
+      this.originalPerson = this.utils.copyObject(userObj);
     }
   }
 
@@ -184,7 +188,8 @@ export class People {
   async checkEmail() {
     if (this.selectedPerson.email) {
       let serverResponse = await this.data.get(this.CHECK_EMAIL + '/' + this.selectedPerson.email);
-      if (serverResponse.code === 409) {
+      if (serverResponse.code !== 404) {
+        this.selectedPerson = serverResponse;
         return true;
       } else {
         return false;
@@ -270,9 +275,11 @@ export class People {
   selectInstitution(index) {
     if (index === undefined) {
       this.selectedInstitution = this.emptyInstitution();
+      this.originalInstitution = this.emptyInstitution();
     } else {
       try {
         this.selectedInstitution = this.utils.copyObject(this.institutionsArray[index]);
+        this.originalInstitution = this.utils.copyObject(this.institutionsArray[index]);
         this.editInstitutionIndex = index;
       } catch (error) {
         console.log(error);
