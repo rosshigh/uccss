@@ -56,7 +56,7 @@ export class EditConfig {
 	async save(){
 		let response = await this.appConfig.saveAll();
 		if(!response.error){  
-            tils.showNotification('The confiugration was saved.')
+            this.utils.showNotification('The confiugration was saved.')
 		}
         this.cleanUp();
 	}
