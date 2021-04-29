@@ -199,17 +199,21 @@ export class EditSystems {
         if (result.error) {
             this.utils.showNotification(result.error, 'error');
         } else {
-            let indexOfProduct = this.products.selectedObjectFromId(this.selectedProduct);
-            this.saveProduct = true;
-            if (this.products.selectedObject.systems && this.products.selectedObject.systems.length > 0) {
-                this.products.selectedObject.systems.forEach(item => {
-                    if (item.sid === this.systems.selectedObject.sid) this.saveProduct = false;
-                })
-            }
-            if (this.saveProduct) {
-                this.products.selectedObject.systems.push({ systemId: this.systems.selectedObject._id, sid: this.systems.selectedObject.sid });
-                if(this.productsToSave.indexOf(indexOfProduct) === -1) this.productsToSave.push(indexOfProduct);
-            }
+           this.addSystemToProduct();
+        }
+    }
+
+    addSystemToProduct(){
+        let indexOfProduct = this.products.selectedObjectById(this.selectedProduct);
+        this.saveProduct = true;
+        if (this.products.selectedObject.systems && this.products.selectedObject.systems.length > 0) {
+            this.products.selectedObject.systems.forEach(item => {
+                if (item.sid === this.systems.selectedObject.sid) this.saveProduct = false;
+            })
+        }
+        if (this.saveProduct) {
+            this.products.objectsArray[indexOfProduct].systems.push({ systemId: this.systems.selectedObject._id, sid: this.systems.selectedObject.sid });
+            if(this.productsToSave.indexOf(indexOfProduct) === -1) this.productsToSave.push(indexOfProduct);
         }
     }
 
@@ -238,6 +242,7 @@ export class EditSystems {
     }
 
     refreshAllClients() {
+        // this.modalMessage = 'Are you sure you want to refresh client ?';
         $("#refreshClientsModal").modal('show');
     }
 
@@ -250,47 +255,12 @@ export class EditSystems {
 
     deleteAllClients() {
         $("#confirmDeleteAllClientsModal").modal('show');
-        // let message = 'Are you sure you want to delete all the clients?';
-        // let title = "Confirm Deelete";
-        // let options = {};
-        // this.dialog.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
-        //     if (!response.wasCancelled) {
-        //         let productToUpdate = this.systems.selectedObject.clients[0].productId;
-        //         this.executeDeleteAllClients();
-        //         let indexOfProduct = this.products.selectedObjectFromId(productToUpdate);
-        //         this.saveProduct = false;
-        //         if (this.products.selectedObject.systems && this.products.selectedObject.systems.length > 0) {
-        //             this.products.selectedObject.systems.forEach((item, index) => {
-        //                 if (item.sid === this.systems.selectedObject.sid) {
-        //                     this.products.selectedObject.systems.splice(index, 1);
-        //                     this.saveProduct = true;
-        //                 }
-        //             })
-        //         }
-        //         if (this.saveProduct) {
-        //             if(this.productsToSave.indexOf(indexOfProduct) === -1) this.productsToSave.push(indexOfProduct);
-        //         }
-        //     } else {
-        //     }
-        // });
     }
 
     executeUpdateProducts(){
         let productToUpdate = this.systems.selectedObject.clients[0].productId;
         this.executeDeleteAllClients();
-        let indexOfProduct = this.products.selectedObjectFromId(productToUpdate);
-        this.saveProduct = false;
-        if (this.products.selectedObject.systems && this.products.selectedObject.systems.length > 0) {
-            this.products.selectedObject.systems.forEach((item, index) => {
-                if (item.sid === this.systems.selectedObject.sid) {
-                    this.products.selectedObject.systems.splice(index, 1);
-                    this.saveProduct = true;
-                }
-            })
-        }
-        if (this.saveProduct) {
-            if(this.productsToSave.indexOf(indexOfProduct) === -1) this.productsToSave.push(indexOfProduct);
-        }
+        this.addSystemToProduct();
     }
 
     executeDeleteAllClients() {
@@ -314,10 +284,11 @@ export class EditSystems {
                 item.productId = newProductId;
             })
         }
+        this.addSystemToProduct();
     }
 
     selectProduct() {
-        this.products.selectedObjectFromId(this.selectedProduct);
+        this.products.selectedObjectById(this.selectedProduct);
     }
 
     toggleSandBox() {
@@ -326,25 +297,29 @@ export class EditSystems {
         } else {
             this.systems.selectedObject.clients[this.selectedIndex].clientStatus = this.systems.selectedObject.clients[this.selectedIndex].clientStatus == this.config.SANDBOX_CLIENT_CODE ? this.config.UNASSIGNED_CLIENT_CODE : this.config.SANDBOX_CLIENT_CODE;
         }
-
+        this.backToClientTable();
     }
 
     refreshClient(index) {
-        $("#confirmRefreshClientModal").modal('show');
+        this.modalMessage = 'Are you sure you want to refresh client ' + this.selectedClient.client + '?';
+        $("#refreshClientModal").modal('show');
     }
 
     executeRefreshClient() {
         this.systems.selectedObject.clients[this.selectedIndex].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
         this.systems.selectedObject.clients[this.selectedIndex].assignments = new Array();
         this.systems.selectedObject.clients[this.selectedIndex].idsAvailable = this.systems.selectedObject.idsAvailable;
+        this.backToClientTable();
     }
 
     deleteClient() {
-        $("#confirmDeleteClient").modal('show');
+        this.modalMessage = "Are you sure you want to delete client" + this.selectedClient.client + '?';
+        $("#confirmDeleteClientModal").modal('show');
     }
 
     executeDeleteClient(){
         this.systems.selectedObject.clients.splice(this.selectedIndex, 1);
+        this.backToClientTable();
     }
 
     downloadInstExcel() {
