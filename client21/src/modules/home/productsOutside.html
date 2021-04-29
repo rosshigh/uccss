@@ -1,0 +1,31 @@
+<template>
+    <div class="card outSideCard">
+        <div class="card-body">
+            <h1>Our Products</h1>
+            <compose view="../../resources/elements/table-nav-bar.html"></compose>
+
+            <table class="table-sm table-striped header-fixed"
+                aurelia-table="data.bind: products.objectsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+                <thead>
+                    <tr>
+                        <th>
+                            <div class="form-group">
+                                <input type="text" value.bind="filters[0].value" placeholder="Filter Products"
+                                    class="form-control" id='filterField' />
+                            </div>
+                        </th>
+    
+                    </tr>
+                    <tr>
+                        <th style="width:40%;" aut-sort="key: name">Name</th>
+                    </tr>
+                </thead>
+                <tbody style="height:500px;">
+                    <tr repeat.for="product of $displayData">
+                        <td style="width:40%;">${product.name}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</template>

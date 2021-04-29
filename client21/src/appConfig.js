@@ -11,14 +11,14 @@ export class AppConfig {
     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/helpTickets';
 
     //Development
-    BASE_URL = "http://localhost/api";
-    IMG_DOWNLOAD_URL = "http://localhost/img/";
-    PHOTO_DOWNLOAD_URL = "http://localhost/uploadedFiles/photos/";
+    // BASE_URL = "http://localhost/api";
+    // IMG_DOWNLOAD_URL = "http://localhost/img/";
+    // PHOTO_DOWNLOAD_URL = "http://localhost/uploadedFiles/photos/";
 
     //Production
-    // BASE_URL = this.HOST + "/api/";
-    // IMG_DOWNLOAD_URL = this.HOST + '/img/';  
-    // PHOTO_DOWNLOAD_URL = this.HOST + "/uploadedFiles/photos/";
+    BASE_URL = this.HOST + "/api/";
+    IMG_DOWNLOAD_URL = this.HOST + '/img/';  
+    PHOTO_DOWNLOAD_URL = this.HOST + "/uploadedFiles/photos/";
 
     REQUEST_LIMIT = 7;
     REQUEST_LEEWAY = 5;

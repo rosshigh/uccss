@@ -127,13 +127,22 @@
 .smart-timeline-list li{position:relative;margin:0;padding:15px 0}
 .smart-timeline-list>li:hover{background-color:#f4f4f4}
 .smart-timeline-hover li:hover{background-color:#f9f9f9}
-.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}
+.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:40px;height:40px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}
 .smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}
 .smart-timeline-time{float:left;width:70px;text-align:right}
 .smart-timeline-time>small{font-style:italic}
 .smart-timeline-content{margin-left:123px}
 
+.menuImage {
+  position:relative;
+  left:-60px;
+  top:-10px;
+}
 
+.outSideCard {
+  position:relative;
+  top:-20px;
+}
 
 .assigned {
   background-color: aqua;

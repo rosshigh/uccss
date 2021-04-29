@@ -27,7 +27,7 @@ export class Home {
             },
             {
                 route: 'about',
-                moduleId: PLATFORM.moduleName('./modules/home/about'),
+                moduleId: PLATFORM.moduleName('./modules/home/aboutOutside'),
                 name: 'about',
                 settings: { auth: false, roles: [] }
             }

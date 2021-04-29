@@ -1,0 +1,32 @@
+<template>
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute " style="position:relative;top:25px;">
+        <div class="container-fluid">
+          <div class="navbar-wrapper">
+            <div class="navbar-minimize">
+            </div>
+            <h2 class="leftMargin">${pageTitle}</h2><br />
+          </div>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="navbar-toggler-icon icon-bar"></span>
+            <span class="navbar-toggler-icon icon-bar"></span>
+            <span class="navbar-toggler-icon icon-bar"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+            <ul class="navbar-nav">
+              <li class="${row.isActive ? 'active nav-item ' : 'nav-item '}" repeat.for="row of router.navigation"><a
+                  class="nav-link" href.bind="row.href">${row.title}</a></li>
+            </ul>
+          </div>
+          <div class="collapse navbar-collapse justify-content-end">
+          </div>
+        </div>
+      </nav>
+    <div class="content">
+        <div class="container-fluid">
+            <router-view></router-view>
+        </div>
+    </div>
+
+</template>

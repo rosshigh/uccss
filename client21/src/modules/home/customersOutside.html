@@ -1,0 +1,37 @@
+<template>
+    <div class="card outSideCard">
+        <div class="card-body">
+            <h1>UCC Customers</h1>
+            <compose view="../../resources/elements/table-nav-bar.html"></compose>
+
+            <table class="table-sm table-striped header-fixed"
+                aurelia-table="data.bind: people.institutionsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+                <thead>
+                    <tr>
+                        <th style="width:25%;">
+                            <div class="form-group">
+                                <input type="text" value.bind="filters[0].value" placeholder="Filter name, country and region "
+                                    class="form-control" id='filterField' />
+                            </div>
+                        </th>
+                      <th  style="width:15%;" ></th>
+                      <th  style="width:15%;"></th>
+                    </tr>
+                    <tr>
+                        <th style="width:25%;" aut-sort="key: name">Name</th>
+                        <th style="width:15%;" aut-sort="key: country">Country</th>
+                        <th style="width:15%;" aut-sort="key: region">Region</th>
+                    </tr>
+                </thead>
+        
+                <tbody style="height:500px;">
+                    <tr repeat.for="institution of $displayData">
+                        <td style=width:25%;">${institution.name}</td>
+                        <td style="width:15%;">${institution.country}</td>
+                        <td style="width:100px;">${institution.region}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</template>
