@@ -369,8 +369,9 @@
     margin-right: 10px;
 }
 
-.overFlow {
-    overflow-y:scroll;
+.noteHeight {
+  height: 500px;
+  color:black;
 }
 
 span i {
@@ -424,6 +425,10 @@ ul, #myUL {
 
   .blackText {
     color: black;
+  }
+
+  .overFlow {
+    overflow-y:scroll;
   }
   
   /* Rotate the caret/arrow icon when clicked on (using JavaScript) */

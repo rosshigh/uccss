@@ -7,6 +7,7 @@ var SystemSchema = new Schema({
   description: { type: String, require: true },
   server: { type: String, require: true },
   port: { type: Number },
+  systemNotes: { type: String },
   instance: { type: String, require: true },
   its: { type: String },
   sessions: [{ type: String }],

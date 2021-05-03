@@ -1,0 +1,15 @@
+<template>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">System Notes</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <label>This text appears in a user's assignment details</label> 
+                    <editor value.bind="systems.selectedObject.systemNotes" toolbar.bind="toolbar" height="250"></editor>
+                 </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -16,8 +16,7 @@ module.exports = function (app) {
     logger.log('info', 'Get systems');
     var query = buildQuery(req.query, System.find())
     await query
-    .select('sid description server instance active')
-      // .populate({ path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName' })
+    .select('sid description server instance active systemNotes')
       .exec().then(result => {
         res.status(200).json(result);
       })
@@ -27,7 +26,7 @@ module.exports = function (app) {
     logger.log('info', 'Get systems');
     var query = buildQuery(req.query, System.find())
     await query
-    .select('sid description server instance active clients')
+    .select('sid description server instance active clients systemNotes')
       .exec().then(result => {
         res.status(200).json(result);
       })

@@ -94,6 +94,7 @@ export class Systems {
         newSystemObj.active = true;
         newSystemObj.description = "";
         newSystemObj.server = "";
+        newSystemObj.systemNotes = "";
         newSystemObj.instance = "00";
         newSystemObj.its = "";
         newSystemObj.terms = "";

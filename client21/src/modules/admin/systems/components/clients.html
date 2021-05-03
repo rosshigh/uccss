@@ -1,0 +1,8 @@
+<template>
+    <div show.bind="showClientTable">
+        <compose view="./clientTable.html"></compose>
+    </div>
+    <div show.bind="!showClientTable">
+        <compose view="./clientForm.html"></compose>
+    </div>
+</template>

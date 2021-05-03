@@ -63,6 +63,7 @@ export class EditSystems {
 
     async edit(system) {
         await this.systems.getObject(system._id);
+        this.systems.selectedObject.systemNotes = this.systems.selectedObject.systemNotes ? this.systems.selectedObject.systemNotes : "";
         this.refreshSelects();
         this.createValidationRules();
         this.saveFilterValues();

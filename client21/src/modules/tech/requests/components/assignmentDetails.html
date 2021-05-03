@@ -14,21 +14,33 @@
               </li>
             </ul>
 
-            <label show.bind="products.selectedObject.documents && products.selectedObject.documents.length > 0"
+            <label show.bind="products.selectedObject.documents && products.selectedObject.documents.length"
               class="topMargin">Helpful Documents</label>
             <div class="list-group">
               <a repeat.for="document of products.selectedObject.documents"
                 href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.path}/${document.fileName}"
                 target="_blank">${document.fileName}</a>
             </div>
-            <label show.bind="requests.selectedDetail.techComments && requests.selectedDetail.techComments.length > 0"
-              class="topMargin">Assignment Comments</label>
-            <div style="height:500px;" show.bind="requests.selectedDetail.techComments && requests.selectedDetail.techComments.length > 0"
-              class="col-lg-12 topMargin well overFlow blackText" innerhtml.bind="requests.selectedDetail.techComments">
+            <div class="overflow noteHeight" innerhtml.bind="notes">
+              
+            </div>
+            <!-- <label show.bind="requests.selectedDetail.techComments && requests.selectedDetail.techComments.length > 0"
+              class="topMargin">UCC Comments</label>
+            <div class="noteHeight overflow">
+              <div show.bind="requests.selectedDetail.techComments && requests.selectedDetail.techComments.length > 0"
+                class="col-lg-12 topMargin well blackText" innerhtml.bind="requests.selectedDetail.techComments">
+              </div>
+              <div repeat.for="note of systemNotes" if.bind="systemNotes.length">
+                <label class="topMargin blackText">System ${note.sid}</label>
+                <div class="col-lg-12" innerhtml.bind="note.notes">
+                </div>
+                <div show.bind="products.selectedObject && products.selectedObject.productInfo.length"
+                  class="col-lg-12 topMargin blackText" innerhtml.bind="products.selectedObject.productInfo">
+                </div>
+              </div> -->
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 </template>

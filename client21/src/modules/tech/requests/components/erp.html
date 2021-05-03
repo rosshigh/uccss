@@ -16,12 +16,13 @@
       <h6>Faculty Password: <span class="bold"> ${assign.assignment.facultyPassword ? assign.assignment.facultyPassword
           : 'N/A'}</span></h6>
     </div>
-    <div class="row">
+    <!-- <div class="row">
       <div class="col">
-        <h6 show.bind="assign.system.its && assign.system.its.length > 0" class="leftMargin bigTopMargin">Web URL:</h6>
+        <textarea if.bind="assign.system.systemNotes.length" innerhtml.bind="assign.system.systemNotes"></textarea> -->
+        <!-- <h6 show.bind="assign.system.its && assign.system.its.length > 0" class="leftMargin bigTopMargin">Web URL:</h6>
         <h6 show.bind="assign.system.its && assign.system.its.length > 0"><span class="bold"> <a
-              href="${assign.system.its}" target="_blank">${assign.system.its}</a> </span></h6>
-      </div>
-    </div>
+              href="${assign.system.its}" target="_blank">${assign.system.its}</a> </span></h6> -->
+      <!-- </div>
+    </div> -->
   </div>
 </template>

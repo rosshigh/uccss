@@ -60,7 +60,7 @@ export class Assignments {
     async activate() {
         let responses = await Promise.all([
             this.sessions.getObjectsArray('/active?order=sortOrder'),
-            this.systems.getObjectsArrayWithClients(),
+            // this.systems.getObjectsArrayWithClients(),
             
         ]);
 
@@ -70,7 +70,7 @@ export class Assignments {
         });
         await this.people.getUCCStaff(uccRoles);
 
-        this.systems.getObjectsArray();
+        // this.systems.getObjectsArray();
         this.products.getObjectsArray('?order=name');
 
         this.filterStatuses = [this.config.UPDATED_REQUEST_CODE, this.config.ASSIGNED_REQUEST_CODE, this.config.PROVISIONAL_REQUEST_CODE, this.config.DELETED_REQUEST_CODE];
@@ -117,7 +117,6 @@ export class Assignments {
         this.firstFacId = 1;
         this.lastFacId = 2;
         this.defaultFacultyIdPrefix = this.requests.selectedDetail.productId.defaultFacultyIdPrefix;
-        this.uccMessage = this.products.selectedObject.productInfo
 
         if (!this.requests.selectedDetail.productId.systems[0]) {
             this.utils.showNotification("You need to assign a system to this product before you can assign this request", 'warning');
@@ -416,16 +415,35 @@ export class Assignments {
     async viewAssignment(detail, event) {
         event.stopPropagation();
         this.assignmentDetails = [];
+        this.systemNotes = [];
+        this.notes = "";
         await this.requests.getRequestDetail(detail._id);
         await this.products.getObject(detail.productId._id);
+        await this.systems.getObjectsArray();
+        this.notes += this.requests.selectedDetail.techComments ? this.requests.selectedDetail.techComments : "";
         this.requests.selectedDetail.assignments.forEach(item => {
             let system = this.getSystem(item.systemId);
             this.assignmentDetails.push({
                 assignment: item,
                 system: system
             });
+            if(system.systemNotes && system.systemNotes !== null && system.systemNotes.length && !this.isSystemOnList(system.sid)) {
+                // this.systemNotes.push({sid: system.sid, notes: system.systemNotes});
+                this.notes += "<div class='topMargin'><h3>System " + system.sid + "</h3>" + system.systemNotes + "</div>"  
+                this.systemNotes.push(system.sid)
+            }
         });
+        this.notes += this.products.selectedObject.productInfo ? "<h3>" + this.products.selectedObject.name + "</h3>" + this.products.selectedObject.productInfo : "";
+     
         this.view = 'form';
+    }
+
+    isSystemOnList(sid){
+        let onList = false;
+        this.systemNotes.forEach(item => {
+            if(item === sid) onList = true;
+        })
+        return onList;
     }
 
     getSystem(id) {
@@ -443,8 +461,6 @@ export class Assignments {
         this.systemsToSave = [];
         this.provisionalClientList.forEach(item => {
             this.requests.selectedDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
-            this.requests.selectedDetail.techComments = this.uccMessage ? this.uccMessage : "";
-            // this.requests.selectedDetail.techComments = this.products.selectedObject.productInfo ? this.products.selectedObject.productInfo : "";
             this.requests.selectedDetail.assignments.push({
                 systemId: item.proposedClient.systemId,
                 client: item.proposedClient.client,
