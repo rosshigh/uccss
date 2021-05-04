@@ -135,12 +135,12 @@ export class Landing {
         $(".list-group-item").removeClass('selected');
         this.people.selectedPerson.institutionId = id;
         await this.people.getInstitution(this.people.selectedPerson.institutionId);
-        this.people.selectedPerson.address1 = this.people.selectedInstitution.address1;
-        this.people.selectedPerson.address2 = this.people.selectedInstitution.address2;
-        this.people.selectedPerson.country = this.people.selectedInstitution.country;
-        this.people.selectedPerson.region = this.people.selectedInstitution.region;
-        this.people.selectedPerson.postalCode = this.people.selectedInstitution.postalCode;
-        this.people.selectedPerson.city = this.people.selectedInstitution.city;
+        // this.people.selectedPerson.address1 = this.people.selectedInstitution.address1;
+        // this.people.selectedPerson.address2 = this.people.selectedInstitution.address2;
+        // this.people.selectedPerson.country = this.people.selectedInstitution.country;
+        // this.people.selectedPerson.region = this.people.selectedInstitution.region;
+        // this.people.selectedPerson.postalCode = this.people.selectedInstitution.postalCode;
+        // this.people.selectedPerson.city = this.people.selectedInstitution.city;
         if (this.people.selectedInstitution.country !== 'CA' && this.people.selectedInstitution.country !== 'US') {
             this.useMask = false;
         } else {

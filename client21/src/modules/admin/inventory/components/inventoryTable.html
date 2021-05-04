@@ -1,0 +1,58 @@
+<template>
+    <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
+
+    <table class="table-sm table-striped header-fixed"
+        aurelia-table="data.bind: inventory.objectsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+        <thead>
+            <tr>
+                <th>
+                    <compose view='./institutionTableToolbar.html'></compose>
+                </th>
+            </tr>
+            <tr>
+                <th style="width:25%;">
+                    <div class="form-group">
+                        <input type="text" value.bind="filters[0].value" placeholder="Filter name"
+                            class="form-control" id='filterField1' />
+                    </div>
+                </th>
+              <th  style="width:15%;" >
+                <div class="form-group">
+                    <input type="text" value.bind="filters[1].value" placeholder="Filter serial number"
+                        class="form-control" id='filterField1' />
+                </div>
+            </th>
+              <th  style="width:15%;">
+                <div class="form-group">
+                    <input type="text" value.bind="filters[2].value" placeholder="Filter model"
+                        class="form-control" id='filterField3' />
+                </div>
+            </th>
+                <th>
+                    <div class="form-group">
+                        <select value.bind="filters[3].value" class="form-control selectpicker"
+                            data-style="btn btn-link" id="institutionStatus" placeholder="Status">
+                            <option value=""></option>
+                            <option repeat.for="type of config.HARDWARE_TYPES" value="${type}">${type}</option>
+                        </select>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th style="width:25%;" aut-sort="key: name">Name</th>
+                <th style="width:15%;" aut-sort="key: serialNumber">Serial Number</th>
+                <th style="width:15%;" aut-sort="key: modelNumber">Model Number</th>
+                <th style="width:25%;" aut-sort="key: type">Type</th>
+            </tr>
+        </thead>
+
+        <tbody style="height:75vh;">
+            <tr class="pointMe" repeat.for="hardware of $displayData" click.delegate="edit(institution)">
+                <td style=width:25%;">${hardware.systemName}</td>
+                <td style="width:15%;">${hardware.serialNumber}</td>
+                <td style="width:15%;">${hardware.modelNumber}</td>
+                <td style="width:25%;">${hardware.type}</td>
+            </tr>
+        </tbody>
+    </table>
+</template>

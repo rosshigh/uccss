@@ -1,5 +1,17 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([["app~d13857b7"],{
 
+/***/ "0z6l":
+/*!*****************************************!*\
+  !*** ./src/resources/img/parallax1.jpg ***!
+  \*****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony default export */ __webpack_exports__[\"default\"] = (__webpack_require__.p + \"53f377a3c1096b0b9de8e7a440185492.jpg\");//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMHo2bC5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy8uL3NyYy9yZXNvdXJjZXMvaW1nL3BhcmFsbGF4MS5qcGc/MTFkOCJdLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgZGVmYXVsdCBfX3dlYnBhY2tfcHVibGljX3BhdGhfXyArIFwiNTNmMzc3YTNjMTA5NmIwYjlkZThlN2E0NDAxODU0OTIuanBnXCI7Il0sIm1hcHBpbmdzIjoiQUFBQTtBQUFBIiwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///0z6l\n");
+
+/***/ }),
+
 /***/ "Ntx3":
 /*!***************************************!*\
   !*** ./src/resources/img/default.jpg ***!

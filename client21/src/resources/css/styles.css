@@ -3,7 +3,8 @@
 }
  
  .selected {
-   background-color:grey;
+   background-color:teal;
+   color: white;
  }
  
  .cardContainer {
@@ -526,7 +527,7 @@ li.timeline-item::before {
 
 .parallax1 {
   /* The image used */
-  background-image: url("http://129.89.93.82/img/parallax1.jpg");
+  background-image: url("../img/parallax1.jpg");
 
   /* Set a specific height */
   min-height: 300px;

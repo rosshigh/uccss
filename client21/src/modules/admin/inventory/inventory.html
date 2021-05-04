@@ -1,0 +1,26 @@
+<template>
+    <span id="loading">
+        <ul class="bokeh">
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </span>
+    <compose view="../../../resources/modals/fixErrorsModal.html"></compose>
+    <compose view="../../../resources/modals/confirmDeleteModal.html"></compose>
+    <compose view="../../../resources/modals/confirmSaveModal.html"></compose>
+    <div show.bind="view === 'table'">
+        <div class="card">
+            <div class="card-body">
+                <compose view="./components/inventoryTable.html"></compose>
+            </div>
+        </div>
+    </div>
+    <div show.bind="view === 'form'">
+        <div class="card">
+            <div class="card-body">
+                <compose view="./components/inventoryForm.html"></compose>
+            </div>
+        </div>
+    </div>
+</template>

@@ -10,13 +10,13 @@
             <div class="row">
                 <div class="col">
                     <label for="sid">This text appears in a user's assignment details</label> 
-                    <editor value.bind="products.selectedObject.productInfo" toolbar.bind="toolbar" height="250"></editor>
+                    <editor value.bind="products.selectedObject.productInfo" toolbar.bind="config.TOOLBAR"  height="250"></editor>
                  </div>
             </div>
             <div class="row">
                 <div class="col">
                     <label class="topMargin" for="sid">This text appears when the user hovers an item on the product list</label>
-                    <editor value.bind="products.selectedObject.productDescription" toolbar.bind="toolbar" height="250"></editor>
+                    <editor value.bind="products.selectedObject.productDescription" toolbar.bind="config.TOOLBAR"  height="250"></editor>
                 </div>
             </div>
         </div>

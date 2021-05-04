@@ -11,11 +11,12 @@ export class Editor {
 	@bindable height = 250;
 	@bindable editorid =  "summernote-" + this.guid();
 	@bindable toolbar = [
-		['style', ['style', 'bold', 'clear']],
+		['style', ['style']],
+		['font', ['bold', 'italic', 'underline', 'clear']],
 		['color', ['color']],
-		['font', ['strikethrough', 'superscript', 'subscript']],
+		['fontname', ['fontname']],
 		['fontsize', ['fontsize']],
-		['layout', ['ul', 'ol', 'paragraph']],
+		['pata', ['ul', 'ol', 'paragraph']],
 		['insert', ['picture', 'link', 'table', 'hello']],
 		['misc', ['undo', 'redo', 'fullscreen']]
 	];

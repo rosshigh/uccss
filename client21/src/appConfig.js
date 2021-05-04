@@ -71,6 +71,8 @@ export class AppConfig {
 
     SYSTEM_TYPES = ["ERP", "HANA", "BO"];
 
+    HARDWARE_TYPES = ['Switch','Router','Server','Storage','Other'];
+
     // SANDBOX_ID = 'a1a1a1a1a1a1a1a1a1a1a1a1';      //Name used for sandbox requests
     SANDBOX_ID = '58a746e8dddd74e80be43a70';
     SANDBOX_NAME = "Trial Client"
@@ -120,6 +122,14 @@ export class AppConfig {
             'description': 'Banner Messages'
         }
     ];
+
+    TOOLBAR = [
+        ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
+        ['color', ['color']],
+        ['layout', ['ul', 'ol', 'paragraph']],
+        ['insert', ['link', 'table', 'hello']],
+        ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
+      ];
 
     // HELP_TICKET_PRIORITIES = [
     //   {

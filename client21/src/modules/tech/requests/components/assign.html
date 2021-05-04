@@ -31,7 +31,7 @@
                                 <h5 class="topMargin">Customer Comments</h5>
                                 <div innerhtml.bind="requests.selectedDetail.requestId.customerMessage"></div>
                             </span>
-                            <editor value.bind="requests.selectedDetail.techComments" toolbar.bind="toolbar" height="250"></editor>
+                            <editor value.bind="requests.selectedDetail.techComments" toolbar.bind="config.TOOLBAR"  height="250"></editor>
                         </div>
                         <div class="tab-pane fade clientTabs assignedTab" id="assigned" role="tabpanel"
                             aria-labelledby="nav-assigned-tab">
@@ -60,7 +60,7 @@
                                 <h5 class="topMargin">Customer Comments</h5>
                                 <div innerhtml.bind="requests.selectedDetail.requestId.customerMessage"></div>
                             </span>
-                            <editor value.bind="requests.selectedDetail.techComments" toolbar.bind="toolbar" height="250"></editor>
+                            <editor value.bind="requests.selectedDetail.techComments" toolbar.bind="config.TOOLBAR"  height="250"></editor>
                         </div>
                     </div>
                 </div>
