@@ -2,6 +2,18 @@ var Mongoose = require('mongoose'),
   Schema = Mongoose.Schema,
   Bcrypt = require('bcryptjs');
 
+  var ReminderSchema = new Schema({
+    reminder: { type: String },
+    description: { type: String},
+    expirationDate: { type: Date },
+    dueDate: { type: Date },
+    createdDate: { type:Date, default: Date.now },
+    personal: { type: Boolean },
+    personId: { type: Schema.Types.ObjectId }
+});
+
+module.exports = Mongoose.model('Reminder', ReminderSchema);
+
 var EmailLogSchema = new Schema({
     personId: { type: Schema.Types.ObjectId },
     personName: { type: String },

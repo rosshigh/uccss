@@ -82,7 +82,7 @@ export class App {
         settings: { auth: false, roles: [] }
       },
       {
-        route: 'helpTicketsTech',
+        route: 'helpTicketsTech/:HTNumber',
         moduleId: PLATFORM.moduleName('./modules/tech/helpTickets/helpTickets'),
         name: 'helpTicketsTech',
         settings: { auth: false, roles: [] }
@@ -121,6 +121,12 @@ export class App {
         route: 'about',
         moduleId: PLATFORM.moduleName('./modules/home/about'),
         name: 'about',
+        settings: { auth: false, roles: [] }
+      },
+      {
+        route: 'inventory',
+        moduleId: PLATFORM.moduleName('./modules/admin/inventory/inventory'),
+        name: 'inventory',
         settings: { auth: false, roles: [] }
       }
     ]);

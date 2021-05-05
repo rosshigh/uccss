@@ -1,5 +1,5 @@
 <template>
-
+  <compose view="../modals/reminderModal.html"></compose>
   <div class="sidebar" id="sidebar" data-color="rose" data-background-color="black"
     data-image="../assets/img/sidebar-1.jpg">
     <!--
@@ -32,6 +32,11 @@
               <li class="nav-item">
                 <a class="nav-link" href="#profile">
                   <span class="sidebar-normal"><i class="fa fa-user"></i> My Profile </span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" click.trigger="createReminder()">
+                  <span class="sidebar-normal pointMe"><i class="fa fa-sign-out"></i> Create Reminder </span>
                 </a>
               </li>
               <li class="nav-item">

@@ -20,6 +20,7 @@ export class People {
   PEOPLE_UPLOAD_SERVICE = '/people/upload/';
   NOTIFICATION_SERVICE = 'notifications';
   PACKAGES_SERVICES = 'apj/packages';
+  REMINDER_SERVICES = '/reminder';
 
   constructor(data, utils) {
     this.data = data;
@@ -60,7 +61,7 @@ export class People {
     let url = this.PEOPLE_SERVICE + '/' + id;
     let serverResponse = await this.data.get(url);
     if (!serverResponse.error) {
-      this.selectedPerson = serverResponse; 
+      this.selectedPerson = serverResponse;
       this.originalPerson = this.utils.copyObject(serverResponse);
     } else {
       this.data.processError(serverResponse);
@@ -411,5 +412,28 @@ export class People {
       var serverResponse = await this.data.saveObject(this.selectedCourse, this.COURSES_SERVICE, "put");
       return serverResponse;
     }
+  }
+
+  async getReminders(id) {
+    let url = this.REMINDER_SERVICES + '/all/' + id;
+    let serverResponse = await this.data.get(url);
+    if (!serverResponse.error) {
+      this.remindersArray = serverResponse;
+    }
+  }
+
+  async saveReminder(reminder) {
+    if (!reminder._id) {
+      let serverResponse = await this.data.saveObject(reminder, this.REMINDER_SERVICES, "post");
+      return serverResponse;
+    } else {
+      let serverResponse = await this.data.saveObject(reminder, this.REMINDER_SERVICES, "put");
+      return serverResponse;
+    }
+
+  }
+
+  async deleteReminder(reminder){
+    let response = await this.data.deleteObject(this.REMINDER_SERVICES + '/' + reminder._id);
   }
 }

@@ -1,22 +1,16 @@
 <template>
+    <!-- <compose view="../../resources/modals/reminderModal.html"></compose> -->
     <compose view="../../resources/elements/top-bar.html"></compose>
     <div class="content">
         <div class="container-fluid">
-            <div style="height:${screenHeight}px;" class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-3 offset-1 leftMartin">
-                            <compose view="./components/uccInformation.html"></compose>
-                        </div>
-
-                        <div class="col-3 bigLeftMargin">
-                            <compose view="./components/newsItem.html"></compose>
-                        </div>
-
-                        <div class="col-3 bigLeftMargin">
-                            <compose view="./components/homePageLinks.html"></compose>
-                        </div>
-                    </div>
+            <div class="card">
+                <div class="card-body" style="height:1500vh;">
+                   <div if.bind="showUserHome">
+                       <compose view="./components/userHome.html"></compose>
+                   </div>
+                   <div if.bind="!showUserHome">
+                    <compose view="./components/uccHome.html"></compose>
+                </div>
                 </div>
             </div>
         </div>

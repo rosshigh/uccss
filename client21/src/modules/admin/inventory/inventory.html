@@ -9,17 +9,22 @@
     <compose view="../../../resources/modals/fixErrorsModal.html"></compose>
     <compose view="../../../resources/modals/confirmDeleteModal.html"></compose>
     <compose view="../../../resources/modals/confirmSaveModal.html"></compose>
-    <div show.bind="view === 'table'">
-        <div class="card">
-            <div class="card-body">
-                <compose view="./components/inventoryTable.html"></compose>
+    <compose view="../../../resources/elements/top-bar.html"></compose>
+    <div class="content">
+        <div class="container-fluid">
+            <div show.bind="view === 'table'">
+                <div class="card">
+                    <div class="card-body">
+                        <compose view="./components/inventoryTable.html"></compose>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <div show.bind="view === 'form'">
-        <div class="card">
-            <div class="card-body">
-                <compose view="./components/inventoryForm.html"></compose>
+            <div show.bind="view === 'form'">
+                <div class="card">
+                    <div class="card-body">
+                        <compose view="./components/inventoryForm.html"></compose>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

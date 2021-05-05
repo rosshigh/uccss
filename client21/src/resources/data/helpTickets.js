@@ -29,6 +29,16 @@ export class HelpTickets {
         }
     }
 
+    async getMyObjectArray(id){
+        let url = this.HELP_TICKET_SERVICES + "/owner/" + id;
+        let serverResponse = await this.data.get(url);
+        if (!serverResponse.error) {
+            this.myObjectsArray = serverResponse;
+        } else {
+            this.data.processError(serverResponse);
+        }
+    }
+
     selectObject(index) {
         if (!index && index != 0) {
             this.emptyObject();

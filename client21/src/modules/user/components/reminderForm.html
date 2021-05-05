@@ -1,0 +1,41 @@
+<template>
+    <span click.delegate="saveReminder()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+        data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border"
+            aria-hidden="true"></i></span>
+    <span click.delegate="cancelEditReminder()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
+        data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border"
+            aria-hidden="true"></i></span>
+    <div class="card">
+        <div class="card-body">
+            <div class="form-group">
+                <label>Reminder *</label>
+                <input value.bind="reminder.reminder" id="editReminderForm" class="form-control" placeholder="Reminder"
+                    type="text" />
+            </div>
+            <div class="form-group">
+                <label>Description *</label>
+                <textarea value.bind="reminder.description" id="editDescriptionForm" class="form-control"
+                    placeholder="Description" type="text"></textarea>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input checked.bind="reminder.personal" type="checkbox"> Just for me
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Due Date</label>
+                <flat-picker controlid="dueDate" placeholder="Expiration date" config.bind="configDate"
+                    value.bind="reminder.dueDate">
+                </flat-picker>
+            </div>
+            <div class="form-group">
+                <label>Expiration Date</label>
+                <flat-picker controlid="expirationDate" placeholder="Expiration date" config.bind="configDate"
+                    value.bind="reminder.expirationDate">
+                </flat-picker>
+            </div>
+        </div>
+    </div>
+</template>

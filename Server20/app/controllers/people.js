@@ -5,6 +5,7 @@ var express = require('express'),
     mongoose = require('mongoose'),
     Person = mongoose.model('Person'),
     Course = mongoose.model('Course'),
+    Reminder = mongoose.model('Reminder'),
     asyncHandler = require('express-async-handler'),
     http = require('http'),
     PasswordReset = mongoose.model('PasswordReset'),
@@ -214,5 +215,53 @@ module.exports = function (app, config) {
                 })
             })
         });
-    })
+    });
+
+    router.get('/reminder', asyncHandler(async (req, res) => {
+        logger.log('info', 'Get reminder');
+        var query = buildQuery(req.query, Reminder.find())
+        query.exec().then(object => {
+            res.status(200).json(object);
+        })
+    }));
+
+    router.get('/reminder/all/:id', asyncHandler(async (req, res) => {
+        logger.log('info', 'Get reminder');
+        var query = Reminder.find({ $or: [{personId: req.params.id}, {personal: false}]});
+        query.exec().then(object => {
+            res.status(200).json(object);
+        })
+    }));
+
+    router.get('/reminder/:id', asyncHandler(async (req, res) => {
+        logger.log('info', 'Get reminder ' + req.params.id);
+        var query = Reminder.findById(req.params.id)
+        query.exec().then(object => {
+            res.status(200).json(object);
+        })
+    }));
+
+    router.post('/reminder/', asyncHandler(async (req, res) => {
+        logger.log('info', 'Create reminder');
+        let reminder = new Reminder(req.body);
+        reminder.save().then(result => {
+            res.status(200).json(result);
+        })
+    }));
+
+    router.put('/reminder', asyncHandler(async (req, res) => {
+        logger.log('info', 'Update reminder ' + req.body._id);
+        Reminder.findOneAndUpdate({ _id: req.body._id }, req.body, { safe: true, multi: false, new: true })
+            .exec()
+            .then(result => {
+                res.status(200).json(result);
+            })
+    }));
+
+    router.delete('/reminder/:id', asyncHandler(async (req, res) => {
+        logger.log('info', 'Delete reminder [%s]', req.params.id);
+        await Reminder.remove({ _id: req.params.id }).then(result => {
+            res.status(200).json({ msg: "Reminder Deleted" });
+        })
+    }));
 };

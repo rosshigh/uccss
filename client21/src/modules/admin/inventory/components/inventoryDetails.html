@@ -1,0 +1,66 @@
+<template>
+    <div class="topMargin leftMargin">
+        <form class="form-horizontal topMargin">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <div class="col-sm-10">
+                            <label>Name *</label>
+                            <input value.bind="inventory.selectedObject.systemName" id="editSystemName" class="form-control"
+                                placeholder="Name" type="text" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <div class="col-sm-10">
+                            <label>Description *</label>
+                            <input value.bind="inventory.selectedObject.description" id="editDescription" class="form-control"
+                                placeholder="Description" type="text" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <div class="col-sm-10">
+                            <label>Date Created</label>
+                            <flat-picker controlid="dateCreated" config.bind="config" value.bind="inventory.selectedObject.dateCreated"></flat-picker>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <div class="col-sm-10">
+                            <label>Serial Number</label>
+                            <input value.bind="inventory.selectedObject.serialNumber" class="form-control"
+                                placeholder="Serial Number" type="text" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <div class="col-sm-10">
+                            <label>Model Number</label>
+                            <input value.bind="inventory.selectedObject.modelNumber" class="form-control"
+                                placeholder="Model Number" type="text" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-lg-3">
+                    <div class="form-group">
+                        <div class="col-sm-10">
+                            <label class="left">Type *</label>
+                            <select id="systemType" value.bind="inventory.selectedObject.type" class="form-control selectpicker"
+                            data-style="btn btn-link">
+                                <option value="">Select an option</option>
+                                <option repeat.for="type of config.HARDWARE_TYPES" value.bind="type">${type}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</template>

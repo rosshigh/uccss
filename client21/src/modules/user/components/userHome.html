@@ -1,0 +1,24 @@
+<template>
+    <div if.bind="role > 5" class="row">
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input class="leftMargin" checked.bind="showUserHome" type="checkbox"> Toggle user home page
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3 offset-1 leftMargin">
+            <compose view="./uccInformation.html"></compose>
+        </div>
+
+        <div class="col-3 bigLeftMargin">
+            <compose view="./newsItem.html"></compose>
+        </div>
+
+        <div class="col-3 bigLeftMargin">
+            <compose view="./homePageLinks.html"></compose>
+        </div>
+    </div>
+</template>

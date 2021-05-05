@@ -1,25 +1,29 @@
-// import { Config } from 'resources/data/config';
 import { inject } from 'aurelia-dependency-injection';
-// import { Store } from '../../store/store';
-
+import { Router } from "aurelia-router";
 import { SiteInfo } from '../../resources/data/site';
 import { Sessions } from '../../resources/data/sessions';
+import { People } from '../../resources/data/people';
+import { HelpTickets } from '../../resources/data/helpTickets';
 import { AppConfig } from '../../appConfig';
-// import { Utils } from '../../../resources/utils/utils';
 
-@inject(SiteInfo, Sessions, AppConfig)
+@inject(Router, SiteInfo, Sessions, People, HelpTickets, AppConfig)
 
 export class User {
     pageTitle = "UCC Self Service Home";
 
-    constructor(site, sessions, config ) {
+    constructor(router, site, sessions, people, helpTickets, config) {
+        this.router = router;
         this.site = site;
         this.sessions = sessions;
+        this.people = people;
+        this.helpTickets = helpTickets;
         this.config = config;
-        // this.store = store;
-
         this.screenHeight = $(window).height();
-        // console.log(this.screenHeight);
+
+        this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        this.role = parseInt(sessionStorage.getItem('role'));
+
+        this.showUserHome = true;
     }
 
     async activate() {
@@ -27,25 +31,61 @@ export class User {
         let responses = await Promise.all([
             this.site.getObjectArray('?filter=expiredDate|gt|' + today),
             this.sessions.getObjectsArray('/active')
-            // this.config.getConfigArray()
         ]);
 
-        this.getSystemMessage();
+        if (this.role >= this.config.UCC_ROLE) {
+            this.showUserHome = false;
+            this.refreshReminders();
+            this.refreshHelpTickets();
+        }
 
-        // this.store.saveConfig(this.config.configArray);
+        this.getSystemMessage();
     }
 
-    getSystemMessage(){
+    getSystemMessage() {
         this.systemMessage = undefined;
         this.site.objectArray.forEach(item => {
-            if(item.itemType === 'MESS'){
+            if (item.itemType === 'MESS') {
                 this.systemMessage = item.title;
             }
         });
-        if(this.systemMessage && this.systemMessage.length) sessionStorage.setItem('systemMessage', this.systemMessage);
+        if (this.systemMessage && this.systemMessage.length) sessionStorage.setItem('systemMessage', this.systemMessage);
     }
 
-    attached(){
+    attached() {
         $("#systemMessage").fadeOut(500).fadeIn(500).fadeOut(500).fadeIn(500);
+    }
+
+    refreshReminders() {
+        this.people.getReminders(this.userObj._id);
+    }
+
+    editReminder(reminder){
+        this.reminder = reminder;
+        this.showEditReminder = true;
+    }
+
+    saveReminder(){
+        this.people.saveReminder(this.reminder);
+        this.showEditReminder = false;
+        this.refreshReminders();
+    }
+
+    deleteReminder(reminder){
+        this.people.deleteReminder(reminder);
+        this.showEditReminder = false;
+        this.refreshReminders();
+    }
+
+    cancelEditReminder(){
+        this.showEditReminder = false;
+    }
+
+    refreshHelpTickets(){
+        this.helpTickets.getMyObjectArray(this.userObj._id);
+    }
+
+    navigateToHelpTicket(helpTicket){
+        this.router.navigateToRoute('helpTicketsTech', { HTNumber: helpTicket._id });
     }
 }

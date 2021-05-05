@@ -6,7 +6,7 @@
         <thead>
             <tr>
                 <th>
-                    <compose view='./institutionTableToolbar.html'></compose>
+                    <compose view='./inventoryTableToolbar.html'></compose>
                 </th>
             </tr>
             <tr>
@@ -47,7 +47,7 @@
         </thead>
 
         <tbody style="height:75vh;">
-            <tr class="pointMe" repeat.for="hardware of $displayData" click.delegate="edit(institution)">
+            <tr class="pointMe" repeat.for="hardware of $displayData" click.delegate="edit(hardware)">
                 <td style=width:25%;">${hardware.systemName}</td>
                 <td style="width:15%;">${hardware.serialNumber}</td>
                 <td style="width:15%;">${hardware.modelNumber}</td>

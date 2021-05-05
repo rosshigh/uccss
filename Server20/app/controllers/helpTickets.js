@@ -25,6 +25,24 @@ module.exports = function (app, config) {
     })
   }));
 
+  router.get('/helpTickets/owner/:id', asyncHandler(async (req, res) => {
+    logger.log('info','Get owner');
+    HelpTicket.find({helpTicketStatus: {$ne: 6}}, {_id: 1, owner: 1, helpTicketStatus:1,  helpTicketNo: 1, personId: 1,})
+    .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName'})
+    .exec()
+    .then(result => {     
+      if(result && result.length){
+        var resultArray = [];
+        result.forEach(item => {            
+          if(item.owner[0].personId == req.params.id){
+            resultArray.push(item);
+          }
+        })
+      }     
+      res.status(200).json(resultArray);
+    })
+  }));
+
   router.get('/helpTickets/:id', asyncHandler(async (req, res) => {
     logger.log('info', 'Get helpTicket ' + req.params.id);
     var query = HelpTicket.findById(req.params.id)

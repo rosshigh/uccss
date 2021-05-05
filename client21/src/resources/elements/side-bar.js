@@ -1,22 +1,23 @@
 import { Aurelia, inject } from 'aurelia-framework';
 import { Router } from "aurelia-router";
-import { RouterEvent } from 'aurelia-router';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { Auth } from '../data/auth';
 import { AppConfig } from '../../appConfig';
 import { Utils } from '../../resources/utils/utils';
+import { People } from '../../resources/data/people';
 import {Store} from '../../store/store';
 
-@inject(Auth, AppConfig, Router, Utils, EventAggregator, Aurelia, Store)
+@inject(Auth, AppConfig, Router, Utils, EventAggregator, Aurelia, People, Store)
 export class SideBar {
 
-    constructor(auth, config, router, utils, eventAggregator, aurelia, store) {
+    constructor(auth, config, router, utils, eventAggregator, aurelia, people, store) {
         this.auth = auth;
         this.router = router;
         this.utils = utils;
         this.aurelia = aurelia;
         this.config = config;
         this.eventAggregator = eventAggregator;
+        this.people = people;
         this.store = store;
         this.userObj = this.store.getUser('user');
         this.isAuthenticated = this.auth.isAuthenticated();
@@ -99,6 +100,21 @@ export class SideBar {
             this.utils.showNotification("Please enter an email address");
         }
 
+    }
+
+    createReminder(){
+        this.reminder = {
+            reminder: "",
+            description: "",
+            personal: true,
+            personId: this.userObj._id,
+            expirationDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+        }
+        $("#reminderModal").modal('show');
+    }
+
+    saveReminder(){
+        this.people.saveReminder(this.reminder);
     }
 
 }

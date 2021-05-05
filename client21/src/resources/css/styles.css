@@ -539,6 +539,10 @@ li.timeline-item::before {
   background-size: cover;
 }
 
+.myReminder {
+  background-color:cornsilk;
+}
+
 .parallax2 {
   /* The image used */
   background-image: url("../img/parallax2.jpg");
@@ -559,4 +563,8 @@ li.timeline-item::before {
   padding: 18px;
   font-size: 25px;
   letter-spacing: 10px;
+}
+
+.borderBottom {
+  border-bottom: 1px solid black;
 }

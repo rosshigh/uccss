@@ -1,0 +1,22 @@
+<template>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="col-lg-2">
+                <div id="invFormListGroup" class="list-group">
+                    <a class="${ $first ? 'menuButtons' : ''} list-group-item" repeat.for="tab of tabs" href="" 
+                        click.delegate="changeTab($event, $index)">
+                        <h4 id="${tab.id}" class="list-group-item-heading">${tab.title}</h4>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-10">
+                <div class="tab-content">
+                    <div repeat.for="tab of tabs" id="${tab.id + 'Tab'}" class="${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }">
+                        <compose view="${tabPath + tab.id + '.html'}"></compose>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

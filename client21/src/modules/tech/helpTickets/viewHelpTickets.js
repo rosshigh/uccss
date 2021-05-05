@@ -90,7 +90,7 @@ export class UserViewHelpTickets {
         document.body.removeChild(hiddenElement);
     }
 
-    async activate() {
+    async activate(params) {
         $("#loading").show();
         let responses = await Promise.all([
             this.helpTickets.getObjectArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC"),
@@ -100,8 +100,29 @@ export class UserViewHelpTickets {
             this.people.getPeopleArray('/small'),
             this.sessions.getObjectsArray('?order=startDate:DSC')
         ]);
+
+        if (params.HTNumber == -1) {
+            await this.showHTList();
+        } else {
+            await this.selectHelpTicket({_id: params.HTNumber});
+        }
         $("#loading").hide();
     }
+
+    // async activate(params) {
+    //     let responses = await Promise.all([
+    //       this.helpTickets.getHelpTicketTypes('?order=category'),
+    //       this.config.getConfig()
+    //     ]);
+
+    //     if (params.HTNumber == -1) {
+    //       await this.showHTList();
+    //     } else {
+    //       this.HTToShow = params.HTNumber;
+    //       this.showHelpTicketImmediately = true;
+
+    //     }
+    //   }
 
     attached() {
         $("#loading").hide();
@@ -211,7 +232,7 @@ export class UserViewHelpTickets {
         $('#confirmClose').modal('hide');
     }
 
-    async saveCheckForEmail(){
+    async saveCheckForEmail() {
         if (this.sendEmail && !this.privateChecked) {
             console.log('Send an email');
         }
@@ -370,12 +391,12 @@ export class UserViewHelpTickets {
         this.catDescription = this.documents.selectedCat.description;
         this.subCatDescription = this.documents.selectedCat.subCategories[this.selectedDocSubCategoryIndex].description;
         this.showDocuments = true;
-        setTimeout(() => { 
+        setTimeout(() => {
             $('[data-toggle="tooltip"]').tooltip();
             $(".form-check-input").prop('checked', false);
             this.content.documents.forEach(item => {
                 let id = item.fileName.split(" ").join("");
-                $("#" + id).prop('checked',true);
+                $("#" + id).prop('checked', true);
             })
         }, 1000);
         el.stopPropagation();
@@ -398,7 +419,7 @@ export class UserViewHelpTickets {
             var indexToRemove = -1;
             this.content.documents.forEach((item, index) => {
                 if (item.fileName === document.files[0].fileName) {
-                    indexToRemove = index; 
+                    indexToRemove = index;
                 }
             });
             if (indexToRemove >= 0) {
@@ -407,7 +428,7 @@ export class UserViewHelpTickets {
         }
     }
 
-    removeDocument(index){
+    removeDocument(index) {
         this.content.documents.splice(index, 1);
     }
 
@@ -417,54 +438,54 @@ export class UserViewHelpTickets {
         this.refreshSelects();
         this.getActiveRequests();
         window.scrollTo(0, 0);
-      }
-    
-      async getActiveRequests() {
+    }
+
+    async getActiveRequests() {
         if (this.selectedSession) {
             this.sessions.selectSessionById(this.selectedSession);
-        await this.requests.getActiveObjectsArray(this.helpTickets.selectedObject.personId._id, this.selectedSession);
-        this.originalClientRequestsArray = new Array();
-        this.clientRequestsArray = new Array();
-        //Cycle through request array
-        this.requests.objectsArray.forEach(item => {
-            //Cycle through details of request
-            item.requestDetails.forEach(item2 => {
-                //If there are assignments
-                if (item2.assignments && item2.assignments.length > 0) {
-                    //Cycle through the assignments
-                    item2.assignments.forEach((assign) => {
+            await this.requests.getActiveObjectsArray(this.helpTickets.selectedObject.personId._id, this.selectedSession);
+            this.originalClientRequestsArray = new Array();
+            this.clientRequestsArray = new Array();
+            //Cycle through request array
+            this.requests.objectsArray.forEach(item => {
+                //Cycle through details of request
+                item.requestDetails.forEach(item2 => {
+                    //If there are assignments
+                    if (item2.assignments && item2.assignments.length > 0) {
+                        //Cycle through the assignments
+                        item2.assignments.forEach((assign) => {
+                            this.originalClientRequestsArray.push({
+                                productId: item2.productId,
+                                productName: item2.productId.name,
+                                sessionId: item.sessionId,
+                                requestStatus: item2.requestStatus,
+                                systemId: assign.systemId,
+                                courseName: item.courseId ? item.courseId.name : 'Trial Client',
+                                courseId: item.courseId ? item.courseId._id : null,
+                                courseNumber: item.courseId ? item.courseId.number : 'Trial Client',
+                                client: assign.client,
+                                clientId: assign.clientId,
+                                _id: item2._id
+                            })
+                        })
+                    } else {
                         this.originalClientRequestsArray.push({
-                            productId: item2.productId,
                             productName: item2.productId.name,
                             sessionId: item.sessionId,
                             requestStatus: item2.requestStatus,
-                            systemId: assign.systemId,
                             courseName: item.courseId ? item.courseId.name : 'Trial Client',
-                            courseId: item.courseId ? item.courseId._id : null,
-                            courseNumber: item.courseId ? item.courseId.number : 'Trial Client',
-                            client: assign.client,
-                            clientId: assign.clientId,
                             _id: item2._id
                         })
-                    })
-                } else {
-                    this.originalClientRequestsArray.push({
-                        productName: item2.productId.name,
-                        sessionId: item.sessionId,
-                        requestStatus: item2.requestStatus,
-                        courseName: item.courseId ? item.courseId.name : 'Trial Client',
-                        _id: item2._id
-                    })
-                }
+                    }
+                })
+            });
+            this.originalClientRequestsArray.forEach(item => {
+                this.clientRequestsArray.push(item);
             })
-        });
-        this.originalClientRequestsArray.forEach(item => {
-            this.clientRequestsArray.push(item);
-        })
-    }
+        }
     }
 
-    showNotePanel(){
+    showNotePanel() {
         this.showNotesPanel = !this.showNotesPanel;
     }
 
@@ -479,27 +500,27 @@ export class UserViewHelpTickets {
         //     if (this.selectedRequestDetail.requestId && this.selectedRequestDetail.requestId.courseId === null) this.selectedRequestDetail.requestId.courseId = { _id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME };
         //     this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
         //     if (this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) this.systems.selectedSystemFromId(this.selectedRequestDetail.assignments[0].systemId);
-            this.requestTableOrForm = 'form';
+        this.requestTableOrForm = 'form';
         // }
 
     }
 
-    async openSearchForm(){
+    async openSearchForm() {
         let responses = await Promise.all([
             this.products.getObjectsArray('?order=name'),
             this.people.getPeopleArray('?order=lastName'),
             this.people.getInstitutionArray('?order=name'),
             this.sessions.getObjectsArray('?order=startDate:DSC'),
             this.products.getSmallObjectsArray('?order=name')
-          ]);
-      
-          this.filterList();
-          this.filterPeopleList();
-          this.filterInstitutionsList();
+        ]);
+
+        this.filterList();
+        this.filterPeopleList();
+        this.filterInstitutionsList();
         this.searchForm = true;
     }
 
-    backToTable(){
+    backToTable() {
         this.searchForm = false;
     }
 
@@ -508,81 +529,81 @@ export class UserViewHelpTickets {
         $("#requestProductsLabel").html("Requested Products");
         this.products.selectedObjectFromId(el.target.id);
         this.selectedProducts.push(this.products.selectedObject);
-      }
-    
-      removeProduct(el) {
+    }
+
+    removeProduct(el) {
         this.selectedProducts.splice(this.selectedProducts.indexOf(el.target.id), 1);
-      }
-    
-      filterList() {
+    }
+
+    filterList() {
         if (this.filter) {
-          var thisFilter = this.filter
-          this.filteredProductsArray = this.products.objectsArray.filter((item) => {
-            return item.name.toUpperCase().indexOf(thisFilter.toUpperCase()) != -1;
-          });
+            var thisFilter = this.filter
+            this.filteredProductsArray = this.products.objectsArray.filter((item) => {
+                return item.name.toUpperCase().indexOf(thisFilter.toUpperCase()) != -1;
+            });
         } else {
-          this.filteredProductsArray = this.products.objectsArray;
+            this.filteredProductsArray = this.products.objectsArray;
         }
-      }
-    
-      filterPeopleList() {
+    }
+
+    filterPeopleList() {
         if (this.peopleFilter) {
-          var thisFilter = this.peopleFilter
-          this.filteredPersonArray = this.people.peopleArray.filter((item) => {
-            return item.fullName.toUpperCase().indexOf(thisFilter.toUpperCase()) != -1;
-          });
+            var thisFilter = this.peopleFilter
+            this.filteredPersonArray = this.people.peopleArray.filter((item) => {
+                return item.fullName.toUpperCase().indexOf(thisFilter.toUpperCase()) != -1;
+            });
         } else {
-          this.filteredPersonArray = this.people.peopleArray;
+            this.filteredPersonArray = this.people.peopleArray;
         }
-      }
-    
-      selectPerson(el, person) {
+    }
+
+    selectPerson(el, person) {
         if (!this.selectedPeople) this.selectedPeople = [];
         $("#requestProductsLabel").html("Requested Person");
         this.people.setSelectedPerson(person)
         this.selectedPeople.push(this.people.selectedPerson);
-      }
-    
-      removePerson(el) {
+    }
+
+    removePerson(el) {
         this.selectedPeople.splice(this.selectedPeople.indexOf(el.target.id), 1);
-      }
-    
-      filterInstitutionsList() {
+    }
+
+    filterInstitutionsList() {
         if (this.institutionsFilter) {
-          var thisFilter = this.institutionsFilter;
-          this.filteredInstitutionArray = this.people.institutionsArray.filter((item) => {
-            return item.name.toUpperCase().indexOf(thisFilter.toUpperCase()) != -1;
-          });
+            var thisFilter = this.institutionsFilter;
+            this.filteredInstitutionArray = this.people.institutionsArray.filter((item) => {
+                return item.name.toUpperCase().indexOf(thisFilter.toUpperCase()) != -1;
+            });
         } else {
-          this.filteredInstitutionArray = this.people.institutionsArray;
+            this.filteredInstitutionArray = this.people.institutionsArray;
         }
-      }
-    
-      selectInstitution(el, obj) {
+    }
+
+    selectInstitution(el, obj) {
         if (!this.selectedInstitutions) this.selectedInstitutions = [];
         this.people.setInstitution(obj);
         this.selectedInstitutions.push(this.people.selectedInstitution);
-      }
-    
-      removeInstitution(el) {
+    }
+
+    removeInstitution(el) {
         this.selectedInstitutions.splice(this.selectedInstitutions.indexOf(el.target.id), 1);
-      }
-    
+    }
+
     //   buildSearchCriteria() {
     //     console.log('lkasjdflj')
     //     this.searchObj = new Object();
-    
+
     //     if (this.helpTicketNo) {
     //       this.searchObj.helpTicketNo = this.helpTicketNo;
     //     }
-    
+
     //     if (this.dateFrom || this.dateTo) {
     //       this.searchObj.dateRange = {
     //         dateFrom: this.dateFrom,
     //         dateTo: this.dateTo
     //       };
     //     }
-    
+
     //     // if (this.selectedStatus) {
     //     //   if(this.selectedStatus == this.config.MY_HELPTICKET_STATUS){
     //     //     this.searchObj.owner = this.userObj._id;
@@ -590,33 +611,33 @@ export class UserViewHelpTickets {
     //     //     this.searchObj.status = this.selectedStatus;
     //     //   }
     //     // }
-    
+
     //     if (this.keyWords) {
     //       this.searchObj.keyWords = this.keyWords;
     //     }
-    
+
     //     if (this.content) {
     //       this.searchObj.content = this.contentSearchTerm;
     //     }
-    
+
     //     // if (this.selectedType != -1) {
     //     //   this.searchObj.helpTicketType = this.selectedType;
     //     // }
-    
+
     //     if (this.selectedProducts && this.selectedProducts.length) {
     //       this.searchObj.productIds = this.selectedProducts;
     //     }
-    
+
     //     if (this.selectedPeople && this.selectedPeople.length) {
     //       this.searchObj.peopleIds = this.selectedPeople;
     //     }
-    
+
     //     if (this.selectedInstitutions && this.selectedInstitutions.length) {
     //       this.searchObj.institutionIds = this.selectedInstitutions;
     //     }
-    
+
     //   }
-    
+
     //   async search() {
     //     $("#loading").show();
     //     this.buildSearchCriteria();

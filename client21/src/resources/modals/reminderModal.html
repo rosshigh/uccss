@@ -1,0 +1,49 @@
+<template>
+    <div class="modal fade" id="reminderModal" tabindex="-1" role="dialog" aria-labelledby="reminderModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reminderModalLabel">Create Reminder</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Reminder *</label>
+                        <input value.bind="reminder.reminder" id="editReminder" class="form-control"
+                            placeholder="Reminder" type="text" />
+                    </div>
+                    <div class="form-group">
+                        <label>Description *</label>
+                        <textarea rows="3" value.bind="reminder.description" id="editDescription" class="form-control"
+                            placeholder="Description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input checked.bind="reminder.personal" type="checkbox"> Just for me
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Expiration Date</label>
+                        <flat-picker controlid="expirationDate" placeholder="Expiration date" config.bind="configDate"
+                            value.bind="reminder.expirationDate">
+                        </flat-picker>
+                    </div>
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        <flat-picker controlid="dueDate" placeholder="Expiration date" config.bind="configDate"
+                            value.bind="reminder.dueDate">
+                        </flat-picker>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button click.trigger="saveReminder()" type="button" class="btn btn-primary"
+                            data-dismiss="modal">Save</button>
+                    </div>
+                </div>
+            </div>
+</template>

@@ -55,17 +55,23 @@ export class Inventory {
 
     selectObject(index) {
         if (index === undefined) {
-            this.selectedObject = this.emptyProduct();
+            this.selectedObject = this.emptyInventory();
             this.newSystem = true;
         } else {
             try {
                 this.selectedObject = this.utils.copyObject(this.objectsArray[index]);
+                this.originalObject = this.utils.copyObject(this.selectedObject);
             } catch (error) {
                 console.log(error);
-                this.selectedObject = this.emptyProduct();
+                this.selectedObject = this.emptyInventory();
                 this.newSystem = true;
             }
         }
+    }
+
+    setObject(object){
+        this.selectedObject = this.utils.copyObject(object);
+        this.originalObject = this.utils.copyObject(object);
     }
 
     selectedObjectById(id) {
@@ -73,6 +79,7 @@ export class Inventory {
         for (let i = 0; i < this.objectsArray.length; i++) {
             if (this.objectsArray[i]._id === id) {
                 this.selectedObject = this.utils.copyObject(this.objectsArray[i]);
+                this.originalObject = this.utils.copyObject(this.selectedObject);
                 return i;
             }
         }
