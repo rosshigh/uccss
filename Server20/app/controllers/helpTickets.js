@@ -32,14 +32,18 @@ module.exports = function (app, config) {
     .exec()
     .then(result => {     
       if(result && result.length){
+        var newArray = [];
         var resultArray = [];
         result.forEach(item => {            
           if(item.owner[0].personId == req.params.id){
             resultArray.push(item);
           }
+          if(item.owner[0].personId == 'b1b1b1b1b1b1b1b1b1b1b1b1'){
+            newArray.push(item);
+          }
         })
       }     
-      res.status(200).json(resultArray);
+      res.status(200).json({mine: resultArray, new: newArray});
     })
   }));
 

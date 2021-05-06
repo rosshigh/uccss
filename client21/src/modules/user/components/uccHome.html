@@ -38,7 +38,22 @@
                         aria-hidden="true"></i></span></h3>
             <ul>
                 <li click.trigger="navigateToHelpTicket(helpTicket)" class="borderBottom pointMe"
-                    repeat.for="helpTicket of helpTickets.myObjectsArray">
+                    repeat.for="helpTicket of helpTickets.myObjectsArray.mine">
+                    <span>Help Ticket: ${helpTicket.helpTicketNo}</span><span
+                        class="pull-right">${helpTicket.personId.fullName}</span>
+                    <div>${helpTicket.helpTicketStatus |
+                        lookupValue:config.HELP_TICKET_STATUSES:'code':'description'}</div>
+                    </span>
+                </li>
+            </ul>
+        </div>
+        <div class="col-3 offset-1 leftMargin">
+            <h3>New Help Tickets <span click.delegate="refreshHelpTickets()" bootstrap-tooltip data-toggle="tooltip"
+                    data-placement="bottom" title="" data-original-title="Refresh Help Tickets"><i class="fa fa-refresh"
+                        aria-hidden="true"></i></span></h3>
+            <ul>
+                <li click.trigger="navigateToHelpTicket(helpTicket)" class="borderBottom pointMe"
+                    repeat.for="helpTicket of helpTickets.myObjectsArray.new">
                     <span>Help Ticket: ${helpTicket.helpTicketNo}</span><span
                         class="pull-right">${helpTicket.personId.fullName}</span>
                     <div>${helpTicket.helpTicketStatus |

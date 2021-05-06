@@ -101,9 +101,8 @@ export class UserViewHelpTickets {
             this.sessions.getObjectsArray('?order=startDate:DSC')
         ]);
 
-        if (params.HTNumber == -1) {
-            await this.showHTList();
-        } else {
+        if (params.HSNumber) {
+            
             await this.selectHelpTicket({_id: params.HTNumber});
         }
         $("#loading").hide();

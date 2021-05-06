@@ -88,6 +88,12 @@ export class App {
         settings: { auth: false, roles: [] }
       },
       {
+        route: 'helpTicketsTechMenu',
+        moduleId: PLATFORM.moduleName('./modules/tech/helpTickets/helpTickets'),
+        name: 'helpTicketsTechMenu',
+        settings: { auth: false, roles: [] }
+      },
+      {
         route: 'productRequests',
         moduleId: PLATFORM.moduleName('./modules/user/requests/productRequests'),
         name: 'productRequests',
