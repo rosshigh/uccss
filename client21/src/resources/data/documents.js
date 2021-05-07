@@ -112,16 +112,15 @@ export class DocumentsServices {
         return newObj;
     }
 
-    async deleteSubSubCategory(subIndex, subSubIndex){
-        if (!this.selectedCat) {
-            return;
-        }
+    // async deleteSubSubCategory(subIndex, subSubIndex){
+    //     if (!this.selectedCat) {
+    //         return;
+    //     }
 
-        this.selectedCat.subCategories[subIndex].subSubCategories.splice(subSubIndex, 1);  
-console.log( this.selectedCat.subCategories[subIndex].subSubCategories)             
-        let serverResponse = await this.data.saveObject(this.selectedCat, this.DOCUMENTS_CATEGORY_SERVICE, "put");
-        return serverResponse;
-    }
+    //     this.selectedCat.subCategories[subIndex].subSubCategories.splice(subSubIndex, 1);           
+    //     let serverResponse = await this.data.saveObject(this.selectedCat, this.DOCUMENTS_CATEGORY_SERVICE, "put");
+    //     return serverResponse;
+    // }
 
     async saveCategory() {
         if (!this.selectedCat) {

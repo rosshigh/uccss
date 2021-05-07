@@ -12,6 +12,7 @@ import { Store } from '../../../store/store';
 export class Documents {
 
     pageSize = 200;
+    selectedSubCatoryIndex = -1;
 
     constructor(ValidationControllerFactory, documents, utils, store, dialogService, config) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
@@ -51,7 +52,19 @@ export class Documents {
         $("#systemMessage").fadeOut(500).fadeIn(500).fadeOut(500).fadeIn(500);
     }
 
-    toggleListItem(el, id) {
+    toggleListItem(el, object, type, index) {
+       
+        if(object._id !== this.documents.selectedCat._id){
+            this.documents.setCategory(object);
+        }
+        if(type === "C"){
+            this.categorySelected = true;
+            this.selectedSubCategoryIndex = -1;
+            this.selectedSubSubCategoryIndex = -1;
+        }
+        if(type === 'S'){
+            this.selectedSubCategoryIndex = index;
+        }
         let thisElement = el.target;
         thisElement.parentElement.querySelector(".nested").classList.toggle("active");
         thisElement.classList.toggle("caret-down");
@@ -93,7 +106,7 @@ export class Documents {
     }
 
     editCategory(obj, index, el) {
-        this.documents.setCategory(obj);
+        // this.documents.setCategory(obj);
         this.selectedCategory = index;
         this.refreshSelects();
         this.modalTitle = "Edit Category";
@@ -117,16 +130,17 @@ export class Documents {
     }
 
     async deleteTheCategory() {
-        this.documents.selectCategory(this.selectedCategory);
+        // this.documents.selectCategory(this.selectedCategory);
         let serverResponse = this.documents.deleteCategory();
         if (!serverResponse.error) {
             this.utils.showNotification("Category Deleted");
         }
+        this.categorySelected = false;
         this.cleanUp();
     }
     
     newSubCategory(obj, el) {
-        this.documents.setCategory(obj);
+        // this.documents.setCategory(obj);
         this.documents.selectedCat.subCategories.push(this.documents.emptySubCat());
         this.selectedSubCategoryIndex = this.documents.selectedCat.subCategories.length - 1;
         this.newSubCategoryFlag = true;
@@ -135,12 +149,12 @@ export class Documents {
         setTimeout(()=>{
             $('#subCategoryInput').focus();
         }, 500);
-        el.stopPropagation();
+        // el.stopPropagation();
     }
 
     editSubCategory(index, category, el) {
-        this.documents.setCategory(category);
-        this.selectedSubCategoryIndex = index;
+        // this.documents.setCategory(category);
+        // this.selectedSubCategoryIndex = index;
         // let descriptionNoSpaces = this.documents.selectedCat.subCategories[index].description.split(" ").join("");
         this.newSubCategoryFlag = false;
         this.modalTitle = "Edit Subcategory";
@@ -148,17 +162,17 @@ export class Documents {
         setTimeout(()=>{
             $('#subCategoryInput').focus();
         }, 500);
-        el.stopPropagation();
+        // el.stopPropagation();
     }
 
     // this(index){
     //     console.log(index)
     // }
 
-    async this(index, parent, el) {
-        el.stopPropagation();
-        this.selectedSubCategoryIndex = index;
-        this.selectedCategory = parent;
+    async deleteSubCategory(index, parent, el) {
+        // el.stopPropagation();
+        // this.selectedSubCategoryIndex = index;
+        // this.selectedCategory = parent;
         let message = 'Are you sure you want to delete this subcategory?';
         let title = "Confirm Delete";
         let options = {};
@@ -170,44 +184,45 @@ export class Documents {
     }
 
     async deleteTheSubCategory() {
-        this.documents.selectCategory(this.selectedCategory);
+        // this.documents.selectCategory(this.selectedCategory);
         this.documents.selectedCat.subCategories.splice(this.selectedSubCategoryIndex, 1);
+        this.selectedSubCategoryIndex = -1;
         this.saveCategory();
     }
 
     newSubSubCategory(index, obj, el) {
-        this.documents.setCategory(obj);
-        this.selectedSubCategoryIndex = index;
-        if (!this.documents.selectedCat.subCategories[index].subSubCategories) this.documents.selectedCat.subCategories[index].subSubCategories = [];
-        this.documents.selectedCat.subCategories[index].subSubCategories.push(this.documents.emptySubSubCat(index));
-        this.selectedSubSubCategoryIndex = this.documents.selectedCat.subCategories[index].subSubCategories.length - 1;
-        this.documents.selectedCat.subCategories[index].subSubCategories[this.selectedSubSubCategoryIndex].sortOrder = this.selectedSubSubCategoryIndex + 1;
+        // this.documents.setCategory(obj);
+        // this.selectedSubCategoryIndex = index;
+        if (!this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex ].subSubCategories) this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex ].subSubCategories = [];
+        this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex ].subSubCategories.push(this.documents.emptySubSubCat(this.selectedSubCategoryIndex ));
+        this.selectedSubSubCategoryIndex = this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories.length - 1;
+        this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex ].subSubCategories[this.selectedSubSubCategoryIndex].sortOrder = this.selectedSubSubCategoryIndex + 1;
         this.newSubSubCategoryFlag = true;
         $('#subSubCategoryModal').modal('show');
         setTimeout(()=>{
             $('#subSubCategoryInput').focus();
         }, 500);
-        el.stopPropagation();
+        // el.stopPropagation();
     }
 
     editSubSubCategory(index, obj, subCatIndex, el) {
-        this.documents.setCategory(obj);
-        this.selectedSubCategoryIndex = subCatIndex;
-        this.selectedSubSubCategoryIndex = index;
+        // this.documents.setCategory(obj);
+        // this.selectedSubCategoryIndex = subCatIndex;
+        // this.selectedSubSubCategoryIndex = index;
         this.newSubSubCategoryFlag = false;
         $('#subSubCategoryModal').modal('show');
         setTimeout(()=>{
             $('#subSubCategoryInput').focus();
         }, 500);
-        el.stopPropagation();
+        // el.stopPropagation();
     }
 
     deleteSubSubCategory(obj, parent, parentParent, el) {
-        el.stopPropagation();
+        // el.stopPropagation();
         // this.selectedSubSubCategoryIndex = index;
-        this.subSubCat = obj;
-        this.selectedSubCategoryIndex = parent;
-        this.selectedCategory = parentParent;
+        // this.subSubCat = obj;
+        // this.selectedSubCategoryIndex = parent;
+        // this.selectedCategory = parentParent;
         let message = 'Are you sure you want to delete this subcategory?';
         let title = "Confirm Delete";
         let options = {};
@@ -229,9 +244,12 @@ export class Documents {
     }
 
     deleteTheSubSubCategory() {
-        this.documents.selectCategory(this.selectedCategory);
-        let spliceIndex = this.findIndex(this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories, this.subSubCat.description, 'description')
-        setTimeout(()=> {this.documents.deleteSubSubCategory(this.selectedSubCategoryIndex, spliceIndex)}, 500);
+        this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories.splice(this.selectedSubSubCategoryIndex, 1);
+        this.selectedSubSubCategoryIndex = -1;
+        this.saveCategory();
+        // this.documents.selectCategory(this.selectedCategory);
+        // let spliceIndex = this.findIndex(this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories, this.subSubCat.description, 'description')
+        // setTimeout(()=> {this.documents.deleteSubSubCategory(this.selectedSubCategoryIndex, this.selectedSubSubCategoryIndex)}, 500);
     }
 
     async validateCategoryToSave() {
@@ -280,8 +298,12 @@ export class Documents {
         })
     }
 
-    showSubCategoryDocuments(category, SubCategoryIndex, SubSubCategoryIndex, el) {
-        this.documents.setCategory(category);
+    showSubCategoryDocuments(object, SubCategoryIndex, SubSubCategoryIndex, el) {
+        if(object._id !== this.documents.selectedCat._id){
+            this.documents.setCategory(object);
+        }
+
+        // this.documents.setCategory(category);
         this.selectedSubCategoryIndex = SubCategoryIndex;
         this.selectedSubSubCategoryIndex = SubSubCategoryIndex;
         this.showDocuments = true;
