@@ -17,18 +17,17 @@
         <tbody>
             <tr repeat.for="document of $displayData">
                 <td><a target="_blank"
-                        href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedCat.DocCode}-${selectedSubCategoryIndex}-${selectedSubSubCategoryIndex}-${document.files[0].fileName}">${document.name}</a>
+                        href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedCat.DocCode}/${selectedSubCategoryIndex}/${selectedSubSubCategoryIndex}/${document.file.fileName}">${document.name}</a>
                 </td>
-                <td>${document.files[0].fileName}</td>
+                <td>${document.file.fileName}</td>
                 <td style="width:10rem;"><input change.trigger="saveDocument(document)" class="form-control" type="number" value.bind="document.sortOrder"></td>
                 <td>${document.files[0].size}</td>
                 <td>${document.description | concatenateString:10}</td>
-                <td>${document.createdDate | dateFormat:configParameters.DATE_FORMAT_TABLE}</td>
-                <td>${document.displayDate | dateFormat:configParameters.DATE_FORMAT_TABLE}</td>
+                <td>${document.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+                <td>${document.displayDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
                 <td> <span click.trigger="toggleFileActive(document)"
                         innerhtml="${document.active | activateButton:true}" bootstrap-tooltip data-toggle="tooltip"
                         data-placement="bottom" title="" data-original-title="${document.active}"></span>
-
                 </td>
                 <td>
                     <span click.delegate="editDocument(document)" bootstrap-tooltip data-toggle="toggle"

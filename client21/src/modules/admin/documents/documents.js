@@ -6,26 +6,24 @@ import { ConfirmDialog } from '../../../resources/dialogs/confirm-dialog';
 import { MessageDialog } from '../../../resources/dialogs/message-dialog';
 import { Utils } from '../../../resources/utils/utils';
 import { AppConfig } from '../../../appConfig';
-import { Store } from '../../../store/store';
+// import { Store } from '../../../store/store';
 
-@inject(ValidationControllerFactory, DocumentsServices, Utils, Store, DialogService, AppConfig)
+@inject(ValidationControllerFactory, DocumentsServices, Utils, DialogService, AppConfig)
 export class Documents {
 
     pageSize = 200;
     selectedSubCatoryIndex = -1;
 
-    constructor(ValidationControllerFactory, documents, utils, store, dialogService, config) {
+    constructor(ValidationControllerFactory, documents, utils, dialogService, config) {
         this.controller = ValidationControllerFactory.createForCurrentScope();
         this.documents = documents;
         this.utils = utils;
-        this.store = store;
         this.dialogService = dialogService;
         this.config = config;
 
         this.view = 'categoryList';
         this.showDocuments = false;
-        this.userObj = this.store.getUser();
-        this.configParameters = this.store.getConfig();
+        this.userObj = JSON.parse(sessionStorage.getItem('user'));
 
         this.pageTitle = 'File Management';
 
@@ -54,7 +52,7 @@ export class Documents {
 
     toggleListItem(el, object, type, index) {
        
-        if(object._id !== this.documents.selectedCat._id){
+        if(!this.documents.selectedCat || object._id !== this.documents.selectedCat._id){
             this.documents.setCategory(object);
         }
         if(type === "C"){
@@ -106,7 +104,6 @@ export class Documents {
     }
 
     editCategory(obj, index, el) {
-        // this.documents.setCategory(obj);
         this.selectedCategory = index;
         this.refreshSelects();
         this.modalTitle = "Edit Category";
@@ -130,7 +127,6 @@ export class Documents {
     }
 
     async deleteTheCategory() {
-        // this.documents.selectCategory(this.selectedCategory);
         let serverResponse = this.documents.deleteCategory();
         if (!serverResponse.error) {
             this.utils.showNotification("Category Deleted");
@@ -139,8 +135,7 @@ export class Documents {
         this.cleanUp();
     }
     
-    newSubCategory(obj, el) {
-        // this.documents.setCategory(obj);
+    newSubCategory() {
         this.documents.selectedCat.subCategories.push(this.documents.emptySubCat());
         this.selectedSubCategoryIndex = this.documents.selectedCat.subCategories.length - 1;
         this.newSubCategoryFlag = true;
@@ -149,30 +144,18 @@ export class Documents {
         setTimeout(()=>{
             $('#subCategoryInput').focus();
         }, 500);
-        // el.stopPropagation();
     }
 
-    editSubCategory(index, category, el) {
-        // this.documents.setCategory(category);
-        // this.selectedSubCategoryIndex = index;
-        // let descriptionNoSpaces = this.documents.selectedCat.subCategories[index].description.split(" ").join("");
+    editSubCategory() {
         this.newSubCategoryFlag = false;
         this.modalTitle = "Edit Subcategory";
         $('#subCategoryModal').modal('show');
         setTimeout(()=>{
             $('#subCategoryInput').focus();
         }, 500);
-        // el.stopPropagation();
     }
 
-    // this(index){
-    //     console.log(index)
-    // }
-
-    async deleteSubCategory(index, parent, el) {
-        // el.stopPropagation();
-        // this.selectedSubCategoryIndex = index;
-        // this.selectedCategory = parent;
+    async deleteSubCategory() {
         let message = 'Are you sure you want to delete this subcategory?';
         let title = "Confirm Delete";
         let options = {};
@@ -184,15 +167,12 @@ export class Documents {
     }
 
     async deleteTheSubCategory() {
-        // this.documents.selectCategory(this.selectedCategory);
         this.documents.selectedCat.subCategories.splice(this.selectedSubCategoryIndex, 1);
         this.selectedSubCategoryIndex = -1;
         this.saveCategory();
     }
 
-    newSubSubCategory(index, obj, el) {
-        // this.documents.setCategory(obj);
-        // this.selectedSubCategoryIndex = index;
+    newSubSubCategory() {;
         if (!this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex ].subSubCategories) this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex ].subSubCategories = [];
         this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex ].subSubCategories.push(this.documents.emptySubSubCat(this.selectedSubCategoryIndex ));
         this.selectedSubSubCategoryIndex = this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories.length - 1;
@@ -202,27 +182,17 @@ export class Documents {
         setTimeout(()=>{
             $('#subSubCategoryInput').focus();
         }, 500);
-        // el.stopPropagation();
     }
 
-    editSubSubCategory(index, obj, subCatIndex, el) {
-        // this.documents.setCategory(obj);
-        // this.selectedSubCategoryIndex = subCatIndex;
-        // this.selectedSubSubCategoryIndex = index;
+    editSubSubCategory() {
         this.newSubSubCategoryFlag = false;
         $('#subSubCategoryModal').modal('show');
         setTimeout(()=>{
             $('#subSubCategoryInput').focus();
         }, 500);
-        // el.stopPropagation();
     }
 
     deleteSubSubCategory(obj, parent, parentParent, el) {
-        // el.stopPropagation();
-        // this.selectedSubSubCategoryIndex = index;
-        // this.subSubCat = obj;
-        // this.selectedSubCategoryIndex = parent;
-        // this.selectedCategory = parentParent;
         let message = 'Are you sure you want to delete this subcategory?';
         let title = "Confirm Delete";
         let options = {};
@@ -247,9 +217,6 @@ export class Documents {
         this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories.splice(this.selectedSubSubCategoryIndex, 1);
         this.selectedSubSubCategoryIndex = -1;
         this.saveCategory();
-        // this.documents.selectCategory(this.selectedCategory);
-        // let spliceIndex = this.findIndex(this.documents.selectedCat.subCategories[this.selectedSubCategoryIndex].subSubCategories, this.subSubCat.description, 'description')
-        // setTimeout(()=> {this.documents.deleteSubSubCategory(this.selectedSubCategoryIndex, this.selectedSubSubCategoryIndex)}, 500);
     }
 
     async validateCategoryToSave() {

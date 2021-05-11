@@ -6,27 +6,12 @@
             <div class="col-10">
                 <ul id="myUL">
                     <li class="pointMe" repeat.for="type of filteredQuestionArray | sortArray:'sortOrder':'ASC'">
-                        <span click.trigger="toggleListItem($event, type.DocCode)" class="caret">
+                        <span click.trigger="toggleListItem($event, type, 'C')" class="caret">
                             ${type.description | concatenateString:60}</span><br/>
-                        <span click.delegate="newSubCategory(type, $event)" class="smallMarginRight" bootstrap-tooltip
-                            data-toggle="tooltip" data-placement="bottom" title=""
-                            data-original-title="New Subcategory"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                        <span click.delegate="editCategory(type, $index, $event)" bootstrap-tooltip data-toggle="toggle"
-                            data-placement="bottom" title="" data-original-title="Edit" class="smallMarginRight"><i
-                                class="fa fa-pencil" aria-hidden="true"></i></span>
-                        <span class="input-group-btn">
-                            <i click.trigger="deleteCategory(type)" class="fa fa-trash" aria-hidden="true"></i>
-                        </span>
                         <ul class="nested">
                             <li click.delegate="showQuestions(type, $parent.$index, $index, $event)"
                                 repeat.for="subCat of type.subCategories | sortArray:'sortOrder':'ASC'">
                                 <span>${subCat.description | concatenateString:25}</span><br/>
-                                <span click.delegate="editSubCategory($index, type, $event)" class="smallMarginRight"
-                                    bootstrap-tooltip data-toggle="toggle" data-placement="bottom" title=""
-                                    data-original-title="Edit"><i class="fa fa-pencil" aria-hidden="true"></i></span>
-                                <span class="input-group-btn">
-                                    <i click.trigger="deleteSubCategory(type, $index, $event)" class="fa fa-trash" aria-hidden="true"></i>
-                                </span>
                             </li>
                         </ul>
                     </li>

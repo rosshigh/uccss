@@ -12,7 +12,7 @@ export class EditFAQ {
 
     constructor(validation, documentService, faqservices, config, store, utils) {
         this.validation = validation;
-        this.documentsService = documentService;
+        this.documents = documentService;
         this.faqservices = faqservices;
         this.config = config;
         this.store = store;
@@ -40,7 +40,7 @@ export class EditFAQ {
 
     filterQuestionList() {
         this.filteredQuestionArray = [];
-         let arrayToFilter = [];
+        let arrayToFilter = [];
         this.faqservices.objectQuesitonsArray.forEach(item => {
             arrayToFilter.push(item);
         })
@@ -50,24 +50,24 @@ export class EditFAQ {
             let subCategoryToBuild;
             let indicesToSplice;
             arrayToFilter.forEach(categoryItem => {
-                categoryToBuild = {description: categoryItem.description, sortOrder: categoryItem.sortOrder, subCategories: []};
+                categoryToBuild = { description: categoryItem.description, sortOrder: categoryItem.sortOrder, subCategories: [] };
                 categoryItem.subCategories.forEach(subCatItem => {
-                    subCategoryToBuild = {description: subCatItem.description, sortOrder: subCatItem.sorOrder};
+                    subCategoryToBuild = { description: subCatItem.description, sortOrder: subCatItem.sorOrder };
                     indicesToSplice = [];
                     subCatItem.questions.forEach((questItem, index) => {
-                        if(questItem.question.toUpperCase().indexOf(thisFilter.toUpperCase()) === -1){
+                        if (questItem.question.toUpperCase().indexOf(thisFilter.toUpperCase()) === -1) {
                             indicesToSplice.push(index);
-                        } 
+                        }
                     })
-                    if(subCatItem.questions && subCatItem.questions.length > 0){
-                        for(let i = indicesToSplice.length - 1; i >= 0; i--){
+                    if (subCatItem.questions && subCatItem.questions.length > 0) {
+                        for (let i = indicesToSplice.length - 1; i >= 0; i--) {
                             subCatItem.questions.splice(indicesToSplice[i], 1);
                         }
-                        
+
                         categoryToBuild.subCategories.push(subCatItem);
                     }
                 })
-                if(categoryToBuild.subCategories.length > 0){
+                if (categoryToBuild.subCategories.length > 0) {
                     this.filteredQuestionArray.push(categoryToBuild);
                 }
             })
@@ -82,7 +82,15 @@ export class EditFAQ {
         }
     }
 
-    toggleListItem(el, id) {
+    toggleListItem(el, object, type, index) {
+
+        if (!this.faqservices.selectedCat || object._id !== this.faqservices.selectedCat._id) {
+            this.faqservices.setCategory(object);
+        }
+        if (type === "C") {
+            this.categorySelected = true;
+            this.selectedSubCategoryIndex = -1;
+        }
         let thisElement = el.target;
         thisElement.parentElement.querySelector(".nested").classList.toggle("active");
         thisElement.classList.toggle("caret-down");
@@ -99,25 +107,23 @@ export class EditFAQ {
         this.refreshSelects();
         this.modalTitle = "New Category";
         $('#categoryModal').modal('show');
-        setTimeout(()=>{
+        setTimeout(() => {
             $('#categoryInput').focus();
         }, 500);
     }
 
     editCategory(obj, index, el) {
-        this.faqservices.setCategory(obj);
-        this.selectedCat = index;
+        this.selectedCategory = index;
         this.refreshSelects();
         this.modalTitle = "Edit Category";
         $('#categoryModal').modal('show');
-        setTimeout(()=>{
+        setTimeout(() => {
             $('#categoryInput').focus();
         }, 500);
         el.stopPropagation();
     }
 
-    async deleteCategory(obj) {
-        this.faqservices.setCategory(obj);
+    async deleteCategory() {
         $("#confirmDeleteModal").modal('show');
     }
 
@@ -126,40 +132,35 @@ export class EditFAQ {
         if (!serverResponse.error) {
             this.utils.showNotification("Category Deleted");
         }
+        this.categorySelected = false;
         this.cleanUp();
     }
 
-    newSubCategory(obj, el) {
-        this.faqservices.setCategory(obj);
+    newSubCategory() {
         this.faqservices.selectedCat.subCategories.push(this.faqservices.emptySubCat());
         this.selectedSubCategoryIndex = this.faqservices.selectedCat.subCategories.length - 1;
         this.newSubCategoryFlag = true;
         this.modalTitle = "New Subcategory";
         $('#subCategoryModal').modal('show');
-        setTimeout(() => {$("#subCategoryInput").focus();},500);
-        el.stopPropagation();
+        setTimeout(() => { $("#subCategoryInput").focus(); }, 500);
     }
 
-    editSubCategory(index, category, el) {
-        this.faqservices.setCategory(category);
-        this.selectedSubCategoryIndex = index;
-        let descriptionNoSpaces = this.faqservices.selectedCat.subCategories[index].description.split(" ").join("");
+    editSubCategory() {
         this.newSubCategoryFlag = false;
         this.modalTitle = "Edit Subcategory";
         $('#subCategoryModal').modal('show');
-        $("#subCategoryInput").focus();
-        el.stopPropagation();
+        setTimeout(() => {
+            $('#subCategoryInput').focus();
+        }, 500);
     }
 
-    async deleteSubCategory(obj, index, el) {
-        this.selectedSubCategoryIndex = index;
-        this.faqservices.setCategory(obj);
+    async deleteSubCategory() {
         $("#confirmSubDeleteModal").modal('show');
-        el.stopPropagation();
     }
 
     async deleteTheSubCategory() {
         this.faqservices.selectedCat.subCategories.splice(this.selectedSubCategoryIndex, 1);
+        this.selectedSubCategoryIndex = -1;
         this.saveCategory();
     }
 
@@ -168,7 +169,7 @@ export class EditFAQ {
         await this.saveCategory();
         if (this.categoriesToSave.length) {
             for (let i = 0; i < this.categoriesToSave.length; i++) {
-                this.documentsService.setCategory(this.categoriesToSave[i]);
+                this.documents.setCategory(this.categoriesToSave[i]);
                 await this.saveCategory();
             }
         }
@@ -183,21 +184,21 @@ export class EditFAQ {
 
     selectQuestion(index, question) {
         this.faqservices.setQuestion(question);
-        this.keepDocuments = [];
-        this.faqservices.selectedQuestion.links.forEach(item => {
-            this.keepDocuments.push(item);
-        });
+        // this.keepDocuments = [];
+        // this.faqservices.selectedQuestion.links.forEach(item => {
+        //     this.keepDocuments.push(item);
+        // });
         this.selectedQuestionIndex = index;
         this.showDocumentForm = true;
     }
 
     async attachDocument() {
         let responses = await Promise.all([
-            this.documentsService.getDocumentsCategoriesArray("?filter=[or]category|DOC:CUR:SOF:HPT:USE"),
+            this.documents.getDocumentsCategoriesArray("?filter=[or]category|DOC:CUR:SOF:HPT:USE"),
         ]);
         this.filterDocumentList();
         this.modalTitle = "Choose a Document";
-        this.keepDocuments = [];
+        // this.keepDocuments = [];
         // $(".form-check-input").prop('checked', false);
         $('#documentsModal').modal('show');
     }
@@ -205,11 +206,11 @@ export class EditFAQ {
     filterDocumentList() {
         if (this.DocumentFilter) {
             let thisFilter = this.filter
-            this.filteredDocumentArray = this.documentsService.objectCategoriesArray.filter((item) => {
+            this.filteredDocumentArray = this.documents.objectCategoriesArray.filter((item) => {
                 return item.description.toUpperCase().indexOf(thisFilter.toUpperCase()) > -1;
             });
         } else {
-            this.filteredDocumentArray = this.documentsService.objectCategoriesArray;
+            this.filteredDocumentArray = this.documents.objectCategoriesArray;
         }
     }
 
@@ -228,9 +229,9 @@ export class EditFAQ {
 
     saveQuestion() {
         if (this.selectedQuestionIndex != undefined && this.faqservices.selectedCat.subCategories[this.selectedSubCategoryIndex].questions[this.selectedQuestionIndex]) {
-            this.faqservices.selectedCat.subCategories[this.selectedSubCategoryIndex].questions[this.selectedQuestionIndex].question = this.faqservices.selectedQuestion.question;
-            this.faqservices.selectedCat.subCategories[this.selectedSubCategoryIndex].questions[this.selectedQuestionIndex].answer = this.faqservices.selectedQuestion.answer;
-            this.faqservices.selectedCat.subCategories[this.selectedSubCategoryIndex].questions[this.selectedQuestionIndex].links = this.faqservices.selectedQuestion.links;
+            this.faqservices.selectedCat.subCategories[this.selectedSubCategoryIndex].questions[this.selectedQuestionIndex] = this.faqservices.selectedQuestion;
+            //     this.faqservices.selectedCat.subCategories[this.selectedSubCategoryIndex].questions[this.selectedQuestionIndex].answer = this.faqservices.selectedQuestion.answer;
+            //     this.faqservices.selectedCat.subCategories[this.selectedSubCategoryIndex].questions[this.selectedQuestionIndex].links = this.faqservices.selectedQuestion.links;
         } else {
             this.faqservices.selectedCat.subCategories[this.selectedSubCategoryIndex].questions.push(this.faqservices.selectedQuestion);
         }
@@ -238,27 +239,40 @@ export class EditFAQ {
         this.saveCategory();
     }
 
-    addLinksToQuestion() {
-        this.keepDocuments.forEach(item => {
-            this.faqservices.selectedQuestion.links.push({
-                docCode: this.documentsService.selectedCat.DocCode,
-                subDocCode: this.selectedDocSubCategoryIndex,
-                fileName: item.files[0].fileName
-            })
-        });
-    }
+    // addLinksToQuestion() {
+    //     this.keepDocuments.forEach(item => {
+    //         this.faqservices.selectedQuestion.links.push({
+    //             docCode: this.documents.selectedCat.DocCode,
+    //             subDocCode: this.selectedDocSubCategoryIndex,
+    //             fileName: item.files[0].fileName
+    //         })
+    //     });
+    // }
 
     toggleAddToList(document) {
         let indexToRemove = -1;;
-        this.keepDocuments.forEach((item, index) => {
-            if (item.files[0].fileName == document.files[0].fileName) {
+        // this.faqservices.selectedCat.subCategories[this.selectedSubCategoryIndex].questions[this.selectedQuestionIndex].links.forEach((item, index) =>{
+        this.faqservices.selectedQuestion.links.forEach((item, index) => {
+            if (item.fileName == document.file.fileName) {
                 indexToRemove = index;
             }
         })
+
+
+        // this.keepDocuments.forEach((item, index) => {
+        //     if (item.file.fileName == document.file.fileName) {
+        //         indexToRemove = index;
+        //     }
+        // })
         if (indexToRemove >= 0) {
-            this.keepDocuments.splice(indexToRemove, 1);
+            this.faqservices.selectedQuestion.links.splice(indexToRemove, 1);
         } else {
-            this.keepDocuments.push(document);
+            this.faqservices.selectedQuestion.links.push({
+                docCode: this.documents.selectedCat.DocCode,
+                subDocCode: this.selectedDocSubCategoryIndex,
+                subSubDocCode: this.selectedDocSubSubCategoryIndex,
+                fileName: document.file.fileName
+            });
         }
 
     }
@@ -267,46 +281,8 @@ export class EditFAQ {
         this.showDocumentForm = false;
     }
 
-    showSubCategoryDocuments(category, SubCategoryIndex, SubSubCategoryIndex, el) {
-        this.documentsService.setCategory(category);
-        this.selectedDocSubCategoryIndex = SubCategoryIndex;
-        this.selectedDocSubSubCategoryIndex = SubSubCategoryIndex;
-        this.catDescription = this.documentsService.selectedCat.description;
-        this.subCatDescription = this.documentsService.selectedCat.subCategories[this.selectedDocSubCategoryIndex].description;
-        this.showDocuments = true;
-        this.checkLinks();
-        setTimeout(() => { $('[data-toggle="tooltip"]').tooltip(); }, 1000);
-        el.stopPropagation();
-    }
-
-    checkLinks() {
-        if (!this.faqservices.selectedQuestion.links || this.faqservices.selectedQuestion.links.length === 0) {
-            this.documents = this.documentsService.selectedCat.subCategories[this.selectedDocSubCategoryIndex].subSubCategories[this.selectedDocSubSubCategoryIndex].documents;
-            return;
-        }
-        this.documents = [];
-        let pieces;
-        let checked;
-        this.faqservices.selectedQuestion.links.forEach(item => {
-            this.documentsService.selectedCat.subCategories[this.selectedDocSubCategoryIndex].subSubCategories[this.selectedDocSubSubCategoryIndex].documents.forEach(doc => {
-                pieces = item.split('/');
-                if (doc.fileName === pieces[2]) {
-                    checked = true;
-                } else {
-                    checked = false;
-                }
-                this.documents.push({
-                    document: doc,
-                    checked: checked
-                })
-            })
-        })
-
-
-    }
-
     showQuestions(category, categoryIndex, subCategoryIndex, el) {
-        this.faqservices.setCategory(category);
+        // this.faqservices.setCategory(category);
         this.selectedSubCategoryIndex = subCategoryIndex;
         this.showDocuments = true;
         setTimeout(() => { $('[data-toggle="tooltip"]').tooltip(); }, 1000);
@@ -333,5 +309,71 @@ export class EditFAQ {
         $('#CategoryForm').hide();
         $("#SubCategoryForm").hide();
         $("#SubSubCategoryForm").hide();
+    }
+
+
+    toggleDocListItem(el, object, type, index) {
+        if (!this.documents.selectedCat || object._id !== this.documents.selectedCat._id) {
+            this.documents.setCategory(object);
+        }
+        if (type === "C") {
+            this.categorySelected = true;
+            this.selectedDocSubCategoryIndex = -1;
+            this.selectedDocSubSubCategoryIndex = -1;
+        }
+        if (type === 'S') {
+            this.selectedDocSubCategoryIndex = index;
+        }
+        let thisElement = el.target;
+        thisElement.parentElement.querySelector(".nested").classList.toggle("active");
+        thisElement.classList.toggle("caret-down");
+        el.stopPropagation();
+    }
+
+    showSubCategoryDocuments(category, SubCategoryIndex, SubSubCategoryIndex, el) {
+        if (category._id !== this.documents.selectedCat._id) {
+            this.documents.setCategory(category);
+        }
+        // this.selectedDocSubCategoryIndex = SubCategoryIndex;
+        this.selectedDocSubSubCategoryIndex = SubSubCategoryIndex;
+        this.catDescription = this.documents.selectedCat.description;
+        this.subCatDescription = this.documents.selectedCat.subCategories[this.selectedDocSubCategoryIndex].description;
+        this.showDocuments = true;
+        setTimeout(() => {this.checkLinks();}, 500);
+        setTimeout(() => { $('[data-toggle="tooltip"]').tooltip(); }, 1000);
+        el.stopPropagation();
+    }
+
+    checkLinks() {
+        // if (!this.faqservices.selectedQuestion.links || this.faqservices.selectedQuestion.links.length === 0) {
+        //     this.documents = this.documents.selectedCat.subCategories[this.selectedDocSubCategoryIndex].subSubCategories[this.selectedDocSubSubCategoryIndex].documents;
+        //     return;
+        // }
+        // this.document = [];
+        // let pieces;
+        // let checked;
+        // this.faqservices.selectedQuestion.links.forEach(item => {
+        //     this.documents.selectedCat.subCategories[this.selectedDocSubCategoryIndex].subSubCategories[this.selectedDocSubSubCategoryIndex].documents.forEach(doc => {
+        //         pieces = item.split('/');
+        //         if (doc.fileName === pieces[2]) {
+        //             checked = true;
+        //         } else {
+        //             checked = false;
+        //         }
+        //         this.documents.push({
+        //             document: doc,
+        //             checked: checked
+        //         })
+        //     })
+        // })
+        this.documents.selectedCat.subCategories[this.selectedDocSubCategoryIndex].subSubCategories[this.selectedDocSubSubCategoryIndex].documents.forEach((doc, index) => {
+            this.faqservices.selectedQuestion.links.forEach(item => {
+                if(item.fileName === doc.file.fileName){
+                    $("#DOC-" + index).prop('checked', true);
+                }
+            });
+        });
+
+
     }
 }
