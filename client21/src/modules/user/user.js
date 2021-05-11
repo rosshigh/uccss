@@ -23,7 +23,7 @@ export class User {
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
         this.role = parseInt(sessionStorage.getItem('role'));
 
-        this.showUserHome = true;
+        this.showUserHome = localStorage.getItem('showUserHome') === 'true';
     }
 
     async activate() {
@@ -34,7 +34,7 @@ export class User {
         ]);
 
         if (this.role >= this.config.UCC_ROLE) {
-            this.showUserHome = false;
+            // this.showUserHome = false;
             this.refreshReminders();
             this.refreshHelpTickets();
         }
@@ -87,5 +87,10 @@ export class User {
 
     navigateToHelpTicket(helpTicket){
         this.router.navigateToRoute('helpTicketsTech', { HTNumber: helpTicket._id });
+    }
+
+    updateHomePreference(){
+        localStorage.setItem('showUserHome', !this.showUserHome);
+        return true;
     }
 }

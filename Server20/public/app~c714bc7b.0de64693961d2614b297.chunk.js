@@ -69,6 +69,17 @@ eval("module.exports = \"<template>\\r\\n    <div class=\\\"modal fade\\\" id=\\
 
 /***/ }),
 
+/***/ "resources/modals/messageModal.html":
+/*!************************************************!*\
+  !*** ./src/resources/modals/messageModal.html ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = \"<template>\\r\\n    <div class=\\\"modal fade\\\" id=\\\"messageModal\\\" tabindex=\\\"-1\\\" role=\\\"dialog\\\" aria-labelledby=\\\"messageModalLabel\\\" aria-hidden=\\\"true\\\">\\r\\n        <div class=\\\"modal-dialog\\\" role=\\\"document\\\">\\r\\n          <div class=\\\"modal-content\\\">\\r\\n            <div class=\\\"modal-header\\\">\\r\\n              <h5 class=\\\"modal-title\\\" id=\\\"messageModalModalLabel\\\">${site.title}</h5>\\r\\n              <button type=\\\"button\\\" class=\\\"close\\\" data-dismiss=\\\"modal\\\" aria-label=\\\"Close\\\">\\r\\n                <span aria-hidden=\\\"true\\\">&times;</span>\\r\\n              </button>\\r\\n            </div>\\r\\n            <div class=\\\"modal-body\\\">\\r\\n              <div innerhtml.bind = \\\"site.modalMessage\\\"></div>\\r\\n            </div>\\r\\n            <div class=\\\"modal-footer\\\">\\r\\n              <button type=\\\"button\\\" class=\\\"btn btn-secondary\\\" data-dismiss=\\\"modal\\\">OK</button>\\r\\n            </div>\\r\\n          </div>\\r\\n        </div>\\r\\n</template>\";//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicmVzb3VyY2VzL21vZGFscy9tZXNzYWdlTW9kYWwuaHRtbC5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy8uL3NyYy9yZXNvdXJjZXMvbW9kYWxzL21lc3NhZ2VNb2RhbC5odG1sPzI3ZmEiXSwic291cmNlc0NvbnRlbnQiOlsibW9kdWxlLmV4cG9ydHMgPSBcIjx0ZW1wbGF0ZT5cXHJcXG4gICAgPGRpdiBjbGFzcz1cXFwibW9kYWwgZmFkZVxcXCIgaWQ9XFxcIm1lc3NhZ2VNb2RhbFxcXCIgdGFiaW5kZXg9XFxcIi0xXFxcIiByb2xlPVxcXCJkaWFsb2dcXFwiIGFyaWEtbGFiZWxsZWRieT1cXFwibWVzc2FnZU1vZGFsTGFiZWxcXFwiIGFyaWEtaGlkZGVuPVxcXCJ0cnVlXFxcIj5cXHJcXG4gICAgICAgIDxkaXYgY2xhc3M9XFxcIm1vZGFsLWRpYWxvZ1xcXCIgcm9sZT1cXFwiZG9jdW1lbnRcXFwiPlxcclxcbiAgICAgICAgICA8ZGl2IGNsYXNzPVxcXCJtb2RhbC1jb250ZW50XFxcIj5cXHJcXG4gICAgICAgICAgICA8ZGl2IGNsYXNzPVxcXCJtb2RhbC1oZWFkZXJcXFwiPlxcclxcbiAgICAgICAgICAgICAgPGg1IGNsYXNzPVxcXCJtb2RhbC10aXRsZVxcXCIgaWQ9XFxcIm1lc3NhZ2VNb2RhbE1vZGFsTGFiZWxcXFwiPiR7c2l0ZS50aXRsZX08L2g1PlxcclxcbiAgICAgICAgICAgICAgPGJ1dHRvbiB0eXBlPVxcXCJidXR0b25cXFwiIGNsYXNzPVxcXCJjbG9zZVxcXCIgZGF0YS1kaXNtaXNzPVxcXCJtb2RhbFxcXCIgYXJpYS1sYWJlbD1cXFwiQ2xvc2VcXFwiPlxcclxcbiAgICAgICAgICAgICAgICA8c3BhbiBhcmlhLWhpZGRlbj1cXFwidHJ1ZVxcXCI+JnRpbWVzOzwvc3Bhbj5cXHJcXG4gICAgICAgICAgICAgIDwvYnV0dG9uPlxcclxcbiAgICAgICAgICAgIDwvZGl2PlxcclxcbiAgICAgICAgICAgIDxkaXYgY2xhc3M9XFxcIm1vZGFsLWJvZHlcXFwiPlxcclxcbiAgICAgICAgICAgICAgPGRpdiBpbm5lcmh0bWwuYmluZCA9IFxcXCJzaXRlLm1vZGFsTWVzc2FnZVxcXCI+PC9kaXY+XFxyXFxuICAgICAgICAgICAgPC9kaXY+XFxyXFxuICAgICAgICAgICAgPGRpdiBjbGFzcz1cXFwibW9kYWwtZm9vdGVyXFxcIj5cXHJcXG4gICAgICAgICAgICAgIDxidXR0b24gdHlwZT1cXFwiYnV0dG9uXFxcIiBjbGFzcz1cXFwiYnRuIGJ0bi1zZWNvbmRhcnlcXFwiIGRhdGEtZGlzbWlzcz1cXFwibW9kYWxcXFwiPk9LPC9idXR0b24+XFxyXFxuICAgICAgICAgICAgPC9kaXY+XFxyXFxuICAgICAgICAgIDwvZGl2PlxcclxcbiAgICAgICAgPC9kaXY+XFxyXFxuPC90ZW1wbGF0ZT5cIjsiXSwibWFwcGluZ3MiOiJBQUFBIiwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///resources/modals/messageModal.html\n");
+
+/***/ }),
+
 /***/ "resources/modals/reminderModal.html":
 /*!*************************************************!*\
   !*** ./src/resources/modals/reminderModal.html ***!

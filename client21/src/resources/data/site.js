@@ -26,6 +26,23 @@ export class SiteInfo {
     }
   }
 
+  async getSystemMessage(){
+    var url = this.SITE_SERVICES + '?filter=itemType|eq|MESS';
+    let response = await this.data.get(url);
+    if(!response.error){
+      this.systemMessage = response;
+    }
+  }
+  
+  async showBannerMessage() {
+    await this.getSystemMessage();
+    if (this.systemMessage[0].content.length) {
+        this.modalMessage = this.systemMessage[0].content;
+        this.title = 'System Message';
+        $("#messageModal").modal('show');
+    }
+}
+
   async getObject(id) {
     let url = this.SITE_SERVICES + '/' + id;
     console.log(url)
