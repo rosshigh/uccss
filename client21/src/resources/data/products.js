@@ -12,6 +12,10 @@ export class Products {
         this.utils = utils;
     }
 
+    testFunction(){
+        console.log('here')
+    }
+
     async getObjectsArray(options) {
         var url = this.PRODUCTS_SERVICE;
         url += options ? options : "";
@@ -78,6 +82,9 @@ export class Products {
         }
         return -1;
     }
+
+
+
 
     emptyProduct() {
         var newProduct = new Object();;

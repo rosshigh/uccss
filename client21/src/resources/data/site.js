@@ -30,14 +30,14 @@ export class SiteInfo {
     var url = this.SITE_SERVICES + '?filter=itemType|eq|MESS';
     let response = await this.data.get(url);
     if(!response.error){
-      this.systemMessage = response;
+      this.systemMessage = response[0];
     }
   }
   
   async showBannerMessage() {
     await this.getSystemMessage();
-    if (this.systemMessage[0].content.length) {
-        this.modalMessage = this.systemMessage[0].content;
+    if (this.systemMessage.content.length) {
+        this.modalMessage = this.systemMessage.content;
         this.title = 'System Message';
         $("#messageModal").modal('show');
     }

@@ -145,7 +145,7 @@ export class EditInfo {
             let options = {};
             this.dialogService.open({ viewModel: ConfirmDialog, model: { message, title, options }, lock: false }).whenClosed(response => {
                 if (!response.wasCancelled) {
-                    this.save();
+                    this.saveObject();
                 } else {
                     this.goBack();
                 }

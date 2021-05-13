@@ -349,7 +349,7 @@ export class CreateRequest {
             if (this.alreadyOnList(el.target.id)) {
                 this.utils.showNotification('If you need more than one client of a product, add a comment on the next step.', 'warning')
             } else {
-                this.products.selectedObjectFromId(el.target.id);
+                this.products.selectedObjectById(el.target.id);
                 this.selectedProducts.push({
                     product: this.products.selectedObject,
                     requiredDate: "",

@@ -115,7 +115,7 @@ export class AppConfig {
         },
         {
             'type': "DLNK",
-            'description': 'Useful Information - Home Page'
+            'description': 'Useful Links'
         },
         {
             'type': "MESS",

@@ -1,3 +1,14 @@
+
+li.nav-item {
+  color: white;
+  background-color:black;
+}
+
+li.active {
+  color: white;
+  background-color: red;
+}
+
 .errorText {
   color: red;
 }

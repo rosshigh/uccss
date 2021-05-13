@@ -309,7 +309,8 @@ export class ViewHelpTickets {
         newObj.productId = el.target.id;
         newObj.sessionId = this.requests.selectedRequest.sessionId;
         this.requests.selectedRequest.requestDetails.push(newObj);
-        this.products.selectedProductFromId(newObj.productId);
+        this.products.testFunction();
+        this.products.selectedObjectById(newObj.productId);
         this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = this.products.selectedProduct.name;
         // this.requiredDates.push(false);
       }

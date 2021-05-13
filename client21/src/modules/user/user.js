@@ -39,17 +39,22 @@ export class User {
             this.refreshHelpTickets();
         }
 
-        this.getSystemMessage();
+        await this.getSystemMessage();
     }
 
-    getSystemMessage() {
+    async getSystemMessage() {
         this.systemMessage = undefined;
-        this.site.objectArray.forEach(item => {
-            if (item.itemType === 'MESS') {
-                this.systemMessage = item.title;
-            }
-        });
-        if (this.systemMessage && this.systemMessage.length) sessionStorage.setItem('systemMessage', this.systemMessage);
+        await this.site.getSystemMessage()
+        // this.site.objectArray.forEach(item => {
+        //     if (item.itemType === 'MESS') {
+        //         this.systemMessage = item.title;
+        //     }
+        // });
+
+        if (this.site.systemMessage && this.site.systemMessage.title.length) {
+            this.systemMessage = this.site.systemMessage.title;
+            sessionStorage.setItem('systemMessage', JSON.stringify(this.site.systemMessage));
+        }
     }
 
     attached() {

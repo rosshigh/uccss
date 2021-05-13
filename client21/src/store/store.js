@@ -147,7 +147,7 @@ function deleteState(){
   sessionStorage.removeItem('config');
 }
 
-function getter(parameter){
+function getter(parameter){ 
   return sessionStorage.getItem(parameter);
 }
 
