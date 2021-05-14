@@ -62,7 +62,7 @@ export class EditPeople {
         });
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
-        $('.selectpicker').selectpicker();
+        // $('.selectpicker').selectpicker();
     }
 
     async refresh() {
@@ -105,18 +105,18 @@ export class EditPeople {
 
     new() {
         this.people.selectPerson();
-        this.refreshSelects();
+        // this.refreshSelects();
         this.createValidationRules();
         this.getPhoneMask();
         this.filterRoles();
-        this.utils.refreshSelect("#editStatus", this.is4ua.personStatusArray, "code", this.people.selectedPerson.personStatus);
+        // this.utils.refreshSelect("#editStatus", this.is4ua.personStatusArray, "code", this.people.selectedPerson.personStatus);
         this.view = 'form';
     }
 
     async edit(person) {
         this.selectedPersonId = person._id;
         await this.people.getPerson(this.selectedPersonId);
-        this.refreshSelects();
+        // this.refreshSelects();
         this.createValidationRules();
         this.getPhoneMask();
         this.filterRoles();

@@ -3,8 +3,8 @@ import { Router } from "aurelia-router";
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { Auth } from '../data/auth';
 import { AppConfig } from '../../appConfig';
-import { Utils } from '../../resources/utils/utils';
-import { People } from '../../resources/data/people';
+import { Utils } from '../utils/utils';
+import { People } from '../data/people';
 import {Store} from '../../store/store';
 
 @inject(Auth, AppConfig, Router, Utils, EventAggregator, Aurelia, People, Store)
@@ -32,6 +32,11 @@ export class SideBar {
         //     this.currentRoute = this.router.currentInstruction.config.name;
         //   })
           
+    }
+
+    toggleMenu(menu){
+        $("#" + menu).toggleClass('open');
+        $("#" + menu).toggleClass('active');
     }
 
     // activate(){

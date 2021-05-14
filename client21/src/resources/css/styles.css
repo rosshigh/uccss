@@ -1,5 +1,5 @@
 
-li.nav-item {
+/* li.nav-item {
   color: white;
   background-color:black;
 }
@@ -7,7 +7,16 @@ li.nav-item {
 li.active {
   color: white;
   background-color: red;
+} */
+
+/* li.submenu {
+ 
+  color: red;
 }
+
+a.submenu {
+  font-weight:boldest;
+} */
 
 .errorText {
   color: red;

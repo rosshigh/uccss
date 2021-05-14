@@ -1,161 +1,118 @@
 <template>
-  <compose view="../modals/reminderModal.html"></compose>
-  <div class="sidebar" id="sidebar" data-color="rose" data-background-color="black"
-    data-image="../assets/img/sidebar-1.jpg">
-    <!--
-          Tip 1: You can change the color of the sidebar using: data-color="purple | azure | green | orange | danger"
-  
-          Tip 2: you can also add an image using data-image tag
+    <aside class="page-sidebar" style="height:100%;">
+        <div class="page-logo">
+            <a href="#" class="page-logo-link press-scale-down d-flex align-items-center position-relative"
+                data-toggle="modal" data-target="#modal-shortcut">
+                <!-- <img src="http://localhost/admin/img/logo.png" alt="SmartAdmin WebApp" aria-roledescription="logo"> -->
+                <img src="${config.IMG_DOWNLOAD_URL}UCC_LOGO_HOME.png" aria-roledescription="logo">
+                <span class="page-logo-text mr-1">UCCSS</span>
+                <span class="position-absolute text-white opacity-50 small pos-top pos-right mr-2 mt-n2">SLIM
+                    Project</span>
+            </a>
+        </div>
+        <!-- BEGIN PRIMARY NAVIGATION -->
+        <nav id="js-primary-nav" class="primary-nav" role="navigation">
+            <div class="nav-filter">
+                <div class="position-relative">
+                    <input type="text" id="nav_filter_input" placeholder="Filter menu" class="form-control"
+                        tabindex="0">
+                    <a href="#" onclick="return false;" class="btn-primary btn-search-close js-waves-off"
+                        data-action="toggle" data-class="list-filter-active" data-target=".page-sidebar">
+                        <i class="fal fa-chevron-up"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="info-card">
+                <!-- <img src="http://localhost/admin/img//avatar-admin.png" class="profile-image rounded-circle"
+                    alt="Dr. Codex Lantern"> -->
+                    <img if.bind="userObj.file.fileName" class="profile-image rounded-circle"
+              src="${config.PHOTO_DOWNLOAD_URL}/${userObj.file.fileName}">
+                <div class="info-card-text">
+                    <a href="#" class="d-flex align-items-center text-white">
+                        <span class="text-truncate text-truncate-sm d-inline-block">
+                            ${userObj.fullName}
+                        </span>
+                    </a>
+                    
+                </div>
+                <img src="http://localhost/admin/img/cover-2-lg.png" class="cover" alt="cover">
+                <a href="#" onclick="return false;" class="pull-trigger-btn" data-action="toggle"
+                    data-class="list-filter-active" data-target=".page-sidebar" data-focus="nav_filter_input">
+                    <i class="fal fa-angle-down"></i>
+                </a>
+            </div>
+            <!-- 
+      TIP: The menu items are not auto translated. You must have a residing lang file associated with the menu saved inside dist/media/data with reference to each 'data-i18n' attribute.
       -->
-    <div class="logo">
-      <img class="leftMargin" src="${config.IMG_DOWNLOAD_URL}UCC_LOGO_HOME.png">
-      <!-- <span class="align-middle" style="color:white;margin-left:30px;font-weight:bold;">UCCSS</span> -->
-    </div>
-    <div class="sidebar-wrapper">
-      <div class="user">
-        <div class="photo">
-
-        </div>
-        <div class="user-info">
-          <div class="menuImage">
-            <img if.bind="userObj.file.fileName" class="smart-timeline-icon bottomMarginLg"
-              src="${config.PHOTO_DOWNLOAD_URL}/${userObj.file.fileName}" height="120">
-          </div>
-          <a data-toggle="collapse" href="#collapseExample" class="username">
-            <span>
-              ${userObj.fullName}
-              <b class="caret"></b>
-            </span>
-          </a>
-          <div class="collapse" id="collapseExample">
-            <ul class="nav">
-              <li class="nav-item">
-                <a class="nav-link" href="#profile">
-                  <span class="sidebar-normal"><i class="fa fa-user"></i> My Profile </span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" click.trigger="createReminder()">
-                  <span class="sidebar-normal pointMe"><i class="fa fa-sign-out"></i> Create Reminder </span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" click.trigger="logout()">
-                  <span class="sidebar-normal pointMe"><i class="fa fa-sign-out"></i> Logoff </span>
-                </a>
-              </li>
+            <ul id="js-nav-menu" class="nav-menu">
+                <li class="active">
+                    <a href="#/user">
+                      <i class="fal fa-home"></i>
+                      <span class="nav-link-text" data-i18n="nav.blankpage">Home </span>
+                    </a>
+                  </li>
+               
+                <li class="nav-title">Tools & Components</li>
+                
+                <li id="systemAdmin">
+                    <a href="#"  click.trigger="toggleMenu('systemAdmin')" title="System Administrator" data-filter-tags="system administration">
+                        <i class="fal fa-cog"></i>
+                        <span class="nav-link-text" data-i18n="nav.system_administration">System Administration</span>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#systems" title="Systems" data-filter-tags="systems">
+                                <span class="nav-link-text" data-i18n="nav.systems">System Admin</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#customers" title="customers" data-filter-tags="customers">
+                                <span class="nav-link-text" data-i18n="nav.customers">Customers</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link" href="#/site">
+                                <span class="nav-link-text">Site</span></a>
+                          </li>
+                          <li>
+                            <a class="nav-link" href="#/inventory">
+                                <span class="nav-link-text">Inventory</span></a>
+                          </li>
+                          <li>
+                            <a class="nav-link" href="#/documents">
+                                <span class="nav-link-text">File Management</span></a>
+                          </li>
+                    </ul>
+                </li>
+             
             </ul>
-          </div>
-        </div>
-      </div>
-      <ul class="nav">
-        <li class="nav-item ">
-          <a class="nav-link" href="#/user">
-            <i class="material-icons">home</i>
-            <p> Home </p>
-          </a>
-        </li>
-        <li class="nav-item ">
-          <a class="nav-link" data-toggle="collapse" href="#pagesExamples">
-            <i class="material-icons">dashboard</i>
-            <p> Administration
-              <b class="caret"></b>
-            </p>
-          </a>
-          <div class="collapse" id="pagesExamples">
-            <ul class="nav">
-              <li class="nav-item">
-                <a class="nav-link" href="#/systems"><span class="subMenu sidebar-normal"><i class="fa fa-desktop"></i>
-                    System Admin</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#/customers"> <span class="subMenu sidebar-normal"><i
-                      class="fa fa-user"></i>Customers</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#/site"><span class="subMenu sidebar-normal"><i
-                      class="fa fa-globe"></i>Site</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#/inventory"><span class="subMenu sidebar-normal"><i
-                      class="fa fa-server"></i>Inventory</span></a>
-              </li>
-              <li class="nav-item ">
-                <a class="nav-link" href="#/documents"><span class="subMenu sidebar-normal"><i
-                      class="fa fa-file"></i>File Management</span></a>
-              </li>
+            <div class="filter-message js-filter-message bg-success-600"></div>
+        </nav>
+        <!-- END PRIMARY NAVIGATION -->
+        <!-- NAV FOOTER -->
+        <div class="nav-footer shadow-top">
+            <a href="#" onclick="return false;" data-action="toggle" data-class="nav-function-minify"
+                class="hidden-md-down">
+                <i class="ni ni-chevron-right"></i>
+                <i class="ni ni-chevron-right"></i>
+            </a>
+            <ul class="list-table m-auto nav-footer-buttons">
+                <li>
+                    <a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" title="Chat logs">
+                        <i class="fal fa-comments"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" title="Support Chat">
+                        <i class="fal fa-life-ring"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" title="Make a call">
+                        <i class="fal fa-phone"></i>
+                    </a>
+                </li>
             </ul>
-          </div>
-        </li>
-        <li class="nav-item ">
-          <a class="nav-link" data-toggle="collapse" href="#pagesTech">
-            <i class="material-icons">build</i>
-            <p> Tech Staff
-              <b class="caret"></b>
-            </p>
-          </a>
-          <div class="collapse" id="pagesTech">
-            <ul class="nav">
-              <li class="nav-item">
-                <a class="nav-link" href="#/techProductRequests"><i class="fa fa-shopping-basket"></i> <span
-                    class="sidebar-normal subMenu">Product Requests</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#/apj"><i class="fa fa-cart-plus"></i> <span
-                    class="sidebar-normal subMenu">APJ Requests</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#/helpTicketsTechMenu"><i class="fa fa-question"></i> <span
-                    class="sidebar-normal subMenu">Help Tickets</span></a>
-              </li>
-            </ul>
-          </div>
-        </li>
-        <li class="nav-item ">
-          <a class="nav-link" href="#/helpTickets">
-            <i class="material-icons">help</i>
-            <p> HelpTickets
-            </p>
-          </a>
-        </li>
-        <li class="nav-item ">
-          <a class="nav-link" href="#/productRequests">
-            <i class="material-icons">shopping_cart</i>
-            <p> Product Requests
-            </p>
-          </a>
-        </li>
-        <li class="nav-item ">
-          <a class="nav-link" href="#/facCoord">
-            <i class="material-icons">supervisor_account</i>
-            <p> Faculty Coordinator
-            </p>
-          </a>
-        </li>
-        <li class="nav-item ">
-          <a class="nav-link" data-toggle="collapse" href="#facultyResources">
-            <i class="material-icons">image</i>
-            <p> Faculty Resources
-              <b class="caret"></b>
-            </p>
-          </a>
-          <div class="collapse" id="facultyResources">
-            <ul class="nav">
-              <li class="nav-item">
-                <a class="nav-link" href="#/downloads/CUR"><span class="sidebar-normal subMenu"><i
-                      class="fa fa-files-o"></i> Curriculum</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#/downloads/SOF"><span class="sidebar-normal subMenu"><i
-                      class="fa fa-download"></i> Software</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#/faq"><span class="sidebar-normal subMenu"><i class="fa fa-question"></i>
-                    FAQ</span></a>
-              </li>
-            </ul>
-          </div>
-        </li>
-    </div>
-  </div>
+        </div> <!-- END NAV FOOTER -->
+    </aside>
 </template>

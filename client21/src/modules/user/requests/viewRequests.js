@@ -28,6 +28,8 @@ export class ViewRequests {
         this.selectedProducts = [];
 
         this.userObj = this.store.getUser('user');
+
+        this.pageTitle = 'View Product Requests';
     }
 
     async activate() {

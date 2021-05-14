@@ -134,7 +134,23 @@ export class App {
         moduleId: PLATFORM.moduleName('./modules/admin/inventory/inventory'),
         name: 'inventory',
         settings: { auth: false, roles: [] }
-      }
+      },
+      {
+        route: 'viewRequests',
+        moduleId: PLATFORM.moduleName('./modules/user/requests/viewRequests'),
+        settings: { auth: true, roles: [] },
+        nav: true,
+        name: 'viewRequests',
+        title: "View Requests"
+    },
+    {
+        route: 'createRequest',
+        moduleId: PLATFORM.moduleName('./modules/user/requests/createRequest'),
+        settings: { auth: true, roles: [] },
+        nav: true,
+        name: 'createRequest',
+        title: 'Create/Modify Request'
+    }
     ]);
   }
 

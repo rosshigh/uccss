@@ -14,13 +14,10 @@
                 class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span> -->
     </div>
     <div class='bottomMargin topMargin'></div>
-    <ul class="nav nav-pills bottomMargin">
+    <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item">
             <a class="nav-link active" data-toggle="tab" role="tab" href="#userinfo">User Info</a>
         </li>
-        <!-- <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" role="tab" href="#address">Address</a>
-        </li> -->
         <li class="nav-item">
             <a class="nav-link" data-toggle="tab" role="tab" href="#roles">Roles</a>
         </li>
@@ -32,9 +29,6 @@
         <div class="tab-pane fade show active" id="userinfo" role="tabpanel" aria-labelledby="home-tab">
             <compose view="./userInfo.html"></compose>
         </div>
-        <!-- <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="home-tab">
-            <compose view="./address.html"></compose>
-        </div> -->
         <div class="tab-pane fade" id="roles" role="tabpanel" aria-labelledby="home-tab">
             <compose view="./roles.html"></compose>
         </div>
@@ -42,6 +36,28 @@
             <compose view="./password.html"></compose>
         </div>
     </div>
+    <!-- <ul class="nav nav-pills bottomMargin">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" role="tab" href="#userinfo">User Info</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#roles">Roles</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#password">Password</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="userinfo" role="tabpanel" aria-labelledby="home-tab">
+            <compose view="./userInfo.html"></compose>
+        </div>
+        <div class="tab-pane fade" id="roles" role="tabpanel" aria-labelledby="home-tab">
+            <compose view="./roles.html"></compose>
+        </div>
+        <div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="home-tab">
+            <compose view="./password.html"></compose>
+        </div>
+    </div> -->
     <div class="row">
         <div class="col">
             <ul if.bind="controller.errors.length > 0">

@@ -46,7 +46,7 @@ export class Landing {
         this.people.selectPerson();
 
         this.filterList();
-        this.refreshSelects();
+        // this.refreshSelects();
     }
 
     openAboutTheUCC(){

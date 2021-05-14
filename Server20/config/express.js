@@ -16,15 +16,15 @@ module.exports = function (app, config) {
   logger.log('info', "Starting application");
 
   app.use(compression({ threshold: 1 }));
-  app.use(helmet());
-  app.use(helmet.hsts({
-    maxAge: 0,
-    includeSubDomains: false
-  }));
-
+  // app.use(helmet());
+  // app.use(helmet.hsts({
+  //   maxAge: 0,
+  //   includeSubDomains: false
+  // }));
+  app.use(cors());
   app.use(express.static(config.root + '/public'));
   app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
-  app.use(cors({ origin: "*" }));
+  
 
   logger.log('info', "Loading Mongoose functionality");
   mongoose.Promise = require('bluebird');

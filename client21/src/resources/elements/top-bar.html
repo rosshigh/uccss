@@ -1,6 +1,7 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute ">
-    <div class="container-fluid">
+  <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute " >
+    <div  class="container-fluid">
+      <!-- style="position:relative;top:-10px;background-color:black;color:white;" -->
       <div class="navbar-wrapper">
         <div class="navbar-minimize">
           <button id="minimizeSidebar" click.trigger="toggleTheSideBar()"
@@ -20,8 +21,8 @@
       </button>
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
         <ul class="navbar-nav">
-          <li class="${row.isActive ? 'active nav-item ' : 'nav-item '}" repeat.for="row of router.navigation"><a
-              class="nav-link" href.bind="row.href">${row.title}</a></li>
+          <li class="${row.isActive ? 'active nav-item submenu' : 'nav-item submenu'}" repeat.for="row of router.navigation">
+            <a class="nav-link submenu" href.bind="row.href">${row.title}</a></li>
         </ul>
       </div>
       <div class="collapse navbar-collapse justify-content-end">
@@ -33,5 +34,15 @@
       </div>
     </div>
   </nav>
+  <!-- <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute" style="z-index:-200;">
+    <div style="position:relative;top:50px;background-color:#ffbd00;color:white;" class="container-fluid">
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+      <ul class="navbar-nav">
+        <li style="margin-left:50px;" class="${row.isActive ? 'active nav-item ' : 'nav-item '}" repeat.for="row of router.navigation"><a
+            class="nav-link" href.bind="row.href">${row.title}</a></li>
+      </ul>
+    </div>
+    </div>
+  </nav> -->
   <div class="notification"></div>
 </template>
