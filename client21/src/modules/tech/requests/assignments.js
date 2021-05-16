@@ -78,7 +78,8 @@ export class Assignments {
 
     attached() {
         $('[data-toggle="tooltip"]').tooltip();
-        $('.selectpicker').selectpicker();
+        // $('.selectpicker').selectpicker();
+        $("#assignTab").addClass('active');
         this.getRequests();
     }
 
@@ -170,7 +171,7 @@ export class Assignments {
             return (a['sid'] < b['sid']) ? -1 : (a['sid'] > b['sid']) ? 1 : 0;
         });
 
-        this.refreshSelects();
+        // this.refreshSelects();
         // FIX THIS: this.selectedSystemId = this.productSystems[0]._id;
     }
 
@@ -223,13 +224,13 @@ export class Assignments {
         return "";
     }
 
-    refreshSelects() {
-        this.utils.refreshSelect("#systemSelector", this.productSystems, "_id", this.selectedSystemId);
-    }
+    // refreshSelects() {
+    //     this.utils.refreshSelect("#systemSelector", this.productSystems, "_id", this.selectedSystemId);
+    // }
 
-    refreshProductSelect() {
-        this.utils.refreshSelect("#productSelect", this.products.objectsArray, "_id", this.selectedRequestDetail.productId._id);
-    }
+    // refreshProductSelect() {
+    //     this.utils.refreshSelect("#productSelect", this.products.objectsArray, "_id", this.selectedRequestDetail.productId._id);
+    // }
 
     selectClient(client, index) {
         let clientIndex = this.getClientIndex(client.client);

@@ -36,7 +36,7 @@ export class EditSessions {
     attached() {
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
-        $('.selectpicker').selectpicker();
+        // $('.selectpicker').selectpicker();
     }
 
     async refresh() {
@@ -46,14 +46,14 @@ export class EditSessions {
 
     new() {
         this.sessions.selectSession();
-        this.refreshSelects();
+        // this.refreshSelects();
         this.createValidationRules();
         this.view = 'form';
     }
 
     async edit(session) {
         await this.sessions.getSession(session._id);
-        this.refreshSelects();
+        // this.refreshSelects();
         this.createValidationRules();
         this.view = 'form';
     }

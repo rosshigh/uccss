@@ -10,8 +10,18 @@ export class UserHelpTickets {
         this.systemMessage = sessionStorage.getItem('systemMessage');
     }
 
-    attached(){
+    attached() {
         $("#systemMessage").fadeOut(500).fadeIn(500).fadeOut(500).fadeIn(500);
+        if(this.router.currentInstruction.fragment.length){
+            $(".nav-link").removeClass('active');
+            $("#" + this.router.currentInstruction.fragment).addClass('active');
+        }
+    }
+
+    navigate(el) {
+        $(".nav-link").removeClass('active');
+        $(el.target).addClass('active');
+        this.router.navigate(el.target.id)
     }
 
     configureRouter(config, router) {

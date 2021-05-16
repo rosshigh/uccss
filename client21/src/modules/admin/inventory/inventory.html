@@ -9,9 +9,8 @@
     <compose view="../../../resources/modals/fixErrorsModal.html"></compose>
     <compose view="../../../resources/modals/confirmDeleteModal.html"></compose>
     <compose view="../../../resources/modals/confirmSaveModal.html"></compose>
-    <compose view="../../../resources/elements/top-bar.html"></compose>
-    <div class="content">
-        <div class="container-fluid">
+    <compose view="../../../resources/elements/nav-bar.html"></compose>
+    <main id="js-page-content" role="main" class="page-content">
             <div show.bind="view === 'table'">
                 <div class="card">
                     <div class="card-body">
@@ -26,6 +25,5 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+    </main>
 </template>

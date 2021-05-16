@@ -26,8 +26,13 @@ export class FacCoord {
         this.pageTitle = "Faculty Coordinator";
 
         this.filters = [
-            { value: '', keys: ['fullName', 'email', 'roles'] }
+            { value: '', keys: ['fullName'] },
+            { value: '', keys: ['email'] },
+            { value: '', keys: ['roles'] },
+            { value: false, custom: this.filterStatus },
         ];
+
+        this.loadStatus = "01";
     }
 
     async activate() {
@@ -35,9 +40,13 @@ export class FacCoord {
     }
 
     async refresh() {
-        let responses = await Promise.all([
-            this.people.getPeopleArray('?rorder=lastName&filter=institutionId|eq|' + this.userObj.institutionId._id),
-        ]);
+        $('#loading').show();
+        if (this.loadStatus === "03") {
+            await this.people.getPeopleArray('?order=lastName&filter=institutionId|eq|' + this.userObj.institutionId._id);
+        } else {
+            await this.people.getPeopleArray('?order=lastName&filter=[and]personStatus|eq|' + this.loadStatus + ':institutionId|eq|' + this.userObj.institutionId._id);
+        }
+        $('#loading').hide();
     }
 
     clearFilters() {
@@ -79,7 +88,6 @@ export class FacCoord {
     }
 
     setRoles(){
-        console.log(this.roles);
         this.roles.forEach(item => {
             if(item.keep && this.people.selectedPerson.roles.indexOf(item.role) === -1){
                 this.people.selectedPerson.roles.push(item.role);

@@ -11,7 +11,6 @@ import { AppConfig } from '../../../appConfig';
 import { Utils } from '../../../resources/utils/utils';
 import { DialogService } from 'aurelia-dialog';
 import { ConfirmDialog } from '../../../resources/dialogs/confirm-dialog';
-import { thisExpression, tsImportEqualsDeclaration } from '../../../../../../../../AppData/Local/Microsoft/TypeScript/4.0/node_modules/@babel/types/lib/index';
 
 @inject(HelpTickets, ClientRequests, Sessions, Products, People, Systems, DocumentsServices, Store, AppConfig, Utils, DialogService)
 export class UserViewHelpTickets {
@@ -69,12 +68,12 @@ export class UserViewHelpTickets {
         }
     }
 
-    refreshSelects() {
-        this.utils.refreshSelect("#session", this.sessions.objectsArray, "_id", this.selectedSession);
-        // this.utils.refreshSelect("#institutionSelect", this.people.institutionsArray, "_id", this.people.selectedPerson.institutionId);
-        // this.utils.refreshSelect("#specializationSelect", this.is4ua.specialArray, "code", this.people.selectedPerson.personSpecialization);
-        // this.utils.refreshSelect("#departmentSelect", this.is4ua.deptArray, "code", this.people.selectedPerson.departmentCategory);
-    }
+    // refreshSelects() {
+    //     this.utils.refreshSelect("#session", this.sessions.objectsArray, "_id", this.selectedSession);
+    //     // this.utils.refreshSelect("#institutionSelect", this.people.institutionsArray, "_id", this.people.selectedPerson.institutionId);
+    //     // this.utils.refreshSelect("#specializationSelect", this.is4ua.specialArray, "code", this.people.selectedPerson.personSpecialization);
+    //     // this.utils.refreshSelect("#departmentSelect", this.is4ua.deptArray, "code", this.people.selectedPerson.departmentCategory);
+    // }
 
     copyEmail(helpTicket) {
         const hiddenElement = document.createElement('textarea');
@@ -126,7 +125,7 @@ export class UserViewHelpTickets {
     attached() {
         $("#loading").hide();
         $('[data-toggle="tooltip"]').tooltip();
-        $('.selectpicker').selectpicker();
+        // $('.selectpicker').selectpicker();
     }
 
     async refresh() {
@@ -434,7 +433,7 @@ export class UserViewHelpTickets {
     showRequestsPanel() {
         this.showRequestPanel = !this.showRequestPanel;
         this.requestTableOrForm = 'table'
-        this.refreshSelects();
+        // this.refreshSelects();
         this.getActiveRequests();
         window.scrollTo(0, 0);
     }

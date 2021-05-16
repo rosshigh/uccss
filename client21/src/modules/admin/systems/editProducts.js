@@ -30,7 +30,8 @@ export class EditProducts {
         this.utils = utils;
 
         this.filters = [
-            { value: '', keys: ['name', 'systemList'] },
+            { value: '', keys: ['name'] },
+            { value: '', keys: ['systemList'] },
             { value: true, keys: ['active'] }
         ];
 

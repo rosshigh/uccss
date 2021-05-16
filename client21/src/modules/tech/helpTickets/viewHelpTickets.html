@@ -10,29 +10,25 @@
     <compose view="./components/statusModal.html"></compose>
     <compose view="./components/confirmCloseModal.html"></compose>
     <compose view="./components/documentsModal.html"></compose>
-    <div class="card">
-        <div class="card-body">
-            <h1>View Help Tickets</h1>
-            <div if.bind="helpTickets.objectArray.length === 0">
-                <h3>You have not submitted a help ticket.</h3>
-            </div>
-            <div if.bind="helpTickets.objectArray.length > 0">
-                <div show.bind="showTable">
-                    <div class="container-fluid" >
-                    <div class="card">
-                        <div class="card-body">
-                            <compose view="./components/helpTicketTable.html"></compose>
-                        </div>
-                    </div>
+
+    <div if.bind="helpTickets.objectArray.length === 0">
+        <h3>You have not submitted a help ticket.</h3>
+    </div>
+    <div if.bind="helpTickets.objectArray.length > 0">
+        <div show.bind="showTable">
+            <div class="container-fluid">
+                <div class="card">
+                    <div class="card-body">
+                        <compose view="./components/helpTicketTable.html"></compose>
                     </div>
                 </div>
-                <div show.bind="!showTable">
-                    <div class="container-fluid">
-                    <div class="card">
-                        <div class="card-body">
-                            <compose view="./components/helpTicketDetail.html"></compose>
-                        </div>
-                    </div>
+            </div>
+        </div>
+        <div show.bind="!showTable">
+            <div class="container-fluid">
+                <div class="card">
+                    <div class="card-body">
+                        <compose view="./components/helpTicketDetail.html"></compose>
                     </div>
                 </div>
             </div>

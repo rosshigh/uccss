@@ -1,18 +1,21 @@
 <template>
+    <compose view="../../../resources/elements/nav-bar.html"></compose>
     <main id="js-page-content" role="main" class="page-content">
-        <ol class="breadcrumb page-breadcrumb">
-          <li class="breadcrumb-item"><a href="javascript:void(0);">UCCSS Home</a></li>
-          <li class="breadcrumb-item">Product Requests</li>
-          <li class="breadcrumb-item active">View Requests</li>
-          <li class="position-absolute pos-top pos-right d-none d-sm-block"><span class="js-get-date"></span></li>
-      </ol>
-            <router-view></router-view>
-      
-          </main>
-    <!-- <compose view="../../../resources/elements/top-bar.html"></compose>
-    <div class="content">
-        <div class="container-fluid">
-            <router-view></router-view>
-        </div>
-    </div> -->
+        <ul class="nav nav-pills smallBottomMargin" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="editPeople" click.trigger="navigate($event)"
+                    href="#/customers/editPeople">People</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="editInstitutions" click.trigger="navigate($event)"
+                    href="#/customers/editInstitutions">Institutions</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="bulkEmails" click.trigger="navigate($event)" href="#/customers/bulkEmails">Bulk
+                    Email</a>
+            </li>
+        </ul>
+        <router-view></router-view>
+
+    </main>
 </template>

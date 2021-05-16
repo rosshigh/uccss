@@ -51,8 +51,6 @@
                       <span class="nav-link-text" data-i18n="nav.blankpage">Home </span>
                     </a>
                   </li>
-               
-                <li class="nav-title">Tools & Components</li>
                 
                 <li id="systemAdmin">
                     <a href="#"  click.trigger="toggleMenu('systemAdmin')" title="System Administrator" data-filter-tags="system administration">
@@ -84,6 +82,65 @@
                           </li>
                     </ul>
                 </li>
+                <li id="userSupport">
+                    <a href="#"  click.trigger="toggleMenu('userSupport')" title="User Support" data-filter-tags="user support">
+                        <i class="fal fa-support"></i>
+                        <span class="nav-link-text" data-i18n="nav.user_support">User Support</span>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#techProductRequests" title="Systems" data-filter-tags="systems">
+                                <span class="nav-link-text" data-i18n="nav.systems">Product Requests</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#apj" title="customers" data-filter-tags="customers">
+                                <span class="nav-link-text" data-i18n="nav.customers">APJ Requests</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link" href="#/helpTicketsTechMenu">
+                                <span class="nav-link-text">Help Tickets</span></a>
+                          </li>
+                    </ul>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" href="#/helpTickets">
+                        <i class="fal fa-question"></i> HelpTickets
+                    </a>
+                  </li>
+                  <li class="nav-item ">
+                    <a class="nav-link" href="#/productRequests">
+                        <i class="ni ni-basket"></i> Product Requests
+                    </a>
+                  </li>
+                  <li class="nav-item ">
+                    <a class="nav-link" href="#/facCoord">
+                      <i class="ni ni-user-following"></i>Faculty Coordinator
+                    </a>
+                  </li>
+                  <li id="facultyResources">
+                    <a href="#"  click.trigger="toggleMenu('facultyResources')" title="Faculty Resources" data-filter-tags="faculty resources">
+                        <i class="fal fa-support"></i>
+                        <span class="nav-link-text" data-i18n="nav.faculty Resources">Faculty Resources</span>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#/downloads/CUR" title="Systems" data-filter-tags="systems">
+                                <span class="nav-link-text" data-i18n="nav.systems">Curriculum</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#/downloads/SOF" title="customers" data-filter-tags="customers">
+                                <span class="nav-link-text" data-i18n="nav.customers">Software</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link" href="#/faq">
+                                <span class="nav-link-text">FAQ</span></a>
+                          </li>
+                    </ul>
+                </li>
              
             </ul>
             <div class="filter-message js-filter-message bg-success-600"></div>
@@ -91,7 +148,7 @@
         <!-- END PRIMARY NAVIGATION -->
         <!-- NAV FOOTER -->
         <div class="nav-footer shadow-top">
-            <a href="#" onclick="return false;" data-action="toggle" data-class="nav-function-minify"
+            <!-- <a href="#" onclick="return false;" data-action="toggle" data-class="nav-function-minify"
                 class="hidden-md-down">
                 <i class="ni ni-chevron-right"></i>
                 <i class="ni ni-chevron-right"></i>
@@ -112,7 +169,7 @@
                         <i class="fal fa-phone"></i>
                     </a>
                 </li>
-            </ul>
+            </ul> -->
         </div> <!-- END NAV FOOTER -->
     </aside>
 </template>

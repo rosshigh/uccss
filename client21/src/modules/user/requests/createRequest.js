@@ -63,13 +63,13 @@ export class CreateRequest {
         this.filterList();
     }
 
-    refreshSelects() {
-        this.utils.refreshSelect("#sessionSelect", this.config.HELP_TICKET_CLOSE_REASONS, "code", this.selectedReason);
-    }
+    // refreshSelects() {
+    //     this.utils.refreshSelect("#sessionSelect", this.config.HELP_TICKET_CLOSE_REASONS, "code", this.selectedReason);
+    // }
 
     attached() {
-        $('.selectpicker').selectpicker();
-        $('.selectpicker').click(e => e.stopPropagation());
+        // $('.selectpicker').selectpicker();
+        // $('.selectpicker').click(e => e.stopPropagation());
         var wizard = $('.wizard').wizard();
         var that = this;
 
@@ -107,6 +107,20 @@ export class CreateRequest {
             }
         })
 
+        
+        var controls = {
+            leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
+            rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
+        }
+
+
+            // minimum setup
+            $('#datepicker-1').datepicker(
+            {
+                todayHighlight: true,
+                orientation: "bottom left",
+                templates: controls
+            });
     }
 
     validateStepOne() {
@@ -167,7 +181,7 @@ export class CreateRequest {
         if (this.aSessionHasBeenSelected) this.setDates();
         this.sessionDatesMessage = "This session runs from <b>" + moment(this.sessions.selectedObject.startDate).format(format) + "</b> to <b>" + moment(this.sessions.selectedObject.endDate).format(format) + "</b>";
 
-        this.utils.refreshSelect("#courseSelect", this.people.coursesArray, "_id", this.selectedCourse);
+        // this.utils.refreshSelect("#courseSelect", this.people.coursesArray, "_id", this.selectedCourse);
     }
 
     setDates() {
@@ -195,7 +209,7 @@ export class CreateRequest {
             this.endDate = this.sessions.selectedObject.endDate;
             this.CourseSelected = this.config.SANDBOX_NAME;
         }
-        this.utils.refreshSelect("#courseSelect", this.people.coursesArray, "_id", this.selectedCourse);
+        // this.utils.refreshSelect("#courseSelect", this.people.coursesArray, "_id", this.selectedCourse);
     }
 
     buildRequest() {
@@ -245,7 +259,7 @@ export class CreateRequest {
         this.requestTypeChosen = false;
         this.selectedProducts = [];
         this.existingRequest = false;
-        this.refreshSelects();
+        // this.refreshSelects();
         $('.wizard').wizard('selectedItem', {
             step: 1
         })
@@ -310,7 +324,7 @@ export class CreateRequest {
             this.requestComments = this.requests.selectedObject.customerMessage;
             this.selectedProducts = [];
             this.requests.selectedObject.requestDetails.forEach(item => {
-                this.products.selectedObjectFromId(item.productId);
+                this.products.selectedObjectById(item.productId);
                 if(item.requestStatus == this.config.ASSIGNED_REQUEST_CODE) this.existingRequest = true;
                 this.selectedProducts.push({
                     detailId: item._id,

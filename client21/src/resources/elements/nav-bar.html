@@ -1,5 +1,29 @@
 <template>
-    <header class="page-header" role="banner" >
-      
-    </header>
+    <div>
+        <nav class="navbar navbar-expand-lg navbar-light" style="height:66px;background-color:white;">
+    <!-- <header class="page-header" role="banner" > -->
+        <!-- class="page-header" role="banner" -->
+        <h3 class="leftMargin">${pageTitle}</h3>
+        
+        <!-- <nav class="navbar navbar-expand-lg navbar-light">
+            <div>
+                <ul class="navbar-nav mr-auto">
+                    <li class="${row.isActive ? 'active nav-item' : 'nav-item'}" repeat.for="row of router.navigation">
+                       <h4> <a class="nav-link" href.bind="row.href">${row.title}</a></h4>
+                    </li>
+                </ul>
+            </div>
+        </nav> -->
+       
+     
+        <div class="ml-auto d-flex">
+            <span click.trigger="site.showBannerMessage()" class="nav-item pointMe"><h4 id="systemMessage">${systemMessage.title | concatenateString:50}</h4></span>
+           <h4 class="leftMargin rightMargin"><a href="#about">About the UCC</a></h4>
+               
+                
+              </ul>
+        </div>
+    <!-- </header> -->
+</nav>
+</div>
 </template>

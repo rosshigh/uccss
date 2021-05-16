@@ -102,8 +102,8 @@ export class UserCreateHelpTicket {
     }
 
     attached() {
-        $('.selectpicker').selectpicker();
-        $('.selectpicker').click(e => e.stopPropagation());
+        // $('.selectpicker').selectpicker();
+        // $('.selectpicker').click(e => e.stopPropagation());
         var wizard = $('.wizard').wizard();
         var that = this;
 
@@ -147,16 +147,16 @@ export class UserCreateHelpTicket {
 
     async institutionSelected() {
         await this.people.getPeopleArray('?filter=institutionId|eq|' + this.selectedInsitutionId + '&order=lastName');
-        this.refreshSelects();
+        // this.refreshSelects();
     }
 
     async personSelected(){
         await this.getActiveRequests();
     }
 
-    refreshSelects() {
-        this.utils.refreshSelect("#personSelect", this.people.peopleArray, "_id", this.selectedPersonId);
-    }
+    // refreshSelects() {
+    //     this.utils.refreshSelect("#personSelect", this.people.peopleArray, "_id", this.selectedPersonId);
+    // }
 
     async getActiveRequests() {
         var sessions = "";

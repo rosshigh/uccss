@@ -1,24 +1,19 @@
 <template>
-    <div class="panel panel-default" >
-        <div class="panel-body" style="padding:5px;">
-            <h3>Category: ${documents.selectedCat.description}</h3>
-            <div if.bind="documents.selectedCat.subCategories.length" style="padding:2px;background-color:ghostwhite;">
-                <h4>Existing Subcategories:</h4>
-                <ul class="list-group">
-                    <li class="list-group-item" repeat.for="subCat of documents.selectedCat.subCategories">
-                        ${subCat.description}</li>
-                </ul>
-            </div>
-            <span if.bind="!documents.selectedCat.subCategories.length">
-                <h5>This document category has no subcategories</h5>
-            </span>
+    <h3>Category: ${documents.selectedCat.description}</h3>
+    <div if.bind="documents.selectedCat.subCategories.length" style="padding:2px;background-color:ghostwhite;">
+        <h4>Existing Subcategories:</h4>
+        <ul class="list-group">
+            <li class="list-group-item" repeat.for="subCat of documents.selectedCat.subCategories">
+                ${subCat.description}</li>
+        </ul>
+    </div>
+    <span if.bind="!documents.selectedCat.subCategories.length">
+        <h5>This document category has no subcategories</h5>
+    </span>
 
-            <div class="form-group topMargin">
-                <input id="subCategoryInput"
-                    value.bind="documents.selectedCat.subCategories[selectedSubCategoryIndex].description"
-                    type="text" placeholder="Subcategory Name" class="form-control" />
-            </div>
-        </div>
-
+    <div class="form-group topMargin">
+        <input id="subCategoryInput"
+            value.bind="documents.selectedCat.subCategories[selectedSubCategoryIndex].description" type="text"
+            placeholder="Subcategory Name" class="form-control" />
     </div>
 </template>

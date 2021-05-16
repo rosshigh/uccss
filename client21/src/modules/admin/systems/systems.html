@@ -1,9 +1,18 @@
 <template>
-    <compose view="../../../resources/elements/top-bar.html"></compose>
-    <div class="content">
-        <div class="container-fluid">
+    <compose view="../../../resources/elements/nav-bar.html"></compose>
+    <main id="js-page-content" role="main" class="page-content">
+        <ul class="nav nav-pills smallBottomMargin" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="editSessions" click.trigger="navigate($event)" href="#/systems/editSessions">Sessions</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="editSystems" click.trigger="navigate($event)" href="#/systems/editSystems">Systems</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="editProducts" click.trigger="navigate($event)" href="#/customers/editProducts">Products</a>
+            </li>
+        </ul>
             <router-view></router-view>
-        </div>
-    </div>
+        </main>
     
 </template>

@@ -20,7 +20,9 @@ export class EditSystems {
         this.utils = utils;
 
         this.filters = [
-            { value: '', keys: ['sid', 'description'] },
+            { value: '', keys: ['sid'] },
+            { value: '', keys: ['description'] },
+            { value: '', keys: ['server'] },
             { value: true, keys: ['active'] }
         ];
 
@@ -44,7 +46,7 @@ export class EditSystems {
         $("#loading").hide();
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
-        $('.selectpicker').selectpicker();
+        // $('.selectpicker').selectpicker();
     }
 
     async refresh() {
@@ -56,7 +58,7 @@ export class EditSystems {
 
     new() {
         this.systems.selectObject();
-        this.refreshSelects();
+        // this.refreshSelects();
         this.createValidationRules();
         this.view = 'form';
     }
@@ -64,7 +66,7 @@ export class EditSystems {
     async edit(system) {
         await this.systems.getObject(system._id);
         this.systems.selectedObject.systemNotes = this.systems.selectedObject.systemNotes ? this.systems.selectedObject.systemNotes : "";
-        this.refreshSelects();
+        // this.refreshSelects();
         this.createValidationRules();
         this.saveFilterValues();
         this.view = 'form';
@@ -163,10 +165,10 @@ export class EditSystems {
     editClientsButton() {
         this.showClientParametersForm = !this.showClientParametersForm;
         this.editClientStatus = this.config.UNASSIGNED_CLIENT_CODE;
-        setTimeout(() => {
-            $('#clientStatusSelect').selectpicker();
-            this.utils.refreshSelect("#clientStatusSelect", this.config.CLIENT_STATUSES, "code", this.editClientStatus);
-        },250); 
+        // setTimeout(() => {
+        //     // $('#clientStatusSelect').selectpicker();
+        //     this.utils.refreshSelect("#clientStatusSelect", this.config.CLIENT_STATUSES, "code", this.editClientStatus);
+        // },250); 
         $("#editFirstClient").focus();
     }
 

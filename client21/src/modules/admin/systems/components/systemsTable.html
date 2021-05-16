@@ -10,19 +10,28 @@
                 </th>
             </tr>
             <tr>
-                <th colspan="2">
+                <th style="width:15%;">
                     <div class="form-group">
                         <input type="text" value.bind="filters[0].value"
-                            placeholder="Filter SID, Description, and Server" class="form-control" id='filterField' />
+                            placeholder="Filter SID" class="form-control" id='filterField0' />
                     </div>
                 </th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th>
-                    <div class='col'>
-                        <select value.bind="filters[1].value" class="form-control selectpicker" id="personStatus"
-                            data-style="btn btn-link">
+                <th style="width:25%;">
+                    <div class="form-group">
+                        <input type="text" value.bind="filters[1].value"
+                            placeholder="Filter Description" class="form-control" id='filterField1' />
+                    </div>
+                </th>
+                <th style="width:25%;">
+                    <div class="form-group">
+                        <input type="text" value.bind="filters[2].value"
+                            placeholder="Filter Server" class="form-control" id='filterField2' />
+                    </div>
+                </th>
+                <th style="width:25%;"></th>
+                <th style="width:10%;">
+                    <div class="form-group">
+                        <select value.bind="filters[1].value" class="form-control" id="personStatus">
                             <option value=true>Active</option>
                             <option value=false>Inactive</option>
                         </select>

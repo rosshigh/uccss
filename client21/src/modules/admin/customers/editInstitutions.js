@@ -50,7 +50,7 @@ export class EditInstitutions {
         $("#loading").hide();
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
-        $('.selectpicker').selectpicker();
+        // $('.selectpicker').selectpicker();
     }
 
     async refresh() {
@@ -61,17 +61,17 @@ export class EditInstitutions {
 
     new() {
         this.people.selectInstitution();
-        this.refreshSelects();
+        // this.refreshSelects();
         this.people.getInstitutionPeople(-1);
         this.createValidationRules();
-        this.refreshSelects();
+        // this.refreshSelects();
         this.view = 'form';
     }
 
     async edit(institution) {
         this.selectedInstitutionId = institution._id;
         await this.people.getInstitution(institution._id);
-        this.refreshSelects();
+        // this.refreshSelects();
         this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.people.selectedInstitution._id);
         this.createValidationRules();
         this.view = 'form';

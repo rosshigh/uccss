@@ -63,7 +63,7 @@ export class RequestsArchive {
 
     attached() {
         $('[data-toggle="tooltip"]').tooltip();
-        $('.selectpicker').selectpicker();
+        // $('.selectpicker').selectpicker();
         this.getRequests();
     }
 

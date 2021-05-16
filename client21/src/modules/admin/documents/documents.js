@@ -45,7 +45,7 @@ export class Documents {
     async attached() {
         $('[data-toggle="tooltip"]').tooltip();
         $(".hover").css("display", "none");
-        $('.selectpicker').selectpicker();
+        // $('.selectpicker').selectpicker();
         this.refresh();
         $("#systemMessage").fadeOut(500).fadeIn(500).fadeOut(500).fadeIn(500);
     }
@@ -95,7 +95,7 @@ export class Documents {
     newCategory() {
         this.documents.selectCategory();
         this.documents.selectedCat.sortOrder = this.documents.objectCategoriesArray.length
-        this.refreshSelects();
+        // this.refreshSelects();
         this.modalTitle = "New Category";
         $('#categoryModal').modal('show');
         setTimeout(()=>{
@@ -105,7 +105,7 @@ export class Documents {
 
     editCategory(obj, index, el) {
         this.selectedCategory = index;
-        this.refreshSelects();
+        // this.refreshSelects();
         this.modalTitle = "Edit Category";
         $('#categoryModal').modal('show');
         setTimeout(()=>{

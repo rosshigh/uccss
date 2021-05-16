@@ -10,11 +10,15 @@ export class Site {
         this.site = site;
         this.pageTitle = 'Site';
 
-        this.systemMessage = sessionStorage.getItem('systemMessage');
+        this.systemMessage = JSON.parse(sessionStorage.getItem('systemMessage'));
     }
 
     attached() {
         $("#systemMessage").fadeOut(500).fadeIn(500).fadeOut(500).fadeIn(500);
+        if(this.router.currentInstruction.fragment.length){
+            $(".nav-link").removeClass('active');
+            $("#" + this.router.currentInstruction.fragment).addClass('active');
+        }
     }
 
     toggleTheSideBar() {
@@ -26,6 +30,13 @@ export class Site {
             $('#sidebar').show();
             $('.main-panel').css('width', '');
         }
+    }
+
+    navigate(el){
+        $(".nav-link").removeClass('active');
+        $(el.target).addClass('active');
+        this.router.navigate(el.target.id)
+
     }
 
     configureRouter(config, router) {

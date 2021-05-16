@@ -41,7 +41,7 @@ export class ViewRequests {
     }
 
     attached() {
-        $('.selectpicker').selectpicker();
+        // $('.selectpicker').selectpicker();
         this.getRequests();
     }
 

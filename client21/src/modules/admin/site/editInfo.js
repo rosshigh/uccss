@@ -46,7 +46,7 @@ export class EditInfo {
     attached() {
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
-        $('.selectpicker').selectpicker();
+        // $('.selectpicker').selectpicker();
     }
 
     async refresh() {
@@ -55,14 +55,14 @@ export class EditInfo {
 
     new() {
         this.siteInfo.selectObject();
-        this.refreshSelects();
+        // this.refreshSelects();
         this.view = 'form';
     }
 
     async edit(info) {
         this.selectedInfoId = info._id;
         await this.siteInfo.getObject(this.selectedInfoId);
-        this.refreshSelects();
+        // this.refreshSelects();
         this.view = 'form';
     }
 
@@ -161,13 +161,13 @@ export class EditInfo {
 
     cancel() {
         this.siteInfo.refreshOriginalObject();
-        this.refreshSelects();
+        // this.refreshSelects();
     }
 
     clearFilters() {
         this.filters[0].value = "";
         this.filters[1].value = "";
-        this.refreshSelects();
+        // this.refreshSelects();
         $('#filterField').focus();
     }
 

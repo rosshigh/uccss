@@ -1,23 +1,21 @@
 <template>
-    <compose view="../../resources/elements/top-bar.html"></compose>
-    <div class="content">
-        <div class="container-fluid">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-3">
-                            <div class="bottomMargin list-group-item panelContrastColor">
-                            </div>
-                            <div show.bind="view == 'categoryList'">
-                                <compose view="./components/categoryList.html"></compose>
-                            </div>
+    <compose view="../../resources/elements/nav-bar.html"></compose>
+    <main id="js-page-content" role="main" class="page-content">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3">
+                        <div class="bottomMargin list-group-item panelContrastColor">
                         </div>
-                        <div show.bind="showDocuments" class="col-9">
-                            <compose view="./components/questionForm.html"></compose>
+                        <div show.bind="view == 'categoryList'">
+                            <compose view="./components/categoryList.html"></compose>
                         </div>
+                    </div>
+                    <div show.bind="showDocuments" class="col-9">
+                        <compose view="./components/questionForm.html"></compose>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 </template>

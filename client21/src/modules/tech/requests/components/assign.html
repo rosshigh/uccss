@@ -3,7 +3,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-6">
-                    <ul class="nav nav-pills" id="nav-tab">
+                    <ul class="nav nav-tabs" id="nav-tab">
                         <li class="nav-item">
                             <a href="#proposed" class="nav-link active clientTabs proposed" id="proposed-tab"
                                 data-toggle="tab" role="tab">Proposed</a>
@@ -17,13 +17,19 @@
                         <div class="tab-pane fade show active clientTabs proposedTab" id="proposed" role="tabpanel"
                             aria-labelledby="nav-propsed-tab">
                             <div class="topMargin bold">
-                                <span show.bind="selectedClientIndex >= 0">
-                                    System: ${provisionalClientList[selectedClientIndex].proposedClient.systemId |
-                                    lookupValue:systems.objectsArray:"_id":"sid"}
-                                    Client: ${provisionalClientList[selectedClientIndex].proposedClient.client}
-                                </span>
-                                <span class='pull-right'>Requested user IDs: ${requests.selectedDetail.requestId |
-                                    idsRequested}</span>
+                                <div class="row smallBottomMargin">
+                                    <div class="col">
+                                        <span show.bind="selectedClientIndex >= 0">
+                                            System: ${provisionalClientList[selectedClientIndex].proposedClient.systemId
+                                            |
+                                            lookupValue:systems.objectsArray:"_id":"sid"}
+                                            Client: ${provisionalClientList[selectedClientIndex].proposedClient.client}
+                                        </span>
+                                        <span class='pull-right'>Requested user IDs: ${requests.selectedDetail.requestId
+                                            |
+                                            idsRequested}</span>
+                                    </div>
+                                </div>
                             </div>
                             <compose show.bind="!verticalDisplay" view="./verticalInputFields.html"></compose>
                             <compose show.bind="verticalDisplay" view="./horizontalInputFields.html"></compose>
@@ -31,7 +37,8 @@
                                 <h5 class="topMargin">Customer Comments</h5>
                                 <div innerhtml.bind="requests.selectedDetail.requestId.customerMessage"></div>
                             </span>
-                            <editor value.bind="requests.selectedDetail.techComments" toolbar.bind="config.TOOLBAR"  height="250"></editor>
+                            <editor value.bind="requests.selectedDetail.techComments" toolbar.bind="config.TOOLBAR"
+                                height="250"></editor>
                         </div>
                         <div class="tab-pane fade clientTabs assignedTab" id="assigned" role="tabpanel"
                             aria-labelledby="nav-assigned-tab">
@@ -60,7 +67,8 @@
                                 <h5 class="topMargin">Customer Comments</h5>
                                 <div innerhtml.bind="requests.selectedDetail.requestId.customerMessage"></div>
                             </span>
-                            <editor value.bind="requests.selectedDetail.techComments" toolbar.bind="config.TOOLBAR"  height="250"></editor>
+                            <editor value.bind="requests.selectedDetail.techComments" toolbar.bind="config.TOOLBAR"
+                                height="250"></editor>
                         </div>
                     </div>
                 </div>

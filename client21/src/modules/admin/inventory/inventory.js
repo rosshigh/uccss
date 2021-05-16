@@ -22,6 +22,7 @@ export class ManageInventory {
             { value: '', keys: ['type'] }
         ];
 
+        this.pageTitle =  'Inventory';
 
         this.view = 'table';
     }
@@ -61,7 +62,7 @@ export class ManageInventory {
         this.inventory.setObject(object)
         $("#editSystemName").focus();
         this.isDuplicate = false;
-        this.utils.refreshSelect("#systemType", this.config.HARDWARE_TYPES, "type", this.inventory.selectedObject.type);
+        // this.utils.refreshSelect("#systemType", this.config.HARDWARE_TYPES, "type", this.inventory.selectedObject.type);
         this.view = 'form';
     }
 

@@ -1,3 +1,14 @@
+.nav-link.active {
+  color:white;
+}
+
+.nav-link:not(.active) {
+  color:#886ab5;
+}
+
+/* .nav-item {
+  color:black;
+} */
 
 /* li.nav-item {
   color: white;
@@ -32,7 +43,7 @@ a.submenu {
   }
 
   .subMenu{
-    color:navajowhite;
+    color:black;
   }
 
   #loading {
@@ -388,6 +399,10 @@ a.submenu {
 
 .smallMarginRight {
     margin-right: 10px;
+}
+
+.smallBottomMargin {
+  margin-bottom: 5px;
 }
 
 .noteHeight {

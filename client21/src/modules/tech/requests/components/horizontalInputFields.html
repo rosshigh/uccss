@@ -23,7 +23,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row topMargin">
                         <div class="col">
                             <div class="form-group">
                                 <input id="studentIDs" type="text" placeholder="Student IDs" class="form-control"
@@ -31,7 +31,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group topMargin">
                         <input id="studentPassword" type="text" placeholder="Student Password" class="form-control"
                             value.bind="provisionalClientList[selectedClientIndex].proposedClient.studentPassword" />
                     </div>
@@ -57,7 +57,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row topMargin">
                         <div class="col">
                             <div class="form-group">
                                 <input id="facultyIDs" type="text" placeholder="Faculty IDs" class="form-control"
@@ -74,8 +74,8 @@
             </div>
         </div>
     </div>
-    <div class='row'>
-        <div class="col-8">
+    <div class='row bottomMargin' style="padding:5px;">
+        <div class="col">
             <compose view="./proposedClientsTable.html"></compose>
         </div>
     </div>

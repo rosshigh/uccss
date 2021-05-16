@@ -1,7 +1,4 @@
 <template>
-    <compose view="../../../resources/elements/top-bar.html"></compose>
-    <div class="content">
-        <div class="container-fluid">
     <div class="card">
         <div class="card-body">
             <!-- <h1>View Product Requests</h1> -->
@@ -18,7 +15,7 @@
                     </div>
                 </div>
             </div>
-                <div if.bind="requests.objectsArray.length === 0">
+                <div class="topMargin" if.bind="requests.objectsArray.length === 0">
                     <h3>You have made no requests for this semester.</h3>
                 </div>
               
