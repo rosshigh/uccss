@@ -1,17 +1,17 @@
 <template>
-    <compose view="../../../resources/elements/nav-bar.html"></compose>
+    <!-- <compose view="../../../resources/elements/nav-bar.html"></compose> -->
     <main id="js-page-content" role="main" class="page-content">
-        <ul class="nav nav-pills smallBottomMargin" role="tablist">
+        <ul class="nav nav-tabs smallBottomMargin" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="editPeople" click.trigger="navigate($event)"
-                    href="#/customers/editPeople">People</a>
+                <a class="nav-link active" id="editPeople" click.trigger="utils.navigate('customers', $event)"
+                    href="#">People</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="editInstitutions" click.trigger="navigate($event)"
-                    href="#/customers/editInstitutions">Institutions</a>
+                <a class="nav-link" id="editInstitutions" click.trigger="utils.navigate('customers', $event)"
+                    href="#">Institutions</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="bulkEmails" click.trigger="navigate($event)" href="#/customers/bulkEmails">Bulk
+                <a class="nav-link" id="bulkEmails" click.trigger="utils.navigate('customers', $event)" href="#">Bulk
                     Email</a>
             </li>
         </ul>

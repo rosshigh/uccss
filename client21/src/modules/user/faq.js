@@ -17,7 +17,8 @@ export class ShowFAQ {
         this.editorid = 'answerhtml';
         this.view = 'categoryList';
         this.userObj = this.store.getUser();
-        this.pageTitle = "Frequently Asked Questions";
+
+        this.utils.publishPageTitle('Frequently Asked Questions')
     }
 
     async attached() {

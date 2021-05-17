@@ -1,16 +1,19 @@
 import { inject } from 'aurelia-framework';
 import { Router } from "aurelia-router";
 import { SiteInfo } from '../../../resources/data/site';
+import { Utils } from '../../../resources/utils/utils';
 
-@inject(Router, SiteInfo)
+@inject(Router, SiteInfo, Utils)
 export class Site {
 
-    constructor(router, site) {
+    constructor(router, site, utils) {
         this.router = router;
         this.site = site;
-        this.pageTitle = 'Site';
+        this.utils = utils;
 
-        this.systemMessage = JSON.parse(sessionStorage.getItem('systemMessage'));
+        this.utils.publishPageTitle('Site')
+
+        // this.systemMessage = JSON.parse(sessionStorage.getItem('systemMessage'));
     }
 
     attached() {

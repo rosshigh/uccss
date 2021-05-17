@@ -1,16 +1,30 @@
 import { inject } from 'aurelia-framework';
 import { Notification } from 'aurelia-notification';
+import{ EventAggregator } from 'aurelia-event-aggregator';
+import { Router } from "aurelia-router";
 import * as toastr from 'toastr';
 
-@inject(Notification)
+@inject(Notification, EventAggregator, Router)
 export class Utils {
 
-  constructor(notification) {
+  constructor(notification, eventAggregator, router) {
     this.notification = notification;
+    this.eventAggregator = eventAggregator;
+    this.router = router;
     this.notification.waitForMove = true;
 
     toastr.info("It worked!");
   }
+
+  publishPageTitle(pageTitle){
+    this.eventAggregator.publish('pageTitleUpdate', pageTitle);
+  }
+
+  navigate(root, el){
+    $(".nav-link").removeClass('active');
+    $(el.target).addClass('active');
+    this.router.navigate(root + '/' + el.target.id)
+}
 
   guid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {

@@ -1,18 +1,32 @@
-import { inject, BindingEngine } from 'aurelia-framework';
+import { inject } from 'aurelia-framework';
+import{ EventAggregator } from 'aurelia-event-aggregator';
 import { Router } from "aurelia-router";
 import { Auth } from '../data/auth';
 import {SiteInfo} from '../data/site';
 
-@inject(Auth,SiteInfo)
+@inject(Auth, SiteInfo, EventAggregator, Router)
 export class NavBar {
 
-    constructor(auth, site){
+    constructor(auth, site, eventAggregator, router){
         this.auth = auth;
         this.site = site;
+        this.eventAggregator = eventAggregator;
+        this.router = router;
+
+        this.pageTitle = 'UCC Support System Home';
+
+        this.subscribe();
+    }
+
+    subscribe(){
+        this.subscriber = this.eventAggregator.subscribe('pageTitleUpdate', payload => {
+            this.pageTitle = payload;
+        })
     }
     
     
     logout() {
+        this.subscriber.dispose();
         this.auth.logout();
         this.isAuthenticated = this.auth.isAuthenticated();
         this.router.navigate("home");

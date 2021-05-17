@@ -12,14 +12,14 @@ export class EditProducts {
     pageSize = 200;
     testVar = 'alksjdf;alskdfj;l';
 
-    toolbar = [
-        ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
-        ['color', ['color']],
-        ['font', ['strikethrough', 'superscript', 'subscript']],
-        ['layout', ['ul', 'ol', 'paragraph']],
-        ['insert', ['link', 'table', 'hello']],
-        ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
-      ];
+    // toolbar = [
+    //     ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
+    //     ['color', ['color']],
+    //     ['font', ['strikethrough', 'superscript', 'subscript']],
+    //     ['layout', ['ul', 'ol', 'paragraph']],
+    //     ['insert', ['link', 'table', 'hello']],
+    //     ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
+    //   ];
 
     constructor(ValidationControllerFactory, products, systems, documents, config, utils) {
         this.controller = ValidationControllerFactory.createForCurrentScope();

@@ -25,9 +25,9 @@ export class Documents {
         this.showDocuments = false;
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
 
-        this.pageTitle = 'File Management';
+        this.utils.publishPageTitle('File Management')
 
-        this.systemMessage = sessionStorage.getItem('systemMessage');
+        // this.systemMessage = sessionStorage.getItem('systemMessage');
 
     }
 

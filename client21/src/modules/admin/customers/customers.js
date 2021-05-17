@@ -1,14 +1,17 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
+import{ Utils } from '../../../resources/utils/utils';
 
-@inject(Router)
+@inject(Router, Utils)
 export class Customers {
 
-    constructor(router){
+    constructor(router, utils){
         this.router = router;
-        this.pageTitle = 'Customers';
+        this.utils = utils;
 
-        this.systemMessage = sessionStorage.getItem('systemMessage');
+        this.utils.publishPageTitle('Customers')
+
+        // this.systemMessage = sessionStorage.getItem('systemMessage');
     }
 
     attached(){

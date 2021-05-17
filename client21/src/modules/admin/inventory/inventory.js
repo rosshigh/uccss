@@ -22,7 +22,7 @@ export class ManageInventory {
             { value: '', keys: ['type'] }
         ];
 
-        this.pageTitle =  'Inventory';
+        this.utils.publishPageTitle('Inventory')
 
         this.view = 'table';
     }

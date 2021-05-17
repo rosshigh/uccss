@@ -25,6 +25,12 @@ export class App {
     });
   }
 
+  logout() {
+    this.auth.logout();
+    this.isAuthenticated = this.auth.isAuthenticated();
+    this.router.navigate("home");
+}
+
   toggleTheSideBar() {
     $('#sidebar').slideToggle();
   }

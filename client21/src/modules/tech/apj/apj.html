@@ -1,8 +1,16 @@
 <template>
-    <compose view="../../../resources/elements/top-bar.html"></compose>
-    <div class="content">
-        <div class="container-fluid">
+    <main id="js-page-content" role="main" class="page-content">
+        <ul class="nav nav-tabs smallBottomMargin" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="apjInstitutions" click.trigger="utils.navigate('apj',$event)" href="#">Institutions</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="assignments" click.trigger="utils.navigate('apj',$event)" href="#">Assignments</a>
+            </li>
+            <!-- <li class="nav-item">
+                <a class="nav-link" id="editProducts" click.trigger="utils.navigate('apj',$event)" href="#">Products</a>
+            </li> -->
+        </ul>
             <router-view></router-view>
-        </div>
-    </div> 
+        </main>
 </template>

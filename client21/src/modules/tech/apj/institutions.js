@@ -6,7 +6,6 @@ import { Products } from '../../../resources/data/products';
 import { APJClientRequests } from '../../../resources/data/apjClientRequests';
 import { Utils } from '../../../resources/utils/utils';
 import { AppConfig } from '../../../appConfig';
-import { throwStatement } from '../../../../../../../../AppData/Local/Microsoft/TypeScript/4.2/node_modules/@babel/types/lib/index';
 
 @inject(ValidationControllerFactory, is4ua, People, Products, APJClientRequests, Utils, AppConfig)
 export class APJInstitutions {
@@ -21,15 +20,22 @@ export class APJInstitutions {
         this.config = config;
 
         this.filters = [
-            { value: '', keys: ['name', 'country'] },
-            { value: '', keys: ['institutionStatus'] }
-
+            { value: '', keys: ['name'] },
+            { value: '', keys: ['country'] },
+            { value: '', keys: ['institutionStatus'] },
+            { value: '', custom: this.filterPackage },
         ];
 
         this.newRequestDetails = [];
         this.filterRetired = true;
 
         this.view = 'table';
+    }
+
+    filterPackage(filterValue, row) {
+        if (filterValue === null || filterValue === undefined || filterValue === "") return true;
+        if(!row.packages[0]) return false;
+        return filterValue === row.packages[0].packageId;
     }
 
     async activate() {
@@ -40,20 +46,30 @@ export class APJInstitutions {
             this.products.getObjectsArray('?filter=apj|eq|true&order=name')
         ]);
 
+        this.fixPackages();
+
         this.filterList();
+    }
+
+    fixPackages(){
+        this.people.institutionsArray.forEach(item => {
+            if(!item.packages || !item.packages.length){
+                item.packages = [{packageId: null}];
+            }
+        })
     }
 
     attached() {
         $("#loading").hide();
         $('#filterField').focus();
         $('[data-toggle="tooltip"]').tooltip();
-        $('.selectpicker').selectpicker();
+        // $('.selectpicker').selectpicker();
     }
 
-    refreshSelects() {
-        this.utils.refreshSelect("#editInstitutonStatusArray", this.is4ua.institutonStatusArray, "code", this.people.selectedInstitution.institutionStatus);
-        this.utils.refreshSelect("#editInstitutionType", this.is4ua.institutionTypes, "code", this.people.selectedInstitution.institutionType);
-    }
+    // refreshSelects() {
+    //     this.utils.refreshSelect("#editInstitutonStatusArray", this.is4ua.institutonStatusArray, "code", this.people.selectedInstitution.institutionStatus);
+    //     this.utils.refreshSelect("#editInstitutionType", this.is4ua.institutionTypes, "code", this.people.selectedInstitution.institutionType);
+    // }
 
     async refresh() {
         $('#loading').show();
@@ -63,7 +79,7 @@ export class APJInstitutions {
 
     new() {
         this.people.selectInstitution();
-        this.refreshSelects();
+        // this.refreshSelects();
         // this.createValidationRules();
     }
 
@@ -95,7 +111,7 @@ export class APJInstitutions {
     editRequest(index) {
         this.originalRequest = JSON.parse(JSON.stringify(this.requestDetails[index]));
         this.requestDetailsIndex = index;
-        this.utils.refreshSelect("#selectExistingProduct", this.filteredProductsArray, "_id", this.requestDetails[this.requestDetailsIndex].productId);
+        // this.utils.refreshSelect("#selectExistingProduct", this.filteredProductsArray, "_id", this.requestDetails[this.requestDetailsIndex].productId);
         $("#requestModal").modal('show');
     }
 
@@ -131,7 +147,7 @@ export class APJInstitutions {
             this.requests.selectRequest(0);
         }
         this.filterNotActiveRequests();
-        this.refreshSelects();
+        // this.refreshSelects();
         this.createValidationRules();
         this.newRequestDetails = [];
         $('[data-toggle="tooltip"]').tooltip();
@@ -309,7 +325,7 @@ export class APJInstitutions {
     editPackage(index) {
         this.editPackageIndex = index;
         this.packageId = this.people.selectedInstitution.packages[index].packageId;
-        this.utils.refreshSelect("#editPackageID", this.people.packageArray, "_id", this.people.selectedInstitution.packages[index].packageId);
+        // this.utils.refreshSelect("#editPackageID", this.people.packageArray, "_id", this.people.selectedInstitution.packages[index].packageId);
         $("#editPackageModal").modal('show');
     }
 

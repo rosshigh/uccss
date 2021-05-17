@@ -12,14 +12,29 @@
             <tr>
                 <th style="width:25%;">
                     <div class="form-group">
-                        <input type="text" value.bind="filters[0].value" placeholder="Filter name, country and region "
-                            class="form-control" id='filterField' />
+                        <input type="text" value.bind="filters[0].value" placeholder="Filter Name "
+                            class="form-control" id='filterField0' />
                     </div>
                 </th>
-                <th></th>
+                <th style="width:15%;>
+                    <div class="form-group">
+                        <input type="text" value.bind="filters[1].value" placeholder="Filter Country "
+                            class="form-control" id='filterField1' />
+                    </div>
+                </th>
+                <th style="width:20%">
+                    <div class="form-group">
+                        <select value.bind="filters[3].value" class="form-control"
+                            data-style="btn btn-link" id="institutionStatus" placeholder="Status">
+                            <option value=""></option>
+                            <option repeat.for='package of people.packageArray' model.bind='package._id'>
+                                ${package.name}</option>
+                        </select>
+                    </div>
+                </th>
                 <th>
                     <div class="form-group">
-                        <select value.bind="filters[2].value" class="form-control selectpicker"
+                        <select value.bind="filters[2].value" class="form-control"
                             data-style="btn btn-link" id="institutionStatus" placeholder="Status">
                             <option value=""></option>
                             <option repeat.for='status of is4ua.institutonStatusArray' model.bind='status.code'>
@@ -40,9 +55,8 @@
             <tr class="pointMe" repeat.for="institution of $displayData" click.delegate="edit(institution)">
                 <td style=width:25%;">${institution.name}</td>
                 <td style="width:15%;">${institution.country}</td>
-                <td data-tile="Phone">${inst.packageId.packageId |
-                    lookupValue:people.packageArray:"_id":"name"}</td>
-                <td data-title="Status">${inst.institutionStatus |
+                <td data-tile="Phone">${institution.packages[0].packageId | lookupValue:people.packageArray:"_id":"name"}</td> -->
+                <td data-title="Status">${institution.institutionStatus |
                     lookupValue:is4ua.institutonStatusArray:"code":"description"}</td>
             </tr>
         </tbody>

@@ -2,16 +2,18 @@ import { inject} from 'aurelia-framework';
 import { DocumentsServices } from '../../../resources/data/documents';
 import { Store } from '../../../store/store';
 import { AppConfig } from '../../../appConfig';
+import { Utils } from '../../../resources/utils/utils';
 
-@inject( DocumentsServices, Store, AppConfig)
+@inject( DocumentsServices, Store, AppConfig, Utils)
 export class Downloads {
 
     pageSize = 200;
 
-    constructor(documentsService, store, config) {
+    constructor(documentsService, store, config, utils) {
         this.documentsService = documentsService;
         this.store = store;
         this.config = config;
+        this.utils = utils;
     }
 
     activate(params){
@@ -23,7 +25,7 @@ export class Downloads {
     lookUpPageTitle(code){
         this.pageTitle = "";
         this.config.DOCUMENT_CATGORIES.forEach(item => {
-            if(code === item.code) this.pageTitle = item.description;
+            if(code === item.code) this.utils.publishPageTitle(item.description);
         });
     }
 

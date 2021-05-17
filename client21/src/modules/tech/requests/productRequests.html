@@ -1,15 +1,16 @@
 <template>
-    <compose view="../../../resources/elements/nav-bar.html"></compose>
+    <!-- <compose view="../../../resources/elements/nav-bar.html"></compose> -->
     <main id="js-page-content" role="main" class="page-content">
-        <ul class="nav nav-pills smallBottomMargin" role="tablist">
+        <ul class="nav nav-tabs smallBottomMargin" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="assignments" click.trigger="navigate($event)" href="#/techProductRequests/assignments">Assignments</a>
+                <a class="nav-link active" id="assignments"
+                    click.trigger="utils.navigate('techProductRequests', $event)" href="#">Assignments</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="archive" click.trigger="navigate($event)" href="#/techProductRequests/archive">Request Archive</a>
+                <a class="nav-link" id="archive" click.trigger="utils.navigate('techProductRequests', $event)"
+                    href="#">Request Archive</a>
             </li>
         </ul>
-            <router-view></router-view>
-      
-          </main>
+        <router-view></router-view>
+    </main>
 </template>
