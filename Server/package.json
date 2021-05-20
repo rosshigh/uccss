@@ -46,7 +46,7 @@
     "passport-local": "^1.0.0",
     "password": "^0.1.1",
     "puppeteer": "^1.19.0",
-    "redis": "^2.6.0-1",
+    "redis": "^3.1.1",
     "response-time": "^2.3.1",
     "serve-favicon": "^2.5.0",
     "winston": "^3.1.0",
