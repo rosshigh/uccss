@@ -5,16 +5,19 @@
                 <div class="steps-container">
                     <ul class="steps">
                         <li data-step="1" data-target="#step1" class="active">
-                            <span class="badge">1</span>Step 1<span class="chevron"></span>
+                            <span class="badge">1</span>Session<span class="chevron"></span>
                         </li>
                         <li data-step="2" data-target="#step2">
-                            <span class="badge">2</span>Step 2<span class="chevron"></span>
+                            <span class="badge">2</span>Course<span class="chevron"></span>
                         </li>
                         <li data-step="3" data-target="#step3">
-                            <span class="badge">3</span>Step 3<span class="chevron"></span>
+                            <span class="badge">3</span>Products<span class="chevron"></span>
                         </li>
                         <li data-step="4" data-target="#step4">
-                            <span class="badge">4</span>Step 4<span class="chevron"></span>
+                            <span class="badge">4</span>Commens<span class="chevron"></span>
+                        </li>
+                        <li data-step="5" data-target="#step5">
+                            <span class="badge">5</span>Confirm<span class="chevron"></span>
                         </li>
                     </ul>
                 </div>
@@ -47,7 +50,23 @@
                     <div class="step-pane" id="step2" data-step="2">
                         <div class="row">
                             <div class="col-8">
-                                <h3><strong>Step 2 </strong> - Choose the products you need</h3>
+                                <h3><strong>Step 2 </strong> - Choose the course</h3>
+                            </div>
+                            <div class="col-4">
+                                <div if.bind="stepOneAErrors.length > 0" class="alert alert-danger col" role="alert">
+                                    <ul>
+                                        <li repeat.for="error of stepOneAErrors">Error: ${error}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <compose view="./product-request-step1a.html"></compose>
+                    </div>
+
+                    <div class="step-pane" id="step3" data-step="3">
+                        <div class="row">
+                            <div class="col-8">
+                                <h3><strong>Step 3 </strong> - Choose the products you need</h3>
                             </div>
                             <div class="col-4">
                                 <div if.bind="stepTwoErrors.length > 0" class="alert alert-danger col" role="alert">
@@ -60,15 +79,15 @@
                         <compose view="./product-request-step2.html"></compose>
                     </div>
 
-                    <div class="step-pane" id="step3" data-step="3">
-                        <h3><strong>Step 3 </strong> - Tell us anything that might help us with your request</h3>
+                    <div class="step-pane" id="step4" data-step="4">
+                        <h3><strong>Step 4 </strong> - Tell us anything that might help us with your request</h3>
                         <compose view="./product-request-step3.html"></compose>
                     </div>
 
-                    <div class="step-pane" id="step4" data-step="4">
+                    <div class="step-pane" id="step5" data-step="5">
                         <div class="row">
                             <div class="col-8">
-                                <h3><strong>Step 4 </strong> - Review and tell us when you will need the product
+                                <h3><strong>Step 5 </strong> - Review and tell us when you will need the product
                                     assigned
                                 </h3>
                             </div>

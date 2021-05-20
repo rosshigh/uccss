@@ -88,7 +88,7 @@ export class Sessions {
 
     setSession(session) {
         if(!session){
-            this.selectedObject = emptySession();
+            this.selectedObject = this.emptySession();
             return;
         }
         this.selectedObject = session;

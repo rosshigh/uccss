@@ -1,13 +1,9 @@
 <template>
-    <!-- <div class="card">
-        <div class="card-body"> -->
-    <!-- <div class="row" style="height:500px;"> -->
     <div class="row">
         <div class="col-6">
             <div class="row" style="padding:10px;">
                 <div class="col">
                     <div class="form-group">
-                        <!-- <label for="editPhone">Session</label> -->
                         <select value.two-way="selectedSession" change.trigger="sessionSelected()"
                             class="form-control selectpicker" data-style="btn btn-link" id="sessionSelect">
                             <option value="">Select the session in which you will use this product
@@ -16,66 +12,35 @@
                                 Session ${session.session} - ${session.year}</option>
                         </select>
                     </div>
-                    <span class="pointMe" click.trigger="showSessionInfo()"><i class="fa fa-info"
-                            aria-hidden="true"></i> Current Sessions</span>
-                    <div innerhtml.bind="sessionDatesMessage"></div>
+                    <!-- <span class="pointMe" click.trigger="showSessionInfo()"><i class="fa fa-info"
+                            aria-hidden="true"></i> Current Sessions</span> -->
+                    <!-- <div innerhtml.bind="sessionDatesMessage"></div> -->
                 </div>
             </div>
-            <div show.bind="aSessionHasBeenSelected" class="row" style="padding:10px;">
+            <!-- <div show.bind="aSessionHasBeenSelected" class="row" style="padding:10px;">
                 <div class="col">
-                    <!-- <div class="form-group">
-                                <!-- <label for="editPhone">Type of Request</label> 
-                                <select value.two-way="requestType" change.trigger="changeRequestType($event)"
-                                    class="form-control selectpicker" data-style="btn btn-link" id="requestType">
-                                    <option value="">Choose the type of request</option>
-                                    <option value="sandboxCourse">${config.SANDBOX_NAME}</option>
-                                    <option value="regularCourse">Regular Course</option>
-                                </select>
-                            </div> -->
                     <compose view="./courses.html"></compose>
                 </div>
+            </div> -->
+            <div class="row">
+                <div class="col">
+                    <div class="list-group topMargin">
+                        <div class="list-group-item" repeat.for="session of sessions.objectsArray">
+                            <h4>Session ${session.session} - ${session.year}</h4>
+                            Requests open: ${session.requestsOpenDate |
+                            dateFormat:config.DATE_FORMAT_TABLE}<br />
+                            Clients available: ${session.startDate |
+                            dateFormat:config.DATE_FORMAT_TABLE}<br />
+                            Session ends: ${session.endDate |
+                            dateFormat:config.DATE_FORMAT_TABLE}<br />
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- <compose show.bind="requestTypeChosen" view="./courses.html"></compose> -->
-            <!-- <div show.bind="requestTypeChosen && requestType !== 'sandboxCourse'" class="row topMargin">
-                        <div class="col">
-                            <div class="form-group">
-                                <!-- <label>Course Start Date</label>
-                                <flat-picker controlid="startDate" placeholder="Choose the first date of your course"
-                                    change.trigger="changeBeginDate($event)" startdate.bind="minStartDate"
-                                    enddate.bind="maxStartDate" config.bind="configDate" value.bind="startDate">
-                                </flat-picker>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="form-group">
-                                <!-- <label>Course End Date</label>
-                                <flat-picker controlid="endDate" placeholder="Choose the last date of your course"
-                                    startdate.bind="minEndDate" enddate.bind="maxEndDate" config.bind="configDate"
-                                    value.bind="endDate">
-                                </flat-picker>
-                            </div>
-                        </div>
-                        --->
-            <!-- </div> -->
-            <!-- <div show.bind="requestTypeChosen && requestType !== 'sandboxCourse'" class="row topMargin">
-                        <div class="col">
-                            <div class="form-group">
-                                <!-- <label>Course Start Date</label> 
-                                <input id="undergraduates" type="number" placeholder="Number of Undergraduates"
-                                    class="form-control" value.bind="numberOfUndergradIds" />
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="form-group">
-                                <!-- <label>Course End Date</label> 
-                                <input id="graduates" type="number" placeholder="Number of Graduates"
-                                    class="form-control" value.bind="numberOfGraduateIds" />
-                            </div>
-                        </div>
-                    </div> -->
         </div>
-        <div class="col-6">
-            <div class="row" style="height:160px;">
+    </div>
+    <div class="col-6">
+        <!-- <div class="row" style="height:160px;">
                 <div class="col">
                     <div show.bind="!existingRequest">
                         <div show.bind="requestTypeChosen && requestType !== 'sandboxCourse'" class="row topMargin">
@@ -124,8 +89,8 @@
                         <h5>Make sure you reference the course number and name in the help ticket.</h5>
                     </div>
                 </div>
-            </div>
-            <div class="row topMargin">
+            </div> -->
+        <!-- <div class="row topMargin">
                 <div class="col">
                     <div style="height:300px;">
                         <div show.bind="sessions.selectedObject.session" class="card bigTopMargin">
@@ -150,7 +115,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div> -->
+    </div>
     </div>
 </template>

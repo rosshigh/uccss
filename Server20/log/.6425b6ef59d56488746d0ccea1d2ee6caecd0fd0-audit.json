@@ -6,46 +6,6 @@
     "auditLog": "log\\.6425b6ef59d56488746d0ccea1d2ee6caecd0fd0-audit.json",
     "files": [
         {
-            "date": 1620061241998,
-            "name": "log\\error-2021-05-03-12.log",
-            "hash": "d48eef14a673981bfc3b61099ee901b6"
-        },
-        {
-            "date": 1620066851117,
-            "name": "log\\error-2021-05-03-13.log",
-            "hash": "c7d33b3da838eda2bfeb4bfcbc3f8cd1"
-        },
-        {
-            "date": 1620132823480,
-            "name": "log\\error-2021-05-04-07.log",
-            "hash": "9b6326ba0b7aff65497437a576dc6bf7"
-        },
-        {
-            "date": 1620148565396,
-            "name": "log\\error-2021-05-04-12.log",
-            "hash": "d86b810ea7b381571ebbdf24457b364c"
-        },
-        {
-            "date": 1620237334331,
-            "name": "log\\error-2021-05-05-12.log",
-            "hash": "f1ab3172991454f838a20c30a995b0a5"
-        },
-        {
-            "date": 1620237714592,
-            "name": "log\\error-2021-05-05-13.log",
-            "hash": "f4a5979e75bf95848dc179f96ec9f797"
-        },
-        {
-            "date": 1620242058451,
-            "name": "log\\error-2021-05-05-14.log",
-            "hash": "9a23ae570718207a94aa3926c3927de0"
-        },
-        {
-            "date": 1620246325296,
-            "name": "log\\error-2021-05-05-15.log",
-            "hash": "fbed7eae3ac46055c53ccc9616195dc6"
-        },
-        {
             "date": 1620319955266,
             "name": "log\\error-2021-05-06-11.log",
             "hash": "3876e937a55b60c018047d7afa035ef7"
@@ -144,6 +104,21 @@
             "date": 1621268536991,
             "name": "log\\error-2021-05-17-11.log",
             "hash": "b5c980c032ed0974830a200c5307751c"
+        },
+        {
+            "date": 1621363744809,
+            "name": "log\\error-2021-05-18-13.log",
+            "hash": "189aaaa40760d2b63a42c3b5b61a405b"
+        },
+        {
+            "date": 1621517084261,
+            "name": "log\\error-2021-05-20-08.log",
+            "hash": "477c326f621a1df6a6029a502259662e"
+        },
+        {
+            "date": 1621528608809,
+            "name": "log\\error-2021-05-20-11.log",
+            "hash": "42fea57d3cf5bd7a7d866dd6539c496f"
         }
     ]
 }

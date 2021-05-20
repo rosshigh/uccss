@@ -4,19 +4,21 @@ import { SiteInfo } from '../../resources/data/site';
 import { Sessions } from '../../resources/data/sessions';
 import { People } from '../../resources/data/people';
 import { HelpTickets } from '../../resources/data/helpTickets';
+import { Utils } from '../../resources/utils/utils';
 import { AppConfig } from '../../appConfig';
 
-@inject(Router, SiteInfo, Sessions, People, HelpTickets, AppConfig)
+@inject(Router, SiteInfo, Sessions, People, HelpTickets, Utils, AppConfig)
 
 export class User {
     pageTitle = "UCC Self Service Home";
 
-    constructor(router, site, sessions, people, helpTickets, config) {
+    constructor(router, site, sessions, people, helpTickets, utils, config) {
         this.router = router;
         this.site = site;
         this.sessions = sessions;
         this.people = people;
         this.helpTickets = helpTickets;
+        this.utils = utils;
         this.config = config;
         this.screenHeight = $(window).height();
 

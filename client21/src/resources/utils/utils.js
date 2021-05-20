@@ -2,7 +2,7 @@ import { inject } from 'aurelia-framework';
 import { Notification } from 'aurelia-notification';
 import{ EventAggregator } from 'aurelia-event-aggregator';
 import { Router } from "aurelia-router";
-import * as toastr from 'toastr';
+import toastr from 'toastr';
 
 @inject(Notification, EventAggregator, Router)
 export class Utils {
@@ -12,6 +12,9 @@ export class Utils {
     this.eventAggregator = eventAggregator;
     this.router = router;
     this.notification.waitForMove = true;
+
+    toastr.options.extendedTimeOut = "1000";
+    toastr.options.timeOut = "1500";
 
     toastr.info("It worked!");
   }
@@ -59,24 +62,57 @@ export class Utils {
    * Display a notification
    * msg - the message to display
    ****************************************************************************/
-  showNotification(msg, type) {
-
-    $(".notification").css("background-color", "ghostwhite");
-    switch (type) {
+  showNotification(msg, type, title) {
+    // type = type ? type : "success";
+    // toastr[type](msg);
+    msg = this.adjustMessage(msg);
+    title = "";
+    let bgColor;
+    switch(type){
+      case 'success': 
+        bgColor = 'green';
+        break;
       case 'error':
-        $(".notification").css("color", "red");
-        $(".notification").html(msg).fadeIn(1000).fadeOut(100).fadeIn(1500).fadeOut(100);
+        bgColor = 'red';
         break;
-      case 'warning':
-        $(".notification").css("color", "orange");
-        $(".notification").html(msg).fadeIn(1000).fadeOut(100).fadeIn(1500).fadeOut(100);
+      case 'warn':
+        bgColor = 'orange';
         break;
-      default:
-        $(".notification").css("color", "black");
-        $(".notification").html(msg).fadeIn(1500).fadeOut(1500);
+      // default:
+      //   bgColor = 'green';
     }
 
+    iziToast.show({
+      title: title,
+      message: msg,
+      backgroundColor: bgColor
+
+  });
   }
+
+  adjustMessage(msg){
+    if(msg.length > 40){
+      return msg.substring(0,40);
+    }
+    
+    return msg;
+  }
+
+    // $(".notification").css("background-color", "ghostwhite");
+    // switch (type) {
+    //   case 'error':
+    //     $(".notification").css("color", "red");
+    //     $(".notification").html(msg).fadeIn(1000).fadeOut(100).fadeIn(1500).fadeOut(100);
+    //     break;
+    //   case 'warning':
+    //     $(".notification").css("color", "orange");
+    //     $(".notification").html(msg).fadeIn(1000).fadeOut(100).fadeIn(1500).fadeOut(100);
+    //     break;
+    //   default:
+    //     $(".notification").css("color", "black");
+    //     $(".notification").html(msg).fadeIn(1500).fadeOut(1500);
+    // }
+
 
   getIndex(obj, array){
     let index = -1;

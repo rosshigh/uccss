@@ -84,38 +84,44 @@ export class CreateRequest {
                         }
                         break;
                     case 2:
+                        that.validateStepOneA();
+                        if (that.stepOneAErrors.length) {
+                            e.preventDefault();
+                        }
+                        break;
+                    case 3:
                         that.validateStepTwo();
                         if (that.stepTwoErrors.length) {
                             e.preventDefault();
                         }
                         break;
-                    case 3:
+                    case 4:
                         that.validateStepThree();
                         if (that.stepThreeErrors.length) {
                             e.preventDefault();
                         }
                         break;
-                    case 4:
+                    case 5:
                         that.validateStepFour();
                         if (that.stepFourErrors.length) {
                             e.preventDefault()
                         }
                         this.save();
-                        $('.wizard').wizard('selectedItem', { step: 0 });
+                        // $('.wizard').wizard('selectedItem', { step: 1 });
                         break;
                 }
             }
         })
 
-        
+
         var controls = {
             leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
             rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
         }
 
 
-            // minimum setup
-            $('#datepicker-1').datepicker(
+        // minimum setup
+        $('#datepicker-1').datepicker(
             {
                 todayHighlight: true,
                 orientation: "bottom left",
@@ -129,21 +135,25 @@ export class CreateRequest {
             this.stepOneErrors.push('Select a session');
             return;
         }
+    }
+
+    validateStepOneA() {
+        this.stepOneAErrors = [];
         if (this.CourseSelected === undefined || this.CourseSelected === "") {
-            this.stepOneErrors.push('Select a course');
+            this.stepOneAErrors.push('Select a course');
         } else {
             if (this.requestType !== 'sandboxCourse') {
                 if (this.startDate === undefined) {
-                    this.stepOneErrors.push('Select the date your semester begins');
+                    this.stepOnstepOneAErrorseErrors.push('Select the date your semester begins');
                 }
                 if (this.endDate === undefined) {
-                    this.stepOneErrors.push('Select the date your semester ends');
+                    this.stepOneAErrors.push('Select the date your semester ends');
                 }
-                if ((!this.numberOfUndergradIds || this.numberOfUndergradIds === 0) && (!this.numberOfGraduateIds || this.numberOfGraduateIds === 0) && this.requestType !== 'sandboxCourse') {
-                    this.stepOneErrors.push('Enter the number of students');
+                if ((!this.numberOfUndergradIds || this.numberOfUndergradIds == 0) && (!this.numberOfGraduateIds || this.numberOfGraduateIds == 0) && this.requestType !== 'sandboxCourse') {
+                    this.stepOneAErrors.push('Enter the number of students');
                 }
                 if (moment(this.startDate).isAfter(this.endDate)) {
-                    this.stepOneErrors.push('Start date must be before end date.')
+                    this.stepOneAErrors.push('Start date must be before end date.')
                 }
             }
         }
@@ -315,7 +325,7 @@ export class CreateRequest {
 
     async selectCourse(course, event) {
         let serverResponse = await this.requests.getRequest('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.selectedSession + ':courseId|eq|' + course._id);
-        if (this.requests.selectedObject !== null ) {
+        if (this.requests.selectedObject !== null) {
             this.CourseSelected = this.requests.selectedObject.courseId.number + " - " + this.requests.selectedObject.courseId.name;
             this.startDate = this.requests.selectedObject.startDate;
             this.endDate = this.requests.selectedObject.endDate;
@@ -325,7 +335,7 @@ export class CreateRequest {
             this.selectedProducts = [];
             this.requests.selectedObject.requestDetails.forEach(item => {
                 this.products.selectedObjectById(item.productId);
-                if(item.requestStatus == this.config.ASSIGNED_REQUEST_CODE) this.existingRequest = true;
+                if (item.requestStatus == this.config.ASSIGNED_REQUEST_CODE) this.existingRequest = true;
                 this.selectedProducts.push({
                     detailId: item._id,
                     product: this.products.selectedObject,
@@ -333,8 +343,9 @@ export class CreateRequest {
                     assigned: item.requestStatus == this.config.ASSIGNED_REQUEST_CODE
                 })
             });
-            this.requestType = 'regularCourse';
-        } else {
+            // this.requestType = 'regularCourse';
+            this.requestType !== 'sandboxCourse'
+        } 
             if (this.people.trialClient && course._id === this.people.trialClient._id) {
                 this.people.setCourse(this.people.trialClient);
                 this.numberOfUndergradIds = 0;
@@ -346,11 +357,15 @@ export class CreateRequest {
             } else {
                 this.people.setCourse(course);
                 this.CourseSelected = this.people.selectedCourse.number + " - " + this.people.selectedCourse.name;
+                // this.numberOfUndergradIds = 0;
+                // this.numberOfGraduateIds = 0;
+                // this.startDate = this.sessions.selectedObject.startDate;
+                // this.endDate = this.sessions.selectedObject.endDate;
                 this.courseSelected = true;
                 this.requestType = 'regularCourse';
             }
             this.existingRequest = false;
-        }
+
 
         this.requestTypeChosen = true;
         if (this.selectedRow) this.selectedRow.children().removeClass('bold');

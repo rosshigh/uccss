@@ -1,6 +1,7 @@
 <template>
   <!-- <require from="resources/css/material-dashboard.css"></require> -->
-  <require from="resources/css/styles.css"></require>
+  <require from="resources/css/styles.css"></require> 
+ 
   <!-- <require from="humane-js/themes/jackedup.css"></require> -->
 
   <div class="page-wrapper"> 
@@ -11,14 +12,13 @@
         <div class="page-content-wrapper"> 
             <!-- BEGIN Page Header -->
             <!-- <compose view="resources/elements/nav-bar.html"></compose> -->
-         <nav-bar></nav-bar>
+         <!-- <nav-bar></nav-bar> -->
             <!-- END Page Header -->
             <!-- BEGIN Page Content -->
             <!-- the #js-page-content id is needed for some plugins to initialize -->
            
                
                 <router-view></router-view>
-          
             <!-- this overlay is activated only when mobile menu is triggered -->
             <div class="page-content-overlay" data-action="toggle" data-class="mobile-nav-on"></div> <!-- END Page Content -->
             <!-- BEGIN Page Footer -->
@@ -35,6 +35,7 @@
                     </ul>
                 </div> -->
             </footer>
+            
             <!-- END Page Footer -->
             <!-- BEGIN Color profile -->
             <!-- this area is hidden and will not be seen on screens or screen readers -->
@@ -117,4 +118,5 @@
       </footer>
     </div>
   </div> -->
+ 
 </template>
