@@ -16,7 +16,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-async-handler": "^1.1.4",
-    "express-fileupload": "^1.1.7-alpha.3",
+    "express-fileupload": "^1.1.9",
     "formidable": "^1.2.2",
     "grunt-contrib-jshint": "^2.1.0",
     "grunt-contrib-nodemon": "^0.5.4",
