@@ -103,8 +103,8 @@ export class UserCreateHelpTicket {
     }
 
     attached() {
-        $('.selectpicker').selectpicker();
-        $('.selectpicker').click(e => e.stopPropagation());
+        // $('.selectpicker').selectpicker();
+        // $('.selectpicker').click(e => e.stopPropagation());
         var wizard = $('.wizard').wizard();
         var that = this;
 

@@ -27,7 +27,7 @@ export class UserHelpTickets {
         $(el.target).addClass('active');
         this.router.navigate(el.target.id)
     }
-
+    
     configureRouter(config, router) {
         config.map([
             {
@@ -45,6 +45,14 @@ export class UserHelpTickets {
                 nav: true,
                 name: 'createHelpTicket',
                 title: 'Create Help Ticket'
+            },
+            {
+                route: 'archiveHelpTickets',
+                moduleId: PLATFORM.moduleName('./archiveHelpTickets'),
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'archiveHelpTickets',
+                title: 'View Old HelpTickets'
             }
         ]);
 

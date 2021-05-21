@@ -1,43 +1,41 @@
 <template>
   <div class="row" style="padding:10px;">
-    <div class="col-7">
+    <div class="col">
       <div class="row">
-        <div class="col-8">
+        <div class="col-5">
           <h5>Are you having an issue with a specific SAP UA curriculum? </h5>
         </div>
-        <div class="col">
-          <div class="form-check form-check-radio form-check-inline leftMargin">
-            <label class="form-check-label" repeat.for="option of yesNo">
-              <input change.delegate="toggleCurriculumQuestion()" checked.bind="curriculumQuestion" value.bind="option"
-                class="form-check-input" type="radio" name="curriculumOptions" id="inlineRadio3" value="option1">
-              ${option}
-              <span class="circle">
-                <span class="check"></span>
-              </span>
-            </label>
+        <div class="col-2">
+          <div class="frame-wrap">
+            <div class="custom-control custom-radio custom-control-inline" repeat.for="option of yesNo">
+              <input change.delegate="toggleCurriculumQuestion()" checked.bind="curriculumQuestion" type="radio"
+                class="custom-control-input" id="defaultInline1Radio-${$index}"
+                name="inlineDefaultRadiosExample-${$index}" value.bind="option">
+              <label class="custom-control-label" for="defaultInline1Radio-${$index}">${option}</label>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="col">
-      <div if.bind="stepTwoErrors.length > 0" class="alert alert-danger col" role="alert">
-        <ul>
-          <li repeat.for="error of stepTwoErrors">Error: ${error}</li>
-        </ul>
+      <div class="row">
+        <div class="col">
+          <div if.bind="stepTwoErrors.length > 0" class="alert alert-danger col" role="alert">
+            <ul>
+              <li repeat.for="error of stepTwoErrors">Error: ${error}</li>
+            </ul>
+          </div>
+          <div class="hover" id="curriculumTitleHelp">
+            <img src="http://localhost/helpImages/curriculumTitle.png">
+            <h4>If you are using a University Alliance curriculum, the curriculum title would be the name of the
+              curriculum file you downloaded. If you aren't sure of the official title, put something that
+              will
+              help us identify it. For example, the product you requested (i.e. Intro Using Global Bike 3.3
+              (S/4HANA). </h4>
+          </div>
+        </div>
       </div>
-      <div class="hover" id="curriculumTitleHelp">
-        <img src="http://localhost/helpImages/curriculumTitle.png">
-        <h4>If you are using a University Alliance curriculum, the curriculum title would be the name of the
-          curriculum file you downloaded. If you aren't sure of the official title, put something that
-          will
-          help us identify it. For example, the product you requested (i.e. Intro Using Global Bike 3.3
-          (S/4HANA). </h4>
+      <div class="row">
+        <div class="col topMargin">
+          <compose if.bind="curriculumQuestion === 'Yes'" view="./curriculumHelp.html"></compose>
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <compose if.bind="curriculumQuestion === 'Yes'" view="./curriculumHelp.html"></compose>
-    </div>
-  </div>
 </template>

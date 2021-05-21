@@ -53,7 +53,7 @@ export class UserViewHelpTickets {
 
     attached() {
         $('[data-toggle="tooltip"]').tooltip();
-        $('.selectpicker').selectpicker();
+        // $('.selectpicker').selectpicker();
     }
 
     async refresh() {
@@ -63,16 +63,16 @@ export class UserViewHelpTickets {
         $('#loading').hide();
     }
 
-    refreshSelects(){
-        $('.selectpicker').selectpicker();
-        // this.utils.refreshSelect("#reason", this.config.HELP_TICKET_CLOSE_REASONS, "code", this.selectedReason);
-    }
+    // refreshSelects(){
+    //     // $('.selectpicker').selectpicker();
+    //     // this.utils.refreshSelect("#reason", this.config.HELP_TICKET_CLOSE_REASONS, "code", this.selectedReason);
+    // }
 
     closeHelpTicket(helpTicket, event) {
         event.stopPropagation();
         this.helpTickets.setHelpTicket(helpTicket);
         $('#requestCloseModal').modal('show');
-        setTimeout(()=>{this.refreshSelects()},500);
+        // setTimeout(()=>{this.refreshSelects()},500);
         // let message = "You have chosen to close this help ticket.";
         // let title = "Close Help Ticket";
         // let options = ['Submit', 'Cancel']

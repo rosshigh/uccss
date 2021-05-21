@@ -1,12 +1,15 @@
 <template>
     <!-- <compose view="../../../resources/elements/nav-bar.html"></compose> -->
     <main id="js-page-content" role="main" class="page-content">
-        <ul class="nav nav-tabs smallBottomMargin" role="tablist">
+        <ul class="nav nav-pills smallBottomMargin" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="viewHelpTickets" click.trigger="utils.navigate('helpTickets',$event)" href="#">View Requests</a>
+                <a class="nav-link active" id="viewHelpTickets" click.trigger="utils.navigate('helpTickets',$event)" href="#">View Help Tickets</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="createHelpTicket" click.trigger="utils.navigate('helpTickets',$event)" href="#">Create Requests</a>
+                <a class="nav-link" id="createHelpTicket" click.trigger="utils.navigate('helpTickets',$event)" href="#">Create Help Ticket</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="archiveHelpTickets" click.trigger="utils.navigate('helpTickets',$event)" href="#">View Old Help Ticket</a>
             </li>
         </ul>
             <router-view></router-view>

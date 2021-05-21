@@ -1,43 +1,6 @@
 <template>
     <div class="row" style="padding:10px;">
         <div class="col-7">
-            <!-- <div class="row">
-                <div class="col-8">
-                    <h5>Does this issue relate to a product that you have requested? </h5>
-                </div>
-                <div class="col">
-                    <div class="form-check form-check-radio form-check-inline leftMargin">
-                        <label class="form-check-label" repeat.for="option of yesNo">
-                            <input change.delegate="toggleRequresClient()" checked.bind="requiresClient"
-                                value.bind="option" class="form-check-input" type="radio"
-                                name="productRequestRequredOptions" id="inlineRadio1" value="option1"> ${option}
-                            <span class="circle">
-                                <span class="check"></span>
-                            </span>
-                        </label>
-                    </div>
-
-                </div>
-            </div> -->
-            <!-- <div show.bind="requiresClient === 'Yes'">
-                <div class="row">
-                    <div class="col-8">
-                        <h5>Does this issue relate to all the products requested for a course or only one product? </h5>
-                    </div>
-                    <div class="col">
-                        <div class="form-check form-check-radio form-check-inline leftMargin">
-                            <label class="form-check-label" repeat.for="option of courseProduct">
-                                <input change.delegate="toggleForACourse()" checked.bind="forACourse"
-                                    value.bind="option" class="form-check-input" type="radio"
-                                    name="courseOrClientOptions" id="inlineRadio2" value="option1"> ${option}
-                                <span class="circle">
-                                    <span class="check"></span>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         </div>
         <div class="col">
             <div if.bind="stepOneErrors.length > 0" class="alert alert-info col" role="alert">
@@ -49,28 +12,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <!-- <div show.bind="forACourse === 'Course' && requiresClient === 'Yes'">
-                <div class="row">
-                    <div class="col-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <h4 class="topMargin">Courses:</h4>
-                                    <select value.bind="courseSelected" id="selectedCourse"
-                                        change.delegate="aCourseIsSelected($index)" class="form-control selectpicker"
-                                        data-style="btn btn-link">
-                                        <option value=null></option>
-                                        <option repeat.for="course of activeCourses" model.bind="$index">
-                                            ${course.courseNumber} - ${course.courseName}</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-            <div >
-                <!-- show.bind="forACourse === 'Product' && requiresClient === 'Yes'" -->
+            <div>
                 <div id="demo" class="collapse show">
                     <div class="row">
                         <div class="col">
@@ -81,6 +23,5 @@
                 </div>
             </div>
         </div>
-    </div>
     </div>
 </template>

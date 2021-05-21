@@ -1,8 +1,6 @@
 <template>
     <div class='row justify-content-md-center'>
         <div class="col">
-            <!-- <button data-toggle="collapse" click.trigger="togglecurriculumForm()" data-target="#curriculumForm"
-                class="btn btn-primary">${curriculumFormButtonCaption}</button> -->
             <div id="curriculumForm" class="collapse show">
                 <div class="card" style="background-color:ghostwhite;">
                     <div class="card-header">
@@ -16,7 +14,8 @@
                                             mouseover.delegate="showComment('curriculumTitleHelp')"
                                             mouseout.delegate="hideComment('curriculumTitleHelp')"><i
                                                 class="fa fa-question-circle" aria-hidden="true"></i></span></label>
-                                    <input value.bind="content.curriculumTitle" class="form-control" type="text" placeholder="${curriculumTitlePlaceholder}"/>
+                                    <input value.bind="content.curriculumTitle" class="form-control" type="text"
+                                        placeholder="${curriculumTitlePlaceholder}" />
                                 </div>
                                 <div class="form-group">
                                     <div class="row">
@@ -37,7 +36,7 @@
                                         </div>
                                     </div>
                                     <input value.bind="content.curriculumAuthor" disabled.bind="authorNotApplicable"
-                                        class="form-control" type="text" placeholder="${curriculumAuthorPlaceholder}"/>
+                                        class="form-control" type="text" placeholder="${curriculumAuthorPlaceholder}" />
                                 </div>
                                 <div class="form-group">
                                     <div>
@@ -58,7 +57,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <input value.bind="content.curriculumModule" class="form-control" type="text" disabled.bind="moduleNotApplicable" placeholder="${curriculumModulePlaceHolder}"/>
+                                        <input value.bind="content.curriculumModule" class="form-control" type="text"
+                                            disabled.bind="moduleNotApplicable"
+                                            placeholder="${curriculumModulePlaceHolder}" />
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -80,7 +81,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <input value.bind="content.curriculumPageNumber" class="form-control" type="text" disabled.bind="pageNumberNotApplicable" placeholder="${curriculumPageNumberPlaceHolder}"/>
+                                        <input value.bind="content.curriculumPageNumber" class="form-control"
+                                            type="text" disabled.bind="pageNumberNotApplicable"
+                                            placeholder="${curriculumPageNumberPlaceHolder}" />
                                     </div>
                                 </div>
                             </div>
@@ -104,7 +107,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <input value.bind="content.curriculumStep" class="form-control" type="text" disabled.bind="stepNumberNotApplicable" placeholder="${curriculumStepNumberPlaceHolder}"/>
+                                        <input value.bind="content.curriculumStep" class="form-control" type="text"
+                                            disabled.bind="stepNumberNotApplicable"
+                                            placeholder="${curriculumStepNumberPlaceHolder}" />
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -126,13 +131,16 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <input value.bind="content.curriculumIDs" class="form-control" type="text" disabled.bind="idsNotApplicable" placeholder="${curriculumUserIDsPlaceholder}"/>
+                                        <input value.bind="content.curriculumIDs" class="form-control" type="text"
+                                            disabled.bind="idsNotApplicable"
+                                            placeholder="${curriculumUserIDsPlaceholder}" />
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-3">
-                                            <label class="blackText">Have any other students progressed past this point?</label>
+                                            <label class="blackText">Have any other students progressed past this
+                                                point?</label>
                                         </div>
                                         <div class="col">
                                             <div class="form-check">
@@ -162,36 +170,22 @@
                                     <div>
                                         <div class="row">
                                             <div class="col">
-                                                <label class="blackText">Is there any other information that would help us determine what
+                                                <label class="blackText">Is there any other information that would help
+                                                    us determine what
                                                     curriculum
                                                     that
                                                     you
                                                     are working with?</label>
                                             </div>
-                                            <!-- <div class="col">
-                                    <div class="form-check">
-                                        <label class="form-check-label">
-                                            <input class="form-check-input" type="checkbox"
-                                                checked.bind="otherInfoNotApplicable">
-                                            Not applicable
-                                            <span class="form-check-sign">
-                                                <span class="check"></span>
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div> -->
                                         </div>
-                                        <input value.bind="curriculumOtherInformation" class="form-control"
-                                            type="text" />
                                     </div>
+                                    <input value.bind="curriculumOtherInformation" class="form-control" type="text" />
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col">
-               
-            </div>
         </div>
+    </div>
 </template>

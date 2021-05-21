@@ -1,24 +1,27 @@
 <template>
     <div show.bind="enterResponse" class="topMargin bottomMargin">
-
         <div class="panel panel-default leftMargin rightMargin" style="background-color:ghostwhite;">
           <div class="panel-body">
-    
- 
-            <div class="bottomMargin list-group-item leftMargin rightMargin">
+            <div class="bottomMargin topMargin list-group-item leftMargin rightMargin">
               <span click.trigger="saveResponse()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
                 title="" data-original-title="Send Response"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
               <span click.trigger="cancelResponse()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
                 title="" data-original-title="Cancel"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
             </div>
 
-            <div class="row leftMargin rightMargin">
+            <div class="row leftMargin">
+              <div class="col-10">
               <editor value.bind="content.response" toolbar.bind="config.TOOLBAR" height="250"></editor>
-      
-              <p>&nbsp;</p>
-              <div class="row hidden-xs hidden-sm">
+            </div>
+            </div>
+            <div class="row leftMargin">
+              <div class="col-10">
                 <h4>Upload screenshots or other files that will help us solve you problem</h4>
-                  <div class="col-lg-2">
+              </div>
+            </div>
+            <div class="row leftMargin">
+              <div class="col-10">
+                  <div class="col-lg-3">
                       <label class="btn btn-primary">
                           Browse for files&hellip; <input type="file" style="display: none;" change.delegate="changeFiles()"files.bind="files" multiple>
                       </label>
