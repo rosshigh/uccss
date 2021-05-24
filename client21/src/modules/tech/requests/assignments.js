@@ -73,7 +73,7 @@ export class Assignments {
         // this.systems.getObjectsArray();
         this.products.getObjectsArray('?order=name');
 
-        this.filterStatuses = [this.config.UPDATED_REQUEST_CODE, this.config.ASSIGNED_REQUEST_CODE, this.config.PROVISIONAL_REQUEST_CODE, this.config.DELETED_REQUEST_CODE];
+        this.filterStatuses = [this.config.UPDATED_REQUEST_CODE, this.config.RETIRED_REQUEST_CODE, this.config.ASSIGNED_REQUEST_CODE, this.config.REPLIED_REQUEST_CODE, this.config.PROVISIONAL_REQUEST_CODE, this.config.DELETED_REQUEST_CODE];
     }
 
     attached() {

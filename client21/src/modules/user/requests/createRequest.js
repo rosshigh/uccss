@@ -224,7 +224,7 @@ export class CreateRequest {
 
     buildRequest() {
         this.requests.setRequest();
-        this.requests.selectedObject.courseId = this.people.selectedCourse;
+        this.requests.selectedObject.courseId = this.people.selectedCourse._id;
         // ? this.people.selectedCourse._id : this.config.SANDBOX_ID;
         this.requests.selectedObject.personId = this.userObj._id;
         this.requests.selectedObject.institutionId = this.userObj.institutionId._id;
@@ -325,6 +325,7 @@ export class CreateRequest {
 
     async selectCourse(course, event) {
         let serverResponse = await this.requests.getRequest('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.selectedSession + ':courseId|eq|' + course._id);
+        this.selectedProducts = [];
         if (this.requests.selectedObject !== null) {
             this.CourseSelected = this.requests.selectedObject.courseId.number + " - " + this.requests.selectedObject.courseId.name;
             this.startDate = this.requests.selectedObject.startDate;
@@ -332,7 +333,6 @@ export class CreateRequest {
             this.numberOfUndergradIds = parseInt(this.requests.selectedObject.undergradIds);
             this.numberOfGraduateIds = parseInt(this.requests.selectedObject.graduateIds);
             this.requestComments = this.requests.selectedObject.customerMessage;
-            this.selectedProducts = [];
             this.requests.selectedObject.requestDetails.forEach(item => {
                 this.products.selectedObjectById(item.productId);
                 if (item.requestStatus == this.config.ASSIGNED_REQUEST_CODE) this.existingRequest = true;

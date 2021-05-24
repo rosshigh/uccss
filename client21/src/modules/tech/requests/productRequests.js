@@ -57,6 +57,14 @@ export class ProductRequestsTech {
                 nav: true,
                 name: 'archive',
                 title: 'Requests Archive'
+            },
+            {
+                route: 'createRequest',
+                moduleId: PLATFORM.moduleName('./createRequest'),
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'createRequest',
+                title: 'Create Request'
             }
         ]);
 

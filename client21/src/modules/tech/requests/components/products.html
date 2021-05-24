@@ -1,0 +1,36 @@
+<template>
+    <div class="row">
+        <div class="col-6">
+            <label id=" productList">Select the products you need</label>
+            <h6>Hover over the name to see which curricula require this product</h6>
+            <input class="form-control" value.bind="filter" input.trigger="filterList()" placeholder="Filter products" />
+            <div class="overFlow card" style="height:400px;">
+                <ul class="card-body">
+                    <a click.trigger="selectProduct($event)" type="button" repeat.for="product of filteredProductsArray"
+                        id="${product._id}" class="list-group-item dropbtn">${product.name}</a>
+                </ul>
+            </div>
+        </div>
+        <div class="col-6">
+            <label id="requestProductsLabel">Products you want to request</label>
+            <p show.bind="selectedProducts.length">If a client has not been assigned, you can click the product to
+                remove it</p>
+            <div class="card" style="height:425px;width:350px;margin-top:30px;">
+                <ul class="card-body">
+                    <li repeat.for="product of selectedProducts">
+                        <h6 click.trigger="removeProduct($index, product)" style="margin-top:20px;" type="button"
+                            id="${product.product._id}" class="${product.assigned ? '' : 'pointMe'}">
+                            ${product.product.name}
+                            <span style="color:blue;" class="bold" show.bind="product.assigned"> (Client
+                                assigned)</span>
+                        </h6>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div show.bind="showCurriculumBoolean" class="col bigTopMargin" id="curriculumInfo">
+            <h4 class="underline">${productInfoObject.header}</h4>
+            <div class="panel-body topMargin" innerhtml.bind="productInfoObject.info"></div>
+        </div>
+    </div>
+</template>

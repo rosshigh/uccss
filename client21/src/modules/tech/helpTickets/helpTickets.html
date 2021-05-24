@@ -3,10 +3,13 @@
     <main id="js-page-content" role="main" class="page-content">
         <ul class="nav nav-tabs smallBottomMargin" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="viewHelpTickets" click.trigger="utils.navigate('helpTicketsTechMenu', $event)" href="#">View Requests</a>
+                <a class="nav-link active" id="viewHelpTickets" click.trigger="utils.navigate('helpTicketsTechMenu', $event)" href="#">View Help Tickets</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="createHelpTicket" click.trigger="utils.navigate('helpTicketsTechMenu', $event)" href="#">Create Requests</a>
+                <a class="nav-link" id="createHelpTicket" click.trigger="utils.navigate('helpTicketsTechMenu', $event)" href="#">Create Help Tickets</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="archive" click.trigger="utils.navigate('helpTicketsTechMenu', $event)" href="#">Help Tickets Archive</a>
             </li>
         </ul>
             <router-view></router-view>
