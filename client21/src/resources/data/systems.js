@@ -31,7 +31,7 @@ export class Systems {
     }
 
     async getObjectsArrayWithClients(options) {
-        var url = this.SYSTEMS_SERVICE +'/clients';
+        var url = this.SYSTEMS_SERVICE + '/clients';
         url += options ? options : "";
         try {
             let serverResponse = await this.data.get(url);
@@ -46,46 +46,44 @@ export class Systems {
 
     async getObject(id) {
         let url = this.SYSTEMS_SERVICE + '/' + id;
-        try {
-            let serverResponse = await this.data.get(url);
-            if (!serverResponse.error) {
-                this.selectedObject = serverResponse;
-                this.originalObject = this.utils.copyObject(this.selectedObject);
-            } else {
-                this.data.processError(serverResponse);
-            }
-        } catch (error) {
-            console.log(error);
+        let serverResponse = await this.data.get(url);
+        if (!serverResponse.error) {
+            this.selectedSystem = serverResponse;
+            this.originalSystem = this.utils.copyObject(this.selectedSystem);
+        } else {
+            this.data.processError(serverResponse);
         }
     }
-    
-    selectObject(index){
-        if(!index && index != 0) {
-            this.selectedObject = this.emptySystem();
+
+    selectObject(index) {
+        if (!index && index != 0) {
+            this.selectedSystem = this.emptySystem();
         } else {
-            try{
-                this.selectedObject = this.utils.copyObject(this.objectsArray[index]);
-            } catch (error){
+            try {
+                this.selectedSystem = this.utils.copyObject(this.objectsArray[index]);
+                this.originalSystem = this.utils.copyObject(this.selectedSystem);
+            } catch (error) {
                 console.log(error);
-                this.selectedObject = this.emptySystem();
+                this.selectedSystem = this.emptySystem();
                 this.newSystem = true;
             }
 
         }
     }
 
-    selectedObjectById(id) {
-        this.selectedObject = null;
+    selectedSystemById(id) {
+        this.selectedSystem = null;
         for (var i = 0, x = this.objectsArray.length; i < x; i++) {
             if (this.objectsArray[i]._id === id) {
-                this.selectedObject = this.utils.copyObject(this.objectsArray[i]);
+                this.selectedSystem = this.utils.copyObject(this.objectsArray[i]);
+                this.originalSystem = this.utils.copyObject(this.selectedSystem);
                 break;
             }
         };
     }
 
-    setObject(object){
-        this.selectedObject = this.utils.copyObject(object);
+    setObject(object) {
+        this.selectedSystem = this.utils.copyObject(object);
     }
 
     emptySystem() {
@@ -106,35 +104,35 @@ export class Systems {
     }
 
     async saveObject() {
-        if (!this.selectedObject) {
+        if (!this.selectedSystem) {
             return;
         }
 
-        if (!this.selectedObject._id) {
-            let serverResponse = await this.data.saveObject(this.selectedObject, this.SYSTEMS_SERVICE, "post");
+        if (!this.selectedSystem._id) {
+            let serverResponse = await this.data.saveObject(this.selectedSystem, this.SYSTEMS_SERVICE, "post");
             return serverResponse;
         } else {
-            var serverResponse = await this.data.saveObject(this.selectedObject, this.SYSTEMS_SERVICE, "put");
+            var serverResponse = await this.data.saveObject(this.selectedSystem, this.SYSTEMS_SERVICE, "put");
             return serverResponse;
         }
     }
 
     isObjectDirty() {
-        return this.utils.objectsEqual(this.selectedObject, this.originalObject);
+        return this.utils.objectsEqual(this.selectedSystem, this.originalSystem);
     }
 
     async deleteObject() {
-        let serverResponse = await this.data.deleteObject(this.SYSTEMS_SERVICE + '/' + this.selectedObject._id);
+        let serverResponse = await this.data.deleteObject(this.SYSTEMS_SERVICE + '/' + this.selectedSystem._id);
         return serverResponse;
     }
 
-    emptyClient(clientNo, status, product, idsAvailable){
+    emptyClient(clientNo, status, product, idsAvailable) {
         let obj = new Object();
         obj.client = clientNo;
         obj.clientStatus = status;
-        obj.systemId = this.selectedObject._id;
+        obj.systemId = this.selectedSystem._id;
         obj.idsAvailable = product.idsAvailable;
-        obj.assignments = new Array(); 
+        obj.assignments = new Array();
         obj.createdDate = new Date();
         obj.lastIdAssigned = 0;
         obj.lastFacIdAssigned = 0;
@@ -145,15 +143,15 @@ export class Systems {
         return obj;
     }
 
-    async getConfiguredProductSystems(sids){
-        if(sids){
+    async getConfiguredProductSystems(sids) {
+        if (sids) {
             let serverResponse = await this.data.get(this.SYSTEMS_SERVICE + "/product/" + sids);
             return serverResponse;
         }
     }
 
-    async getAPJConfiguredProductSystems(sids){
-        if(sids){
+    async getAPJConfiguredProductSystems(sids) {
+        if (sids) {
             let serverResponse = await this.data.get('apj/' + this.SYSTEMS_SERVICE + "/product/" + sids);
             return serverResponse;
         }

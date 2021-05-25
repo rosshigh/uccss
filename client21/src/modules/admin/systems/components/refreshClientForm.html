@@ -12,16 +12,16 @@
                     <input value.bind="editLastClient" id="editLastClient" placeholder="End"
                         class="form-control input-sm" type="text" />
                 </div>
-                <div class="col">
+                <!-- <div class="col">
                     <label>IDs Available</label>
                     <input value.bind="idsAvailable" id="editClientIdsAvailable" placeholder="IDS Available"
                         class="form-control input-sm" type="text" />
-                </div>
+                </div> -->
                 <div class="col">
                     <label>Status</label>
                     <select value.bind="editClientStatus" id="clientStatusSelect" class="form-control selectpicker"
                     data-style="btn btn-link">
-                        <option repeat.for="status of config.CLIENT_STATUSES" value="${status.code}">
+                        <option repeat.for="status of config.CLIENT_STATUSES" model.bind="status.code">
                             ${status.description}
                         </option>
                     </select>

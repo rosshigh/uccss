@@ -9,7 +9,7 @@
                     <div class="form-group">
                         <div class="checkbox">
                             <label>
-                                <input checked.bind="systems.selectedObject.active" type="checkbox"> Active
+                                <input checked.bind="systems.selectedSystem.active" type="checkbox"> Active
                             </label>
                         </div>
                     </div>
@@ -18,7 +18,7 @@
                     <div class="form-group">
                         <div class="checkbox">
                             <label>
-                                <input checked.bind="systems.selectedObject.apj" type="checkbox"> APJ
+                                <input checked.bind="systems.selectedSystem.apj" type="checkbox"> APJ
                             </label>
                         </div>
                     </div>
@@ -28,14 +28,14 @@
                 <div class="col">
                     <div class="form-group">
                         <label for="sid">SID *</label>
-                        <input value.bind="systems.selectedObject.sid & validateOnChange" type="text"
+                        <input value.bind="systems.selectedSystem.sid & validateOnChange" type="text"
                             class="form-control" id="sid" aria-describedby="sidHelp">
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-group">
                         <label for="sid">Description *</label>
-                        <input value.bind="systems.selectedObject.description & validateOnChange" type="text"
+                        <input value.bind="systems.selectedSystem.description & validateOnChange" type="text"
                             class="form-control" id="description" aria-describedby="descriptionHelp">
                     </div>
                 </div>
@@ -44,14 +44,14 @@
                 <div class="col">
                     <div class="form-group">
                         <label for="sid">Server *</label>
-                        <input value.bind="systems.selectedObject.server & validateOnChange" type="text"
+                        <input value.bind="systems.selectedSystem.server & validateOnChange" type="text"
                             class="form-control" id="server" aria-describedby="serverHelp">
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-group">
                         <label for="sid">Instance</label>
-                        <input value.bind="systems.selectedObject.instance & validateOnChange" type="text"
+                        <input value.bind="systems.selectedSystem.instance & validateOnChange" type="text"
                             class="form-control" id="instance" aria-describedby="instanceHelp">
                     </div>
                 </div>
@@ -59,7 +59,7 @@
             <div class="row topMargin">
                 <div class="col">
                     <label for="edittype">System Type</label>
-                    <select value.bind="systems.selectedObject.type" id="edittype" class="form-control selectpicker"
+                    <select value.bind="systems.selectedSystem.type" id="edittype" class="form-control selectpicker"
                         data-style="btn btn-link">
                         <option model.bind="type" repeat.for="type of config.SYSTEM_TYPES">${type}
                         </option>
@@ -67,14 +67,14 @@
                 </div>
                 <div class="col">
                     <label for="editIts" class="form-control-label">URL</label>
-                    <input value.bind="systems.selectedObject.its" id="editIts" class="form-control" type="text" />
+                    <input value.bind="systems.selectedSystem.its" id="editIts" class="form-control" type="text" />
                 </div>
             </div>
             <div class="row topMargin">
                 <div class="col">
                     <label>Sessions</label>
                     <select class="form-control selectpicker" id="sessions" multiple data-style="btn btn-link"
-                        value.bind="systems.selectedObject.sessions">
+                        value.bind="systems.selectedSystem.sessions">
                         <option model.bind="session.session" repeat.for="session of sessions.SESSION_PARAMS">
                             ${session.session}</option>
                     </select>

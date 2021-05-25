@@ -1,8 +1,9 @@
 <template>
     <compose view="../../../../resources/elements/table-nav-bar.html"></compose>
-
+${systems.objectsArray.length}
     <table class="table-sm table-striped header-fixed"
         aurelia-table="data.bind: systems.objectsArray; display-data.bind: $displayData; filters.bind: filters; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+        
         <thead>
             <tr>
                 <th>

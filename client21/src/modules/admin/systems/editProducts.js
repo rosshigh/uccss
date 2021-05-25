@@ -159,8 +159,7 @@ export class EditProducts {
     }
 
     goBack() {
-        this.refresh();
-        this.resetFilterValues();
+        // this.resetFilterValues();
         this.view = 'table';
     }
 
