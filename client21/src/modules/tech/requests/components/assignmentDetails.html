@@ -3,26 +3,67 @@
     <h4 class="topMargin"><strong>Assignments</strong></h4>
     <div class="card topMargin">
       <div class="card-body leftJustify">
-        <div show.bind="requests.selectedDetail.requestStatus == config.ASSIGNED_REQUEST_CODE"
-          class="panel panel-primary topMargin">
-          <div class="panel-body">
-            <ul style="padding-left:10px;">
+        <div show.bind="requests.selectedDetail.requestStatus == config.ASSIGNED_REQUEST_CODE">
+          <!-- class="panel panel-primary topMargin"> -->
+          <!-- <div class="panel-body" style="padding-left:10px;"> -->
+            <div class="row">
+              <div class="col-12 list-group-item" repeat.for="assign of assignmentDetails">
+                <div class="row">
+                  <div class="col">
+                    <h3>System: ${assign.system.sid} </h3>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <h6>Client: ${assign.assignment.client} </h6>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-6 alert alert-info" role="alert">
+                    <div class="row " >
+                  <div class="col">
+                    <h6>Student IDs: <span class="bold"> ${assign.assignment.studentUserIds ?
+                        assign.assignment.studentUserIds :
+                        'N/A'}</span></h6>
+                    <h6>Student Password: <span class="bold"> ${assign.assignment.studentPassword ?
+                        assign.assignment.studentPassword
+                        : 'N/A'}</span></h6>
+                  </div>
+                  <div class="col">
+                    <h6>Faculty IDs <span class="bold">: ${assign.assignment.facultyUserIds ?
+                        assign.assignment.facultyUserIds : 'N/A'}</span></h6>
+                    <h6>Faculty Password: <span class="bold"> ${assign.assignment.facultyPassword ?
+                        assign.assignment.facultyPassword
+                        : 'N/A'}</span></h6>
+                  </div>
+                    </div>
+                </div>
+                </div>
+                <div>
+                  <h4 System Notes</h4>
+                  <div innerhtml.bind="assign.system.systemNotes"></div>
+                </div>
+              
+              </div>
+            </div>
+            <!-- <ul style="padding-left:10px;">
               <li class="list-group-item" repeat.for="assign of assignmentDetails">
                 <compose if.bind="assign.system.type === 'ERP' || !assign.system.type" view="./erp.html"></compose>
                 <compose if.bind="assign.system.type === 'HANA'" view="./hana.html"></compose>
                 <compose if.bind="assign.system.type === 'BO'" view="./bo.html"></compose>
               </li>
-            </ul>
+            </ul> -->
 
-            <label show.bind="products.selectedObject.documents && products.selectedObject.documents.length"
+            <label class="topMargin" show.bind="products.selectedObject.documents && products.selectedObject.documents.length"
               class="topMargin">Helpful Documents</label>
             <div class="list-group">
               <a repeat.for="document of products.selectedObject.documents"
                 href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.path}/${document.fileName}"
                 target="_blank">${document.fileName}</a>
             </div>
-            <div class="overflow noteHeight" innerhtml.bind="notes">
-              
+            <h4 class="topMargin">Product Notes</h4>
+            <div class="topMargin" innerhtml.bind="notes">
+
             </div>
             <!-- <label show.bind="requests.selectedDetail.techComments && requests.selectedDetail.techComments.length > 0"
               class="topMargin">UCC Comments</label>
@@ -38,9 +79,9 @@
                   class="col-lg-12 topMargin blackText" innerhtml.bind="products.selectedObject.productInfo">
                 </div>
               </div> -->
-            </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 </template>

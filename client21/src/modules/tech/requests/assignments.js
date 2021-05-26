@@ -418,21 +418,37 @@ export class Assignments {
         this.assignmentDetails = [];
         this.systemNotes = [];
         this.notes = "";
+        let obj;
         await this.requests.getRequestDetail(detail._id);
         await this.products.getObject(detail.productId._id);
         await this.systems.getObjectsArray();
         this.notes += this.requests.selectedDetail.techComments ? this.requests.selectedDetail.techComments : "";
         this.requests.selectedDetail.assignments.forEach(item => {
             let system = this.getSystem(item.systemId);
-            this.assignmentDetails.push({
-                assignment: item,
-                system: system
-            });
-            if(system.systemNotes && system.systemNotes !== null && system.systemNotes.length && !this.isSystemOnList(system.sid)) {
-                // this.systemNotes.push({sid: system.sid, notes: system.systemNotes});
-                this.notes += "<div class='topMargin'><h3>System " + system.sid + "</h3>" + system.systemNotes + "</div>"  
-                this.systemNotes.push(system.sid)
-            }
+            // if(!this.isSystemOnList(system.sid)) {
+            //     obj = {
+            //         assignment: item,
+            //         system: system,
+            //         notes: system.systemNotes
+            //     }
+            // } else {
+            //     obj = {
+            //         assignment: item,
+            //         system: system,
+            //         notes: undefined
+            //     }
+            // }
+            obj = {
+                        assignment: item,
+                        system: system
+                    }
+            this.assignmentDetails.push(obj);
+
+            // if(system.systemNotes && system.systemNotes !== null && system.systemNotes.length && !this.isSystemOnList(system.sid)) {
+            //     // this.systemNotes.push({sid: system.sid, notes: system.systemNotes});
+            //     this.notes += "<div class='topMargin'><h3>System " + system.sid + "</h3>" + system.systemNotes + "</div>"  
+            //     this.systemNotes.push(system.sid)
+            // }
         });
         this.notes += this.products.selectedObject.productInfo ? "<h3>" + this.products.selectedObject.name + "</h3>" + this.products.selectedObject.productInfo : "";
      
@@ -441,8 +457,8 @@ export class Assignments {
 
     isSystemOnList(sid){
         let onList = false;
-        this.systemNotes.forEach(item => {
-            if(item === sid) onList = true;
+        this.assignmentDetails.forEach(item => {
+            if(item.system.sid === sid) onList = true;
         })
         return onList;
     }
