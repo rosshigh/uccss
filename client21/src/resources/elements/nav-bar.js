@@ -1,17 +1,18 @@
-import { inject } from 'aurelia-framework';
+import { Aurelia, inject } from 'aurelia-framework';
 import{ EventAggregator } from 'aurelia-event-aggregator';
 import { Router } from "aurelia-router";
 import { Auth } from '../data/auth';
 import {SiteInfo} from '../data/site';
 
-@inject(Auth, SiteInfo, EventAggregator, Router)
+@inject(Auth, SiteInfo, EventAggregator, Router,  Aurelia)
 export class NavBar {
 
-    constructor(auth, site, eventAggregator, router){
+    constructor(auth, site, eventAggregator, router, aurelia){
         this.auth = auth;
         this.site = site;
         this.eventAggregator = eventAggregator;
         this.router = router;
+        this.aurelia = aurelia;
 
         this.pageTitle = 'UCC Support System Home';
 
@@ -24,12 +25,11 @@ export class NavBar {
         })
     }
     
-    
     logout() {
-        this.subscriber.dispose();
+        this.router.navigate("");
         this.auth.logout();
         this.isAuthenticated = this.auth.isAuthenticated();
-        this.router.navigate("home");
+        this.aurelia.setRoot(PLATFORM.moduleName('home'));
     }
 
     toggleSideBar(){

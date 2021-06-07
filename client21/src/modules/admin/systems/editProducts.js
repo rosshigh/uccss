@@ -32,10 +32,16 @@ export class EditProducts {
         this.filters = [
             { value: '', keys: ['name'] },
             { value: '', keys: ['systemList'] },
-            { value: true, keys: ['active'] }
+            { value: 'true', custom: this.filterStatus },
         ];
 
         this.view = 'table';
+    }
+
+    
+    filterStatus(filterValue, row) {
+        if (filterValue === "") return true;
+        return (row.active == (filterValue == 'true'));
     }
 
     async activate() {

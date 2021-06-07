@@ -6,96 +6,6 @@
     "auditLog": "log\\.6425b6ef59d56488746d0ccea1d2ee6caecd0fd0-audit.json",
     "files": [
         {
-            "date": 1620830631798,
-            "name": "log\\error-2021-05-12-09.log",
-            "hash": "5232c5067dcd8cc4e5b139c9f91b04cd"
-        },
-        {
-            "date": 1620931725025,
-            "name": "log\\error-2021-05-13-13.log",
-            "hash": "8310380eb7aae45cd0e1b11d4a95edb2"
-        },
-        {
-            "date": 1620936298921,
-            "name": "log\\error-2021-05-13-15.log",
-            "hash": "23c0509724bc5d7813d17934d682f992"
-        },
-        {
-            "date": 1620997851851,
-            "name": "log\\error-2021-05-14-08.log",
-            "hash": "76efca3d938e2f0bbec563f15751f737"
-        },
-        {
-            "date": 1621000933888,
-            "name": "log\\error-2021-05-14-09.log",
-            "hash": "765227e225a50a8e4c49d4571d846a97"
-        },
-        {
-            "date": 1621016898409,
-            "name": "log\\error-2021-05-14-13.log",
-            "hash": "4cb43128827dc539d62531e4db2f984c"
-        },
-        {
-            "date": 1621101451717,
-            "name": "log\\error-2021-05-15-12.log",
-            "hash": "d493bb26a762f3074a5e3504ee99f2ac"
-        },
-        {
-            "date": 1621102764244,
-            "name": "log\\error-2021-05-15-13.log",
-            "hash": "282ef433c02793d65620cbf679b4338a"
-        },
-        {
-            "date": 1621177160822,
-            "name": "log\\error-2021-05-16-09.log",
-            "hash": "a09c2948f509f9a70e7b1c7d2b380db6"
-        },
-        {
-            "date": 1621180187926,
-            "name": "log\\error-2021-05-16-10.log",
-            "hash": "cf2beff09ad1c5db706ab6c87aa3d00c"
-        },
-        {
-            "date": 1621181187678,
-            "name": "log\\error-2021-05-16-11.log",
-            "hash": "dd0d6f24b491b4555ab6da2d6c97d3f3"
-        },
-        {
-            "date": 1621185353195,
-            "name": "log\\error-2021-05-16-12.log",
-            "hash": "6dfd591cf558a62efab01ebf7f8fa4b1"
-        },
-        {
-            "date": 1621268536991,
-            "name": "log\\error-2021-05-17-11.log",
-            "hash": "b5c980c032ed0974830a200c5307751c"
-        },
-        {
-            "date": 1621363744809,
-            "name": "log\\error-2021-05-18-13.log",
-            "hash": "189aaaa40760d2b63a42c3b5b61a405b"
-        },
-        {
-            "date": 1621517084261,
-            "name": "log\\error-2021-05-20-08.log",
-            "hash": "477c326f621a1df6a6029a502259662e"
-        },
-        {
-            "date": 1621528608809,
-            "name": "log\\error-2021-05-20-11.log",
-            "hash": "42fea57d3cf5bd7a7d866dd6539c496f"
-        },
-        {
-            "date": 1621619133128,
-            "name": "log\\error-2021-05-21-12.log",
-            "hash": "d24347e9c246303dab937418f5d30a32"
-        },
-        {
-            "date": 1621621794939,
-            "name": "log\\error-2021-05-21-13.log",
-            "hash": "b56ea1741abe06d2186fce40698a7441"
-        },
-        {
             "date": 1621885246672,
             "name": "log\\error-2021-05-24-14.log",
             "hash": "c63d8d714c762839f92a3032c126531a"
@@ -119,6 +29,26 @@
             "date": 1622034202871,
             "name": "log\\error-2021-05-26-08.log",
             "hash": "e4d44c022e8ac4026cd9b5bbce9f6c7f"
+        },
+        {
+            "date": 1622146369507,
+            "name": "log\\error-2021-05-27-15.log",
+            "hash": "30a59dcaef02f42ee642224940c93f45"
+        },
+        {
+            "date": 1623079566234,
+            "name": "log\\error-2021-06-07-10.log",
+            "hash": "e522fcf668e2478ba69e298452603dc1"
+        },
+        {
+            "date": 1623086156144,
+            "name": "log\\error-2021-06-07-12.log",
+            "hash": "6de3a7c9e5f062361c6a06ffb82c3b34"
+        },
+        {
+            "date": 1623090966711,
+            "name": "log\\error-2021-06-07-13.log",
+            "hash": "91e6058433756476dbabcd08c1cb35a0"
         }
     ]
 }

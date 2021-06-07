@@ -23,13 +23,18 @@ export class EditSystems {
             { value: '', keys: ['sid'] },
             { value: '', keys: ['description'] },
             { value: '', keys: ['server'] },
-            { value: true, keys: ['active'] }
+            { value: 'true', custom: this.filterStatus },
         ];
 
         this.productsToSave = [];
 
         this.view = 'table';
         this.showClientTable = true
+    }
+
+    filterStatus(filterValue, row) {
+        if (filterValue === "") return true;
+        return (row.active == (filterValue == 'true'));
     }
 
     async activate() {
@@ -63,8 +68,8 @@ export class EditSystems {
 
     async edit(system) {
         await this.systems.getObject(system._id);
-        this.systems.selectedSystem.systemNotes = this.systems.selectedSystem.systemNotes ? this.systems.selectedSystem.systemNotes : "";
-        this.createValidationRules();
+        // this.systems.selectedSystem.systemNotes = this.systems.selectedSystem.systemNotes ? this.systems.selectedSystem.systemNotes : "";
+        // this.createValidationRules();
         this.view = 'form';
     }
 
@@ -344,7 +349,7 @@ export class EditSystems {
     }
 
     _cleanUp() {
-        this.clearFilters();
+        // this.clearFilters();
         this.goBack();
     }
 

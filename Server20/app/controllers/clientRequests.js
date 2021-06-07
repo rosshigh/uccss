@@ -82,7 +82,7 @@ module.exports = function (app) {
     query
       .select('requestStatus requiredDate createdDate requestId productId assignments.systemId assignments.client')
       .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country' } })
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name apj' } })
       .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'courseId', model: 'Course', select: 'number name' } })
       .populate({ path: "productId", model: "Product", select: "name" })
       .populate({ path: 'assignments.systemId', model: "System", select: "sid" })
@@ -101,7 +101,7 @@ module.exports = function (app) {
     ClientRequestDetail.findById(req.params.id)
       .select('requestStatus requiredDate createdDate requestId productId assignments assignments techComments documents')
       .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile ext email institutionId file country' } })
-      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name' } })
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'institutionId', model: 'Institution', select: 'name apj' } })
       .populate({ path: 'requestId', model: 'ClientRequest', populate: { path: 'courseId', model: 'Course', select: 'number name' } })
       .populate({ path: "productId", model: "Product", select: "name systems defaultStudentIdPrefix firstAllowableId defaultFacultyIdPrefix" })
       .exec()

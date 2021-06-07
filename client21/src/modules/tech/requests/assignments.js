@@ -450,7 +450,8 @@ export class Assignments {
             //     this.systemNotes.push(system.sid)
             // }
         });
-        this.notes += this.products.selectedObject.productInfo ? "<h3>" + this.products.selectedObject.name + "</h3>" + this.products.selectedObject.productInfo : "";
+        let productNotes = this.requests.selectedDetail.requestId.institutionId.apj ? this.products.selectedObject.productInfo : this.products.selectedObject.productInfoApj 
+        this.notes += productNotes ? "<h3>" + this.products.selectedObject.name + "</h3>" + productNotes : "";
      
         this.view = 'form';
     }

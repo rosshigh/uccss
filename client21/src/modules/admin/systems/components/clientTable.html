@@ -3,7 +3,7 @@
         <div class="card-body">
             <div class='col-lg-12 bottomMargin'>
                 <table class="table  table-striped header-fixed"
-                    aurelia-table="data.bind: systems.selectedSystem.clients; display-data.bind: $displayData; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+                    aurelia-table="data.bind: systems.selectedSystem.clients; display-data.bind: $displayClientData; current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
                     <thead>
                         <tr>
                             <compose view='./clientTableToolbar.html'></compose>
@@ -17,7 +17,7 @@
                         </tr>
                     </thead>
                     <tbody style="height:500px;">
-                        <tr click.delegate="editClient(client, $index)" class="pointMe" repeat.for="client of $displayData" >
+                        <tr click.delegate="editClient(client, $index)" class="pointMe" repeat.for="client of $displayClientData" >
                             <td style="width:10rem;" >${client.client}</td>
                             <td style="width:20rem;" >${client.productId |
                                 lookupValue:products.objectsArray:"_id":"name"}</td>
