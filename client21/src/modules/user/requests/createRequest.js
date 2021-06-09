@@ -252,7 +252,7 @@ export class CreateRequest {
         this.buildRequest();
         let response = await this.requests.saveRequest();
         if (!response.error) {
-            this.utils.showNotification("The request was created");
+            this.utils.showNotification("Your product requests for " + this.CourseSelected + " have been submitted");
             this.cleanUp();
         }
     }
@@ -387,9 +387,10 @@ export class CreateRequest {
             }
         } else {
             if (this.requests.selectedRequest.requestDetails.length === this.config.REQUEST_LIMIT) {
-                this.utils.showNotification('Only ' + this.config.REQUEST_LIMIT + ' products per request are allowed.', 'warning')
+                this.utils.showNotification('Only ' + this.config.REQUEST_LIMIT + ' products per course are allowed.', 'warning')
             }
         }
+        this.stepTwoErrors = [];
     }
 
     alreadyOnList(id) {
@@ -404,6 +405,7 @@ export class CreateRequest {
             return;
         }
         this.selectedProducts.splice(index, 1);
+        this.hideCurriculum();
     }
 
     filterList() {
@@ -425,6 +427,8 @@ export class CreateRequest {
 
     showCurriculum(product) {
         this.productInfoObject = this.products.getProductInfo(product._id);
+        console.log(product._id)
+        console.log(this.productInfoObject.header)
         this.showCurriculumBoolean = true;
     }
 

@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-4">
             <label id=" productList">Select the products you need</label>
-            <h6>Hover over the name to see which curricula require this product</h6>
+            <h6>Product specific information may appear on the right when you over a product name</h6>
             <input class="form-control" value.bind="filter" input.trigger="filterList()" placeholder="Filter products" />
             <div class="overFlow card" style="height:400px;">
                 <ul class="card-body">
@@ -23,7 +23,8 @@
                 <ul class="card-body">
                     <li repeat.for="product of selectedProducts">
                         <h6 click.trigger="removeProduct($index, product)" style="margin-top:20px;" type="button"
-                            id="${product.product._id}" class="${product.assigned ? '' : 'pointMe'}">
+                            id="${product.product._id}" class="${product.assigned ? '' : 'pointMe'}" mouseover.delegate="showCurriculum(product.product, $event)"
+                            mouseout.delegate="hideCurriculum()">
                             ${product.product.name}
                             <span style="color:blue;" class="bold" show.bind="product.assigned"> (Client
                                 assigned)</span>

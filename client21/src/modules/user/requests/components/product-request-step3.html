@@ -1,6 +1,7 @@
 <template>
     <div show.bind="!existingRequest">
-        <p>For example, if you need multiple instances of the same product.</p>
+        <p>Comments are not required, but for example, if you need multiple instances of the same product, you can let us know here.</p>
+        <p>Comments are not seen until assignments are being fulfilled. If you have a question or assistance that is needed before your assignment due date, submit a help ticket. </p>
         <editor value.bind="requestComments" toolbar.bind="config.TOOLBAR" height="250"></editor>
     </div>
     <div show.bind="existingRequest">
