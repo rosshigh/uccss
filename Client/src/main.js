@@ -11,13 +11,13 @@ Promise.config({
   }
 });
 
-export function configure(aurelia) {
+export function configure(aurelia) { 
   aurelia.use
     .standardConfiguration()
-    .globalResources("aurelia-mask")
-    .plugin("aurelia-dialog")
-    .plugin("aurelia-chart")
-    .plugin('aurelia-notification', config => {
+    .globalResources(PLATFORM.moduleName("aurelia-mask"))
+    .plugin(PLATFORM.moduleName("aurelia-dialog"))
+    .plugin(PLATFORM.moduleName("aurelia-chart"))
+    .plugin(PLATFORM.moduleName('aurelia-notification'), config => {
       config.configure({
         translate: false,  // 'true' needs aurelia-i18n to be configured
         notifications: {
@@ -73,7 +73,7 @@ export function configure(aurelia) {
   }
 
   if (environment.testing) {
-    aurelia.use.plugin('aurelia-testing');
+    aurelia.use.plugin(PLATFORM.moduleName('aurelia-testing'));
   }
 
   aurelia.start().then(() => aurelia.setRoot());
