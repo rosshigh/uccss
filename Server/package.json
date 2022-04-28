@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "async": "^2.6.3",
+    "async": "^2.6.4",
     "async-polling": "^0.2.1",
     "bcrypt-nodejs": "0.0.3",
     "bcryptjs": "^2.3.0",
