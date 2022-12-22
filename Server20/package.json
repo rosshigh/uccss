@@ -23,7 +23,7 @@
     "grunt-env": "^1.0.1",
     "helmet": "^3.22.0",
     "jshint-stylish": "^2.2.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "mkdirp": "^1.0.4",
     "mongoose": "^5.9.16",
     "mongoose-sequence": "^5.2.2",
