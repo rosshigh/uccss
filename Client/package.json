@@ -46,7 +46,7 @@
   },
   "peerDependencies": {},
   "devDependencies": {
-    "aurelia-cli": "^0.22.0",
+    "aurelia-cli": "^3.0.1",
     "aurelia-testing": "^1.0.0-beta.2.0.0",
     "aurelia-tools": "^0.2.2",
     "browser-sync": "^2.13.0",
@@ -75,7 +75,7 @@
     "gulp-babel": "^6.1.2",
     "gulp-eslint": "^2.0.0",
     "jasmine-core": "^2.4.1",
-    "karma": "^0.13.22",
+    "karma": "^6.4.1",
     "karma-babel-preprocessor": "^6.0.1",
     "karma-chrome-launcher": "^1.0.1",
     "karma-jasmine": "^1.0.2"
