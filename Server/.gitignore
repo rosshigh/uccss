@@ -1,5 +1,6 @@
 node_modules/
-public/
+public/uploadedFiles/
+public/img/
 log-auth/
 log/
 forever-log/
