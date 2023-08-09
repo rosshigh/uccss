@@ -32,54 +32,54 @@ export class Site{
             name: 'editNews',
             title: 'Site Information'
         },
-        {
-            route: 'downloads',
-            moduleId: './editDownloads',
-            settings: { auth: false, roles: [] },
-            nav: true,
-            name: 'downloads',
-            title: 'Downloads'
-        },
-        {
-            route: 'messages',
-            moduleId: './editMessages',
-            settings: { auth: false, roles: [] },
-            nav: true,
-            name: 'messages',
-            title: 'Messages'
-        },
-        {
-            route: 'config',
-            moduleId: './editConfig',
-            settings: { auth: false, roles: [] },
-            nav: true,
-            name: 'config',
-            title: 'Config'
-        },
-        {
-            route: 'curriculum',
-            moduleId: './editCurriculum',
-            settings: { auth: false, roles: [] },
-            nav: true,
-            name: 'curriculum',
-            title: 'Curriculum'
-        },
-        {
-            route: 'helptickets',
-            moduleId: './editHelpTickets',
-            settings: { auth: false, roles: [] },
-            nav: true,
-            name: 'helptickets',
-            title: 'Help Tickets'
-        },
-        {
-            route: 'admin',
-            moduleId: './admin',
-            settings: { auth: false, roles: [] },
-            nav: true,
-            name: 'admin',
-            title: 'Server Admin'
-        }
+        // {
+        //     route: 'downloads',
+        //     moduleId: './editDownloads',
+        //     settings: { auth: false, roles: [] },
+        //     nav: true,
+        //     name: 'downloads',
+        //     title: 'Downloads'
+        // },
+        // {
+        //     route: 'messages',
+        //     moduleId: './editMessages',
+        //     settings: { auth: false, roles: [] },
+        //     nav: true,
+        //     name: 'messages',
+        //     title: 'Messages'
+        // },
+        // {
+        //     route: 'config',
+        //     moduleId: './editConfig',
+        //     settings: { auth: false, roles: [] },
+        //     nav: true,
+        //     name: 'config',
+        //     title: 'Config'
+        // },
+        // {
+        //     route: 'curriculum',
+        //     moduleId: './editCurriculum',
+        //     settings: { auth: false, roles: [] },
+        //     nav: true,
+        //     name: 'curriculum',
+        //     title: 'Curriculum'
+        // },
+        // {
+        //     route: 'helptickets',
+        //     moduleId: './editHelpTickets',
+        //     settings: { auth: false, roles: [] },
+        //     nav: true,
+        //     name: 'helptickets',
+        //     title: 'Help Tickets'
+        // },
+        // {
+        //     route: 'admin',
+        //     moduleId: './admin',
+        //     settings: { auth: false, roles: [] },
+        //     nav: true,
+        //     name: 'admin',
+        //     title: 'Server Admin'
+        // }
         ]);
 
         this.router = router;

@@ -28,7 +28,8 @@ var InstitutionSchema = new Schema({
     packageId: { type: Schema.Types.ObjectId },
     packageStartDate: { type: Date },
     packageInvoiceDate: { type: Date },
-    packagePayDate: { type: Date }
+    packagePayDate: { type: Date },
+    mac: {type: String }
 });
 
 InstitutionSchema.pre('update', function() {

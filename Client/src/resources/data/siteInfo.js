@@ -16,14 +16,14 @@ export class SiteInfo {
         this.config = config;
     }
 
-    async getInfoArray(refresh, options){
-        if (!this.siteArray || refresh) {
+    async getObjectsArray(refresh, options){
+        if (!this.objectsArray || refresh) {
             var url = this.SITE_SERVICES;
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
                 if (!serverResponse.error) {
-                    this.siteArray = serverResponse;
+                    this.objectsArray = serverResponse;
                 }
             } catch (error) {
                 console.log(error);
@@ -31,12 +31,12 @@ export class SiteInfo {
         }
     }
 
-    selectSiteItem(index){
+    selectObject(index){
         if (!index || index === -1) {
             this.selectedItem = this.emptyItem();
         } else {
             try {
-            this.selectedItem = this.utils.copyObject(this.siteArray[index]);
+            this.selectedItem = this.utils.copyObject(this.objectsArray[index]);
             this.editIndex = index;
             } catch (error) {
                 console.log(error);
@@ -45,7 +45,7 @@ export class SiteInfo {
         }
     }
 
-    setSiteItem(item){
+    setObject(item){
         this.selectedItem = this.utils.copyObject(item);
     }
 
@@ -64,24 +64,18 @@ export class SiteInfo {
         return newItem;
     }
 
-    async saveInfoItem(){
+    async saveObject(){
          if(!this.selectedItem){
             return;
         }
 
         if(!this.selectedItem._id){
             let serverResponse = await this.data.saveObject(this.selectedItem, this.SITE_SERVICES, "post");
-            if(!serverResponse.error){
-                this.selectedItem = this.utils.copyObject(serverResponse);
-                this.siteArray.push(serverResponse);
-            }
+           
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedItem, this.SITE_SERVICES, "put");
-            if(!serverResponse.error){
-                this.selectedItem = this.utils.copyObject(serverResponse);
-                this.siteArray[this.editIndex] = this.utils.copyObject(this.selectedItem, this.siteArray[this.editIndex]);
-            }
+            
             return serverResponse;
         }
     }
@@ -89,14 +83,14 @@ export class SiteInfo {
     async uploadFile(files){
        let response = await this.data.uploadFiles(files, this.SITE_SERVICES + '/upload/' + this.selectedItem._id);
        if(!response.error){
-            this.siteArray[this.editIndex] = this.utils.copyObject(response, this.siteArray[this.editIndex]);
+            this.objectsArray[this.editIndex] = this.utils.copyObject(response, this.objectsArray[this.editIndex]);
        }
     }
 
-    async deleteItem(){
+    async deleteObject(){
          let serverResponse = await this.data.deleteObject(this.SITE_SERVICES + '/' + this.selectedItem._id);
             if (!serverResponse.error) {
-                this.siteArray.splice(this.editIndex, 1);
+                this.objectsArray.splice(this.editIndex, 1);
                 this.editIndex = - 1;
             }
             return serverResponse;
@@ -119,8 +113,8 @@ export class SiteInfo {
     }
 
     showCarousel(){
-        for(let i = 0; i < this.siteArray.length; i++){
-            if(this.siteArray[i].itemType === 'CARO') return true
+        for(let i = 0; i < this.objectsArray.length; i++){
+            if(this.objectsArray[i].itemType === 'CARO') return true
         }
         return false;
     }

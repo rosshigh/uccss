@@ -41,29 +41,30 @@ export class EditNews {
   }
 
   async activate() {
-    await this.siteinfo.getInfoArray(true, '?order=createdDate');
+    await this.siteinfo.getObjectsArray(true, '?order=createdDate');
     await this.config.getConfig();
-    this.dataTable.updateArray(this.siteinfo.siteArray);
+    this.dataTable.updateArray(this.siteinfo.objectsArray);
     this.filterOutExpired();
   }
 
   async refresh() {
     this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-    await this.siteinfo.getInfoArray(true);
-    this.dataTable.updateArray(this.siteinfo.siteArray);
+    await this.siteinfo.getObjectsArray(true);
+    this.dataTable.updateArray(this.siteinfo.objectsArray);
     this.spinnerHTML = "";
   }
 
   async new() {
     this.editIndex = -1;
-    this.siteinfo.selectSiteItem(this.editIndex);
+    this.siteinfo.selectObject(this.editIndex);
     $("#editTitle").focus();
     this.newsItemSelected = true;
   }
 
   async edit(index, el, item) {
-    this.siteinfo.setSiteItem(item)
-    this.originalSiteInfo = this.utils.copyObject(this.siteinfo.selectedItem);
+    // this.siteinfo.setSiteItem(item)
+    // this.originalSiteInfo = this.utils.copyObject(this.siteinfo.selectedObject);
+    await this.siteinfo.getObject(id);
 
     //Editing a product
     $("#editTitle").focus();
@@ -80,15 +81,16 @@ export class EditNews {
     if (this.editIndex == -1) {
       this.new();
     } else {
-      this.siteinfo.selectSiteItem(this.editIndex);
+      this.siteinfo.selectObject(this.editIndex);
     }
   }
 
   async save() {
     if (this.validation.validate(1)) {
-      let serverResponse = await this.siteinfo.saveInfoItem();
+      let serverResponse = await this.siteinfo.saveObject();
       if (!serverResponse.error) {
-        this.dataTable.updateArray(this.siteinfo.siteArray);
+        this.refresh();
+        // this.dataTable.updateArray(this.siteinfo.objectsArray);
         this.utils.showNotification("The item was saved");
         if (this.filesToUpload && this.filesToUpload.length > 0) {
           this.siteinfo.uploadFile(this.filesToUpload);
@@ -103,8 +105,8 @@ export class EditNews {
   changeFiles() {
     this.filesToUpload = new Array();
     this.filesToUpload.push(this.files[0]);
-    this.siteinfo.selectedItem.url = this.config.DOWNLOAD_URL + '/site/' + this.filesToUpload[0].name;
-    this.siteinfo.selectedItem.file.fileName = this.filesToUpload[0].name;
+    this.siteinfo.selectedObject.url = this.config.DOWNLOAD_URL + '/site/' + this.filesToUpload[0].name;
+    this.siteinfo.selectedObject.file.fileName = this.filesToUpload[0].name;
   }
 
   removeFile(index) {
@@ -124,9 +126,10 @@ export class EditNews {
   }
 
   async deleteItem() {
-    let serverResponse = await this.siteinfo.deleteItem();
+    let serverResponse = await this.siteinfo.deleteObject();
     if (!serverResponse.error) {
-      this.dataTable.updateArray(this.siteinfo.siteArray);
+      this.refresh();
+      // this.dataTable.updateArray(this.siteinfo.objectsArray);
       this.utils.showNotification("The Item was deleted");
     }
     this.newsItemSelected = false;
@@ -168,12 +171,12 @@ export class EditNews {
     this.createdDateFilterValue = "";
     this.titleFilterValue = "";
     this.urlFilterValue = "";
-    this.dataTable.updateArray(this.siteinfo.siteArray);
+    this.dataTable.updateArray(this.siteinfo.objectsArray);
     this.filterOutExpired();
   }
 
   _setupValidation() {
-    this.validation.addRule(1, "editTitle", [{ "rule": "required", "message": "Title is required", "value": "siteinfo.selectedItem.title" }]);
+    this.validation.addRule(1, "editTitle", [{ "rule": "required", "message": "Title is required", "value": "siteinfo.selectedObject.title" }]);
   }
 
   //TODO: Fix This
@@ -182,7 +185,7 @@ export class EditNews {
     if (this.isChecked) {
       this.dataTable.filterList(new Date(), { type: 'date', filter: "expiredFilter", collectionProperty: 'expiredDate', compare: 'after' });
     } else {
-      this.dataTable.updateArray(this.siteinfo.siteArray);
+      this.dataTable.updateArray(this.siteinfo.objectsArray);
     }
   }
 

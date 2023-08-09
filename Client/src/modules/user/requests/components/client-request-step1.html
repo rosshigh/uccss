@@ -72,7 +72,7 @@
             <div show.bind="!existingRequest">
             <label class="col-sm-3 form-control-label ">Start Date</label>
             <div show.bind="!existingRequest" class="col-sm-8">
-                <flat-picker  controlid="startDate" config.bind="configDate" change.trigger="changeBeginDate($event)"  
+                <flat-picker  controlid="startDate" config.bind="configDate" change.delegate="changeBeginDate($event)"  
                     value.bind="requests.selectedRequest.startDate" startdate.bind="minStartDate" enddate.bind="maxStartDate"></flat-picker>
               <span id='startDateError'></span>
             </div>
